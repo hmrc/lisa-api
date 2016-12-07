@@ -1,0 +1,12 @@
+This call attempts to crate a new LISAInvestor.  As LISAInvestor is
+normalised across LISAManagers the call synchronously verifies a match of the
+LISAInvestor with HMRC systems & fails on no match.
+The match is done on NINO, firstname, lastname and DoB.
+If the LISAInvestor matches HMRC records and does not previously exist, then it
+is created as a HTTP status code of 201 is returned.  An investorID is allocated
+and the response location header is populated with a link to the newly created
+resource.This should be used when a LISAManager has a new customer to tell HMRC
+about. It uses NINO as the ID to support normalisation across LISA providers.
+If the resource already exists then the POST will return a conflict error response.
+Then a GET should be performed using the NINO, firstname, lastname and DoB to
+discover the investorID.

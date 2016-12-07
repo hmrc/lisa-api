@@ -1,0 +1,643 @@
+#%RAML 1.0
+---
+
+title: Lifetime ISA API
+version: 1.0
+protocols: [ HTTPS ]
+baseUri: http://api.service.hmrc.gov.uk/lifetime-isa
+
+documentation:
+ - title: Overview
+   content: This document is an HMRC Digital specification of a RESTful Application Program Interface.
+    The API is being produced to support the introduction of the Lifetime Independent Savings Account
+    or LISA.  It is intended that the API must be used by financial organisations who will offer
+    Lifetime ISA products to UK citizens.  It has been a decision of HM Treasury that the LISA product
+    will be supported by HMRC as a Digital only offering.  Hence this API specification defines the
+    only method offered by HMRC to prospective LISA providers.
+    HMRC digital intends to engage in API user research with a group of interested financial organisations
+    to discover their user needs.  HMRC digital intends to refine the API to meet;
+    a) the user needs,
+    b) any emerging HMRC technical constraints and
+    c) any change in policy or legislation regarding the LISA concept.
+    This release of the document is marked "Alpha" as it has been produced early in the delivery cycle
+    with the express intent to support the API user research.  It is very likely to change.  Therefore
+    development against an Alpha API specification is best thought of as a learning exercise.   Any
+    effort estimation or costing against the content of this specification must be considered as a
+    rough guide only.
+    This is a technical specification document.  Therefore, the target audience is technical staff
+    operating on behalf of a financial organisation who is considering offering a LISA product.  The
+    reader is assumed to have familiarity with RESTful API concepts and JSON and JSON Schema.
+ - title: Resource Model
+   content:
+     The resource model show below depicts the resources that are exposed via the API.
+     Three of the resources are read-only via the API; LISAManager, HMRCPayment and HMRCTransaction.
+     LISAManager is effectively created as part of the LISA registration process – which is not done
+     over API methods.  HMRCPayment and HMRCTransaction resources are created by HMRC systems and
+     represent the money transferred between HMRC and the LISA provider in either direction. Three
+     resources are writeable via the API; LISAInvestor, LISAAccount and LISATransaction.  These three
+     resources represent data sent from the LISA provider to HMRC.  LISAInvestor is a resource that
+     is shared between LISA Providers.  LISAAccount represents the creation a LISA account by the LISA
+     provider on behalf of an investor. LISATransaction represents some of the transactions on the LISA
+     account where HMRC has a business reason to need the information.
+     See the resource model image at [link]
+     (https://github.com/ridouta/lifetime-isa/blob/master/documentation/LISA%20data%20model%20v2_4.png)
+ - title: Versioning
+   content: A specific version of the API can be requested by providing an Accept header with a media
+    type of application/vnd.hmrc.v1.0+json
+ - title: Errors
+   content: 2xx range indicates success, 4xx range indicates failure
+
+uses:
+  sec: resourceTypes/securitySchemes.raml
+
+mediaType: [ application/json, application/hal+json ]
+
+traits:
+  version-1:
+    headers:
+      Accept:
+        description: Define the Accept header value as a trait
+        type: string
+        example: application/vnd.hmrc.1.0+json
+      Authorization:
+        description: An OAUTH2 access token generated using the HMRC user restricted endpoint capability
+          See https://developer.service.hmrc.gov.uk/api-documentation/docs/authorisation#user-restricted
+          for more details.  It is expected that Government Gateway organisation credentials will be required
+          and an associated Government Gateway service enrolment (also known as a subscription) will
+          also be required when the LISA managing organisation registers with HMRC.  Existing organisation
+          Government Gateway credentials may be use-used.
+        type: string
+        example: Bearer 0b79bab50daca910b000d4f1a2b675d604257e42
+
+types:
+  NINOtype:
+#    type: !include schemas/LISAtypes.schema.json#definitions/NINOType
+    pattern: "^[A-Z]{2}\\d{6}[A-D]$"
+  IDtype:
+#    type: !include schemas/LISAtypes.schema.json#definitions/IDType
+    pattern: "^\\d{10}$"
+#  LISAManager:
+#    type: !include schemas/LISAManager.get.schema.json
+  LISAManagerReferenceNumberType:
+#    type: !include schemas/LISAtypes.schema.json#definitions/LISAManagerReferenceNumberType
+    pattern: "^Z\\d{6}$"
+  ISO8601-Date:
+#    type: !include schemas/LISAtypes.schema.json#ISO8601-Date
+      pattern: "^\\d{4}-\\d{2}-\\d{2}$"
+  errorCodeType:
+    type: !include schemas/ErrorCodes.schema.json
+#    type: !include schemas/ErrorCodes.schema.json#definitions/error-codeType
+
+  paymentDirectionType:
+#    type: !include schemas/HMRCPayment.get.json#definitions/paymentDirectionType
+    schema:
+      {
+        "type" : "string",
+        "enum": ["credit", "debit"]
+      }
+
+  paymentStatusType:
+    {
+      "type" : "string",
+      "enum": ["pending", "submitted", "completed"]
+    }
+#    type: !include schemas/HMRCPayment.get.json#definitions/paymentStatusType
+
+  paymentMethodType:
+    {
+      "type" : "string",
+      "enum": ["directDebit", "BACS"]
+    }
+#    type: !include schemas/HMRCPayment.get.json#definitions/paymentMethodType
+
+  hmrcTransactionType:
+    {
+      "type" : "string",
+      "enum": ["bonus", "charge"]
+    }
+
+  lisaTransactionType:
+    {
+      "type" : "string",
+      "enum": ["deposit", "withdrawal", "HTBtransfer", "LISAtransfer",
+            "bonusClaim", "chargeMade"]
+    }
+#    type: !include schemas/LISATransaction.get.schema.json#definitions/lisaTransactionTypeType
+
+/manager:
+  description: This resource models the existence of a registered LISA Manager organisation.
+    It is created by HMRC as a result of a LISA registration.  The registration process is not
+    part of the API specification as it is a forms based process with manual verification by HMRC staff.
+
+  /{LISAManagerReferenceNumber}:
+    uriParameters:
+      LISAManagerReferenceNumber:
+        type : LISAManagerReferenceNumberType
+        description: The number issued to the LISA provider upon successful LISA registration with HMRC
+        example: "Z123456"
+    get:
+      description: The HTTP GET call fetches a resource that is the primary entry point for the LISA API.
+        It provides a set of links that allow the API developer to discover the URI endpoints
+        for access to other resources defined in this specification.
+      displayName: GET a LISAManager resource by LISAManagerReferenceNumber
+      is: [version-1]
+      responses:
+        200:
+          body:
+            application/json:
+              type: !include schemas/LISAManager.get.schema.json
+              example: !include examples/LISAManager.get.json
+        403:
+          description: The LISAManager resource requested is not the calling Lisa Manager
+            therefore access has been declined
+        404:
+          description: The LISAManager resource specified by the supplied
+            LISAManagerReferenceNumber has not been found.
+
+
+    /accounts:
+      description: !include documentation/LISAAccount
+      post:
+        is: [version-1]
+        description: Create a new account
+        displayName: POST a LISAAccount to create the resource
+        body:
+          application/json:
+            type: !include schemas/LISAAccount.put.schema.json
+            example: !include examples/LISAAccount.put.json
+        responses:
+          201:
+            headers:
+              Location:
+                description: URI to the created LISAAccount resource
+                type: string
+          403:
+            body:
+              application/json:
+                type: errorCodeType
+                examples:
+                  notOpenStatus:
+                    {
+                      "error-code" : "not-open-status",
+                      "error-desc" : "invalid status: must create with open status"
+                    }
+                  InvestorNotFound:
+                    {
+                      "error-code" : "investor-not-found",
+                      "error-desc" : "invalid status: must create with open status"
+                    }
+                  wrongLISAManager:
+                    {
+                      "error-code" : "wrong-lisa-manager",
+                      "error-desc" : "the LISAManagerReferenceNumber in URI does match match the calling LISAManager"
+                    }
+          409:
+            description: The LISAAccount already exists
+      /{accountID}:
+        uriParameters:
+          accountID:
+            type: IDtype
+            description: The ID for the account.  This will be generated by the LISAManager and will only
+              be unique when used in combination with LISAManagerReferenceNumber
+            example: "1234567890"
+        get:
+          is: [version-1]
+          description: Get a single LISAAccount resource using the unique
+            combination of LISAManagerReferenceNumber and accountID.  Returns a
+            JSON object in the response body.  An example is shown below, as is
+            a JSON schema describing the JSON object.
+          displayName: GET a single LISAAccount resource using LISAManagerReferenceNumber and accountID.
+
+          responses:
+            200:
+              body:
+                application/json:
+                  example: !include examples/LISAAccount.get.json
+                  type: !include schemas/LISAAccount.get.schema.json
+            403:
+              body:
+                application/json:
+                  type: errorCodeType
+                  examples:
+                    wrongLISAManager:
+                      {
+                        "error-code" : "wrong-lisa-manager",
+                        "error-desc" : "the LISAManagerReferenceNumber in URI does match match the calling LISAManager"
+                      }
+            404:
+              description: The LISAAccount identified by the accountID does not exist
+        put:
+          is: [version-1]
+          description: To update an existing LISAAccount to change status and set closeDate.
+          displayName: PUT to update an existing LISAAccount to change status and set closeDate
+          body:
+            application/json:
+              type: !include schemas/LISAAccount.put.schema.json
+              example: !include examples/LISAAccount.put.json
+          responses:
+            200:
+              description: The account is updated successfully.
+            403:
+              body:
+                application/json:
+                  type: errorCodeType
+                  examples:
+                    wrongLISAManager:
+                      {
+                        "error-code" : "wrong-lisa-manager",
+                        "error-desc" : "the LISAManagerReferenceNumber in URI does match match the calling LISAManager"
+                      }
+                    cantChangeAccountID:
+                      {
+                        "error-code" : "cant-change-accountID",
+                        "error-desc" : "You cannot change the accountID for an existing account"
+                      }
+                    cantChangeInvestor:
+                      {
+                        "error-code" : "cant-change-investor",
+                        "error-desc" : "You cannot change the investorID for an existing account"
+                      }
+                    invalidStatusChange:
+                      {
+                        "error-code" : "invalid-status-change",
+                        "error-desc" : "You cannot change the status to the requested value"
+                      }
+            404:
+              description: The LISAAccount identified by the accountID does not exist
+
+
+        /transactions:
+          description: !include documentation/LISATransaction
+          get:
+            is: [version-1]
+            displayName: GET an array of LISATransaction using query parameters
+              on date range and optionally transactionType
+            description: Returns a collection of LISATransaction resources for
+              the specified account as a JSON array.  The array will be empty
+              if none are found.  The request and response must support pagination.
+            queryParameters:
+              startDate:
+                description:  first date from which to search for HMRCTransactions
+                type: ISO8601-Date
+                required: true
+                example: "2017-10-06"
+              endDate:
+                description:  last date from which to search for HMRCTransactions
+                type: ISO8601-Date
+                required: true
+                example: "2017-11-05"
+              transactionType:
+                description:  search for HMRCTransactions including transactions
+                  with the specified transactiomType
+                type: lisaTransactionType
+                required: false
+                example: "LISAtransfer"
+            responses:
+              200:
+                body:
+                  application/json:
+                    type: !include schemas/LISATransaction.get.schema.array.json
+                    example: !include examples/LISATransaction.get.array.json
+
+              403:
+                description: Access Denied.
+                body:
+                  application/json:
+                    type: errorCodeType
+                    example:
+                      {
+                        "error-code" : "wrong-lisa-manager",
+                        "error-desc" : "The LISAAccount specified by the
+                          accountID or the LISAManagerReferenceNumber in the URL does
+                          not belong to the calling LISAManager"
+                      }
+              404:
+                description: the LISAManagerReferenceNumber or accountID fail to
+                  locate to their respective resources.
+                  Namely LISAManager and LISAAccount.
+
+
+          post:
+            is: [version-1]
+            description: Create a LISATransaction resource.  This endpoint
+              does not support updating a LISATransaction. To correct a LISA
+              transaction, it is necessary to create a superseding transaction.
+            displayName: POST to create a LISATransaction resource.
+            body:
+              application/json:
+                type: !include schemas/LISATransaction.post.schema.json
+                example: !include examples/LISATransaction.post.json
+            responses:
+              201:
+                description: The LISATransaction resource has been created.
+                headers:
+                  Location:
+                    description: relative URI to the created LISATransaction resource
+                    type: string
+                    example: /manager/Z876543210/accounts/1234567890/transactions/3333333333
+              403:
+                description: matches already existing resource.
+                  Response contains a location header with link to the existing resource.
+                body:
+                  application/json:
+                    type: errorCodeType
+                    examples:
+                      notOpenStatus:
+                        {
+                          "error-code" : "wrong-lisa-manager",
+                          "error-desc" : "The LISAManager or the LISAAccount do
+                            not belong to the calling LISAManager"
+                        }
+                      complianceChargeWrong:
+                        {
+                          "error-code" : "compliance-charge-wrong",
+                          "error-desc" : "Charge Made disagrees with HMRC records"
+                        }
+                      complianceBonusWrong:
+                        {
+                          "error-code" : "compliance-bonus-wrong",
+                          "error-desc" : "Bonus claim disagrees with HMRC records"
+                        }
+                      complianceTooManySubcriptions:
+                        {
+                          "error-code" : "compliance-too-many-subscriptions-in-FP",
+                          "error-desc" : "The Investor is trying to start a second
+                            LISA subscription in the financial period"
+                        }
+                      complianceTooMuchLISAFunds:
+                        {
+                          "error-code" : "compliance-too-much-LISA-funds-credited",
+                          "error-desc" : "The Investor is trying to credit more
+                            funds than the current limit LISA subscription in the
+                            financial period"
+                        }
+                      complianceTooMuchISAFunds:
+                        {
+                          "error-code" : "compliance-too-much-ISA-funds-credited",
+                          "error-desc" : "The Investor is trying to credit more
+                            funds than the current limit ISA subscription in the
+                            financial period"
+                        }
+
+              409:
+                description: Conflict. The LISATransaction resource already exists.
+                  Updating of LISATransaction resources is not supported.
+
+
+          /{lisaTransactionID}:
+            uriParameters:
+              lisaTransactionID:
+                type: IDtype
+                description: The ID for the account.  This will be generated by the LISAManager and will only
+                  be unique when
+                example: "1234567890"
+            get:
+              is: [version-1]
+              displayName: GET a LISATransaction resource by its lisaTransactionID
+              description: Request a single LISATransaction resource as a JSON object
+                identified by its lisaTransactionID
+              responses:
+                200:
+                  body:
+                    application/json:
+                      type: !include schemas/LISATransaction.get.schema.json
+                      example: !include examples/LISATransaction.get.json
+                403:
+                  description: Access Denied.  The LISAAccount specified by the
+                    accountID in the URL or the LISAManagerReferenceNumber is do
+                    not belong to the calling LISAManager
+                404:
+                  description: Not found
+
+
+    /payments:
+      get:
+        is: [version-1]
+        displayName: GET HMRC Payment using query parameters on date range and optionally direction, method and status
+        description: !include documentation/HMRCPayment
+        queryParameters:
+          startDate:
+            description:  first date from which to search for HMRCPayments
+            type: ISO8601-Date
+            required: true
+            example: "2017-10-06"
+          endDate:
+            description:  last date from which to search for HMRCPayments
+            type: ISO8601-Date
+            required: true
+            example: "2017-11-05"
+          direction:
+            description:  search for HMRCPayments including payments with the specified payment Direction
+            type: paymentDirectionType
+            required: false
+            example: "credit"
+          status:
+            description:  search for HMRCPayments including payments with the specified payment status
+            type: paymentStatusType
+            required: false
+            example: "pending"
+          method:
+            description:  search for HMRCPayments including payments with the specified payment method
+            type: paymentMethodType
+            required: false
+            example: "BACS"
+        responses:
+          200:
+            description: OK - Returns a JSON array of HMRCPayment resources in the response body.
+            body:
+              application/json:
+                type: !include schemas/HMRCPayment.get.array.json
+                example: !include examples/HMRCPayment.get.array.json
+          403:
+            description: access denied – If attempting to access a payment not belonging to the calling LISAManager
+
+
+      /{paymentReference}:
+        uriParameters:
+          paymentReference:
+            type: IDtype
+            description: identify the exact payment by a unique payment reference
+            example: "1111111111"
+        get:
+          is: [version-1]
+          displayName: GET an HMRCPayment resource using paymentReference as a unique key
+          description: Fetch a JSON HMRCPayment resource selected by paymentReference
+          responses:
+            200:
+              description: OK - Returns a JSON array of HMRCPayment resources in the response body.
+              body:
+                application/json:
+                  type: !include schemas/HMRCPayment.get.json
+                  example: !include examples/HMRCPayment.get.json
+            403:
+              description: access denied – If attempting to access a payment not
+                belonging to the calling LISAManager
+            404:
+              description: HMRC Payment not found for specified paymentReference
+
+        /hmrc-transactions:
+          description: !include documentation/HMRCTransaction
+          get:
+            is: [version-1]
+            displayName: Get an array of HMRCTransaction using optional
+              query parameters on date range
+            description: Fetch a JSON array of HMRCTransaction resources either
+              fetching all HMRCTRansactions for the paymentReference or selected by
+              a date range search from the startDate to the endDate supplied as
+              HTML query parameters.
+            queryParameters:
+              startDate:
+                description:  first date from which to search for HMRCTransaction
+                type: ISO8601-Date
+                #        required: true
+                example: "2017-10-06"
+              endDate:
+                description:  last date from which to search for HMRCTransaction
+                type: ISO8601-Date
+                #required: true
+                example: "2017-11-05"
+            responses:
+              200:
+                description: OK - Returns a JSON array of HMRCTransaction resources in the response body.
+                body:
+                  application/json:
+                    type: !include schemas/HMRCTransaction.get.array.json
+                    example: !include examples/HMRCTransaction.get.array.json
+
+              403:
+                description: access denied – If attempting to access a payment not belonging to the calling LISAManager
+              404:
+                description: Returned if the LISAManager cannot be found or the HMRCPayment cannot be founnd.
+                  Finding zero HMRCPayment objects will result in a 200 response code and an empty JSON array response body
+
+          /{hmrcTransactionID}:
+            uriParameters:
+              hmrcTransactionID:
+                type: IDtype
+                description: identify the exact HMRCTransaction by a unique HMRCTransactionID
+                example: "1111111111"
+            get:
+              description: Request an individual HMRCTransaction resource for a specified HMRCTransactionID
+              displayName: GET an HMRCTransaction resource by HMRCTransactionID
+              is: [version-1]
+              responses:
+                200:
+                  description: A single HMRCTransaction resource is returned in the response body.
+                  body:
+                    application/json:
+                      type: !include schemas/HMRCTransaction.get.json
+                      example: !include examples/HMRCTransaction.get.json
+
+                403:
+                  description: access denied – if the HMRCTransaction is not for the calling LISAManager
+                  body:
+                    application/json:
+                      type: errorCodeType
+                      examples:
+                        notOpenStatus:
+                          {
+                            "error-code" : "wrong-lisa-manager",
+                            "error-desc" : "The Investor resource already exists.
+                              The HMRCTransaction does not belong to the calling LISAManager."
+                          }
+
+                404:
+                  description: not found – if the requested LISATransaction resource does not exist
+
+
+/investors:
+  get:
+    is: [version-1]
+    displayName: GET a LISA investor using full matching
+    description: !include documentation/LISAInvestor
+    queryParameters:
+      NINO:
+        description:  NINO for the Investor
+        type: NINOtype
+        required: true
+        example: "AB123456D"
+      firstname:
+        description:  first name of the Investor
+        type: string
+        required: true
+        example: "John"
+      lastname:
+        description:  last name of the Investor
+        type: string
+        required: true
+        example: "Doe"
+      DoB:
+        description: Date of birth of the Investor
+        type: ISO8601-Date
+        required: true
+        example: "2017-10-23"
+    responses:
+      200:
+        body:
+          application/json:
+            type: !include schemas/LISAManager.get.schema.json
+      404:
+        description: An investor has not been found that matches the 4 search parameters
+
+  post:
+    is: [version-1]
+    displayName: POST to create new LISA Investor that has not already been created
+    description: !include documentation/LISAInvestor.post
+    body:
+      application/json:
+        example: !include examples/LISAInvestor.post.json
+        type: !include schemas/LISAInvestor.post.schema.json
+    responses:
+      201:
+        description: The LISA investor resource has been created.
+        headers:
+          Location:
+            description: relative URI to the created LISAAccount resource
+            type: string
+            example: /investors/0987654321
+      403:
+        description: Access Denied.  Used when the match verification fails.
+      409:
+        description: matches already existing resource.
+          Response contains a location header with link to the existing resource.
+        body:
+          application/json:
+            type: errorCodeType
+            examples:
+              notOpenStatus:
+                {
+                  "error-code" : "investor-already-created",
+                  "error-desc" : "The Investor resource already exists.
+                    Use the full matching form of GET to access the resource and discover the investorID."
+                }
+
+  /{investorID}:
+    uriParameters:
+      investorID: IDtype
+    get:
+      is: [version-1]
+      description: This is the primary access mechanism for an already known
+        investor with an existing LISAInvestor resource in existence.
+      displayName: GET an existing LISAInvestor resource associated with calling LISAManager
+      body:
+      responses:
+        200:
+          body:
+            application/json:
+              type: !include schemas/LISAInvestor.get.schema.json
+              example: !include examples/LISAInvestor.get.json
+        403:
+          description: if LISAInvestor exists but does not have accounts
+            belonging to the accessing LISAManager.  This error message supplied
+            in the body of the response.
+          body:
+            application/json:
+              type: errorCodeType
+              examples:
+                noAccountWithManager:
+                  {
+                    "error-code" : "no-acccount-with-manager",
+                    "error-desc" : "the investor does not have an account with the calling LISAManager"
+                  }
+        404:
+          description: The Investor with the specified investorID has not been found

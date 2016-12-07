@@ -1,0 +1,50 @@
+[
+	{
+		"LISAManagerReferenceNumber" : "Z9876543210",
+		"paymentReference" : "2222222222",
+
+		"method" : "directDebit",
+		"direction" : "credit",
+		"paymentDate" : "2017-12-19",
+		"amount" : 12345.67,
+
+		"status" : "pending",
+
+		"financialPeriod" :
+		{
+	 		"startDate" : "2017-04-06",
+			"endDate" : "2018-04-15"
+		},
+
+		"_links" :
+		{
+	    "self" : {"href" : "/lisa/manager/ Z9876543210/payments/2222222222"},
+	    "manager" : {"href" : "/lisa/manager/Z9876543210"},
+	    "hmrc-transactions" : {"href" : "/lisa/manager/Z9876543210/payments/1234565432/hmrc-transactions"}
+		}
+	},
+	{
+		"LISAManagerReferenceNumber" : "Z9876543211",
+		"paymentReference" : "2222222222",
+
+		"method" : "directDebit",
+		"direction" : "debit",
+		"paymentDate" : "2017-12-19",
+		"amount" : 12345.67,
+
+		"status" : "pending",
+
+		"financialPeriod" :
+		{
+	 		"startDate" : "2017-04-06",
+			"endDate" : "2018-04-15"
+		},
+
+		"_links" :
+		{
+	    "self" : {"href" : "/lisa/manager/ Z9876543210/payments/2222222222"},
+	    "manager" : {"href" : "/lisa/manager/Z9876543210"},
+	    "hmrc-transactions" : {"href" : "/lisa/manager/Z9876543210/payments/1234565432/hmrc-transactions"}
+		}
+	}
+]
