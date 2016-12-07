@@ -1,0 +1,16 @@
+{
+  "LISAManagerReferenceNumber" : "Z1234567890",
+  "LISAProviderName" : "Example Building Society",
+  "_links" :
+  {
+    "self" : {"href" : "/lisa/manager/{LISAManagerReferenceNumber}"},
+    "account" : {"href" : "/lisa/manager/Z9876543210/accounts/{accountID}"},
+    "accounts" : {"href" : "/lisa/manager/Z9876543210/accounts"},
+    "investor" : {"href" : "/lisa/investors/{investorID}"},
+    "investorSearch" : {"href" : "/lisa/investors?NINO={NINO}&firstname={firstname}&lastname={lastname}&DoB={DoB}"},
+    "investors" : {"href" : "/lisa/investors"},
+    "payment" : {"href" : "/lisa/payments/{paymentReference}"},
+    "payments" : {"href" : "/lisa/payments"},
+		"paymentsByDateRange" : {"href" : "/lisa/payments&startDate={startDate}&endDate={endDate}"}
+  }
+}

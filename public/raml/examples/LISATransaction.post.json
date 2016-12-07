@@ -1,0 +1,41 @@
+{
+	"lisaTransactionID" : "3333333333",
+	"accountID" : "1234567890",
+	"LISAManagerReferenceNumber" : "Z9876543210",
+
+	"transactionType" :  "deposit",
+	"complianceReason" : "chargeable",
+	"dateSubmitted" : "2017-09-23T13:29Z",
+	"financialPeriod" :
+	{
+ 		"startDate" : "2017-04-06",
+		"endDate" : "2018-04-15"
+	},
+	"amount" : 123.45,
+
+ 	"transferFromLISA" 	:
+	{
+		"LISAManagerReferenceNumber" : "Z9876543222",
+		"accountID" : "1234567890",
+		"transferDate" : "2012-12-22"
+	},
+
+	"incurredCharge" :
+	{
+		"chargeLISATransactionID" : "7654479865"
+	},
+
+	"chargeDueTo" :
+	{
+		"chargeReasonCode" : "over-lisa-limit",
+		"chargeReasonText" : "More money credited to LISA than the yearly LISA limit allows",
+		"causingLISATransactionID" : "4444444444"
+	},
+
+	"supersedesTransaction" :
+	{
+		"supersedeReasonCode" : "error-correction",
+		"supersedeReasonText" : "system error corrective transaction",
+		"supersededLISATransactionID" : "4444444444"
+	}
+}

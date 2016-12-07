@@ -1,0 +1,36 @@
+#%RAML 1.0 Library
+
+securitySchemes:
+  oauth_2_0:
+    type: OAuth 2.0
+    description: HMRC supports OAuth 2.0 for authenticating User-restricted API requests
+    describedBy:
+      headers:
+        Authorization:
+          description: Used to send a valid OAuth 2 access token
+          type: string
+      responses:
+        401:
+          description: |
+            Bad or expired token.
+            This can happen if the user or HMRC revoked or expired an access token.
+            To fix, you should re-authenticate the user.
+        403:
+          description: |
+            Bad OAuth request (wrong consumer key, bad nonce, expired
+            timestamp...). Unfortunately, re-authenticating the user won't help here.
+    settings:
+      authorizationUri: https://api.service.hmrc.gov.uk/oauth/authorize
+      accessTokenUri: https://api.service.hmrc.gov.uk/oauth/token
+      authorizationGrants: [ authorization_code, client_credentials ]
+      scopes:
+  x-application:
+    type: x-application
+    description: Application restricted endpoints require a server token. This must be passed as an Authorization header with type Bearer.
+    describedBy:
+      headers:
+        Authorization:
+          description: Used to send the server token.
+          type: string
+          example: "Authorization: Bearer [YOUR-SERVER-TOKEN]"
+      responses:
