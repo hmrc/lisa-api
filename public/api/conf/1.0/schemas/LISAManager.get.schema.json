@@ -1,0 +1,27 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"type": "object",
+	"properties":
+	{
+		"LISAManagerReferenceNumber" :
+		{
+			"$ref": "#/definitions/LISAManagerReferenceNumberType"
+		},
+		"LISAProviderName" : {"type" : "string"},
+		"_links" : {"type" : "object"}
+},
+	"required" :
+	[
+		"LISAManagerReferenceNumber",
+		"LISAProviderName"
+	],
+	"additionalProperties": false,
+	"definitions":
+	{
+		"LISAManagerReferenceNumberType" :
+		{
+			"type" : "string",
+			"pattern": "^Z\\d{6}$"
+		}
+	}
+}
