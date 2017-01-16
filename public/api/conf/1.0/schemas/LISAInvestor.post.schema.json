@@ -5,13 +5,11 @@
 	{
 		"investorID" : {"$ref" : "#/definitions/IDType"},
 		"investorNINO": {"$ref" : "#/definitions/NINOType"},
-
-		"title" : {"type" : "string"},
 		"firstname" : {"type" : "string"},
 		"lastname" : {"type" : "string"},
 		"DoB": {"$ref": "#/definitions/ISO8601-Date"}
 	},
-	"required": ["investorNINO","title","firstname","lastname","DoB"],
+	"required": ["investorNINO","firstname","lastname","DoB"],
 	"additionalProperties": false,
 	"definitions":
 	{
