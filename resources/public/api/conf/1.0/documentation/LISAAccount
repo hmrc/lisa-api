@@ -1,5 +1,0 @@
-Resource represents the existence of a LISA account at a Lisa Manager.
-It must be created before a LISATransaction can be created for the account.
-AccountID must be generated and supplied by the LISA provider and so is only
-unique when combined with LISAManagerReferenceNumber.  The associated
-LISAInvestor resource must exist before a LISAAccount is created.

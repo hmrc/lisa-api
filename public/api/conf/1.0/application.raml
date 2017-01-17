@@ -100,14 +100,14 @@ types:
         description: !include documentation/LISAAccount
         post:
           is: [headers.acceptHeader, headers.contentHeader]
-          description: Create a new account
-          displayName: Creates a new LISA account resource
+          description: Request to create a new LISA Investor account
+          displayName: Create a new LISA account
           (annotations.scope): "write:lifetime-individual-savings-account"
           securedBy: [ sec.oauth_2_0: { scopes: [ "write:lifetime-individual-savings-account" ] } ]
           body:
             application/json:
-              type: !include schemas/LISAAccount.put.schema.json
-              example: !include examples/LISAAccount.put.json
+              type: !include schemas/LISAAccount.post.schema.json
+              example: !include examples/LISAAccount.post.json
           responses:
             201:
               headers:
@@ -225,60 +225,6 @@ types:
 
           /transactions:
             description: !include documentation/LISATransaction
-            get:
-              is: [headers.acceptHeader, headers.contentHeader]
-              displayName: Get a list of LISA transactions
-              description: Returns a list of LISA transaction resources for
-                the specified account, date range and optionally transaction type.
-                The request and response must support pagination.
-              (annotations.scope): "read:lifetime-individual-savings-account"
-              securedBy: [ sec.oauth_2_0: { scopes: [ "read:lifetime-individual-savings-account" ] } ]
-              queryParameters:
-                startDate:
-                  description:  First date from which to search for transactions
-                  type: date-only
-                  required: true
-                  example: "2017-10-06"
-                endDate:
-                  description:  Last date from which to search for transactions
-                  type: date-only
-                  required: true
-                  example: "2017-11-05"
-                transactionType:
-                  description:  Search for transactions with the specified transactionType
-                  type: lisaTransactionType
-                  required: false
-                  example: LISAtransfer
-              responses:
-                200:
-                  body:
-                    application/json:
-                      type: !include schemas/LISATransaction.get.schema.array.json
-                      example: !include examples/LISATransaction.get.array.json
-
-                403:
-                  description: Access Denied.
-                  body:
-                    application/json:
-                      type: !include schemas/ErrorCodes.schema.json
-                      example: |
-                        {
-                          "code" : "wrong-lisa-manager",
-                          "message" : "The LISAAccount specified by the accountID or the lisaManagerReferenceNumber in the URL not belong to the calling LISAManager"
-                        }
-                404:
-                  body:
-                    application/json:
-                      description: The lisaManagerReferenceNumber or accountId fail to
-                        locate to their respective resources.
-                        Namely LISAManager and LISAAccount.
-                      type: !include schemas/ErrorCodes.schema.json
-                      example: |
-                        {
-                          "code": "TODO",
-                          "message": "TODO"
-                        }
-
             post:
               is: [headers.acceptHeader, headers.contentHeader]
               displayName: Create a LISA transaction
@@ -459,53 +405,3 @@ types:
                         "code": "TODO",
                         "message": "TODO"
                       }
-
-          /hmrc-transactions:
-            description: !include documentation/HMRCTransaction
-            get:
-              is: [headers.acceptHeader, headers.contentHeader]
-              displayName: Get a list of HMRC transactions
-              description: Fetch a JSON array of HMRCTransaction resources either
-                fetching all HMRCTRansactions for the paymentReference or selected by
-                a date range search from the startDate to the endDate supplied as
-                HTML query parameters.
-              (annotations.scope): "read:lifetime-individual-savings-account"
-              securedBy: [ sec.oauth_2_0: { scopes: [ "read:lifetime-individual-savings-account" ] } ]
-              queryParameters:
-                startDate:
-                  description:  First date from which to search
-                  type: date-only
-                  example: "2017-10-06"
-                endDate:
-                  description:  Last date from which to search
-                  type: date-only
-                  example: "2017-11-05"
-              responses:
-                200:
-                  description: Returns a list of HMRC transaction resources
-                  body:
-                    application/json:
-                      type: !include schemas/HMRCTransaction.get.array.json
-                      example: !include examples/HMRCTransaction.get.array.json
-
-                403:
-                  body:
-                    application/json:
-                      description: Attempting to access a payment not belonging to the calling LISA manager
-                      type: !include schemas/ErrorCodes.schema.json
-                      example: |
-                        {
-                          "code": "TODO",
-                          "message": "TODO"
-                        }
-                404:
-                  body:
-                    application/json:
-                      description: The LISA manager cannot be found or the HMRC payment cannot be found.
-                        Finding zero HMRC payment objects will result in a 200 response code and an empty JSON array response body
-                      type: !include schemas/ErrorCodes.schema.json
-                      example: |
-                        {
-                          "code": "TODO",
-                          "message": "TODO"
-                        }

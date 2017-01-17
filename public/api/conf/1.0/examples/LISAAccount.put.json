@@ -1,22 +1,12 @@
 {
-  "accountID" : "1234567890",
-  "LISAManagerReferenceNumber" : "Z543210",
   "investorID" : "8765432100",
+  "lisaManagerReferenceNumber" : "Z543210",
+  "PrevLisaInvestorAccountID": "Z543210",
+  "PrevLisaManagerReferenceNumber" : "Z543333",
+  "transferInDate" : "2015-12-13",
 
-  "status" : "open",
-  "openDate" : "2011-02-01",
-  "closeDate" : "2015-12-13",
+  "accountCreationReason" : "Transferred Account",
 
-  "healthStatus" : "default",
-
-  "terminalIllnessNotification" :
-  {
-    "notifiedDate" : "2016-08-07T09:15:35Z"
-  },
-
-  "deathNotification"  :
-  {
-    "DoD" : "2016-09-12",
-    "notifiedDate" : "2016-09-19T12:31:09Z"
-  }
+  "firstSubscriptionDate" : "2011-02-02",
+  "investorNINO":"AB123456D"
 }
