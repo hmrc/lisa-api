@@ -1,2 +1,0 @@
-This resource models the citizen who has a LISA account.
-It is shared between all LISAManagers who hold an account for that LISAInvestor. I.E. Only one resource will exist for each individual LISA Investor
