@@ -11,38 +11,24 @@
 	"lisaManagerReferenceNumber": {
 	  "$ref": "#/definitions/LISAManagerReferenceNumberType"
 	},
-	"PrevLisaInvestorAccountID": {
-	  "type": "string"
-	},
-	"PrevLisaManagerReferenceNumber": {
-	  "$ref": "#/definitions/LISAManagerReferenceNumberType"
-	},
-	"transferInDate": {
-	  "$ref": "#/definitions/ISO8601-Date"
-	},
-	"accountCreationReason": {
+	"accountClosureReason": {
 	  "type": "string",
 	  "enum": [
-		"New Account",
-		"Transferred Account"
+		"Transferred-out",
+		"All funds withdrawn",
+		"Voided"
 	  ]
 	},
-	"firstSubscriptionDate": {
+	"closureDate": {
 	  "$ref": "#/definitions/ISO8601-Date"
-	},
-	"investorNINO": {
-	  "$ref": "#/definitions/NINOType"
 	}
   },
 	"required": [
 	  "investorID",
+	  "lisaInvestorAccountID",
 	  "lisaManagerReferenceNumber",
-	  "PrevLisaInvestorAccountID",
-	  "PrevLisaManagerReferenceNumber",
-	  "transferInDate",
-	  "accountCreationReason",
-	  "firstSubscriptionDate",
-	  "investorNINO"
+	  "accountClosureReason",
+	  "closureDate"
 	],
 	"additionalProperties": false,
 	"definitions": {

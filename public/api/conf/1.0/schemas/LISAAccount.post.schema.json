@@ -11,12 +11,6 @@
     "lisaManagerReferenceNumber": {
       "$ref": "#/definitions/LISAManagerReferenceNumberType"
     },
-    "PrevLisaInvestorAccountID": {
-      "type": "string"
-    },
-    "PrevLisaManagerReferenceNumber": {
-      "$ref": "#/definitions/LISAManagerReferenceNumberType"
-    },
     "accountCreationReason": {
       "type": "string",
       "enum": [
