@@ -161,8 +161,8 @@ types:
 
         put:
             is: [headers.acceptHeader, headers.contentHeader]
-            displayName: Update an existing LISA account
-            description: Updates an existing LISA account for a transfer reason.
+            displayName: transfer an existing LISA account
+            description: transfer an existing LISA account to create a new account and close the old.
             (annotations.scope): "write:lifetime-individual-savings-account"
             securedBy: [ sec.oauth_2_0: { scopes: [ "write:lifetime-individual-savings-account" ] } ]
             body:
@@ -271,21 +271,80 @@ types:
                         "code": "TODO",
                         "message": "TODO"
                       }
+      /events:
+            description: !include documentation/LISATransaction
+            post:
+              is: [headers.acceptHeader, headers.contentHeader]
+              displayName: Submit a life event.
+              description: submit information to notify a life event of lisa Investor who has an Lisa account.
+              (annotations.scope): "write:lifetime-individual-savings-account"
+              securedBy: [ sec.oauth_2_0: { scopes: [ "write:lifetime-individual-savings-account" ] } ]
+              body:
+                application/json:
+                  type: !include schemas/LifeEvent.post.schema.json
+                  example: !include examples/LifeEvent.post.json
+              responses:
+                201:
+                  description: The LISA transaction resource has been created.
+                  headers:
+                    Location:
+                      description: Relative URI to the created LISA transaction resource
+                      type: string
+                      example: /manager/Z876543210/accounts/1234567890/transactions/3333333333
+                403:
+                  description: Matches already existing resource.
+                    Response contains a location header with link to the existing resource.
+                  body:
+                    application/json:
+                      type: !include schemas/ErrorCodes.schema.json
+                      examples:
+                        notOpenStatus:
+                          description: TODO short description of scenario
+                          value: |
+                            {
+                              "code" : "wrong-lisa-manager",
+                              "message" : "The LISA manager or the LISA account do not belong to the calling LISA manager"
+                            }
+                        complianceChargeWrong:
+                          description: TODO short description of scenario
+                          value: |
+                            {
+                              "code" : "compliance-charge-wrong",
+                              "message" : "Charge made disagrees with HMRC records"
+                            }
+                        complianceBonusWrong:
+                          description: TODO short description of scenario
+                          value: |
+                            {
+                              "code" : "compliance-bonus-wrong",
+                              "message" : "Bonus claim disagrees with HMRC records"
+                            }
+
+
+                409:
+                  body:
+                    application/json:
+                      description: Conflict. The LISA transaction resource already exists.
+                        Updating of LISA transaction resources is not supported.
+                      type: !include schemas/ErrorCodes.schema.json
+                      example: |
+                        {
+                          "code": "TODO",
+                          "message": "TODO"
+                        }
 
       /transactions:
             description: !include documentation/LISATransaction
             post:
               is: [headers.acceptHeader, headers.contentHeader]
-              displayName: Create a LISA transaction
-              description: Creates a LISA transaction resource.  This endpoint
-                does not support updating a LISATransaction. To correct a LISA
-                transaction, it is necessary to create a superseding transaction.
+              displayName: Request for bonus payment
+              description: Request for a bonus payment.
               (annotations.scope): "write:lifetime-individual-savings-account"
               securedBy: [ sec.oauth_2_0: { scopes: [ "write:lifetime-individual-savings-account" ] } ]
               body:
                 application/json:
-                  type: !include schemas/LISATransaction.post.schema.json
-                  example: !include examples/LISATransaction.post.json
+                  type: !include schemas/BonusPaymentRequest.post.schema.json
+                  example: !include examples/BonusPaymentRequest.post.json
               responses:
                 201:
                   description: The LISA transaction resource has been created.
