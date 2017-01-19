@@ -17,6 +17,7 @@
 package uk.gov.hmrc.lisaapi.controllers
 
 import controllers.AssetsBuilder
+import play.api.Logger
 import play.api.http.{HttpErrorHandler, LazyHttpErrorHandler}
 import uk.gov.hmrc.play.microservice.controller.BaseController
 
@@ -27,10 +28,12 @@ class Documentation(httpErrorHandler: HttpErrorHandler) extends AssetsBuilder(ht
   }
 
   def definition() = {
+    Logger.info("calling the definition json")
     super.at("/public/api/", "definition.json")
   }
 
   def raml(version: String, file: String) = {
+    Logger.info("RAM FILE IS " + s"/public/api/conf/$version/" + file)
     super.at(s"/public/api/conf/$version", file)
   }
 }

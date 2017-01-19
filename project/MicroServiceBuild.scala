@@ -74,7 +74,9 @@ private object AppDependencies {
         "org.mockito" % "mockito-core" % "1.9.0" % scope,
         "org.scalaj" %% "scalaj-http" % "1.1.5" % scope,
         "com.github.tomakehurst" % "wiremock" % "1.57" % scope,
-        "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1"  % scope
+        "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1"  % scope,
+        "info.cukes" %% "cucumber-scala" % "1.2.4" % scope,
+        "info.cukes" % "cucumber-junit" % "1.2.4" % scope
       )
     }.test
   }
