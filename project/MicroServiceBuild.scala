@@ -49,7 +49,13 @@ private object AppDependencies {
         "uk.gov.hmrc" %% "hmrctest" % hmrcTestVersion % scope,
         "org.scalatest" %% "scalatest" % scalaTestVersion % scope,
         "org.pegdown" % "pegdown" % pegdownVersion % scope,
-        "com.typesafe.play" %% "play-test" % PlayVersion.current % scope
+        "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
+        "org.mockito" % "mockito-core" % "1.9.0" % scope,
+        "info.cukes" %% "cucumber-scala" % "1.2.4" % scope,
+        "info.cukes" % "cucumber-junit" % "1.2.4" % scope,
+        "org.scalaj" %% "scalaj-http" % "1.1.5" % scope,
+        "com.github.tomakehurst" % "wiremock" % "1.57"  % scope,
+        "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1"  % scope
       )
     }.test
   }
@@ -59,11 +65,18 @@ private object AppDependencies {
 
       override lazy val scope: String = "it"
 
+
       override lazy val test = Seq(
         "uk.gov.hmrc" %% "hmrctest" % hmrcTestVersion % scope,
         "org.scalatest" %% "scalatest" % scalaTestVersion % scope,
         "org.pegdown" % "pegdown" % pegdownVersion % scope,
-        "com.typesafe.play" %% "play-test" % PlayVersion.current % scope
+        "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
+        "org.mockito" % "mockito-core" % "1.9.0" % scope,
+        "org.scalaj" %% "scalaj-http" % "1.1.5" % scope,
+        "com.github.tomakehurst" % "wiremock" % "1.57" % scope,
+        "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1"  % scope,
+        "info.cukes" %% "cucumber-scala" % "1.2.4" % scope,
+        "info.cukes" % "cucumber-junit" % "1.2.4" % scope
       )
     }.test
   }
