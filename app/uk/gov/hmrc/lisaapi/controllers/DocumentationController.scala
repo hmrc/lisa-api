@@ -29,7 +29,7 @@ class Documentation(httpErrorHandler: HttpErrorHandler) extends AssetsBuilder(ht
 
   def definition() = {
     Logger.info("calling the definition json")
-    super.at("/public/api/", "definition.json")
+    super.at("/public/api", "definition.json")
   }
 
   def raml(version: String, file: String) = {
