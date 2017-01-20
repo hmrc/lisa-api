@@ -12,15 +12,8 @@
 
   "financialPeriod" :
   {
-   		"startDate" : "2017-04-06",
-  "endDate" : "2018-04-15"
-  },
-
-  "_links" :
-  {
-      "self" : {"href" : "/lisa/manager/Z543210/payments/2222222222"},
-      "manager" : {"href" : "/lisa/manager/Z543210"},
-      "hmrc-transactions" : {"href" : "/lisa/manager/Z543210/payments/1234565432/hmrc-transactions"}
+   	  "startDate" : "2017-04-06",
+      "endDate" : "2018-04-15"
   }
   },
   {
@@ -36,15 +29,8 @@
 
   "financialPeriod" :
   {
-   		"startDate" : "2017-04-06",
-  "endDate" : "2018-04-15"
-  },
-
-  "_links" :
-  {
-      "self" : {"href" : "/lisa/manager/Z543210/payments/2222222222"},
-      "manager" : {"href" : "/lisa/manager/Z543210"},
-      "hmrc-transactions" : {"href" : "/lisa/manager/Z543210/payments/1234565432/hmrc-transactions"}
+   	  "startDate" : "2017-04-06",
+      "endDate" : "2018-04-15"
   }
-  }
+ }
 ]

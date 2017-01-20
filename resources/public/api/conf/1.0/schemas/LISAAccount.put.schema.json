@@ -11,10 +11,10 @@
 	"lisaManagerReferenceNumber": {
 	  "$ref": "#/definitions/LISAManagerReferenceNumberType"
 	},
-	"PrevLisaInvestorAccountID": {
+	"prevLisaInvestorAccountID": {
 	  "type": "string"
 	},
-	"PrevLisaManagerReferenceNumber": {
+	"prevLisaManagerReferenceNumber": {
 	  "$ref": "#/definitions/LISAManagerReferenceNumberType"
 	},
 	"transferInDate": {
@@ -37,8 +37,8 @@
 	"required": [
 	  "investorID",
 	  "lisaManagerReferenceNumber",
-	  "PrevLisaInvestorAccountID",
-	  "PrevLisaManagerReferenceNumber",
+	  "prevLisaInvestorAccountID",
+	  "prevLisaManagerReferenceNumber",
 	  "transferInDate",
 	  "accountCreationReason",
 	  "firstSubscriptionDate",
