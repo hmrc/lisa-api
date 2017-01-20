@@ -14,9 +14,8 @@
 		"paymentDate" : {"$ref": "#/definitions/ISO8601-Date"},
 		"amount" : {"type" : "number"},
 		"status" : {"$ref": "#/definitions/paymentStatusType"},
-		"financialPeriod" : {"$ref": "#/definitions/financialPeriodType"},
+		"financialPeriod" : {"$ref": "#/definitions/financialPeriodType"}
 
-		"_links" : {"type" : "object" }
 	},
 	"required": [
 		"LISAManagerReferenceNumber",
