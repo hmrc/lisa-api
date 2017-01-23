@@ -1,0 +1,515 @@
+#%RAML 1.0
+---
+
+title: Lifetime ISA
+version: 1.0
+protocols: [ HTTPS ]
+baseUri: http://api.service.hmrc.gov.uk
+
+documentation:
+  - title: Overview
+    content: !include documentation/overview.md
+  - title: Versioning
+    content: !include http://api-documentation-raml-frontend.service/api-documentation/assets/common/docs/versioning.md
+  - title: Errors
+    content: !include http://api-documentation-raml-frontend.service/api-documentation/assets/common/docs/errors.md
+
+uses:
+  sec: http://api-documentation-raml-frontend.service/api-documentation/assets/common/modules/securitySchemes.raml
+  headers: http://api-documentation-raml-frontend.service/api-documentation/assets/common/modules/headers.raml
+  annotations: http://api-documentation-raml-frontend.service/api-documentation/assets/common/modules/annotations.raml
+
+mediaType: [ application/json, application/hal+json ]
+
+types:
+  NINOtype:
+    pattern: "^[A-Z]{2}\\d{6}[A-D]$"
+  IDtype:
+    pattern: "^\\d{10}$"
+  LISAManagerReferenceNumberType:
+    pattern: "^Z\\d{6}$"
+  paymentDirectionType:
+    enum: [credit, debit]
+  paymentStatusType:
+    enum: [pending, submitted, completed]
+  paymentMethodType:
+    enum : [directDebit, BACS]
+  hmrcTransactionType :
+    enum: [bonus, charge]
+  lisaTransactionType :
+    enum: [deposit, withdrawal, HTBtransfer, LISAtransfer, bonusClaim, chargeMade]
+
+/lifetime-isa:
+  /manager:
+    description: This resource models the existence of a registered LISA Manager organisation.
+      It is created by HMRC as a result of a LISA registration.  The registration process is not
+      part of the API specification as it is a forms based process with manual verification by HMRC staff.
+
+    /{lisaManagerReferenceNumber}:
+      uriParameters:
+        lisaManagerReferenceNumber:
+          type : LISAManagerReferenceNumberType
+          description: The number issued to the LISA provider upon successful LISA registration with HMRC
+          example: "Z123456"
+      /investors:
+            post:
+              is: [headers.acceptHeader, headers.contentHeader]
+              displayName: Create a LISA investor
+              description: !include documentation/LISAInvestor.post
+              (annotations.scope): "write:lifetime-individual-savings-account"
+              securedBy: [ sec.oauth_2_0: { scopes: [ "write:lifetime-individual-savings-account" ] } ]
+              body:
+                application/json:
+                  example: !include examples/LISAInvestor.post.json
+                  type: !include schemas/LISAInvestor.post.schema.json
+              responses:
+                201:
+                  description: The LISA investor resource has been created.
+                  headers:
+                    Location:
+                      description: Relative URI to the created LISAAccount resource
+                      type: string
+                      example: /investors/0987654321
+                403:
+                  body:
+                    application/json:
+                      description: Investor not found
+                      type: !include schemas/ErrorCodes.schema.json
+                      example: |
+                        {
+                          "code": "investor-not-found",
+                          "message": "The investor details are not present with HMRC and are unable to create a investor"
+                        }
+
+                409:
+                  description: Matches already existing resource.
+                    Response contains a location header with link to the existing resource.
+                  body:
+                    application/json:
+                      type: !include schemas/ErrorCodes.schema.json
+                      examples:
+                        notOpenStatus:
+                          description: TODO short description of scenario
+                          value: |
+                            {
+                              "code" : "investor-already-created",
+                              "message" : "The investor resource already exists. the existing InvestorId is returned"
+                            }
+
+      /accounts:
+        description: !include documentation/LISAAccount
+        post:
+          is: [headers.acceptHeader, headers.contentHeader]
+          description: Request to create a new LISA Investor account
+          displayName: Create a new LISA account
+          (annotations.scope): "write:lifetime-individual-savings-account"
+          securedBy: [ sec.oauth_2_0: { scopes: [ "write:lifetime-individual-savings-account" ] } ]
+          body:
+            application/json:
+              type: !include schemas/LISAAccount.post.schema.json
+              example: !include examples/LISAAccount.post.json
+          responses:
+            201:
+              headers:
+                Location:
+                  description: URI to the created LISA account resource
+                  type: string
+                  example: /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}
+            403:
+              body:
+                application/json:
+                  type: !include schemas/ErrorCodes.schema.json
+                  examples:
+                    notOpenStatus:
+                      description: TODO short description of scenario
+                      value: |
+                        {
+                          "code" : "not-open-status",
+                          "message" : "invalid status: must create with open status"
+                        }
+                    investorNotFound:
+                      description: TODO short description of scenario
+                      value: |
+                        {
+                          "code" : "investor-not-found",
+                          "message" : "invalid status: must create with open status"
+                        }
+                    wrongLISAManager:
+                      description: TODO short description of scenario
+                      value: |
+                        {
+                          "code" : "wrong-lisa-manager",
+                          "message" : "the lisaManagerReferenceNumber in URI does match match the calling LISAManager"
+                        }
+                    outsideAgeRange:
+                      description: TODO short description of scenario
+                      value: |
+                        {
+                          "code" : "compliance-account-open-outside-age-range",
+                          "message" : "Can't open a LISA if investor is older than 40 or younger than 18"
+                        }
+            409:
+              body:
+                application/json:
+                  description: The LISA account already exists
+                  type: !include schemas/ErrorCodes.schema.json
+                  example: |
+                    {
+                      "code": "TODO",
+                      "message": "TODO"
+                    }
+
+        put:
+            is: [headers.acceptHeader, headers.contentHeader]
+            displayName: transfer an existing LISA account
+            description: transfer an existing LISA account to create a new account and close the old.
+            (annotations.scope): "write:lifetime-individual-savings-account"
+            securedBy: [ sec.oauth_2_0: { scopes: [ "write:lifetime-individual-savings-account" ] } ]
+            body:
+              application/json:
+                type: !include schemas/LISAAccount.put.schema.json
+                example: !include examples/LISAAccount.put.json
+            responses:
+              200:
+                description: The account is updated successfully.
+              403:
+                body:
+                  application/json:
+                    type: !include schemas/ErrorCodes.schema.json
+                    examples:
+                      wrongLISAManager:
+                        description: TODO short description of scenario
+                        value: |
+                          {
+                            "code" : "wrong-lisa-manager",
+                            "message" : "the lisaManagerReferenceNumber in URI does match match the calling LISAManager"
+                          }
+                      cantChangeAccountID:
+                        description: TODO short description of scenario
+                        value: |
+                          {
+                            "code" : "cant-change-accountID",
+                            "message" : "You cannot change the accountId for an existing account"
+                          }
+                      cantChangeInvestor:
+                        description: TODO short description of scenario
+                        value: |
+                          {
+                            "code" : "cant-change-investor",
+                            "message" : "You cannot change the investorId for an existing account"
+                          }
+                      invalidStatusChange:
+                        description: TODO short description of scenario
+                        value: |
+                          {
+                            "code" : "invalid-status-change",
+                            "message" : "You cannot change the status to the requested value"
+                          }
+              404:
+                body:
+                  application/json:
+                    description: The LISA account identified by the accountId does not exist
+                    type: !include schemas/ErrorCodes.schema.json
+                    example: |
+                      {
+                        "code": "TODO",
+                        "message": "TODO"
+                      }
+        delete:
+            is: [headers.acceptHeader, headers.contentHeader]
+            displayName: close an existing LISA account
+            description: close an existing LISA account to change status and set close date.
+            (annotations.scope): "write:lifetime-individual-savings-account"
+            securedBy: [ sec.oauth_2_0: { scopes: [ "write:lifetime-individual-savings-account" ] } ]
+            body:
+              application/json:
+                type: !include schemas/LISAAccount.delete.schema.json
+                example: !include examples/LISAAccount.delete.json
+            responses:
+              200:
+                description: The account is updated successfully.
+              403:
+                body:
+                  application/json:
+                    type: !include schemas/ErrorCodes.schema.json
+                    examples:
+                      wrongLISAManager:
+                        description: TODO short description of scenario
+                        value: |
+                          {
+                            "code" : "wrong-lisa-manager",
+                            "message" : "the lisaManagerReferenceNumber in URI does match match the calling LISAManager"
+                          }
+                      cantChangeAccountID:
+                        description: TODO short description of scenario
+                        value: |
+                          {
+                            "code" : "cant-change-accountID",
+                            "message" : "You cannot change the accountId for an existing account"
+                          }
+                      cantChangeInvestor:
+                        description: TODO short description of scenario
+                        value: |
+                          {
+                            "code" : "cant-change-investor",
+                            "message" : "You cannot change the investorId for an existing account"
+                          }
+                      invalidStatusChange:
+                        description: TODO short description of scenario
+                        value: |
+                          {
+                            "code" : "invalid-status-change",
+                            "message" : "You cannot change the status to the requested value"
+                          }
+              404:
+                body:
+                  application/json:
+                    description: The LISA account identified by the accountId does not exist
+                    type: !include schemas/ErrorCodes.schema.json
+                    example: |
+                      {
+                        "code": "TODO",
+                        "message": "TODO"
+                      }
+      /events:
+            description: !include documentation/LISATransaction
+            post:
+              is: [headers.acceptHeader, headers.contentHeader]
+              displayName: Submit a life event.
+              description: submit information to notify a life event of lisa Investor who has an Lisa account.
+              (annotations.scope): "write:lifetime-individual-savings-account"
+              securedBy: [ sec.oauth_2_0: { scopes: [ "write:lifetime-individual-savings-account" ] } ]
+              body:
+                application/json:
+                  type: !include schemas/LifeEvent.post.schema.json
+                  example: !include examples/LifeEvent.post.json
+              responses:
+                201:
+                  description: The LISA transaction resource has been created.
+                  headers:
+                    Location:
+                      description: Relative URI to the created LISA transaction resource
+                      type: string
+                      example: /manager/Z876543210/accounts/1234567890/transactions/3333333333
+                403:
+                  description: Matches already existing resource.
+                    Response contains a location header with link to the existing resource.
+                  body:
+                    application/json:
+                      type: !include schemas/ErrorCodes.schema.json
+                      examples:
+                        notOpenStatus:
+                          description: TODO short description of scenario
+                          value: |
+                            {
+                              "code" : "wrong-lisa-manager",
+                              "message" : "The LISA manager or the LISA account do not belong to the calling LISA manager"
+                            }
+                        complianceChargeWrong:
+                          description: TODO short description of scenario
+                          value: |
+                            {
+                              "code" : "compliance-charge-wrong",
+                              "message" : "Charge made disagrees with HMRC records"
+                            }
+                        complianceBonusWrong:
+                          description: TODO short description of scenario
+                          value: |
+                            {
+                              "code" : "compliance-bonus-wrong",
+                              "message" : "Bonus claim disagrees with HMRC records"
+                            }
+
+
+                409:
+                  body:
+                    application/json:
+                      description: Conflict. The LISA transaction resource already exists.
+                        Updating of LISA transaction resources is not supported.
+                      type: !include schemas/ErrorCodes.schema.json
+                      example: |
+                        {
+                          "code": "TODO",
+                          "message": "TODO"
+                        }
+
+      /transactions:
+            description: !include documentation/LISATransaction
+            post:
+              is: [headers.acceptHeader, headers.contentHeader]
+              displayName: Request for bonus payment
+              description: Request for a bonus payment.
+              (annotations.scope): "write:lifetime-individual-savings-account"
+              securedBy: [ sec.oauth_2_0: { scopes: [ "write:lifetime-individual-savings-account" ] } ]
+              body:
+                application/json:
+                  type: !include schemas/BonusPaymentRequest.post.schema.json
+                  example: !include examples/BonusPaymentRequest.post.json
+              responses:
+                201:
+                  description: The LISA transaction resource has been created.
+                  headers:
+                    Location:
+                      description: Relative URI to the created LISA transaction resource
+                      type: string
+                      example: /manager/Z876543210/accounts/1234567890/transactions/3333333333
+                403:
+                  description: Matches already existing resource.
+                    Response contains a location header with link to the existing resource.
+                  body:
+                    application/json:
+                      type: !include schemas/ErrorCodes.schema.json
+                      examples:
+                        notOpenStatus:
+                          description: TODO short description of scenario
+                          value: |
+                            {
+                              "code" : "wrong-lisa-manager",
+                              "message" : "The LISA manager or the LISA account do not belong to the calling LISA manager"
+                            }
+                        complianceChargeWrong:
+                          description: TODO short description of scenario
+                          value: |
+                            {
+                              "code" : "compliance-charge-wrong",
+                              "message" : "Charge made disagrees with HMRC records"
+                            }
+                        complianceBonusWrong:
+                          description: TODO short description of scenario
+                          value: |
+                            {
+                              "code" : "compliance-bonus-wrong",
+                              "message" : "Bonus claim disagrees with HMRC records"
+                            }
+                        complianceTooManySubcriptions:
+                          description: TODO short description of scenario
+                          value: |
+                            {
+                              "code" : "compliance-too-many-subscriptions-in-FP",
+                              "message" : "The investor is trying to start a second LISA subscription in the financial period"
+                            }
+                        complianceTooMuchLISAFunds:
+                          description: TODO short description of scenario
+                          value: |
+                            {
+                              "code" : "compliance-too-much-LISA-funds-credited",
+                              "message" : "The investor is trying to credit more funds than the current limit LISA subscription in the financial period"
+                            }
+                        complianceTooMuchISAFunds:
+                          description: TODO short description of scenario
+                          value: |
+                            {
+                              "code" : "compliance-too-much-ISA-funds-credited",
+                              "message" : "The investor is trying to credit more funds than the current limit ISA subscription in the financial period"
+                            }
+                        complianceAgeRangeForCredit:
+                          description: TODO short description of scenario
+                          value: |
+                            {
+                              "code" : "compliance-funds-credit-outside-age-range",
+                              "message" : "The investor is trying to cedit funds to a LISA when outside the compliant age range. Transfers for a LISA do not count as credits"
+                            }
+
+                409:
+                  body:
+                    application/json:
+                      description: Conflict. The LISA transaction resource already exists.
+                        Updating of LISA transaction resources is not supported.
+                      type: !include schemas/ErrorCodes.schema.json
+                      example: |
+                        {
+                          "code": "TODO",
+                          "message": "TODO"
+                        }
+
+      /payments:
+        get:
+          is: [headers.acceptHeader, headers.contentHeader]
+          displayName: Get HMRC payments
+          description: !include documentation/HMRCPayment
+          (annotations.scope): "read:lifetime-individual-savings-account"
+          securedBy: [ sec.oauth_2_0: { scopes: [ "read:lifetime-individual-savings-account" ] } ]
+          queryParameters:
+            startDate:
+              description:  First date from which to search for HMRC payments
+              type: date-only
+              required: true
+              example: "2017-10-06"
+            endDate:
+              description:  Last date from which to search for HMRC payments
+              type: date-only
+              required: true
+              example: "2017-11-05"
+            direction:
+              description: Search for HMRC payments with the specified payment direction
+              type: paymentDirectionType
+              required: false
+              example: credit
+            status:
+              description: Search for HMRC payments with the specified payment status
+              type: paymentStatusType
+              required: false
+              example: pending
+            method:
+              description: Search for HMRC payments with the specified payment method
+              type: paymentMethodType
+              required: false
+              example: BACS
+          responses:
+            200:
+              description: A list of HMRC payment resources
+              body:
+                application/json:
+                  type: !include schemas/HMRCPayment.get.array.json
+                  example: !include examples/HMRCPayment.get.array.json
+            403:
+              body:
+                application/json:
+                  description: Attempting to access a payment not belonging to the calling LISA manager
+                  type: !include schemas/ErrorCodes.schema.json
+                  example: |
+                    {
+                      "code": "TODO",
+                      "message": "TODO"
+                    }
+
+        /{paymentReference}:
+          uriParameters:
+            paymentReference:
+              type: IDtype
+              description: Identifies the exact payment by a unique payment reference
+              example: "1111111111"
+          get:
+            is: [headers.acceptHeader, headers.contentHeader]
+            displayName: Get an HMRC payment
+            description: Returns an HMRC payment resource selected by paymentReference
+            (annotations.scope): "read:lifetime-individual-savings-account"
+            securedBy: [ sec.oauth_2_0: { scopes: [ "read:lifetime-individual-savings-account" ] } ]
+            responses:
+              200:
+                description: Returns a HMRC payment resource
+                body:
+                  application/json:
+                    type: !include schemas/HMRCPayment.get.json
+                    example: !include examples/HMRCPayment.get.json
+              403:
+                body:
+                  application/json:
+                    description: Attempting to access a payment not
+                      belonging to the calling LISA manager
+                    type: !include schemas/ErrorCodes.schema.json
+                    example: |
+                      {
+                        "code": "TODO",
+                        "message": "TODO"
+                      }
+              404:
+                body:
+                  application/json:
+                    description: HMRC payment not found for specified paymentReference
+                    type: !include schemas/ErrorCodes.schema.json
+                    example: |
+                      {
+                        "code": "TODO",
+                        "message": "TODO"
+                      }

@@ -1,0 +1,12 @@
+{
+  "investorID" : "8765432100",
+  "lisaManagerReferenceNumber" : "Z543210",
+  "prevLisaInvestorAccountID": "Z543210",
+  "prevLisaManagerReferenceNumber" : "Z543333",
+  "transferInDate" : "2015-12-13",
+
+  "accountCreationReason" : "Transferred Account",
+
+  "firstSubscriptionDate" : "2011-02-02",
+  "investorNINO":"AB123456D"
+}

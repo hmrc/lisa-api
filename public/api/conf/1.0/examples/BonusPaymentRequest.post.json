@@ -1,0 +1,24 @@
+{
+  "lisaInvestorAccountID" : "1234567890",
+  "lisaManagerReferenceNumber" : "Z543210",
+  "lifeEventID" : "1234567891",
+  "claimPeriodStartDate" : "2016-12-22",
+  "claimPeriodEndDate" : "2016-12-22",
+  "claimReason" : "Life Event",
+  "htbTransfer" : {
+    "SubscriptionAmountInClaimPeriod" : 0,
+    "totalAmountToDate" : 0
+  },
+  "subscriptions"   :
+  {
+    "newSubscriptionsInClaimPeriod" : 4000,
+    "newSubscriptionsTaxYearToDate" : 4000,
+    "totalSubscriptionsInClaimPeriod" : 4000,
+    "totalSubscriptionsTaxYearToDate" : 4000
+  },
+  "bonuses"   :
+  {
+    "bonusDueInClaimPeriod" : 1000,
+    "bonusDueYearToDate" : 1000
+  }
+}
