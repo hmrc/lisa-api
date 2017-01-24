@@ -3,15 +3,19 @@
   "type": "object",
   "properties": {
     "investorID": {
+      "description": "The investor’s ID reference number.",
       "$ref": "#/definitions/IDType"
     },
-    "accountId": {
+    "accountID": {
+      "description": "The financial organisation’s own unique reference number for the investor’s LISA account.",
       "type": "string"
     },
     "lisaManagerReferenceNumber": {
+      "description": "The number issued to the LISA provider upon successful LISA registration with HMRC.",
       "$ref": "#/definitions/LISAManagerReferenceNumberType"
     },
     "accountCreationReason": {
+      "description": "The reason the account was created",
       "type": "string",
       "enum": [
         "New",
@@ -19,18 +23,23 @@
       ]
     },
     "firstSubscriptionDate": {
+      "description":"The date of the first deposit into the account - if this is a transfer, use the date of deposit into the account managed by the previous organisation.",
       "$ref": "#/definitions/ISO8601-Date"
     },
     "transferAccount": {
       "type": "object",
+      "description" : "If the accountCreationReason is ‘Transferred’, then this is required.",
       "properties": {
         "prevAccountId": {
+          "description" : "The previous financial organisation’s own unique reference number for the investor’s LISA account.",
           "type": "string"
         },
         "prevLisaManagerReferenceNumber": {
+          "description" : "The number issued to the previous LISA provider when they registered with HMRC.",
           "$ref": "#/definitions/LISAManagerReferenceNumberType"
         },
         "transferInDate": {
+          "description": "The date the account transferred from the previous provider to the new one.",
           "$ref": "#/definitions/ISO8601-Date"
         }
       },
@@ -45,7 +54,7 @@
 
   "required": [
       "investorID",
-      "accountId",
+      "accountID",
       "lisaManagerReferenceNumber",
       "accountCreationReason",
       "firstSubscriptionDate"
