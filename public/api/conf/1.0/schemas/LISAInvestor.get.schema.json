@@ -1,18 +1,23 @@
 {
-	"$schema": "http://json-schema.org/draft-04/schema",
+	"$schema": "http://json-schema.org/draft-04/schema#",
 	"type": "object",
 	"properties":
 	{
 		"investorID" : {"$ref" : "#/definitions/IDType"},
 		"investorNINO": {"$ref" : "#/definitions/NINOType"},
-		"firstName" : {"type" : "string"},
-		"lastName" : {"type" : "string"},
-		"DoB": {"$ref": "#/definitions/ISO8601-Date"}
+
+		"title" : {"type" : "string"},
+		"firstname" : {"type" : "string"},
+		"lastname" : {"type" : "string"},
+		"DoB": {"$ref": "#/definitions/ISO8601-Date"},
+
+		"_links" : {
+			"type" : "object"
+		}
 	},
-	"required": ["investorNINO","firstName","lastName","DoB"],
+	"required": ["investorNINO","title","firstname","lastname","DoB"],
 	"additionalProperties": false,
-	"definitions":
-	{
+	"definitions": {
 		"ISO8601-Date" :
 		{
 			"type": "string",
@@ -23,13 +28,10 @@
 			"type" : "string",
 			"pattern" : "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}(:\\d{2})?(([+-]\\d{2}(:\\d{2})?)|Z)"
 		},
-		"IDType":
-		{
+		"IDType": {
 			"type": "string",
-			"pattern": "^\\d{10}$"
-		},
-		"NINOType":
-		{
+			"pattern": "^\\d{10}$"},
+		"NINOType": {
 			"type": "string",
 			"pattern": "^[A-Z]{2}\\d{6}[A-D]$"}
 	}
