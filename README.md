@@ -8,7 +8,7 @@ This API allows financial organisations to report Lifetime ISA (LISA) informatio
 
 This version of the API is in development and is very likely to change.
 
-The current API allows the financial organisation to :
+The current API allows the financial organisation to:
 
     report a new investor to HMRC
     create, transfer or close a LISA account
