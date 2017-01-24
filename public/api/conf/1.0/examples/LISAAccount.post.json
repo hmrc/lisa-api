@@ -1,7 +1,7 @@
 {
   "investorID" : "8765432100",
   "lisaManagerReferenceNumber" : "Z543210",
-  "accountId" :"8765432100",
+  "accountID" :"8765432100",
   "accountCreationReason" : "Transferred",
   "firstSubscriptionDate" : "2011-02-02",
   "transferAccount": {

@@ -3,11 +3,21 @@
 	"type": "object",
 	"properties":
 	{
-		"lifeEventID" : {"$ref": "#/definitions/IDType"},
-		"accountId" : {"$ref": "#/definitions/IDType"},
-		"lisaManagerReferenceNumber" : {"$ref": "#/definitions/LISAManagerReferenceNumberType"},
-        "eventType" : {"$ref": "#/definitions/eventType"},
-		"eventDate" : {"$ref": "#/definitions/ISO8601-Date"}
+		"lifeEventID" : {
+          "description": "TODO",
+          "$ref": "#/definitions/IDType"},
+		"accountId" : {
+          "description": "The financial organisation’s own unique reference number for the investor’s LISA account.",
+          "$ref": "#/definitions/IDType"},
+		"lisaManagerReferenceNumber" : {
+		  "description": "The number issued to the LISA provider upon successful LISA registration with HMRC.",
+		  "$ref": "#/definitions/LISAManagerReferenceNumberType"},
+        "eventType" : {
+          "description": "TODO",
+          "$ref": "#/definitions/eventType"},
+		"eventDate" : {
+          "description": "TODO",
+          "$ref": "#/definitions/ISO8601-Date"}
 	},
 	"required": [
 		"accountId",

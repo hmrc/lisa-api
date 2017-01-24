@@ -49,7 +49,7 @@ types:
       uriParameters:
         lisaManagerReferenceNumber:
           type : LISAManagerReferenceNumberType
-          description: The number issued to the LISA provider upon successful LISA registration with HMRC
+          description: The number issued to the LISA provider upon successful LISA registration with HMRC.
           example: "Z123456"
       /investors:
             post:
@@ -67,13 +67,13 @@ types:
                   description: The LISA investor resource has been created.
                   headers:
                     Location:
-                      description: Relative URI to the created LISAAccount resource
+                      description: Relative URI to the created LISAAccount resource.
                       type: string
                       example: /investors/0987654321
                 403:
                   body:
                     application/json:
-                      description: Investor not found
+                      description: The investor details given do not match with HMRC’s records
                       type: !include schemas/ErrorCodes.schema.json
                       example: |
                         {
@@ -89,7 +89,7 @@ types:
                       type: !include schemas/ErrorCodes.schema.json
                       examples:
                         notOpenStatus:
-                          description: TODO short description of scenario
+                          description: The investor already has a record with HMRC
                           value: |
                             {
                               "code" : "investor-already-exists",
@@ -100,8 +100,8 @@ types:
         description: !include documentation/LISAAccount
         post:
           is: [headers.acceptHeader, headers.contentHeader]
-          description: Request to create a new LISA Investor account or transfer of an account
-          displayName: Create a new LISA account
+          description: !include documentation/LISAAccount
+          displayName: Create or transfer a LISA account
           (annotations.scope): "write:lisa"
           securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
           body:
@@ -112,7 +112,7 @@ types:
             201:
               headers:
                 Location:
-                  description: URI to the created LISA account resource
+                  description: URI to the created LISA account resource.
                   type: string
                   example: /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}
               body:
