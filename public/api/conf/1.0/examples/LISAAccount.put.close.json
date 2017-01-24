@@ -1,0 +1,10 @@
+{
+  "investorID" : "8765432100",
+  "accountId" : "8765432100",
+  "lisaManagerReferenceNumber" : "Z543210",
+
+  "closeAccount": {
+    "accountClosureReason" : "All funds withdrawn",
+    "closureDate" : "2017-06-23"
+  }
+}
