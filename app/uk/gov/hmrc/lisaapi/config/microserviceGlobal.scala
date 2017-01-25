@@ -45,7 +45,7 @@ trait ServiceLocatorRegistration extends GlobalSettings with RunMode {
   override def onStart(app: Application): Unit = {
     super.onStart(app)
     registrationEnabled match {
-      case true => slConnector.register
+      case true => {Logger.info("Starting Registration"); slConnector.register}
       case false => Logger.warn("Registration in Service Locator is disabled")
     }
   }
