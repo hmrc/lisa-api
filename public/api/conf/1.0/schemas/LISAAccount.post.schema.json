@@ -11,10 +11,10 @@
       "type": "string"
     },
     "lisaManagerReferenceNumber": {
-      "description": "The number issued to the LISA provider upon successful LISA registration with HMRC.",
+      "description": "The number issued to the provider when they register with HMRC for LISA.",
       "$ref": "#/definitions/LISAManagerReferenceNumberType"
     },
-    "accountCreationReason": {
+    "creationReason": {
       "description": "The reason the account was created",
       "type": "string",
       "enum": [
@@ -30,12 +30,12 @@
       "type": "object",
       "description" : "If the accountCreationReason is ‘Transferred’, then this is required.",
       "properties": {
-        "prevAccountId": {
+        "transferredFromAccountID": {
           "description" : "The previous financial organisation’s own unique reference number for the investor’s LISA account.",
           "type": "string"
         },
-        "prevLisaManagerReferenceNumber": {
-          "description" : "The number issued to the previous LISA provider when they registered with HMRC.",
+        "transferredFromLMRN": {
+          "description" : "The number issued to the previous LISA provider when they registered with HMRC. for LISA",
           "$ref": "#/definitions/LISAManagerReferenceNumberType"
         },
         "transferInDate": {
@@ -44,8 +44,8 @@
         }
       },
       "required": [
-        "prevAccountId",
-        "prevLisaManagerReferenceNumber",
+        "transferredFromAccountID",
+        "transferredFromLMRN",
         "transferInDate"
       ]
     }
@@ -56,7 +56,7 @@
       "investorID",
       "accountID",
       "lisaManagerReferenceNumber",
-      "accountCreationReason",
+      "creationReason",
       "firstSubscriptionDate"
     ],
     "additionalProperties": false,

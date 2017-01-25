@@ -11,7 +11,7 @@
       "type": "string"
     },
     "lisaManagerReferenceNumber": {
-      "description": "The number issued to the LISA provider upon successful LISA registration with HMRC.",
+      "description": "The number issued to the provider when they register with HMRC for LISA.",
       "$ref": "#/definitions/LISAManagerReferenceNumberType"
     },
     "closeAccount": {

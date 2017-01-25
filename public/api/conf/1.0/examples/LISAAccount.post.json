@@ -2,11 +2,11 @@
   "investorID" : "8765432100",
   "lisaManagerReferenceNumber" : "Z543210",
   "accountID" :"8765432100",
-  "accountCreationReason" : "Transferred",
+  "creationReason" : "Transferred",
   "firstSubscriptionDate" : "2011-02-02",
   "transferAccount": {
-    "prevAccountId": "Z543210",
-    "prevLisaManagerReferenceNumber": "Z543333",
+    "transferredFromAccountID": "Z543210",
+    "transferredFromLMRN": "Z543333",
     "transferInDate": "2015-12-13"
   }
 }
