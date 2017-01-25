@@ -38,6 +38,7 @@ trait ServiceLocatorConnector {
 
 
   def register(implicit hc: HeaderCarrier): Future[Boolean] = {
+    Logger.info("The service url is " + serviceUrl)
     val registration = Registration(appName, appUrl, metadata)
     http.POST(s"$serviceUrl/registration", registration, Seq("Content-Type" -> "application/json")) map {
       _ =>
