@@ -49,7 +49,7 @@ types:
       uriParameters:
         lisaManagerReferenceNumber:
           type : LISAManagerReferenceNumberType
-          description: The number issued to the LISA provider upon successful LISA registration with HMRC
+          description: The number issued to the LISA provider upon successful LISA registration with HMRC.
           example: "Z123456"
       /investors:
             post:
@@ -67,18 +67,18 @@ types:
                   description: The LISA investor resource has been created.
                   headers:
                     Location:
-                      description: Relative URI to the created LISAAccount resource
+                      description: Relative URI to the created LISAAccount resource.
                       type: string
                       example: /investors/0987654321
                 403:
                   body:
                     application/json:
-                      description: Investor not found
+                      description: The investor details given do not match with HMRC’s records
                       type: !include schemas/ErrorCodes.schema.json
                       example: |
                         {
                           "code": "investor-not-found",
-                          "message": "The investor details are not present with HMRC and are unable to create a investor"
+                          "message": "The investor details given do not match with HMRC’s records."
                         }
 
                 409:
@@ -89,19 +89,19 @@ types:
                       type: !include schemas/ErrorCodes.schema.json
                       examples:
                         notOpenStatus:
-                          description: TODO short description of scenario
+                          description: The investor already has a record with HMRC
                           value: |
                             {
                               "code" : "investor-already-exists",
-                              "message" : "The investor resource already exists. the existing InvestorId is returned"
+                              "message" : "The investor already has a record with HMRC."
                             }
 
       /accounts:
         description: !include documentation/LISAAccount
         post:
           is: [headers.acceptHeader, headers.contentHeader]
-          description: Request to create a new LISA Investor account or transfer of an account
-          displayName: Create a new LISA account
+          description: !include documentation/LISAAccount
+          displayName: Create or transfer a LISA account
           (annotations.scope): "write:lisa"
           securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
           body:
@@ -112,7 +112,7 @@ types:
             201:
               headers:
                 Location:
-                  description: URI to the created LISA account resource
+                  description: URI to the created LISA account resource.
                   type: string
                   example: /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}
               body:
@@ -132,35 +132,35 @@ types:
                   type: !include schemas/ErrorCodes.schema.json
                   examples:
                     investorNotFound:
-                      description: TODO short description of scenario
+                      description: The investorID given does not match with HMRC’s records.
                       value: |
                         {
                           "code" : "investor-not-found",
                           "message" : "invalid status: must create with open status"
                         }
                     wrongLISAManager:
-                      description: TODO short description of scenario
+                      description: The lisaManagerReferenceNumber given does not match with HMRC’s records.
                       value: |
                         {
                           "code" : "wrong-lisa-manager",
                           "message" : "the lisaManagerReferenceNumber in URI does match match the calling LISAManager"
                         }
                     outsideAgeRange:
-                      description: TODO short description of scenario
+                      description: The investor is not eligible for a LISA account.
                       value: |
                         {
                           "code" : "Investor-Eligibility-Check-Failed",
                           "message" : "Can't open a LISA if investor is older than 40 or younger than 18"
                          }
                     complianceFail:
-                      description: TODO short description of scenario
+                      description: TODO
                       value: |
                         {
                           "code" : "Investor-Compliance-Check-Failed",
                           "message" : "Investor has an active account associated with another provider"
                         }
                     prevAccntDoNoExists:
-                      description: TODO short description of scenario
+                      description: The previous LISA account details given do not match with HMRC’s records.
                       value: |
                         {
                           "code" : "Previous-Investor-Account-Does-not-Exist",
@@ -207,10 +207,10 @@ types:
                               value: |
                                 {
                                   "code" : "wrong-lisa-manager",
-                                  "message" : "the lisaManagerReferenceNumber in URI does match match the calling LISAManager"
+                                  "message" : "The lisaManagerReferenceNumber given does not match with HMRC’s records."
                                 }
                             accountClosed:
-                              description: Investor Account is already closed
+                              description: The LISA account is already closed.
                               value: |
                                 {
                                   "code" : "Investor-Account-already-closed",
@@ -220,12 +220,12 @@ types:
                     404:
                       body:
                         application/json:
-                          description: The LISA account identified by the accountId does not exist
+                          description: The accountID given does not match with HMRC’s records.
                           type: !include schemas/ErrorCodes.schema.json
                           example: |
                             {
                               "code": "Investor-Account-ID-Not-Found",
-                              "message": "Investor-Account-ID-Not-Found"
+                              "message": "The accountID given does not match with HMRC’s records."
                             }
               /events:
                     description: !include documentation/LifeEvent
@@ -255,7 +255,7 @@ types:
                               type: !include schemas/ErrorCodes.schema.json
                               examples:
                                 notOpenStatus:
-                                  description: The LISA manager or the LISA account do not belong to the calling LISA manage
+                                  description: The lisaManagerReferenceNumber given does not match with HMRC’s records.
                                   value: |
                                     {
                                       "code" : "wrong-lisa-manager",
@@ -264,20 +264,20 @@ types:
                         409:
                           body:
                             application/json:
-                              description: Conflict. The Investor Life Event already Exists.
+                              description: The investor’s life event has already been reported.
                               type: !include schemas/ErrorCodes.schema.json
                               example: |
                                 {
                                       "code" : "Life-Event-already-Exists",
-                                      "message" : "Investor Life Event already Exists"
+                                      "message" : "The investor’s life event has already been reported."
                                 }
 
               /transactions:
                     description: !include documentation/LISATransaction
                     post:
                       is: [headers.acceptHeader, headers.contentHeader]
-                      displayName: Request for bonus payment
-                      description: Request for a bonus payment.
+                      displayName: Request for a bonus payment
+                      description: Request a bonus payment from HMRC and provide a reason for the request.
                       (annotations.scope): "write:lisa"
                       securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
                       body:
@@ -313,18 +313,18 @@ types:
                               type: !include schemas/ErrorCodes.schema.json
                               examples:
                                 notOpenStatus:
-                                  description: TODO short description of scenario
+                                  description: The lisaManagerReferenceNumber given does not match with HMRC’s records.
                                   value: |
                                     {
                                       "code" : "wrong-lisa-manager",
-                                      "message" : "The LISA manager or the LISA account do not belong to the calling LISA manager"
+                                      "message" : "The lisaManagerReferenceNumber given does not match with HMRC’s records."
                                     }
                                 noLifeEvent:
-                                  description: Investor Life Event doesn’t Exist
+                                  description: The lifeEventID does not match with HMRC’s records.
                                   value: |
                                     {
                                       "code" : "Investor-Life-Event-doesn’t-Exist",
-                                      "message" : "Investor Life Event doesn’t Exist"
+                                      "message" : "The lifeEventID does not match with HMRC’s records."
                                     }
                                 bonusWrong:
                                   description: Bonus Claim Error
@@ -333,14 +333,3 @@ types:
                                       "code" : "Bonus-Claim-Error",
                                       "message" : "Bonus Claim Error"
                                     }
-                        409:
-                          body:
-                            application/json:
-                              description: Conflict. The LISA transaction resource already exists.
-                                Updating of LISA transaction resources is not supported.
-                              type: !include schemas/ErrorCodes.schema.json
-                              example: |
-                                {
-                                  "code": "TODO",
-                                  "message": "TODO"
-                                }
