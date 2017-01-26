@@ -10,10 +10,10 @@
 		  "description": "The financial organisation’s own unique reference number for the investor’s LISA account.",
 		  "$ref": "#/definitions/IDType"},
 		"lisaManagerReferenceNumber" : {
-          "description": "The number issued to the LISA provider upon successful LISA registration with HMRC.",
+          "description": "The number issued to the provider when they register with HMRC for LISA.",
           "$ref": "#/definitions/LISAManagerReferenceNumberType"},
         "lifeEventID" : {
-          "description": "TODO",
+          "description": "Report to HMRC if an investor has bought a house, been diagnosed with a terminal illness, or died. You need to do this to get a lifeEventID before you can request a bonus payment from HMRC.",
           "$ref": "#/definitions/IDType"},
 		"periodStartDate" : {
           "description": "TODO",
