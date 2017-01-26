@@ -3,11 +3,22 @@
 	"type": "object",
 	"properties":
 	{
-		"investorID" : {"$ref" : "#/definitions/IDType"},
-		"investorNINO": {"$ref" : "#/definitions/NINOType"},
-		"firstName" : {"type" : "string"},
-		"lastName" : {"type" : "string"},
-		"DoB": {"$ref": "#/definitions/ISO8601-Date"}
+		"investorID" : {
+		  "description": "The investor’s ID reference number.",
+          "$ref" : "#/definitions/IDType",
+          "example": "Z123456"},
+		"investorNINO": {
+          "description": "The investor’s National Insurance number.",
+          "$ref" : "#/definitions/NINOType"},
+		"firstName" : {
+          "description": "The investor’s first name.",
+          "type" : "string"},
+		"lastName" : {
+          "description": "The investor’s last name.",
+          "type" : "string"},
+		"DoB": {
+          "description": "The investor’s date of birth.",
+          "$ref": "#/definitions/ISO8601-Date"}
 	},
 	"required": ["investorNINO","firstName","lastName","DoB"],
 	"additionalProperties": false,

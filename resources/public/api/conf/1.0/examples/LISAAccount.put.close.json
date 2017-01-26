@@ -1,6 +1,6 @@
 {
   "investorID" : "8765432100",
-  "accountId" : "8765432100",
+  "accountID" : "8765432100",
   "lisaManagerReferenceNumber" : "Z543210",
 
   "closeAccount": {

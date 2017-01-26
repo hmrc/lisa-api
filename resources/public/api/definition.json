@@ -1,12 +1,12 @@
 {
   "scopes": [
     {
-      "key": "read:lifetime-individual-savings-account",
+      "key": "read:lisa",
       "name": "access lifetime isa information",
       "description": "Access Lifetime ISA information"
     },
     {
-      "key": "write:lifetime-individual-savings-account",
+      "key": "write:lisa",
       "name": "create and update lifetime isa information",
       "description": "Create and update Lifetime ISA information"
     }
