@@ -15,11 +15,11 @@
       "$ref": "#/definitions/LISAManagerReferenceNumberType"
     },
     "closeAccount": {
-      "description": "TODO",
+      "description": "Account closure details",
       "type": "object",
       "properties": {
         "accountClosureReason": {
-          "description": "TODO",
+          "description": "The reason the account was closed,",
           "type": "string",
           "enum": [
             "Transferred out",
@@ -28,7 +28,7 @@
           ]
         },
         "closureDate": {
-          "description": "TODO",
+          "description": "The date the account was closed.",
           "$ref": "#/definitions/ISO8601-Date"
         }
 
