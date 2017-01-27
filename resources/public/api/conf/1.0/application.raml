@@ -70,6 +70,18 @@ types:
                       description: Relative URI to the created LISAAccount resource.
                       type: string
                       example: /investors/0987654321
+                400:
+                  body:
+                    application/json:
+                      type: !include schemas/ErrorCodes.schema.json
+                      examples:
+                        notOpenStatus:
+                          description: Bad Request
+                          value: |
+                            {
+                              "code" : "BAD_REQUEST",
+                              "message" : "Bad Request"
+                            }
                 403:
                   body:
                     application/json:
@@ -77,10 +89,33 @@ types:
                       type: !include schemas/ErrorCodes.schema.json
                       example: |
                         {
-                          "code": "investor-not-found",
+                          "code": "INVESTOR_NOT_FOUND",
                           "message": "The investor details given do not match with HMRC’s records."
                         }
-
+                404:
+                  body:
+                    application/json:
+                      type: !include schemas/ErrorCodes.schema.json
+                      examples:
+                        ResourceNotFound:
+                          description: Resource Not Found
+                          value: |
+                            {
+                              "code" : "NOT_FOUND",
+                              "message" : "Resource Not Found"
+                            }
+                406:
+                  body:
+                    application/json:
+                      type: !include schemas/ErrorCodes.schema.json
+                      examples:
+                        headerInvalid:
+                          description: Accept header invalid
+                          value: |
+                            {
+                              "code" : "ACCEPT_HEADER_INVALID",
+                              "message" : "Accept header invalid"
+                            }
                 409:
                   description: Matches already existing resource.
                     Response contains a location header with link to the existing resource.
@@ -88,13 +123,26 @@ types:
                     application/json:
                       type: !include schemas/ErrorCodes.schema.json
                       examples:
-                        notOpenStatus:
+                        recordExists:
                           description: The investor already has a record with HMRC
                           value: |
                             {
-                              "code" : "investor-already-exists",
+                              "code" : "INVESTOR_ALREADY_EXISTS",
                               "message" : "The investor already has a record with HMRC."
                             }
+                500:
+                  body:
+                    application/json:
+                      type: !include schemas/ErrorCodes.schema.json
+                      examples:
+                       internalServerError :
+                          description: Internal Server Error
+                          value: |
+                            {
+                              "code" : "INTERNAL_SERVER_ERROR",
+                              "message" : "Internal Server Error"
+                            }
+
 
       /accounts:
         description: !include documentation/LISAAccount
@@ -126,6 +174,18 @@ types:
                        "success": true,
                        "status": 201
                      }
+            400:
+              body:
+                application/json:
+                  type: !include schemas/ErrorCodes.schema.json
+                  examples:
+                    badRequest:
+                      description: Bad Request
+                      value: |
+                        {
+                          "code" : "BAD_REQUEST",
+                          "message" : "Bad Request"
+                        }
             403:
               body:
                 application/json:
@@ -135,37 +195,62 @@ types:
                       description: The investorID given does not match with HMRC’s records.
                       value: |
                         {
-                          "code" : "investor-not-found",
+                          "code" : "INVESTOR_NOT_FOUND",
                           "message" : "invalid status: must create with open status"
                         }
                     wrongLISAManager:
                       description: The lisaManagerReferenceNumber given does not match with HMRC’s records.
                       value: |
                         {
-                          "code" : "wrong-lisa-manager",
+                          "code" : "WRONG_LISA_MANAGER",
                           "message" : "the lisaManagerReferenceNumber in URI does match match the calling LISAManager"
                         }
                     outsideAgeRange:
                       description: The investor is not eligible for a LISA account.
                       value: |
                         {
-                          "code" : "Investor-Eligibility-Check-Failed",
+                          "code" : "INVESTOR_ELIGIBILITY_CHECK_FAILED",
                           "message" : "Can't open a LISA if investor is older than 40 or younger than 18"
                          }
                     complianceFail:
                       description: TODO
                       value: |
                         {
-                          "code" : "Investor-Compliance-Check-Failed",
+                          "code" : "INVESTOR_COMPLIANCE_CHECK_FAILED",
                           "message" : "Investor has an active account associated with another provider"
                         }
                     prevAccntDoNoExists:
-                      description: The previous LISA account details given do not match with HMRC’s records.
+                      description: The prevAccountID and prevLisaManagerReferenceNumber given don’t match with an account on HMRC’s records.
                       value: |
                         {
-                          "code" : "Previous-Investor-Account-Does-not-Exist",
+                          "code" : "PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST",
                           "message" : "Previous Investor Account Doesn’t Exist"
                         }
+            404:
+              body:
+                application/json:
+                  type: !include schemas/ErrorCodes.schema.json
+                  examples:
+                    ResourceNotFound:
+                      description: Resource Not Found
+                      value: |
+                        {
+                          "code" : "NOT_FOUND",
+                          "message" : "Resource Not Found"
+                        }
+            406:
+              body:
+                application/json:
+                  type: !include schemas/ErrorCodes.schema.json
+                  examples:
+                    notOpenStatus:
+                      description: Accept header invalid
+                      value: |
+                        {
+                          "code" : "ACCEPT_HEADER_INVALID",
+                          "message" : "Accept header invalid"
+                        }
+
             409:
               body:
                 application/json:
@@ -173,9 +258,22 @@ types:
                   type: !include schemas/ErrorCodes.schema.json
                   example: |
                     {
-                      "code": "Investor-Account-Already-Exists",
+                      "code": "INVESTOR_ACCOUNT_ALREADY_EXISTS",
                       "message": "Investor Account Already Exists"
                     }
+            500:
+              body:
+                application/json:
+                  type: !include schemas/ErrorCodes.schema.json
+                  examples:
+                   internalServerError :
+                      description: Internal Server Error
+                      value: |
+                        {
+                          "code" : "INTERNAL_SERVER_ERROR",
+                          "message" : "Internal Server Error"
+                        }
+
         /{accountID}:
               uriParameters:
                 accountID:
@@ -187,7 +285,7 @@ types:
               put:
                   is: [headers.acceptHeader, headers.contentHeader]
                   displayName: Update an existing LISA account
-                  description: Update an existing LISA account for closure of an LISA account.
+                  description: Close an account and report the reason and date.
                   (annotations.scope): "write:lisa"
                   securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
                   body:
@@ -197,42 +295,90 @@ types:
                   responses:
                     200:
                       description: The account is updated successfully.
+                    400:
+                      body:
+                        application/json:
+                          type: !include schemas/ErrorCodes.schema.json
+                          examples:
+                            badRequest:
+                              description: Bad Request
+                              value: |
+                                {
+                                  "code" : "BAD_REQUEST",
+                                  "message" : "Bad Request"
+                                }
+
                     403:
                       body:
                         application/json:
                           type: !include schemas/ErrorCodes.schema.json
                           examples:
                             wrongLISAManager:
-                              description: lisaManagerReferenceNumber does not match the calling LISA Manager
+                              description: The lisaManagerReferenceNumber given does not match with HMRC’s records.
                               value: |
                                 {
-                                  "code" : "wrong-lisa-manager",
+                                  "code" : "WRONG_LISA_MANAGER",
                                   "message" : "The lisaManagerReferenceNumber given does not match with HMRC’s records."
                                 }
                             accountClosed:
                               description: The LISA account is already closed.
                               value: |
                                 {
-                                  "code" : "Investor-Account-already-closed",
+                                  "code" : "INVESTOR_ACCOUNT_ALREADY_CLOSED",
                                   "message" : "The Investor Account is already closed"
                                 }
 
                     404:
                       body:
                         application/json:
-                          description: The accountID given does not match with HMRC’s records.
                           type: !include schemas/ErrorCodes.schema.json
-                          example: |
-                            {
-                              "code": "Investor-Account-ID-Not-Found",
-                              "message": "The accountID given does not match with HMRC’s records."
-                            }
+                          examples:
+                            accountIDNOTFound:
+                              description: The accountID given does not match with HMRC’s records.
+                              value: |
+                                {
+                                  "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
+                                  "message": "The accountID given does not match with HMRC’s records."
+                                }
+                            resourceNotFound:
+                              description: Resource Not Found
+                              value: |
+                                {
+                                  "code" : "NOT_FOUND",
+                                  "message" : "Resource Not Found"
+                                }
+                    406:
+                      body:
+                        application/json:
+                          type: !include schemas/ErrorCodes.schema.json
+                          examples:
+                            headerInvalid:
+                              description: Accept header invalid
+                              value: |
+                                {
+                                  "code" : "ACCEPT_HEADER_INVALID",
+                                  "message" : "Accept header invalid"
+                                }
+                    500:
+                      body:
+                        application/json:
+                          type: !include schemas/ErrorCodes.schema.json
+                          examples:
+                           internalServerError :
+                              description: Internal Server Error
+                              value: |
+                                {
+                                  "code" : "INTERNAL_SERVER_ERROR",
+                                  "message" : "Internal Server Error"
+                                }
+
+
               /events:
                     description: !include documentation/LifeEvent
                     post:
                       is: [headers.acceptHeader, headers.contentHeader]
-                      displayName: Submit a life event.
-                      description: submit information to notify a life event of lisa Investor who has an Lisa account.
+                      displayName: Report a life event.
+                      description: !include documentation/LifeEvent
                       (annotations.scope): "write:lisa"
                       securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
                       body:
@@ -247,6 +393,19 @@ types:
                               description: Relative URI to the created Life Event
                               type: string
                               example: /manager/Z876543210/accounts/1234567890/events/3333333333
+                        400:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                notOpenStatus:
+                                  description: Bad Request
+                                  value: |
+                                    {
+                                      "code" : "BAD_REQUEST",
+                                      "message" : "Bad Request"
+                                    }
+
                         403:
                           description: Matches already existing resource.
                             Response contains a location header with link to the existing resource.
@@ -254,11 +413,11 @@ types:
                             application/json:
                               type: !include schemas/ErrorCodes.schema.json
                               examples:
-                                notOpenStatus:
+                                wrongLisaManager:
                                   description: The lisaManagerReferenceNumber given does not match with HMRC’s records.
                                   value: |
                                     {
-                                      "code" : "wrong-lisa-manager",
+                                      "code" : "WRONG_LISA_MANAGER",
                                       "message" : "The LISA manager or the LISA account do not belong to the calling LISA manager"
                                     }
                         409:
@@ -268,9 +427,21 @@ types:
                               type: !include schemas/ErrorCodes.schema.json
                               example: |
                                 {
-                                      "code" : "Life-Event-already-Exists",
+                                      "code" : "LIFE_EVENT_ALREADY_EXISTS",
                                       "message" : "The investor’s life event has already been reported."
                                 }
+                        500:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                               internalServerError :
+                                  description: Internal Server Error
+                                  value: |
+                                    {
+                                      "code" : "INTERNAL_SERVER_ERROR",
+                                      "message" : "Internal Server Error"
+                                    }
 
               /transactions:
                     description: !include documentation/LISATransaction
@@ -304,6 +475,18 @@ types:
                                      "success": true,
                                      "status": 200
                                    }
+                        400:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                badRequest:
+                                  description: Bad Request
+                                  value: |
+                                    {
+                                      "code" : "BAD_REQUEST",
+                                      "message" : "Bad Request"
+                                    }
 
                         403:
                           description: Matches already existing resource.
@@ -312,24 +495,68 @@ types:
                             application/json:
                               type: !include schemas/ErrorCodes.schema.json
                               examples:
-                                notOpenStatus:
+                                wrongLisaManager:
                                   description: The lisaManagerReferenceNumber given does not match with HMRC’s records.
                                   value: |
                                     {
-                                      "code" : "wrong-lisa-manager",
+                                      "code" : "WRONG_LISA_MANAGER",
                                       "message" : "The lisaManagerReferenceNumber given does not match with HMRC’s records."
                                     }
                                 noLifeEvent:
                                   description: The lifeEventID does not match with HMRC’s records.
                                   value: |
                                     {
-                                      "code" : "Investor-Life-Event-doesn’t-Exist",
+                                      "code" : "LIFE_EVENT_DOES_NOT_EXISTS",
                                       "message" : "The lifeEventID does not match with HMRC’s records."
                                     }
                                 bonusWrong:
                                   description: Bonus Claim Error
                                   value: |
                                     {
-                                      "code" : "Bonus-Claim-Error",
+                                      "code" : "BONUS_CLAIM_ERROR",
                                       "message" : "Bonus Claim Error"
+                                    }
+                        404:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                accountIDNOTFound:
+                                  description: The accountID given does not match with HMRC’s records.
+                                  value: |
+                                    {
+                                      "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
+                                      "message": "The accountID given does not match with HMRC’s records."
+                                    }
+                                resourceNotFound:
+                                  description: Resource Not Found
+                                  value: |
+                                    {
+                                      "code" : "NOT_FOUND",
+                                      "message" : "Resource Not Found"
+                                    }
+                        406:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                headerInvalid:
+                                  description: Accept header invalid
+                                  value: |
+                                    {
+                                      "code" : "ACCEPT_HEADER_INVALID",
+                                      "message" : "Accept header invalid"
+                                    }
+
+                        500:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                               internalServerError :
+                                  description: Internal Server Error
+                                  value: |
+                                    {
+                                      "code" : "INTERNAL_SERVER_ERROR",
+                                      "message" : "Internal Server Error"
                                     }

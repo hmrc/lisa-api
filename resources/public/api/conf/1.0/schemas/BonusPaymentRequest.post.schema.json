@@ -3,9 +3,6 @@
 	"type": "object",
 	"properties":
 	{
-		"lisaTransactionID" : {
-          "description": "TODO",
-          "$ref": "#/definitions/IDType"},
 		"accountID" : {
 		  "description": "The financial organisation’s own unique reference number for the investor’s LISA account.",
 		  "$ref": "#/definitions/IDType"},
@@ -34,10 +31,10 @@
 			"type" : "object",
 			"properties":
 			{
-				"SubscriptionAmountInClaimPeriod" :{
+				"htbTransferInForPeriod" :{
                   "description": "TODO",
                   "type" : "number"},
-			    "totalAmountToDate" :{
+			    "htbTransferTotalYTD" :{
                   "description": "TODO",
                   "type" : "number"}
 			}
@@ -49,16 +46,16 @@
 			"type" : "object",
 			"properties":
 			{
-			  "newSubscriptionsInClaimPeriod" :{"description": "TODO", "type" : "number"},
-			  "newSubscriptionsTaxYearToDate" :{"description": "TODO", "type" : "number"},
-			  "totalSubscriptionsInClaimPeriod" :{"description": "TODO", "type" : "number"},
-			  "totalSubscriptionsTaxYearToDate" :{"description": "TODO", "type" : "number"}
+			  "newSubsForPeriod" :{"description": "New subscriptions this claim period", "type" : "number"},
+			  "newSubsYTD" :{"description": "New subscriptions tax year-to-date", "type" : "number"},
+			  "totalSubsForPeriod" :{"description": "Total subscriptions in claim period", "type" : "number"},
+			  "totalSubsTYTD" :{"description": "Total subscriptions tax year-to-Date", "type" : "number"}
 			},
 		  "required":
 		  [
-			"newSubscriptionsTaxYearToDate",
-			"totalSubscriptionsInClaimPeriod",
-			"totalSubscriptionsTaxYearToDate"
+			"newSubsYTD",
+			"totalSubsForPeriod",
+			"totalSubsTYTD"
 		  ]
 		},
       "bonuses" :
@@ -67,15 +64,15 @@
         "type": "object",
         "properties" :
         {
-          "bonusDueInClaimPeriod" :{"description": "TODO", "type" : "number"},
-          "bonusDueYearToDate" :{"description": "TODO", "type" : "number"},
-          "bonusPaidInTaxYearToDate" :{"description": "TODO", "type" : "number"},
+          "bonusDueForPeriod" :{"description": "TODO", "type" : "number"},
+          "totalBonusDueYTD" :{"description": "TODO", "type" : "number"},
+          "bonusPaidYTD" :{"description": "TODO", "type" : "number"},
           "claimReason" : {"description": "TODO", "$ref": "#/definitions/claimReasonType"}
         },
         "required":
         [
-          "bonusDueInClaimPeriod" ,
-          "bonusDueYearToDate",
+          "bonusDueForPeriod" ,
+          "totalBonusDueYTD",
           "claimReason"
         ]
 

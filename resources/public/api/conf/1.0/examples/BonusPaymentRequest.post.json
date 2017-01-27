@@ -9,22 +9,22 @@
 
 
   "htbTransfer" : {
-    "SubscriptionAmountInClaimPeriod" : 0,
-    "totalAmountToDate" : 0
+    "htbTransferInForPeriod" : 0,
+    "htbTransferTotalYTD" : 0
   },
 
   "inboundPayments"   :
   {
-    "newSubscriptionsInClaimPeriod" : 4000,
-    "newSubscriptionsTaxYearToDate" : 4000,
-    "totalSubscriptionsInClaimPeriod" : 4000,
-    "totalSubscriptionsTaxYearToDate" : 4000
+    "newSubsForPeriod" : 4000,
+    "newSubsYTD" : 4000,
+    "totalSubsForPeriod" : 4000,
+    "totalSubsTYTD" : 4000
   },
 
   "bonuses"   :
   {
-    "bonusDueInClaimPeriod" : 1000,
-    "bonusDueYearToDate" : 1000,
+    "bonusDueForPeriod" : 1000,
+    "totalBonusDueYTD" : 1000,
     "claimReason" : "Life Event"
   }
 }
