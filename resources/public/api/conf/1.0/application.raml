@@ -28,16 +28,6 @@ types:
     pattern: "^\\d{10}$"
   LISAManagerReferenceNumberType:
     pattern: "^Z\\d{6}$"
-  paymentDirectionType:
-    enum: [credit, debit]
-  paymentStatusType:
-    enum: [pending, submitted, completed]
-  paymentMethodType:
-    enum : [directDebit, BACS]
-  hmrcTransactionType :
-    enum: [bonus, charge]
-  lisaTransactionType :
-    enum: [deposit, withdrawal, HTBtransfer, LISAtransfer, bonusClaim, chargeMade]
 
 /lifetime-isa:
   /manager:
@@ -374,6 +364,10 @@ types:
                   responses:
                     200:
                       description: The account is updated successfully.
+                      body:
+                        application/json:
+                          example: !include examples/LISAAccount.put.response.json
+
                     400:
                       body:
                         application/json:
@@ -471,7 +465,10 @@ types:
                             Location:
                               description: Relative URI to the created Life Event
                               type: string
-                              example: /manager/Z876543210/accounts/1234567890/events/3333333333
+                              example: /manager/Z654321/accounts/1234567890/events/3333333333
+                          body:
+                            application/json:
+                                example: !include examples/LifeEvent.post.response.json
                         400:
                           body:
                             application/json:
@@ -549,19 +546,11 @@ types:
                             Location:
                               description: Relative URI to the created LISA transaction resource
                               type: string
-                              example: /manager/Z876543210/accounts/1234567890/transactions/3333333333
-                        200:
-                           body:
-                              application/json:
-                                example: |
-                                   {
-                                     "data": {
-                                       "transactionId": "3333333333",
-                                       "message": "Bonus transaction created - Late Notification",
-                                     },
-                                     "success": true,
-                                     "status": 200
-                                   }
+                              example: /manager/Z654321/accounts/1234567890/transactions/3333333333
+                          body:
+                            application/json:
+                              example: !include examples/LISATransaction.post.response.json
+
                         400:
                           body:
                             application/json:
