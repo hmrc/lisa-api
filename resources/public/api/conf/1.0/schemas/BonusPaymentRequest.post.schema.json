@@ -21,9 +21,6 @@
         "transactionType" : {
           "description": "The type of transaction.",
           "$ref": "#/definitions/transactionTypeType"},
-        "chargeReason" : {
-          "description": "The reason the unauthorised withdrawal charge was applied.",
-          "$ref": "#/definitions/chargeReasonType"},
 
 		"htbTransfer" :
 		{
@@ -85,7 +82,6 @@
 		"periodStartDate",
 		"periodEndDate",
         "transactionType",
-        "chargeReason",
 		"inboundPayments",
         "bonuses"
     ],

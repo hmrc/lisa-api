@@ -3,17 +3,19 @@
 	"type": "object",
 	"properties":
 	{
-		"LISAManagerReferenceNumber" :
-		{
-			"$ref": "#/definitions/LISAManagerReferenceNumberType"
-		},
-		"LISAProviderName" : {"type" : "string"},
+	  "lisaManagerReferenceNumber": {
+		"description": "The number issued to the provider when they register with HMRC for LISA.",
+		"$ref": "#/definitions/LISAManagerReferenceNumberType"
+	  },
+		"lisaProviderName" : {
+          "description": "The LISA provider Name used when they registered with HMRC for LISA.",
+          "type" : "string"},
 		"_links" : {"type" : "object"}
 },
 	"required" :
 	[
-		"LISAManagerReferenceNumber",
-		"LISAProviderName"
+		"lisaManagerReferenceNumber",
+		"lisaProviderName"
 	],
 	"additionalProperties": false,
 	"definitions":
