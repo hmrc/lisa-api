@@ -8,7 +8,7 @@
           "$ref" : "#/definitions/IDType",
           "example": "Z123456"},
 		"investorNINO": {
-          "description": "The investor’s National Insurance number.",
+          "description": "The investor’s National Insurance number. Must conform to the regular expression: ^[A-Z]{2}\\d{6}[A-D]$ For example: Z123456",
           "$ref" : "#/definitions/NINOType"},
 		"firstName" : {
           "description": "The investor’s first name.",
@@ -17,7 +17,7 @@
           "description": "The investor’s last name.",
           "type" : "string"},
 		"DoB": {
-          "description": "The investor’s date of birth.",
+          "description": "The investor’s date of birth.\n Must conform to the format : YYYY-MM-DD \n For example: 2017-05-22 ",
           "$ref": "#/definitions/ISO8601-Date"}
 	},
 	"required": ["investorNINO","firstName","lastName","DoB"],
