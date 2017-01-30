@@ -10,64 +10,64 @@
           "description": "The number issued to the provider when they register with HMRC for LISA.",
           "$ref": "#/definitions/LISAManagerReferenceNumberType"},
         "lifeEventID" : {
-          "description": "Report to HMRC if an investor has bought a house, been diagnosed with a terminal illness, or died. You need to do this to get a lifeEventID before you can request a bonus payment from HMRC.",
+          "description": "The reference number you get when you report a life event.",
           "$ref": "#/definitions/IDType"},
 		"periodStartDate" : {
-          "description": "TODO",
+          "description": "The first date in the claim period.",
           "$ref": "#/definitions/ISO8601-Date"},
 	    "periodEndDate" : {
-          "description": "TODO",
+          "description": "The end date of the claim period.",
           "$ref": "#/definitions/ISO8601-Date"},
         "transactionType" : {
-          "description": "TODO",
+          "description": "The type of transaction.",
           "$ref": "#/definitions/transactionTypeType"},
         "chargeReason" : {
-          "description": "TODO",
+          "description": "The reason the unauthorised withdrawal charge was applied.",
           "$ref": "#/definitions/chargeReasonType"},
 
 		"htbTransfer" :
 		{
-          "description": "TODO",
+          "description": "Help-To-Buy transfer details",
 			"type" : "object",
 			"properties":
 			{
 				"htbTransferInForPeriod" :{
-                  "description": "TODO",
+                  "description": "The total amount of Help to Buy funds in the account during the claim period.",
                   "type" : "number"},
 			    "htbTransferTotalYTD" :{
-                  "description": "TODO",
+                  "description": "The total amount of Help to Buy funds in the account in the tax year to date.",
                   "type" : "number"}
 			}
 		},
 
 		"inboundPayments" :
 		{
-          "description": "TODO",
+          "description": "Inbound Payments details",
 			"type" : "object",
 			"properties":
 			{
-			  "newSubsForPeriod" :{"description": "New subscriptions this claim period", "type" : "number"},
-			  "newSubsYTD" :{"description": "New subscriptions tax year-to-date", "type" : "number"},
-			  "totalSubsForPeriod" :{"description": "Total subscriptions in claim period", "type" : "number"},
-			  "totalSubsTYTD" :{"description": "Total subscriptions tax year-to-Date", "type" : "number"}
+			  "newSubsForPeriod" :{"description": "The total amount of new qualifying deposits in the account during the claim period.", "type" : "number"},
+			  "newSubsYTD" :{"description": "The total amount of new qualifying deposits in the account during the tax year to date.", "type" : "number"},
+			  "totalSubsForPeriod" :{"description": "The total amount in the account during the claim period that is eligible for a bonus payment.", "type" : "number"},
+			  "totalSubsYTD" :{"description": "The total amount in the account during the tax year to date that is eligible for a bonus payment.", "type" : "number"}
 			},
 		  "required":
 		  [
 			"newSubsYTD",
 			"totalSubsForPeriod",
-			"totalSubsTYTD"
+			"totalSubsYTD"
 		  ]
 		},
       "bonuses" :
       {
-        "description": "TODO",
+        "description": "Details of Bonuses",
         "type": "object",
         "properties" :
         {
-          "bonusDueForPeriod" :{"description": "TODO", "type" : "number"},
-          "totalBonusDueYTD" :{"description": "TODO", "type" : "number"},
-          "bonusPaidYTD" :{"description": "TODO", "type" : "number"},
-          "claimReason" : {"description": "TODO", "$ref": "#/definitions/claimReasonType"}
+          "bonusDueForPeriod" :{"description": "The total bonus payment amount due for the claim period.", "type" : "number"},
+          "totalBonusDueYTD" :{"description": "The total bonus payment amount due for the tax year to date.", "type" : "number"},
+          "bonusPaidYTD" :{"description": "The total bonus payment that has already been claimed and paid in the tax year to date.", "type" : "number"},
+          "claimReason" : {"description": "The reason the bonus payment was claimed.", "$ref": "#/definitions/claimReasonType"}
         },
         "required":
         [
