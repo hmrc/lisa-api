@@ -7,13 +7,13 @@
           "description": "The financial organisation’s own unique reference number for the investor’s LISA account.",
           "$ref": "#/definitions/IDType"},
 		"lisaManagerReferenceNumber" : {
-		  "description": "The number issued to the provider when they register with HMRC for LISA.",
+		  "description": "The number issued to the provider when they register with HMRC for LISA.\n  Must conform to the regular expression ^Z\\d{6}$ \n (e.g. Z123456)",
 		  "$ref": "#/definitions/LISAManagerReferenceNumberType"},
         "eventType" : {
           "description": "The event that has occurred and triggers eligibility for the bonus payment.",
           "$ref": "#/definitions/eventType"},
 		"eventDate" : {
-          "description": "The date the life event occurred.",
+          "description": "The date the life event occurred.\n Must conform to the format : YYYY-MM-DD \n For example: 2017-10-18 ",
           "$ref": "#/definitions/ISO8601-Date"}
 	},
 	"required": [
