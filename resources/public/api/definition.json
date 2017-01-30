@@ -13,7 +13,7 @@
   ],
   "api": {
     "name": "Lifetime ISA",
-    "description": "TODO short description of the Lifetime ISA API for API documentation index page",
+    "description": "The Lifetime ISA (LISA) API allows financial organisations to report information to HM Revenue and Customs (HMRC) and get information about payments made by HMRC.",
     "context": "lifetime-isa",
     "versions": [
       {
