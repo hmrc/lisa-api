@@ -17,7 +17,7 @@
           "pattern": "^.{1,50}$"
         },
 		"DoB": {
-          "description": "The investor’s date of birth.\n Must conform to the format : YYYY-MM-DD \n For example: 2017-05-22 ",
+          "description": "The investor’s date of birth.\n Must conform to the format : YYYY-MM-DD \n For example: 2001-05-22 ",
           "$ref": "#/definitions/ISO8601-Date"}
 	},
 	"required": ["investorNINO","firstName","lastName","DoB"],

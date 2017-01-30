@@ -3,7 +3,7 @@
   "type": "object",
   "properties": {
     "investorID": {
-      "description": "The investor’s ID reference number.",
+      "description": "The investor’s ID reference number. Must conform to the regular expression: ^\\d{10}$ For example: 9876543210",
       "$ref": "#/definitions/IDType"
     },
     "accountID": {
@@ -11,7 +11,7 @@
       "type": "string"
     },
     "lisaManagerReferenceNumber": {
-      "description": "The number issued to the provider when they register with HMRC for LISA.",
+      "description": "The number issued to the provider when they register with HMRC for LISA.\n  Must conform to the regular expression ^Z\\d{6}$ \n (e.g. Z123456)",
       "$ref": "#/definitions/LISAManagerReferenceNumberType"
     },
     "closeAccount": {
@@ -28,7 +28,7 @@
           ]
         },
         "closureDate": {
-          "description": "The date the account was closed.",
+          "description": "The date the account was closed. \n Must conform to the format : YYYY-MM-DD \n For example: 2017-05-22 ",
           "$ref": "#/definitions/ISO8601-Date"
         }
 

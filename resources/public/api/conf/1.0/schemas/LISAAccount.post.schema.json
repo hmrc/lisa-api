@@ -3,7 +3,7 @@
   "type": "object",
   "properties": {
     "investorID": {
-      "description": "The investor’s ID reference number.",
+      "description": "The investor’s ID reference number. Must conform to the regular expression: ^\\d{10}$ For example: 9876543210",
       "$ref": "#/definitions/IDType"
     },
     "accountID": {
@@ -11,7 +11,7 @@
       "type": "string"
     },
     "lisaManagerReferenceNumber": {
-      "description": "The number issued to the provider when they register with HMRC for LISA.",
+      "description": "The number issued to the provider when they register with HMRC for LISA.\n  Must conform to the regular expression ^Z\\d{6}$ \n (e.g. Z123456)",
       "$ref": "#/definitions/LISAManagerReferenceNumberType"
     },
     "creationReason": {
@@ -23,7 +23,7 @@
       ]
     },
     "firstSubscriptionDate": {
-      "description":"The date of the first deposit into the account - if this is a transfer, use the date of deposit into the account managed by the previous organisation.",
+      "description":"The date of the first deposit into the account - if this is a transfer, use the date of deposit into the account managed by the previous organisation. \n Must conform to the format : YYYY-MM-DD \n For example: 2017-05-22 ",
       "$ref": "#/definitions/ISO8601-Date"
     },
     "transferAccount": {
@@ -35,11 +35,11 @@
           "type": "string"
         },
         "transferredFromLMRN": {
-          "description" : "The number issued to the previous LISA provider when they registered with HMRC. for LISA",
+          "description" : "The number issued to the previous LISA provider when they registered with HMRC for LISA.\n  Must conform to the regular expression ^Z\\d{6}$ \n (e.g. Z123456)",
           "$ref": "#/definitions/LISAManagerReferenceNumberType"
         },
         "transferInDate": {
-          "description": "The date the account transferred from the previous provider to the new one.",
+          "description": "The date the account transferred from the previous provider to the new one. \n Must conform to the format : YYYY-MM-DD \n For example: 2017-05-22 ",
           "$ref": "#/definitions/ISO8601-Date"
         }
       },
