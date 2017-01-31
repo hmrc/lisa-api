@@ -57,7 +57,7 @@
 		},
       "bonuses" :
       {
-        "description": "Details of Bonuses",
+        "description": "Details of bonuses.",
         "type": "object",
         "properties" :
         {
