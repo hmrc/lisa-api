@@ -45,7 +45,7 @@ types:
                   is: [headers.acceptHeader, headers.contentHeader]
                   displayName: Discover available endpoints
                   description: This allows LISA provider to discover all the available endpoints.
-                  (annotations.scope): "read:lifetime-individual-savings-account"
+                  (annotations.scope): "read:lisa"
                   securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
                   responses:
                     200:
