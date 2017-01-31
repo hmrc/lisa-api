@@ -43,8 +43,8 @@ types:
           example: "Z123456"
       get:
                   is: [headers.acceptHeader, headers.contentHeader]
-                  displayName: Get a LISA manager resource
-                  description: This is  first endpoint which allows LISA Provider to discover all the available endpoints.
+                  displayName: Discover available endpoints
+                  description: This allows LISA provider to discover all the available endpoints.
                   (annotations.scope): "read:lifetime-individual-savings-account"
                   securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
                   responses:
@@ -497,7 +497,7 @@ types:
                                       "message" : "The LISA manager or the LISA account do not belong to the calling LISA manager"
                                     }
                                 lifeEventInvalid:
-                                  description: The Life Event conflicts with previous Life Event reported.
+                                  description: The life event conflicts with previous life event reported.
                                   value: |
                                     {
                                       "code" : "LIFE_EVENT_INAPPROPRIATE",
@@ -531,7 +531,7 @@ types:
                     description: !include documentation/LISATransaction
                     post:
                       is: [headers.acceptHeader, headers.contentHeader]
-                      displayName: Request for a bonus payment
+                      displayName: Request a bonus payment
                       description: Request a bonus payment from HMRC and provide a reason for the request.
                       (annotations.scope): "write:lisa"
                       securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
@@ -586,9 +586,8 @@ types:
                                       "message" : "The lifeEventID does not match with HMRC’s records."
                                     }
                                 bonusWrong:
-                                  description:  The bonus information given exceeds the maximum annual amount.
-                                                The qualifying deposits exceed the maximum annual amount.
-                                                The bonus claim doesn't equal 25% of stated qualifying funds.
+                                  description: The bonus information given exceeds the maximum annual amount, the qualifying deposits exceed the maximum annual amount, or the bonus claim doesn't equal the correct percentage of stated qualifying funds.
+                                      
                                   value: |
                                     {
                                       "code" : "BONUS_CLAIM_ERROR",

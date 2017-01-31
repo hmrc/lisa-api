@@ -8,7 +8,7 @@
 		"$ref": "#/definitions/LISAManagerReferenceNumberType"
 	  },
 		"lisaProviderName" : {
-          "description": "The LISA provider Name used when they registered with HMRC for LISA.",
+          "description": "The name used by the provider when they registered with HMRC for LISA.",
           "type" : "string"},
 		"_links" : {"type" : "object"}
 },
