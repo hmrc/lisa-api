@@ -7,14 +7,14 @@
           "description": "The investor’s National Insurance number. Must conform to the regular expression: ^[A-Z]{2}\\d{6}[A-D]$ For example: AB123456D",
           "$ref" : "#/definitions/NINOType"},
 		"firstName" : {
-          "description": "The investor’s first name. Must conform to the regular expression: ^.{1,50}$ For example: AdiFirstNameMe",
+          "description": "The investor’s first name. Must conform to the regular expression: ^.{1,35}$ For example: AdiFirstNameMe",
           "type" : "string",
-          "pattern": "^.{1,50}$"
+          "pattern": "^.{1,35}$"
         },
 		"lastName" : {
-          "description": "The investor’s last name. Must conform to the regular expression: ^.{1,50}$ For example: myLastName",
+          "description": "The investor’s last name. Must conform to the regular expression: ^.{1,35}$ For example: myLastName",
           "type" : "string",
-          "pattern": "^.{1,50}$"
+          "pattern": "^.{1,35}$"
         },
 		"DoB": {
           "description": "The investor’s date of birth.\n Must conform to the format : YYYY-MM-DD \n For example: 2001-05-22 ",
