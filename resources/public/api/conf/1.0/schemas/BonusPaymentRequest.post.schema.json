@@ -24,7 +24,7 @@
 
 		"htbTransfer" :
 		{
-          "description": "Help-To-Buy transfer details",
+          "description": "Details about Help-To-Buy funds.",
 			"type" : "object",
 			"properties":
 			{
@@ -39,7 +39,7 @@
 
 		"inboundPayments" :
 		{
-          "description": "Inbound Payments details",
+          "description": "Details about qualifying deposits and account balance.",
 			"type" : "object",
 			"properties":
 			{
@@ -57,7 +57,7 @@
 		},
       "bonuses" :
       {
-        "description": "Details of Bonuses",
+        "description": "Bonus payment details.",
         "type": "object",
         "properties" :
         {
