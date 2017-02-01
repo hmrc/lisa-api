@@ -16,24 +16,23 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
-import controllers.AssetsBuilder
-import play.api.Logger
 import play.api.http.{HttpErrorHandler, LazyHttpErrorHandler}
-import uk.gov.hmrc.play.microservice.controller.BaseController
+import play.api.mvc.{Action, AnyContent}
+import uk.gov.hmrc.api.controllers.DocumentationController
+import uk.gov.hmrc.lisaapi.config.AppContext
+import uk.gov.hmrc.lisaapi.views._
 
-class Documentation(httpErrorHandler: HttpErrorHandler) extends AssetsBuilder(httpErrorHandler) with BaseController {
+class  Documentation(httpErrorHandler: HttpErrorHandler) extends DocumentationController(httpErrorHandler) {
 
-  def documentation(version: String, endpointName: String) = {
+  override def documentation(version: String, endpointName: String): Action[AnyContent] = {
     super.at(s"/public/api/documentation/$version", s"${endpointName.replaceAll(" ", "-")}.xml")
   }
 
-  def definition() = {
-    Logger.info("calling the definition json")
-    super.at("/public/api", "definition.json")
+  override def definition(): Action[AnyContent] = Action {
+    Ok(txt.definition(AppContext.apiContext))
   }
 
-  def raml(version: String, file: String) = {
-    Logger.info("RAM FILE IS " + s"/public/api/conf/$version/" + file)
+  def raml(version: String, file: String): Action[AnyContent] = {
     super.at(s"/public/api/conf/$version", file)
   }
 }
