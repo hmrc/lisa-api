@@ -24,7 +24,7 @@ private object AppDependencies {
   private val hmrcTestVersion = "2.2.0"
   private val scalaTestVersion = "2.2.6"
   private val pegdownVersion = "1.6.0"
-  private val apiPlatformlibVersion = "0.5.0"
+  private val apiPlatformlibVersion = "1.3.0"
 
 
   val compile = Seq(

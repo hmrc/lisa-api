@@ -16,21 +16,19 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
-import controllers.AssetsBuilder
 import play.api.http.{HttpErrorHandler, LazyHttpErrorHandler}
-import uk.gov.hmrc.play.microservice.controller.BaseController
 import play.api.mvc.{Action, AnyContent}
+import uk.gov.hmrc.api.controllers.DocumentationController
 import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.views._
-import uk.gov.hmrc.api.controllers.DocumentationController
 
-class Documentation(httpErrorHandler: HttpErrorHandler) extends AssetsBuilder(httpErrorHandler) with BaseController {
+class  Documentation(httpErrorHandler: HttpErrorHandler) extends DocumentationController(httpErrorHandler) {
 
-  def documentation(version: String, endpointName: String): Action[AnyContent] = {
+  override def documentation(version: String, endpointName: String): Action[AnyContent] = {
     super.at(s"/public/api/documentation/$version", s"${endpointName.replaceAll(" ", "-")}.xml")
   }
 
-  def definition(): Action[AnyContent] = Action {
+  override def definition(): Action[AnyContent] = Action {
     Ok(txt.definition(AppContext.apiContext))
   }
 
