@@ -7,7 +7,7 @@
 		  "description": "The financial organisation’s own unique reference number for the investor’s LISA account.",
 		  "$ref": "#/definitions/IDType"},
 		"lisaManagerReferenceNumber" : {
-          "description": "The number issued to the provider when they register with HMRC for LISA.\n  Must conform to the regular expression ^Z\\d{6}$ \n (e.g. Z123456)",
+          "description": "The number issued to the provider when they register with HMRC for LISA.\n  Must conform to the regular expression ^Z\\d{4,6}$ \n (e.g. Z123456)",
           "$ref": "#/definitions/LISAManagerReferenceNumberType"},
         "lifeEventID" : {
           "description": "The reference number you get when you report a life event. Must conform to the regular expression: ^\\d{10}$ For example: 9876543210",
@@ -98,7 +98,7 @@
 		},
 		"LISAManagerReferenceNumberType" : {
 			"type" : "string",
-			"pattern": "^Z\\d{6}$"
+			"pattern": "^Z\\d{4,6}$"
 		},
       "transactionTypeType" : {
         "type" : "string",
