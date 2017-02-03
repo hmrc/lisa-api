@@ -7,7 +7,7 @@
           "description": "The financial organisation’s own unique reference number for the investor’s LISA account.",
           "$ref": "#/definitions/IDType"},
 		"lisaManagerReferenceNumber" : {
-		  "description": "The number issued to the provider when they register with HMRC for LISA.\n  Must conform to the regular expression ^Z\\d{6}$ \n (e.g. Z123456)",
+		  "description": "The number issued to the provider when they register with HMRC for LISA.\n  Must conform to the regular expression ^Z\\d{4,6}$ \n (e.g. Z123456)",
 		  "$ref": "#/definitions/LISAManagerReferenceNumberType"},
         "eventType" : {
           "description": "The event that has occurred and triggers eligibility for the bonus payment.",
@@ -35,7 +35,7 @@
 		},
 		"LISAManagerReferenceNumberType" : {
 			"type" : "string",
-			"pattern": "^Z\\d{6}$"
+			"pattern": "^Z\\d{4,6}$"
 		},
 
 		"eventType" : {
