@@ -33,12 +33,17 @@ class LifetimeIsaSpec extends WordSpec with MockitoSugar with ShouldMatchers wit
 
   val lisainvestor = "Z019283"
 
-  "LisaController " should {
+  "The LisaSandbox Controller  " should {
     "return with status 200 " in
       new ServerWithConfig() {
-        val fh = FakeHeaders(Seq(("accept","application/vnd.hmrc.1.0+json")))
         val res = mockLisaController.createLisaInvestor(lisainvestor).apply(FakeRequest(Helpers.PUT,"/").withHeaders(("accept","application/vnd.hmrc.1.0+json")))
         status(res) should be (OK)
+      }
+
+    "return with status 406 " in
+      new ServerWithConfig() {
+        val res = mockLisaController.createLisaInvestor(lisainvestor).apply(FakeRequest(Helpers.PUT,"/").withHeaders(("accept","application/vnd.hmrc.2.0+json")))
+        status(res) should be (406)
       }
   }
 
