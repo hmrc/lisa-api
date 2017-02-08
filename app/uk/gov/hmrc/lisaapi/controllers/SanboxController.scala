@@ -18,9 +18,11 @@ package uk.gov.hmrc.lisaapi.controllers
 
 import play.api.http.HeaderNames
 import play.api.libs.json.Json
-import play.api.mvc.{AnyContent, Request, Result}
+import play.api.mvc.{Action, AnyContent, Request, Result}
+import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.services.SandboxService
 import uk.gov.hmrc.play.http.HeaderCarrier
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -29,6 +31,11 @@ class SandboxController extends LisaController {
   override implicit val hc: HeaderCarrier = HeaderCarrier()
   override lazy val service = SandboxService
 
+  override implicit def baseUrl(implicit request: Request[AnyContent]): String =
+    env match {
+      case "Test" | "Dev" => s"http://${request.headers.get(HeaderNames.HOST).getOrElse("unknown")}/sandbox"
+      case _ => s"https://${AppContext.baseUrl}/${AppContext.apiContext}"
+    }
 
   def withValidAuthHeader(f: Future[Result])(implicit request: Request[AnyContent]): Future[Result] = {
     request.headers.get(HeaderNames.AUTHORIZATION) match {
@@ -38,6 +45,16 @@ class SandboxController extends LisaController {
     }
   }
 
+  override def availableEndpoints(lisaManager: String): Action[AnyContent] = ???
+
+  override def createTransferLisaAccount(lisaManager: String): Action[AnyContent] = ???
+
+  override def closeLisaAccount(lisaManger: String, accountId: String): Action[AnyContent] = ???
+
+  override def lifeEvent(lisaManager: String, accountId: String): Action[AnyContent] = ???
+
+  override def requestBonus(lisaManager: String, accountId: String): Action[AnyContent] = ???
+
   override def createLisaInvestor(lisaManager: String) =  validateAccept(acceptHeaderValidationRules).async {
     implicit request =>
       withValidAuthHeader {
@@ -46,6 +63,8 @@ class SandboxController extends LisaController {
     } recover {
       case _ => Status(ErrorInternalServerError.httpStatusCode)(Json.toJson(ErrorInternalServerError))
     }
+
+
   }
 
 }

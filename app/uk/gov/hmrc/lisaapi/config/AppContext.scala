@@ -25,4 +25,5 @@ object AppContext extends ServicesConfig {
   lazy val serviceLocatorUrl: String = baseUrl("service-locator")
   lazy val registrationEnabled: Boolean = current.configuration.getBoolean(s"${env}.microservice.services.service-locator.enabled").getOrElse(true)
   lazy val apiContext = current.configuration.getString(s"api.context").getOrElse(throw new RuntimeException(s"Missing Key $env.api.context"))
+  lazy val baseUrl = current.configuration.getString(s"$env.baseUrl").getOrElse(throw new RuntimeException(s"Missing Key $env.baseUrl"))
 }
