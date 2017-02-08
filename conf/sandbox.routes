@@ -1,0 +1,1 @@
+GET         /sandbox/manager/:lisaref/accounts  @uk.gov.hmrc.lisaapi.controllers.SandboxController.createLisaInvestor(lisaref)

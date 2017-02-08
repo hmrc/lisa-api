@@ -21,30 +21,41 @@ import org.scalatest.{ShouldMatchers, WordSpec}
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.test.Helpers._
 import play.api.test._
+import play.mvc.Http.HeaderNames
 import play.test.WithServer
 
 
-class LifetimeIsaSpec extends WordSpec with MockitoSugar with ShouldMatchers with OneAppPerSuite {
+class SandboxControllerSpec extends WordSpec with MockitoSugar with ShouldMatchers with OneAppPerSuite {
 
-  // val mockLisaController = new  LisaController{ implicit val hc: HeaderCarrier = mock[HeaderCarrier}
-  val mockLisaController = SandboxController
+
+  val mockLisaController = new SandboxController
+
+  val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
+  val contentTypeHeader: (String, String) = (HeaderNames.CONTENT_TYPE, "application/json")
+  val authorizationHeader: (String, String) = (HeaderNames.AUTHORIZATION, "bearer token")
 
   abstract class ServerWithConfig(conf: Map[String, String] = Map.empty) extends WithServer()
 
-  val lisainvestor = "Z019283"
+  val lisaManager = "Z019283"
 
   "The LisaSandbox Controller  " should {
     "return with status 200 " in
-      new ServerWithConfig() {
-        val res = mockLisaController.createLisaInvestor(lisainvestor).apply(FakeRequest(Helpers.PUT,"/").withHeaders(("accept","application/vnd.hmrc.1.0+json")))
+     {
+        val res = mockLisaController.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT,"/").withHeaders(acceptHeader, authorizationHeader))
         status(res) should be (OK)
-      }
+     }
+
+    "return with status 401 " in
+      {
+      val res = mockLisaController.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader))
+      status(res) should be(401)
+    }
 
     "return with status 406 " in
-      new ServerWithConfig() {
-        val res = mockLisaController.createLisaInvestor(lisainvestor).apply(FakeRequest(Helpers.PUT,"/").withHeaders(("accept","application/vnd.hmrc.2.0+json")))
+     {
+        val res = mockLisaController.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT,"/").withHeaders(("accept","application/vnd.hmrc.2.0+json")))
         status(res) should be (406)
-      }
+     }
   }
 
 }

@@ -23,10 +23,10 @@ import scala.concurrent.Future
 
 trait LisaService {
 
-  def createInvestor(investor: String)(implicit hc: HeaderCarrier): Future[String]
+  def createInvestor(lisaManager: String)(implicit hc: HeaderCarrier): Future[String]
 }
 
 
 object SandboxService extends LisaService {
-  override def createInvestor(investor: String)(implicit hc: HeaderCarrier) = Future("Investor")
+  override def createInvestor(lisaManager: String)(implicit hc: HeaderCarrier) = Future("Investor")
 }

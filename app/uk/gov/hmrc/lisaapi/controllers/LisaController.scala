@@ -16,8 +16,9 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
-import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent}
+import play.api.libs.json.Json.toJson
+import play.api.libs.json.{JsError, JsSuccess, Json, Reads}
+import play.api.mvc.{Action, AnyContent, Request, Result}
 import uk.gov.hmrc.api.controllers.HeaderValidator
 import uk.gov.hmrc.lisaapi.services.{LisaService, SandboxService}
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -25,21 +26,27 @@ import uk.gov.hmrc.play.microservice.controller.BaseController
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.util.{Failure, Success, Try}
 
 trait LisaController extends BaseController with HeaderValidator {
   implicit val hc: HeaderCarrier
   lazy val service: LisaService = ???
 
-  def createLisaInvestor(investor: String) =  validateAccept(acceptHeaderValidationRules).async {
-    service.createInvestor(investor).map { invest => Ok("done")
-    } recover {
-      case _ => Status(ErrorInternalServerError.httpStatusCode)(Json.toJson(ErrorInternalServerError))
+  protected def withValidJson[T](f: (T) => Future[Result])(implicit request: Request[AnyContent], reads: Reads[T]): Future[Result] =
+    request.body.asJson match {
+      case Some(json) =>
+        Try(json.validate[T]) match {
+          case Success(JsSuccess(payload, _)) => f(payload)
+          case Success(JsError(errs)) => Future.successful(BadRequest(toJson(MissingID)))
+          case Failure(e) => Future.successful(BadRequest(toJson(InvalidID)))
+        }
+      case None =>
+        Future.successful(BadRequest(toJson(EmptyJson)))
     }
-  }
+
+  def createLisaInvestor(lisaManager: String): Action[AnyContent]
+
 }
 
-object SandboxController extends LisaController {
-  override implicit val hc: HeaderCarrier = HeaderCarrier()
-  override lazy val service = SandboxService
-}
+
 
