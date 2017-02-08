@@ -1,7 +1,7 @@
 GET         /manager/:lisamanagerref                                    @uk.gov.hmrc.lisaapi.controllers.SandboxController.availableEndpoints(lisamanagerref)
-GET         /manager/:lisamanagerref/investors                          @uk.gov.hmrc.lisaapi.controllers.SandboxController.createLisaInvestor(lisamanagerref)
-GET         /manager/:lisamanagerref/accounts                           @uk.gov.hmrc.lisaapi.controllers.SandboxController.createTransferLisaAccount(lisamanagerref)
-GET         /maanger/:lisamanagerref/accounts/:accountid/close-account  @uk.gov.hmrc.lisaapi.controllers.SandboxController.closeLisaAccount(lisamanagerref, accountid)
-GET         /maanger/:lisamanagerref/accounts/:accountid/events         @uk.gov.hmrc.lisaapi.controllers.SandboxController.lifeEvent(lisamanagerref, accountid)
-GET         /maanger/:lisamanagerref/accounts/:accountid/transactions   @uk.gov.hmrc.lisaapi.controllers.SandboxController.requestBonus(lisamanagerref, accountid)
+POST         /manager/:lisamanagerref/investors                          @uk.gov.hmrc.lisaapi.controllers.SandboxController.createLisaInvestor(lisamanagerref)
+POST         /manager/:lisamanagerref/accounts                           @uk.gov.hmrc.lisaapi.controllers.SandboxController.createTransferLisaAccount(lisamanagerref)
+POST         /maanger/:lisamanagerref/accounts/:accountid/close-account  @uk.gov.hmrc.lisaapi.controllers.SandboxController.closeLisaAccount(lisamanagerref, accountid)
+POST         /maanger/:lisamanagerref/accounts/:accountid/events         @uk.gov.hmrc.lisaapi.controllers.SandboxController.lifeEvent(lisamanagerref, accountid)
+POST         /maanger/:lisamanagerref/accounts/:accountid/transactions   @uk.gov.hmrc.lisaapi.controllers.SandboxController.requestBonus(lisamanagerref, accountid)
 

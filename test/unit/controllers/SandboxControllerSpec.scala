@@ -23,7 +23,7 @@ import play.api.test.Helpers._
 import play.api.test._
 import play.mvc.Http.HeaderNames
 import play.test.WithServer
-
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class SandboxControllerSpec extends WordSpec with MockitoSugar with ShouldMatchers with OneAppPerSuite {
 
@@ -39,23 +39,29 @@ class SandboxControllerSpec extends WordSpec with MockitoSugar with ShouldMatche
   val lisaManager = "Z019283"
 
   "The LisaSandbox Controller  " should {
-    "return with status 200 " in
+    "return with status 200 createInvestor" in
      {
         val res = mockLisaController.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT,"/").withHeaders(acceptHeader, authorizationHeader))
         status(res) should be (OK)
      }
 
-    "return with status 401 " in
+    "return with status 401 createInvestor " in
       {
       val res = mockLisaController.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader))
       status(res) should be(401)
     }
 
-    "return with status 406 " in
+    "return with status 406 createInvestor " in
      {
         val res = mockLisaController.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT,"/").withHeaders(("accept","application/vnd.hmrc.2.0+json")))
         status(res) should be (406)
      }
+
+    "return with status 200 endpoints " in
+    {
+      val res = mockLisaController.availableEndpoints(lisaManager).apply(FakeRequest(Helpers.PUT,"/").withHeaders(acceptHeader, authorizationHeader))
+      status(res) should be (OK)
+    }
   }
 
 }

@@ -45,7 +45,11 @@ class SandboxController extends LisaController {
     }
   }
 
-  override def availableEndpoints(lisaManager: String): Action[AnyContent] = ???
+  override def availableEndpoints(lisaManager: String): Action[AnyContent] =  validateAccept(acceptHeaderValidationRules).async {
+    implicit request =>
+        service.availableEndpoints(lisaManager).map { endpoints => Ok(endpoints)
+        }
+  }
 
   override def createTransferLisaAccount(lisaManager: String): Action[AnyContent] = ???
 
@@ -59,12 +63,10 @@ class SandboxController extends LisaController {
     implicit request =>
       withValidAuthHeader {
       service.createInvestor(lisaManager).map { invest => Ok("done")
-    }
+      }
     } recover {
       case _ => Status(ErrorInternalServerError.httpStatusCode)(Json.toJson(ErrorInternalServerError))
     }
-
-
   }
 
 }
