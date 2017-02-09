@@ -17,14 +17,27 @@
 package uk.gov.hmrc.lisaapi.services
 
 import play.api.libs.json.{JsValue, Json}
+import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.play.http.HeaderCarrier
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 
 object SandboxService extends LisaService {
 
-  override def createInvestor(lisaManager: String)(implicit hc: HeaderCarrier) = Future("Investor")
+  override def createInvestor(lisaManager: String, lisaInvestor: LisaInvestor)(implicit hc: HeaderCarrier) = {
+    Future(Json.parse(
+      s"""{
+         |  "data": {
+         |    "investorID": "9876543210",
+         |    "message": "Investor Created."
+         |  },
+         |  "success": true,
+         |  "status": 201
+         |}""".stripMargin
+    ))
+  }
 
   override def availableEndpoints(lisaManager: String): Future[JsValue] = {
     Future(Json.parse(

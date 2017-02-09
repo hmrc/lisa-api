@@ -20,6 +20,7 @@ import play.api.http.HeaderNames
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, Request, Result}
 import uk.gov.hmrc.lisaapi.config.AppContext
+import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.SandboxService
 import uk.gov.hmrc.play.http.HeaderCarrier
 
@@ -65,12 +66,14 @@ class SandboxController extends LisaController {
 
   override def createLisaInvestor(lisaManager: String) =  validateAccept(acceptHeaderValidationRules).async {
     implicit request =>
-      withValidAuthHeader {
-      service.createInvestor(lisaManager).map { invest => Ok("done")
+      withValidJson[LisaInvestor] { lisainvestor =>
+        withValidAuthHeader {
+          service.createInvestor(lisaManager, lisainvestor).map { invest => Created(invest)
+          }
+        } recover {
+          case _ => Status(ErrorInternalServerError.httpStatusCode)(Json.toJson(ErrorInternalServerError))
+        }
       }
-    } recover {
-      case _ => Status(ErrorInternalServerError.httpStatusCode)(Json.toJson(ErrorInternalServerError))
-    }
   }
 
 }

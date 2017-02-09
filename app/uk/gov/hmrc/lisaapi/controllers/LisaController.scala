@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
+import play.api.Logger
 import play.api.http.HeaderNames
 import play.api.libs.json.Json.toJson
 import play.api.libs.json.{JsError, JsSuccess, Json, Reads}
@@ -45,7 +46,10 @@ trait LisaController extends BaseController with HeaderValidator with RunMode {
       case Some(json) =>
         Try(json.validate[T]) match {
           case Success(JsSuccess(payload, _)) => f(payload)
-          case Success(JsError(errs)) => Future.successful(BadRequest(toJson(MissingID)))
+          case Success(JsError(errs)) => {
+            Logger.info("The errors are " + errs.toString())
+            Future.successful(BadRequest(toJson(MissingID)))
+          }
           case Failure(e) => Future.successful(BadRequest(toJson(InvalidID)))
         }
       case None =>
