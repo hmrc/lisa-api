@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.lisaapi.models
 
+import play.api.libs.json.Json
+
 
 case class ID(id:String)
 
@@ -25,6 +27,9 @@ case class ReferenceNumber(ref:String)
 
 case class ISO8601Date (date:String)
 
+object ISO8601Date {
+  implicit val format = Json.format[ISO8601Date]
+}
 
 object Constants {
 
@@ -75,6 +80,10 @@ case class ClosureReason(closureCode: String) {
 case class LisaManager(referenceNo: ReferenceNumber, name: String)
 
 case class LisaInvestor(NINO:String, firstName :String, lastName:String, dob:ISO8601Date)
+
+object LisaInvestor {
+  implicit val format = Json.format[LisaInvestor]
+}
 
 case class LisaAccount(investorID:ID,
                        accountID: AccountId,

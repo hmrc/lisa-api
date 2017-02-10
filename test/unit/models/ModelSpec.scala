@@ -16,8 +16,8 @@
 
 package uk.gov.hmrc.models
 
-import uk.gov.hmrc.play.test.UnitSpec
 import uk.gov.hmrc.lisaapi.models.CreationReason
+import uk.gov.hmrc.play.test.UnitSpec
 
 import scala.util.Try
 
