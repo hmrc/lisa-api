@@ -56,4 +56,17 @@ object SandboxService extends LisaService {
       }"""
     ))
   }
+
+  override def createTransferAccount(lisaManager: String, lisaAccount: LisaAccount): Future[JsValue] = {
+    Future(Json.parse(
+      s"""{{
+         |  "data": {
+         |    "accountId": "87654321",
+         |    "message": "Investor Account Created Late Notification"
+         |  },
+         |  "success": true,
+         |  "status": 201
+         |}""".stripMargin
+    ))
+  }
 }

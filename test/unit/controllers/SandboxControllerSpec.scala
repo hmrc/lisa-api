@@ -44,6 +44,19 @@ class SandboxControllerSpec extends WordSpec with MockitoSugar with ShouldMatche
                          "dob" : {"date": "1973-03-24"}
                        }""".stripMargin
 
+  val createAccountJson = """{
+                          "investorID" : "9876543210",
+                          "lisaManagerReferenceNumber" : "Z4321",
+                          "accountID" :"8765432100",
+                          "creationReason" : "Transferred",
+                          "firstSubscriptionDate" : "2011-02-02",
+                          "transferAccount": {
+                            "transferredFromAccountID": "Z543210",
+                            "transferredFromLMRN": "Z543333",
+                            "transferInDate": "2015-12-13"
+                          }
+                        }""".stripMargin
+
   abstract class ServerWithConfig(conf: Map[String, String] = Map.empty) extends WithServer()
 
   val lisaManager = "Z019283"
@@ -72,6 +85,12 @@ class SandboxControllerSpec extends WordSpec with MockitoSugar with ShouldMatche
     {
       val res = mockLisaController.availableEndpoints(lisaManager).apply(FakeRequest(Helpers.PUT,"/").withHeaders(acceptHeader, authorizationHeader))
       status(res) should be (OK)
+    }
+
+    "rerurn with start 201 for create/transfer account " in {
+      val res = mockLisaController.createTransferLisaAccount(lisaManager).apply(FakeRequest(Helpers.PUT,"/").withHeaders(acceptHeader, authorizationHeader).
+        withBody(AnyContentAsJson(Json.parse(createAccountJson))))
+      status(res) should be (CREATED)
     }
   }
 

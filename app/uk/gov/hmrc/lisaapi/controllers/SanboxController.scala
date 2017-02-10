@@ -56,7 +56,16 @@ class SandboxController extends LisaController {
       }
   }
 
-  override def createTransferLisaAccount(lisaManager: String): Action[AnyContent] = ???
+  override def createTransferLisaAccount(lisaManager: String): Action[AnyContent]  =  validateAccept(acceptHeaderValidationRules).async {
+    implicit request =>
+      withValidAuthHeader {
+       val lisaaccount = LisaAccount(ID(""),AccountId(""),ReferenceNumber(""),CreationReason("New"),ISO8601Date(""),TransferAccount(AccountId(""),ReferenceNumber(""),ISO8601Date("")),ClosureReason(""),ISO8601Date(""))
+        service.createTransferAccount(lisaManager, lisaaccount).map { account => Created(account)
+        }
+      } recover {
+        case _ => Status(ErrorInternalServerError.httpStatusCode)(Json.toJson(ErrorInternalServerError))
+      }
+  }
 
   override def closeLisaAccount(lisaManger: String, accountId: String): Action[AnyContent] = ???
 
@@ -66,14 +75,13 @@ class SandboxController extends LisaController {
 
   override def createLisaInvestor(lisaManager: String) =  validateAccept(acceptHeaderValidationRules).async {
     implicit request =>
-      withValidJson[LisaInvestor] { lisainvestor =>
         withValidAuthHeader {
-          service.createInvestor(lisaManager, lisainvestor).map { invest => Created(invest)
+          val investor = LisaInvestor("","","",ISO8601Date(""))
+          service.createInvestor(lisaManager, investor).map { invest => Created(invest)
           }
         } recover {
           case _ => Status(ErrorInternalServerError.httpStatusCode)(Json.toJson(ErrorInternalServerError))
         }
-      }
   }
 
 }
