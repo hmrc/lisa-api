@@ -2,6 +2,5 @@
 
 ->         /                          definition.Routes
 ->         /                          health.Routes
-->         /sandbox                   sandbox.Routes
 
 GET        /admin/metrics             @com.kenshoo.play.metrics.MetricsController.metrics
