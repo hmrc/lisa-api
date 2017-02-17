@@ -16,6 +16,12 @@
 
 package uk.gov.hmrc.lisaapi.services
 
-trait LisaService {}
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 
+object InvestorService extends LisaService {
+  def createInvestor(lisamanager: String): Future[String] = {
+    Future("json")
+  }
+}
