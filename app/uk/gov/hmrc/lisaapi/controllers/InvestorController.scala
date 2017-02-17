@@ -20,14 +20,15 @@ import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.api.controllers.HeaderValidator
 import uk.gov.hmrc.lisaapi.models.LisaInvestor
-import uk.gov.hmrc.lisaapi.services.{InvestorService, LisaService}
+import uk.gov.hmrc.lisaapi.services.InvestorService
 import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.microservice.controller.BaseController
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class InvestorController extends LisaController {
 
-  override lazy val service = InvestorService
+  val service: InvestorService = InvestorService
+
   implicit val hc: HeaderCarrier = new HeaderCarrier()
 
   def createLisaInvestor(lisaManager: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async {

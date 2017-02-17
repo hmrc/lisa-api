@@ -23,7 +23,6 @@ import play.api.libs.json.{JsError, JsSuccess, Reads}
 import play.api.mvc.{AnyContent, Request, Result}
 import uk.gov.hmrc.api.controllers.HeaderValidator
 import uk.gov.hmrc.lisaapi.config.AppContext
-import uk.gov.hmrc.lisaapi.services.LisaService
 import uk.gov.hmrc.play.config.RunMode
 import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.microservice.controller.BaseController
@@ -33,7 +32,6 @@ import scala.util.{Failure, Success, Try}
 
 trait LisaController extends BaseController with HeaderValidator with RunMode {
   implicit val hc: HeaderCarrier
-  lazy val service: LisaService = ???
 
   implicit def baseUrl(implicit request: Request[AnyContent]): String = env match {
     case "Dev" => s"http://${request.headers.get(HeaderNames.HOST).getOrElse("unknown")}"
@@ -49,6 +47,7 @@ trait LisaController extends BaseController with HeaderValidator with RunMode {
             Logger.info("The errors are " + errs.toString())
             Future.successful(BadRequest(toJson(MissingID)))
           }
+
           case Failure(e) => Future.successful(BadRequest(toJson(InvalidID)))
         }
       case None =>

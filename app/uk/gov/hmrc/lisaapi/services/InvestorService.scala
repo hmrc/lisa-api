@@ -16,12 +16,16 @@
 
 package uk.gov.hmrc.lisaapi.services
 
+import play.api.libs.json.JsValue
+import play.api.mvc.Result
+
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
+trait InvestorService  {
+  def createInvestor(lisamanager: String): Future[String]
+}
 
-object InvestorService extends LisaService {
-  def createInvestor(lisamanager: String): Future[String] = {
-    Future("json")
-  }
+object InvestorService  extends InvestorService {
+ override def createInvestor(lisamanager: String): Future[String] = ???
 }

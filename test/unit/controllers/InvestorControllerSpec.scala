@@ -16,19 +16,29 @@
 
 package unit.controllers
 
+import org.mockito.Matchers.any
+import org.mockito.Mockito.when
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.{ShouldMatchers, WordSpec}
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.libs.json.Json
-import play.api.mvc.AnyContentAsJson
+import play.api.mvc.{AnyContentAsJson, Results}
 import play.api.test.Helpers._
 import play.api.test._
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.lisaapi.controllers.InvestorController
+import uk.gov.hmrc.lisaapi.services.InvestorService
+
+import scala.concurrent.Future
+
 
 class InvestorControllerSpec extends WordSpec with MockitoSugar with ShouldMatchers with OneAppPerSuite {
 
-  val mockInvestorController = new InvestorController
+  val mockService = mock[InvestorService]
+
+  val mockInvestorController = new InvestorController{
+    override val service: InvestorService = mockService
+  }
 
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
 
@@ -45,6 +55,7 @@ class InvestorControllerSpec extends WordSpec with MockitoSugar with ShouldMatch
   "The Investor Controller  " should {
     "return with status 200 createInvestor" in
       {
+        when(mockService.createInvestor(any())).thenReturn(Future.successful("result"))
         val res = mockInvestorController.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT,"/").withHeaders(acceptHeader).
           withBody(AnyContentAsJson(Json.parse(investorJson))))
         status(res) should be (CREATED)
@@ -53,6 +64,7 @@ class InvestorControllerSpec extends WordSpec with MockitoSugar with ShouldMatch
 
     "return with status 406 createInvestor " in
       {
+        when(mockService.createInvestor(any())).thenReturn(Future.successful("result"))
         val res = mockInvestorController.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT,"/").withHeaders(("accept","application/vnd.hmrc.2.0+json")))
         status(res) should be (406)
       }
