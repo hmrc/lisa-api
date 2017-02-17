@@ -51,8 +51,7 @@ class CreateLisaInvestorRequestSpec extends PlaySpec with JsonFormats {
         case JsError(errors) => {
           errors.count {
             case (path: JsPath, errors: Seq[ValidationError]) => {
-              path.toString() == "investorNINO"
-              errors.contains(ValidationError("error.formatting.nino"))
+              path.toString() == "/investorNINO" && errors.contains(ValidationError("error.formatting.nino"))
             }
           } mustBe 1
         }
@@ -68,8 +67,7 @@ class CreateLisaInvestorRequestSpec extends PlaySpec with JsonFormats {
         case JsError(errors) => {
           errors.count {
             case (path: JsPath, errors: Seq[ValidationError]) => {
-              path.toString() == "investorNINO"
-              errors.contains(ValidationError("error.formatting.firstName"))
+              path.toString() == "/firstName" && errors.contains(ValidationError("error.formatting.firstName"))
             }
           } mustBe 1
         }
@@ -85,8 +83,7 @@ class CreateLisaInvestorRequestSpec extends PlaySpec with JsonFormats {
         case JsError(errors) => {
           errors.count {
             case (path: JsPath, errors: Seq[ValidationError]) => {
-              path.toString() == "lastName"
-              errors.contains(ValidationError("error.formatting.lastName"))
+              path.toString() == "/lastName" && errors.contains(ValidationError("error.formatting.lastName"))
             }
           } mustBe 1
         }
@@ -102,8 +99,7 @@ class CreateLisaInvestorRequestSpec extends PlaySpec with JsonFormats {
         case JsError(errors) => {
           errors.count {
             case (path: JsPath, errors: Seq[ValidationError]) => {
-              path.toString() == "DoB"
-              errors.contains(ValidationError("error.formatting.date"))
+              path.toString() == "/DoB" && errors.contains(ValidationError("error.formatting.date"))
             }
           } mustBe 1
         }
