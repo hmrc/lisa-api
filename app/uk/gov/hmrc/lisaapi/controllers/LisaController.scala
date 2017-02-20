@@ -30,7 +30,7 @@ import uk.gov.hmrc.play.microservice.controller.BaseController
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 
-trait LisaController extends BaseController with HeaderValidator with RunMode {
+trait LisaController extends BaseController with HeaderValidator with RunMode with JsonFormats {
   implicit val hc: HeaderCarrier
 
   implicit def baseUrl(implicit request: Request[AnyContent]): String = env match {
@@ -45,10 +45,10 @@ trait LisaController extends BaseController with HeaderValidator with RunMode {
           case Success(JsSuccess(payload, _)) => f(payload)
           case Success(JsError(errs)) => {
             Logger.info("The errors are " + errs.toString())
-            Future.successful(BadRequest(toJson(MissingID)))
+            Future.successful(BadRequest(JsError.toJson(errs)))
           }
 
-          case Failure(e) => Future.successful(BadRequest(toJson(InvalidID)))
+          case Failure(e) => Future.successful(InternalServerError("Unable to validate Json request"))
         }
       case None =>
         Future.successful(BadRequest(toJson(EmptyJson)))

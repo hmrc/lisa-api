@@ -16,6 +16,7 @@
 
 package unit.models
 
+import org.joda.time.DateTime
 import org.scalatestplus.play.PlaySpec
 import play.api.data.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
@@ -24,11 +25,12 @@ import uk.gov.hmrc.lisaapi.models.CreateLisaInvestorRequest
 
 class CreateLisaInvestorRequestSpec extends PlaySpec with JsonFormats {
 
+  val validRequestJson = """{"investorNINO":"AB123456A", "firstName":"A", "lastName":"B", "DoB":"2000-01-01"}"""
+
   "CreateLisaInvestorRequest" must {
 
     "serialize from json" in {
-      val req = """{"investorNINO":"AB123456A", "firstName":"A", "lastName":"B", "DoB":"2000-01-01"}"""
-      val res = Json.parse(req).validate[CreateLisaInvestorRequest]
+      val res = Json.parse(validRequestJson).validate[CreateLisaInvestorRequest]
 
       res match {
         case JsError(errors) => fail()
@@ -41,6 +43,14 @@ class CreateLisaInvestorRequestSpec extends PlaySpec with JsonFormats {
           data.DoB.getDayOfMonth mustBe 1
         }
       }
+    }
+
+    "deserialize to json" in {
+      val request = CreateLisaInvestorRequest("AB123456A", "A", "B", new DateTime("2000-01-01"))
+
+      val json = Json.toJson[CreateLisaInvestorRequest](request)
+
+      json mustBe Json.parse(validRequestJson)
     }
 
     "catch an invalid NINO" in {

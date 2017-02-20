@@ -19,10 +19,11 @@ package uk.gov.hmrc.lisaapi.controllers
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.api.controllers.HeaderValidator
-import uk.gov.hmrc.lisaapi.models.LisaInvestor
+import uk.gov.hmrc.lisaapi.models.{CreateLisaInvestorRequest, LisaInvestor}
 import uk.gov.hmrc.lisaapi.services.InvestorService
 import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.microservice.controller.BaseController
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class InvestorController extends LisaController {
@@ -33,9 +34,13 @@ class InvestorController extends LisaController {
 
   def createLisaInvestor(lisaManager: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async {
     implicit request =>
-      service.createInvestor(lisaManager).map { invest => Created(invest)
-      } recover {
-        case _ => Status(ErrorInternalServerError.httpStatusCode)(Json.toJson(ErrorInternalServerError))
+      withValidJson[CreateLisaInvestorRequest] {
+        createRequest => {
+          service.createInvestor(lisaManager).map { invest => Created(invest)
+          } recover {
+            case _ => Status(ErrorInternalServerError.httpStatusCode)(Json.toJson(ErrorInternalServerError))
+          }
+        }
       }
   }
 
