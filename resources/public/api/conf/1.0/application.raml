@@ -42,7 +42,7 @@ types:
           description: The number issued to the LISA provider upon successful LISA registration with HMRC.
           example: "Z123456"
       get:
-                  is: [headers.acceptHeader, headers.contentHeader]
+                  is: [headers.acceptHeader]
                   displayName: Discover available endpoints
                   description: This allows LISA provider to discover all the available endpoints.
                   (annotations.scope): "read:lisa"

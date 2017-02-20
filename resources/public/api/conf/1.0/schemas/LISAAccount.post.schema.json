@@ -3,15 +3,17 @@
   "type": "object",
   "properties": {
     "investorID": {
-      "description": "The investor’s ID reference number. Must conform to the regular expression: ^\\d{10}$ For example: 9876543210",
-      "$ref": "#/definitions/IDType"
+      "description": "The investor’s ID reference number.",
+      "$ref": "#/definitions/IDType",
+      "example": "9876543210"
     },
     "accountID": {
       "description": "The financial organisation’s own unique reference number for the investor’s LISA account.",
-      "type": "string"
+      "type": "string",
+      "example": "9876543210"
     },
     "lisaManagerReferenceNumber": {
-      "description": "The number issued to the provider when they register with HMRC for LISA.\n  Must conform to the regular expression ^Z\\d{4,6}$ \n (e.g. Z123456)",
+      "description": "The number issued to the provider when they register with HMRC for LISA.",
       "$ref": "#/definitions/LISAManagerReferenceNumberType"
     },
     "creationReason": {
@@ -23,8 +25,9 @@
       ]
     },
     "firstSubscriptionDate": {
-      "description":"The date of the first deposit into the account - if this is a transfer, use the date of deposit into the account managed by the previous organisation. \n Must conform to the format : YYYY-MM-DD \n For example: 2017-05-22 ",
+      "description":"The date of the first deposit into the account - if this is a transfer, use the date of deposit into the account managed by the previous organisation.",
       "$ref": "#/definitions/ISO8601-Date"
+
     },
     "transferAccount": {
       "type": "object",
@@ -32,14 +35,15 @@
       "properties": {
         "transferredFromAccountID": {
           "description" : "The previous financial organisation’s own unique reference number for the investor’s LISA account.",
-          "type": "string"
+          "type": "string",
+          "example": "987654320"
         },
         "transferredFromLMRN": {
-          "description" : "The number issued to the previous LISA provider when they registered with HMRC for LISA.\n  Must conform to the regular expression ^Z\\d{4,6}$ \n (e.g. Z123456)",
+          "description" : "The number issued to the previous LISA provider when they registered with HMRC for LISA.",
           "$ref": "#/definitions/LISAManagerReferenceNumberType"
         },
         "transferInDate": {
-          "description": "The date the account transferred from the previous provider to the new one. \n Must conform to the format : YYYY-MM-DD \n For example: 2017-05-22 ",
+          "description": "The date the account transferred from the previous provider to the new one.",
           "$ref": "#/definitions/ISO8601-Date"
         }
       },
@@ -62,20 +66,20 @@
     "additionalProperties": false,
     "definitions": {
       "ISO8601-Date": {
+        "id": "full-date",
         "type": "string",
-        "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
-      },
-      "ISO8601-Timestamp": {
-        "type": "string",
-        "pattern": "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}(:\\d{2})?(([+-]\\d{2}(:\\d{2})?)|Z)"
+        "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+        "example": "2017-07-19"
       },
       "IDType": {
         "type": "string",
-        "pattern": "^\\d{10}$"
+        "pattern": "^\\d{10}$",
+        "example": "1234567890"
       },
       "LISAManagerReferenceNumberType": {
         "type": "string",
-        "pattern": "^Z\\d{4,6}$"
+        "pattern": "^Z\\d{4,6}$",
+        "example": "Z1234"
       }
     ,
       "NINOType":
