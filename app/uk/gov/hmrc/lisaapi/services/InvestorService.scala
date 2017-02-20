@@ -16,21 +16,16 @@
 
 package uk.gov.hmrc.lisaapi.services
 
-import com.fasterxml.jackson.annotation.JsonValue
 import play.api.libs.json.JsValue
-import uk.gov.hmrc.lisaapi.models.{LisaAccount, LisaInvestor, LisaManager, TransferAccount}
-import uk.gov.hmrc.play.http.HeaderCarrier
+import play.api.mvc.Result
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
-trait LisaService {
-
-  def createInvestor(lisaManager: String, lisaInvestor: LisaInvestor)(implicit hc: HeaderCarrier) : Future[JsValue]
-
-  def createTransferAccount(lisaManager: String, lisaAccount: LisaAccount): Future[JsValue]
-
-  def availableEndpoints(lisaManger: String) : Future[JsValue]
+trait InvestorService  {
+  def createInvestor(lisamanager: String): Future[String]
 }
 
-
+object InvestorService  extends InvestorService {
+ override def createInvestor(lisamanager: String): Future[String] = ???
+}

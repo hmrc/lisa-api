@@ -33,4 +33,11 @@ trait JsonFormats {
       (JsPath \ "lastName").read[String].filter(ValidationError("error.formatting.lastName"))(input => input.matches(nameRegex)) and
       (JsPath \ "DoB").read[String].filter(ValidationError("error.formatting.date"))(input => input.matches(dateRegex)).map(new DateTime(_))
     )(CreateLisaInvestorRequest.apply _)
+
+  implicit val createLisaInvestorRequestWrites: Writes[CreateLisaInvestorRequest] = (
+    (JsPath \ "investorNINO").write[String] and
+      (JsPath \ "firstName").write[String] and
+      (JsPath \ "lastName").write[String] and
+      (JsPath \ "DoB").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd"))
+    )(unlift(CreateLisaInvestorRequest.unapply))
 }
