@@ -14,22 +14,27 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.lisaapi.services
+package uk.gov.hmrc.lisaapi.connectors
 
-import uk.gov.hmrc.lisaapi.connectors.DesConnector
+import uk.gov.hmrc.lisaapi.config.WSHttp
 import uk.gov.hmrc.lisaapi.models.CreateLisaInvestorRequest
-import uk.gov.hmrc.play.http.HeaderCarrier
+import uk.gov.hmrc.play.config.ServicesConfig
+import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost}
 
 import scala.concurrent.Future
 
-trait InvestorService  {
-  val desConnector: DesConnector
+trait DesConnector extends ServicesConfig {
 
-  def createInvestor(lisaManager: String, request: CreateLisaInvestorRequest)(implicit hc: HeaderCarrier) : Future[String] = {
-    desConnector.createInvestor(lisaManager, request)
+  val httpPost:HttpPost = WSHttp
+  lazy val desUrl = baseUrl("des")
+
+  def createInvestor(lisaManager: String, request: CreateLisaInvestorRequest)(implicit hc: HeaderCarrier): Future[String] = {
+    ???
   }
+
 }
 
-object InvestorService extends InvestorService {
-  override val desConnector: DesConnector = DesConnector
+
+object DesConnector extends DesConnector {
+
 }

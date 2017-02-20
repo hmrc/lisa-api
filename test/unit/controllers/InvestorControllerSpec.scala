@@ -63,7 +63,7 @@ class InvestorControllerSpec extends WordSpec with MockitoSugar with ShouldMatch
   "The Investor Controller  " should {
     "return with status 200 createInvestor" in
       {
-        when(mockService.createInvestor(any())).thenReturn(Future.successful("result"))
+        when(mockService.createInvestor(any(), any())(any())).thenReturn(Future.successful("result"))
         val res = mockInvestorController.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT,"/").withHeaders(acceptHeader).
           withBody(AnyContentAsJson(Json.parse(investorJson))))
         status(res) should be (CREATED)
@@ -71,7 +71,7 @@ class InvestorControllerSpec extends WordSpec with MockitoSugar with ShouldMatch
 
     "return with status 400 bad request" when {
       "given an invalid json body" in {
-        when(mockService.createInvestor(any())).thenReturn(Future.successful("result"))
+        when(mockService.createInvestor(any(), any())(any())).thenReturn(Future.successful("result"))
         val res = mockInvestorController.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
           withBody(AnyContentAsJson(Json.parse(invalidInvestorJson))))
         status(res) should be(BAD_REQUEST)
@@ -81,7 +81,7 @@ class InvestorControllerSpec extends WordSpec with MockitoSugar with ShouldMatch
 
     "return with status 406 createInvestor " in
       {
-        when(mockService.createInvestor(any())).thenReturn(Future.successful("result"))
+        when(mockService.createInvestor(any(), any())(any())).thenReturn(Future.successful("result"))
         val res = mockInvestorController.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT,"/").withHeaders(("accept","application/vnd.hmrc.2.0+json")))
         status(res) should be (406)
       }
