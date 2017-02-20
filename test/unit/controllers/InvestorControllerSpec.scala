@@ -70,10 +70,18 @@ class InvestorControllerSpec extends WordSpec with MockitoSugar with ShouldMatch
       }
 
     "return with status 400 bad request" when {
-      "given an invalid json body" in {
+      "given a json body which does not match the schema" in {
         when(mockService.createInvestor(any(), any())(any())).thenReturn(Future.successful(Right("Success")))
         val res = mockInvestorController.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
           withBody(AnyContentAsJson(Json.parse(invalidInvestorJson))))
+        status(res) should be(BAD_REQUEST)
+      }
+
+      "given a plain text body" in {
+        when(mockService.createInvestor(any(), any())(any())).thenReturn(Future.successful(Right("Success")))
+        val res = mockInvestorController.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
+          withTextBody("hello"))
+
         status(res) should be(BAD_REQUEST)
       }
     }
