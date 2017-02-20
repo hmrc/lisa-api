@@ -45,7 +45,7 @@ class DesConnectorSpec extends PlaySpec
         val request = CreateLisaInvestorRequest("AB123456A", "A", "B", new DateTime("2000-01-01"))
         val result = Await.result(SUT.createInvestor("Z019283", request), Duration.Inf)
 
-        result must be("Created")
+        result must be(Right("Created"))
       }
     }
 
@@ -57,7 +57,7 @@ class DesConnectorSpec extends PlaySpec
         val request = CreateLisaInvestorRequest("AB123456A", "A", "B", new DateTime("2000-01-01"))
         val result = Await.result(SUT.createInvestor("Z019283", request), Duration.Inf)
 
-        result must be("Error")
+        result must be(Left("Error"))
       }
 
       "An upstream exception is thrown" in {
@@ -67,7 +67,7 @@ class DesConnectorSpec extends PlaySpec
         val request = CreateLisaInvestorRequest("AB123456A", "A", "B", new DateTime("2000-01-01"))
         val result = Await.result(SUT.createInvestor("Z019283", request), Duration.Inf)
 
-        result must be("Error")
+        result must be(Left("Error"))
       }
     }
 

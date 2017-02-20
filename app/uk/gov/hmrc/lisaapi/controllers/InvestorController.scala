@@ -36,9 +36,11 @@ class InvestorController extends LisaController {
     implicit request =>
       withValidJson[CreateLisaInvestorRequest] {
         createRequest => {
-          service.createInvestor(lisaManager, createRequest).map { invest => Created(invest)
-          } recover {
-            case _ => Status(ErrorInternalServerError.httpStatusCode)(Json.toJson(ErrorInternalServerError))
+          service.createInvestor(lisaManager, createRequest).map { result =>
+            result match {
+              case Right(msg) => Created(Json.toJson(msg))
+              case Left(msg) => InternalServerError(Json.toJson(msg))
+            }
           }
         }
       }
