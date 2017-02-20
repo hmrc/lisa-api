@@ -4,20 +4,22 @@
 	"properties":
 	{
 		"investorNINO": {
-          "description": "The investor’s National Insurance number. Must conform to the regular expression: ^[A-Z]{2}\\d{6}[A-D]$ For example: AB123456D",
+          "description": "The investor’s National Insurance number.",
           "$ref" : "#/definitions/NINOType"},
 		"firstName" : {
-          "description": "The investor’s first name. Must conform to the regular expression: ^.{1,35}$ For example: AdiFirstNameMe",
+          "description": "The investor’s first name.",
           "type" : "string",
-          "pattern": "^.{1,35}$"
+          "pattern": "^.{1,35}$",
+		  "example": "FirstNameMe"
         },
 		"lastName" : {
-          "description": "The investor’s last name. Must conform to the regular expression: ^.{1,35}$ For example: myLastName",
+          "description": "The investor’s last name.",
           "type" : "string",
-          "pattern": "^.{1,35}$"
+          "pattern": "^.{1,35}$",
+          "example": "lastNameDough"
         },
 		"DoB": {
-          "description": "The investor’s date of birth.\n Must conform to the format : YYYY-MM-DD \n For example: 2001-05-22 ",
+          "description": "The investor’s date of birth.",
           "$ref": "#/definitions/ISO8601-Date"}
 	},
 	"required": ["investorNINO","firstName","lastName","DoB"],
@@ -27,21 +29,13 @@
 		"ISO8601-Date" :
 		{
 			"type": "string",
-			"pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+			"pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+             "example": "1989-04-22"
 		},
-		"ISO8601-Timestamp" :
-		{
-			"type" : "string",
-			"pattern" : "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}(:\\d{2})?(([+-]\\d{2}(:\\d{2})?)|Z)"
-		},
-		"IDType":
-		{
-			"type": "string",
-			"pattern": "^\\d{10}$"
-		},
-		"NINOType":
-		{
-			"type": "string",
-			"pattern": "^[A-Z]{2}\\d{6}[A-D]$"}
+		"NINOType": {
+          "type": "string",
+          "pattern": "^[A-Z]{2}\\d{6}[A-D]$",
+          "example": "AB123456D"
+        }
 	}
 }
