@@ -19,22 +19,19 @@ package uk.gov.hmrc.lisaapi.controllers
 import play.api.Logger
 import play.api.http.HeaderNames
 import play.api.libs.json.Json.toJson
-import play.api.libs.json.{JsError, JsSuccess, Json, Reads}
-import play.api.mvc.{Action, AnyContent, Request, Result}
+import play.api.libs.json.{JsError, JsSuccess, Reads}
+import play.api.mvc.{AnyContent, Request, Result}
 import uk.gov.hmrc.api.controllers.HeaderValidator
 import uk.gov.hmrc.lisaapi.config.AppContext
-import uk.gov.hmrc.lisaapi.services.LisaService
 import uk.gov.hmrc.play.config.RunMode
 import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.microservice.controller.BaseController
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 
-trait LisaController extends BaseController with HeaderValidator with RunMode {
+trait LisaController extends BaseController with HeaderValidator with RunMode with JsonFormats {
   implicit val hc: HeaderCarrier
-  lazy val service: LisaService = ???
 
   implicit def baseUrl(implicit request: Request[AnyContent]): String = env match {
     case "Dev" => s"http://${request.headers.get(HeaderNames.HOST).getOrElse("unknown")}"
@@ -48,25 +45,15 @@ trait LisaController extends BaseController with HeaderValidator with RunMode {
           case Success(JsSuccess(payload, _)) => f(payload)
           case Success(JsError(errs)) => {
             Logger.info("The errors are " + errs.toString())
-            Future.successful(BadRequest(toJson(MissingID)))
+            Future.successful(BadRequest(JsError.toJson(errs)))
           }
-          case Failure(e) => Future.successful(BadRequest(toJson(InvalidID)))
+
+          case Failure(e) => Future.successful(InternalServerError("Unable to validate Json request"))
         }
       case None =>
         Future.successful(BadRequest(toJson(EmptyJson)))
     }
 
-  def availableEndpoints(lisaManager: String): Action[AnyContent]
-
-  def createLisaInvestor(lisaManager: String): Action[AnyContent]
-
-  def createTransferLisaAccount(lisaManager: String): Action[AnyContent]
-
-  def closeLisaAccount(lisaManger: String, accountId: String): Action[AnyContent]
-
-  def lifeEvent(lisaManager: String, accountId: String): Action[AnyContent]
-
-  def requestBonus(lisaManager: String, accountId: String): Action[AnyContent]
 }
 
 
