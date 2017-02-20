@@ -17,19 +17,33 @@
 package uk.gov.hmrc.lisaapi.connectors
 
 import uk.gov.hmrc.lisaapi.config.WSHttp
+import uk.gov.hmrc.lisaapi.controllers.JsonFormats
 import uk.gov.hmrc.lisaapi.models.CreateLisaInvestorRequest
 import uk.gov.hmrc.play.config.ServicesConfig
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost}
+import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpResponse}
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-trait DesConnector extends ServicesConfig {
+trait DesConnector extends ServicesConfig with JsonFormats {
 
   val httpPost:HttpPost = WSHttp
   lazy val desUrl = baseUrl("des")
+  lazy val lisaServiceUrl = s"$desUrl/lisa"
 
   def createInvestor(lisaManager: String, request: CreateLisaInvestorRequest)(implicit hc: HeaderCarrier): Future[String] = {
-    ???
+    val uri = s"$lisaServiceUrl/$lisaManager"
+
+    val result = httpPost.POST[CreateLisaInvestorRequest, HttpResponse](uri, request)
+
+    result.map(r => {
+      r.status match {
+        case 201 => "Created"
+        case _ => "Error"
+      }
+    }).recover({
+      case _ => "Error"
+    })
   }
 
 }

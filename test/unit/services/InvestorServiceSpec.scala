@@ -50,9 +50,7 @@ class InvestorServiceSpec extends PlaySpec
   }
 
   val mockDesConnector = mock[DesConnector]
-  object TestInvestorService extends InvestorService {
+  object SUT extends InvestorService {
     override val desConnector: DesConnector = mockDesConnector
   }
-
-  val SUT = TestInvestorService
 }
