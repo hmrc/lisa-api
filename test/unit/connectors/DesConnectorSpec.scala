@@ -60,9 +60,9 @@ class DesConnectorSpec extends PlaySpec
         result must be("Error")
       }
 
-      "An upstream exception is thrown" ignore {
+      "An upstream exception is thrown" in {
         when(mockHttpPost.POST[CreateLisaInvestorRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
-            .thenThrow(new RuntimeException("Upstream exceptions can be thrown by Http Verbs by default"))
+            .thenReturn(Future.failed(new RuntimeException("Http Verbs library can throw Upstream Exceptions")))
 
         val request = CreateLisaInvestorRequest("AB123456A", "A", "B", new DateTime("2000-01-01"))
         val result = Await.result(SUT.createInvestor("Z019283", request), Duration.Inf)
