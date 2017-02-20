@@ -16,16 +16,20 @@
 
 package uk.gov.hmrc.lisaapi.services
 
-import play.api.libs.json.JsValue
-import play.api.mvc.Result
+import uk.gov.hmrc.lisaapi.connectors.DesConnector
+import uk.gov.hmrc.lisaapi.models.CreateLisaInvestorRequest
+import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
 
 trait InvestorService  {
-  def createInvestor(lisamanager: String): Future[String]
+  val desConnector: DesConnector
+
+  def createInvestor(lisaManager: String, request: CreateLisaInvestorRequest)(implicit hc: HeaderCarrier) : Future[Either[String, String]] = {
+    desConnector.createInvestor(lisaManager, request)
+  }
 }
 
-object InvestorService  extends InvestorService {
- override def createInvestor(lisamanager: String): Future[String] = ???
+object InvestorService extends InvestorService {
+  override val desConnector: DesConnector = DesConnector
 }

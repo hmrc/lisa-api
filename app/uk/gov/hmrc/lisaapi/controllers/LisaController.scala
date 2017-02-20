@@ -33,11 +33,6 @@ import scala.util.{Failure, Success, Try}
 trait LisaController extends BaseController with HeaderValidator with RunMode with JsonFormats {
   implicit val hc: HeaderCarrier
 
-  implicit def baseUrl(implicit request: Request[AnyContent]): String = env match {
-    case "Dev" => s"http://${request.headers.get(HeaderNames.HOST).getOrElse("unknown")}"
-    case _ => s"https://${AppContext.baseUrl}/${AppContext.apiContext}"
-  }
-
   protected def withValidJson[T](f: (T) => Future[Result])(implicit request: Request[AnyContent], reads: Reads[T]): Future[Result] =
     request.body.asJson match {
       case Some(json) =>
