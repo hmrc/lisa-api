@@ -31,7 +31,7 @@ trait DesConnector extends ServicesConfig with JsonFormats {
 
   val httpPost:HttpPost = WSHttp
   lazy val desUrl = baseUrl("des")
-  lazy val lisaServiceUrl = s"$desUrl/lisa"
+  lazy val lisaServiceUrl = s"$desUrl/lifetime-isa/manager"
 
   /**
     * Attempts to create a new LISA investor
@@ -39,7 +39,7 @@ trait DesConnector extends ServicesConfig with JsonFormats {
     * @return A tuple of the http status code and an (optional) data response
     */
   def createInvestor(lisaManager: String, request: CreateLisaInvestorRequest)(implicit hc: HeaderCarrier): Future[(Int, Option[DesCreateInvestorResponse])] = {
-    val uri = s"$lisaServiceUrl/$lisaManager"
+    val uri = s"$lisaServiceUrl/$lisaManager/investors"
 
     val result = httpPost.POST[CreateLisaInvestorRequest, HttpResponse](uri, request)
 
