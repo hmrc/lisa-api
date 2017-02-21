@@ -33,6 +33,11 @@ trait DesConnector extends ServicesConfig with JsonFormats {
   lazy val desUrl = baseUrl("des")
   lazy val lisaServiceUrl = s"$desUrl/lisa"
 
+  /**
+    * Attempts to create a new LISA investor
+    *
+    * @return A tuple of the http status code and an (optional) data response
+    */
   def createInvestor(lisaManager: String, request: CreateLisaInvestorRequest)(implicit hc: HeaderCarrier): Future[(Int, Option[DesCreateInvestorResponse])] = {
     val uri = s"$lisaServiceUrl/$lisaManager"
 
