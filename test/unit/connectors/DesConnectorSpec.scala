@@ -21,10 +21,11 @@ import org.mockito.Matchers._
 import org.mockito.Mockito.when
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import play.api.libs.json.Json
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models.CreateLisaInvestorRequest
-import uk.gov.hmrc.lisaapi.services.InvestorService
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpResponse, Upstream5xxResponse}
+import uk.gov.hmrc.lisaapi.models.des.DesCreateInvestorResponse
+import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpResponse}
 
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
@@ -33,41 +34,51 @@ class DesConnectorSpec extends PlaySpec
   with MockitoSugar
   with OneAppPerSuite {
 
+  val request = CreateLisaInvestorRequest("AB123456A", "A", "B", new DateTime("2000-01-01"))
+
   "DesConnector" must {
 
-    val request = CreateLisaInvestorRequest("AB123456A", "A", "B", new DateTime("2000-01-01"))
-
-    "Return a Created Response" when {
-      "Given a 201 response from DES" in {
+    "Return a status code of 200" when {
+      "Given a 200 response from DES" in {
         when(mockHttpPost.POST[CreateLisaInvestorRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(HttpResponse(201)))
+          .thenReturn(Future.successful(HttpResponse(responseStatus = 200, responseJson = None)))
 
-        val request = CreateLisaInvestorRequest("AB123456A", "A", "B", new DateTime("2000-01-01"))
         val result = Await.result(SUT.createInvestor("Z019283", request), Duration.Inf)
 
-        result must be(Right("Created"))
+        result must be((200, None))
       }
     }
 
-    "Return a Error Response" when {
-      "Given a 500 response from DES" in {
+    "Return no DesCreateInvestorResponse" when {
+      "The DES response has no json body" in {
         when(mockHttpPost.POST[CreateLisaInvestorRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(HttpResponse(500)))
+          .thenReturn(Future.successful(HttpResponse(responseStatus = 503, responseJson = None)))
 
-        val request = CreateLisaInvestorRequest("AB123456A", "A", "B", new DateTime("2000-01-01"))
         val result = Await.result(SUT.createInvestor("Z019283", request), Duration.Inf)
 
-        result must be(Left("Error"))
+        result must be((503, None))
       }
+    }
 
-      "An upstream exception is thrown" in {
+    "Return any empty DesCreateInvestorResponse" when {
+      "The DES response has a json body that is in an incorrect format" in {
         when(mockHttpPost.POST[CreateLisaInvestorRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
-            .thenReturn(Future.failed(new RuntimeException("Http Verbs library can throw Upstream Exceptions")))
+          .thenReturn(Future.successful(HttpResponse(responseStatus = 200, responseJson = Some(Json.parse("""[1,2,3]""")))))
 
-        val request = CreateLisaInvestorRequest("AB123456A", "A", "B", new DateTime("2000-01-01"))
         val result = Await.result(SUT.createInvestor("Z019283", request), Duration.Inf)
 
-        result must be(Left("Error"))
+        result must be((200, Some(DesCreateInvestorResponse(None, None))))
+      }
+    }
+
+    "Return a populated DesCreateInvestorResponse" when {
+      "The DES response has a json body that is in the correct format" in {
+        when(mockHttpPost.POST[CreateLisaInvestorRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(HttpResponse(responseStatus = 200, responseJson = Some(Json.parse("""{"rdsCode":12345, "investorId": "AB123456"}""")))))
+
+        val result = Await.result(SUT.createInvestor("Z019283", request), Duration.Inf)
+
+        result must be((200, Some(DesCreateInvestorResponse(rdsCode = Some(12345), investorId = Some("AB123456")))))
       }
     }
 

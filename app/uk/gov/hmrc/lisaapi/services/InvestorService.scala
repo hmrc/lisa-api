@@ -27,6 +27,8 @@ trait InvestorService  {
 
   def createInvestor(lisaManager: String, request: CreateLisaInvestorRequest)(implicit hc: HeaderCarrier) : Future[Either[String, String]] = {
     desConnector.createInvestor(lisaManager, request)
+
+    Future.successful(Left("Error"))
   }
 }
 
