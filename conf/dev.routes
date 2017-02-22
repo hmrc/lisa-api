@@ -5,3 +5,4 @@
 
 GET         /admin/metrics                                  @com.kenshoo.play.metrics.MetricsController.metrics
 
+POST      /lifetime-isa/manager/:manager/investors        @uk.gov.hmrc.lisaapi.controllers.InvestorController.createLisaInvestor(manager)
