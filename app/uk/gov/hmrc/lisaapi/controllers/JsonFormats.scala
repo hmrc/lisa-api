@@ -94,10 +94,8 @@ trait JsonFormats {
     (JsPath \ "transferAccount").write[AccountTransfer]
   )(unlift(CreateLisaAccountTransferRequest.unapply))
 
-  implicit val createLisaAccountRequestWrites = Writes[CreateLisaAccountRequest] { obj =>
-    obj match {
-      case r: CreateLisaAccountCreationRequest => createLisaAccountCreationRequestWrites.writes(r)
-      case r: CreateLisaAccountTransferRequest => createLisaAccountTransferRequestWrites.writes(r)
-    }
+  implicit val createLisaAccountRequestWrites = Writes[CreateLisaAccountRequest] {
+    case r: CreateLisaAccountCreationRequest => createLisaAccountCreationRequestWrites.writes(r)
+    case r: CreateLisaAccountTransferRequest => createLisaAccountTransferRequestWrites.writes(r)
   }
 }
