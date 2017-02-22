@@ -24,5 +24,5 @@ case class CreateLisaAccountRequest(
   accountID: String,
   creationReason: String,
   firstSubscriptionDate: DateTime,
-  transferAccount: Option[AccountTransfer]
+  transferAccount: Option[AccountTransfer] = None
 )
