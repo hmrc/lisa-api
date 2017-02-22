@@ -20,7 +20,8 @@ import org.joda.time.DateTime
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import play.api.data.validation.ValidationError
-import uk.gov.hmrc.lisaapi.models.CreateLisaInvestorRequest
+import uk.gov.hmrc.lisaapi.models.{ApiResponse, ApiResponseData, CreateLisaInvestorRequest}
+import uk.gov.hmrc.lisaapi.models.des.DesCreateInvestorResponse
 
 trait JsonFormats {
   implicit val ninoRegex: String = "^[A-Z]{2}\\d{6}[A-D]$"
@@ -40,4 +41,9 @@ trait JsonFormats {
       (JsPath \ "lastName").write[String] and
       (JsPath \ "DoB").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd"))
     )(unlift(CreateLisaInvestorRequest.unapply))
+
+  implicit val desCreateInvestorResponseFormats = Json.format[DesCreateInvestorResponse]
+
+  implicit val apiResponseDataFormats = Json.format[ApiResponseData]
+  implicit val apiResponseFormats = Json.format[ApiResponse]
 }

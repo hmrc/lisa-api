@@ -28,6 +28,7 @@ import play.api.test.Helpers._
 import play.api.test._
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.lisaapi.controllers.InvestorController
+import uk.gov.hmrc.lisaapi.models.{CreateLisaInvestorAlreadyExistsResponse, CreateLisaInvestorErrorResponse, CreateLisaInvestorNotFoundResponse, CreateLisaInvestorSuccessResponse}
 import uk.gov.hmrc.lisaapi.services.InvestorService
 
 import scala.concurrent.Future
@@ -61,24 +62,42 @@ class InvestorControllerSpec extends WordSpec with MockitoSugar with ShouldMatch
   val lisaManager = "Z019283"
 
   "The Investor Controller" should {
-    "return with status 200 createInvestor" in
+    "return with status 201 created" in
       {
-        when(mockService.createInvestor(any(), any())(any())).thenReturn(Future.successful(Right("Success")))
+        when(mockService.createInvestor(any(), any())(any())).thenReturn(Future.successful(CreateLisaInvestorSuccessResponse("AB123456")))
         val res = mockInvestorController.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT,"/").withHeaders(acceptHeader).
           withBody(AnyContentAsJson(Json.parse(investorJson))))
         status(res) should be (CREATED)
       }
 
+    "return with status 403 forbidden" when {
+      "given a Not Found response from the service layer" in {
+        when(mockService.createInvestor(any(), any())(any())).thenReturn(Future.successful(CreateLisaInvestorNotFoundResponse))
+        val res = mockInvestorController.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
+          withBody(AnyContentAsJson(Json.parse(investorJson))))
+        status(res) should be(FORBIDDEN)
+      }
+    }
+
+    "return with status 409 conflict" when {
+      "given a Already Exists response from the service layer" in {
+        when(mockService.createInvestor(any(), any())(any())).thenReturn(Future.successful(CreateLisaInvestorAlreadyExistsResponse))
+        val res = mockInvestorController.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
+          withBody(AnyContentAsJson(Json.parse(investorJson))))
+        status(res) should be(CONFLICT)
+      }
+    }
+
     "return with status 400 bad request" when {
       "given a json body which does not match the schema" in {
-        when(mockService.createInvestor(any(), any())(any())).thenReturn(Future.successful(Right("Success")))
+        when(mockService.createInvestor(any(), any())(any())).thenReturn(Future.successful(CreateLisaInvestorSuccessResponse("AB123456")))
         val res = mockInvestorController.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
           withBody(AnyContentAsJson(Json.parse(invalidInvestorJson))))
         status(res) should be(BAD_REQUEST)
       }
 
       "given a plain text body" in {
-        when(mockService.createInvestor(any(), any())(any())).thenReturn(Future.successful(Right("Success")))
+        when(mockService.createInvestor(any(), any())(any())).thenReturn(Future.successful(CreateLisaInvestorSuccessResponse("AB123456")))
         val res = mockInvestorController.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
           withTextBody("hello"))
 
@@ -88,16 +107,23 @@ class InvestorControllerSpec extends WordSpec with MockitoSugar with ShouldMatch
 
     "return with status 500 internal server error" when {
       "given an invalid json body" in {
-        when(mockService.createInvestor(any(), any())(any())).thenReturn(Future.successful(Left("Error")))
+        when(mockService.createInvestor(any(), any())(any())).thenReturn(Future.successful(CreateLisaInvestorErrorResponse))
         val res = mockInvestorController.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
           withBody(AnyContentAsJson(Json.parse(investorJson))))
         status(res) should be(INTERNAL_SERVER_ERROR)
+      }
+
+      "given an error response from the service layer" in {
+        when(mockService.createInvestor(any(), any())(any())).thenReturn(Future.successful(CreateLisaInvestorErrorResponse))
+        val res = mockInvestorController.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT,"/").withHeaders(acceptHeader).
+          withBody(AnyContentAsJson(Json.parse(investorJson))))
+        status(res) should be (INTERNAL_SERVER_ERROR)
       }
     }
 
     "return with status 406 createInvestor " in
       {
-        when(mockService.createInvestor(any(), any())(any())).thenReturn(Future.successful(Right("Success")))
+        when(mockService.createInvestor(any(), any())(any())).thenReturn(Future.successful(CreateLisaInvestorSuccessResponse("AB123456")))
         val res = mockInvestorController.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT,"/").withHeaders(("accept","application/vnd.hmrc.2.0+json")))
         status(res) should be (406)
       }
