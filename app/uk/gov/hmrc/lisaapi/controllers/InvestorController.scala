@@ -38,10 +38,14 @@ class InvestorController extends LisaController {
         createRequest => {
           service.createInvestor(lisaManager, createRequest).map { result =>
             result match {
-              case CreateLisaInvestorSuccessResponse(investorId) => Created(Json.toJson(investorId))
-              case CreateLisaInvestorNotFoundResponse => Forbidden(Json.toJson("INVESTOR_NOT_FOUND"))
-              case CreateLisaInvestorAlreadyExistsResponse => Conflict(Json.toJson("INVESTOR_ALREADY_EXISTS"))
-              case CreateLisaInvestorErrorResponse => InternalServerError(Json.toJson("INTERNAL_SERVER_ERROR"))
+              case CreateLisaInvestorSuccessResponse(investorId) => {
+                val data = ApiResponseData(message = "Investor Created.", investorId = Some(investorId))
+
+                Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = 201)))
+              }
+              case CreateLisaInvestorNotFoundResponse => Forbidden(Json.toJson(ApiResponse(success = false, status = 403)))
+              case CreateLisaInvestorAlreadyExistsResponse => Conflict(Json.toJson(ApiResponse(success = false, status = 409)))
+              case CreateLisaInvestorErrorResponse => InternalServerError(Json.toJson(ApiResponse(success = false, status = 500)))
             }
           }
         }
