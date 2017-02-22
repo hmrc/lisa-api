@@ -20,7 +20,7 @@ import org.joda.time.DateTime
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import play.api.data.validation.ValidationError
-import uk.gov.hmrc.lisaapi.models.{AccountTransfer, CreateLisaAccountRequest, CreateLisaInvestorRequest}
+import uk.gov.hmrc.lisaapi.models._
 
 import scala.util.matching.Regex
 
@@ -57,15 +57,17 @@ trait JsonFormats {
     (JsPath \ "transferInDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd"))
   )(unlift(AccountTransfer.unapply))
 
-  implicit val createLisaAccountRequestReads: Reads[CreateLisaAccountRequest] = (
-    (JsPath \ "investorID").read(Reads.pattern(investorIDRegex, "error.formatting.investorID")) and
-    (JsPath \ "lisaManagerReferenceNumber").read(Reads.pattern(lmrnRegex, "error.formatting.lmrn")) and
-    (JsPath \ "accountID").read[String] and
-    (JsPath \ "firstSubscriptionDate").read(Reads.pattern(dateRegex, "error.formatting.date")).map(new DateTime(_)) and
-    (JsPath \ "creationReason").read(Reads.pattern("^(New|Transferred)$".r, "error.formatting.creationReason")) and
-    (JsPath \ "transferAccount").readNullable[AccountTransfer]
-  )(CreateLisaAccountRequest.apply _)
+  implicit val createLisaAccountCreationRequestReads = Json.reads[CreateLisaAccountCreationRequest]
+  implicit val createLisaAccountTransferRequestReads = Json.reads[CreateLisaAccountTransferRequest]
 
+  implicit val createLisaAccountRequestReads = Reads[CreateLisaAccountRequest] { json =>
+    (json \ "creationReason").validate[String](Reads.pattern("^(New|Transferred)$".r, "error.formatting.creationReason")).flatMap {
+      case "New" => createLisaAccountCreationRequestReads.reads(json)
+      case "Transferred" => createLisaAccountTransferRequestReads.reads(json)
+    }
+  }
+
+  /*
   implicit val createLisaAccountRequestWrites: Writes[CreateLisaAccountRequest] = (
     (JsPath \ "investorID").write[String] and
     (JsPath \ "lisaManagerReferenceNumber").write[String] and
@@ -74,4 +76,5 @@ trait JsonFormats {
     (JsPath \ "creationReason").write[String] and
     (JsPath \ "transferAccount").writeNullable[AccountTransfer]
   )(unlift(CreateLisaAccountRequest.unapply))
+  */
 }

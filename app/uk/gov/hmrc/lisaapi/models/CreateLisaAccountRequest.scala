@@ -18,11 +18,19 @@ package uk.gov.hmrc.lisaapi.models
 
 import org.joda.time.DateTime
 
-case class CreateLisaAccountRequest(
+sealed trait CreateLisaAccountRequest
+
+case class CreateLisaAccountCreationRequest (
+  investorID: String,
+  lisaManagerReferenceNumber: String,
+  accountID: String,
+  firstSubscriptionDate: DateTime
+) extends CreateLisaAccountRequest
+
+case class CreateLisaAccountTransferRequest (
   investorID: String,
   lisaManagerReferenceNumber: String,
   accountID: String,
   firstSubscriptionDate: DateTime,
-  creationReason: String,
-  transferAccount: Option[AccountTransfer] = None
-)
+  transferAccount: AccountTransfer
+) extends CreateLisaAccountRequest
