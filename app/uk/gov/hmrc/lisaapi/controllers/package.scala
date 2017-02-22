@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.lisaapi
 
-import play.api.libs.json.{JsValue, Json, Writes}
+import play.api.libs.json.{JsError, JsValue, Json, Writes}
 import uk.gov.hmrc.lisaapi.controllers.ErrorResponse
 
 /**
