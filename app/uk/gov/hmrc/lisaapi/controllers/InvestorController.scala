@@ -19,7 +19,7 @@ package uk.gov.hmrc.lisaapi.controllers
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.api.controllers.HeaderValidator
-import uk.gov.hmrc.lisaapi.models.{CreateLisaInvestorRequest, LisaInvestor}
+import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.InvestorService
 import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.microservice.controller.BaseController
@@ -38,8 +38,14 @@ class InvestorController extends LisaController {
         createRequest => {
           service.createInvestor(lisaManager, createRequest).map { result =>
             result match {
-              case Right(msg) => Created(Json.toJson(msg))
-              case Left(msg) => InternalServerError(Json.toJson(msg))
+              case CreateLisaInvestorSuccessResponse(investorId) => {
+                val data = ApiResponseData(message = "Investor Created.", investorId = Some(investorId))
+
+                Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = 201)))
+              }
+              case CreateLisaInvestorNotFoundResponse => Forbidden(Json.toJson(ApiResponse(success = false, status = 403)))
+              case CreateLisaInvestorAlreadyExistsResponse => Conflict(Json.toJson(ApiResponse(success = false, status = 409)))
+              case CreateLisaInvestorErrorResponse => InternalServerError(Json.toJson(ApiResponse(success = false, status = 500)))
             }
           }
         }

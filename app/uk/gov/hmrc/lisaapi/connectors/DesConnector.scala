@@ -19,30 +19,36 @@ package uk.gov.hmrc.lisaapi.connectors
 import uk.gov.hmrc.lisaapi.config.WSHttp
 import uk.gov.hmrc.lisaapi.controllers.JsonFormats
 import uk.gov.hmrc.lisaapi.models.CreateLisaInvestorRequest
+import uk.gov.hmrc.lisaapi.models.des.DesCreateInvestorResponse
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.util.{Failure, Success, Try}
 
 trait DesConnector extends ServicesConfig with JsonFormats {
 
   val httpPost:HttpPost = WSHttp
   lazy val desUrl = baseUrl("des")
-  lazy val lisaServiceUrl = s"$desUrl/lisa"
+  lazy val lisaServiceUrl = s"$desUrl/lifetime-isa/manager"
 
-  def createInvestor(lisaManager: String, request: CreateLisaInvestorRequest)(implicit hc: HeaderCarrier): Future[Either[String, String]] = {
-    val uri = s"$lisaServiceUrl/$lisaManager"
+  /**
+    * Attempts to create a new LISA investor
+    *
+    * @return A tuple of the http status code and an (optional) data response
+    */
+  def createInvestor(lisaManager: String, request: CreateLisaInvestorRequest)(implicit hc: HeaderCarrier): Future[(Int, Option[DesCreateInvestorResponse])] = {
+    val uri = s"$lisaServiceUrl/$lisaManager/investors"
 
     val result = httpPost.POST[CreateLisaInvestorRequest, HttpResponse](uri, request)
 
     result.map(r => {
-      r.status match {
-        case 201 => Right("Created")
-        case _ => Left("Error")
+      // catch any NullPointerExceptions that may occur from r.json being a null
+      Try(r.json.asOpt[DesCreateInvestorResponse]) match {
+        case Success(data) => (r.status, data)
+        case Failure(_) => (r.status, None)
       }
-    }).recover({
-      case _ => Left("Error")
     })
   }
 

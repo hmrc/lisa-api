@@ -19,10 +19,8 @@ package uk.gov.hmrc.lisaapi.controllers
 import org.joda.time.DateTime
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
-import play.api.data.validation.ValidationError
-import uk.gov.hmrc.lisaapi.models._
-
-import scala.util.matching.Regex
+import uk.gov.hmrc.lisaapi.models.des.DesCreateInvestorResponse
+import uk.gov.hmrc.lisaapi.models.{ApiResponse, ApiResponseData, CreateLisaInvestorRequest, _}
 
 trait JsonFormats {
   implicit val ninoRegex = "^[A-Z]{2}\\d{6}[A-D]$".r
@@ -44,6 +42,11 @@ trait JsonFormats {
     (JsPath \ "lastName").write[String] and
     (JsPath \ "DoB").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd"))
   )(unlift(CreateLisaInvestorRequest.unapply))
+
+  implicit val desCreateInvestorResponseFormats = Json.format[DesCreateInvestorResponse]
+
+  implicit val apiResponseDataFormats = Json.format[ApiResponseData]
+  implicit val apiResponseFormats = Json.format[ApiResponse]
 
   implicit val accountTransferReads: Reads[AccountTransfer] = (
     (JsPath \ "transferredFromAccountID").read[String] and
@@ -98,4 +101,5 @@ trait JsonFormats {
     case r: CreateLisaAccountCreationRequest => createLisaAccountCreationRequestWrites.writes(r)
     case r: CreateLisaAccountTransferRequest => createLisaAccountTransferRequestWrites.writes(r)
   }
+
 }
