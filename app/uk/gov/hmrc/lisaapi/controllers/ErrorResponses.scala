@@ -16,14 +16,10 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
-import play.api.data.validation.ValidationError
-import play.api.libs.json.JsPath
-
 sealed abstract class ErrorResponse(
   val httpStatusCode: Int,
   val errorCode: String,
-  val message: String,
-  val errors: Option[Seq[(JsPath, Seq[ValidationError])]] = None
+  val message: String
 )
 
 case object ErrorUnauthorized extends ErrorResponse(401, "UNAUTHORIZED", "Bearer token is missing or not authorized")
