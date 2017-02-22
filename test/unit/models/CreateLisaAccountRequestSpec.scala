@@ -49,7 +49,7 @@ class CreateLisaAccountRequestSpec extends PlaySpec with JsonFormats {
   "CreateLisaAccountRequest" must {
 
     "serialize transfer request from json" in {
-      val res = Json.parse(validAccountTransferRequest).validate[CreateLisaAccountRequest](createLisaAccountRequestReads)
+      val res = Json.parse(validAccountTransferRequest).validate[CreateLisaAccountRequest]
 
       res match {
         case JsError(errors) => fail()
@@ -71,7 +71,7 @@ class CreateLisaAccountRequestSpec extends PlaySpec with JsonFormats {
     }
 
     "serialize creation request from json" in {
-      val res = Json.parse(validAccountCreationRequest).validate[CreateLisaAccountRequest](createLisaAccountRequestReads)
+      val res = Json.parse(validAccountCreationRequest).validate[CreateLisaAccountRequest]
 
       res match {
         case JsError(errors) => fail()
@@ -91,7 +91,6 @@ class CreateLisaAccountRequestSpec extends PlaySpec with JsonFormats {
       }
     }
 
-    /*
     "deserialize transfer request to json" in {
       val request = CreateLisaAccountTransferRequest(
         investorID = "9876543210",
@@ -103,7 +102,7 @@ class CreateLisaAccountRequestSpec extends PlaySpec with JsonFormats {
 
       val json = Json.toJson[CreateLisaAccountRequest](request)
 
-      json mustBe Json.parse(validAccountTransferRequest)
+      json mustBe Json.parse(validAccountTransferRequest.replace(""""creationReason": "Transferred",""", ""))
     }
 
     "deserialize creation request to json" in {
@@ -116,13 +115,12 @@ class CreateLisaAccountRequestSpec extends PlaySpec with JsonFormats {
 
       val json = Json.toJson[CreateLisaAccountRequest](request)
 
-      json mustBe Json.parse(validAccountCreationRequest)
+      json mustBe Json.parse(validAccountCreationRequest.replace(""""creationReason": "New",""", ""))
     }
-    */
 
     "catch an invalid lisaManagerReferenceNumber" in {
       val req = validAccountTransferRequest.replace("Z4321", "A123")
-      val res = Json.parse(req).validate[CreateLisaAccountRequest](createLisaAccountRequestReads)
+      val res = Json.parse(req).validate[CreateLisaAccountRequest]
 
       res match {
         case JsError(errors) => {
@@ -138,7 +136,7 @@ class CreateLisaAccountRequestSpec extends PlaySpec with JsonFormats {
 
     "catch an invalid firstSubscriptionDate" in {
       val req = validAccountTransferRequest.replace("2011-03-23", "2011")
-      val res = Json.parse(req).validate[CreateLisaAccountRequest](createLisaAccountRequestReads)
+      val res = Json.parse(req).validate[CreateLisaAccountRequest]
 
       res match {
         case JsError(errors) => {
@@ -154,7 +152,7 @@ class CreateLisaAccountRequestSpec extends PlaySpec with JsonFormats {
 
     "catch an invalid investorID" in {
       val req = validAccountTransferRequest.replace("9876543210", "2011")
-      val res = Json.parse(req).validate[CreateLisaAccountRequest](createLisaAccountRequestReads)
+      val res = Json.parse(req).validate[CreateLisaAccountRequest]
 
       res match {
         case JsError(errors) => {
@@ -170,7 +168,7 @@ class CreateLisaAccountRequestSpec extends PlaySpec with JsonFormats {
 
     "catch an invalid creationReason value" in {
       val req = validAccountTransferRequest.replace("Transferred", "transferred")
-      val res = Json.parse(req).validate[CreateLisaAccountRequest](createLisaAccountRequestReads)
+      val res = Json.parse(req).validate[CreateLisaAccountRequest]
 
       res match {
         case JsError(errors) => {
@@ -186,7 +184,7 @@ class CreateLisaAccountRequestSpec extends PlaySpec with JsonFormats {
 
     "catch an invalid creationReason data type" in {
       val req = validAccountTransferRequest.replace("\"Transferred\"", "1")
-      val res = Json.parse(req).validate[CreateLisaAccountRequest](createLisaAccountRequestReads)
+      val res = Json.parse(req).validate[CreateLisaAccountRequest]
 
       res match {
         case JsError(errors) => {
@@ -200,10 +198,9 @@ class CreateLisaAccountRequestSpec extends PlaySpec with JsonFormats {
       }
     }
 
-    // not implemented for the moment - validation for conditionals are to be handled differently
     "catch a transfer request without the transfer data" in {
       val req = validAccountCreationRequest.replace("New", "Transferred")
-      val res = Json.parse(req).validate[CreateLisaAccountRequest](createLisaAccountRequestReads)
+      val res = Json.parse(req).validate[CreateLisaAccountRequest]
 
       res match {
         case JsError(errors) => {
