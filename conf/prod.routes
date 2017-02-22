@@ -1,8 +1,8 @@
 # Add all the application routes to the app.routes file
 
-->         /                          definition.Routes
-->         /                          health.Routes
+->          /                                               definition.Routes
+->          /                                               health.Routes
 
-GET        /admin/metrics             @com.kenshoo.play.metrics.MetricsController.metrics
+GET         /admin/metrics                                  @com.kenshoo.play.metrics.MetricsController.metrics
 
-POST    /lifetime-isa/manager/:manager/investors @uk.gov.hmrc.lisaapi.controllers.InvestorController.createLisaInvestor(manager)
+# POST      /lifetime-isa/manager/:manager/investors        @uk.gov.hmrc.lisaapi.controllers.InvestorController.createLisaInvestor(manager)
