@@ -22,19 +22,20 @@ import play.api.libs.json._
 import play.api.data.validation.ValidationError
 import uk.gov.hmrc.lisaapi.models.{AccountTransfer, CreateLisaAccountRequest, CreateLisaInvestorRequest}
 
+import scala.util.matching.Regex
+
 trait JsonFormats {
-  implicit val ninoRegex: String = "^[A-Z]{2}\\d{6}[A-D]$"
-  implicit val nameRegex: String = "^.{1,35}$"
-  implicit val dateRegex: String = "^\\d{4}-\\d{2}-\\d{2}$"
-  implicit val lmrnRegex: String = "^Z\\d{4,6}$"
-  implicit val investorIDRegex: String = "^\\d{10}$"
-  implicit val creationReasonRegex: String = "^(New|Transferred)$"
+  implicit val ninoRegex = "^[A-Z]{2}\\d{6}[A-D]$".r
+  implicit val nameRegex = "^.{1,35}$".r
+  implicit val dateRegex = "^\\d{4}-\\d{2}-\\d{2}$".r
+  implicit val lmrnRegex = "^Z\\d{4,6}$".r
+  implicit val investorIDRegex = "^\\d{10}$".r
 
   implicit val createLisaInvestorRequestReads: Reads[CreateLisaInvestorRequest] = (
-    (JsPath \ "investorNINO").read[String].filter(ValidationError("error.formatting.nino"))(input => input.matches(ninoRegex)) and
-    (JsPath \ "firstName").read[String].filter(ValidationError("error.formatting.firstName"))(input => input.matches(nameRegex)) and
-    (JsPath \ "lastName").read[String].filter(ValidationError("error.formatting.lastName"))(input => input.matches(nameRegex)) and
-    (JsPath \ "DoB").read[String].filter(ValidationError("error.formatting.date"))(input => input.matches(dateRegex)).map(new DateTime(_))
+    (JsPath \ "investorNINO").read(Reads.pattern(ninoRegex, "error.formatting.nino")) and
+    (JsPath \ "firstName").read(Reads.pattern(nameRegex, "error.formatting.firstName")) and
+    (JsPath \ "lastName").read(Reads.pattern(nameRegex, "error.formatting.lastName")) and
+    (JsPath \ "DoB").read(Reads.pattern(dateRegex, "error.formatting.date")).map(new DateTime(_))
   )(CreateLisaInvestorRequest.apply _)
 
   implicit val createLisaInvestorRequestWrites: Writes[CreateLisaInvestorRequest] = (
@@ -46,8 +47,8 @@ trait JsonFormats {
 
   implicit val accountTransferReads: Reads[AccountTransfer] = (
     (JsPath \ "transferredFromAccountID").read[String] and
-    (JsPath \ "transferredFromLMRN").read[String].filter(ValidationError("error.formatting.lmrn"))(input => input.matches(lmrnRegex)) and
-    (JsPath \ "transferInDate").read[String].filter(ValidationError("error.formatting.date"))(input => input.matches(dateRegex)).map(new DateTime(_))
+    (JsPath \ "transferredFromLMRN").read(Reads.pattern(lmrnRegex, "error.formatting.lmrn")) and
+    (JsPath \ "transferInDate").read(Reads.pattern(dateRegex, "error.formatting.date")).map(new DateTime(_))
   )(AccountTransfer.apply _)
 
   implicit val accountTransferWrites: Writes[AccountTransfer] = (
@@ -57,11 +58,11 @@ trait JsonFormats {
   )(unlift(AccountTransfer.unapply))
 
   implicit val createLisaAccountRequestReads: Reads[CreateLisaAccountRequest] = (
-    (JsPath \ "investorID").read[String].filter(ValidationError("error.formatting.investorID"))(input => input.matches(investorIDRegex)) and
-    (JsPath \ "lisaManagerReferenceNumber").read[String].filter(ValidationError("error.formatting.lmrn"))(input => input.matches(lmrnRegex)) and
+    (JsPath \ "investorID").read(Reads.pattern(investorIDRegex, "error.formatting.investorID")) and
+    (JsPath \ "lisaManagerReferenceNumber").read(Reads.pattern(lmrnRegex, "error.formatting.lmrn")) and
     (JsPath \ "accountID").read[String] and
-    (JsPath \ "creationReason").read[String].filter(ValidationError("error.formatting.creationReason"))(input => input.matches(creationReasonRegex)) and
-    (JsPath \ "firstSubscriptionDate").read[String].filter(ValidationError("error.formatting.date"))(input => input.matches(dateRegex)).map(new DateTime(_)) and
+    (JsPath \ "firstSubscriptionDate").read(Reads.pattern(dateRegex, "error.formatting.date")).map(new DateTime(_)) and
+    (JsPath \ "creationReason").read(Reads.pattern("^(New|Transferred)$".r, "error.formatting.creationReason")) and
     (JsPath \ "transferAccount").readNullable[AccountTransfer]
   )(CreateLisaAccountRequest.apply _)
 
@@ -69,8 +70,8 @@ trait JsonFormats {
     (JsPath \ "investorID").write[String] and
     (JsPath \ "lisaManagerReferenceNumber").write[String] and
     (JsPath \ "accountID").write[String] and
-    (JsPath \ "creationReason").write[String] and
     (JsPath \ "firstSubscriptionDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
+    (JsPath \ "creationReason").write[String] and
     (JsPath \ "transferAccount").writeNullable[AccountTransfer]
   )(unlift(CreateLisaAccountRequest.unapply))
 }

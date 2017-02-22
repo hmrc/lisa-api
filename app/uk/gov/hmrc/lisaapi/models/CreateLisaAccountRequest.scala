@@ -22,7 +22,7 @@ case class CreateLisaAccountRequest(
   investorID: String,
   lisaManagerReferenceNumber: String,
   accountID: String,
-  creationReason: String,
   firstSubscriptionDate: DateTime,
+  creationReason: String,
   transferAccount: Option[AccountTransfer] = None
 )
