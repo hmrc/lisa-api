@@ -185,7 +185,7 @@ class CreateLisaAccountRequestSpec extends PlaySpec with JsonFormats {
         case JsError(errors) => {
           errors.count {
             case (path: JsPath, errors: Seq[ValidationError]) => {
-              path.toString() == "/transferAccount" && errors.contains(ValidationError("error.missing.transferAccount"))
+              path.toString() == "/transferAccount" && errors.contains(ValidationError("error.path.missing"))
             }
           } mustBe 1
         }
