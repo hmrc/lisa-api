@@ -40,10 +40,10 @@ trait LisaController extends BaseController with HeaderValidator with RunMode wi
           case Success(JsSuccess(payload, _)) => f(payload)
           case Success(JsError(errs)) => {
             Logger.info("The errors are " + errs.toString())
-            Future.successful(BadRequest(JsError.toJson(errs)))
+            Future.successful(BadRequest(toJson(ErrorGenericBadRequest)))
           }
 
-          case Failure(e) => Future.successful(InternalServerError("Unable to validate Json request"))
+          case Failure(e) => Future.successful(InternalServerError(toJson(ErrorInternalServerError)))
         }
       case None =>
         Future.successful(BadRequest(toJson(EmptyJson)))

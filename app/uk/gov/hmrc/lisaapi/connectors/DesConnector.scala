@@ -21,7 +21,7 @@ import uk.gov.hmrc.lisaapi.controllers.JsonFormats
 import uk.gov.hmrc.lisaapi.models.CreateLisaInvestorRequest
 import uk.gov.hmrc.lisaapi.models.des.DesCreateInvestorResponse
 import uk.gov.hmrc.play.config.ServicesConfig
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpResponse}
+import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpReads, HttpResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -33,6 +33,10 @@ trait DesConnector extends ServicesConfig with JsonFormats {
   lazy val desUrl = baseUrl("des")
   lazy val lisaServiceUrl = s"$desUrl/lifetime-isa/manager"
 
+  val httpReads: HttpReads[HttpResponse] = new HttpReads[HttpResponse] {
+    override def read(method: String, url: String, response: HttpResponse) = response
+  }
+
   /**
     * Attempts to create a new LISA investor
     *
@@ -41,7 +45,7 @@ trait DesConnector extends ServicesConfig with JsonFormats {
   def createInvestor(lisaManager: String, request: CreateLisaInvestorRequest)(implicit hc: HeaderCarrier): Future[(Int, Option[DesCreateInvestorResponse])] = {
     val uri = s"$lisaServiceUrl/$lisaManager/investors"
 
-    val result = httpPost.POST[CreateLisaInvestorRequest, HttpResponse](uri, request)
+    val result = httpPost.POST[CreateLisaInvestorRequest, HttpResponse](uri, request)(implicitly, httpReads, implicitly)
 
     result.map(r => {
       // catch any NullPointerExceptions that may occur from r.json being a null

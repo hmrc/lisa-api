@@ -17,9 +17,10 @@
 package uk.gov.hmrc.lisaapi.controllers
 
 sealed abstract class ErrorResponse(
-                                     val httpStatusCode: Int,
-                                     val errorCode: String,
-                                     val message: String)
+  val httpStatusCode: Int,
+  val errorCode: String,
+  val message: String
+)
 
 case object ErrorUnauthorized extends ErrorResponse(401, "UNAUTHORIZED", "Bearer token is missing or not authorized")
 
@@ -42,3 +43,7 @@ case object MissingID extends ErrorResponse(400, "BAD_REQUEST", "Missing Registr
 case object InvalidID extends ErrorResponse(400, "BAD_REQUEST", s"Invalid Registration Id")
 
 case object EmptyJson extends ErrorResponse(400,"BAD_REQUEST", "Can't parse empty json")
+
+case object ErrorInvestorNotFound extends ErrorResponse(403, "INVESTOR_NOT_FOUND", "The investor details given do not match with HMRC’s records")
+
+case object ErrorInvestorAlreadyExists extends ErrorResponse(409, "INVESTOR_ALREADY_EXISTS", "The investor already has a record with HMRC")

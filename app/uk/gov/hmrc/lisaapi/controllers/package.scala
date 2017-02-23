@@ -17,11 +17,7 @@
 package uk.gov.hmrc.lisaapi
 
 import play.api.libs.json.{JsValue, Json, Writes}
-import uk.gov.hmrc.lisaapi.controllers.ErrorResponse
 
-/**
-  * Created by mark on 16/01/17.
-  */
 package object controllers {
   implicit val errorResponseWrites = new Writes[ErrorResponse] {
     def writes(e: ErrorResponse): JsValue = Json.obj("code" -> e.errorCode, "message" -> e.message)
