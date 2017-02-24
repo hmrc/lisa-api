@@ -31,37 +31,31 @@ class AccountController extends LisaController {
 
   implicit val hc: HeaderCarrier = new HeaderCarrier()
 
-  def createOrTransferLisaAccount(lisaManager: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async {
-    implicit request =>
-      withValidJson[CreateLisaAccountRequest] {
-        req => {
-          req match {
-            case transferRequest: CreateLisaAccountTransferRequest => Future.successful(NotImplemented(Json.toJson(ErrorNotImplemented)))
-            case createRequest: CreateLisaAccountCreationRequest => {
-              service.createAccount(lisaManager, createRequest).map { result =>
-                result match {
-                  case CreateLisaAccountSuccessResponse(accountId) => {
-                    val data = ApiResponseData(message = "Account Created.", accountId = Some(accountId))
+  def createOrTransferLisaAccount(lisaManager: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
+    withValidJson[CreateLisaAccountRequest] {
+      req => {
+        req match {
+          case transferRequest: CreateLisaAccountTransferRequest => Future.successful(NotImplemented(Json.toJson(ErrorNotImplemented)))
+          case createRequest: CreateLisaAccountCreationRequest => {
+            service.createAccount(lisaManager, createRequest).map { result =>
+              result match {
+                case CreateLisaAccountSuccessResponse(accountId) => {
+                  val data = ApiResponseData(message = "Account Created.", accountId = Some(accountId))
 
-                    Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = 201)))
-                  }
-                  case CreateLisaAccountInvestorNotFoundResponse => Forbidden(Json.toJson(ErrorInvestorNotFound))
-                  case CreateLisaAccountErrorResponse => InternalServerError(Json.toJson(ErrorInternalServerError))
+                  Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = 201)))
                 }
+                case CreateLisaAccountInvestorNotFoundResponse => Forbidden(Json.toJson(ErrorInvestorNotFound))
+                case CreateLisaAccountInvestorNotEligibleResponse => Forbidden(Json.toJson(ErrorInvestorNotEligible))
+                case CreateLisaAccountInvestorComplianceCheckFailedResponse => Forbidden(Json.toJson(ErrorInvestorComplianceCheckFailed))
+                case CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse => Forbidden(Json.toJson(ErrorPreviousAccountDoesNotExist))
+                case CreateLisaAccountAlreadyExistsResponse => Forbidden(Json.toJson(ErrorAccountAlreadyExists))
+                case CreateLisaAccountErrorResponse => InternalServerError(Json.toJson(ErrorInternalServerError))
               }
             }
           }
-
         }
       }
+    }
   }
-
-  /*
-            case (Some(INVESTOR_NOT_FOUND), _) => CreateLisaAccountInvestorNotFoundResponse
-          case (Some(INVESTOR_NOT_ELIGIBLE), _) => CreateLisaAccountInvestorNotEligibleResponse
-          case (Some(INVESTOR_COMPLIANCE_FAILED), _) => CreateLisaAccountInvestorComplianceCheckFailedResponse
-          case (Some(INVESTOR_PREVIOUS_ACCOUNT_DOES_NOT_EXIST), _) => CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse
-          case (Some(INVESTOR_ACCOUNT_ALREADY_EXISTS), _) => CreateLisaAccountAlreadyExistsResponse
-   */
 
 }

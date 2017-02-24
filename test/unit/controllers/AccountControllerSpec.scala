@@ -82,6 +82,50 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
       }
     }
 
+    "return with status 403 forbidden and a code of INVESTOR_ELIGIBILITY_CHECK_FAILED" when {
+      "the data service returns a CreateLisaAccountInvestorNotEligibleResponse" in {
+        when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorNotEligibleResponse))
+
+        doRequest(createAccountJson) { res =>
+          status(res) mustBe (FORBIDDEN)
+          (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ELIGIBILITY_CHECK_FAILED")
+        }
+      }
+    }
+
+    "return with status 403 forbidden and a code of INVESTOR_COMPLIANCE_CHECK_FAILED" when {
+      "the data service returns a CreateLisaAccountInvestorComplianceCheckFailedResponse" in {
+        when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorComplianceCheckFailedResponse))
+
+        doRequest(createAccountJson) { res =>
+          status(res) mustBe (FORBIDDEN)
+          (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_COMPLIANCE_CHECK_FAILED")
+        }
+      }
+    }
+
+    "return with status 403 forbidden and a code of PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST" when {
+      "the data service returns a CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse" in {
+        when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse))
+
+        doRequest(createAccountJson) { res =>
+          status(res) mustBe (FORBIDDEN)
+          (contentAsJson(res) \ "code").as[String] mustBe ("PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST")
+        }
+      }
+    }
+
+    "return with status 403 forbidden and a code of INVESTOR_ACCOUNT-ALREADY_EXISTS" when {
+      "the data service returns a CreateLisaAccountAlreadyExistsResponse" in {
+        when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountAlreadyExistsResponse))
+
+        doRequest(createAccountJson) { res =>
+          status(res) mustBe (FORBIDDEN)
+          (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ACCOUNT_ALREADY_EXISTS")
+        }
+      }
+    }
+
     "return with status 500 internal server error" when {
       "the data service returns an error" in {
         when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountErrorResponse))
