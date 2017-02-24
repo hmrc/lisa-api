@@ -19,7 +19,7 @@ package uk.gov.hmrc.lisaapi.controllers
 import org.joda.time.DateTime
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
-import uk.gov.hmrc.lisaapi.models.des.DesCreateInvestorResponse
+import uk.gov.hmrc.lisaapi.models.des.{DesCreateAccountResponse, DesCreateInvestorResponse}
 import uk.gov.hmrc.lisaapi.models.{ApiResponse, ApiResponseData, CreateLisaInvestorRequest, _}
 
 trait JsonFormats {
@@ -43,6 +43,7 @@ trait JsonFormats {
     (JsPath \ "DoB").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd"))
   )(unlift(CreateLisaInvestorRequest.unapply))
 
+  implicit val desCreateAccountResponseFormats = Json.format[DesCreateAccountResponse]
   implicit val desCreateInvestorResponseFormats = Json.format[DesCreateInvestorResponse]
 
   implicit val apiResponseDataFormats = Json.format[ApiResponseData]

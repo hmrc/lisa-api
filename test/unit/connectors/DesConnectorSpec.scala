@@ -23,8 +23,8 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
-import uk.gov.hmrc.lisaapi.models.CreateLisaInvestorRequest
-import uk.gov.hmrc.lisaapi.models.des.DesCreateInvestorResponse
+import uk.gov.hmrc.lisaapi.models.{CreateLisaAccountCreationRequest, CreateLisaInvestorRequest}
+import uk.gov.hmrc.lisaapi.models.des.{DesCreateAccountResponse, DesCreateInvestorResponse}
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpResponse}
 
 import scala.concurrent.{Await, Future}
@@ -37,15 +37,16 @@ class DesConnectorSpec extends PlaySpec
   val statusCodeSuccess = 200
   val statusCodeServiceUnavailable = 503
   val rdsCodeInvestorNotFound = 63214
+  val rdsCodeAccountAlreadyExists = 63219
 
-  "DesConnector" must {
+  "Create Lisa Investor endpoint" must {
 
     "Return a status code of 200" when {
       "Given a 200 response from DES" in {
         when(mockHttpPost.POST[CreateLisaInvestorRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(HttpResponse(responseStatus = statusCodeSuccess, responseJson = None)))
 
-        doRequest { response =>
+        doCreateInvestorRequest { response =>
           response must be((
             statusCodeSuccess,
             None
@@ -66,7 +67,7 @@ class DesConnectorSpec extends PlaySpec
             )
           )
 
-        doRequest { response =>
+        doCreateInvestorRequest { response =>
           response must be((
             statusCodeServiceUnavailable,
             None
@@ -87,7 +88,7 @@ class DesConnectorSpec extends PlaySpec
             )
           )
 
-        doRequest { response =>
+        doCreateInvestorRequest { response =>
           response must be((
             statusCodeSuccess,
             Some(DesCreateInvestorResponse(None, None))
@@ -108,7 +109,7 @@ class DesConnectorSpec extends PlaySpec
             )
           )
 
-        doRequest { response =>
+        doCreateInvestorRequest { response =>
           response must be((
             statusCodeSuccess,
             Some(DesCreateInvestorResponse(rdsCode = Some(rdsCodeInvestorNotFound), investorId = Some("AB123456")))
@@ -119,9 +120,97 @@ class DesConnectorSpec extends PlaySpec
 
   }
 
-  private def doRequest(callback: ((Int, Option[DesCreateInvestorResponse])) => Unit) = {
+  "Create Lisa Account endpoint" must {
+
+    "Return a status code of 200" when {
+      "Given a 200 response from DES" in {
+        when(mockHttpPost.POST[CreateLisaAccountCreationRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(HttpResponse(responseStatus = statusCodeSuccess, responseJson = None)))
+
+        doCreateAccountRequest { response =>
+          response must be((
+            statusCodeSuccess,
+            None
+          ))
+        }
+      }
+    }
+
+    "Return no DesCreateAccountResponse" when {
+      "The DES response has no json body" in {
+        when(mockHttpPost.POST[CreateLisaAccountCreationRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = statusCodeServiceUnavailable,
+                responseJson = None
+              )
+            )
+          )
+
+        doCreateAccountRequest { response =>
+          response must be((
+            statusCodeServiceUnavailable,
+            None
+          ))
+        }
+      }
+    }
+
+    "Return any empty DesCreateAccountResponse" when {
+      "The DES response has a json body that is in an incorrect format" in {
+        when(mockHttpPost.POST[CreateLisaAccountCreationRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = statusCodeSuccess,
+                responseJson = Some(Json.parse("""[1,2,3]"""))
+              )
+            )
+          )
+
+        doCreateAccountRequest { response =>
+          response must be((
+            statusCodeSuccess,
+            Some(DesCreateAccountResponse(None, None))
+          ))
+        }
+      }
+    }
+
+    "Return a populated DesCreateAccountResponse" when {
+      "The DES response has a json body that is in the correct format" in {
+        when(mockHttpPost.POST[CreateLisaAccountCreationRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = statusCodeSuccess,
+                responseJson = Some(Json.parse(s"""{"rdsCode":$rdsCodeAccountAlreadyExists, "accountId": "AB123456"}"""))
+              )
+            )
+          )
+
+        doCreateAccountRequest { response =>
+          response must be((
+            statusCodeSuccess,
+            Some(DesCreateAccountResponse(rdsCode = Some(rdsCodeAccountAlreadyExists), accountId = Some("AB123456")))
+          ))
+        }
+      }
+    }
+
+  }
+
+  private def doCreateInvestorRequest(callback: ((Int, Option[DesCreateInvestorResponse])) => Unit) = {
     val request = CreateLisaInvestorRequest("AB123456A", "A", "B", new DateTime("2000-01-01"))
     val response = Await.result(SUT.createInvestor("Z019283", request), Duration.Inf)
+
+    callback(response)
+  }
+
+  private def doCreateAccountRequest(callback: ((Int, Option[DesCreateAccountResponse])) => Unit) = {
+    val request = CreateLisaAccountCreationRequest("1234567890", "Z019283", "9876543210", new DateTime("2000-01-01"))
+    val response = Await.result(SUT.createAccount("Z019283", request), Duration.Inf)
 
     callback(response)
   }
