@@ -32,10 +32,10 @@ trait InvestorService  {
 
   def createInvestor(lisaManager: String, request: CreateLisaInvestorRequest)(implicit hc: HeaderCarrier) : Future[CreateLisaInvestorResponse] = {
     val response = desConnector.createInvestor(lisaManager, request)
+    val httpStatusOk = 200
 
-    // scalastyle:off magic.number
     response map {
-      case (200, Some(data)) => {
+      case (`httpStatusOk`, Some(data)) => {
         (data.rdsCode, data.investorId) match {
           case (None, Some(investorId)) => CreateLisaInvestorSuccessResponse(investorId)
           case (Some(INVESTOR_NOT_FOUND), _) => CreateLisaInvestorNotFoundResponse

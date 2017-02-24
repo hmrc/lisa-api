@@ -36,8 +36,9 @@ class InvestorServiceSpec extends PlaySpec
 
   "InvestorService" must {
 
-    "Return a Success Response" when {
-      "Given a investor id from the DES connector" in {
+    "return a Success Response" when {
+
+      "given a investor id from the DES connector" in {
         when(mockDesConnector.createInvestor(any(), any())(any()))
           .thenReturn(
             Future.successful((
@@ -50,10 +51,12 @@ class InvestorServiceSpec extends PlaySpec
           response mustBe CreateLisaInvestorSuccessResponse("AB123456")
         }
       }
+
     }
 
-    "Return a Not Found Response" when {
-      "Given an RDS code of 63214 from the DES connector" in {
+    "return a Not Found Response" when {
+
+      "given an RDS code of 63214 from the DES connector" in {
         when(mockDesConnector.createInvestor(any(), any())(any()))
           .thenReturn(
             Future.successful((
@@ -66,10 +69,12 @@ class InvestorServiceSpec extends PlaySpec
           response mustBe CreateLisaInvestorNotFoundResponse
         }
       }
+
     }
 
-    "Return a Already Exists Response" when {
-      "Given an RDS code of 63215 from the DES connector" in {
+    "return a Already Exists Response" when {
+
+      "given an RDS code of 63215 from the DES connector" in {
         when(mockDesConnector.createInvestor(any(), any())(any()))
           .thenReturn(
             Future.successful((
@@ -82,11 +87,12 @@ class InvestorServiceSpec extends PlaySpec
           response mustBe CreateLisaInvestorAlreadyExistsResponse
         }
       }
+
     }
 
-    "Return a Error Response" when {
+    "return a Error Response" when {
 
-      "Given no data from the DES connector" in {
+      "given no data from the DES connector" in {
         when(mockDesConnector.createInvestor(any(), any())(any()))
           .thenReturn(
             Future.successful((
@@ -100,7 +106,7 @@ class InvestorServiceSpec extends PlaySpec
         }
       }
 
-      "Given an empty data object from the DES connector" in {
+      "given an empty data object from the DES connector" in {
         when(mockDesConnector.createInvestor(any(), any())(any()))
           .thenReturn(
             Future.successful((
@@ -114,7 +120,7 @@ class InvestorServiceSpec extends PlaySpec
         }
       }
 
-      "Given a status code other than 200" in {
+      "given a status code other than 200" in {
         when(mockDesConnector.createInvestor(any(), any())(any()))
           .thenReturn(
             Future.successful((
@@ -128,7 +134,7 @@ class InvestorServiceSpec extends PlaySpec
         }
       }
 
-      "Given an RDS code other than the ones for Not Found and Already Exists" in {
+      "given an RDS code other than the ones for Not Found and Already Exists" in {
         when(mockDesConnector.createInvestor(any(), any())(any()))
           .thenReturn(
             Future.successful((
