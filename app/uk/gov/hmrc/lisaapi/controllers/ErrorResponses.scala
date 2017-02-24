@@ -22,6 +22,8 @@ sealed abstract class ErrorResponse(
   val message: String
 )
 
+case object ErrorNotImplemented extends ErrorResponse(501, "NOT_IMPLEMENTED", "Not implemented")
+
 case object ErrorUnauthorized extends ErrorResponse(401, "UNAUTHORIZED", "Bearer token is missing or not authorized")
 
 case object ErrorNotFound extends ErrorResponse(404, "NOT_FOUND", "Resource was not found")
@@ -47,3 +49,11 @@ case object EmptyJson extends ErrorResponse(400,"BAD_REQUEST", "Can't parse empt
 case object ErrorInvestorNotFound extends ErrorResponse(403, "INVESTOR_NOT_FOUND", "The investor details given do not match with HMRC’s records")
 
 case object ErrorInvestorAlreadyExists extends ErrorResponse(409, "INVESTOR_ALREADY_EXISTS", "The investor already has a record with HMRC")
+
+case object ErrorInvestorNotEligible extends ErrorResponse(403, "INVESTOR_ELIGIBILITY_CHECK_FAILED", "The investor is not eligible for a LISA account")
+
+case object ErrorInvestorComplianceCheckFailed extends ErrorResponse(403, "INVESTOR_COMPLIANCE_CHECK_FAILED", "The investor has failed a compliance check - they may have breached ISA guidelines or regulations")
+
+case object ErrorPreviousAccountDoesNotExist extends ErrorResponse(403, "PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST", "The transferredFromAccountID and transferredFromLMRN given don’t match with an account on HMRC’s records")
+
+case object ErrorAccountAlreadyExists extends ErrorResponse(403, "INVESTOR_ACCOUNT_ALREADY_EXISTS", "The LISA account already exists")
