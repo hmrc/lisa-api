@@ -18,8 +18,8 @@ package uk.gov.hmrc.lisaapi.connectors
 
 import uk.gov.hmrc.lisaapi.config.WSHttp
 import uk.gov.hmrc.lisaapi.controllers.JsonFormats
-import uk.gov.hmrc.lisaapi.models.CreateLisaInvestorRequest
-import uk.gov.hmrc.lisaapi.models.des.DesCreateInvestorResponse
+import uk.gov.hmrc.lisaapi.models.{CreateLisaAccountCreationRequest, CreateLisaInvestorRequest}
+import uk.gov.hmrc.lisaapi.models.des.{DesCreateAccountResponse, DesCreateInvestorResponse}
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpReads, HttpResponse}
 
@@ -50,6 +50,25 @@ trait DesConnector extends ServicesConfig with JsonFormats {
     result.map(r => {
       // catch any NullPointerExceptions that may occur from r.json being a null
       Try(r.json.asOpt[DesCreateInvestorResponse]) match {
+        case Success(data) => (r.status, data)
+        case Failure(_) => (r.status, None)
+      }
+    })
+  }
+
+  /**
+    * Attempts to create a new LISA account
+    *
+    * @return A tuple of the http status code and an (optional) data response
+    */
+  def createAccount(lisaManager: String, request: CreateLisaAccountCreationRequest)(implicit hc: HeaderCarrier): Future[(Int, Option[DesCreateAccountResponse])] = {
+    val uri = s"$lisaServiceUrl/$lisaManager/createaccount"
+
+    val result = httpPost.POST[CreateLisaAccountCreationRequest, HttpResponse](uri, request)(implicitly, httpReads, implicitly)
+
+    result.map(r => {
+      // catch any NullPointerExceptions that may occur from r.json being a null
+      Try(r.json.asOpt[DesCreateAccountResponse]) match {
         case Success(data) => (r.status, data)
         case Failure(_) => (r.status, None)
       }
