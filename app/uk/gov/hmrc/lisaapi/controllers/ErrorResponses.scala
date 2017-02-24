@@ -22,6 +22,8 @@ sealed abstract class ErrorResponse(
   val message: String
 )
 
+case object ErrorNotImplemented extends ErrorResponse(501, "NOT_IMPLEMENTED", "Not implemented")
+
 case object ErrorUnauthorized extends ErrorResponse(401, "UNAUTHORIZED", "Bearer token is missing or not authorized")
 
 case object ErrorNotFound extends ErrorResponse(404, "NOT_FOUND", "Resource was not found")
