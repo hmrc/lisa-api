@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
+import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.api.controllers.HeaderValidator
@@ -34,6 +35,7 @@ class InvestorController extends LisaController {
 
   def createLisaInvestor(lisaManager: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async {
     implicit request =>
+      Logger.debug(s"LISA HTTP Request: ${request.uri}  and method: ${request.method}" )
       withValidJson[CreateLisaInvestorRequest] {
         createRequest => {
           service.createInvestor(lisaManager, createRequest).map { result =>
