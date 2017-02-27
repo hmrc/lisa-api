@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
+import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.lisaapi.models._
@@ -32,6 +33,7 @@ class AccountController extends LisaController {
   implicit val hc: HeaderCarrier = new HeaderCarrier()
 
   def createOrTransferLisaAccount(lisaManager: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
+    Logger.debug(s"LISA HTTP Request: ${request.uri}  and method: ${request.method}" )
     withValidJson[CreateLisaAccountRequest] {
       req => {
         req match {
