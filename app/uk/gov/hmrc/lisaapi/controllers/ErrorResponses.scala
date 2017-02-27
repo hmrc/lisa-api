@@ -31,10 +31,6 @@ case class ErrorResponseWithId(
                                 id: String
                               )
 
-object ErrorResponseWithId {
-  implicit val format = Json.format[ErrorResponseWithId]
-}
-
 case object ErrorNotImplemented extends ErrorResponse(501, "NOT_IMPLEMENTED", "Not implemented")
 
 case object ErrorUnauthorized extends ErrorResponse(401, "UNAUTHORIZED", "Bearer token is missing or not authorized")
