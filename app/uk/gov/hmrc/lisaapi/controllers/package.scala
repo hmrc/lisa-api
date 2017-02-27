@@ -22,4 +22,8 @@ package object controllers {
   implicit val errorResponseWrites = new Writes[ErrorResponse] {
     def writes(e: ErrorResponse): JsValue = Json.obj("code" -> e.errorCode, "message" -> e.message)
   }
+
+  implicit val errorResponseWithIdWrites = new Writes[ErrorResponseWithId] {
+    def writes(e: ErrorResponseWithId): JsValue = Json.obj("code" -> e.errorCode, "message" -> e.message, "id" -> e.id)
+  }
 }
