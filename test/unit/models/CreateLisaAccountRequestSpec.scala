@@ -214,6 +214,23 @@ class CreateLisaAccountRequestSpec extends PlaySpec with JsonFormats {
       }
     }
 
+    "fail if request has invalid date value " in {
+      val req = validAccountCreationRequest.replace("2011-03-23","2011-14-23")
+      val res = Json.parse(req).validate[CreateLisaAccountRequest]
+
+      res match {
+        case JsError(errors) => {
+          errors.count {
+            case (path: JsPath, errors: Seq[ValidationError]) => {
+              path.toString() == "/firstSubscriptionDate" && errors.contains(ValidationError("error.formatting.date"))
+            }
+          } mustBe 1
+        }
+        case _ => fail()
+      }
+    }
+
+
   }
 
 }
