@@ -81,7 +81,7 @@ class InvestorControllerSpec extends WordSpec with MockitoSugar with ShouldMatch
 
     "return with status 409 conflict" when {
       "given a Already Exists response from the service layer" in {
-        when(mockService.createInvestor(any(), any())(any())).thenReturn(Future.successful(CreateLisaInvestorAlreadyExistsResponse))
+        when(mockService.createInvestor(any(), any())(any())).thenReturn(Future.successful(CreateLisaInvestorAlreadyExistsResponse("A92823736")))
         val res = mockInvestorController.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
           withBody(AnyContentAsJson(Json.parse(investorJson))))
         status(res) should be(CONFLICT)

@@ -16,11 +16,24 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
+import play.api.libs.json.Json
+
 sealed abstract class ErrorResponse(
-  val httpStatusCode: Int,
-  val errorCode: String,
-  val message: String
-)
+                                     val httpStatusCode: Int,
+                                     val errorCode: String,
+                                     val message: String
+                                   )
+
+case class ErrorResponseWithId(
+                                httpStatusCode: Int,
+                                errorCode: String,
+                                message: String,
+                                id: String
+                              )
+
+object ErrorResponseWithId {
+  implicit val format = Json.format[ErrorResponseWithId]
+}
 
 case object ErrorNotImplemented extends ErrorResponse(501, "NOT_IMPLEMENTED", "Not implemented")
 
@@ -44,11 +57,9 @@ case object MissingID extends ErrorResponse(400, "BAD_REQUEST", "Missing Registr
 
 case object InvalidID extends ErrorResponse(400, "BAD_REQUEST", s"Invalid Registration Id")
 
-case object EmptyJson extends ErrorResponse(400,"BAD_REQUEST", "Can't parse empty json")
+case object EmptyJson extends ErrorResponse(400, "BAD_REQUEST", "Can't parse empty json")
 
 case object ErrorInvestorNotFound extends ErrorResponse(403, "INVESTOR_NOT_FOUND", "The investor details given do not match with HMRC’s records")
-
-case object ErrorInvestorAlreadyExists extends ErrorResponse(409, "INVESTOR_ALREADY_EXISTS", "The investor already has a record with HMRC")
 
 case object ErrorInvestorNotEligible extends ErrorResponse(403, "INVESTOR_ELIGIBILITY_CHECK_FAILED", "The investor is not eligible for a LISA account")
 
@@ -57,3 +68,11 @@ case object ErrorInvestorComplianceCheckFailed extends ErrorResponse(403, "INVES
 case object ErrorPreviousAccountDoesNotExist extends ErrorResponse(403, "PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST", "The transferredFromAccountID and transferredFromLMRN given don’t match with an account on HMRC’s records")
 
 case object ErrorAccountAlreadyExists extends ErrorResponse(403, "INVESTOR_ACCOUNT_ALREADY_EXISTS", "The LISA account already exists")
+
+object ErrorInvestorAlreadyExists {
+
+  def apply(investorId: String) = {
+    ErrorResponseWithId(409, "INVESTOR_ALREADY_EXISTS", "The investor already has a record with HMRC ", investorId)
+  }
+
+}

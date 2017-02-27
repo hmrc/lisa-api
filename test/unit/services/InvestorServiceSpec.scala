@@ -84,7 +84,7 @@ class InvestorServiceSpec extends PlaySpec
           )
 
         doRequest { response =>
-          response mustBe CreateLisaInvestorAlreadyExistsResponse
+          response mustBe CreateLisaInvestorErrorResponse
         }
       }
 
