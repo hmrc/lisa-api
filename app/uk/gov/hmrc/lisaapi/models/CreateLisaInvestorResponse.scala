@@ -19,7 +19,8 @@ package uk.gov.hmrc.lisaapi.models
 sealed trait CreateLisaInvestorResponse
 
 case class CreateLisaInvestorSuccessResponse(investorId: String) extends CreateLisaInvestorResponse
+case class CreateLisaInvestorAlreadyExistsResponse(investorId: String) extends CreateLisaInvestorResponse
 case object CreateLisaInvestorErrorResponse extends CreateLisaInvestorResponse
 case object CreateLisaInvestorNotFoundResponse extends CreateLisaInvestorResponse
-case object CreateLisaInvestorAlreadyExistsResponse extends CreateLisaInvestorResponse
+
 

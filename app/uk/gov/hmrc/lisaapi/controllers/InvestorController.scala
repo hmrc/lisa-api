@@ -46,7 +46,7 @@ class InvestorController extends LisaController {
                 Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = 201)))
               }
               case CreateLisaInvestorNotFoundResponse => Forbidden(Json.toJson(ErrorInvestorNotFound))
-              case CreateLisaInvestorAlreadyExistsResponse => Conflict(Json.toJson(ErrorInvestorAlreadyExists))
+              case CreateLisaInvestorAlreadyExistsResponse(investorId) => Conflict(Json.toJson(ErrorInvestorAlreadyExists(investorId)))
               case CreateLisaInvestorErrorResponse => InternalServerError(Json.toJson(ErrorInternalServerError))
             }
           }
