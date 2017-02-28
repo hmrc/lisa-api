@@ -54,154 +54,62 @@ class CreateLisaInvestorRequestSpec extends PlaySpec with JsonFormats {
     }
 
     "catch an invalid NINO" in {
-      val req = """{"investorNINO":"123", "firstName":"A", "lastName":"B", "DoB":"2000-01-01"}"""
-      val res = Json.parse(req).validate[CreateLisaInvestorRequest]
-
-      res match {
-        case JsError(errors) => {
-          errors.count {
-            case (path: JsPath, errors: Seq[ValidationError]) => {
-              path.toString() == "/investorNINO" && errors.contains(ValidationError("error.formatting.nino"))
-            }
-          } mustBe 1
-        }
-        case _ => fail()
-      }
+      hasCorrectValidationError(validRequestJson.replace("AB123456A", "123"), "/investorNINO", "error.formatting.nino")
     }
 
     "catch an invalid firstName" in {
-      val req = """{"investorNINO":"AB123456A", "firstName":"", "lastName":"B", "DoB":"2000-01-01"}"""
-      val res = Json.parse(req).validate[CreateLisaInvestorRequest]
-
-      res match {
-        case JsError(errors) => {
-          errors.count {
-            case (path: JsPath, errors: Seq[ValidationError]) => {
-              path.toString() == "/firstName" && errors.contains(ValidationError("error.formatting.firstName"))
-            }
-          } mustBe 1
-        }
-        case _ => fail()
-      }
+      hasCorrectValidationError(validRequestJson.replace("A", ""), "/firstName", "error.formatting.firstName")
     }
 
     "catch an invalid lastName" in {
-      val req = """{"investorNINO":"AB123456A", "firstName":"A", "lastName":"", "DoB":"2000-01-01"}"""
-      val res = Json.parse(req).validate[CreateLisaInvestorRequest]
-
-      res match {
-        case JsError(errors) => {
-          errors.count {
-            case (path: JsPath, errors: Seq[ValidationError]) => {
-              path.toString() == "/lastName" && errors.contains(ValidationError("error.formatting.lastName"))
-            }
-          } mustBe 1
-        }
-        case _ => fail()
-      }
+      hasCorrectValidationError(validRequestJson.replace("B", ""), "/lastName", "error.formatting.lastName")
     }
 
     "catch an invalid DoB" when {
 
-      "the date is in the future" in {
-        val futureDate = new DateTime().plusDays(1).toString("yyyy-MM-dd")
-        val req = s"""{"investorNINO":"AB123456A", "firstName":"A", "lastName":"B", "DoB": "${futureDate}"}"""
-        val res = Json.parse(req).validate[CreateLisaInvestorRequest]
-
-        res match {
-          case JsError(errors) => {
-            errors.count {
-              case (path: JsPath, errors: Seq[ValidationError]) => {
-                path.toString() == "/DoB" && errors.contains(ValidationError("error.formatting.date"))
-              }
-            } mustBe 1
-          }
-          case _ => fail()
-        }
-      }
-
       "the data type is incorrect" in {
-        val req = """{"investorNINO":"AB123456A", "firstName":"A", "lastName":"B", "DoB": 123456789}"""
-        val res = Json.parse(req).validate[CreateLisaInvestorRequest]
-
-        res match {
-          case JsError(errors) => {
-            errors.count {
-              case (path: JsPath, errors: Seq[ValidationError]) => {
-                path.toString() == "/DoB" && errors.contains(ValidationError("error.formatting.date"))
-              }
-            } mustBe 1
-          }
-          case _ => fail()
-        }
+        hasCorrectValidationError(validRequestJson.replace("\"2000-02-29\"", "123456789"), "/DoB", "error.formatting.date")
       }
 
       "the format is incorrect" in {
-        val req = """{"investorNINO":"AB123456A", "firstName":"A", "lastName":"B", "DoB":"01/01/2000"}"""
-        val res = Json.parse(req).validate[CreateLisaInvestorRequest]
-
-        res match {
-          case JsError(errors) => {
-            errors.count {
-              case (path: JsPath, errors: Seq[ValidationError]) => {
-                path.toString() == "/DoB" && errors.contains(ValidationError("error.formatting.date"))
-              }
-            } mustBe 1
-          }
-          case _ => fail()
-        }
+        hasCorrectValidationError(validRequestJson.replace("2000-02-29", "01/01/2000"), "/DoB", "error.formatting.date")
       }
 
       "day and month are in the wrong order" in {
-        val req = """{"investorNINO":"AB123456A", "firstName":"A", "lastName":"B", "DoB":"2000-31-01"}"""
-        val res = Json.parse(req).validate[CreateLisaInvestorRequest]
-
-        res match {
-          case JsError(errors) => {
-            errors.count {
-              case (path: JsPath, errors: Seq[ValidationError]) => {
-                path.toString() == "/DoB" && errors.contains(ValidationError("error.formatting.date"))
-              }
-            } mustBe 1
-          }
-          case _ => fail()
-        }
+        hasCorrectValidationError(validRequestJson.replace("2000-02-29", "2000-31-01"), "/DoB", "error.formatting.date")
       }
 
       "an invalid date is supplied" in {
-        val req = """{"investorNINO":"AB123456A", "firstName":"A", "lastName":"B", "DoB":"2000-09-31"}"""
-        val res = Json.parse(req).validate[CreateLisaInvestorRequest]
-
-        res match {
-          case JsError(errors) => {
-            errors.count {
-              case (path: JsPath, errors: Seq[ValidationError]) => {
-                path.toString() == "/DoB" && errors.contains(ValidationError("error.formatting.date"))
-              }
-            } mustBe 1
-          }
-          case _ => fail()
-        }
+        hasCorrectValidationError(validRequestJson.replace("2000-02-29", "2000-09-31"), "/DoB", "error.formatting.date")
       }
 
       "feb 29th is supplied for a non-leap year" in {
-        val req = """{"investorNINO":"AB123456A", "firstName":"A", "lastName":"B", "DoB":"2017-02-29"}"""
-        val res = Json.parse(req).validate[CreateLisaInvestorRequest]
+        hasCorrectValidationError(validRequestJson.replace("2000-02-29", "2017-02-29"), "/DoB", "error.formatting.date")
+      }
 
-        res match {
-          case JsError(errors) => {
-            errors.count {
-              case (path: JsPath, errors: Seq[ValidationError]) => {
-                path.toString() == "/DoB" && errors.contains(ValidationError("error.formatting.date"))
-              }
-            } mustBe 1
-          }
-          case _ => fail()
-        }
+      "the date is in the future" in {
+        val futureDate = new DateTime().plusDays(1).toString("yyyy-MM-dd")
+
+        hasCorrectValidationError(validRequestJson.replace("2000-02-29", futureDate), "/DoB", "error.formatting.date")
       }
 
     }
 
+  }
+
+  private def hasCorrectValidationError(req: String, path: String, errorMessage: String): Unit = {
+    val res = Json.parse(req).validate[CreateLisaInvestorRequest]
+
+    res match {
+      case JsError(errors) => {
+        errors.count {
+          case (path: JsPath, errors: Seq[ValidationError]) => {
+            path.eq(path) && errors.contains(ValidationError(errorMessage))
+          }
+        } mustBe 1
+      }
+      case _ => fail()
+    }
   }
 
 }
