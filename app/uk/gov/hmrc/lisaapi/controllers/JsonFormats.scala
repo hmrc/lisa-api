@@ -25,7 +25,7 @@ import uk.gov.hmrc.lisaapi.models.{ApiResponse, ApiResponseData, CreateLisaInves
 trait JsonFormats {
   implicit val ninoRegex = "^[A-Z]{2}\\d{6}[A-D]$".r
   implicit val nameRegex = "^.{1,35}$".r
-  implicit val dateRegex = "^\\d{4}-\\d{2}-\\d{2}$".r
+  implicit val dateRegex = "^[0-9]{4}-(((0[13578]|(10|12))-(0[1-9]|[1-2][0-9]|3[0-1]))|(02-(0[1-9]|[1-2][0-9]))|((0[469]|11)-(0[1-9]|[1-2][0-9]|30)))$".r
   implicit val lmrnRegex = "^Z\\d{4,6}$".r
   implicit val investorIDRegex = "^\\d{10}$".r
 
