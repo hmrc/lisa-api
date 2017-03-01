@@ -51,7 +51,7 @@ class AccountController extends LisaController {
                 case CreateLisaAccountInvestorComplianceCheckFailedResponse => Forbidden(Json.toJson(ErrorInvestorComplianceCheckFailed))
                 case CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse => Forbidden(Json.toJson(ErrorPreviousAccountDoesNotExist))
                 case CreateLisaAccountAlreadyExistsResponse => Forbidden(Json.toJson(ErrorAccountAlreadyExists))
-                case CreateLisaAccountErrorResponse => InternalServerError(Json.toJson(ErrorInternalServerError))
+                case _ => InternalServerError(Json.toJson(ErrorInternalServerError))
               }
             }
           }
@@ -64,7 +64,14 @@ class AccountController extends LisaController {
     withValidJson[CloseLisaAccountRequest] { req =>
       service.closeAccount(lisaManager, accountId, req).map { result =>
         result match {
-          case _ => Ok
+          case CloseLisaAccountSuccessResponse(accountId) => {
+            val data = ApiResponseData(message = "LISA Account Closed", accountId = Some(accountId))
+
+            Ok(Json.toJson(ApiResponse(data = Some(data), success = true, status = 200)))
+          }
+          case CloseLisaAccountAlreadyClosedResponse => Forbidden(Json.toJson(ErrorAccountAlreadyClosed))
+          case CloseLisaAccountNotFoundResponse => NotFound(Json.toJson(ErrorAccountNotFound))
+          case _ => InternalServerError(Json.toJson(ErrorInternalServerError))
         }
       }
     }

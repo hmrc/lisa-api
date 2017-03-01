@@ -51,7 +51,7 @@ class AccountServiceSpec extends PlaySpec
             ))
           )
 
-        doRequest { response =>
+        doCreateRequest { response =>
           response mustBe CreateLisaAccountSuccessResponse("AB123456")
         }
       }
@@ -69,7 +69,7 @@ class AccountServiceSpec extends PlaySpec
             ))
           )
 
-        doRequest { response =>
+        doCreateRequest { response =>
           response mustBe CreateLisaAccountErrorResponse
         }
       }
@@ -83,7 +83,7 @@ class AccountServiceSpec extends PlaySpec
             ))
           )
 
-        doRequest { response =>
+        doCreateRequest { response =>
           response mustBe CreateLisaAccountErrorResponse
         }
       }
@@ -97,7 +97,7 @@ class AccountServiceSpec extends PlaySpec
             ))
           )
 
-        doRequest { response =>
+        doCreateRequest { response =>
           response mustBe CreateLisaAccountErrorResponse
         }
       }
@@ -111,7 +111,7 @@ class AccountServiceSpec extends PlaySpec
             ))
           )
 
-        doRequest { response =>
+        doCreateRequest { response =>
           response mustBe CreateLisaAccountErrorResponse
         }
       }
@@ -128,7 +128,7 @@ class AccountServiceSpec extends PlaySpec
             ))
           )
 
-        doRequest { response =>
+        doCreateRequest { response =>
           response mustBe CreateLisaAccountInvestorNotFoundResponse
         }
       }
@@ -142,7 +142,7 @@ class AccountServiceSpec extends PlaySpec
             ))
           )
 
-        doRequest { response =>
+        doCreateRequest { response =>
           response mustBe CreateLisaAccountInvestorNotEligibleResponse
         }
       }
@@ -156,7 +156,7 @@ class AccountServiceSpec extends PlaySpec
             ))
           )
 
-        doRequest { response =>
+        doCreateRequest { response =>
           response mustBe CreateLisaAccountInvestorComplianceCheckFailedResponse
         }
       }
@@ -170,7 +170,7 @@ class AccountServiceSpec extends PlaySpec
             ))
           )
 
-        doRequest { response =>
+        doCreateRequest { response =>
           response mustBe CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse
         }
       }
@@ -184,7 +184,7 @@ class AccountServiceSpec extends PlaySpec
             ))
           )
 
-        doRequest { response =>
+        doCreateRequest { response =>
           response mustBe CreateLisaAccountAlreadyExistsResponse
         }
       }
@@ -195,22 +195,129 @@ class AccountServiceSpec extends PlaySpec
 
   "Close Account" must {
 
-    "return true" when {
+    "return a Success Response" when {
 
-      "given any request" in {
-        val request = CloseLisaAccountRequest("Voided", new DateTime("2000-01-01"))
-        val response = Await.result(SUT.closeAccount("Z019283", "ABC12345", request)(HeaderCarrier()), Duration.Inf)
+      "given no rds code and an account id" in {
+        when(mockDesConnector.closeAccount(any(), any(), any())(any()))
+          .thenReturn(
+            Future.successful((
+              httpStatusOk,
+              Some(DesAccountResponse(None, accountId = Some("AB123456")))
+            ))
+          )
 
-        response mustBe true
+        doCloseRequest { response =>
+          response mustBe CloseLisaAccountSuccessResponse("AB123456")
+        }
+      }
+
+    }
+
+    "return a Error Response" when {
+
+      "given a status code other than 200" in {
+        when(mockDesConnector.closeAccount(any(), any(), any())(any()))
+          .thenReturn(
+            Future.successful((
+              httpStatusCreated,
+              None
+            ))
+          )
+
+        doCloseRequest { response =>
+          response mustBe CloseLisaAccountErrorResponse
+        }
+      }
+
+      "given no data" in {
+        when(mockDesConnector.closeAccount(any(), any(), any())(any()))
+          .thenReturn(
+            Future.successful((
+              httpStatusOk,
+              None
+            ))
+          )
+
+        doCloseRequest { response =>
+          response mustBe CloseLisaAccountErrorResponse
+        }
+      }
+
+      "given empty data" in {
+        when(mockDesConnector.closeAccount(any(), any(), any())(any()))
+          .thenReturn(
+            Future.successful((
+              httpStatusOk,
+              Some(DesAccountResponse(rdsCode = None, accountId = None))
+            ))
+          )
+
+        doCloseRequest { response =>
+          response mustBe CloseLisaAccountErrorResponse
+        }
+      }
+
+      "given an rds code which is not recognised" in {
+        when(mockDesConnector.closeAccount(any(), any(), any())(any()))
+          .thenReturn(
+            Future.successful((
+              httpStatusOk,
+              Some(DesAccountResponse(rdsCode = Some(unknownRdsCode)))
+            ))
+          )
+
+        doCloseRequest { response =>
+          response mustBe CloseLisaAccountErrorResponse
+        }
+      }
+    }
+
+    "return the type-appropriate response" when {
+
+      /* TODO: 403 & WRONG_LISA_MANAGER */
+
+      "given the RDS code for a Account Already Closed Response" in {
+        when(mockDesConnector.closeAccount(any(), any(), any())(any()))
+          .thenReturn(
+            Future.successful((
+              httpStatusOk,
+              Some(DesAccountResponse(rdsCode = Some(SUT.INVESTOR_ACCOUNT_ALREADY_CLOSED)))
+            ))
+          )
+
+        doCloseRequest { response =>
+          response mustBe CloseLisaAccountAlreadyClosedResponse
+        }
+      }
+
+      "given the RDS code for a Account Not Found Response" in {
+        when(mockDesConnector.closeAccount(any(), any(), any())(any()))
+          .thenReturn(
+            Future.successful((
+              httpStatusOk,
+              Some(DesAccountResponse(rdsCode = Some(SUT.INVESTOR_ACCOUNT_NOT_FOUND)))
+            ))
+          )
+
+        doCloseRequest { response =>
+          response mustBe CloseLisaAccountNotFoundResponse
+        }
       }
 
     }
 
   }
 
-  private def doRequest(callback: (CreateLisaAccountResponse) => Unit) = {
+  private def doCreateRequest(callback: (CreateLisaAccountResponse) => Unit) = {
     val request = CreateLisaAccountCreationRequest("1234567890", "Z019283", "9876543210", new DateTime("2000-01-01"))
     val response = Await.result(SUT.createAccount("Z019283", request)(HeaderCarrier()), Duration.Inf)
+
+    callback(response)
+  }
+
+  private def doCloseRequest(callback: (CloseLisaAccountResponse) => Unit) = {
+    val request = CloseLisaAccountRequest("Voided", new DateTime("2000-01-01"))
+    val response = Await.result(SUT.closeAccount("Z019283", "A123456", request)(HeaderCarrier()), Duration.Inf)
 
     callback(response)
   }
