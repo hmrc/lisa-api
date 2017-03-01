@@ -16,4 +16,4 @@
 
 package uk.gov.hmrc.lisaapi.models.des
 
-case class DesCreateAccountResponse(rdsCode: Option[Int] = None, accountId: Option[String] = None)
+case class DesAccountResponse(rdsCode: Option[Int] = None, accountId: Option[String] = None)

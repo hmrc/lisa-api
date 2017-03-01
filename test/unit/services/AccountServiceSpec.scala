@@ -23,7 +23,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.models.des.{DesCreateAccountResponse, DesCreateInvestorResponse}
+import uk.gov.hmrc.lisaapi.models.des.{DesAccountResponse, DesCreateInvestorResponse}
 import uk.gov.hmrc.lisaapi.services.{AccountService, InvestorService}
 import uk.gov.hmrc.play.http.HeaderCarrier
 
@@ -47,7 +47,7 @@ class AccountServiceSpec extends PlaySpec
           .thenReturn(
             Future.successful((
               httpStatusOk,
-              Some(DesCreateAccountResponse(None, accountId = Some("AB123456")))
+              Some(DesAccountResponse(None, accountId = Some("AB123456")))
             ))
           )
 
@@ -93,7 +93,7 @@ class AccountServiceSpec extends PlaySpec
           .thenReturn(
             Future.successful((
               httpStatusOk,
-              Some(DesCreateAccountResponse(rdsCode = None, accountId = None))
+              Some(DesAccountResponse(rdsCode = None, accountId = None))
             ))
           )
 
@@ -107,7 +107,7 @@ class AccountServiceSpec extends PlaySpec
           .thenReturn(
             Future.successful((
               httpStatusOk,
-              Some(DesCreateAccountResponse(rdsCode = Some(unknownRdsCode)))
+              Some(DesAccountResponse(rdsCode = Some(unknownRdsCode)))
             ))
           )
 
@@ -124,7 +124,7 @@ class AccountServiceSpec extends PlaySpec
           .thenReturn(
             Future.successful((
               httpStatusOk,
-              Some(DesCreateAccountResponse(rdsCode = Some(SUT.INVESTOR_NOT_FOUND)))
+              Some(DesAccountResponse(rdsCode = Some(SUT.INVESTOR_NOT_FOUND)))
             ))
           )
 
@@ -138,7 +138,7 @@ class AccountServiceSpec extends PlaySpec
           .thenReturn(
             Future.successful((
               httpStatusOk,
-              Some(DesCreateAccountResponse(rdsCode = Some(SUT.INVESTOR_NOT_ELIGIBLE)))
+              Some(DesAccountResponse(rdsCode = Some(SUT.INVESTOR_NOT_ELIGIBLE)))
             ))
           )
 
@@ -152,7 +152,7 @@ class AccountServiceSpec extends PlaySpec
           .thenReturn(
             Future.successful((
               httpStatusOk,
-              Some(DesCreateAccountResponse(rdsCode = Some(SUT.INVESTOR_COMPLIANCE_FAILED)))
+              Some(DesAccountResponse(rdsCode = Some(SUT.INVESTOR_COMPLIANCE_FAILED)))
             ))
           )
 
@@ -166,7 +166,7 @@ class AccountServiceSpec extends PlaySpec
           .thenReturn(
             Future.successful((
               200,
-              Some(DesCreateAccountResponse(rdsCode = Some(SUT.INVESTOR_PREVIOUS_ACCOUNT_DOES_NOT_EXIST)))
+              Some(DesAccountResponse(rdsCode = Some(SUT.INVESTOR_PREVIOUS_ACCOUNT_DOES_NOT_EXIST)))
             ))
           )
 
@@ -180,7 +180,7 @@ class AccountServiceSpec extends PlaySpec
           .thenReturn(
             Future.successful((
               httpStatusOk,
-              Some(DesCreateAccountResponse(rdsCode = Some(SUT.INVESTOR_ACCOUNT_ALREADY_EXISTS)))
+              Some(DesAccountResponse(rdsCode = Some(SUT.INVESTOR_ACCOUNT_ALREADY_EXISTS)))
             ))
           )
 

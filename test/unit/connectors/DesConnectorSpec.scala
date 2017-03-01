@@ -23,8 +23,8 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
-import uk.gov.hmrc.lisaapi.models.{CreateLisaAccountCreationRequest, CreateLisaInvestorRequest}
-import uk.gov.hmrc.lisaapi.models.des.{DesCreateAccountResponse, DesCreateInvestorResponse}
+import uk.gov.hmrc.lisaapi.models.{CloseLisaAccountRequest, CreateLisaAccountCreationRequest, CreateLisaInvestorRequest}
+import uk.gov.hmrc.lisaapi.models.des.{DesAccountResponse, DesCreateInvestorResponse}
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpResponse}
 
 import scala.concurrent.{Await, Future}
@@ -136,7 +136,7 @@ class DesConnectorSpec extends PlaySpec
       }
     }
 
-    "Return no DesCreateAccountResponse" when {
+    "Return no DesAccountResponse" when {
       "The DES response has no json body" in {
         when(mockHttpPost.POST[CreateLisaAccountCreationRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
@@ -157,7 +157,7 @@ class DesConnectorSpec extends PlaySpec
       }
     }
 
-    "Return any empty DesCreateAccountResponse" when {
+    "Return any empty DesAccountResponse" when {
       "The DES response has a json body that is in an incorrect format" in {
         when(mockHttpPost.POST[CreateLisaAccountCreationRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
@@ -172,13 +172,13 @@ class DesConnectorSpec extends PlaySpec
         doCreateAccountRequest { response =>
           response must be((
             statusCodeSuccess,
-            Some(DesCreateAccountResponse(None, None))
+            Some(DesAccountResponse(None, None))
           ))
         }
       }
     }
 
-    "Return a populated DesCreateAccountResponse" when {
+    "Return a populated DesAccountResponse" when {
       "The DES response has a json body that is in the correct format" in {
         when(mockHttpPost.POST[CreateLisaAccountCreationRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
@@ -193,7 +193,88 @@ class DesConnectorSpec extends PlaySpec
         doCreateAccountRequest { response =>
           response must be((
             statusCodeSuccess,
-            Some(DesCreateAccountResponse(rdsCode = Some(rdsCodeAccountAlreadyExists), accountId = Some("AB123456")))
+            Some(DesAccountResponse(rdsCode = Some(rdsCodeAccountAlreadyExists), accountId = Some("AB123456")))
+          ))
+        }
+      }
+    }
+
+  }
+
+  "Close Lisa Account endpoint" must {
+
+    "Return a status code of 200" when {
+      "Given a 200 response from DES" in {
+        when(mockHttpPost.POST[CloseLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(HttpResponse(responseStatus = statusCodeSuccess, responseJson = None)))
+
+        doCloseAccountRequest { response =>
+          response must be((
+            statusCodeSuccess,
+            None
+          ))
+        }
+      }
+    }
+
+    "Return no DesAccountResponse" when {
+      "The DES response has no json body" in {
+        when(mockHttpPost.POST[CloseLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = statusCodeServiceUnavailable,
+                responseJson = None
+              )
+            )
+          )
+
+        doCloseAccountRequest { response =>
+          response must be((
+            statusCodeServiceUnavailable,
+            None
+          ))
+        }
+      }
+    }
+
+    "Return any empty DesAccountResponse" when {
+      "The DES response has a json body that is in an incorrect format" in {
+        when(mockHttpPost.POST[CloseLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = statusCodeSuccess,
+                responseJson = Some(Json.parse("""[1,2,3]"""))
+              )
+            )
+          )
+
+        doCloseAccountRequest { response =>
+          response must be((
+            statusCodeSuccess,
+            Some(DesAccountResponse(None, None))
+          ))
+        }
+      }
+    }
+
+    "Return a populated DesAccountResponse" when {
+      "The DES response has a json body that is in the correct format" in {
+        when(mockHttpPost.POST[CloseLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = statusCodeSuccess,
+                responseJson = Some(Json.parse(s"""{"rdsCode": null, "accountId": "AB123456"}"""))
+              )
+            )
+          )
+
+        doCloseAccountRequest { response =>
+          response must be((
+            statusCodeSuccess,
+            Some(DesAccountResponse(rdsCode = None, accountId = Some("AB123456")))
           ))
         }
       }
@@ -208,9 +289,16 @@ class DesConnectorSpec extends PlaySpec
     callback(response)
   }
 
-  private def doCreateAccountRequest(callback: ((Int, Option[DesCreateAccountResponse])) => Unit) = {
+  private def doCreateAccountRequest(callback: ((Int, Option[DesAccountResponse])) => Unit) = {
     val request = CreateLisaAccountCreationRequest("1234567890", "Z019283", "9876543210", new DateTime("2000-01-01"))
     val response = Await.result(SUT.createAccount("Z019283", request), Duration.Inf)
+
+    callback(response)
+  }
+
+  private def doCloseAccountRequest(callback: ((Int, Option[DesAccountResponse])) => Unit) = {
+    val request = CloseLisaAccountRequest("Voided", new DateTime("2000-01-01"))
+    val response = Await.result(SUT.closeAccount("Z123456", "ABC12345", request), Duration.Inf)
 
     callback(response)
   }

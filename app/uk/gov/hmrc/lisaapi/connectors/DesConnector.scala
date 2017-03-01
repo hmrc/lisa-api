@@ -18,8 +18,8 @@ package uk.gov.hmrc.lisaapi.connectors
 
 import uk.gov.hmrc.lisaapi.config.WSHttp
 import uk.gov.hmrc.lisaapi.controllers.JsonFormats
-import uk.gov.hmrc.lisaapi.models.{CreateLisaAccountCreationRequest, CreateLisaInvestorRequest}
-import uk.gov.hmrc.lisaapi.models.des.{DesCreateAccountResponse, DesCreateInvestorResponse}
+import uk.gov.hmrc.lisaapi.models.{CloseLisaAccountRequest, CreateLisaAccountCreationRequest, CreateLisaInvestorRequest}
+import uk.gov.hmrc.lisaapi.models.des.{DesAccountResponse, DesCreateInvestorResponse}
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpReads, HttpResponse}
 
@@ -61,14 +61,33 @@ trait DesConnector extends ServicesConfig with JsonFormats {
     *
     * @return A tuple of the http status code and an (optional) data response
     */
-  def createAccount(lisaManager: String, request: CreateLisaAccountCreationRequest)(implicit hc: HeaderCarrier): Future[(Int, Option[DesCreateAccountResponse])] = {
+  def createAccount(lisaManager: String, request: CreateLisaAccountCreationRequest)(implicit hc: HeaderCarrier): Future[(Int, Option[DesAccountResponse])] = {
     val uri = s"$lisaServiceUrl/$lisaManager/createaccount"
 
     val result = httpPost.POST[CreateLisaAccountCreationRequest, HttpResponse](uri, request)(implicitly, httpReads, implicitly)
 
     result.map(r => {
       // catch any NullPointerExceptions that may occur from r.json being a null
-      Try(r.json.asOpt[DesCreateAccountResponse]) match {
+      Try(r.json.asOpt[DesAccountResponse]) match {
+        case Success(data) => (r.status, data)
+        case Failure(_) => (r.status, None)
+      }
+    })
+  }
+
+  /**
+    * Attempts to close a LISA account
+    *
+    * @return A tuple of the http status code and an (optional) data response
+    */
+  def closeAccount(lisaManager: String, accountId: String, request: CloseLisaAccountRequest)(implicit hc: HeaderCarrier): Future[(Int, Option[DesAccountResponse])] = {
+    val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId/close-account"
+
+    val result = httpPost.POST[CloseLisaAccountRequest, HttpResponse](uri, request)(implicitly, httpReads, implicitly)
+
+    result.map(r => {
+      // catch any NullPointerExceptions that may occur from r.json being a null
+      Try(r.json.asOpt[DesAccountResponse]) match {
         case Success(data) => (r.status, data)
         case Failure(_) => (r.status, None)
       }
