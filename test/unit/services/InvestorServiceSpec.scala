@@ -74,17 +74,17 @@ class InvestorServiceSpec extends PlaySpec
 
     "return a Already Exists Response" when {
 
-      "given an RDS code of 63215 from the DES connector" in {
+      "given an RDS code of 63215 and an investor ID from the DES connector" in {
         when(mockDesConnector.createInvestor(any(), any())(any()))
           .thenReturn(
             Future.successful((
               200,
-              Some(DesCreateInvestorResponse(rdsCode = Some(63215)))
+              Some(DesCreateInvestorResponse(rdsCode = Some(63215), investorId = Some("AB1234")))
             ))
           )
 
         doRequest { response =>
-          response mustBe CreateLisaInvestorErrorResponse
+          response mustBe CreateLisaInvestorAlreadyExistsResponse("AB1234")
         }
       }
 
@@ -140,6 +140,20 @@ class InvestorServiceSpec extends PlaySpec
             Future.successful((
               200,
               Some(DesCreateInvestorResponse(rdsCode = Some(63216)))
+            ))
+          )
+
+        doRequest { response =>
+          response mustBe CreateLisaInvestorErrorResponse
+        }
+      }
+
+      "given an RDS code for Already Exists, but no investor ID" in {
+        when(mockDesConnector.createInvestor(any(), any())(any()))
+          .thenReturn(
+            Future.successful((
+              200,
+              Some(DesCreateInvestorResponse(rdsCode = Some(63215), investorId = None))
             ))
           )
 
