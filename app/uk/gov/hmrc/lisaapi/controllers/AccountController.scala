@@ -60,4 +60,14 @@ class AccountController extends LisaController {
     }
   }
 
+  def closeLisaAccount(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
+    withValidJson[CloseLisaAccountRequest] { req =>
+      service.closeAccount(lisaManager, accountId, req).map { result =>
+        result match {
+          case _ => Ok
+        }
+      }
+    }
+  }
+
 }

@@ -38,7 +38,7 @@ class AccountServiceSpec extends PlaySpec
   val httpStatusCreated = 201
   val unknownRdsCode = 99999
 
-  "AccountService" must {
+  "Create / Transfer Account" must {
 
     "return a Success Response" when {
 
@@ -187,6 +187,21 @@ class AccountServiceSpec extends PlaySpec
         doRequest { response =>
           response mustBe CreateLisaAccountAlreadyExistsResponse
         }
+      }
+
+    }
+
+  }
+
+  "Close Account" must {
+
+    "return true" when {
+
+      "given any request" in {
+        val request = CloseLisaAccountRequest("Voided", new DateTime("2000-01-01"))
+        val response = Await.result(SUT.closeAccount("Z019283", "ABC12345", request)(HeaderCarrier()), Duration.Inf)
+
+        response mustBe true
       }
 
     }

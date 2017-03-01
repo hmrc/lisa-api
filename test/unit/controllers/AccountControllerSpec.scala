@@ -37,6 +37,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
   val lisaManager = "Z019283"
+  val accountId = "ABC12345"
 
   val createAccountJson = """{
                               |  "investorID" : "9876543210",
@@ -59,13 +60,15 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
                             |  }
                             |}""".stripMargin
 
-  "The Account endpoint" must {
+  val closeAccountJson = """{"accountClosureReason" : "Voided", "closureDate" : "2017-06-23"}"""
+
+  "The Create / Transfer Account endpoint" must {
 
     "return with status 201 created" when {
       "submitted a valid create account request" in {
         when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountSuccessResponse("AB123456")))
 
-        doRequest(createAccountJson) { res =>
+        doCreateOrTransferRequest(createAccountJson) { res =>
           status(res) mustBe (CREATED)
         }
       }
@@ -75,7 +78,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
       "the data service returns a CreateLisaAccountInvestorNotFoundResponse" in {
         when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorNotFoundResponse))
 
-        doRequest(createAccountJson) { res =>
+        doCreateOrTransferRequest(createAccountJson) { res =>
           status(res) mustBe (FORBIDDEN)
           (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_NOT_FOUND")
         }
@@ -86,7 +89,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
       "the data service returns a CreateLisaAccountInvestorNotEligibleResponse" in {
         when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorNotEligibleResponse))
 
-        doRequest(createAccountJson) { res =>
+        doCreateOrTransferRequest(createAccountJson) { res =>
           status(res) mustBe (FORBIDDEN)
           (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ELIGIBILITY_CHECK_FAILED")
         }
@@ -97,7 +100,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
       "the data service returns a CreateLisaAccountInvestorComplianceCheckFailedResponse" in {
         when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorComplianceCheckFailedResponse))
 
-        doRequest(createAccountJson) { res =>
+        doCreateOrTransferRequest(createAccountJson) { res =>
           status(res) mustBe (FORBIDDEN)
           (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_COMPLIANCE_CHECK_FAILED")
         }
@@ -108,7 +111,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
       "the data service returns a CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse" in {
         when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse))
 
-        doRequest(createAccountJson) { res =>
+        doCreateOrTransferRequest(createAccountJson) { res =>
           status(res) mustBe (FORBIDDEN)
           (contentAsJson(res) \ "code").as[String] mustBe ("PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST")
         }
@@ -119,7 +122,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
       "the data service returns a CreateLisaAccountAlreadyExistsResponse" in {
         when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountAlreadyExistsResponse))
 
-        doRequest(createAccountJson) { res =>
+        doCreateOrTransferRequest(createAccountJson) { res =>
           status(res) mustBe (FORBIDDEN)
           (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ACCOUNT_ALREADY_EXISTS")
         }
@@ -130,7 +133,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
       "the data service returns an error" in {
         when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountErrorResponse))
 
-        doRequest(createAccountJson) { res =>
+        doCreateOrTransferRequest(createAccountJson) { res =>
           status(res) mustBe (INTERNAL_SERVER_ERROR)
         }
       }
@@ -138,7 +141,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
     "return with status 501 not implemented" when {
       "submitted a account transfer request" in {
-        doRequest(transferAccountJson) { res =>
+        doCreateOrTransferRequest(transferAccountJson) { res =>
           status(res) mustBe (NOT_IMPLEMENTED)
         }
       }
@@ -146,8 +149,37 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
   }
 
-  def doRequest(jsonString: String)(callback: (Future[Result]) => Unit) {
+  "The Close Account endpoint" must {
+
+    "return with status 200 ok" when {
+      "submitted a valid close account request" in {
+        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(true))
+
+        doCloseRequest(closeAccountJson) { res =>
+          status(res) mustBe (OK)
+        }
+      }
+    }
+
+    "return with status 400 bad request" when {
+      "submitted an invalid close account request" in {
+        doCloseRequest(closeAccountJson.replace("Voided", "X")) { res =>
+          status(res) mustBe (BAD_REQUEST)
+        }
+      }
+    }
+
+  }
+
+  def doCreateOrTransferRequest(jsonString: String)(callback: (Future[Result]) => Unit) {
     val res = SUT.createOrTransferLisaAccount(lisaManager).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
+      withBody(AnyContentAsJson(Json.parse(jsonString))))
+
+    callback(res)
+  }
+
+  def doCloseRequest(jsonString: String)(callback: (Future[Result]) => Unit) {
+    val res = SUT.closeLisaAccount(lisaManager, accountId).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
       withBody(AnyContentAsJson(Json.parse(jsonString))))
 
     callback(res)
