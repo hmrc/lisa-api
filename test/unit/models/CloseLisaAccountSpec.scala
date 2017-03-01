@@ -51,6 +51,60 @@ class CloseLisaAccountSpec extends PlaySpec with JsonFormats {
       json mustBe Json.parse(validRequestJson)
     }
 
+    "catch errors" when {
+
+      "given an empty object" in {
+        val req = "{}"
+
+        validateRequest(req) { errors =>
+          errors.count {
+            case (path: JsPath, errors: Seq[ValidationError]) => {
+              val accountClosureReasonMissing = path.toString() == "/accountClosureReason" && errors.contains(ValidationError("error.path.missing"))
+              val closureDateMissing = path.toString() == "/closureDate" && errors.contains(ValidationError("error.path.missing"))
+
+              (accountClosureReasonMissing || closureDateMissing)
+            }
+          } mustBe 2
+        }
+      }
+
+      "given an invalid reason for closure" in {
+        val req = validRequestJson.replace("Voided", "X")
+
+        validateRequest(req) { errors =>
+          errors.count {
+            case (path: JsPath, errors: Seq[ValidationError]) => {
+              path.toString() == "/accountClosureReason" && errors.contains(ValidationError("error.formatting.accountClosureReason"))
+            }
+          } mustBe 1
+        }
+      }
+
+      "given an invalid closure date" in {
+        val req = validRequestJson.replace("2000-01-01", "01/01/2000")
+
+        validateRequest(req) { errors =>
+          errors.count {
+            case (path: JsPath, errors: Seq[ValidationError]) => {
+              path.toString() == "/closureDate" && errors.contains(ValidationError("error.formatting.date"))
+            }
+          } mustBe 1
+        }
+      }
+
+    }
+
+  }
+
+  private def validateRequest(req: String)(callback:(Seq[(JsPath, Seq[ValidationError])]) => Unit) = {
+    val res = Json.parse(req).validate[CloseLisaAccountRequest]
+
+    res match {
+      case JsError(errors) => {
+        callback(errors)
+      }
+      case _ => fail()
+    }
   }
 
 }
