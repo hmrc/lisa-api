@@ -53,6 +53,10 @@ trait AccountService  {
     }
   }
 
+  def closeAccount(lisaManager: String, accountId: String, request: CloseLisaAccountRequest)(implicit hc: HeaderCarrier) : Future[Boolean] = {
+    Future.successful(true)
+  }
+
 }
 
 object AccountService extends AccountService {
