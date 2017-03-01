@@ -118,7 +118,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
       }
     }
 
-    "return with status 403 forbidden and a code of INVESTOR_ACCOUNT-ALREADY_EXISTS" when {
+    "return with status 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_EXISTS" when {
       "the data service returns a CreateLisaAccountAlreadyExistsResponse" in {
         when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountAlreadyExistsResponse))
 
@@ -157,6 +157,30 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
         doCloseRequest(closeAccountJson) { res =>
           status(res) mustBe (OK)
+        }
+      }
+    }
+
+    /* TODO: 403 & WRONG_LISA_MANAGER */
+
+    "return with status 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_CLOSED" when {
+      "the data service returns a CloseLisaAccountAlreadyClosedResponse" in {
+        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountAlreadyClosedResponse))
+
+        doCloseRequest(closeAccountJson) { res =>
+          status(res) mustBe (FORBIDDEN)
+          (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ACCOUNT_ALREADY_CLOSED")
+        }
+      }
+    }
+
+    "return with status 404 forbidden and a code of INVESTOR_ACCOUNTID_NOT_FOUND" when {
+      "the data service returns a CloseLisaAccountNotFoundResponse" in {
+        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountNotFoundResponse))
+
+        doCloseRequest(closeAccountJson) { res =>
+          status(res) mustBe (NOT_FOUND)
+          (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ACCOUNTID_NOT_FOUND")
         }
       }
     }

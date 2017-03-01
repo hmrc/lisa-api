@@ -272,6 +272,40 @@ class AccountServiceSpec extends PlaySpec
       }
     }
 
+    "return the type-appropriate response" when {
+
+      /* TODO: 403 & WRONG_LISA_MANAGER */
+
+      "given the RDS code for a Account Already Closed Response" in {
+        when(mockDesConnector.closeAccount(any(), any(), any())(any()))
+          .thenReturn(
+            Future.successful((
+              httpStatusOk,
+              Some(DesAccountResponse(rdsCode = Some(SUT.INVESTOR_ACCOUNT_ALREADY_CLOSED)))
+            ))
+          )
+
+        doCloseRequest { response =>
+          response mustBe CloseLisaAccountAlreadyClosedResponse
+        }
+      }
+
+      "given the RDS code for a Account Not Found Response" in {
+        when(mockDesConnector.closeAccount(any(), any(), any())(any()))
+          .thenReturn(
+            Future.successful((
+              httpStatusOk,
+              Some(DesAccountResponse(rdsCode = Some(SUT.INVESTOR_ACCOUNT_NOT_FOUND)))
+            ))
+          )
+
+        doCloseRequest { response =>
+          response mustBe CloseLisaAccountNotFoundResponse
+        }
+      }
+
+    }
+
   }
 
   private def doCreateRequest(callback: (CreateLisaAccountResponse) => Unit) = {

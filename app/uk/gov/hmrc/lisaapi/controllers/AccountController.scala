@@ -69,6 +69,8 @@ class AccountController extends LisaController {
 
             Ok(Json.toJson(ApiResponse(data = Some(data), success = true, status = 200)))
           }
+          case CloseLisaAccountAlreadyClosedResponse => Forbidden(Json.toJson(ErrorAccountAlreadyClosed))
+          case CloseLisaAccountNotFoundResponse => NotFound(Json.toJson(ErrorAccountNotFound))
           case _ => InternalServerError(Json.toJson(ErrorInternalServerError))
         }
       }

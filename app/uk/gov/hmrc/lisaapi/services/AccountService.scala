@@ -32,6 +32,8 @@ trait AccountService  {
   val INVESTOR_COMPLIANCE_FAILED = 63217
   val INVESTOR_PREVIOUS_ACCOUNT_DOES_NOT_EXIST = 63218
   val INVESTOR_ACCOUNT_ALREADY_EXISTS = 63219
+  val INVESTOR_ACCOUNT_ALREADY_CLOSED = 63220
+  val INVESTOR_ACCOUNT_NOT_FOUND = 63221
 
   def createAccount(lisaManager: String, request: CreateLisaAccountCreationRequest)(implicit hc: HeaderCarrier) : Future[CreateLisaAccountResponse] = {
     val response = desConnector.createAccount(lisaManager, request)
@@ -61,6 +63,8 @@ trait AccountService  {
       case (`httpStatusOk`, Some(data)) => {
         (data.rdsCode, data.accountId) match {
           case (None, Some(accountId)) => CloseLisaAccountSuccessResponse(accountId)
+          case (Some(INVESTOR_ACCOUNT_ALREADY_CLOSED), _) => CloseLisaAccountAlreadyClosedResponse
+          case (Some(INVESTOR_ACCOUNT_NOT_FOUND), _) => CloseLisaAccountNotFoundResponse
           case (_, _) => CloseLisaAccountErrorResponse
         }
       }
