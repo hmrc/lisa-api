@@ -25,10 +25,12 @@ import uk.gov.hmrc.lisaapi.models.des.{DesCreateAccountResponse, DesCreateInvest
 import uk.gov.hmrc.lisaapi.models.{ApiResponse, ApiResponseData, CreateLisaInvestorRequest, _}
 
 trait JsonFormats {
+
   implicit val ninoRegex = "^[A-Z]{2}\\d{6}[A-D]$".r
   implicit val nameRegex = "^.{1,35}$".r
   implicit val lmrnRegex = "^Z\\d{4,6}$".r
   implicit val investorIDRegex = "^\\d{10}$".r
+  implicit val accountClosureRegex = "^(Transferred out|All funds withdrawn|Voided)$".r
 
   implicit val createLisaInvestorRequestReads: Reads[CreateLisaInvestorRequest] = (
     (JsPath \ "investorNINO").read(Reads.pattern(ninoRegex, "error.formatting.nino")) and
@@ -103,6 +105,16 @@ trait JsonFormats {
     case r: CreateLisaAccountCreationRequest => createLisaAccountCreationRequestWrites.writes(r)
     case r: CreateLisaAccountTransferRequest => createLisaAccountTransferRequestWrites.writes(r)
   }
+
+  implicit val closeLisaAccountRequestReads: Reads[CloseLisaAccountRequest] = (
+    (JsPath \ "accountClosureReason").read(Reads.pattern(accountClosureRegex, "error.formatting.accountClosureReason")) and
+    (JsPath \ "closureDate").read(isoDateReads()).map(new DateTime(_))
+  )(CloseLisaAccountRequest.apply _)
+
+  implicit val closeLisaAccountRequestWrites: Writes[CloseLisaAccountRequest] = (
+    (JsPath \ "accountClosureReason").write[String] and
+    (JsPath \ "closureDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd"))
+  )(unlift(CloseLisaAccountRequest.unapply))
 
   private def isoDateReads(allowFutureDates: Boolean = true): Reads[org.joda.time.DateTime] = new Reads[org.joda.time.DateTime] {
 
