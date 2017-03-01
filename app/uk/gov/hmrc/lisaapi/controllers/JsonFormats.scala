@@ -28,6 +28,7 @@ trait JsonFormats {
   implicit val dateRegex = "^[0-9]{4}-(((0[13578]|(10|12))-(0[1-9]|[1-2][0-9]|3[0-1]))|(02-(0[1-9]|[1-2][0-9]))|((0[469]|11)-(0[1-9]|[1-2][0-9]|30)))$".r
   implicit val lmrnRegex = "^Z\\d{4,6}$".r
   implicit val investorIDRegex = "^\\d{10}$".r
+  implicit val accountClosureRegex = "^(Transferred out|All funds withdrawn|Voided)$".r
 
   implicit val createLisaInvestorRequestReads: Reads[CreateLisaInvestorRequest] = (
     (JsPath \ "investorNINO").read(Reads.pattern(ninoRegex, "error.formatting.nino")) and
@@ -102,5 +103,15 @@ trait JsonFormats {
     case r: CreateLisaAccountCreationRequest => createLisaAccountCreationRequestWrites.writes(r)
     case r: CreateLisaAccountTransferRequest => createLisaAccountTransferRequestWrites.writes(r)
   }
+
+  implicit val closeLisaAccountRequestReads: Reads[CloseLisaAccountRequest] = (
+    (JsPath \ "accountClosureReason").read(Reads.pattern(accountClosureRegex, "error.formatting.accountClosureReason")) and
+    (JsPath \ "closureDate").read(Reads.pattern(dateRegex, "error.formatting.date")).map(new DateTime(_))
+  )(CloseLisaAccountRequest.apply _)
+
+  implicit val closeLisaAccountRequestWrites: Writes[CloseLisaAccountRequest] = (
+    (JsPath \ "accountClosureReason").write[String] and
+    (JsPath \ "closureDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd"))
+  )(unlift(CloseLisaAccountRequest.unapply))
 
 }
