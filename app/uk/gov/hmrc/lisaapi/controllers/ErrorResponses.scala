@@ -63,7 +63,7 @@ case object ErrorInvestorComplianceCheckFailed extends ErrorResponse(403, "INVES
 
 case object ErrorPreviousAccountDoesNotExist extends ErrorResponse(403, "PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST", "The transferredFromAccountID and transferredFromLMRN given don’t match with an account on HMRC’s records")
 
-case object ErrorAccountAlreadyExists extends ErrorResponse(403, "INVESTOR_ACCOUNT_ALREADY_EXISTS", "The LISA account already exists")
+case object ErrorAccountAlreadyExists extends ErrorResponse(409, "INVESTOR_ACCOUNT_ALREADY_EXISTS", "The LISA account already exists")
 
 case object ErrorAccountAlreadyClosed extends ErrorResponse(403, "INVESTOR_ACCOUNT_ALREADY_CLOSED", "The LISA account is already closed")
 
