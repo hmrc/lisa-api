@@ -17,6 +17,8 @@
 package uk.gov.hmrc.lisaapi.controllers
 
 import org.joda.time.DateTime
+import org.joda.time.format.DateTimeFormat
+import play.api.data.validation.ValidationError
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import uk.gov.hmrc.lisaapi.models.des.{DesCreateAccountResponse, DesCreateInvestorResponse}
@@ -25,7 +27,6 @@ import uk.gov.hmrc.lisaapi.models.{ApiResponse, ApiResponseData, CreateLisaInves
 trait JsonFormats {
   implicit val ninoRegex = "^[A-Z]{2}\\d{6}[A-D]$".r
   implicit val nameRegex = "^.{1,35}$".r
-  implicit val dateRegex = "^[0-9]{4}-(((0[13578]|(10|12))-(0[1-9]|[1-2][0-9]|3[0-1]))|(02-(0[1-9]|[1-2][0-9]))|((0[469]|11)-(0[1-9]|[1-2][0-9]|30)))$".r
   implicit val lmrnRegex = "^Z\\d{4,6}$".r
   implicit val investorIDRegex = "^\\d{10}$".r
 
@@ -33,7 +34,7 @@ trait JsonFormats {
     (JsPath \ "investorNINO").read(Reads.pattern(ninoRegex, "error.formatting.nino")) and
     (JsPath \ "firstName").read(Reads.pattern(nameRegex, "error.formatting.firstName")) and
     (JsPath \ "lastName").read(Reads.pattern(nameRegex, "error.formatting.lastName")) and
-    (JsPath \ "DoB").read(Reads.pattern(dateRegex, "error.formatting.date")).map(new DateTime(_))
+    (JsPath \ "DoB").read(isoDateReads(allowFutureDates = false)).map(new DateTime(_))
   )(CreateLisaInvestorRequest.apply _)
 
   implicit val createLisaInvestorRequestWrites: Writes[CreateLisaInvestorRequest] = (
@@ -52,7 +53,7 @@ trait JsonFormats {
   implicit val accountTransferReads: Reads[AccountTransfer] = (
     (JsPath \ "transferredFromAccountID").read[String] and
     (JsPath \ "transferredFromLMRN").read(Reads.pattern(lmrnRegex, "error.formatting.lmrn")) and
-    (JsPath \ "transferInDate").read(Reads.pattern(dateRegex, "error.formatting.date")).map(new DateTime(_))
+    (JsPath \ "transferInDate").read(isoDateReads()).map(new DateTime(_))
   )(AccountTransfer.apply _)
 
   implicit val accountTransferWrites: Writes[AccountTransfer] = (
@@ -65,14 +66,14 @@ trait JsonFormats {
     (JsPath \ "investorID").read(Reads.pattern(investorIDRegex, "error.formatting.investorID")) and
     (JsPath \ "lisaManagerReferenceNumber").read(Reads.pattern(lmrnRegex, "error.formatting.lmrn")) and
     (JsPath \ "accountID").read[String] and
-    (JsPath \ "firstSubscriptionDate").read(Reads.pattern(dateRegex, "error.formatting.date")).map(new DateTime(_))
+    (JsPath \ "firstSubscriptionDate").read(isoDateReads()).map(new DateTime(_))
   )(CreateLisaAccountCreationRequest.apply _)
 
   implicit val createLisaAccountTransferRequestReads: Reads[CreateLisaAccountTransferRequest] = (
     (JsPath \ "investorID").read(Reads.pattern(investorIDRegex, "error.formatting.investorID")) and
     (JsPath \ "lisaManagerReferenceNumber").read(Reads.pattern(lmrnRegex, "error.formatting.lmrn")) and
     (JsPath \ "accountID").read[String] and
-    (JsPath \ "firstSubscriptionDate").read(Reads.pattern(dateRegex, "error.formatting.date")).map(new DateTime(_)) and
+    (JsPath \ "firstSubscriptionDate").read(isoDateReads()).map(new DateTime(_)) and
     (JsPath \ "transferAccount").read[AccountTransfer]
   )(CreateLisaAccountTransferRequest.apply _)
 
@@ -101,6 +102,31 @@ trait JsonFormats {
   implicit val createLisaAccountRequestWrites = Writes[CreateLisaAccountRequest] {
     case r: CreateLisaAccountCreationRequest => createLisaAccountCreationRequestWrites.writes(r)
     case r: CreateLisaAccountTransferRequest => createLisaAccountTransferRequestWrites.writes(r)
+  }
+
+  private def isoDateReads(allowFutureDates: Boolean = true): Reads[org.joda.time.DateTime] = new Reads[org.joda.time.DateTime] {
+
+    val dateFormat = "yyyy-MM-dd"
+    val dateValidationMessage = "error.formatting.date"
+
+    def reads(json: JsValue): JsResult[DateTime] = json match {
+      case JsString(s) => parseDate(s) match {
+        case Some(d: DateTime) => {
+          if (!allowFutureDates && d.isAfterNow) {
+            JsError(Seq(JsPath() -> Seq(ValidationError(dateValidationMessage))))
+          }
+          else {
+            JsSuccess(d)
+          }
+        }
+        case None => JsError(Seq(JsPath() -> Seq(ValidationError(dateValidationMessage))))
+      }
+      case _ => JsError(Seq(JsPath() -> Seq(ValidationError(dateValidationMessage))))
+    }
+
+    private def parseDate(input: String): Option[DateTime] =
+      scala.util.control.Exception.allCatch[DateTime] opt (DateTime.parse(input, DateTimeFormat.forPattern(dateFormat)))
+
   }
 
 }
