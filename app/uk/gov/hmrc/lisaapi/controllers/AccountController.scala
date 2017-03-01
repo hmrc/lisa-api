@@ -64,8 +64,7 @@ class AccountController extends LisaController {
     withValidJson[CloseLisaAccountRequest] { req =>
       service.closeAccount(lisaManager, accountId, req).map { result =>
         result match {
-          case true => Ok
-          case false => InternalServerError
+          case _ => Ok
         }
       }
     }
