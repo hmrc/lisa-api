@@ -50,8 +50,13 @@ class AccountController extends LisaController {
                 case CreateLisaAccountInvestorNotEligibleResponse => Forbidden(Json.toJson(ErrorInvestorNotEligible))
                 case CreateLisaAccountInvestorComplianceCheckFailedResponse => Forbidden(Json.toJson(ErrorInvestorComplianceCheckFailed))
                 case CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse => Forbidden(Json.toJson(ErrorPreviousAccountDoesNotExist))
+<<<<<<< HEAD
+                case CreateLisaAccountAlreadyExistsResponse => Conflict(Json.toJson(ErrorAccountAlreadyExists))
+                case CreateLisaAccountErrorResponse => InternalServerError(Json.toJson(ErrorInternalServerError))
+=======
                 case CreateLisaAccountAlreadyExistsResponse => Forbidden(Json.toJson(ErrorAccountAlreadyExists))
                 case _ => InternalServerError(Json.toJson(ErrorInternalServerError))
+>>>>>>> 137e99f023adada4819ab4eb97246f7ffd070a20
               }
             }
           }

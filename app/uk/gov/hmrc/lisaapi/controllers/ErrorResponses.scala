@@ -65,6 +65,10 @@ case object ErrorPreviousAccountDoesNotExist extends ErrorResponse(403, "PREVIOU
 
 case object ErrorAccountAlreadyExists extends ErrorResponse(409, "INVESTOR_ACCOUNT_ALREADY_EXISTS", "The LISA account already exists")
 
+case object ErrorAccountAlreadyClosed extends ErrorResponse(403, "INVESTOR_ACCOUNT_ALREADY_CLOSED", "The LISA account is already closed")
+
+case object ErrorAccountNotFound extends ErrorResponse(404, "INVESTOR_ACCOUNTID_NOT_FOUND", "The accountID given does not match with HMRC’s records")
+
 object ErrorInvestorAlreadyExists {
 
   def apply(investorId: String) = {
