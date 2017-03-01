@@ -153,7 +153,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
     "return with status 200 ok" when {
       "submitted a valid close account request" in {
-        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(true))
+        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountSuccessResponse("AB123456")))
 
         doCloseRequest(closeAccountJson) { res =>
           status(res) mustBe (OK)
@@ -165,6 +165,16 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
       "submitted an invalid close account request" in {
         doCloseRequest(closeAccountJson.replace("Voided", "X")) { res =>
           status(res) mustBe (BAD_REQUEST)
+        }
+      }
+    }
+
+    "return with status 500 internal server error" when {
+      "the data service returns an error" in {
+        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountErrorResponse))
+
+        doCloseRequest(closeAccountJson) { res =>
+          status(res) mustBe (INTERNAL_SERVER_ERROR)
         }
       }
     }
