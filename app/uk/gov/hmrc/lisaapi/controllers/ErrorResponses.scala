@@ -49,10 +49,6 @@ case object InvalidAcceptHeader extends ErrorResponse(401, "ACCEPT_HEADER_INVALI
 
 case object MissingAuthorisationHeader extends ErrorResponse(401, "AUTH_HEADER_MISSING", "The Authorization header is missing")
 
-case object MissingID extends ErrorResponse(400, "BAD_REQUEST", "Missing Registration Id")
-
-case object InvalidID extends ErrorResponse(400, "BAD_REQUEST", s"Invalid Registration Id")
-
 case object EmptyJson extends ErrorResponse(400, "BAD_REQUEST", "Can't parse empty json")
 
 case object ErrorInvestorNotFound extends ErrorResponse(403, "INVESTOR_NOT_FOUND", "The investor details given do not match with HMRC’s records")
