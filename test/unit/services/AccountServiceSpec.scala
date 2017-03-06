@@ -38,7 +38,7 @@ class AccountServiceSpec extends PlaySpec
   val httpStatusCreated = 201
   val unknownRdsCode = 99999
 
-  "Create / Transfer Account" must {
+  "Create Account" must {
 
     "return a Success Response" when {
 
@@ -94,6 +94,20 @@ class AccountServiceSpec extends PlaySpec
             Future.successful((
               httpStatusOk,
               Some(DesAccountResponse(rdsCode = None, accountId = None))
+            ))
+          )
+
+        doCreateRequest { response =>
+          response mustBe CreateLisaAccountErrorResponse
+        }
+      }
+
+      "given the RDS code for a Investor Previous Account Does Not Exist Response" in {
+        when(mockDesConnector.createAccount(any(), any())(any()))
+          .thenReturn(
+            Future.successful((
+              200,
+              Some(DesAccountResponse(rdsCode = Some(SUT.INVESTOR_PREVIOUS_ACCOUNT_DOES_NOT_EXIST)))
             ))
           )
 
@@ -158,20 +172,6 @@ class AccountServiceSpec extends PlaySpec
 
         doCreateRequest { response =>
           response mustBe CreateLisaAccountInvestorComplianceCheckFailedResponse
-        }
-      }
-
-      "given the RDS code for a Investor Previous Account Does Not Exist Response" in {
-        when(mockDesConnector.createAccount(any(), any())(any()))
-          .thenReturn(
-            Future.successful((
-              200,
-              Some(DesAccountResponse(rdsCode = Some(SUT.INVESTOR_PREVIOUS_ACCOUNT_DOES_NOT_EXIST)))
-            ))
-          )
-
-        doCreateRequest { response =>
-          response mustBe CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse
         }
       }
 

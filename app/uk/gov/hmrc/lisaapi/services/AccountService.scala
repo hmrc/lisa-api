@@ -46,7 +46,6 @@ trait AccountService  {
           case (Some(INVESTOR_NOT_FOUND), _) => CreateLisaAccountInvestorNotFoundResponse
           case (Some(INVESTOR_NOT_ELIGIBLE), _) => CreateLisaAccountInvestorNotEligibleResponse
           case (Some(INVESTOR_COMPLIANCE_FAILED), _) => CreateLisaAccountInvestorComplianceCheckFailedResponse
-          case (Some(INVESTOR_PREVIOUS_ACCOUNT_DOES_NOT_EXIST), _) => CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse
           case (Some(INVESTOR_ACCOUNT_ALREADY_EXISTS), _) => CreateLisaAccountAlreadyExistsResponse
           case (_, _) => CreateLisaAccountErrorResponse
         }
