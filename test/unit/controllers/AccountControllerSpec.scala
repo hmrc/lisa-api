@@ -107,17 +107,6 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
       }
     }
 
-    "return with status 403 forbidden and a code of PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST" when {
-      "the data service returns a CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse" in {
-        when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse))
-
-        doCreateOrTransferRequest(createAccountJson) { res =>
-          status(res) mustBe (FORBIDDEN)
-          (contentAsJson(res) \ "code").as[String] mustBe ("PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST")
-        }
-      }
-    }
-
     "return with status 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_EXISTS" when {
       "the data service returns a CreateLisaAccountAlreadyExistsResponse" in {
         when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountAlreadyExistsResponse))
