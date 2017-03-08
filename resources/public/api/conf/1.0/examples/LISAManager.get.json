@@ -1,6 +1,5 @@
 {
   "lisaManagerReferenceNumber" : "Z543210",
-  "lisaProviderName" : "Example Building Society",
   "_links" :
   {
     "self" : {"href" : "/lifetime-isa/manager/{LISAManagerReferenceNumber}"},
