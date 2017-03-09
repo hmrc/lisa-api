@@ -88,7 +88,7 @@ class CreateLisaInvestorRequestSpec extends PlaySpec with JsonFormats {
       }
 
       "the date is in the future" in {
-        val futureDate = new DateTime().plusDays(1).toString("yyyy-MM-dd")
+        val futureDate = DateTime.now().plusDays(1).toString("yyyy-MM-dd")
 
         hasCorrectValidationError(validRequestJson.replace("2000-02-29", futureDate), "/DoB", "error.formatting.date")
       }

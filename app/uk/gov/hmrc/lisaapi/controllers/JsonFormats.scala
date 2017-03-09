@@ -108,7 +108,7 @@ trait JsonFormats {
 
   implicit val closeLisaAccountRequestReads: Reads[CloseLisaAccountRequest] = (
     (JsPath \ "accountClosureReason").read(Reads.pattern(accountClosureRegex, "error.formatting.accountClosureReason")) and
-    (JsPath \ "closureDate").read(isoDateReads()).map(new DateTime(_))
+    (JsPath \ "closureDate").read(isoDateReads(allowFutureDates = false)).map(new DateTime(_))
   )(CloseLisaAccountRequest.apply _)
 
   implicit val closeLisaAccountRequestWrites: Writes[CloseLisaAccountRequest] = (

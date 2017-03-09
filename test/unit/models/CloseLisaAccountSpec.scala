@@ -92,6 +92,19 @@ class CloseLisaAccountSpec extends PlaySpec with JsonFormats {
         }
       }
 
+      "given a closure date in the future" in {
+        val futureDate = DateTime.now().plusDays(1).toString("yyyy-MM-dd")
+        val req = validRequestJson.replace("2000-01-01", futureDate)
+
+        validateRequest(req) { errors =>
+          errors.count {
+            case (path: JsPath, errors: Seq[ValidationError]) => {
+              path.toString() == "/closureDate" && errors.contains(ValidationError("error.formatting.date"))
+            }
+          } mustBe 1
+        }
+      }
+
     }
 
   }
