@@ -40,7 +40,7 @@ types:
         lisaManagerReferenceNumber:
           type : LISAManagerReferenceNumberType
           description: The number issued to the LISA provider upon successful LISA registration with HMRC.
-          example: "Z123456"
+          example: "Z1234"
       get:
                   is: [headers.acceptHeader]
                   displayName: Discover available endpoints
@@ -354,7 +354,7 @@ types:
                           description: The account is updated successfully.
                           body:
                             application/json:
-                              example: !include examples/LISAAccount.put.response.json
+                              example: !include examples/LISAAccount.close.post.json
 
                         400:
                           body:

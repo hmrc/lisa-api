@@ -40,7 +40,8 @@
         },
         "transferredFromLMRN": {
           "description" : "The number issued to the previous LISA provider when they registered with HMRC for LISA.",
-          "$ref": "#/definitions/LISAManagerReferenceNumberType"
+          "$ref": "#/definitions/LISAManagerReferenceNumberType",
+          "example": "Z4567"
         },
         "transferInDate": {
           "description": "The date the account transferred from the previous provider to the new one.",

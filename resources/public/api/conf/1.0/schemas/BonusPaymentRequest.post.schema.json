@@ -36,7 +36,12 @@
 			    "htbTransferTotalYTD" :{
                   "description": "The total amount of Help to Buy funds in the account in the tax year to date.",
                   "type" : "number"}
-			}
+			},
+          "required":
+          [
+            "htbTransferInForPeriod",
+            "htbTransferTotalYTD"
+          ]
 		},
 
 		"inboundPayments" :
