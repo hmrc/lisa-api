@@ -5,8 +5,8 @@
 	{
 		"accountId" : {
           "description": "The financial organisation’s own unique reference number for the investor’s LISA account.",
-          "type": "string",
-          "example": "1234567890"
+		  "$ref": "#/definitions/accountIdType",
+          "example": "BB1234567890"
           },
 		"lisaManagerReferenceNumber" : {
 		  "description": "The number issued to the provider when they register with HMRC for LISA.",
@@ -39,10 +39,14 @@
           "example": "Z1234"
 
 		},
-
 		"eventType" : {
 			"type" : "string",
 			"enum": ["LISA Investor Terminal Ill Health", "LISA Investor Death", "House Purchase"]
-		}
+		},
+	  "accountIdType": {
+		"type": "string",
+		"example": "AB9876543210",
+		"pattern": "^[a-zA-Z0-9 :\\-]{1,20}$"
+	  }
 	}
 }
