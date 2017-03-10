@@ -7,15 +7,11 @@
 		"description": "The number issued to the provider when they register with HMRC for LISA.",
 		"$ref": "#/definitions/LISAManagerReferenceNumberType"
 	  },
-		"lisaProviderName" : {
-          "description": "The name used by the provider when they registered with HMRC for LISA.",
-          "type" : "string"},
 		"_links" : {"type" : "object"}
 },
 	"required" :
 	[
-		"lisaManagerReferenceNumber",
-		"lisaProviderName"
+		"lisaManagerReferenceNumber"
 	],
 	"additionalProperties": false,
 	"definitions":
@@ -23,7 +19,7 @@
 		"LISAManagerReferenceNumberType" :
 		{
 			"type" : "string",
-			"pattern": "^Z\\d{6}$"
+			"pattern": "^Z\\d{4,6}$"
 		}
 	}
 }

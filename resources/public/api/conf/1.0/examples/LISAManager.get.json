@@ -1,13 +1,12 @@
 {
   "lisaManagerReferenceNumber" : "Z543210",
-  "lisaProviderName" : "Example Building Society",
   "_links" :
   {
     "self" : {"href" : "/lifetime-isa/manager/{LISAManagerReferenceNumber}"},
     "investors" : {"href" : "/lifetime-isa/manager/{lisaManagerReferenceNumber}/investors"},
-    "accounts" : {"href" : " /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts"},
-    "update Account" : {"href" : " /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountID}"},
+    "create or transfer Account" : {"href" : "/lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts"},
+    "close Account" : {"href" : " /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountID}"},
     "life events" : {"href" : " /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountID}/events"},
-    "transactions" : {"href" : " /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountID}/transactions"}
+    "bonus payments" : {"href" : " /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountID}/transactions"}
   }
 }

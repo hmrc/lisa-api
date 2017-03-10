@@ -5,8 +5,9 @@
 	{
 		"accountID" : {
 		  "description": "The financial organisation’s own unique reference number for the investor’s LISA account.",
-          "type": "string"
-        },
+          "$ref": "#/definitions/accountIdType",
+          "example": "9876543210"
+       },
 		"lisaManagerReferenceNumber" : {
           "description": "The number issued to the provider when they register with HMRC for LISA.",
           "$ref": "#/definitions/LISAManagerReferenceNumberType"},
@@ -35,7 +36,12 @@
 			    "htbTransferTotalYTD" :{
                   "description": "The total amount of Help to Buy funds in the account in the tax year to date.",
                   "type" : "number"}
-			}
+			},
+          "required":
+          [
+            "htbTransferInForPeriod",
+            "htbTransferTotalYTD"
+          ]
 		},
 
 		"inboundPayments" :
@@ -116,6 +122,10 @@
       "chargeReasonType" : {
         "type" : "string",
         "enum": ["Unauthorised withdrawal", "Others TBD"]
+      } ,
+      "accountIdType": {
+        "type": "string",
+        "pattern": "^[a-zA-Z0-9 :\\-]{1,20}$"
       }
 
 

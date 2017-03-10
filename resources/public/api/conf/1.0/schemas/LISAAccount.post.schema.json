@@ -9,8 +9,8 @@
     },
     "accountID": {
       "description": "The financial organisation’s own unique reference number for the investor’s LISA account.",
-      "type": "string",
-      "example": "9876543210"
+      "$ref": "#/definitions/accountIdType",
+      "example": "AB76543210"
     },
     "lisaManagerReferenceNumber": {
       "description": "The number issued to the provider when they register with HMRC for LISA.",
@@ -31,16 +31,17 @@
     },
     "transferAccount": {
       "type": "object",
-      "description" : "If the accountCreationReason is ‘Transferred’, then this is required.",
+      "description" : "If the creationReason is ‘Transferred’, then this is required.",
       "properties": {
         "transferredFromAccountID": {
           "description" : "The previous financial organisation’s own unique reference number for the investor’s LISA account.",
-          "type": "string",
+          "$ref": "#/definitions/accountIdType",
           "example": "987654320"
         },
         "transferredFromLMRN": {
           "description" : "The number issued to the previous LISA provider when they registered with HMRC for LISA.",
-          "$ref": "#/definitions/LISAManagerReferenceNumberType"
+          "$ref": "#/definitions/LISAManagerReferenceNumberType",
+          "example": "Z4567"
         },
         "transferInDate": {
           "description": "The date the account transferred from the previous provider to the new one.",
@@ -82,10 +83,11 @@
         "example": "Z1234"
       }
     ,
-      "NINOType":
-      {
+      "accountIdType": {
         "type": "string",
-        "pattern": "^[A-Z]{2}\\d{6}[A-D]$"}
+        "example": "AB9876543210",
+        "pattern": "^[a-zA-Z0-9 :\\-]{1,20}$"
+      }
     }
 
 

@@ -9,13 +9,13 @@
 		"firstName" : {
           "description": "The investor’s first name.",
           "type" : "string",
-          "pattern": "^.{1,35}$",
+          "pattern": "^[a-zA-Z &`\\-\\'^]{1,35}$",
 		  "example": "FirstNameMe"
         },
 		"lastName" : {
           "description": "The investor’s last name.",
           "type" : "string",
-          "pattern": "^.{1,35}$",
+          "pattern": "^[a-zA-Z &`\\-\\'^]{1,35}$",
           "example": "lastNameDough"
         },
 		"DoB": {
@@ -35,8 +35,8 @@
 		},
 		"NINOType": {
           "type": "string",
-          "pattern": "^[A-Z]{2}\\d{6}[A-D]$",
-          "example": "AB123456D"
+          "pattern": "^((?!(BG|GB|KN|NK|NT|TN|ZZ)|(D|F|I|Q|U|V)[A-Z]|[A-Z](D|F|I|O|Q|U|V))[A-Z]{2})[0-9]{6}[A-D]?$",
+          "example": "BC123456"
         }
 	}
 }
