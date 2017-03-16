@@ -247,13 +247,6 @@ types:
                           "code" : "INVESTOR_NOT_FOUND",
                           "message" : "invalid status: must create with open status"
                         }
-                    wrongLISAManager:
-                      description: The lisaManagerReferenceNumber given does not match with HMRC’s records.
-                      value: |
-                        {
-                          "code" : "WRONG_LISA_MANAGER",
-                          "message" : "the lisaManagerReferenceNumber in URI does match match the calling LISAManager"
-                        }
                     outsideAgeRange:
                       description: The investor is not eligible for a LISA account.
                       value: |
@@ -374,13 +367,6 @@ types:
                             application/json:
                               type: !include schemas/ErrorCodes.schema.json
                               examples:
-                                wrongLISAManager:
-                                  description: The lisaManagerReferenceNumber given does not match with HMRC’s records.
-                                  value: |
-                                    {
-                                      "code" : "WRONG_LISA_MANAGER",
-                                      "message" : "The lisaManagerReferenceNumber given does not match with HMRC’s records."
-                                    }
                                 accountClosed:
                                   description: The LISA account is already closed.
                                   value: |
@@ -476,13 +462,6 @@ types:
                             application/json:
                               type: !include schemas/ErrorCodes.schema.json
                               examples:
-                                wrongLisaManager:
-                                  description: The lisaManagerReferenceNumber given does not match with HMRC’s records.
-                                  value: |
-                                    {
-                                      "code" : "WRONG_LISA_MANAGER",
-                                      "message" : "The LISA manager or the LISA account do not belong to the calling LISA manager"
-                                    }
                                 lifeEventInvalid:
                                   description: The life event conflicts with previous life event reported.
                                   value: |
@@ -558,13 +537,6 @@ types:
                             application/json:
                               type: !include schemas/ErrorCodes.schema.json
                               examples:
-                                wrongLisaManager:
-                                  description: The lisaManagerReferenceNumber given does not match with HMRC’s records.
-                                  value: |
-                                    {
-                                      "code" : "WRONG_LISA_MANAGER",
-                                      "message" : "The lisaManagerReferenceNumber given does not match with HMRC’s records."
-                                    }
                                 noLifeEvent:
                                   description: The lifeEventID does not match with HMRC’s records.
                                   value: |
