@@ -76,7 +76,7 @@ trait DesConnector extends ServicesConfig with JsonFormats {
   }
 
   /**
-    * Attempts to transfer a new LISA account
+    * Attempts to transfer a LISA account
     *
     * @return A tuple of the http status code and an (optional) data response
     */
