@@ -62,6 +62,10 @@ trait AccountService  {
       case (`httpStatusOk`, Some(data)) => {
         (data.rdsCode, data.accountId) match {
           case (None, Some(accountId)) => CreateLisaAccountSuccessResponse(accountId)
+          case (Some(INVESTOR_NOT_FOUND), _) => CreateLisaAccountInvestorNotFoundResponse
+          case (Some(INVESTOR_COMPLIANCE_FAILED), _) => CreateLisaAccountInvestorComplianceCheckFailedResponse
+          case (Some(INVESTOR_ACCOUNT_ALREADY_EXISTS), _) => CreateLisaAccountAlreadyExistsResponse
+          case (Some(INVESTOR_PREVIOUS_ACCOUNT_DOES_NOT_EXIST), _) => CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse
           case (_, _) => CreateLisaAccountErrorResponse
         }
       }

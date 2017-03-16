@@ -22,7 +22,7 @@ import org.mockito.Mockito.when
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
-import uk.gov.hmrc.lisaapi.models._
+import uk.gov.hmrc.lisaapi.models.{CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse, _}
 import uk.gov.hmrc.lisaapi.models.des.{DesAccountResponse, DesCreateInvestorResponse}
 import uk.gov.hmrc.lisaapi.services.{AccountService, InvestorService}
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -282,6 +282,66 @@ class AccountServiceSpec extends PlaySpec
 
         doTransferRequest { response =>
           response mustBe CreateLisaAccountErrorResponse
+        }
+      }
+
+    }
+
+    "return the type-appropriate response" when {
+
+      "given the RDS code for a Investor Not Found Response" in {
+        when(mockDesConnector.transferAccount(any(), any())(any()))
+          .thenReturn(
+            Future.successful((
+              httpStatusOk,
+              Some(DesAccountResponse(rdsCode = Some(SUT.INVESTOR_NOT_FOUND)))
+            ))
+          )
+
+        doTransferRequest { response =>
+          response mustBe CreateLisaAccountInvestorNotFoundResponse
+        }
+      }
+
+      "given the RDS code for a Investor Compliance Failed Response" in {
+        when(mockDesConnector.transferAccount(any(), any())(any()))
+          .thenReturn(
+            Future.successful((
+              httpStatusOk,
+              Some(DesAccountResponse(rdsCode = Some(SUT.INVESTOR_COMPLIANCE_FAILED)))
+            ))
+          )
+
+        doTransferRequest { response =>
+          response mustBe CreateLisaAccountInvestorComplianceCheckFailedResponse
+        }
+      }
+
+      "given the RDS code for a Investor Account Already Exists Response" in {
+        when(mockDesConnector.transferAccount(any(), any())(any()))
+          .thenReturn(
+            Future.successful((
+              httpStatusOk,
+              Some(DesAccountResponse(rdsCode = Some(SUT.INVESTOR_ACCOUNT_ALREADY_EXISTS)))
+            ))
+          )
+
+        doTransferRequest { response =>
+          response mustBe CreateLisaAccountAlreadyExistsResponse
+        }
+      }
+
+      "given the RDS code for a Investor Previous Account Does Not Exist Response" in {
+        when(mockDesConnector.transferAccount(any(), any())(any()))
+          .thenReturn(
+            Future.successful((
+              httpStatusOk,
+              Some(DesAccountResponse(rdsCode = Some(SUT.INVESTOR_PREVIOUS_ACCOUNT_DOES_NOT_EXIST)))
+            ))
+          )
+
+        doTransferRequest { response =>
+          response mustBe CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse
         }
       }
 
