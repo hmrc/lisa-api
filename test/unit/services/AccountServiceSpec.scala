@@ -193,6 +193,102 @@ class AccountServiceSpec extends PlaySpec
 
   }
 
+  "Transfer Account" must {
+
+    "return a Success Response" when {
+
+      "given no rds code and an account id" in {
+        when(mockDesConnector.transferAccount(any(), any())(any()))
+          .thenReturn(
+            Future.successful((
+              httpStatusOk,
+              Some(DesAccountResponse(None, accountId = Some("AB123456")))
+            ))
+          )
+
+        doTransferRequest { response =>
+          response mustBe CreateLisaAccountSuccessResponse("AB123456")
+        }
+      }
+
+    }
+
+    "return a Error Response" when {
+
+      "given a status code other than 200" in {
+        when(mockDesConnector.transferAccount(any(), any())(any()))
+          .thenReturn(
+            Future.successful((
+              httpStatusCreated,
+              None
+            ))
+          )
+
+        doTransferRequest { response =>
+          response mustBe CreateLisaAccountErrorResponse
+        }
+      }
+
+      "given no data" in {
+        when(mockDesConnector.transferAccount(any(), any())(any()))
+          .thenReturn(
+            Future.successful((
+              httpStatusOk,
+              None
+            ))
+          )
+
+        doTransferRequest { response =>
+          response mustBe CreateLisaAccountErrorResponse
+        }
+      }
+
+      "given empty data" in {
+        when(mockDesConnector.transferAccount(any(), any())(any()))
+          .thenReturn(
+            Future.successful((
+              httpStatusOk,
+              Some(DesAccountResponse(rdsCode = None, accountId = None))
+            ))
+          )
+
+        doTransferRequest { response =>
+          response mustBe CreateLisaAccountErrorResponse
+        }
+      }
+
+      "given the RDS code for a Investor Not Eligible Response" in {
+        when(mockDesConnector.transferAccount(any(), any())(any()))
+          .thenReturn(
+            Future.successful((
+              200,
+              Some(DesAccountResponse(rdsCode = Some(SUT.INVESTOR_NOT_ELIGIBLE)))
+            ))
+          )
+
+        doTransferRequest { response =>
+          response mustBe CreateLisaAccountErrorResponse
+        }
+      }
+
+      "given an rds code which is not recognised" in {
+        when(mockDesConnector.transferAccount(any(), any())(any()))
+          .thenReturn(
+            Future.successful((
+              httpStatusOk,
+              Some(DesAccountResponse(rdsCode = Some(unknownRdsCode)))
+            ))
+          )
+
+        doTransferRequest { response =>
+          response mustBe CreateLisaAccountErrorResponse
+        }
+      }
+
+    }
+
+  }
+
   "Close Account" must {
 
     "return a Success Response" when {
@@ -311,6 +407,14 @@ class AccountServiceSpec extends PlaySpec
   private def doCreateRequest(callback: (CreateLisaAccountResponse) => Unit) = {
     val request = CreateLisaAccountCreationRequest("1234567890", "Z019283", "9876543210", new DateTime("2000-01-01"))
     val response = Await.result(SUT.createAccount("Z019283", request)(HeaderCarrier()), Duration.Inf)
+
+    callback(response)
+  }
+
+  private def doTransferRequest(callback: (CreateLisaAccountResponse) => Unit) = {
+    val accountTransfer = AccountTransfer("123456", "123456", new DateTime("2000-01-01"))
+    val request = CreateLisaAccountTransferRequest("1234567890", "Z019283", "9876543210", new DateTime("2000-01-01"), accountTransfer)
+    val response = Await.result(SUT.transferAccount("Z019283", request)(HeaderCarrier()), Duration.Inf)
 
     callback(response)
   }
