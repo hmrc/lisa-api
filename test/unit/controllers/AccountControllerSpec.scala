@@ -74,7 +74,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
         }
       }
       "submitted a valid transfer account request" in {
-        when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountSuccessResponse("AB123456")))
+        when(mockService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountSuccessResponse("AB123456")))
 
         doCreateOrTransferRequest(transferAccountJson) { res =>
           status(res) mustBe (CREATED)
