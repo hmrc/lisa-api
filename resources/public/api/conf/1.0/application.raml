@@ -25,7 +25,7 @@ types:
   IDtype:
     pattern: "^\\d{10}$"
   LISAManagerReferenceNumberType:
-    pattern: "^Z\\d{4,6}$"
+    pattern: "^Z([0-9]{4}|[0-9]{6})$"
   accountIdType:
     "pattern": "^[a-zA-Z0-9 :\\-]{1,20}$"
 
@@ -65,7 +65,18 @@ types:
                                   "code" : "BAD_REQUEST",
                                   "message" : "Bad Request"
                                 }
-
+                    401:
+                      body:
+                        application/json:
+                          type: !include schemas/ErrorCodes.schema.json
+                          examples:
+                            notOpenStatus:
+                              description: lisaManagerReferenceNumber is not authorised
+                              value: |
+                                {
+                                  "code" : "UNAUTHORIZED",
+                                  "message" : "lisaManagerReferenceNumber is not authorised"
+                                }
                     404:
                       body:
                         application/json:
@@ -138,6 +149,18 @@ types:
                             {
                               "code" : "BAD_REQUEST",
                               "message" : "Bad Request"
+                            }
+                401:
+                  body:
+                    application/json:
+                      type: !include schemas/ErrorCodes.schema.json
+                      examples:
+                        notOpenStatus:
+                          description: lisaManagerReferenceNumber is not authorised
+                          value: |
+                            {
+                              "code" : "UNAUTHORIZED",
+                              "message" : "lisaManagerReferenceNumber is not authorised"
                             }
                 403:
                   body:
@@ -234,6 +257,18 @@ types:
                         {
                           "code" : "BAD_REQUEST",
                           "message" : "Bad Request"
+                        }
+            401:
+              body:
+                application/json:
+                  type: !include schemas/ErrorCodes.schema.json
+                  examples:
+                    notOpenStatus:
+                      description: lisaManagerReferenceNumber is not authorised
+                      value: |
+                        {
+                          "code" : "UNAUTHORIZED",
+                          "message" : "lisaManagerReferenceNumber is not authorised"
                         }
             403:
               body:
@@ -361,6 +396,18 @@ types:
                                       "code" : "BAD_REQUEST",
                                       "message" : "Bad Request"
                                     }
+                        401:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                notOpenStatus:
+                                  description: lisaManagerReferenceNumber is not authorised
+                                  value: |
+                                    {
+                                      "code" : "UNAUTHORIZED",
+                                      "message" : "lisaManagerReferenceNumber is not authorised"
+                                    }
 
                         403:
                           body:
@@ -454,6 +501,18 @@ types:
                                       "code" : "BAD_REQUEST",
                                       "message" : "Bad Request"
                                     }
+                        401:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                notOpenStatus:
+                                  description: lisaManagerReferenceNumber is not authorised
+                                  value: |
+                                    {
+                                      "code" : "UNAUTHORIZED",
+                                      "message" : "lisaManagerReferenceNumber is not authorised"
+                                    }
 
                         403:
                           description: Matches already existing resource.
@@ -469,7 +528,18 @@ types:
                                       "code" : "LIFE_EVENT_INAPPROPRIATE",
                                       "message" : "The Life Event conflicts with previous Life Event reported."
                                     }
-
+                        404:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                accountIDNOTFound:
+                                  description: The accountID given does not match with HMRC’s records.
+                                  value: |
+                                    {
+                                      "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
+                                      "message": "The accountID given does not match with HMRC’s records."
+                                    }
                         409:
                           body:
                             application/json:
@@ -529,6 +599,18 @@ types:
                                       "code" : "BAD_REQUEST",
                                       "message" : "Bad Request"
                                     }
+                        401:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                notOpenStatus:
+                                  description: lisaManagerReferenceNumber is not authorised
+                                  value: |
+                                    {
+                                      "code" : "UNAUTHORIZED",
+                                      "message" : "lisaManagerReferenceNumber is not authorised"
+                                    }
 
                         403:
                           description: Matches already existing resource.
@@ -583,7 +665,6 @@ types:
                                       "code" : "ACCEPT_HEADER_INVALID",
                                       "message" : "Accept header invalid"
                                     }
-
                         500:
                           body:
                             application/json:
