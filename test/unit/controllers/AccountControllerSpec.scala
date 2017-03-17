@@ -64,12 +64,21 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
   "The Create / Transfer Account endpoint" must {
 
-    "return with status 201 created" when {
+    "return with status 201 created and an account Id" when {
       "submitted a valid create account request" in {
         when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountSuccessResponse("AB123456")))
 
         doCreateOrTransferRequest(createAccountJson) { res =>
           status(res) mustBe (CREATED)
+          (contentAsJson(res) \ "data" \ "accountId").as[String] mustBe ("AB123456")
+        }
+      }
+      "submitted a valid transfer account request" in {
+        when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountSuccessResponse("AB123456")))
+
+        doCreateOrTransferRequest(transferAccountJson) { res =>
+          status(res) mustBe (CREATED)
+          (contentAsJson(res) \ "data" \ "accountId").as[String] mustBe ("AB123456")
         }
       }
     }
@@ -124,14 +133,6 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
         doCreateOrTransferRequest(createAccountJson) { res =>
           status(res) mustBe (INTERNAL_SERVER_ERROR)
-        }
-      }
-    }
-
-    "return with status 501 not implemented" when {
-      "submitted a account transfer request" in {
-        doCreateOrTransferRequest(transferAccountJson) { res =>
-          status(res) mustBe (NOT_IMPLEMENTED)
         }
       }
     }

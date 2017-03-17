@@ -37,7 +37,17 @@ class AccountController extends LisaController {
     withValidJson[CreateLisaAccountRequest] {
       req => {
         req match {
-          case transferRequest: CreateLisaAccountTransferRequest => Future.successful(NotImplemented(Json.toJson(ErrorNotImplemented)))
+          case transferRequest: CreateLisaAccountTransferRequest => {
+            service.transferAccount(lisaManager, transferRequest).map { result =>
+              result match {
+                case CreateLisaAccountSuccessResponse(accountId) => {
+                  val data = ApiResponseData(message = "Account Transferred.", accountId = Some(accountId))
+
+                  Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = 201)))
+                }
+              }
+            }
+          }
           case createRequest: CreateLisaAccountCreationRequest => {
             service.createAccount(lisaManager, createRequest).map { result =>
               result match {
