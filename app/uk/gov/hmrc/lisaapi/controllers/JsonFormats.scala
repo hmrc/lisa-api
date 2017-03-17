@@ -26,10 +26,11 @@ import uk.gov.hmrc.lisaapi.models.{ApiResponse, ApiResponseData, CreateLisaInves
 
 trait JsonFormats {
 
-  implicit val ninoRegex = "^[A-Z]{2}\\d{6}[A-D]$".r
-  implicit val nameRegex = "^.{1,35}$".r
+  implicit val ninoRegex = "^((?!(BG|GB|KN|NK|NT|TN|ZZ)|(D|F|I|Q|U|V)[A-Z]|[A-Z](D|F|I|O|Q|U|V))[A-Z]{2})[0-9]{6}[A-D]?$".r
+  implicit val nameRegex = "^[a-zA-Z &`\\-\\'^]{1,35}$".r
   implicit val lmrnRegex = "^Z\\d{4,6}$".r
   implicit val investorIDRegex = "^\\d{10}$".r
+  implicit val accountIDRegex = "^[a-zA-Z0-9 :\\-]{1,20}$".r
   implicit val accountClosureRegex = "^(Transferred out|All funds withdrawn|Voided)$".r
   implicit val lifeEventTypeRegex = "^(LISA Investor Terminal Ill Health|LISA Investor Death|House Purchase)$".r
 
@@ -54,7 +55,7 @@ trait JsonFormats {
   implicit val apiResponseFormats = Json.format[ApiResponse]
 
   implicit val accountTransferReads: Reads[AccountTransfer] = (
-    (JsPath \ "transferredFromAccountID").read[String] and
+    (JsPath \ "transferredFromAccountID").read(Reads.pattern(accountIDRegex, "error.formatting.accountID")) and
     (JsPath \ "transferredFromLMRN").read(Reads.pattern(lmrnRegex, "error.formatting.lmrn")) and
     (JsPath \ "transferInDate").read(isoDateReads()).map(new DateTime(_))
   )(AccountTransfer.apply _)
@@ -68,14 +69,14 @@ trait JsonFormats {
   implicit val createLisaAccountCreationRequestReads: Reads[CreateLisaAccountCreationRequest] = (
     (JsPath \ "investorID").read(Reads.pattern(investorIDRegex, "error.formatting.investorID")) and
     (JsPath \ "lisaManagerReferenceNumber").read(Reads.pattern(lmrnRegex, "error.formatting.lmrn")) and
-    (JsPath \ "accountID").read[String] and
+    (JsPath \ "accountID").read(Reads.pattern(accountIDRegex, "error.formatting.accountID")) and
     (JsPath \ "firstSubscriptionDate").read(isoDateReads()).map(new DateTime(_))
   )(CreateLisaAccountCreationRequest.apply _)
 
   implicit val createLisaAccountTransferRequestReads: Reads[CreateLisaAccountTransferRequest] = (
     (JsPath \ "investorID").read(Reads.pattern(investorIDRegex, "error.formatting.investorID")) and
     (JsPath \ "lisaManagerReferenceNumber").read(Reads.pattern(lmrnRegex, "error.formatting.lmrn")) and
-    (JsPath \ "accountID").read[String] and
+    (JsPath \ "accountID").read(Reads.pattern(accountIDRegex, "error.formatting.accountID")) and
     (JsPath \ "firstSubscriptionDate").read(isoDateReads()).map(new DateTime(_)) and
     (JsPath \ "transferAccount").read[AccountTransfer]
   )(CreateLisaAccountTransferRequest.apply _)

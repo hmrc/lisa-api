@@ -23,7 +23,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
-import uk.gov.hmrc.lisaapi.models.{CloseLisaAccountRequest, CreateLisaAccountCreationRequest, CreateLisaInvestorRequest}
+import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des.{DesAccountResponse, DesCreateInvestorResponse}
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpResponse}
 
@@ -201,6 +201,87 @@ class DesConnectorSpec extends PlaySpec
 
   }
 
+  "Transfer Lisa Account endpoint" must {
+
+    "Return a status code of 200" when {
+      "Given a 200 response from DES" in {
+        when(mockHttpPost.POST[CreateLisaAccountTransferRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(HttpResponse(responseStatus = statusCodeSuccess, responseJson = None)))
+
+        doTransferAccountRequest { response =>
+          response must be((
+            statusCodeSuccess,
+            None
+          ))
+        }
+      }
+    }
+
+    "Return no DesAccountResponse" when {
+      "The DES response has no json body" in {
+        when(mockHttpPost.POST[CreateLisaAccountTransferRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = statusCodeServiceUnavailable,
+                responseJson = None
+              )
+            )
+          )
+
+        doTransferAccountRequest { response =>
+          response must be((
+            statusCodeServiceUnavailable,
+            None
+          ))
+        }
+      }
+    }
+
+    "Return any empty DesAccountResponse" when {
+      "The DES response has a json body that is in an incorrect format" in {
+        when(mockHttpPost.POST[CreateLisaAccountTransferRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = statusCodeSuccess,
+                responseJson = Some(Json.parse("""[1,2,3]"""))
+              )
+            )
+          )
+
+        doTransferAccountRequest { response =>
+          response must be((
+            statusCodeSuccess,
+            Some(DesAccountResponse(None, None))
+          ))
+        }
+      }
+    }
+
+    "Return a populated DesAccountResponse" when {
+      "The DES response has a json body that is in the correct format" in {
+        when(mockHttpPost.POST[CreateLisaAccountTransferRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = statusCodeSuccess,
+                responseJson = Some(Json.parse(s"""{"rdsCode":$rdsCodeAccountAlreadyExists, "accountId": "AB123456"}"""))
+              )
+            )
+          )
+
+        doTransferAccountRequest { response =>
+          response must be((
+            statusCodeSuccess,
+            Some(DesAccountResponse(rdsCode = Some(rdsCodeAccountAlreadyExists), accountId = Some("AB123456")))
+          ))
+        }
+      }
+    }
+
+  }
+
   "Close Lisa Account endpoint" must {
 
     "Return a status code of 200" when {
@@ -292,6 +373,14 @@ class DesConnectorSpec extends PlaySpec
   private def doCreateAccountRequest(callback: ((Int, Option[DesAccountResponse])) => Unit) = {
     val request = CreateLisaAccountCreationRequest("1234567890", "Z019283", "9876543210", new DateTime("2000-01-01"))
     val response = Await.result(SUT.createAccount("Z019283", request), Duration.Inf)
+
+    callback(response)
+  }
+
+  private def doTransferAccountRequest(callback: ((Int, Option[DesAccountResponse])) => Unit) = {
+    val transferAccount = AccountTransfer("1234", "1234", new DateTime("2000-01-01"))
+    val request = CreateLisaAccountTransferRequest("1234567890", "Z019283", "9876543210", new DateTime("2000-01-01"), transferAccount)
+    val response = Await.result(SUT.transferAccount("Z019283", request), Duration.Inf)
 
     callback(response)
   }

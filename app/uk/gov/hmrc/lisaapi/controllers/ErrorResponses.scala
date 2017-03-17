@@ -65,6 +65,8 @@ case object ErrorAccountAlreadyClosed extends ErrorResponse(403, "INVESTOR_ACCOU
 
 case object ErrorAccountNotFound extends ErrorResponse(404, "INVESTOR_ACCOUNTID_NOT_FOUND", "The accountID given does not match with HMRC’s records")
 
+case object ErrorTransferAccountDataNotProvided extends ErrorResponse(403, "TRANSFER_ACCOUNT_DATA_NOT_PROVIDED", "The transferredFromAccountID, transferredFromLMRN and transferInDate are not provided and are required for transfer of an account.")
+
 object ErrorInvestorAlreadyExists {
 
   def apply(investorId: String) = {
