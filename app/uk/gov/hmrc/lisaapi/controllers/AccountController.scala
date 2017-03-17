@@ -48,7 +48,7 @@ class AccountController extends LisaController {
 
           val transferAccountDataNotProvided = errors.count {
             case (path: JsPath, errors: Seq[ValidationError]) => {
-              path.toString() == "/transferAccount" && errors.contains(ValidationError("error.path.missing"))
+              path.toString().contains("/transferAccount") && errors.contains(ValidationError("error.path.missing"))
             }
           }
 
