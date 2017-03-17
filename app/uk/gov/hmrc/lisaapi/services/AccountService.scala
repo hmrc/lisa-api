@@ -54,6 +54,25 @@ trait AccountService  {
     }
   }
 
+  def transferAccount(lisaManager: String, request: CreateLisaAccountTransferRequest)(implicit hc: HeaderCarrier) : Future[CreateLisaAccountResponse] = {
+    val response = desConnector.transferAccount(lisaManager, request)
+    val httpStatusOk = 200
+
+    response map {
+      case (`httpStatusOk`, Some(data)) => {
+        (data.rdsCode, data.accountId) match {
+          case (None, Some(accountId)) => CreateLisaAccountSuccessResponse(accountId)
+          case (Some(INVESTOR_NOT_FOUND), _) => CreateLisaAccountInvestorNotFoundResponse
+          case (Some(INVESTOR_COMPLIANCE_FAILED), _) => CreateLisaAccountInvestorComplianceCheckFailedResponse
+          case (Some(INVESTOR_ACCOUNT_ALREADY_EXISTS), _) => CreateLisaAccountAlreadyExistsResponse
+          case (Some(INVESTOR_PREVIOUS_ACCOUNT_DOES_NOT_EXIST), _) => CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse
+          case (_, _) => CreateLisaAccountErrorResponse
+        }
+      }
+      case (_, _) => CreateLisaAccountErrorResponse
+    }
+  }
+
   def closeAccount(lisaManager: String, accountId: String, request: CloseLisaAccountRequest)(implicit hc: HeaderCarrier) : Future[CloseLisaAccountResponse] = {
     val response = desConnector.closeAccount(lisaManager, accountId, request)
     val httpStatusOk = 200
