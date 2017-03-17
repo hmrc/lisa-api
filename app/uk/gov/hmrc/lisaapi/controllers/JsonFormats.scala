@@ -104,7 +104,7 @@ trait JsonFormats {
   )(unlift(CreateLisaAccountTransferRequest.unapply))
 
   implicit val reportLifeEventRequestReads: Reads[ReportLifeEventRequest] = (
-    (JsPath \ "accountId").read[String] and
+    (JsPath \ "accountId").read(Reads.pattern(accountIDRegex, "error.formatting.accountID")) and
     (JsPath \ "lisaManagerReferenceNumber").read(Reads.pattern(lmrnRegex, "error.formatting.lmrn")) and
     (JsPath \ "eventType").read(Reads.pattern(lifeEventTypeRegex, "error.formatting.eventType")) and
     (JsPath \ "eventDate").read(isoDateReads(allowFutureDates = true)).map(new DateTime(_))
