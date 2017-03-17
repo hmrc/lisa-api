@@ -17,12 +17,11 @@
 package uk.gov.hmrc.lisaapi.controllers
 
 import play.api.Logger
-import play.api.http.HeaderNames
+import play.api.data.validation.ValidationError
 import play.api.libs.json.Json.toJson
-import play.api.libs.json.{JsError, JsSuccess, Reads}
+import play.api.libs.json.{JsError, JsPath, JsSuccess, Reads}
 import play.api.mvc.{AnyContent, Request, Result}
 import uk.gov.hmrc.api.controllers.HeaderValidator
-import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.play.config.RunMode
 import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.microservice.controller.BaseController
@@ -33,21 +32,30 @@ import scala.util.{Failure, Success, Try}
 trait LisaController extends BaseController with HeaderValidator with RunMode with JsonFormats {
   implicit val hc: HeaderCarrier
 
-  protected def withValidJson[T](f: (T) => Future[Result])(implicit request: Request[AnyContent], reads: Reads[T]): Future[Result] =
+  protected def withValidJson[T] (
+    success: (T) => Future[Result],
+    invalid: Option[(Seq[(JsPath, Seq[ValidationError])]) => Future[Result]] = None
+  )(implicit request: Request[AnyContent], reads: Reads[T]): Future[Result] = {
+
     request.body.asJson match {
       case Some(json) =>
         Try(json.validate[T]) match {
-          case Success(JsSuccess(payload, _)) => f(payload)
-          case Success(JsError(errs)) => {
-            Logger.info("The errors are " + errs.toString())
-            Future.successful(BadRequest(toJson(ErrorGenericBadRequest)))
+          case Success(JsSuccess(payload, _)) => success(payload)
+          case Success(JsError(errors)) => {
+            invalid match {
+              case Some(invalidCallback) => invalidCallback(errors)
+              case None => {
+                Logger.info("The errors are " + errors.toString())
+                Future.successful(BadRequest(toJson(ErrorGenericBadRequest)))
+              }
+            }
           }
-
           case Failure(e) => Future.successful(InternalServerError(toJson(ErrorInternalServerError)))
         }
-      case None =>
-        Future.successful(BadRequest(toJson(EmptyJson)))
+      case None => Future.successful(BadRequest(toJson(EmptyJson)))
     }
+
+  }
 
 }
 

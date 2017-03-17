@@ -17,7 +17,9 @@
 package uk.gov.hmrc.lisaapi.controllers
 
 import play.api.Logger
-import play.api.libs.json.Json
+import play.api.data.validation.ValidationError
+import play.api.libs.json.{JsPath, Json}
+import play.api.libs.json.Json.toJson
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.AccountService
@@ -33,12 +35,32 @@ class AccountController extends LisaController {
   implicit val hc: HeaderCarrier = new HeaderCarrier()
 
   def createOrTransferLisaAccount(lisaManager: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
-    withValidJson[CreateLisaAccountRequest] { request =>
-      request match {
-        case createRequest: CreateLisaAccountCreationRequest => processAccountCreation(lisaManager, createRequest)
-        case transferRequest: CreateLisaAccountTransferRequest => processAccountTransfer(lisaManager, transferRequest)
-      }
-    }
+    withValidJson[CreateLisaAccountRequest] (
+      (request) => {
+        request match {
+          case createRequest: CreateLisaAccountCreationRequest => processAccountCreation(lisaManager, createRequest)
+          case transferRequest: CreateLisaAccountTransferRequest => processAccountTransfer(lisaManager, transferRequest)
+        }
+      },
+      Some(
+        (errors) => {
+          Logger.info("The errors are " + errors.toString())
+
+          val transferAccountDataNotProvided = errors.count {
+            case (path: JsPath, errors: Seq[ValidationError]) => {
+              path.toString() == "/transferAccount" && errors.contains(ValidationError("error.path.missing"))
+            }
+          }
+
+          if (transferAccountDataNotProvided > 0) {
+            Future.successful(Forbidden(toJson(ErrorTransferAccountDataNotProvided)))
+          }
+          else {
+            Future.successful(BadRequest(toJson(ErrorGenericBadRequest)))
+          }
+        }
+      )
+    )
   }
 
   def closeLisaAccount(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
