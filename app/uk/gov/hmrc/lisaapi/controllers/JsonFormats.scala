@@ -31,6 +31,7 @@ trait JsonFormats {
   implicit val lmrnRegex = "^Z\\d{4,6}$".r
   implicit val investorIDRegex = "^\\d{10}$".r
   implicit val accountClosureRegex = "^(Transferred out|All funds withdrawn|Voided)$".r
+  implicit val lifeEventTypeRegex = "^(LISA Investor Terminal Ill Health|LISA Investor Death|House Purchase)$".r
 
   implicit val createLisaInvestorRequestReads: Reads[CreateLisaInvestorRequest] = (
     (JsPath \ "investorNINO").read(Reads.pattern(ninoRegex, "error.formatting.nino")) and
@@ -100,6 +101,20 @@ trait JsonFormats {
     (JsPath \ "firstSubscriptionDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
     (JsPath \ "transferAccount").write[AccountTransfer]
   )(unlift(CreateLisaAccountTransferRequest.unapply))
+
+  implicit val reportLifeEventRequestReads: Reads[ReportLifeEventRequest] = (
+    (JsPath \ "accountId").read[String] and
+    (JsPath \ "lisaManagerReferenceNumber").read(Reads.pattern(lmrnRegex, "error.formatting.lmrn")) and
+    (JsPath \ "eventType").read(Reads.pattern(lifeEventTypeRegex, "error.formatting.eventType")) and
+    (JsPath \ "eventDate").read(isoDateReads(allowFutureDates = true)).map(new DateTime(_))
+    )(ReportLifeEventRequest.apply _)
+
+  implicit val reportLifeEventRequestWrites: Writes[ReportLifeEventRequest] = (
+    (JsPath \ "accountId").write[String] and
+      (JsPath \ "lisaManagerReferenceNumber").write[String] and
+      (JsPath \ "eventType").write[String] and
+      (JsPath \ "eventDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd"))
+  )(unlift(ReportLifeEventRequest.unapply))
 
   implicit val createLisaAccountRequestWrites = Writes[CreateLisaAccountRequest] {
     case r: CreateLisaAccountCreationRequest => createLisaAccountCreationRequestWrites.writes(r)
