@@ -60,6 +60,14 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
                             |  }
                             |}""".stripMargin
 
+  val transferAccountJsonIncomplete = """{
+                              |  "investorID" : "9876543210",
+                              |  "lisaManagerReferenceNumber" : "Z4321",
+                              |  "accountID" :"8765432100",
+                              |  "creationReason" : "Transferred",
+                              |  "firstSubscriptionDate" : "2011-03-23"
+                              |}""".stripMargin
+
   val closeAccountJson = """{"accountClosureReason" : "Voided", "closureDate" : "2000-06-23"}"""
 
   "The Create / Transfer Account endpoint" must {
@@ -150,6 +158,15 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
         doCreateOrTransferRequest(transferAccountJson) { res =>
           status(res) mustBe (FORBIDDEN)
           (contentAsJson(res) \ "code").as[String] mustBe ("PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST")
+        }
+      }
+    }
+
+    "return with status 403 forbidden and a code of TRANSFER_ACCOUNT_DATA_NOT_PROVIDED" when {
+      "sent a transfer request json with no transferAccount data" in {
+        doCreateOrTransferRequest(transferAccountJsonIncomplete) { res =>
+          status(res) mustBe (FORBIDDEN)
+          (contentAsJson(res) \ "code").as[String] mustBe ("TRANSFER_ACCOUNT_DATA_NOT_PROVIDED")
         }
       }
     }
