@@ -33,56 +33,65 @@ class AccountController extends LisaController {
   implicit val hc: HeaderCarrier = new HeaderCarrier()
 
   def createOrTransferLisaAccount(lisaManager: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
-    Logger.debug(s"LISA HTTP Request: ${request.uri}  and method: ${request.method}" )
-    withValidJson[CreateLisaAccountRequest] {
-      req => {
-        req match {
-          case transferRequest: CreateLisaAccountTransferRequest => {
-            service.transferAccount(lisaManager, transferRequest).map { result =>
-              result match {
-                case CreateLisaAccountSuccessResponse(accountId) => {
-                  val data = ApiResponseData(message = "Account Transferred.", accountId = Some(accountId))
-
-                  Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = 201)))
-                }
-              }
-            }
-          }
-          case createRequest: CreateLisaAccountCreationRequest => {
-            service.createAccount(lisaManager, createRequest).map { result =>
-              result match {
-                case CreateLisaAccountSuccessResponse(accountId) => {
-                  val data = ApiResponseData(message = "Account Created.", accountId = Some(accountId))
-
-                  Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = 201)))
-                }
-                case CreateLisaAccountInvestorNotFoundResponse => Forbidden(Json.toJson(ErrorInvestorNotFound))
-                case CreateLisaAccountInvestorNotEligibleResponse => Forbidden(Json.toJson(ErrorInvestorNotEligible))
-                case CreateLisaAccountInvestorComplianceCheckFailedResponse => Forbidden(Json.toJson(ErrorInvestorComplianceCheckFailed))
-                case CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse => Forbidden(Json.toJson(ErrorPreviousAccountDoesNotExist))
-                case CreateLisaAccountAlreadyExistsResponse => Conflict(Json.toJson(ErrorAccountAlreadyExists))
-                case _ => InternalServerError(Json.toJson(ErrorInternalServerError))
-              }
-            }
-          }
-        }
+    withValidJson[CreateLisaAccountRequest] { request =>
+      request match {
+        case createRequest: CreateLisaAccountCreationRequest => processAccountCreation(lisaManager, createRequest)
+        case transferRequest: CreateLisaAccountTransferRequest => processAccountTransfer(lisaManager, transferRequest)
       }
     }
   }
 
   def closeLisaAccount(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
-    withValidJson[CloseLisaAccountRequest] { req =>
-      service.closeAccount(lisaManager, accountId, req).map { result =>
-        result match {
-          case CloseLisaAccountSuccessResponse(accountId) => {
-            val data = ApiResponseData(message = "LISA Account Closed", accountId = Some(accountId))
+    withValidJson[CloseLisaAccountRequest] { request =>
+      processAccountClosure(lisaManager, accountId, request)
+    }
+  }
 
-            Ok(Json.toJson(ApiResponse(data = Some(data), success = true, status = 200)))
-          }
-          case CloseLisaAccountAlreadyClosedResponse => Forbidden(Json.toJson(ErrorAccountAlreadyClosed))
-          case CloseLisaAccountNotFoundResponse => NotFound(Json.toJson(ErrorAccountNotFound))
-          case _ => InternalServerError(Json.toJson(ErrorInternalServerError))
+  private def processAccountCreation(lisaManager: String, request: CreateLisaAccountCreationRequest) = {
+    service.createAccount(lisaManager, request).map { result =>
+      result match {
+        case CreateLisaAccountSuccessResponse(accountId) => {
+          val data = ApiResponseData(message = "Account Created.", accountId = Some(accountId))
+
+          Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = 201)))
         }
+        case CreateLisaAccountInvestorNotFoundResponse => Forbidden(Json.toJson(ErrorInvestorNotFound))
+        case CreateLisaAccountInvestorNotEligibleResponse => Forbidden(Json.toJson(ErrorInvestorNotEligible))
+        case CreateLisaAccountInvestorComplianceCheckFailedResponse => Forbidden(Json.toJson(ErrorInvestorComplianceCheckFailed))
+        case CreateLisaAccountAlreadyExistsResponse => Conflict(Json.toJson(ErrorAccountAlreadyExists))
+        case _ => InternalServerError(Json.toJson(ErrorInternalServerError))
+      }
+    }
+  }
+
+  private def processAccountTransfer(lisaManager: String, request: CreateLisaAccountTransferRequest) = {
+    service.transferAccount(lisaManager, request).map { result =>
+      result match {
+        case CreateLisaAccountSuccessResponse(accountId) => {
+          val data = ApiResponseData(message = "Account Transferred.", accountId = Some(accountId))
+
+          Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = 201)))
+        }
+        case CreateLisaAccountInvestorNotFoundResponse => Forbidden(Json.toJson(ErrorInvestorNotFound))
+        case CreateLisaAccountInvestorComplianceCheckFailedResponse => Forbidden(Json.toJson(ErrorInvestorComplianceCheckFailed))
+        case CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse => Forbidden(Json.toJson(ErrorPreviousAccountDoesNotExist))
+        case CreateLisaAccountAlreadyExistsResponse => Conflict(Json.toJson(ErrorAccountAlreadyExists))
+        case _ => InternalServerError(Json.toJson(ErrorInternalServerError))
+      }
+    }
+  }
+
+  private def processAccountClosure(lisaManager: String, accountId: String, request: CloseLisaAccountRequest) = {
+    service.closeAccount(lisaManager, accountId, request).map { result =>
+      result match {
+        case CloseLisaAccountSuccessResponse(accountId) => {
+          val data = ApiResponseData(message = "LISA Account Closed", accountId = Some(accountId))
+
+          Ok(Json.toJson(ApiResponse(data = Some(data), success = true, status = 200)))
+        }
+        case CloseLisaAccountAlreadyClosedResponse => Forbidden(Json.toJson(ErrorAccountAlreadyClosed))
+        case CloseLisaAccountNotFoundResponse => NotFound(Json.toJson(ErrorAccountNotFound))
+        case _ => InternalServerError(Json.toJson(ErrorInternalServerError))
       }
     }
   }

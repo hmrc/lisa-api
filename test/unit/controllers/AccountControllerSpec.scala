@@ -83,11 +83,30 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
       }
     }
 
+    "return with status 400 bad request and a code of BAD_REQUEST" when {
+      "invalid json is sent" in {
+        val invalidJson = createAccountJson.replace("9876543210", "")
+
+        doCreateOrTransferRequest(invalidJson) { res =>
+          status(res) mustBe (BAD_REQUEST)
+          (contentAsJson(res) \ "code").as[String] mustBe ("BAD_REQUEST")
+        }
+      }
+    }
+
     "return with status 403 forbidden and a code of INVESTOR_NOT_FOUND" when {
-      "the data service returns a CreateLisaAccountInvestorNotFoundResponse" in {
+      "the data service returns a CreateLisaAccountInvestorNotFoundResponse for a create request" in {
         when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorNotFoundResponse))
 
         doCreateOrTransferRequest(createAccountJson) { res =>
+          status(res) mustBe (FORBIDDEN)
+          (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_NOT_FOUND")
+        }
+      }
+      "the data service returns a CreateLisaAccountInvestorNotFoundResponse for a transfer request" in {
+        when(mockService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorNotFoundResponse))
+
+        doCreateOrTransferRequest(transferAccountJson) { res =>
           status(res) mustBe (FORBIDDEN)
           (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_NOT_FOUND")
         }
@@ -106,7 +125,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
     }
 
     "return with status 403 forbidden and a code of INVESTOR_COMPLIANCE_CHECK_FAILED" when {
-      "the data service returns a CreateLisaAccountInvestorComplianceCheckFailedResponse" in {
+      "the data service returns a CreateLisaAccountInvestorComplianceCheckFailedResponse for a create request" in {
         when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorComplianceCheckFailedResponse))
 
         doCreateOrTransferRequest(createAccountJson) { res =>
@@ -114,10 +133,29 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
           (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_COMPLIANCE_CHECK_FAILED")
         }
       }
+      "the data service returns a CreateLisaAccountInvestorComplianceCheckFailedResponse for a transfer request" in {
+        when(mockService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorComplianceCheckFailedResponse))
+
+        doCreateOrTransferRequest(transferAccountJson) { res =>
+          status(res) mustBe (FORBIDDEN)
+          (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_COMPLIANCE_CHECK_FAILED")
+        }
+      }
     }
 
-    "return with status 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_EXISTS" when {
-      "the data service returns a CreateLisaAccountAlreadyExistsResponse" in {
+    "return with status 403 forbidden and a code of PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST" when {
+      "the data service returns a CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse for a transfer request" in {
+        when(mockService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse))
+
+        doCreateOrTransferRequest(transferAccountJson) { res =>
+          status(res) mustBe (FORBIDDEN)
+          (contentAsJson(res) \ "code").as[String] mustBe ("PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST")
+        }
+      }
+    }
+
+    "return with status 409 conflict and a code of INVESTOR_ACCOUNT_ALREADY_EXISTS" when {
+      "the data service returns a CreateLisaAccountAlreadyExistsResponse for a create request" in {
         when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountAlreadyExistsResponse))
 
         doCreateOrTransferRequest(createAccountJson) { res =>
@@ -125,13 +163,42 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
           (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ACCOUNT_ALREADY_EXISTS")
         }
       }
+      "the data service returns a CreateLisaAccountAlreadyExistsResponse for a transfer request" in {
+        when(mockService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountAlreadyExistsResponse))
+
+        doCreateOrTransferRequest(transferAccountJson) { res =>
+          status(res) mustBe (CONFLICT)
+          (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ACCOUNT_ALREADY_EXISTS")
+        }
+      }
     }
 
     "return with status 500 internal server error" when {
-      "the data service returns an error" in {
+      "the data service returns an error for a create request" in {
         when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountErrorResponse))
 
         doCreateOrTransferRequest(createAccountJson) { res =>
+          status(res) mustBe (INTERNAL_SERVER_ERROR)
+        }
+      }
+      "the data service returns an error for a transfer request" in {
+        when(mockService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountErrorResponse))
+
+        doCreateOrTransferRequest(transferAccountJson) { res =>
+          status(res) mustBe (INTERNAL_SERVER_ERROR)
+        }
+      }
+      "the data service returns a CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse for a create request" in {
+        when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse))
+
+        doCreateOrTransferRequest(createAccountJson) { res =>
+          status(res) mustBe (INTERNAL_SERVER_ERROR)
+        }
+      }
+      "the data service returns a CreateLisaAccountInvestorNotEligibleResponse for a transfer request" in {
+        when(mockService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorNotEligibleResponse))
+
+        doCreateOrTransferRequest(transferAccountJson) { res =>
           status(res) mustBe (INTERNAL_SERVER_ERROR)
         }
       }
