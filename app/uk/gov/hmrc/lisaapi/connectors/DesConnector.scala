@@ -18,14 +18,16 @@ package uk.gov.hmrc.lisaapi.connectors
 
 import uk.gov.hmrc.lisaapi.config.WSHttp
 import uk.gov.hmrc.lisaapi.controllers.JsonFormats
-import uk.gov.hmrc.lisaapi.models.{CloseLisaAccountRequest, CreateLisaAccountCreationRequest, CreateLisaAccountTransferRequest, CreateLisaInvestorRequest}
-import uk.gov.hmrc.lisaapi.models.des.{DesAccountResponse, DesCreateInvestorResponse}
+import uk.gov.hmrc.lisaapi.models._
+import uk.gov.hmrc.lisaapi.models.des._
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpReads, HttpResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
+
+import play.api.libs.json.Reads
 
 trait DesConnector extends ServicesConfig with JsonFormats {
 
@@ -113,6 +115,37 @@ trait DesConnector extends ServicesConfig with JsonFormats {
     })
   }
 
+  /**
+    * Attempts to report a LISA Life Event
+    *
+    * @return A tuple of the http status code and an (optional) data response
+    */
+  def reportLifeEvent(lisaManager: String, accountId: String, request: ReportLifeEventRequest)(implicit hc: HeaderCarrier): Future[(Int, Option[DesResponse])] = {
+
+    def returnLifeTimeId(lifeEvent: Any) = lifeEvent.asInstanceOf[DesLifeEventResponse].lifeEventID
+
+    val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId/events"
+
+    val result = httpPost.POST[ReportLifeEventRequest, HttpResponse](uri, request)(implicitly, httpReads, implicitly)
+
+    result.map(r => {
+      parseDesResponse[DesLifeEventResponse](r,returnLifeTimeId)
+    })
+  }
+
+  def parseDesResponse[A: Reads](r: HttpResponse, f: (Any)=>String):  (Int, Option[DesResponse])  = {
+    r.status match {
+      case 201 => Try(r.json.asOpt[A]) match {
+        case Success(data) => data match {
+          case Some(_) => (r.status, Some(DesSuccessResponse(f(data.get))))
+          case None => (r.status, None)
+        }
+        case Failure(_) => (r.status, None)}
+      case _ => Try(r.json.asOpt[DesFailureResponse]) match {
+        case Success(data) => (r.status, data)
+        case Failure(_) => (r.status, None)}
+    }
+  }
 }
 
 

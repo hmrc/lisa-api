@@ -21,7 +21,7 @@ import org.joda.time.format.DateTimeFormat
 import play.api.data.validation.ValidationError
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
-import uk.gov.hmrc.lisaapi.models.des.{DesAccountResponse, DesCreateInvestorResponse}
+import uk.gov.hmrc.lisaapi.models.des._
 import uk.gov.hmrc.lisaapi.models.{ApiResponse, ApiResponseData, CreateLisaInvestorRequest, _}
 
 trait JsonFormats {
@@ -50,6 +50,10 @@ trait JsonFormats {
 
   implicit val desCreateAccountResponseFormats = Json.format[DesAccountResponse]
   implicit val desCreateInvestorResponseFormats = Json.format[DesCreateInvestorResponse]
+  implicit val desLifeEventResponseFormats = Json.format[DesLifeEventResponse]
+
+  implicit val desSuccessResponse = Json.format[DesSuccessResponse]
+  implicit val desFailureResponse = Json.format[DesFailureResponse]
 
   implicit val apiResponseDataFormats = Json.format[ApiResponseData]
   implicit val apiResponseFormats = Json.format[ApiResponse]
