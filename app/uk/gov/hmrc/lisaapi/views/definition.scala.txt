@@ -19,7 +19,7 @@
     "versions": [
       {
         "version": "1.0",
-        "status": @status
+        "status": "@status"
       }
     ]
   }

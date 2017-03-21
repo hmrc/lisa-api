@@ -36,7 +36,7 @@
 		"NINOType": {
           "type": "string",
           "pattern": "^((?!(BG|GB|KN|NK|NT|TN|ZZ)|(D|F|I|Q|U|V)[A-Z]|[A-Z](D|F|I|O|Q|U|V))[A-Z]{2})[0-9]{6}[A-D]?$",
-          "example": "BC123456"
+          "example": "BC123456D"
         }
 	}
 }
