@@ -19,5 +19,6 @@ package uk.gov.hmrc.lisaapi.models
 case class ApiResponseData(
   message: String,
   investorId: Option[String] = None,
-  accountId: Option[String] = None
+  accountId: Option[String] = None,
+  lifeEventId: Option[String] = None
 )
