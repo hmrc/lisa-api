@@ -292,11 +292,18 @@ types:
                           "message" : "Previous Investor Account Doesn’t Exist"
                         }
                     noTransferAccntData:
-                      description: The transferredFromAccountID, transferredFromLMRN and transferInDate are not provided and are required for transfer of an account.
+                      description: transferredFromAccountID, transferedFromLMRN and transferInDate are required fields when the creationReason is "Transferred".
                       value: |
                         {
                           "code" : "TRANSFER_ACCOUNT_DATA_NOT_PROVIDED",
                           "message" : "transfer account data not provided"
+                        }
+                    transferAccntDataProvided:
+                      description: transferredFromAccountID, transferedFromLMRN, and transferInDate fields should only be completed when the creationReason is "Transferred".
+                      value: |
+                        {
+                          "code" : "TRANSFER_ACCOUNT_DATA_PROVIDED",
+                          "message" : "transfer account data provided"
                         }
 
             404:
@@ -601,22 +608,19 @@ types:
                                     }
 
                         403:
-                          description: Matches already existing resource.
-                            Response contains a location header with link to the existing resource.
                           body:
                             application/json:
                               type: !include schemas/ErrorCodes.schema.json
                               examples:
-                                noLifeEvent:
-                                  description: The lifeEventID does not match with HMRC’s records.
+                                lifeEventNotProvided:
+                                  description: lifeEventID is required when the claimReason is "Life Event".
                                   value: |
                                     {
-                                      "code" : "LIFE_EVENT_DOES_NOT_EXISTS",
-                                      "message" : "The lifeEventID does not match with HMRC’s records."
+                                      "code" : "LIFE_EVENT_NOT_PROVIDED",
+                                      "message" : "lifeEventID is required when the claimReason is \"Life Event\"."
                                     }
                                 bonusWrong:
                                   description: The bonus information given exceeds the maximum annual amount, the qualifying deposits exceed the maximum annual amount, or the bonus claim doesn't equal the correct percentage of stated qualifying funds.
-
                                   value: |
                                     {
                                       "code" : "BONUS_CLAIM_ERROR",
@@ -627,6 +631,13 @@ types:
                             application/json:
                               type: !include schemas/ErrorCodes.schema.json
                               examples:
+                                noLifeEvent:
+                                  description: The lifeEventID does not match with HMRC’s records.
+                                  value: |
+                                    {
+                                      "code" : "LIFE_EVENT_NOT_FOUND",
+                                      "message" : "The lifeEventID does not match with HMRC’s records."
+                                    }
                                 accountIDNOTFound:
                                   description: The accountID given does not match with HMRC’s records.
                                   value: |
