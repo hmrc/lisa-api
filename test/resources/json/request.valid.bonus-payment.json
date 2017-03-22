@@ -1,0 +1,24 @@
+{
+  "lifeEventID": "1234567891",
+  "periodStartDate": "2016-05-22",
+  "periodEndDate": "2017-05-22",
+  "transactionType": "Bonus",
+
+  "htbTransfer": {
+    "htbTransferInForPeriod": 0.00,
+    "htbTransferTotalYTD": 0.00
+  },
+
+  "inboundPayments": {
+    "newSubsForPeriod": 4000.00,
+    "newSubsYTD": 4000.00,
+    "totalSubsForPeriod": 4000.00,
+    "totalSubsYTD": 4000.00
+  },
+
+  "bonuses": {
+    "bonusDueForPeriod": 1000.00,
+    "totalBonusDueYTD": 1000.00,
+    "claimReason": "Life Event"
+  }
+}
