@@ -23,8 +23,6 @@ import uk.gov.hmrc.lisaapi.services.LifeEventService
 import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
-
 
 class LifeEventController extends LisaController {
 
@@ -34,12 +32,15 @@ class LifeEventController extends LisaController {
 
   def reportLisaLifeEvent(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async {
     implicit request =>
-    withValidJson[ReportLifeEventRequest] { evenRequest =>
-      service.reportLifeEvent(lisaManager, accountId, evenRequest) map { res =>
+
+    withValidJson[ReportLifeEventRequest] { req =>
+      service.reportLifeEvent(lisaManager, accountId, req) map { res =>
         res match {
-          case ReportLifeEventSuccessResponse(lifeEventId) =>
+          case ReportLifeEventSuccessResponse(lifeEventId) => {
             val data = ApiResponseData(message = "Life Event Created", lifeEventId = Some(lifeEventId))
+
             Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = 201)))
+          }
           case ReportLifeEventInappropriateResponse => Forbidden(Json.toJson(ErrorLifeEventInappropriate))
           case ReportLifeEventAlreadyExistsResponse => Conflict(Json.toJson(ErrorLifeEventAlreadyExists))
           case _ => InternalServerError(Json.toJson(ErrorInternalServerError))

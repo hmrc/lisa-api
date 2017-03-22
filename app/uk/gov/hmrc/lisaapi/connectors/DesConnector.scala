@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.lisaapi.connectors
 
+import play.api.Logger
 import uk.gov.hmrc.lisaapi.config.WSHttp
 import uk.gov.hmrc.lisaapi.controllers.JsonFormats
 import uk.gov.hmrc.lisaapi.models._
@@ -26,7 +27,6 @@ import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpReads, HttpResponse}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
-
 import play.api.libs.json.Reads
 
 trait DesConnector extends ServicesConfig with JsonFormats {
@@ -120,30 +120,35 @@ trait DesConnector extends ServicesConfig with JsonFormats {
     *
     * @return A tuple of the http status code and an (optional) data response
     */
-  def reportLifeEvent(lisaManager: String, accountId: String, request: ReportLifeEventRequest)(implicit hc: HeaderCarrier): Future[(Int, Option[DesResponse])] = {
-
-    def returnLifeTimeId(lifeEvent: Any) = lifeEvent.asInstanceOf[DesLifeEventResponse].lifeEventID
+  def reportLifeEvent(lisaManager: String, accountId: String, request: ReportLifeEventRequest)
+                     (implicit hc: HeaderCarrier): Future[DesResponse] = {
 
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId/events"
 
     val result = httpPost.POST[ReportLifeEventRequest, HttpResponse](uri, request)(implicitly, httpReads, implicitly)
 
-    result.map(r => {
-      parseDesResponse[DesLifeEventResponse](r,returnLifeTimeId)
+    result.map(res => {
+      parseDesResponse[DesLifeEventResponse](res)
     })
   }
 
-  def parseDesResponse[A: Reads](r: HttpResponse, f: (Any)=>String):  (Int, Option[DesResponse])  = {
-    r.status match {
-      case 201 => Try(r.json.asOpt[A]) match {
-        case Success(data) => data match {
-          case Some(_) => (r.status, Some(DesSuccessResponse(f(data.get))))
-          case None => (r.status, None)
+  // scalastyle:off magic.number
+  def parseDesResponse[A <: DesResponse](res: HttpResponse)(implicit reads:Reads[A]): DesResponse = {
+    res.status match {
+      case 201 => Try(res.json.as[A]) match {
+        case Success(data) => data
+        case Failure(ex) => {
+          Logger.debug(s"Unexpected DES response. Exception: ${ex.getMessage}")
+          DesFailureResponse()
         }
-        case Failure(_) => (r.status, None)}
-      case _ => Try(r.json.asOpt[DesFailureResponse]) match {
-        case Success(data) => (r.status, data)
-        case Failure(_) => (r.status, None)}
+      }
+      case _ => Try(res.json.as[DesFailureResponse]) match {
+        case Success(data) => data
+        case Failure(ex) => {
+          Logger.debug(s"Unexpected DES response. Exception: ${ex.getMessage}")
+          DesFailureResponse()
+        }
+      }
     }
   }
 }

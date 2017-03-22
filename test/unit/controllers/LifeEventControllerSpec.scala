@@ -16,22 +16,20 @@
 
 package unit.controllers
 
-import com.sun.glass.ui.MenuItem.Callback
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
 import play.api.mvc.{AnyContentAsJson, Result}
+import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.lisaapi.controllers.LifeEventController
 import uk.gov.hmrc.lisaapi.models.{ReportLifeEventAlreadyExistsResponse, ReportLifeEventInappropriateResponse, ReportLifeEventSuccessResponse}
-import uk.gov.hmrc.lisaapi.models.des.DesSuccessResponse
-import play.api.test.Helpers._
+import uk.gov.hmrc.lisaapi.services.LifeEventService
 
 import scala.concurrent.Future
-import uk.gov.hmrc.lisaapi.services.LifeEventService
 
 /**
   * Created by mark on 20/03/17.

@@ -368,21 +368,7 @@ class DesConnectorSpec extends PlaySpec
 
   "Report Life Event endpoint" must {
 
-    "Return a status code of 200" when {
-      "Given a 200 response from DES" in {
-        when(mockHttpPost.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(HttpResponse(responseStatus = statusCodeSuccess, responseJson = None)))
-
-        doReportLifeEventRequest { response =>
-          response must be((
-            statusCodeSuccess,
-            None
-          ))
-        }
-      }
-    }
-
-    "Return no LifeEventReponse" when {
+    "Return an failure response" when {
       "The DES response has no json body" in {
         when(mockHttpPost.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
@@ -395,10 +381,7 @@ class DesConnectorSpec extends PlaySpec
           )
 
         doReportLifeEventRequest { response =>
-          response must be((
-            statusCodeServiceUnavailable,
-            None
-          ))
+          response must be(DesFailureResponse())
         }
       }
     }
@@ -416,10 +399,7 @@ class DesConnectorSpec extends PlaySpec
           )
 
         doReportLifeEventRequest { response =>
-          response must be((
-            statusCodeSuccess,
-            None
-          ))
+          response must be(DesFailureResponse())
         }
       }
     }
@@ -437,10 +417,7 @@ class DesConnectorSpec extends PlaySpec
           )
 
         doReportLifeEventRequest { response =>
-          response must be((
-            statusCodeCreated,
-            Some(DesSuccessResponse("87654321"))
-          ))
+          response must be(DesLifeEventResponse("87654321"))
         }
       }
     }
@@ -458,10 +435,7 @@ class DesConnectorSpec extends PlaySpec
           )
 
         doReportLifeEventRequest { response =>
-          response must be((
-            statusCodeForbidden,
-            Some(DesFailureResponse("LIFE_EVENT_INAPPROPRIATE","The life event conflicts with previous life event reported."))
-          ))
+          response must be(DesFailureResponse("LIFE_EVENT_INAPPROPRIATE","The life event conflicts with previous life event reported."))
         }
       }
     }
@@ -497,7 +471,7 @@ class DesConnectorSpec extends PlaySpec
     callback(response)
   }
 
-  private def doReportLifeEventRequest(callback: ((Int, Option[DesResponse])) => Unit) = {
+  private def doReportLifeEventRequest(callback: (DesResponse) => Unit) = {
     val request = ReportLifeEventRequest("1234567890","Z543210","LISA Investor Terminal Ill Health",new DateTime("2000-01-01"))
     val response = Await.result(SUT.reportLifeEvent("Z123456", "ABC12345", request), Duration.Inf)
 

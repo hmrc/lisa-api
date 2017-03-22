@@ -18,17 +18,17 @@ package unit.services
 
 import org.joda.time.DateTime
 import org.mockito.Matchers.any
-import org.scalatest.mock.MockitoSugar
 import org.mockito.Mockito.when
+import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesResponse, DesSuccessResponse}
+import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesLifeEventResponse}
 import uk.gov.hmrc.lisaapi.services.LifeEventService
 import uk.gov.hmrc.play.http.HeaderCarrier
 
-import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
 
 /**
   * Created by mark on 21/03/17.
@@ -38,9 +38,8 @@ class LifeEventServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuit
   "LifeEventService" must {
 
     "return a Success Reponse" when {
-      "given and lifeEventId from the DES connector" in {
-
-        when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful((201,Some(DesSuccessResponse("AB123456")))))
+      "given a success response from the DES connector" in {
+        when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(DesLifeEventResponse("AB123456")))
 
         doRequest{response => response mustBe ReportLifeEventSuccessResponse("AB123456")}
       }
@@ -48,33 +47,16 @@ class LifeEventServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuit
 
     "return a Inappropriate Life Event" when {
       "given DesFailureResponse and status 403" in {
-        when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful((403,Some(DesFailureResponse("LIFE_EVENT_INAPPROPRIATE","The life Event was inappropriate")))))
+        when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("LIFE_EVENT_INAPPROPRIATE","The life Event was inappropriate")))
         doRequest(response => response mustBe ReportLifeEventInappropriateResponse)
       }
     }
 
     "return a Already Exists error" when {
       "given DesFailureResponse and status 409" in {
-        when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful((409,Some(DesFailureResponse("LIFE_EVENT_ALREADY_EXISTS","The life Event Already Exists")))))
+        when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("LIFE_EVENT_ALREADY_EXISTS","The life Event Already Exists")))
         doRequest(response => response mustBe ReportLifeEventAlreadyExistsResponse)
       }
-    }
-
-    "return Error response" when {
-      "given no data from the Desconnector" in {
-        when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful((201,None)))
-        doRequest(response => response mustBe ReportLifeEventErrorResponse)
-      }
-    }
-
-    "given an empty DesResponse" in {
-      when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful((201,Some(DesSuccessResponse(null)))))
-      doRequest(response => response mustBe ReportLifeEventErrorResponse)
-    }
-
-    "given a status code other than 201, 403 or 409" in {
-      when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful((501,None)))
-      doRequest(response => response mustBe ReportLifeEventErrorResponse)
     }
   }
 

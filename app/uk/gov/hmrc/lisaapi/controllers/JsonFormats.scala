@@ -52,7 +52,7 @@ trait JsonFormats {
   implicit val desCreateInvestorResponseFormats = Json.format[DesCreateInvestorResponse]
   implicit val desLifeEventResponseFormats = Json.format[DesLifeEventResponse]
 
-  implicit val desSuccessResponse = Json.format[DesSuccessResponse]
+  //implicit val desSuccessResponse = Json.format[DesSuccessResponse]
   implicit val desFailureResponse = Json.format[DesFailureResponse]
 
   implicit val apiResponseDataFormats = Json.format[ApiResponseData]
