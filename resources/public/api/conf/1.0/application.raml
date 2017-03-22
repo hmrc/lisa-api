@@ -25,7 +25,7 @@ types:
   IDtype:
     pattern: "^\\d{10}$"
   LISAManagerReferenceNumberType:
-    pattern: "^Z\\d{4,6}$"
+    pattern: "^Z([0-9]{4}|[0-9]{6})$"
   accountIdType:
     "pattern": "^[a-zA-Z0-9 :\\-]{1,20}$"
 
@@ -65,7 +65,6 @@ types:
                                   "code" : "BAD_REQUEST",
                                   "message" : "Bad Request"
                                 }
-
                     404:
                       body:
                         application/json:
@@ -138,6 +137,18 @@ types:
                             {
                               "code" : "BAD_REQUEST",
                               "message" : "Bad Request"
+                            }
+                401:
+                  body:
+                    application/json:
+                      type: !include schemas/ErrorCodes.schema.json
+                      examples:
+                        notOpenStatus:
+                          description: The lisaManagerReferenceNumber path parameter you've used doesn't match with an authorised LISA provider in HMRC's records.
+                          value: |
+                            {
+                              "code" : "UNAUTHORIZED",
+                              "message" : "lisaManagerReferenceNumber is not authorised"
                             }
                 403:
                   body:
@@ -235,6 +246,18 @@ types:
                           "code" : "BAD_REQUEST",
                           "message" : "Bad Request"
                         }
+            401:
+              body:
+                application/json:
+                  type: !include schemas/ErrorCodes.schema.json
+                  examples:
+                    notOpenStatus:
+                      description: The lisaManagerReferenceNumber path parameter you've used doesn't match with an authorised LISA provider in HMRC's records.
+                      value: |
+                        {
+                          "code" : "UNAUTHORIZED",
+                          "message" : "lisaManagerReferenceNumber is not authorised"
+                        }
             403:
               body:
                 application/json:
@@ -246,13 +269,6 @@ types:
                         {
                           "code" : "INVESTOR_NOT_FOUND",
                           "message" : "invalid status: must create with open status"
-                        }
-                    wrongLISAManager:
-                      description: The lisaManagerReferenceNumber given does not match with HMRC’s records.
-                      value: |
-                        {
-                          "code" : "WRONG_LISA_MANAGER",
-                          "message" : "the lisaManagerReferenceNumber in URI does match match the calling LISAManager"
                         }
                     outsideAgeRange:
                       description: The investor is not eligible for a LISA account.
@@ -368,19 +384,24 @@ types:
                                       "code" : "BAD_REQUEST",
                                       "message" : "Bad Request"
                                     }
+                        401:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                notOpenStatus:
+                                  description: The lisaManagerReferenceNumber path parameter you've used doesn't match with an authorised LISA provider in HMRC's records.
+                                  value: |
+                                    {
+                                      "code" : "UNAUTHORIZED",
+                                      "message" : "lisaManagerReferenceNumber is not authorised"
+                                    }
 
                         403:
                           body:
                             application/json:
                               type: !include schemas/ErrorCodes.schema.json
                               examples:
-                                wrongLISAManager:
-                                  description: The lisaManagerReferenceNumber given does not match with HMRC’s records.
-                                  value: |
-                                    {
-                                      "code" : "WRONG_LISA_MANAGER",
-                                      "message" : "The lisaManagerReferenceNumber given does not match with HMRC’s records."
-                                    }
                                 accountClosed:
                                   description: The LISA account is already closed.
                                   value: |
@@ -468,6 +489,18 @@ types:
                                       "code" : "BAD_REQUEST",
                                       "message" : "Bad Request"
                                     }
+                        401:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                notOpenStatus:
+                                  description: The lisaManagerReferenceNumber path parameter you've used doesn't match with an authorised LISA provider in HMRC's records.
+                                  value: |
+                                    {
+                                      "code" : "UNAUTHORIZED",
+                                      "message" : "lisaManagerReferenceNumber is not authorised"
+                                    }
 
                         403:
                           description: Matches already existing resource.
@@ -476,13 +509,6 @@ types:
                             application/json:
                               type: !include schemas/ErrorCodes.schema.json
                               examples:
-                                wrongLisaManager:
-                                  description: The lisaManagerReferenceNumber given does not match with HMRC’s records.
-                                  value: |
-                                    {
-                                      "code" : "WRONG_LISA_MANAGER",
-                                      "message" : "The LISA manager or the LISA account do not belong to the calling LISA manager"
-                                    }
                                 lifeEventInvalid:
                                   description: The life event conflicts with previous life event reported.
                                   value: |
@@ -490,7 +516,18 @@ types:
                                       "code" : "LIFE_EVENT_INAPPROPRIATE",
                                       "message" : "The Life Event conflicts with previous Life Event reported."
                                     }
-
+                        404:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                accountIDNOTFound:
+                                  description: The accountID given does not match with HMRC’s records.
+                                  value: |
+                                    {
+                                      "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
+                                      "message": "The accountID given does not match with HMRC’s records."
+                                    }
                         409:
                           body:
                             application/json:
@@ -550,6 +587,18 @@ types:
                                       "code" : "BAD_REQUEST",
                                       "message" : "Bad Request"
                                     }
+                        401:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                notOpenStatus:
+                                  description: The lisaManagerReferenceNumber path parameter you've used doesn't match with an authorised LISA provider in HMRC's records.
+                                  value: |
+                                    {
+                                      "code" : "UNAUTHORIZED",
+                                      "message" : "lisaManagerReferenceNumber is not authorised"
+                                    }
 
                         403:
                           description: Matches already existing resource.
@@ -558,13 +607,6 @@ types:
                             application/json:
                               type: !include schemas/ErrorCodes.schema.json
                               examples:
-                                wrongLisaManager:
-                                  description: The lisaManagerReferenceNumber given does not match with HMRC’s records.
-                                  value: |
-                                    {
-                                      "code" : "WRONG_LISA_MANAGER",
-                                      "message" : "The lisaManagerReferenceNumber given does not match with HMRC’s records."
-                                    }
                                 noLifeEvent:
                                   description: The lifeEventID does not match with HMRC’s records.
                                   value: |
@@ -611,7 +653,6 @@ types:
                                       "code" : "ACCEPT_HEADER_INVALID",
                                       "message" : "Accept header invalid"
                                     }
-
                         500:
                           body:
                             application/json:

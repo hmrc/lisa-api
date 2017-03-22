@@ -2,5 +2,5 @@
   "investorNINO" : "AB123456D",
   "firstName" : "Ex first Name",
   "lastName" : "Ample",
-  "DoB" : "1973-03-24"
+  "dateOfBirth" : "1973-03-24"
 }

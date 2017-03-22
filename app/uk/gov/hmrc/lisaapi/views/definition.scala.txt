@@ -1,4 +1,4 @@
-@(context : String)
+@(context : String, status: String)
 {
   "scopes": [
     {
@@ -19,7 +19,7 @@
     "versions": [
       {
         "version": "1.0",
-        "status": "PUBLISHED"
+        "status": "@status"
       }
     ]
   }

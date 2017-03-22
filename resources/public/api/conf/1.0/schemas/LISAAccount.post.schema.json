@@ -12,10 +12,6 @@
       "$ref": "#/definitions/accountIdType",
       "example": "AB76543210"
     },
-    "lisaManagerReferenceNumber": {
-      "description": "The number issued to the provider when they register with HMRC for LISA.",
-      "$ref": "#/definitions/LISAManagerReferenceNumberType"
-    },
     "creationReason": {
       "description": "The reason the account was created",
       "type": "string",
@@ -60,7 +56,6 @@
   "required": [
       "investorID",
       "accountID",
-      "lisaManagerReferenceNumber",
       "creationReason",
       "firstSubscriptionDate"
     ],
