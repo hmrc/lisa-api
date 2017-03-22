@@ -18,7 +18,7 @@ package uk.gov.hmrc.lisaapi.services
 
 import play.api.Logger
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
-import uk.gov.hmrc.lisaapi.models.des.{DesLifeEventResponse, DesResponse, DesSuccessResponse}
+import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesLifeEventResponse, DesResponse, DesSuccessResponse}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.play.http.HeaderCarrier
 
@@ -34,20 +34,26 @@ trait LifeEventService {
 
     response map { result =>
 
-      result._1 match {
-        case 201 => result._2 match {
-          case Some(_) => {
-            Logger.debug("DesResponse object returned for status 201")
-            ReportLifeEventSuccessResponse(result._2.get.asInstanceOf[DesSuccessResponse].id.toString)
-          }
-          case None => {
-            Logger.debug("Status 201 matched without DesResponse object")
-            ReportLifeEventErrorResponse
+      result._2 match {
+        case Some(_) =>{
+          result._2.get match {
+            case _:DesSuccessResponse => {
+              Logger.debug("Match Success Response")
+              ReportLifeEventSuccessResponse(result._2.get.asInstanceOf[DesSuccessResponse].id.toString)
+            }
+            case _: DesFailureResponse => {
+              Logger.debug("Matched DesFailureResponse and the code is " + result._2.get.asInstanceOf[DesFailureResponse].code)
+              result._2.get.asInstanceOf[DesFailureResponse].code match {
+                case "LIFE_EVENT_INAPPROPRIATE" => ReportLifeEventInappropriateResponse
+                case "LIFE_EVENT_ALREADY_EXISTS" => ReportLifeEventAlreadyExistsResponse
+                case "INTERNAL_SERVER_ERROR" => ReportLifeEventErrorResponse
+                case _ => {Logger.debug("Did not match code"); ReportLifeEventErrorResponse}
+              }
+            }
+            case _ => ReportLifeEventErrorResponse
           }
         }
-        case 403 => ReportLifeEventInappropriateResponse
-        case 409 => ReportLifeEventAlreadyExistsResponse
-        case _ => ReportLifeEventErrorResponse
+        case None => ReportLifeEventErrorResponse
       }
     } recover {
       case ce: ClassCastException => {
