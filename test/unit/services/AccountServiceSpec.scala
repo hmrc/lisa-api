@@ -22,7 +22,7 @@ import org.mockito.Mockito.when
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
-import uk.gov.hmrc.lisaapi.models._
+import uk.gov.hmrc.lisaapi.models.{CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse, _}
 import uk.gov.hmrc.lisaapi.models.des.{DesAccountResponse, DesCreateInvestorResponse}
 import uk.gov.hmrc.lisaapi.services.{AccountService, InvestorService}
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -193,6 +193,162 @@ class AccountServiceSpec extends PlaySpec
 
   }
 
+  "Transfer Account" must {
+
+    "return a Success Response" when {
+
+      "given no rds code and an account id" in {
+        when(mockDesConnector.transferAccount(any(), any())(any()))
+          .thenReturn(
+            Future.successful((
+              httpStatusOk,
+              Some(DesAccountResponse(None, accountId = Some("AB123456")))
+            ))
+          )
+
+        doTransferRequest { response =>
+          response mustBe CreateLisaAccountSuccessResponse("AB123456")
+        }
+      }
+
+    }
+
+    "return a Error Response" when {
+
+      "given a status code other than 200" in {
+        when(mockDesConnector.transferAccount(any(), any())(any()))
+          .thenReturn(
+            Future.successful((
+              httpStatusCreated,
+              None
+            ))
+          )
+
+        doTransferRequest { response =>
+          response mustBe CreateLisaAccountErrorResponse
+        }
+      }
+
+      "given no data" in {
+        when(mockDesConnector.transferAccount(any(), any())(any()))
+          .thenReturn(
+            Future.successful((
+              httpStatusOk,
+              None
+            ))
+          )
+
+        doTransferRequest { response =>
+          response mustBe CreateLisaAccountErrorResponse
+        }
+      }
+
+      "given empty data" in {
+        when(mockDesConnector.transferAccount(any(), any())(any()))
+          .thenReturn(
+            Future.successful((
+              httpStatusOk,
+              Some(DesAccountResponse(rdsCode = None, accountId = None))
+            ))
+          )
+
+        doTransferRequest { response =>
+          response mustBe CreateLisaAccountErrorResponse
+        }
+      }
+
+      "given the RDS code for a Investor Not Eligible Response" in {
+        when(mockDesConnector.transferAccount(any(), any())(any()))
+          .thenReturn(
+            Future.successful((
+              200,
+              Some(DesAccountResponse(rdsCode = Some(SUT.INVESTOR_NOT_ELIGIBLE)))
+            ))
+          )
+
+        doTransferRequest { response =>
+          response mustBe CreateLisaAccountErrorResponse
+        }
+      }
+
+      "given an rds code which is not recognised" in {
+        when(mockDesConnector.transferAccount(any(), any())(any()))
+          .thenReturn(
+            Future.successful((
+              httpStatusOk,
+              Some(DesAccountResponse(rdsCode = Some(unknownRdsCode)))
+            ))
+          )
+
+        doTransferRequest { response =>
+          response mustBe CreateLisaAccountErrorResponse
+        }
+      }
+
+    }
+
+    "return the type-appropriate response" when {
+
+      "given the RDS code for a Investor Not Found Response" in {
+        when(mockDesConnector.transferAccount(any(), any())(any()))
+          .thenReturn(
+            Future.successful((
+              httpStatusOk,
+              Some(DesAccountResponse(rdsCode = Some(SUT.INVESTOR_NOT_FOUND)))
+            ))
+          )
+
+        doTransferRequest { response =>
+          response mustBe CreateLisaAccountInvestorNotFoundResponse
+        }
+      }
+
+      "given the RDS code for a Investor Compliance Failed Response" in {
+        when(mockDesConnector.transferAccount(any(), any())(any()))
+          .thenReturn(
+            Future.successful((
+              httpStatusOk,
+              Some(DesAccountResponse(rdsCode = Some(SUT.INVESTOR_COMPLIANCE_FAILED)))
+            ))
+          )
+
+        doTransferRequest { response =>
+          response mustBe CreateLisaAccountInvestorComplianceCheckFailedResponse
+        }
+      }
+
+      "given the RDS code for a Investor Account Already Exists Response" in {
+        when(mockDesConnector.transferAccount(any(), any())(any()))
+          .thenReturn(
+            Future.successful((
+              httpStatusOk,
+              Some(DesAccountResponse(rdsCode = Some(SUT.INVESTOR_ACCOUNT_ALREADY_EXISTS)))
+            ))
+          )
+
+        doTransferRequest { response =>
+          response mustBe CreateLisaAccountAlreadyExistsResponse
+        }
+      }
+
+      "given the RDS code for a Investor Previous Account Does Not Exist Response" in {
+        when(mockDesConnector.transferAccount(any(), any())(any()))
+          .thenReturn(
+            Future.successful((
+              httpStatusOk,
+              Some(DesAccountResponse(rdsCode = Some(SUT.INVESTOR_PREVIOUS_ACCOUNT_DOES_NOT_EXIST)))
+            ))
+          )
+
+        doTransferRequest { response =>
+          response mustBe CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse
+        }
+      }
+
+    }
+
+  }
+
   "Close Account" must {
 
     "return a Success Response" when {
@@ -311,6 +467,14 @@ class AccountServiceSpec extends PlaySpec
   private def doCreateRequest(callback: (CreateLisaAccountResponse) => Unit) = {
     val request = CreateLisaAccountCreationRequest("1234567890", "Z019283", "9876543210", new DateTime("2000-01-01"))
     val response = Await.result(SUT.createAccount("Z019283", request)(HeaderCarrier()), Duration.Inf)
+
+    callback(response)
+  }
+
+  private def doTransferRequest(callback: (CreateLisaAccountResponse) => Unit) = {
+    val accountTransfer = AccountTransfer("123456", "123456", new DateTime("2000-01-01"))
+    val request = CreateLisaAccountTransferRequest("1234567890", "Z019283", "9876543210", new DateTime("2000-01-01"), accountTransfer)
+    val response = Await.result(SUT.transferAccount("Z019283", request)(HeaderCarrier()), Duration.Inf)
 
     callback(response)
   }
