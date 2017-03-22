@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.lisaapi.models
+package uk.gov.hmrc.lisaapi.models.des
 
-case class ApiResponseData(
-  message: String,
-  investorId: Option[String] = None,
-  accountId: Option[String] = None,
-  lifeEventId: Option[String] = None
-)
+trait DesResponse
+
+case class DesLifeEventResponse(lifeEventID: String) extends DesResponse
+case class DesFailureResponse(code: String = "INTERNAL_SERVER_ERROR", reason: String = "Internal Server Error") extends DesResponse
+

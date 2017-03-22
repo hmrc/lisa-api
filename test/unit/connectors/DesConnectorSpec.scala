@@ -24,7 +24,7 @@ import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.models.des.{DesAccountResponse, DesCreateInvestorResponse}
+import uk.gov.hmrc.lisaapi.models.des._
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpResponse}
 
 import scala.concurrent.{Await, Future}
@@ -38,6 +38,9 @@ class DesConnectorSpec extends PlaySpec
   val statusCodeServiceUnavailable = 503
   val rdsCodeInvestorNotFound = 63214
   val rdsCodeAccountAlreadyExists = 63219
+  val statusCodeCreated = 201
+  val statusCodeForbidden = 403
+
 
   "Create Lisa Investor endpoint" must {
 
@@ -363,6 +366,101 @@ class DesConnectorSpec extends PlaySpec
 
   }
 
+  "Report Life Event endpoint" must {
+
+    "Return an failure response" when {
+      "The DES response has no json body" in {
+        when(mockHttpPost.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = statusCodeServiceUnavailable,
+                responseJson = None
+              )
+            )
+          )
+
+        doReportLifeEventRequest { response =>
+          response must be(DesFailureResponse())
+        }
+      }
+    }
+
+    "Return any empty LifeEventResponse" when {
+      "The DES response has a json body that is in an incorrect format" in {
+        when(mockHttpPost.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = statusCodeSuccess,
+                responseJson = Some(Json.parse("""[1,2,3]"""))
+              )
+            )
+          )
+
+        doReportLifeEventRequest { response =>
+          response must be(DesFailureResponse())
+        }
+      }
+    }
+
+    "Return a populated DesSuccessResponse" when {
+      "The DES response has a json body that is in the correct format" in {
+        when(mockHttpPost.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = statusCodeCreated,
+                responseJson = Some(Json.parse(s"""{"lifeEventID": "87654321"}"""))
+              )
+            )
+          )
+
+        doReportLifeEventRequest { response =>
+          response must be(DesLifeEventResponse("87654321"))
+        }
+      }
+    }
+
+    "Return a DesFailureResponse" when {
+      "Status is 201 and Json is invalid" in {
+        when(mockHttpPost.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = statusCodeCreated,
+                responseJson = Some(Json.parse(s"""{"lifeEvent": "87654321"}"""))
+              )
+            )
+          )
+
+        doReportLifeEventRequest { response =>
+          response must be(DesFailureResponse("INTERNAL_SERVER_ERROR","Internal Server Error"))
+        }
+
+      }
+    }
+
+    "Return a populated DesFailureResponse" when {
+      "A LIFE_EVENT_INAPPROPRIATE failure is returned" in {
+        when(mockHttpPost.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = statusCodeForbidden,
+                responseJson = Some(Json.parse(s"""{"code": "LIFE_EVENT_INAPPROPRIATE","reason": "The life event conflicts with previous life event reported."}"""))
+              )
+            )
+          )
+
+        doReportLifeEventRequest { response =>
+          response must be(DesFailureResponse("LIFE_EVENT_INAPPROPRIATE","The life event conflicts with previous life event reported."))
+        }
+      }
+    }
+
+  }
+
   private def doCreateInvestorRequest(callback: ((Int, Option[DesCreateInvestorResponse])) => Unit) = {
     val request = CreateLisaInvestorRequest("AB123456A", "A", "B", new DateTime("2000-01-01"))
     val response = Await.result(SUT.createInvestor("Z019283", request), Duration.Inf)
@@ -388,6 +486,13 @@ class DesConnectorSpec extends PlaySpec
   private def doCloseAccountRequest(callback: ((Int, Option[DesAccountResponse])) => Unit) = {
     val request = CloseLisaAccountRequest("Voided", new DateTime("2000-01-01"))
     val response = Await.result(SUT.closeAccount("Z123456", "ABC12345", request), Duration.Inf)
+
+    callback(response)
+  }
+
+  private def doReportLifeEventRequest(callback: (DesResponse) => Unit) = {
+    val request = ReportLifeEventRequest("1234567890","Z543210","LISA Investor Terminal Ill Health",new DateTime("2000-01-01"))
+    val response = Await.result(SUT.reportLifeEvent("Z123456", "ABC12345", request), Duration.Inf)
 
     callback(response)
   }

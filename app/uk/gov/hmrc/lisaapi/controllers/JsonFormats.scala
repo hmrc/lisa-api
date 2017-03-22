@@ -21,7 +21,7 @@ import org.joda.time.format.DateTimeFormat
 import play.api.data.validation.ValidationError
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
-import uk.gov.hmrc.lisaapi.models.des.{DesAccountResponse, DesCreateInvestorResponse}
+import uk.gov.hmrc.lisaapi.models.des._
 import uk.gov.hmrc.lisaapi.models.{ApiResponse, ApiResponseData, CreateLisaInvestorRequest, _}
 
 trait JsonFormats {
@@ -32,6 +32,7 @@ trait JsonFormats {
   implicit val investorIDRegex = "^\\d{10}$".r
   implicit val accountIDRegex = "^[a-zA-Z0-9 :\\-]{1,20}$".r
   implicit val accountClosureRegex = "^(Transferred out|All funds withdrawn|Voided)$".r
+  implicit val lifeEventTypeRegex = "^(LISA Investor Terminal Ill Health|LISA Investor Death|House Purchase)$".r
 
   implicit val createLisaInvestorRequestReads: Reads[CreateLisaInvestorRequest] = (
     (JsPath \ "investorNINO").read(Reads.pattern(ninoRegex, "error.formatting.nino")) and
@@ -49,6 +50,10 @@ trait JsonFormats {
 
   implicit val desCreateAccountResponseFormats = Json.format[DesAccountResponse]
   implicit val desCreateInvestorResponseFormats = Json.format[DesCreateInvestorResponse]
+  implicit val desLifeEventResponseFormats = Json.format[DesLifeEventResponse]
+
+  //implicit val desSuccessResponse = Json.format[DesSuccessResponse]
+  implicit val desFailureResponse = Json.format[DesFailureResponse]
 
   implicit val apiResponseDataFormats = Json.format[ApiResponseData]
   implicit val apiResponseFormats = Json.format[ApiResponse]
@@ -101,6 +106,20 @@ trait JsonFormats {
     (JsPath \ "firstSubscriptionDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
     (JsPath \ "transferAccount").write[AccountTransfer]
   )(unlift(CreateLisaAccountTransferRequest.unapply))
+
+  implicit val reportLifeEventRequestReads: Reads[ReportLifeEventRequest] = (
+    (JsPath \ "accountId").read(Reads.pattern(accountIDRegex, "error.formatting.accountID")) and
+    (JsPath \ "lisaManagerReferenceNumber").read(Reads.pattern(lmrnRegex, "error.formatting.lmrn")) and
+    (JsPath \ "eventType").read(Reads.pattern(lifeEventTypeRegex, "error.formatting.eventType")) and
+    (JsPath \ "eventDate").read(isoDateReads(allowFutureDates = true)).map(new DateTime(_))
+    )(ReportLifeEventRequest.apply _)
+
+  implicit val reportLifeEventRequestWrites: Writes[ReportLifeEventRequest] = (
+    (JsPath \ "accountId").write[String] and
+      (JsPath \ "lisaManagerReferenceNumber").write[String] and
+      (JsPath \ "eventType").write[String] and
+      (JsPath \ "eventDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd"))
+  )(unlift(ReportLifeEventRequest.unapply))
 
   implicit val createLisaAccountRequestWrites = Writes[CreateLisaAccountRequest] {
     case r: CreateLisaAccountCreationRequest => createLisaAccountCreationRequestWrites.writes(r)

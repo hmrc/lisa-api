@@ -16,9 +16,9 @@
 
 package uk.gov.hmrc.lisaapi.models
 
-case class ApiResponseData(
-  message: String,
-  investorId: Option[String] = None,
-  accountId: Option[String] = None,
-  lifeEventId: Option[String] = None
-)
+trait ReportLifeEventResponse
+
+case class ReportLifeEventSuccessResponse(lifeEventId: String) extends ReportLifeEventResponse
+case object ReportLifeEventErrorResponse extends ReportLifeEventResponse
+case object ReportLifeEventInappropriateResponse extends ReportLifeEventResponse
+case object ReportLifeEventAlreadyExistsResponse extends ReportLifeEventResponse

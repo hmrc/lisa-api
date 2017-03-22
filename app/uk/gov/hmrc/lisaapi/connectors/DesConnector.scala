@@ -16,16 +16,18 @@
 
 package uk.gov.hmrc.lisaapi.connectors
 
+import play.api.Logger
 import uk.gov.hmrc.lisaapi.config.WSHttp
 import uk.gov.hmrc.lisaapi.controllers.JsonFormats
-import uk.gov.hmrc.lisaapi.models.{CloseLisaAccountRequest, CreateLisaAccountCreationRequest, CreateLisaAccountTransferRequest, CreateLisaInvestorRequest}
-import uk.gov.hmrc.lisaapi.models.des.{DesAccountResponse, DesCreateInvestorResponse}
+import uk.gov.hmrc.lisaapi.models._
+import uk.gov.hmrc.lisaapi.models.des._
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpReads, HttpResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
+import play.api.libs.json.Reads
 
 trait DesConnector extends ServicesConfig with JsonFormats {
 
@@ -113,6 +115,42 @@ trait DesConnector extends ServicesConfig with JsonFormats {
     })
   }
 
+  /**
+    * Attempts to report a LISA Life Event
+    *
+    * @return A tuple of the http status code and an (optional) data response
+    */
+  def reportLifeEvent(lisaManager: String, accountId: String, request: ReportLifeEventRequest)
+                     (implicit hc: HeaderCarrier): Future[DesResponse] = {
+
+    val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId/events"
+
+    val result = httpPost.POST[ReportLifeEventRequest, HttpResponse](uri, request)(implicitly, httpReads, implicitly)
+
+    result.map(res => {
+      parseDesResponse[DesLifeEventResponse](res)
+    })
+  }
+
+  // scalastyle:off magic.number
+  def parseDesResponse[A <: DesResponse](res: HttpResponse)(implicit reads:Reads[A]): DesResponse = {
+    res.status match {
+      case 201 => Try(res.json.as[A]) match {
+        case Success(data) => data
+        case Failure(ex) => {
+          Logger.debug(s"Unexpected DES response. Exception: ${ex.getMessage}")
+          DesFailureResponse()
+        }
+      }
+      case _ => Try(res.json.as[DesFailureResponse]) match {
+        case Success(data) => data
+        case Failure(ex) => {
+          Logger.debug(s"Unexpected DES response. Exception: ${ex.getMessage}")
+          DesFailureResponse()
+        }
+      }
+    }
+  }
 }
 
 
