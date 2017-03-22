@@ -16,8 +16,9 @@
 
 package uk.gov.hmrc.lisaapi.services
 
+import play.api.Logger
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
-import uk.gov.hmrc.lisaapi.models.des.DesResponse
+import uk.gov.hmrc.lisaapi.models.des.{DesLifeEventResponse, DesResponse, DesSuccessResponse}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.play.http.HeaderCarrier
 
@@ -27,17 +28,33 @@ import scala.concurrent.Future
 
 trait LifeEventService {
   val desConnector: DesConnector
-  def reportLifeEvent(lisaManager: String, accountId: String, request: ReportLifeEventRequest)(implicit hc: HeaderCarrier) : Future[ReportLifeEventResponse] = {
+
+  def reportLifeEvent(lisaManager: String, accountId: String, request: ReportLifeEventRequest)(implicit hc: HeaderCarrier): Future[ReportLifeEventResponse] = {
     val response = desConnector.reportLifeEvent(lisaManager, accountId, request)
 
-    response map {result =>
-      result._2 match {
-        case Some(_) =>
-              result._1 match {
-                case 201 => ReportLifeEventSuccessResponse
-              }
-        case None => ReportLifeEventErrorResponse
+    response map { result =>
+
+      result._1 match {
+        case 201 => result._2 match {
+          case Some(_) => {
+            Logger.debug("DesResponse object returned for status 201")
+            ReportLifeEventSuccessResponse(result._2.get.asInstanceOf[DesSuccessResponse].id.toString)
+          }
+          case None => {
+            Logger.debug("Status 201 matched without DesResponse object")
+            ReportLifeEventErrorResponse
+          }
+        }
+        case 403 => ReportLifeEventInappropriateResponse
+        case 409 => ReportLifeEventAlreadyExistsResponse
+        case _ => ReportLifeEventErrorResponse
       }
+    } recover {
+      case ce: ClassCastException => {
+        Logger.debug("Throwing Cast exception error " + ce.getMessage)
+        ReportLifeEventErrorResponse
+      }
+      case e: Exception =>  ReportLifeEventErrorResponse
     }
   }
 }

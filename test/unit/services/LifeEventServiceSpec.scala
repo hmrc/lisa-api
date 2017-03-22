@@ -22,8 +22,8 @@ import org.scalatest.mock.MockitoSugar
 import org.mockito.Mockito.when
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
-import uk.gov.hmrc.lisaapi.models.ReportLifeEventRequest
-import uk.gov.hmrc.lisaapi.models.des.{DesResponse, DesSuccessResponse}
+import uk.gov.hmrc.lisaapi.models._
+import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesResponse, DesSuccessResponse}
 import uk.gov.hmrc.lisaapi.services.LifeEventService
 import uk.gov.hmrc.play.http.HeaderCarrier
 
@@ -40,16 +40,45 @@ class LifeEventServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuit
     "return a Success Reponse" when {
       "given and lifeEventId from the DES connector" in {
 
-        when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful((200,Some(DesSuccessResponse("AB123456")))))
+        when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful((201,Some(DesSuccessResponse("AB123456")))))
 
-        doRequest{response => response mustBe DesSuccessResponse("AB123456")}
+        doRequest{response => response mustBe ReportLifeEventSuccessResponse("AB123456")}
       }
     }
 
-    "return a Not_"
+    "return a Inappropriate Life Event" when {
+      "given DesFailureResponse and status 403" in {
+        when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful((403,Some(DesFailureResponse("403","LIFE_EVENT_INAPPROPRIATE")))))
+        doRequest(response => response mustBe ReportLifeEventInappropriateResponse)
+      }
+    }
+
+    "return a Already Exists error" when {
+      "given DesFailureResponse and status 409" in {
+        when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful((409,Some(DesFailureResponse("409","LIFE_EVENT_ALREADY_EXISTS")))))
+        doRequest(response => response mustBe ReportLifeEventAlreadyExistsResponse)
+      }
+    }
+
+    "return Error response" when {
+      "given no data from the Desconnector" in {
+        when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful((201,None)))
+        doRequest(response => response mustBe ReportLifeEventErrorResponse)
+      }
+    }
+
+    "given an empty DesResponse" in {
+      when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful((201,Some(DesSuccessResponse(null)))))
+      doRequest(response => response mustBe ReportLifeEventErrorResponse)
+    }
+
+    "given a status code other than 201, 403 or 409" in {
+      when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful((501,None)))
+      doRequest(response => response mustBe ReportLifeEventErrorResponse)
+    }
   }
 
-  private def doRequest(callback: (DesResponse) => Unit) = {
+  private def doRequest(callback: (ReportLifeEventResponse) => Unit) = {
     val request = ReportLifeEventRequest("1234567890", "Z543210", "LISA Investor Terminal Ill Health", new DateTime("2017-04-06"))
     val response = Await.result(SUT.reportLifeEvent("Z019283", "192837", request)(HeaderCarrier()), Duration.Inf)
 

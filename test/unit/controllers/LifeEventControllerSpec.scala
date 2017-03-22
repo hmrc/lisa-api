@@ -17,6 +17,8 @@
 package unit.controllers
 
 import com.sun.glass.ui.MenuItem.Callback
+import org.mockito.Matchers.any
+import org.mockito.Mockito.when
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
@@ -24,6 +26,10 @@ import play.api.mvc.{AnyContentAsJson, Result}
 import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.lisaapi.controllers.LifeEventController
+import uk.gov.hmrc.lisaapi.models.{ReportLifeEventAlreadyExistsResponse, ReportLifeEventInappropriateResponse, ReportLifeEventSuccessResponse}
+import uk.gov.hmrc.lisaapi.models.des.DesSuccessResponse
+import play.api.test.Helpers._
+
 import scala.concurrent.Future
 import uk.gov.hmrc.lisaapi.services.LifeEventService
 
@@ -46,13 +52,49 @@ class LifeEventControllerSpec  extends PlaySpec with MockitoSugar with OneAppPer
       |}
     """.stripMargin
 
-  "The Report A Life Event Endpoint" must {
 
-    "return with status 201 created and Life Even ID" when {
-      "submitted with a valid report life event request" in {
+  "The Life Event Controller" should {
 
+    "return with status 201 created" in {
+      when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful((ReportLifeEventSuccessResponse("1928374"))))
+      doReportLifeEventRequest(reportLifeEventJson){res =>
+        status(res) mustBe (CREATED)
+        (contentAsJson(res) \"data" \ "lifeEventId").as[String] mustBe ("1928374")
       }
     }
+
+    "return with status 400 bad request and a code of BAD_REQUEST" in {
+      val invalidJson =    """
+                             |{
+                             |  "accountId" : "1234567890",
+                             |  "lisaManagerReferenceNumber" : "Z543210",
+                             |  "eventType" : "LISA Wanted to Come Out",
+                             |  "eventDate" : "2017-04-06"
+                             |}
+                           """.stripMargin
+
+      doReportLifeEventRequest(invalidJson) { res =>
+        status(res) mustBe (BAD_REQUEST)
+        (contentAsJson(res) \ "code").as[String] mustBe ("BAD_REQUEST")
+      }
+    }
+
+    "return with 403 forbidden and a code of LIFE_EVENT_INAPPROPRIATE" in {
+      when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful((ReportLifeEventInappropriateResponse)))
+      doReportLifeEventRequest(reportLifeEventJson){res =>
+        status(res) mustBe (FORBIDDEN)
+        (contentAsJson(res) \"code").as[String] mustBe ("LIFE_EVENT_INAPPROPRIATE")
+      }
+    }
+
+    "return with 403 forbidden and a code of LIFE_EVENT_ALREADY_EXISTS" in {
+      when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful((ReportLifeEventAlreadyExistsResponse)))
+      doReportLifeEventRequest(reportLifeEventJson){res =>
+        status(res) mustBe (CONFLICT)
+        (contentAsJson(res) \"code").as[String] mustBe ("LIFE_EVENT_ALREADY_EXISTS")
+      }
+    }
+
   }
 
   def doReportLifeEventRequest(jsonString: String)(callback: (Future[Result]) =>  Unit): Unit = {
