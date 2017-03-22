@@ -16,7 +16,7 @@
 
 package unit.controllers
 
-import org.mockito.Matchers.any
+import org.mockito.Matchers._
 import org.mockito.Mockito.when
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
@@ -26,7 +26,7 @@ import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.lisaapi.controllers.LifeEventController
-import uk.gov.hmrc.lisaapi.models.{ReportLifeEventAlreadyExistsResponse, ReportLifeEventInappropriateResponse, ReportLifeEventSuccessResponse}
+import uk.gov.hmrc.lisaapi.models.{ReportLifeEventAlreadyExistsResponse, ReportLifeEventInappropriateResponse, ReportLifeEventResponse, ReportLifeEventSuccessResponse}
 import uk.gov.hmrc.lisaapi.services.LifeEventService
 
 import scala.concurrent.Future
@@ -34,7 +34,10 @@ import scala.concurrent.Future
 /**
   * Created by mark on 20/03/17.
   */
+case object ReportTest extends ReportLifeEventResponse
+
 class LifeEventControllerSpec  extends PlaySpec with MockitoSugar with OneAppPerSuite {
+
 
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
   val lisaManager = "Z019283"
@@ -85,11 +88,18 @@ class LifeEventControllerSpec  extends PlaySpec with MockitoSugar with OneAppPer
       }
     }
 
-    "return with 403 forbidden and a code of LIFE_EVENT_ALREADY_EXISTS" in {
+    "return with 409 Conflict and a code of LIFE_EVENT_ALREADY_EXISTS" in {
       when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful((ReportLifeEventAlreadyExistsResponse)))
       doReportLifeEventRequest(reportLifeEventJson){res =>
         status(res) mustBe (CONFLICT)
         (contentAsJson(res) \"code").as[String] mustBe ("LIFE_EVENT_ALREADY_EXISTS")
+      }
+    }
+
+    "return with InternalServer Error when the Wrong event is returned" in {
+      when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful((ReportTest)))
+      doReportLifeEventRequest(reportLifeEventJson){res =>
+        status(res) mustBe (INTERNAL_SERVER_ERROR)
       }
     }
 
@@ -98,6 +108,8 @@ class LifeEventControllerSpec  extends PlaySpec with MockitoSugar with OneAppPer
   def doReportLifeEventRequest(jsonString: String)(callback: (Future[Result]) =>  Unit): Unit = {
     val res = SUT.reportLisaLifeEvent(lisaManager, accountId).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
       withBody(AnyContentAsJson(Json.parse(jsonString))))
+
+    callback(res)
   }
 
   val mockService = mock[LifeEventService]

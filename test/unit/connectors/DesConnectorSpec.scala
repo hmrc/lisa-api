@@ -422,6 +422,25 @@ class DesConnectorSpec extends PlaySpec
       }
     }
 
+    "Return a DesFailureResponse" when {
+      "Status is 201 and Json is invalid" in {
+        when(mockHttpPost.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = statusCodeCreated,
+                responseJson = Some(Json.parse(s"""{"lifeEvent": "87654321"}"""))
+              )
+            )
+          )
+
+        doReportLifeEventRequest { response =>
+          response must be(DesFailureResponse("INTERNAL_SERVER_ERROR","Internal Server Error"))
+        }
+
+      }
+    }
+
     "Return a populated DesFailureResponse" when {
       "A LIFE_EVENT_INAPPROPRIATE failure is returned" in {
         when(mockHttpPost.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any()))

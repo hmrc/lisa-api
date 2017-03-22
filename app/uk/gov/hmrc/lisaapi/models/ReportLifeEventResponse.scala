@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.lisaapi.models
 
-sealed trait ReportLifeEventResponse
+trait ReportLifeEventResponse
 
 case class ReportLifeEventSuccessResponse(lifeEventId: String) extends ReportLifeEventResponse
 case object ReportLifeEventErrorResponse extends ReportLifeEventResponse

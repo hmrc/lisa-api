@@ -58,6 +58,18 @@ class LifeEventServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuit
         doRequest(response => response mustBe ReportLifeEventAlreadyExistsResponse)
       }
     }
+
+    "Return Internal Server Error" when {
+      "When INTERNAL_SERVER_ERROR sent" in {
+        when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("INTERNAL_SERVER_ERROR","Internal Error")))
+        doRequest(response => response mustBe ReportLifeEventErrorResponse)
+      }
+
+      "When Invalid Code Sent" in {
+        when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("INVALID","Invalid Code")))
+        doRequest(response => response mustBe ReportLifeEventErrorResponse)
+      }
+    }
   }
 
   private def doRequest(callback: (ReportLifeEventResponse) => Unit) = {

@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
+import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.lisaapi.models._
@@ -35,15 +36,25 @@ class LifeEventController extends LisaController {
 
     withValidJson[ReportLifeEventRequest] { req =>
       service.reportLifeEvent(lisaManager, accountId, req) map { res =>
+        Logger.debug("Entering LifeEvent Controller and the response is " + res.toString)
         res match {
           case ReportLifeEventSuccessResponse(lifeEventId) => {
+            Logger.debug("Matched Valid repsponse ")
             val data = ApiResponseData(message = "Life Event Created", lifeEventId = Some(lifeEventId))
 
             Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = 201)))
           }
-          case ReportLifeEventInappropriateResponse => Forbidden(Json.toJson(ErrorLifeEventInappropriate))
-          case ReportLifeEventAlreadyExistsResponse => Conflict(Json.toJson(ErrorLifeEventAlreadyExists))
-          case _ => InternalServerError(Json.toJson(ErrorInternalServerError))
+          case ReportLifeEventInappropriateResponse => {Logger.debug(("Matched Inappropriate"))
+            Forbidden(Json.toJson(ErrorLifeEventInappropriate))
+          }
+          case ReportLifeEventAlreadyExistsResponse => {
+            Logger.debug("Matched Already Exists")
+            Conflict(Json.toJson(ErrorLifeEventAlreadyExists))
+          }
+          case _ => {
+            Logger.debug("Matched Error")
+            InternalServerError(Json.toJson(ErrorInternalServerError))
+          }
         }
       }
     }
