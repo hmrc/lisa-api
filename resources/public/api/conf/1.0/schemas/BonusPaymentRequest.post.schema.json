@@ -3,14 +3,6 @@
 	"type": "object",
 	"properties":
 	{
-		"accountID" : {
-		  "description": "The financial organisation’s own unique reference number for the investor’s LISA account.",
-          "$ref": "#/definitions/accountIdType",
-          "example": "9876543210"
-       },
-		"lisaManagerReferenceNumber" : {
-          "description": "The number issued to the provider when they register with HMRC for LISA.",
-          "$ref": "#/definitions/LISAManagerReferenceNumberType"},
         "lifeEventID" : {
           "description": "The reference number you get when you report a life event.",
           "$ref": "#/definitions/IDType"},
@@ -84,8 +76,6 @@
 
 	},
 	"required": [
-		"accountID",
-		"lisaManagerReferenceNumber",
 		"periodStartDate",
 		"periodEndDate",
         "transactionType",
@@ -106,11 +96,6 @@
 			"pattern": "^\\d{10}$",
           "example": "0987654321"
 		},
-		"LISAManagerReferenceNumberType" : {
-			"type" : "string",
-			"pattern": "^Z\\d{4,6}$",
-          "example": "Z4321"
-		},
       "transactionTypeType" : {
         "type" : "string",
         "enum": ["Bonus", "Penalty"]
@@ -122,12 +107,6 @@
       "chargeReasonType" : {
         "type" : "string",
         "enum": ["Unauthorised withdrawal", "Others TBD"]
-      } ,
-      "accountIdType": {
-        "type": "string",
-        "pattern": "^[a-zA-Z0-9 :\\-]{1,20}$"
       }
-
-
 	}
 }
