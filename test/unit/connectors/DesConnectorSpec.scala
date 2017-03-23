@@ -464,42 +464,8 @@ class DesConnectorSpec extends PlaySpec
 
   "Request Bonus Payment endpoint" must {
 
-    "Return an failure response" when {
-      "The DES response has no json body" in {
-        when(mockHttpPost.POST[RequestBonusPaymentRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                responseStatus = SERVICE_UNAVAILABLE,
-                responseJson = None
-              )
-            )
-          )
-
-        doRequestBonusPaymentRequest { response =>
-          response must be(DesFailureResponse())
-        }
-      }
-
-      "The DES response has a json body that is in an incorrect format" in {
-        when(mockHttpPost.POST[RequestBonusPaymentRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                responseStatus = CREATED,
-                responseJson = Some(Json.parse("""[1,2,3]"""))
-              )
-            )
-          )
-
-        doRequestBonusPaymentRequest { response =>
-          response must be(DesFailureResponse())
-        }
-      }
-    }
-
-    "Return a populated DesTransactionResponse" when {
-      "The DES response has a json body that is in the correct format" in {
+    "return a populated DesTransactionResponse" when {
+      "the DES response has a json body that is in the correct format" in {
         when(mockHttpPost.POST[RequestBonusPaymentRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
@@ -516,27 +482,43 @@ class DesConnectorSpec extends PlaySpec
       }
     }
 
-    "Return a default DesFailureResponse" when {
-      "Status is 201 and Json is invalid" in {
+    "return the default DesFailureResponse" when {
+      "the DES response has no json body" in {
         when(mockHttpPost.POST[RequestBonusPaymentRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = CREATED,
-                responseJson = Some(Json.parse(s"""{"transaction": "87654321"}"""))
+                responseStatus = SERVICE_UNAVAILABLE,
+                responseJson = None
               )
             )
           )
 
         doRequestBonusPaymentRequest { response =>
-          response must be(DesFailureResponse("INTERNAL_SERVER_ERROR","Internal Server Error"))
+          response must be(DesFailureResponse())
         }
+      }
 
+      "the DES response has a json body that is in an incorrect format" in {
+        when(mockHttpPost.POST[RequestBonusPaymentRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = CREATED,
+                responseJson = Some(Json.parse("""[1,2,3]"""))
+              )
+            )
+          )
+
+        doRequestBonusPaymentRequest { response =>
+          response must be(DesFailureResponse())
+        }
       }
     }
 
-    "Return a populated DesFailureResponse" when {
-      "A LIFE_EVENT_DOES_NOT_EXIST failure is returned" in {
+    "return a specific DesFailureResponse" when {
+
+      "a specific failure is returned" in {
         when(mockHttpPost.POST[RequestBonusPaymentRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
@@ -551,6 +533,7 @@ class DesConnectorSpec extends PlaySpec
           response must be(DesFailureResponse("LIFE_EVENT_DOES_NOT_EXIST", "The lifeEventID does not match with HMRC’s records."))
         }
       }
+
     }
 
   }
