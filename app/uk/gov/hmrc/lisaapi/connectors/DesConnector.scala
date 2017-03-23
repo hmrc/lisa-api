@@ -132,6 +132,23 @@ trait DesConnector extends ServicesConfig with JsonFormats {
     })
   }
 
+  /**
+    * Attempts to request a bonus payment
+    *
+    * @return DesResponse
+    */
+  def requestBonusPayment(lisaManager: String, accountId: String, request: RequestBonusPaymentRequest)
+                     (implicit hc: HeaderCarrier): Future[DesResponse] = {
+
+    val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId/events"
+
+    val result = httpPost.POST[RequestBonusPaymentRequest, HttpResponse](uri, request)(implicitly, httpReads, implicitly)
+
+    result.map(res => {
+      parseDesResponse[DesTransactionResponse](res)
+    })
+  }
+
   // scalastyle:off magic.number
   def parseDesResponse[A <: DesResponse](res: HttpResponse)(implicit reads:Reads[A]): DesResponse = {
     res.status match {

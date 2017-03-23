@@ -19,5 +19,6 @@ package uk.gov.hmrc.lisaapi.models.des
 trait DesResponse
 
 case class DesLifeEventResponse(lifeEventID: String) extends DesResponse
+case class DesTransactionResponse(transactionID: String) extends DesResponse
 case class DesFailureResponse(code: String = "INTERNAL_SERVER_ERROR", reason: String = "Internal Server Error") extends DesResponse
 

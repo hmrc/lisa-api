@@ -26,6 +26,7 @@ import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des._
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpResponse}
+import play.api.test.Helpers._
 
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
@@ -461,6 +462,82 @@ class DesConnectorSpec extends PlaySpec
 
   }
 
+  "Request Bonus Payment endpoint" must {
+
+    "return a populated DesTransactionResponse" when {
+      "the DES response has a json body that is in the correct format" in {
+        when(mockHttpPost.POST[RequestBonusPaymentRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = CREATED,
+                responseJson = Some(Json.parse(s"""{"transactionID": "87654321"}"""))
+              )
+            )
+          )
+
+        doRequestBonusPaymentRequest { response =>
+          response must be(DesTransactionResponse("87654321"))
+        }
+      }
+    }
+
+    "return the default DesFailureResponse" when {
+      "the DES response has no json body" in {
+        when(mockHttpPost.POST[RequestBonusPaymentRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = SERVICE_UNAVAILABLE,
+                responseJson = None
+              )
+            )
+          )
+
+        doRequestBonusPaymentRequest { response =>
+          response must be(DesFailureResponse())
+        }
+      }
+
+      "the DES response has a json body that is in an incorrect format" in {
+        when(mockHttpPost.POST[RequestBonusPaymentRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = CREATED,
+                responseJson = Some(Json.parse("""[1,2,3]"""))
+              )
+            )
+          )
+
+        doRequestBonusPaymentRequest { response =>
+          response must be(DesFailureResponse())
+        }
+      }
+    }
+
+    "return a specific DesFailureResponse" when {
+
+      "a specific failure is returned" in {
+        when(mockHttpPost.POST[RequestBonusPaymentRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = NOT_FOUND,
+                responseJson = Some(Json.parse(s"""{"code": "LIFE_EVENT_DOES_NOT_EXIST","reason": "The lifeEventID does not match with HMRC’s records."}"""))
+              )
+            )
+          )
+
+        doRequestBonusPaymentRequest { response =>
+          response must be(DesFailureResponse("LIFE_EVENT_DOES_NOT_EXIST", "The lifeEventID does not match with HMRC’s records."))
+        }
+      }
+
+    }
+
+  }
+
   private def doCreateInvestorRequest(callback: ((Int, Option[DesCreateInvestorResponse])) => Unit) = {
     val request = CreateLisaInvestorRequest("AB123456A", "A", "B", new DateTime("2000-01-01"))
     val response = Await.result(SUT.createInvestor("Z019283", request), Duration.Inf)
@@ -493,6 +570,22 @@ class DesConnectorSpec extends PlaySpec
   private def doReportLifeEventRequest(callback: (DesResponse) => Unit) = {
     val request = ReportLifeEventRequest("1234567890","Z543210","LISA Investor Terminal Ill Health",new DateTime("2000-01-01"))
     val response = Await.result(SUT.reportLifeEvent("Z123456", "ABC12345", request), Duration.Inf)
+
+    callback(response)
+  }
+
+  private def doRequestBonusPaymentRequest(callback: (DesResponse) => Unit) = {
+    val request = RequestBonusPaymentRequest(
+      lifeEventID = "1234567891",
+      periodStartDate = new DateTime("2016-05-22"),
+      periodEndDate = new DateTime("2017-05-22"),
+      transactionType = "Bonus",
+      htbTransfer = HelpToBuyTransfer(0f, 0f),
+      inboundPayments = InboundPayments(4000f, 4000f, 4000f, 4000f),
+      bonuses = Bonuses(1000f, 1000f, None, "Life Event")
+    )
+
+    val response = Await.result(SUT.requestBonusPayment("Z123456", "ABC12345", request), Duration.Inf)
 
     callback(response)
   }

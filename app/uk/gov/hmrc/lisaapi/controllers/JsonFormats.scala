@@ -54,6 +54,7 @@ trait JsonFormats {
   implicit val desCreateAccountResponseFormats = Json.format[DesAccountResponse]
   implicit val desCreateInvestorResponseFormats = Json.format[DesCreateInvestorResponse]
   implicit val desLifeEventResponseFormats = Json.format[DesLifeEventResponse]
+  implicit val desTransactionResponseFormats = Json.format[DesTransactionResponse]
 
   implicit val desFailureResponse = Json.format[DesFailureResponse]
 
