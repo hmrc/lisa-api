@@ -18,7 +18,8 @@ package unit.models
 
 import org.joda.time.DateTime
 import org.scalatestplus.play.PlaySpec
-import play.api.libs.json.{JsError, JsSuccess, Json}
+import play.api.data.validation.ValidationError
+import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 import uk.gov.hmrc.lisaapi.controllers.JsonFormats
 import uk.gov.hmrc.lisaapi.models.{Bonuses, HelpToBuyTransfer, InboundPayments, RequestBonusPaymentRequest}
 
@@ -44,6 +45,52 @@ class RequestBonusPaymentRequestSpec extends PlaySpec with JsonFormats {
           data.inboundPayments mustBe InboundPayments(4000f, 4000f, 4000f, 4000f)
           data.bonuses mustBe Bonuses(1000f, 1000f, None, "Life Event")
         }
+      }
+    }
+
+    "deserialize to json" in {
+      val data = RequestBonusPaymentRequest(
+        lifeEventID = "1234567891",
+        periodStartDate = new DateTime("2016-05-22"),
+        periodEndDate = new DateTime("2017-05-22"),
+        transactionType = "Bonus",
+        htbTransfer = HelpToBuyTransfer(0f, 0f),
+        inboundPayments = InboundPayments(4000f, 4000f, 4000f, 4000f),
+        bonuses = Bonuses(1000f, 1000f, None, "Life Event")
+      )
+
+      val json = Json.toJson[RequestBonusPaymentRequest](data)
+
+      json mustBe Json.parse(validBonusPaymentJson)
+    }
+
+    "catch an invalid life event id" in {
+      val res = Json.parse(validBonusPaymentJson.replace("1234567891", "X")).validate[RequestBonusPaymentRequest]
+
+      res match {
+        case JsError(errors) => {
+          errors.count {
+            case (path: JsPath, errors: Seq[ValidationError]) => {
+              path.toString() == "/lifeEventID" && errors.contains(ValidationError("error.formatting.lifeEventID"))
+            }
+          } mustBe 1
+        }
+        case _ => fail()
+      }
+    }
+
+    "catch an invalid transaction type" in {
+      val res = Json.parse(validBonusPaymentJson.replace("Bonus", "X")).validate[RequestBonusPaymentRequest]
+
+      res match {
+        case JsError(errors) => {
+          errors.count {
+            case (path: JsPath, errors: Seq[ValidationError]) => {
+              path.toString() == "/transactionType" && errors.contains(ValidationError("error.formatting.transactionType"))
+            }
+          } mustBe 1
+        }
+        case _ => fail()
       }
     }
 

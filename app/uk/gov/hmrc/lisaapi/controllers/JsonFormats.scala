@@ -138,8 +138,8 @@ trait JsonFormats {
     (JsPath \ "closureDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd"))
   )(unlift(CloseLisaAccountRequest.unapply))
 
-  implicit val htb = Json.format[HelpToBuyTransfer]
-  implicit val ibp = Json.format[InboundPayments]
+  implicit val htbFormats = Json.format[HelpToBuyTransfer]
+  implicit val ibpFormats = Json.format[InboundPayments]
 
   implicit val bonusesReads: Reads[Bonuses] = (
     (JsPath \ "bonusDueForPeriod").read[Float] and
@@ -164,6 +164,16 @@ trait JsonFormats {
     (JsPath \ "inboundPayments").read[InboundPayments] and
     (JsPath \ "bonuses").read[Bonuses]
   )(RequestBonusPaymentRequest.apply _)
+
+  implicit val requestBonusPaymentWrites: Writes[RequestBonusPaymentRequest] = (
+    (JsPath \ "lifeEventID").write[String] and
+    (JsPath \ "periodStartDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
+    (JsPath \ "periodEndDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
+    (JsPath \ "transactionType").write[String] and
+    (JsPath \ "htbTransfer").write[HelpToBuyTransfer] and
+    (JsPath \ "inboundPayments").write[InboundPayments] and
+    (JsPath \ "bonuses").write[Bonuses]
+  )(unlift(RequestBonusPaymentRequest.unapply))
 
   private def isoDateReads(allowFutureDates: Boolean = true): Reads[org.joda.time.DateTime] = new Reads[org.joda.time.DateTime] {
 
