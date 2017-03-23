@@ -30,8 +30,11 @@ trait JsonFormats {
   implicit val nameRegex = "^[a-zA-Z &`\\-\\'^]{1,35}$".r
   implicit val lmrnRegex = "^Z\\d{4,6}$".r
   implicit val investorIDRegex = "^\\d{10}$".r
+  implicit val lifeEventIDRegex = "^\\d{10}$".r
   implicit val accountIDRegex = "^[a-zA-Z0-9 :\\-]{1,20}$".r
   implicit val accountClosureRegex = "^(Transferred out|All funds withdrawn|Voided)$".r
+  implicit val transactionTypeRegex = "^(Bonus|Penalty)$".r
+  implicit val bonusClaimReasonRegex = "^(Life Event|Regular Bonus)$".r
   implicit val lifeEventTypeRegex = "^(LISA Investor Terminal Ill Health|LISA Investor Death|House Purchase)$".r
 
   implicit val createLisaInvestorRequestReads: Reads[CreateLisaInvestorRequest] = (
@@ -52,7 +55,6 @@ trait JsonFormats {
   implicit val desCreateInvestorResponseFormats = Json.format[DesCreateInvestorResponse]
   implicit val desLifeEventResponseFormats = Json.format[DesLifeEventResponse]
 
-  //implicit val desSuccessResponse = Json.format[DesSuccessResponse]
   implicit val desFailureResponse = Json.format[DesFailureResponse]
 
   implicit val apiResponseDataFormats = Json.format[ApiResponseData]
@@ -135,6 +137,43 @@ trait JsonFormats {
     (JsPath \ "accountClosureReason").write[String] and
     (JsPath \ "closureDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd"))
   )(unlift(CloseLisaAccountRequest.unapply))
+
+  implicit val htbFormats = Json.format[HelpToBuyTransfer]
+  implicit val ibpFormats = Json.format[InboundPayments]
+
+  implicit val bonusesReads: Reads[Bonuses] = (
+    (JsPath \ "bonusDueForPeriod").read[Float] and
+    (JsPath \ "totalBonusDueYTD").read[Float] and
+    (JsPath \ "bonusPaidYTD").readNullable[Float] and
+    (JsPath \ "claimReason").read((Reads.pattern(bonusClaimReasonRegex, "error.formatting.claimReason")))
+  )(Bonuses.apply _)
+
+  implicit val bonusesWrites: Writes[Bonuses] = (
+    (JsPath \ "bonusDueForPeriod").write[Float] and
+    (JsPath \ "totalBonusDueYTD").write[Float] and
+    (JsPath \ "bonusPaidYTD").writeNullable[Float] and
+    (JsPath \ "claimReason").write[String]
+  )(unlift(Bonuses.unapply))
+
+  implicit val requestBonusPaymentReads: Reads[RequestBonusPaymentRequest] = (
+    (JsPath \ "lifeEventID").read(Reads.pattern(lifeEventIDRegex, "error.formatting.lifeEventID")) and
+    (JsPath \ "periodStartDate").read(isoDateReads()).map(new DateTime(_)) and
+    (JsPath \ "periodEndDate").read(isoDateReads()).map(new DateTime(_)) and
+    (JsPath \ "transactionType").read(Reads.pattern(transactionTypeRegex, "error.formatting.transactionType")) and
+    (JsPath \ "htbTransfer").read[HelpToBuyTransfer] and
+    (JsPath \ "inboundPayments").read[InboundPayments] and
+    (JsPath \ "bonuses").read[Bonuses]
+  )(RequestBonusPaymentRequest.apply _)
+
+  implicit val requestBonusPaymentWrites: Writes[RequestBonusPaymentRequest] = (
+    (JsPath \ "lifeEventID").write[String] and
+    (JsPath \ "periodStartDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
+    (JsPath \ "periodEndDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
+    (JsPath \ "transactionType").write[String] and
+    (JsPath \ "htbTransfer").write[HelpToBuyTransfer] and
+    (JsPath \ "inboundPayments").write[InboundPayments] and
+    (JsPath \ "bonuses").write[Bonuses]
+  )(unlift(RequestBonusPaymentRequest.unapply))
 
   private def isoDateReads(allowFutureDates: Boolean = true): Reads[org.joda.time.DateTime] = new Reads[org.joda.time.DateTime] {
 

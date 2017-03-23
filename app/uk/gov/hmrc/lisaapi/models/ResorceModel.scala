@@ -96,13 +96,19 @@ case class LisaAccount(investorID:ID,
 
 case class TransferAccount(transferredFromAccountID:AccountId, transferredFromLMRN:ReferenceNumber, transferInDate:ISO8601Date)
 
-case class Bonuses(bonusDueForPeriod:String,
-                   totalBonusDueYTD:String,
-                   bonusPaidYTD:String,
-                   claimReason:ClaimReason)
+case class Bonuses(bonusDueForPeriod:Float,
+                   totalBonusDueYTD:Float,
+                   bonusPaidYTD:Option[Float],
+                   claimReason:String)
 
-case class HelpToBuyTransfer(htbTransferInForPeriod:String,htbTransferTotalYTD:String)
+case class HelpToBuyTransfer(htbTransferInForPeriod:Float, htbTransferTotalYTD:Float)
 
+case class InboundPayments(
+  newSubsForPeriod: Float,
+  newSubsYTD: Float,
+  totalSubsForPeriod: Float,
+  totalSubsYTD: Float
+)
 
 case class LifeEvent(accountID: AccountId,
                       lisaManagerReferenceNumber:ReferenceNumber,
