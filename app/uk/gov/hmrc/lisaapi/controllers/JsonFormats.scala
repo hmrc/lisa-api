@@ -148,6 +148,13 @@ trait JsonFormats {
     (JsPath \ "claimReason").read((Reads.pattern(bonusClaimReasonRegex, "error.formatting.claimReason")))
   )(Bonuses.apply _)
 
+  implicit val bonusesWrites: Writes[Bonuses] = (
+    (JsPath \ "bonusDueForPeriod").write[Float] and
+    (JsPath \ "totalBonusDueYTD").write[Float] and
+    (JsPath \ "bonusPaidYTD").writeNullable[Float] and
+    (JsPath \ "claimReason").write[String]
+  )(unlift(Bonuses.unapply))
+
   implicit val requestBonusPaymentReads: Reads[RequestBonusPaymentRequest] = (
     (JsPath \ "lifeEventID").read(Reads.pattern(lifeEventIDRegex, "error.formatting.lifeEventID")) and
     (JsPath \ "periodStartDate").read(isoDateReads()).map(new DateTime(_)) and
