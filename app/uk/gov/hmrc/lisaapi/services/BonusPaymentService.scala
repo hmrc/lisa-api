@@ -28,12 +28,12 @@ trait BonusPaymentService {
   val desConnector: DesConnector
 
   def requestBonusPayment(lisaManager: String, accountId: String, request: RequestBonusPaymentRequest)
-                         (implicit hc: HeaderCarrier): Future[String] = {
+                         (implicit hc: HeaderCarrier): Future[RequestBonusPaymentResponse] = {
     val response = desConnector.requestBonusPayment(lisaManager, accountId, request)
 
     response map {
       case successResponse: DesTransactionResponse => {
-        successResponse.transactionID
+        RequestBonusPaymentSuccessResponse(successResponse.transactionID)
       }
     }
   }

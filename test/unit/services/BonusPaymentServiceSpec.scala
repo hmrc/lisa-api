@@ -22,7 +22,7 @@ import org.mockito.Mockito.when
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
-import uk.gov.hmrc.lisaapi.models._
+import uk.gov.hmrc.lisaapi.models.{RequestBonusPaymentResponse, _}
 import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesLifeEventResponse, DesTransactionResponse}
 import uk.gov.hmrc.lisaapi.services.{BonusPaymentService, LifeEventService}
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -40,13 +40,13 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
           thenReturn(Future.successful(DesTransactionResponse("AB123456")))
 
         doRequest{response =>
-          response mustBe "AB123456"
+          response mustBe RequestBonusPaymentSuccessResponse("AB123456")
         }
       }
     }
   }
 
-  private def doRequest(callback: (String) => Unit) = {
+  private def doRequest(callback: (RequestBonusPaymentResponse) => Unit) = {
     val request = RequestBonusPaymentRequest(
       lifeEventID = "1234567891",
       periodStartDate = new DateTime("2016-05-22"),
