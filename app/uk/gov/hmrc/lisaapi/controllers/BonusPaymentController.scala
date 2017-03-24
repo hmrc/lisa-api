@@ -48,11 +48,9 @@ class BonusPaymentController extends LisaController {
             Logger.debug("Matched error response")
             Status(errorResponse.status).apply(Json.toJson(errorResponse.data))
           }
-          case _ => {
-            Logger.debug("No match, returning error")
-            InternalServerError(Json.toJson(ErrorInternalServerError))
-          }
         }
+      } recover {
+        case _ => InternalServerError(Json.toJson(ErrorInternalServerError))
       }
     }
   }

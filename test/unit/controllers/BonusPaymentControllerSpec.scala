@@ -18,6 +18,7 @@ package unit.controllers
 
 import org.mockito.Matchers._
 import org.mockito.Mockito.when
+import org.mockito.Mockito.reset
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
@@ -25,13 +26,15 @@ import play.api.mvc.{AnyContentAsJson, Result}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
-import uk.gov.hmrc.lisaapi.controllers.{BonusPaymentController, LifeEventController}
+import uk.gov.hmrc.lisaapi.controllers.BonusPaymentController
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des.DesFailureResponse
-import uk.gov.hmrc.lisaapi.services.{BonusPaymentService, LifeEventService}
+import uk.gov.hmrc.lisaapi.services.BonusPaymentService
 
 import scala.concurrent.Future
 import scala.io.Source
+
+case object TestBonusPaymentResponse extends RequestBonusPaymentResponse
 
 class BonusPaymentControllerSpec  extends PlaySpec with MockitoSugar with OneAppPerSuite {
 
@@ -73,6 +76,30 @@ class BonusPaymentControllerSpec  extends PlaySpec with MockitoSugar with OneApp
           status(res) mustBe (BAD_REQUEST)
           (contentAsJson(res) \ "code").as[String] mustBe ("BAD_REQUEST")
           (contentAsJson(res) \ "message").as[String] mustBe ("Bad Request")
+        }
+      }
+    }
+
+    "return with status 500 internal server error" when {
+      "an exception gets thrown" in {
+        when(mockService.requestBonusPayment(any(), any(), any())(any())).
+          thenThrow(new RuntimeException("Test"))
+
+        doRequest(validBonusPaymentJson) { res =>
+          reset(mockService) // removes the thenThrow
+
+          status(res) mustBe (INTERNAL_SERVER_ERROR)
+          (contentAsJson(res) \ "code").as[String] mustBe ("INTERNAL_SERVER_ERROR")
+        }
+      }
+
+      "an unexpected result comes back from the service" in {
+        when(mockService.requestBonusPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(TestBonusPaymentResponse))
+
+        doRequest(validBonusPaymentJson) { res =>
+          status(res) mustBe (INTERNAL_SERVER_ERROR)
+          (contentAsJson(res) \ "code").as[String] mustBe ("INTERNAL_SERVER_ERROR")
         }
       }
     }
