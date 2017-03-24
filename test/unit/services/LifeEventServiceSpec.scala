@@ -73,7 +73,7 @@ class LifeEventServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuit
   }
 
   private def doRequest(callback: (ReportLifeEventResponse) => Unit) = {
-    val request = ReportLifeEventRequest("1234567890", "Z543210", "LISA Investor Terminal Ill Health", new DateTime("2017-04-06"))
+    val request = ReportLifeEventRequest("LISA Investor Terminal Ill Health", new DateTime("2017-04-06"))
     val response = Await.result(SUT.reportLifeEvent("Z019283", "192837", request)(HeaderCarrier()), Duration.Inf)
 
     callback(response)

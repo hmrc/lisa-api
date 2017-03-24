@@ -568,7 +568,7 @@ class DesConnectorSpec extends PlaySpec
   }
 
   private def doReportLifeEventRequest(callback: (DesResponse) => Unit) = {
-    val request = ReportLifeEventRequest("1234567890","Z543210","LISA Investor Terminal Ill Health",new DateTime("2000-01-01"))
+    val request = ReportLifeEventRequest("LISA Investor Terminal Ill Health",new DateTime("2000-01-01"))
     val response = Await.result(SUT.reportLifeEvent("Z123456", "ABC12345", request), Duration.Inf)
 
     callback(response)
