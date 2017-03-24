@@ -37,10 +37,21 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
     "return a Success Response" when {
       "given a success response from the DES connector" in {
         when(mockDesConnector.requestBonusPayment(any(), any(),any())(any())).
-          thenReturn(Future.successful(DesTransactionResponse("AB123456")))
+          thenReturn(Future.successful((201, DesTransactionResponse("AB123456"))))
 
         doRequest{response =>
           response mustBe RequestBonusPaymentSuccessResponse("AB123456")
+        }
+      }
+    }
+
+    "return an Error Response" when {
+      "given an error response from the DES connector" in {
+        when(mockDesConnector.requestBonusPayment(any(), any(),any())(any())).
+          thenReturn(Future.successful((500, DesFailureResponse("code1", "reason1"))))
+
+        doRequest{response =>
+          response mustBe RequestBonusPaymentErrorResponse(500, DesFailureResponse("code1", "reason1"))
         }
       }
     }

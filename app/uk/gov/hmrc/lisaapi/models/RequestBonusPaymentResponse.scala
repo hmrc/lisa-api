@@ -16,6 +16,9 @@
 
 package uk.gov.hmrc.lisaapi.models
 
+import uk.gov.hmrc.lisaapi.models.des.DesFailureResponse
+
 trait RequestBonusPaymentResponse
 
 case class RequestBonusPaymentSuccessResponse(transactionID: String) extends RequestBonusPaymentResponse
+case class RequestBonusPaymentErrorResponse(status: Int, data: DesFailureResponse) extends RequestBonusPaymentResponse

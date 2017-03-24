@@ -477,7 +477,7 @@ class DesConnectorSpec extends PlaySpec
           )
 
         doRequestBonusPaymentRequest { response =>
-          response must be(DesTransactionResponse("87654321"))
+          response must be((CREATED, DesTransactionResponse("87654321")))
         }
       }
     }
@@ -495,7 +495,7 @@ class DesConnectorSpec extends PlaySpec
           )
 
         doRequestBonusPaymentRequest { response =>
-          response must be(DesFailureResponse())
+          response must be((INTERNAL_SERVER_ERROR, DesFailureResponse()))
         }
       }
 
@@ -511,7 +511,7 @@ class DesConnectorSpec extends PlaySpec
           )
 
         doRequestBonusPaymentRequest { response =>
-          response must be(DesFailureResponse())
+          response must be((INTERNAL_SERVER_ERROR, DesFailureResponse()))
         }
       }
     }
@@ -530,7 +530,7 @@ class DesConnectorSpec extends PlaySpec
           )
 
         doRequestBonusPaymentRequest { response =>
-          response must be(DesFailureResponse("LIFE_EVENT_DOES_NOT_EXIST", "The lifeEventID does not match with HMRC’s records."))
+          response must be((NOT_FOUND, DesFailureResponse("LIFE_EVENT_DOES_NOT_EXIST", "The lifeEventID does not match with HMRC’s records.")))
         }
       }
 
@@ -574,7 +574,7 @@ class DesConnectorSpec extends PlaySpec
     callback(response)
   }
 
-  private def doRequestBonusPaymentRequest(callback: (DesResponse) => Unit) = {
+  private def doRequestBonusPaymentRequest(callback: ((Int, DesResponse)) => Unit) = {
     val request = RequestBonusPaymentRequest(
       lifeEventID = "1234567891",
       periodStartDate = new DateTime("2016-05-22"),
