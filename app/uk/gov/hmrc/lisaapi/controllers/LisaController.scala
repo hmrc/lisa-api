@@ -40,12 +40,21 @@ trait LisaController extends BaseController with HeaderValidator with RunMode wi
     request.body.asJson match {
       case Some(json) =>
         Try(json.validate[T]) match {
-          case Success(JsSuccess(payload, _)) => success(payload)
+          case Success(JsSuccess(payload, _)) => {
+
+            Try(success(payload)) match {
+              case Success(result) => result
+              case Failure(ex:Exception) => {
+                Logger.info(s"An error occurred ${ex.getMessage}")
+                Future.successful(InternalServerError(toJson(ErrorInternalServerError)))
+              }
+            }
+          }
           case Success(JsError(errors)) => {
             invalid match {
               case Some(invalidCallback) => invalidCallback(errors)
               case None => {
-                Logger.info("The errors are " + errors.toString())
+                Logger.info(s"The errors are ${errors.toString()}")
                 Future.successful(BadRequest(toJson(ErrorGenericBadRequest)))
               }
             }

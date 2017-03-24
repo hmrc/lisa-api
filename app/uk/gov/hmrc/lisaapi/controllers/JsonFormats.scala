@@ -56,7 +56,15 @@ trait JsonFormats {
   implicit val desLifeEventResponseFormats = Json.format[DesLifeEventResponse]
   implicit val desTransactionResponseFormats = Json.format[DesTransactionResponse]
 
-  implicit val desFailureResponse = Json.format[DesFailureResponse]
+  implicit val desFailureReads: Reads[DesFailureResponse] = (
+    (JsPath \ "code").read[String] and
+    (JsPath \ "reason").read[String]
+  )(DesFailureResponse.apply _)
+
+  implicit val desFailureWrites: Writes[DesFailureResponse] = (
+    (JsPath \ "code").write[String] and
+    (JsPath \ "message").write[String]
+  )(unlift(DesFailureResponse.unapply))
 
   implicit val apiResponseDataFormats = Json.format[ApiResponseData]
   implicit val apiResponseFormats = Json.format[ApiResponse]

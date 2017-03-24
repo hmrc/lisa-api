@@ -16,10 +16,9 @@
 
 package uk.gov.hmrc.lisaapi.models
 
-case class ApiResponseData(
-  message: String,
-  investorId: Option[String] = None,
-  accountId: Option[String] = None,
-  lifeEventId: Option[String] = None,
-  transactionId: Option[String] = None
-)
+import uk.gov.hmrc.lisaapi.models.des.DesFailureResponse
+
+trait RequestBonusPaymentResponse
+
+case class RequestBonusPaymentSuccessResponse(transactionID: String) extends RequestBonusPaymentResponse
+case class RequestBonusPaymentErrorResponse(status: Int, data: DesFailureResponse) extends RequestBonusPaymentResponse
