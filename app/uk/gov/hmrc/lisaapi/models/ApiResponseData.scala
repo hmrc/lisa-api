@@ -20,5 +20,6 @@ case class ApiResponseData(
   message: String,
   investorId: Option[String] = None,
   accountId: Option[String] = None,
-  lifeEventId: Option[String] = None
+  lifeEventId: Option[String] = None,
+  transactionId: Option[String] = None
 )
