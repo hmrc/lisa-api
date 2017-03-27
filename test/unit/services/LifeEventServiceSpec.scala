@@ -59,6 +59,13 @@ class LifeEventServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuit
       }
     }
 
+    "Return Not Found response" when {
+      "given DesFailureReponse and status 404" in {
+        when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNTID_NOT_FOUND","The accountID given does not match with HMRC’s records")))
+        doRequest(response => response mustBe ReportLifeEventAccountNotFoundResponse)
+      }
+    }
+
     "Return Internal Server Error" when {
       "When INTERNAL_SERVER_ERROR sent" in {
         when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("INTERNAL_SERVER_ERROR","Internal Error")))
@@ -73,7 +80,7 @@ class LifeEventServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuit
   }
 
   private def doRequest(callback: (ReportLifeEventResponse) => Unit) = {
-    val request = ReportLifeEventRequest("1234567890", "Z543210", "LISA Investor Terminal Ill Health", new DateTime("2017-04-06"))
+    val request = ReportLifeEventRequest("LISA Investor Terminal Ill Health", new DateTime("2017-04-06"))
     val response = Await.result(SUT.reportLifeEvent("Z019283", "192837", request)(HeaderCarrier()), Duration.Inf)
 
     callback(response)

@@ -16,10 +16,9 @@
 
 package uk.gov.hmrc.lisaapi.models
 
-trait ReportLifeEventResponse
+import uk.gov.hmrc.lisaapi.models.des.DesFailureResponse
 
-case class ReportLifeEventSuccessResponse(lifeEventId: String) extends ReportLifeEventResponse
-case object ReportLifeEventErrorResponse extends ReportLifeEventResponse
-case object ReportLifeEventInappropriateResponse extends ReportLifeEventResponse
-case object ReportLifeEventAlreadyExistsResponse extends ReportLifeEventResponse
-case object ReportLifeEventAccountNotFoundResponse extends ReportLifeEventResponse
+trait RequestBonusPaymentResponse
+
+case class RequestBonusPaymentSuccessResponse(transactionID: String) extends RequestBonusPaymentResponse
+case class RequestBonusPaymentErrorResponse(status: Int, data: DesFailureResponse) extends RequestBonusPaymentResponse

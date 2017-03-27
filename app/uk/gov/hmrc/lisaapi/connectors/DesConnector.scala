@@ -128,7 +128,7 @@ trait DesConnector extends ServicesConfig with JsonFormats {
     val result = httpPost.POST[ReportLifeEventRequest, HttpResponse](uri, request)(implicitly, httpReads, implicitly)
 
     result.map(res => {
-      parseDesResponse[DesLifeEventResponse](res)
+      parseDesResponse[DesLifeEventResponse](res)._2
     })
   }
 
@@ -138,9 +138,9 @@ trait DesConnector extends ServicesConfig with JsonFormats {
     * @return DesResponse
     */
   def requestBonusPayment(lisaManager: String, accountId: String, request: RequestBonusPaymentRequest)
-                     (implicit hc: HeaderCarrier): Future[DesResponse] = {
+                     (implicit hc: HeaderCarrier): Future[(Int, DesResponse)] = {
 
-    val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId/events"
+    val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId/transactions"
 
     val result = httpPost.POST[RequestBonusPaymentRequest, HttpResponse](uri, request)(implicitly, httpReads, implicitly)
 
@@ -150,20 +150,20 @@ trait DesConnector extends ServicesConfig with JsonFormats {
   }
 
   // scalastyle:off magic.number
-  def parseDesResponse[A <: DesResponse](res: HttpResponse)(implicit reads:Reads[A]): DesResponse = {
+  def parseDesResponse[A <: DesResponse](res: HttpResponse)(implicit reads:Reads[A]): (Int, DesResponse) = {
     res.status match {
       case 201 => Try(res.json.as[A]) match {
-        case Success(data) => data
+        case Success(data) => (201, data)
         case Failure(ex) => {
           Logger.debug(s"Unexpected DES response. Exception: ${ex.getMessage}")
-          DesFailureResponse()
+          (500, DesFailureResponse())
         }
       }
-      case _ => Try(res.json.as[DesFailureResponse]) match {
-        case Success(data) => data
+      case status:Int => Try(res.json.as[DesFailureResponse]) match {
+        case Success(data) => (status, data)
         case Failure(ex) => {
           Logger.debug(s"Unexpected DES response. Exception: ${ex.getMessage}")
-          DesFailureResponse()
+          (500, DesFailureResponse())
         }
       }
     }

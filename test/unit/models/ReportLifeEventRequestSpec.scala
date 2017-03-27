@@ -27,7 +27,7 @@ import uk.gov.hmrc.lisaapi.models.ReportLifeEventRequest
   */
 class ReportLifeEventRequestSpec extends PlaySpec with JsonFormats {
 
-  val validRequestJson = """{"accountId":"1234567890", "lisaManagerReferenceNumber":"Z543210", "eventType":"LISA Investor Terminal Ill Health", "eventDate":"2017-04-06"}"""
+  val validRequestJson = """{"eventType":"LISA Investor Terminal Ill Health", "eventDate":"2017-04-06"}"""
 
   "ReportLifeEventRequest" must {
 
@@ -37,8 +37,6 @@ class ReportLifeEventRequestSpec extends PlaySpec with JsonFormats {
       res match {
         case JsError(errors) => fail()
         case JsSuccess(data, path) => {
-          data.accountId mustBe "1234567890"
-          data.lisaManagerReferenceNumber mustBe "Z543210"
           data.eventType mustBe "LISA Investor Terminal Ill Health"
           data.eventDate.getYear mustBe 2017
           data.eventDate.getMonthOfYear mustBe 4
@@ -48,7 +46,7 @@ class ReportLifeEventRequestSpec extends PlaySpec with JsonFormats {
     }
 
     "deserialize to json" in {
-      val request = ReportLifeEventRequest("1234567890", "Z543210", "LISA Investor Terminal Ill Health", new DateTime("2017-04-06"))
+      val request = ReportLifeEventRequest( "LISA Investor Terminal Ill Health", new DateTime("2017-04-06"))
 
       val json = Json.toJson[ReportLifeEventRequest](request)
 

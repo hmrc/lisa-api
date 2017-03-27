@@ -56,7 +56,15 @@ trait JsonFormats {
   implicit val desLifeEventResponseFormats = Json.format[DesLifeEventResponse]
   implicit val desTransactionResponseFormats = Json.format[DesTransactionResponse]
 
-  implicit val desFailureResponse = Json.format[DesFailureResponse]
+  implicit val desFailureReads: Reads[DesFailureResponse] = (
+    (JsPath \ "code").read[String] and
+    (JsPath \ "reason").read[String]
+  )(DesFailureResponse.apply _)
+
+  implicit val desFailureWrites: Writes[DesFailureResponse] = (
+    (JsPath \ "code").write[String] and
+    (JsPath \ "message").write[String]
+  )(unlift(DesFailureResponse.unapply))
 
   implicit val apiResponseDataFormats = Json.format[ApiResponseData]
   implicit val apiResponseFormats = Json.format[ApiResponse]
@@ -111,15 +119,11 @@ trait JsonFormats {
   )(unlift(CreateLisaAccountTransferRequest.unapply))
 
   implicit val reportLifeEventRequestReads: Reads[ReportLifeEventRequest] = (
-    (JsPath \ "accountId").read(Reads.pattern(accountIDRegex, "error.formatting.accountID")) and
-    (JsPath \ "lisaManagerReferenceNumber").read(Reads.pattern(lmrnRegex, "error.formatting.lmrn")) and
     (JsPath \ "eventType").read(Reads.pattern(lifeEventTypeRegex, "error.formatting.eventType")) and
     (JsPath \ "eventDate").read(isoDateReads(allowFutureDates = true)).map(new DateTime(_))
     )(ReportLifeEventRequest.apply _)
 
   implicit val reportLifeEventRequestWrites: Writes[ReportLifeEventRequest] = (
-    (JsPath \ "accountId").write[String] and
-      (JsPath \ "lisaManagerReferenceNumber").write[String] and
       (JsPath \ "eventType").write[String] and
       (JsPath \ "eventDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd"))
   )(unlift(ReportLifeEventRequest.unapply))

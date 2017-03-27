@@ -53,6 +53,9 @@ class LifeEventController extends LisaController {
             Logger.debug("Matched Already Exists")
             Conflict(Json.toJson(ErrorLifeEventAlreadyExists))
           }
+          case ReportLifeEventAccountNotFoundResponse => {
+            NotFound(Json.toJson(ErrorAccountNotFound))
+          }
           case _ => {
             Logger.debug("Matched Error")
             InternalServerError(Json.toJson(ErrorInternalServerError))

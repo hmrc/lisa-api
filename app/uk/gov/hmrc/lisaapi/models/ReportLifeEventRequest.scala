@@ -18,4 +18,4 @@ package uk.gov.hmrc.lisaapi.models
 
 import org.joda.time.DateTime
 
-case class ReportLifeEventRequest(accountId: String, lisaManagerReferenceNumber: String, eventType: String,  eventDate: DateTime)
+case class ReportLifeEventRequest(eventType: String,  eventDate: DateTime)
