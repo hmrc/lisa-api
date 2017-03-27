@@ -140,7 +140,7 @@ trait DesConnector extends ServicesConfig with JsonFormats {
   def requestBonusPayment(lisaManager: String, accountId: String, request: RequestBonusPaymentRequest)
                      (implicit hc: HeaderCarrier): Future[(Int, DesResponse)] = {
 
-    val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId/events"
+    val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId/transactions"
 
     val result = httpPost.POST[RequestBonusPaymentRequest, HttpResponse](uri, request)(implicitly, httpReads, implicitly)
 
