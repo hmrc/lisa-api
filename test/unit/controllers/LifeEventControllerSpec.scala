@@ -26,7 +26,7 @@ import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.lisaapi.controllers.LifeEventController
-import uk.gov.hmrc.lisaapi.models.{ReportLifeEventAlreadyExistsResponse, ReportLifeEventInappropriateResponse, ReportLifeEventResponse, ReportLifeEventSuccessResponse}
+import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.LifeEventService
 
 import scala.concurrent.Future
@@ -85,6 +85,14 @@ class LifeEventControllerSpec  extends PlaySpec with MockitoSugar with OneAppPer
       doReportLifeEventRequest(reportLifeEventJson){res =>
         status(res) mustBe (FORBIDDEN)
         (contentAsJson(res) \"code").as[String] mustBe ("LIFE_EVENT_INAPPROPRIATE")
+      }
+    }
+
+    "return with 404 Notfound and a code of INVESTOR_ACCOUNTID_NOT_FOUND" in {
+      when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful((ReportLifeEventAccountNotFoundResponse)))
+      doReportLifeEventRequest(reportLifeEventJson){res =>
+        status(res) mustBe (NOT_FOUND)
+        (contentAsJson(res) \"code").as[String] mustBe ("INVESTOR_ACCOUNTID_NOT_FOUND")
       }
     }
 
