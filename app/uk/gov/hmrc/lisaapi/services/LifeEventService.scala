@@ -45,6 +45,7 @@ trait LifeEventService {
           failureResponse.code match {
             case "LIFE_EVENT_INAPPROPRIATE" => ReportLifeEventInappropriateResponse
             case "LIFE_EVENT_ALREADY_EXISTS" => ReportLifeEventAlreadyExistsResponse
+            case "INVESTOR_ACCOUNTID_NOT_FOUND" => ReportLifeEventAccountNotFoundResponse
             case "INTERNAL_SERVER_ERROR" => ReportLifeEventErrorResponse
             case _ => {
               ReportLifeEventErrorResponse
