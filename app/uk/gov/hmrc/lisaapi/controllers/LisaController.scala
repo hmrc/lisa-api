@@ -22,20 +22,25 @@ import play.api.libs.json.Json.toJson
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Reads}
 import play.api.mvc.{AnyContent, Request, Result}
 import uk.gov.hmrc.api.controllers.HeaderValidator
+import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
+import uk.gov.hmrc.auth.core.Retrievals._
+import uk.gov.hmrc.auth.core.{AuthProviders, AuthorisedFunctions, Enrolment}
 import uk.gov.hmrc.play.config.RunMode
 import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.microservice.controller.BaseController
-
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 
-trait LisaController extends BaseController with HeaderValidator with RunMode with JsonFormats {
+trait LisaController extends BaseController with HeaderValidator with RunMode with JsonFormats with AuthorisedFunctions{
   implicit val hc: HeaderCarrier
 
   protected def withValidJson[T] (
     success: (T) => Future[Result],
     invalid: Option[(Seq[(JsPath, Seq[ValidationError])]) => Future[Result]] = None
-  )(implicit request: Request[AnyContent], reads: Reads[T]): Future[Result] = {
+  )(implicit request: Request[AnyContent], reads: Reads[T]): Future[Result] =
+{
+//    authorised((Enrolment("HMRC-LISA-ORG")).withIdentifier("ZREF", request.getQueryString("lisaManager").getOrElse(""))) {
 
     request.body.asJson match {
       case Some(json) =>
@@ -55,7 +60,16 @@ trait LisaController extends BaseController with HeaderValidator with RunMode wi
       case None => Future.successful(BadRequest(toJson(EmptyJson)))
     }
 
+  } recoverWith {
+    handleFailure
   }
+
+
+
+def handleFailure(implicit request: Request[_]) = PartialFunction[Throwable, Future[Result]] {
+// todo: dont assume any controller exception is related to auth - it may be an error in the application code
+case _ => Future.successful(Unauthorized("The lisaManagerReferenceNumber path parameter you've used doesn't match with an authorised LISA provider in HMRC's records."))
+}
 
 }
 

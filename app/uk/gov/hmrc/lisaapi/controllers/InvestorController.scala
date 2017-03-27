@@ -20,6 +20,9 @@ import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.api.controllers.HeaderValidator
+import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
+import uk.gov.hmrc.auth.core.Enrolment
+import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.InvestorService
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -28,6 +31,7 @@ import uk.gov.hmrc.play.microservice.controller.BaseController
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class InvestorController extends LisaController {
+  val authConnector = LisaAuthConnector
 
   val service: InvestorService = InvestorService
 
@@ -35,8 +39,9 @@ class InvestorController extends LisaController {
 
   def createLisaInvestor(lisaManager: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async {
     implicit request =>
-      Logger.debug(s"LISA HTTP Request: ${request.uri}  and method: ${request.method}" )
-      withValidJson[CreateLisaInvestorRequest] {
+      authorised((Enrolment("HMRC-LISA-ORG")).withIdentifier("ZREF", lisaManager)) {
+        Logger.debug(s"LISA HTTP Request: ${request.uri}  and method: ${request.method} and headers :${request.headers} and parameters : ${lisaManager}")
+        withValidJson[CreateLisaInvestorRequest] {
         createRequest => {
           service.createInvestor(lisaManager, createRequest).map { result =>
             result match {
@@ -51,6 +56,9 @@ class InvestorController extends LisaController {
             }
           }
         }
+      }
+      } recoverWith {
+        handleFailure
       }
   }
 

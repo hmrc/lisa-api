@@ -21,6 +21,7 @@ import play.api.data.validation.ValidationError
 import play.api.libs.json.{JsPath, Json}
 import play.api.libs.json.Json.toJson
 import play.api.mvc.{Action, AnyContent}
+import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.AccountService
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -29,6 +30,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class AccountController extends LisaController {
+  val authConnector = LisaAuthConnector
 
   val service: AccountService = AccountService
 

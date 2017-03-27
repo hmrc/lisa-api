@@ -19,6 +19,7 @@ package uk.gov.hmrc.lisaapi.controllers
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
+import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.LifeEventService
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -26,6 +27,7 @@ import uk.gov.hmrc.play.http.HeaderCarrier
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class LifeEventController extends LisaController {
+  val authConnector = LisaAuthConnector
 
   val service: LifeEventService = LifeEventService
 
