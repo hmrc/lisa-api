@@ -78,3 +78,5 @@ object ErrorInvestorAlreadyExists {
   }
 
 }
+
+case object ErrorLifeEventNotProvided extends ErrorResponse(403,"LIFE_EVENT_NOT_PROVIDED","lifeEventID is required when the claimReason is \"Life Event\"")
