@@ -24,6 +24,7 @@ import uk.gov.hmrc.lisaapi.services.LifeEventService
 import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class LifeEventController extends LisaController {
 
@@ -35,31 +36,49 @@ class LifeEventController extends LisaController {
     implicit request =>
 
     withValidJson[ReportLifeEventRequest] { req =>
-      service.reportLifeEvent(lisaManager, accountId, req) map { res =>
-        Logger.debug("Entering LifeEvent Controller and the response is " + res.toString)
-        res match {
-          case ReportLifeEventSuccessResponse(lifeEventId) => {
-            Logger.debug("Matched Valid repsponse ")
-            val data = ApiResponseData(message = "Life Event Created", lifeEventId = Some(lifeEventId))
+      if(validateDatebyEvent(req)) {
+        service.reportLifeEvent(lisaManager, accountId, req) map { res =>
+          Logger.debug("Entering LifeEvent Controller and the response is " + res.toString)
+          res match {
+            case ReportLifeEventSuccessResponse(lifeEventId) => {
+              Logger.debug("Matched Valid repsponse ")
+              val data = ApiResponseData(message = "Life Event Created", lifeEventId = Some(lifeEventId))
 
-            Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = 201)))
-          }
-          case ReportLifeEventInappropriateResponse => {Logger.debug(("Matched Inappropriate"))
-            Forbidden(Json.toJson(ErrorLifeEventInappropriate))
-          }
-          case ReportLifeEventAlreadyExistsResponse => {
-            Logger.debug("Matched Already Exists")
-            Conflict(Json.toJson(ErrorLifeEventAlreadyExists))
-          }
-          case ReportLifeEventAccountNotFoundResponse => {
-            NotFound(Json.toJson(ErrorAccountNotFound))
-          }
-          case _ => {
-            Logger.debug("Matched Error")
-            InternalServerError(Json.toJson(ErrorInternalServerError))
+              Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = 201)))
+            }
+            case ReportLifeEventInappropriateResponse => {
+              Logger.debug(("Matched Inappropriate"))
+              Forbidden(Json.toJson(ErrorLifeEventInappropriate))
+            }
+            case ReportLifeEventAlreadyExistsResponse => {
+              Logger.debug("Matched Already Exists")
+              Conflict(Json.toJson(ErrorLifeEventAlreadyExists))
+            }
+            case ReportLifeEventAccountNotFoundResponse => {
+              NotFound(Json.toJson(ErrorAccountNotFound))
+            }
+            case _ => {
+              Logger.debug("Matched Error")
+              InternalServerError(Json.toJson(ErrorInternalServerError))
+            }
           }
         }
+      } else {
+        Logger.debug("Bad date")
+        Future.successful(BadRequest(Json.toJson(ErrorLifeEventInvalidFutureDate)))
       }
+    }
+  }
+
+  def validateDatebyEvent(lifeEvent: ReportLifeEventRequest): Boolean = {
+    Logger.debug("Validating the date")
+    val dt = lifeEvent.eventDate
+    Logger.debug("The date is " + lifeEvent.eventDate.toString)
+    Logger.debug("The event type is " + lifeEvent.eventType)
+    lifeEvent.eventType match {
+      case "LISA Investor Terminal Ill Health" => if( dt.isAfterNow ) false else true
+      case "LISA Investor Death"  => if( dt.isAfterNow ) false else true
+      case _ => true
     }
   }
 

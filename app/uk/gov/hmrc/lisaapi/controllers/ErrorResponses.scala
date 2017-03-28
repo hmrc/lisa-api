@@ -71,6 +71,8 @@ case object ErrorLifeEventInappropriate extends ErrorResponse(403, "LIFE_EVENT_I
 
 case object ErrorLifeEventAlreadyExists extends ErrorResponse(409,"LIFE_EVENT_ALREADY_EXISTS","The investor’s life event has already been reported")
 
+case object ErrorLifeEventInvalidFutureDate extends ErrorResponse(400,"BAD_REQUEST"," That life event cannot occur in the future")
+
 object ErrorInvestorAlreadyExists {
 
   def apply(investorId: String) = {
