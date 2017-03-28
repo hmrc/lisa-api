@@ -71,10 +71,7 @@ class LifeEventController extends LisaController {
   }
 
   def validateDatebyEvent(lifeEvent: ReportLifeEventRequest): Boolean = {
-    Logger.debug("Validating the date")
     val dt = lifeEvent.eventDate
-    Logger.debug("The date is " + lifeEvent.eventDate.toString)
-    Logger.debug("The event type is " + lifeEvent.eventType)
     lifeEvent.eventType match {
       case "LISA Investor Terminal Ill Health" => if( dt.isAfterNow ) false else true
       case "LISA Investor Death"  => if( dt.isAfterNow ) false else true
