@@ -68,7 +68,7 @@ class BonusPaymentControllerSpec  extends PlaySpec with MockitoSugar with OneApp
           (contentAsJson(res) \ "message").as[String] mustBe ("xyz")
         }
       }
-      "the bonus claim reason is life event and no life event id is not provided" in {
+      "the bonus claim reason is life event and no life event id is provided" in {
         doRequest(validBonusPaymentJson.replace(""""lifeEventID": "1234567891",""", "")) { res =>
           status(res) mustBe (FORBIDDEN)
           (contentAsJson(res) \ "code").as[String] mustBe ("LIFE_EVENT_NOT_PROVIDED")
