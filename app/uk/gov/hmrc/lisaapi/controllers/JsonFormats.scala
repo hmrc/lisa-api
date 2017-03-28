@@ -161,21 +161,21 @@ trait JsonFormats {
   )(unlift(Bonuses.unapply))
 
   implicit val requestBonusPaymentReads: Reads[RequestBonusPaymentRequest] = (
-    (JsPath \ "lifeEventID").read(Reads.pattern(lifeEventIDRegex, "error.formatting.lifeEventID")) and
+    (JsPath \ "lifeEventID").readNullable(Reads.pattern(lifeEventIDRegex, "error.formatting.lifeEventID")) and
     (JsPath \ "periodStartDate").read(isoDateReads()).map(new DateTime(_)) and
     (JsPath \ "periodEndDate").read(isoDateReads()).map(new DateTime(_)) and
     (JsPath \ "transactionType").read(Reads.pattern(transactionTypeRegex, "error.formatting.transactionType")) and
-    (JsPath \ "htbTransfer").read[HelpToBuyTransfer] and
+    (JsPath \ "htbTransfer").readNullable[HelpToBuyTransfer] and
     (JsPath \ "inboundPayments").read[InboundPayments] and
     (JsPath \ "bonuses").read[Bonuses]
   )(RequestBonusPaymentRequest.apply _)
 
   implicit val requestBonusPaymentWrites: Writes[RequestBonusPaymentRequest] = (
-    (JsPath \ "lifeEventID").write[String] and
+    (JsPath \ "lifeEventID").writeNullable[String] and
     (JsPath \ "periodStartDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
     (JsPath \ "periodEndDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
     (JsPath \ "transactionType").write[String] and
-    (JsPath \ "htbTransfer").write[HelpToBuyTransfer] and
+    (JsPath \ "htbTransfer").writeNullable[HelpToBuyTransfer] and
     (JsPath \ "inboundPayments").write[InboundPayments] and
     (JsPath \ "bonuses").write[Bonuses]
   )(unlift(RequestBonusPaymentRequest.unapply))

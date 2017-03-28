@@ -24,6 +24,7 @@ import uk.gov.hmrc.lisaapi.services.{BonusPaymentService, LifeEventService}
 import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class BonusPaymentController extends LisaController {
 
@@ -35,22 +36,28 @@ class BonusPaymentController extends LisaController {
     implicit request =>
 
     withValidJson[RequestBonusPaymentRequest] { req =>
-      service.requestBonusPayment(lisaManager, accountId, req) map { res =>
-        Logger.debug("Entering Bonus Payment Controller and the response is " + res.toString)
-        res match {
-          case RequestBonusPaymentSuccessResponse(transactionID) => {
-            Logger.debug("Matched success response")
-            val data = ApiResponseData(message = "Bonus transaction created", transactionId = Some(transactionID))
 
-            Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = 201)))
+      if (req.lifeEventID.isEmpty && req.bonuses.claimReason == "Life Event") {
+        Future.successful(Forbidden(Json.toJson(ErrorLifeEventNotProvided)))
+      }
+      else {
+        service.requestBonusPayment(lisaManager, accountId, req) map { res =>
+          Logger.debug("Entering Bonus Payment Controller and the response is " + res.toString)
+          res match {
+            case RequestBonusPaymentSuccessResponse(transactionID) => {
+              Logger.debug("Matched success response")
+              val data = ApiResponseData(message = "Bonus transaction created", transactionId = Some(transactionID))
+
+              Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = 201)))
+            }
+            case errorResponse: RequestBonusPaymentErrorResponse => {
+              Logger.debug("Matched error response")
+              Status(errorResponse.status).apply(Json.toJson(errorResponse.data))
+            }
           }
-          case errorResponse: RequestBonusPaymentErrorResponse => {
-            Logger.debug("Matched error response")
-            Status(errorResponse.status).apply(Json.toJson(errorResponse.data))
-          }
+        } recover {
+          case _ => InternalServerError(Json.toJson(ErrorInternalServerError))
         }
-      } recover {
-        case _ => InternalServerError(Json.toJson(ErrorInternalServerError))
       }
     }
   }
