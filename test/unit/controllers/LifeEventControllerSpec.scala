@@ -130,7 +130,7 @@ class LifeEventControllerSpec  extends PlaySpec with MockitoSugar with OneAppPer
 
     }
 
-    "return with Create when valid past date for LISA Investor Death" in {
+    "return with BadRequest when invalid future date for LISA Investor Death" in {
       when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful((ReportTest)))
 
       val reportLifeEventJsonFutureDateDeath =
