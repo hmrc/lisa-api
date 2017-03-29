@@ -41,14 +41,14 @@ trait JsonFormats {
     (JsPath \ "investorNINO").read(Reads.pattern(ninoRegex, "error.formatting.nino")) and
     (JsPath \ "firstName").read(Reads.pattern(nameRegex, "error.formatting.firstName")) and
     (JsPath \ "lastName").read(Reads.pattern(nameRegex, "error.formatting.lastName")) and
-    (JsPath \ "DoB").read(isoDateReads(allowFutureDates = false)).map(new DateTime(_))
+    (JsPath \ "dateOfBirth").read(isoDateReads(allowFutureDates = false)).map(new DateTime(_))
   )(CreateLisaInvestorRequest.apply _)
 
   implicit val createLisaInvestorRequestWrites: Writes[CreateLisaInvestorRequest] = (
     (JsPath \ "investorNINO").write[String] and
     (JsPath \ "firstName").write[String] and
     (JsPath \ "lastName").write[String] and
-    (JsPath \ "DoB").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd"))
+    (JsPath \ "dateOfBirth").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd"))
   )(unlift(CreateLisaInvestorRequest.unapply))
 
   implicit val desCreateAccountResponseFormats = Json.format[DesAccountResponse]

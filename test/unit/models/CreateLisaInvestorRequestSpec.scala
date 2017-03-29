@@ -25,7 +25,7 @@ import uk.gov.hmrc.lisaapi.models.CreateLisaInvestorRequest
 
 class CreateLisaInvestorRequestSpec extends PlaySpec with JsonFormats {
 
-  val validRequestJson = """{"investorNINO":"AB123456A", "firstName":"A", "lastName":"B", "DoB":"2000-02-29"}"""
+  val validRequestJson = """{"investorNINO":"AB123456A", "firstName":"A", "lastName":"B", "dateOfBirth":"2000-02-29"}"""
 
   "CreateLisaInvestorRequest" must {
 
@@ -38,9 +38,9 @@ class CreateLisaInvestorRequestSpec extends PlaySpec with JsonFormats {
           data.investorNINO mustBe "AB123456A"
           data.firstName mustBe "A"
           data.lastName mustBe "B"
-          data.DoB.getYear mustBe 2000
-          data.DoB.getMonthOfYear mustBe 2
-          data.DoB.getDayOfMonth mustBe 29
+          data.dateOfBirth.getYear mustBe 2000
+          data.dateOfBirth.getMonthOfYear mustBe 2
+          data.dateOfBirth.getDayOfMonth mustBe 29
         }
       }
     }
@@ -65,32 +65,32 @@ class CreateLisaInvestorRequestSpec extends PlaySpec with JsonFormats {
       hasCorrectValidationError(validRequestJson.replace("B", ""), "/lastName", "error.formatting.lastName")
     }
 
-    "catch an invalid DoB" when {
+    "catch an invalid dateOfBirth" when {
 
       "the data type is incorrect" in {
-        hasCorrectValidationError(validRequestJson.replace("\"2000-02-29\"", "123456789"), "/DoB", "error.formatting.date")
+        hasCorrectValidationError(validRequestJson.replace("\"2000-02-29\"", "123456789"), "/dateOfBirth", "error.formatting.date")
       }
 
       "the format is incorrect" in {
-        hasCorrectValidationError(validRequestJson.replace("2000-02-29", "01/01/2000"), "/DoB", "error.formatting.date")
+        hasCorrectValidationError(validRequestJson.replace("2000-02-29", "01/01/2000"), "/dateOfBirth", "error.formatting.date")
       }
 
       "day and month are in the wrong order" in {
-        hasCorrectValidationError(validRequestJson.replace("2000-02-29", "2000-31-01"), "/DoB", "error.formatting.date")
+        hasCorrectValidationError(validRequestJson.replace("2000-02-29", "2000-31-01"), "/dateOfBirth", "error.formatting.date")
       }
 
       "an invalid date is supplied" in {
-        hasCorrectValidationError(validRequestJson.replace("2000-02-29", "2000-09-31"), "/DoB", "error.formatting.date")
+        hasCorrectValidationError(validRequestJson.replace("2000-02-29", "2000-09-31"), "/dateOfBirth", "error.formatting.date")
       }
 
       "feb 29th is supplied for a non-leap year" in {
-        hasCorrectValidationError(validRequestJson.replace("2000-02-29", "2017-02-29"), "/DoB", "error.formatting.date")
+        hasCorrectValidationError(validRequestJson.replace("2000-02-29", "2017-02-29"), "/dateOfBirth", "error.formatting.date")
       }
 
       "the date is in the future" in {
         val futureDate = DateTime.now().plusDays(1).toString("yyyy-MM-dd")
 
-        hasCorrectValidationError(validRequestJson.replace("2000-02-29", futureDate), "/DoB", "error.formatting.date")
+        hasCorrectValidationError(validRequestJson.replace("2000-02-29", futureDate), "/dateOfBirth", "error.formatting.date")
       }
 
     }
