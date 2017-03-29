@@ -18,7 +18,7 @@ package uk.gov.hmrc.lisaapi.controllers
 
 import play.api.Logger
 import play.api.data.validation.ValidationError
-import play.api.libs.json.{JsPath, JsValue, Json}
+import play.api.libs.json.{JsObject, JsPath, JsValue, Json}
 import play.api.libs.json.Json.toJson
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.lisaapi.models._
@@ -39,7 +39,7 @@ class AccountController extends LisaController {
       (req) => {
         req match {
           case createRequest: CreateLisaAccountCreationRequest => {
-            if (hasAccountTransferData(request.body.asJson.get)) {
+            if (hasAccountTransferData(request.body.asJson.get.as[JsObject])) {
               Future.successful(Forbidden(toJson(ErrorTransferAccountDataProvided)))
             }
             else {
@@ -125,8 +125,8 @@ class AccountController extends LisaController {
     }
   }
 
-  private def hasAccountTransferData(js:JsValue): Boolean = {
-    (js \ "transferAccount").asOpt[AccountTransfer].nonEmpty
+  private def hasAccountTransferData(js:JsObject): Boolean = {
+    js.keys.contains("transferAccount")
   }
 
 }
