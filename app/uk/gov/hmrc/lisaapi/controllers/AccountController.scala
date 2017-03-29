@@ -21,7 +21,6 @@ import play.api.data.validation.ValidationError
 import play.api.libs.json.{JsPath, Json}
 import play.api.libs.json.Json.toJson
 import play.api.mvc.{Action, AnyContent}
-import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.AccountService
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -30,7 +29,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class AccountController extends LisaController {
-  val authConnector = LisaAuthConnector
 
   val service: AccountService = AccountService
 
@@ -61,14 +59,13 @@ class AccountController extends LisaController {
             Future.successful(BadRequest(toJson(ErrorGenericBadRequest)))
           }
         }
-      )
+      ), lisaManager=lisaManager
     )
   }
 
   def closeLisaAccount(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
-    withValidJson[CloseLisaAccountRequest] { request =>
-      processAccountClosure(lisaManager, accountId, request)
-    }
+    withValidJson[CloseLisaAccountRequest] ( request =>
+      processAccountClosure(lisaManager, accountId, request) ,lisaManager=lisaManager)
   }
 
   private def processAccountCreation(lisaManager: String, request: CreateLisaAccountCreationRequest) = {

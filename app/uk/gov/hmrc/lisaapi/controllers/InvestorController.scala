@@ -17,29 +17,28 @@
 package uk.gov.hmrc.lisaapi.controllers
 
 import play.api.Logger
-import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent}
-import uk.gov.hmrc.auth.core.Enrolment
-import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
+import play.api.libs.json.{JsPath, Json}
+import play.api.mvc.{Result, Action, AnyContent}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.InvestorService
-import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class InvestorController extends LisaController {
-  val authConnector = LisaAuthConnector
 
   val service: InvestorService = InvestorService
 
-  implicit val hc: HeaderCarrier = new HeaderCarrier()
+//  implicit val hc: HeaderCarrier = new HeaderCarrier()
 
-  def createLisaInvestor(lisaManager: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async {
-    implicit request =>
-      authorised((Enrolment("HMRC-LISA-ORG")).withIdentifier("ZREF", lisaManager)) {
-        Logger.debug(s"LISA HTTP Request: ${request.uri}  and method: ${request.method} and headers :${request.headers} and parameters : ${lisaManager}")
-        withValidJson[CreateLisaInvestorRequest] {
-        createRequest => {
+  def createLisaInvestor( lisaManager: String): Action[AnyContent] =
+    Action.async {
+      implicit request =>
+      Logger.debug(s"LISA HTTP Request: ${request.uri}  and method: ${request.method} and headers :${request.headers} and parameters : ${lisaManager}")
+//        protected def withValidJson[CreateLisaInvestorRequest] ( success: (CreateLisaInvestorRequest) => Future[Result],
+//      invalid: Option[(Seq[(JsPath, Seq[ValidationError])]) => Future[Result]] = None   )
+       withValidJson[CreateLisaInvestorRequest] (
+               createRequest => {
           service.createInvestor(lisaManager, createRequest).map { result =>
             result match {
               case CreateLisaInvestorSuccessResponse(investorId) => {
@@ -51,12 +50,10 @@ class InvestorController extends LisaController {
               case CreateLisaInvestorAlreadyExistsResponse(investorId) => Conflict(Json.toJson(ErrorInvestorAlreadyExists(investorId)))
               case CreateLisaInvestorErrorResponse => InternalServerError(Json.toJson(ErrorInternalServerError))
             }
+
           }
-        }
-      }
-      } recoverWith {
-        handleFailure
-      }
+        },lisaManager=lisaManager)
+
   }
 
 }

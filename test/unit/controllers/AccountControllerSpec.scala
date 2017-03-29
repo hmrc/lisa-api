@@ -294,6 +294,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
   }
 
   val mockService = mock[AccountService]
+
   val SUT = new AccountController{
     override val service: AccountService = mockService
   }

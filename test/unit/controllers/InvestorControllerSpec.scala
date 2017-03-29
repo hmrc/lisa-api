@@ -27,19 +27,23 @@ import play.api.mvc.{AnyContentAsJson, Results}
 import play.api.test.Helpers._
 import play.api.test._
 import play.mvc.Http.HeaderNames
+import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
 import uk.gov.hmrc.lisaapi.controllers.InvestorController
 import uk.gov.hmrc.lisaapi.models.{CreateLisaInvestorAlreadyExistsResponse, CreateLisaInvestorErrorResponse, CreateLisaInvestorNotFoundResponse, CreateLisaInvestorSuccessResponse}
 import uk.gov.hmrc.lisaapi.services.InvestorService
+import uk.gov.hmrc.play.test.WithFakeApplication
 
 import scala.concurrent.Future
 
 
-class InvestorControllerSpec extends WordSpec with MockitoSugar with ShouldMatchers with OneAppPerSuite {
+class InvestorControllerSpec extends WordSpec with MockitoSugar with ShouldMatchers with OneAppPerSuite with WithFakeApplication{
 
   val mockService = mock[InvestorService]
+  val mockAuthConnector = mock[LisaAuthConnector]
 
   val mockInvestorController = new InvestorController{
     override val service: InvestorService = mockService
+    override val authConnector = mockAuthConnector
   }
 
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")

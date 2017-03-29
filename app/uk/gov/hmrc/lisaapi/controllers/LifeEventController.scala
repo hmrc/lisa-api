@@ -27,7 +27,6 @@ import uk.gov.hmrc.play.http.HeaderCarrier
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class LifeEventController extends LisaController {
-  val authConnector = LisaAuthConnector
 
   val service: LifeEventService = LifeEventService
 
@@ -36,7 +35,7 @@ class LifeEventController extends LisaController {
   def reportLisaLifeEvent(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async {
     implicit request =>
 
-    withValidJson[ReportLifeEventRequest] { req =>
+    withValidJson[ReportLifeEventRequest] ( req =>
       service.reportLifeEvent(lisaManager, accountId, req) map { res =>
         Logger.debug("Entering LifeEvent Controller and the response is " + res.toString)
         res match {
@@ -61,8 +60,8 @@ class LifeEventController extends LisaController {
             InternalServerError(Json.toJson(ErrorInternalServerError))
           }
         }
-      }
-    }
+      }, lisaManager=lisaManager
+    )
   }
 
 }
