@@ -48,14 +48,14 @@ class InvestorControllerSpec extends WordSpec with MockitoSugar with ShouldMatch
                          "investorNINO" : "AB123456D",
                          "firstName" : "Ex first Name",
                          "lastName" : "Ample",
-                         "DoB" : "1973-03-24"
+                         "dateOfBirth" : "1973-03-24"
                        }""".stripMargin
 
   val invalidInvestorJson = """{
                          "investorNINO" : 123456,
                          "firstName" : "Ex first Name",
                          "lastName" : "Ample",
-                         "DoB" : "1973-03-24"
+                         "dateOfBirth" : "1973-03-24"
                        }""".stripMargin
 
 

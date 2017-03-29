@@ -18,4 +18,4 @@ package uk.gov.hmrc.lisaapi.models
 
 import org.joda.time.DateTime
 
-case class CreateLisaInvestorRequest(investorNINO: String, firstName: String, lastName: String, DoB: DateTime)
+case class CreateLisaInvestorRequest(investorNINO: String, firstName: String, lastName: String, dateOfBirth: DateTime)
