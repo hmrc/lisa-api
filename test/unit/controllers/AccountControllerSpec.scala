@@ -47,6 +47,19 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
                               |  "firstSubscriptionDate" : "2011-03-23"
                               |}""".stripMargin
 
+  val createAccountJsonWithTransfer = """{
+                            |  "investorID" : "9876543210",
+                            |  "lisaManagerReferenceNumber" : "Z4321",
+                            |  "accountID" :"8765432100",
+                            |  "creationReason" : "New",
+                            |  "firstSubscriptionDate" : "2011-03-23",
+                            |  "transferAccount": {
+                            |    "transferredFromAccountID": "Z543210",
+                            |    "transferredFromLMRN": "Z543333",
+                            |    "transferInDate": "2015-12-13"
+                            |  }
+                            |}""".stripMargin
+
   val transferAccountJson = """{
                             |  "investorID" : "9876543210",
                             |  "lisaManagerReferenceNumber" : "Z4321",
@@ -167,6 +180,15 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
         doCreateOrTransferRequest(transferAccountJsonIncomplete) { res =>
           status(res) mustBe (FORBIDDEN)
           (contentAsJson(res) \ "code").as[String] mustBe ("TRANSFER_ACCOUNT_DATA_NOT_PROVIDED")
+        }
+      }
+    }
+
+    "return with status 403 forbidden and a code of TRANSFER_ACCOUNT_DATA_PROVIDED" when {
+      "sent a create request json with transferAccount data" in {
+        doCreateOrTransferRequest(createAccountJsonWithTransfer) { res =>
+          status(res) mustBe (FORBIDDEN)
+          (contentAsJson(res) \ "code").as[String] mustBe ("TRANSFER_ACCOUNT_DATA_PROVIDED")
         }
       }
     }
