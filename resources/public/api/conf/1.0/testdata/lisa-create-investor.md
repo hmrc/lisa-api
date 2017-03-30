@@ -11,7 +11,7 @@
     </thead>
     <tbody>
         <tr>
-            <td><p>Create Investor with valid lisaManagerRefNumber and  investor NINO data<br>http://localhost:9000/lifetime-isa/manager/Z123456/investors </p></td>
+            <td><p>Create Investor with valid payload and lisaManagerReferenceNumber</p> <pre>lisaManagerReferenceNumber : Z123456</pre></td>
             <td><p>{"investorNINO" : "AA123456A",<br>
                      "firstName" : "First Name",<br>
                      "lastName" : "Last Name",<br>
@@ -28,8 +28,7 @@
                    }</p></td>
         </tr>
         <tr>
-            <td><p>Create Investor with valid lisaManagerRefNumber and an already existing Lisa investor<br>http://localhost:9000/lifetime-isa/manager/Z123456/investors
-</p></td>
+            <td><p>Create Investor with valid lisaManagerReferenceNumber and an already existing Lisa investor<br>lisaManagerReferenceNumber :Z123456</p></td>
             <td><p>{"investorNINO" : "AA222222A",<br>
                                         "firstName" : "First Name",<br>
                                         "lastName" : "Last Name",<br>
