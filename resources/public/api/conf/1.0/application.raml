@@ -13,6 +13,8 @@ documentation:
     content: !include https://developer.service.hmrc.gov.uk/api-documentation/assets/common/docs/versioning.md
   - title: Errors
     content: !include https://developer.service.hmrc.gov.uk/api-documentation/assets/common/docs/errors.md
+  - title: Testing Approach
+    content: !include documentation/testing-approach.md
 
 uses:
   sec: https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/securitySchemes.raml
@@ -110,6 +112,7 @@ types:
               description: !include documentation/LISAInvestor.post
               (annotations.scope): "write:lisa"
               securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
+              (annotations.sandboxData): !include testdata/lisa-create-investor.md
               body:
                 application/json:
                   example: !include examples/LISAInvestor.post.json
@@ -220,6 +223,7 @@ types:
           displayName: Create or transfer a LISA account
           (annotations.scope): "write:lisa"
           securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
+          (annotations.sandboxData): !include testdata/create-account.md
           body:
             application/json:
               type: !include schemas/LISAAccount.post.schema.json
@@ -368,6 +372,8 @@ types:
                       description: Close an account and report the reason and date.
                       (annotations.scope): "write:lisa"
                       securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
+                      (annotations.sandboxData): !include testdata/close-account.md
+
                       body:
                         application/json:
                           type: !include schemas/LISAAccount.close.post.schema.json
@@ -469,6 +475,7 @@ types:
                       description: !include documentation/LifeEvent
                       (annotations.scope): "write:lisa"
                       securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
+                      (annotations.sandboxData): !include testdata/life-event.md
                       body:
                         application/json:
                           type: !include schemas/LifeEvent.post.schema.json
@@ -566,6 +573,7 @@ types:
                       description: Request a bonus payment from HMRC and provide a reason for the request.
                       (annotations.scope): "write:lisa"
                       securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
+                      (annotations.sandboxData): !include testdata/bonus-payment.md
                       body:
                         application/json:
                           type: !include schemas/BonusPaymentRequest.post.schema.json
