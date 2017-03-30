@@ -5,20 +5,38 @@
     <thead>
         <tr>
             <th>Scenario</th>
-            <th>Parameters</th>
+            <th>Payload</th>
             <th>Response</th>
         </tr>
     </thead>
     <tbody>
         <tr>
-            <td><p>Happy path<br/>(example 1)</p></td>
-            <td><p>nino = AA000003D<br>firstName = John<br>surname = Smith<br>dateOfBirth = 1981-01-01</p></td>
-            <td><p>201 (Created)</p></td>
+            <td><p>Create Investor with valid lisaManagerRefNumber and  investor NINO data<br>http://localhost:9000/lifetime-isa/manager/Z123456/investors </p></td>
+            <td><p>{"investorNINO" : "AA123456A",<br>
+                     "firstName" : "First Name",<br>
+                     "lastName" : "Last Name",<br>
+                     "dateOfBirth" : "1985-03-25"<br>
+                   }
+                       </p></td>
+            <td><p>{
+                     "data": {<br>
+                       "investorID": "9876543210",<br>
+                       "message": "Investor Created."<br>
+                     },<br>
+                     "success": true,<br>
+                     "status": 201<br>
+                   }</p></td>
         </tr>
         <tr>
-            <td><p>Happy path<br/>(example 2)</p></td>
-            <td><p>nino = AA000004C<br>firstName = Peter<br>surname = Jones<br>dateOfBirth = 1982-01-01</p></td>
-            <td><p>201 (Created)</p><p>{ &quot;eligible&quot; : false }</p></td>
+            <td><p>Create Investor with valid lisaManagerRefNumber and an already existing Lisa investor<br>http://localhost:9000/lifetime-isa/manager/Z123456/investors
+</p></td>
+            <td><p>{"investorNINO" : "AA222222A",<br>
+                                        "firstName" : "First Name",<br>
+                                        "lastName" : "Last Name",<br>
+                                        "dateOfBirth" : "1985-03-25"<br>
+                                      }
+                                          </p></td>
+            <td><p>409(Conflict)</p></td>
         </tr>
         <tr>
             <td><p>The lisaManagerReferenceNumber path parameter you've used doesn't match with an authorised LISA provider in HMRC's records.</p></td>
