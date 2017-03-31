@@ -1,6 +1,2 @@
-Developers who wish to test LISA API's defined in this version should use sandbox environment i.e. 
-<p><b> https://www-externaltest.tax.service.gov.uk/api-documentation/docs/sandbox/introduction </b></p>
-Details on how to register and use are provided in detail on the site.The environment has feature to create test users and test LISA API's documented below.
-Until LISA sandbox service provide a conversational state i.e. processing the test data of the user in sandbox environment,
-Please use the testdata defined below which will allow to test possible success and failure scenarios of the API defined below against each API.  
- 
+<p>You can <a href="https://www-externaltest.tax.service.gov.uk/api-documentation/docs/sandbox/introduction">use the HMRC Developer Sandbox to test the API</a>. The Sandbox is an enhanced testing service that functions as a simulator of HMRC’s production environment.</p>
+<p>The Sandbox for the Lifetime ISA API does not currently support <a href="https://www-externaltest.tax.service.gov.uk/api-documentation/docs/sandbox/stateful-behaviour">stateful behaviour</a>, but you can use the payloads described in the resources to test specific scenarios.</p>
