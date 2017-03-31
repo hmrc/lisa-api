@@ -16,6 +16,7 @@
 
 package unit.controllers
 
+import org.joda.time.DateTime
 import org.mockito.Matchers._
 import org.mockito.Mockito.when
 import org.scalatest.mock.MockitoSugar
@@ -46,12 +47,11 @@ class LifeEventControllerSpec  extends PlaySpec with MockitoSugar with OneAppPer
   val reportLifeEventJson =
     """
       |{
-      |  "accountId" : "1234567890",
-      |  "lisaManagerReferenceNumber" : "Z543210",
-      |  "eventType" : "LISA Investor Terminal Ill Health",
-      |  "eventDate" : "2017-04-06"
+      |  "eventType" : "House Purchase",
+      |  "eventDate" : "2001-01-01"
       |}
     """.stripMargin
+
 
 
   "The Life Event Controller" should {
@@ -70,7 +70,7 @@ class LifeEventControllerSpec  extends PlaySpec with MockitoSugar with OneAppPer
                              |  "accountId" : "1234567890",
                              |  "lisaManagerReferenceNumber" : "Z543210",
                              |  "eventType" : "LISA Wanted to Come Out",
-                             |  "eventDate" : "2017-04-06"
+                             |  "eventDate" : "2001-01-06"
                              |}
                            """.stripMargin
 
@@ -111,6 +111,78 @@ class LifeEventControllerSpec  extends PlaySpec with MockitoSugar with OneAppPer
       }
     }
 
+    "return with BadRequest when invalid future date for LISA Investor Terminal Ill Health" in {
+      when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful((ReportTest)))
+
+      val reportLifeEventJsonFutureDateDeath =
+        """
+          |{
+          |  "eventType" : "LISA Investor Terminal Ill Health",
+          |  "eventDate" : "2017-04-06"
+          |}
+        """.stripMargin
+      val futureDate = DateTime.now().plusDays(1).toString("yyyy-MM-dd")
+      val req = reportLifeEventJsonFutureDateDeath.replace("2017-04-06", futureDate)
+      doReportLifeEventRequest(req){res =>
+        status(res) mustBe (BAD_REQUEST)
+        (contentAsJson(res) \"code").as[String] mustBe ("BAD_REQUEST")
+      }
+
+    }
+
+    "return with BadRequest when invalid future date for LISA Investor Death" in {
+      when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful((ReportTest)))
+
+      val reportLifeEventJsonFutureDateDeath =
+        """
+          |{
+          |  "eventType" : "LISA Investor Death",
+          |  "eventDate" : "2017-04-06"
+          |}
+        """.stripMargin
+
+      val futureDate = DateTime.now().plusDays(1).toString("yyyy-MM-dd")
+      val req = reportLifeEventJsonFutureDateDeath.replace("2017-04-06", futureDate)
+      doReportLifeEventRequest(req){res =>
+        status(res) mustBe (BAD_REQUEST)
+        (contentAsJson(res) \"code").as[String] mustBe ("BAD_REQUEST")
+      }
+
+    }
+  }
+
+  "return with Created when valid date for LISA Investor Terminal Ill Health" in {
+    when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful((ReportLifeEventSuccessResponse("1928374"))))
+
+    val reportLifeEventJsonFutureDateDeath =
+      """
+        |{
+        |  "eventType" : "LISA Investor Terminal Ill Health",
+        |  "eventDate" : "2001-01-01"
+        |}
+      """.stripMargin
+    doReportLifeEventRequest(reportLifeEventJsonFutureDateDeath){res =>
+      status(res) mustBe (CREATED)
+      (contentAsJson(res) \"data" \ "lifeEventId").as[String] mustBe ("1928374")
+    }
+
+  }
+
+  "return with Created when valid date for LISA Investor Death" in {
+    when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful((ReportLifeEventSuccessResponse("1928374"))))
+
+    val reportLifeEventJsonFutureDateDeath =
+      """
+        |{
+        |  "eventType" : "LISA Investor Death",
+        |  "eventDate" : "2001-01-01"
+        |}
+      """.stripMargin
+    doReportLifeEventRequest(reportLifeEventJsonFutureDateDeath){res =>
+      status(res) mustBe (CREATED)
+      (contentAsJson(res) \"data" \ "lifeEventId").as[String] mustBe ("1928374")
+    }
+
   }
 
   def doReportLifeEventRequest(jsonString: String)(callback: (Future[Result]) =>  Unit): Unit = {
@@ -120,8 +192,10 @@ class LifeEventControllerSpec  extends PlaySpec with MockitoSugar with OneAppPer
     callback(res)
   }
 
+
   val mockService = mock[LifeEventService]
   val SUT = new LifeEventController {
     override val service: LifeEventService = mockService
   }
+
 }
