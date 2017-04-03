@@ -5,60 +5,132 @@
     <thead>
         <tr>
             <th>Scenario</th>
-            <th>Parameters</th>
+            <th>Request Payload</th>
             <th>Response</th>
         </tr>
     </thead>
     <tbody>
         <tr>
-            <td><p>Happy path<br/>(example 1)</p></td>
-            <td><p>nino = AA000003D<br>firstName = John<br>surname = Smith<br>dateOfBirth = 1981-01-01</p></td>
-            <td><p>201 (Created)</p></td>
+            <td><p>Close Account endpoint with valid accountId and Lisa Manager</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountId :A1234568</p></td>
+            <td>
+                <p class ="code--block"> {<br>
+                                     	  "accountClosureReason":"All funds withdrawn",<br>
+                                     	  "closureDate":"2017-01-03"<br>
+                                        }
+                </p>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">201(OK)</code></p>
+                <p class ="code--block"> {<br>
+                                         "status": 201,<br>
+                                         "success": true,<br>
+                                         "data": {<br>
+                                           "message": "LISA Account Closed",<br>
+                                           "accountId": "A1234568"<br>
+                                         }<br>
+                                       }
+                </p>
+            </td>
         </tr>
         <tr>
-            <td><p>Happy path<br/>(example 2)</p></td>
-            <td><p>nino = AA000004C<br>firstName = Peter<br>surname = Jones<br>dateOfBirth = 1982-01-01</p></td>
-            <td><p>201 (Created)</p><p>{ &quot;eligible&quot; : false }</p></td>
+            <td><p>Close Account endpoint without accountClosureReason and (or) closereDate in the payload</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountId :A1234568</p></td>
+            <td>
+                <p class ="code--block"> {<br>
+                                     	  "closureDate":"2017-01-03"<br>
+                                        }
+                </p>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">400(Bad RequestOK)</code></p>
+                <p class ="code--block"> {<br>
+                                            "code": "BAD_REQUEST",<br>
+                                            "message": "Bad Request"<br>
+                                       }
+                </p>
+            </td>
         </tr>
         <tr>
-            <td><p>The lisaManagerReferenceNumber path parameter you've used doesn't match with an authorised LISA provider in HMRC's records.</p></td>
-            <td><p>lisaManagerRefNumber = Z1234<br>&lt;all other parameters syntactically valid&gt;</p></td>
-            <td><p>401 (Unauthorized)</p><p>{ &quot;code&quot; : &quot;UNAUTHORIZED&quot; }</p></td>
-        </tr>        
-        <tr>
-            <td><p>No match found</p></td>
-            <td><p>&lt;any other combination of syntactically valid parameters&gt;</p></td>
-            <td><p>404 (Not Found)</p><p>{ &quot;code&quot; : &quot;NOT_FOUND&quot; }</p></td>
+            <td><p>Close Account endpoint with an accountId that doesnot exist</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountId :A1234562</p></td>
+            <td>
+                <p class ="code--block"> {<br>
+                                          "accountClosureReason" : "All funds withdrawn",
+                                          "closureDate" : "2017-01-03"
+                                        }
+                </p>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">404(Not Found)</code></p>
+                <p class ="code--block"> {<br>
+                                            "code": "INVESTOR_ACCOUNTID_NOT_FOUND",<br>
+                                            "message": "The accountID given does not match with HMRC’s records"<br>
+                                       }
+                </p>
+            </td>
         </tr>
         <tr>
-            <td><p>Invalid NINO</p></td>
-            <td><p>nino = &lt;any invalid NINO e.g. AA000003X&gt;<br>&lt;all other parameters syntactically valid&gt;</p></td>
-            <td><p>400 (Bad Request)</p><p>{ &quot;code&quot; : &quot;NINO_INVALID&quot; }</p></td>
+            <td><p>Close Account endpoint with an accountId that is already closed</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountId :A1234561</p></td>
+            <td>
+                <p class ="code--block"> {<br>
+                                          "accountClosureReason" : "All funds withdrawn",
+                                          "closureDate" : "2017-01-03"
+                                        }
+                </p>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">403(Forbidden)</code></p>
+                <p class ="code--block"> {<br>
+                                            "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED",<br>
+                                            "message": "The LISA account is already closed"<br>
+                                       }
+                </p>
+            </td>
         </tr>
         <tr>
-            <td><p>Missing NINO</p></td>
-            <td><p>&lt;nino not provided&gt;<br>&lt;all other parameters syntactically valid&gt;</p></td>
-            <td><p>400 (Bad Request)</p><p>{ &quot;code&quot; : &quot;NINO_INVALID&quot; }</p></td>
+            <td><p>Close Account endpoint with a Lisamanager in the URI doesnot exist</p><p class ="code--block">lisaManagerReferenceNumber :Z123456789<br>accountId :A1234561</p></td>
+            <td>
+                <p class ="code--block"> {<br>
+                                          "accountClosureReason" : "All funds withdrawn",
+                                          "closureDate" : "2017-01-03"
+                                        }
+                </p>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">403(Forbidden)</code></p>
+                <p class ="code--block"> {<br>
+                                            "code": "NOT_FOUND",<br>
+                                            "message": "Resource was not found"<br>
+                                       }
+                </p>
+            </td>
         </tr>
         <tr>
-            <td><p>Missing first name</p></td>
-            <td><p>&lt;firstName not provided&gt;<br>&lt;all other parameters syntactically valid&gt;</p></td>
-            <td><p>400 (Bad Request)</p><p>{ &quot;code&quot; : &quot;BAD_REQUEST&quot; }</p></td>
+            <td><p>Close Account endpoint with an invalid Authorization Bearer token</p><p class ="code--block">lisaManagerReferenceNumber :Z123456789<br>accountId :A1234561</p></td>
+            <td>
+                <p class ="code--block"> {<br>
+                                          "accountClosureReason" : "All funds withdrawn",
+                                          "closureDate" : "2017-01-03"
+                                        }
+                </p>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">401(Unauthorized)</code></p>
+                <p class ="code--block"> {<br>
+                                            "code": "INVALID_CREDENTIALS",<br>
+                                            "message": "Invalid Authentication information provided"<br>
+                                       }
+                </p>
+            </td>
         </tr>
         <tr>
-            <td><p>Missing surname</p></td>
-            <td><p>&lt;surname not provided&gt;<br>&lt;all other parameters syntactically valid&gt;</p></td>
-            <td><p>400 (Bad Request)</p><p>{ &quot;code&quot; : &quot;BAD_REQUEST&quot; }</p></td>
-        </tr>
-        <tr>
-            <td><p>Invalid date of birth</p></td>
-            <td><p>dateOfBirth = &lt;any invalid date of birth e.g. 1901-13-01&gt;<br>&lt;all other parameters syntactically valid&gt;</p></td>
-            <td><p>400 (Bad Request)</p><p>{ &quot;code&quot; : &quot;DOB_INVALID&quot; }</p></td>
-        </tr>
-        <tr>
-            <td><p>Missing date of birth</p></td>
-            <td><p>&lt;dateOfBirth not provided&gt;<br>&lt;all other parameters syntactically valid&gt;</p></td>
-            <td><p>400 (Bad Request)</p><p>{ &quot;code&quot; : &quot;DOB_INVALID&quot; }</p></td>
+            <td><p>Close Account endpoint with an invalid Accept header</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountId :A1234551<br>Accept:application/vnd.hmrc.1.0</p></td>
+            <td>
+                <p class ="code--block"> {<br>
+                                          "accountClosureReason" : "All funds withdrawn",
+                                          "closureDate" : "2017-01-03"
+                                        }
+                </p>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">401(Unauthorized)</code></p>
+                <p class ="code--block"> {<br>
+                                            "code": "ACCEPT_HEADER_INVALID",<br>
+                                            "message": "The accept header is missing or invalid"<br>
+                                       }
+                </p>
+            </td>
         </tr>
     </tbody>
 </table>
