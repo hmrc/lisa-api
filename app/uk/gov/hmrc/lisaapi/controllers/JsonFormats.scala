@@ -120,7 +120,7 @@ trait JsonFormats {
 
   implicit val reportLifeEventRequestReads: Reads[ReportLifeEventRequest] = (
     (JsPath \ "eventType").read(Reads.pattern(lifeEventTypeRegex, "error.formatting.eventType")) and
-    (JsPath \ "eventDate").read(isoDateReads(allowFutureDates = true)).map(new DateTime(_))
+    (JsPath \ "eventDate").read(isoDateReads(allowFutureDates = false)).map(new DateTime(_))
     )(ReportLifeEventRequest.apply _)
 
   implicit val reportLifeEventRequestWrites: Writes[ReportLifeEventRequest] = (
