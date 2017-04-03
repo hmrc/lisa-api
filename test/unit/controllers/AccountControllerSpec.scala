@@ -41,7 +41,6 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
   val createAccountJson = """{
                               |  "investorID" : "9876543210",
-                              |  "lisaManagerReferenceNumber" : "Z4321",
                               |  "accountID" :"8765432100",
                               |  "creationReason" : "New",
                               |  "firstSubscriptionDate" : "2011-03-23"
@@ -49,7 +48,6 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
   val createAccountJsonWithTransfer = """{
                             |  "investorID" : "9876543210",
-                            |  "lisaManagerReferenceNumber" : "Z4321",
                             |  "accountID" :"8765432100",
                             |  "creationReason" : "New",
                             |  "firstSubscriptionDate" : "2011-03-23",
@@ -62,7 +60,6 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
   val createAccountJsonWithInvalidTransfer = """{
                                         |  "investorID" : "9876543210",
-                                        |  "lisaManagerReferenceNumber" : "Z4321",
                                         |  "accountID" :"8765432100",
                                         |  "creationReason" : "New",
                                         |  "firstSubscriptionDate" : "2011-03-23",
@@ -71,7 +68,6 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
   val transferAccountJson = """{
                             |  "investorID" : "9876543210",
-                            |  "lisaManagerReferenceNumber" : "Z4321",
                             |  "accountID" :"8765432100",
                             |  "creationReason" : "Transferred",
                             |  "firstSubscriptionDate" : "2011-03-23",
@@ -84,7 +80,6 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
   val transferAccountJsonIncomplete = """{
                               |  "investorID" : "9876543210",
-                              |  "lisaManagerReferenceNumber" : "Z4321",
                               |  "accountID" :"8765432100",
                               |  "creationReason" : "Transferred",
                               |  "firstSubscriptionDate" : "2011-03-23"

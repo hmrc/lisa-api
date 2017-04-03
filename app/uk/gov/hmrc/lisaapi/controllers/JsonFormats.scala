@@ -83,14 +83,12 @@ trait JsonFormats {
 
   implicit val createLisaAccountCreationRequestReads: Reads[CreateLisaAccountCreationRequest] = (
     (JsPath \ "investorID").read(Reads.pattern(investorIDRegex, "error.formatting.investorID")) and
-    (JsPath \ "lisaManagerReferenceNumber").read(Reads.pattern(lmrnRegex, "error.formatting.lmrn")) and
     (JsPath \ "accountID").read(Reads.pattern(accountIDRegex, "error.formatting.accountID")) and
     (JsPath \ "firstSubscriptionDate").read(isoDateReads()).map(new DateTime(_))
   )(CreateLisaAccountCreationRequest.apply _)
 
   implicit val createLisaAccountTransferRequestReads: Reads[CreateLisaAccountTransferRequest] = (
     (JsPath \ "investorID").read(Reads.pattern(investorIDRegex, "error.formatting.investorID")) and
-    (JsPath \ "lisaManagerReferenceNumber").read(Reads.pattern(lmrnRegex, "error.formatting.lmrn")) and
     (JsPath \ "accountID").read(Reads.pattern(accountIDRegex, "error.formatting.accountID")) and
     (JsPath \ "firstSubscriptionDate").read(isoDateReads()).map(new DateTime(_)) and
     (JsPath \ "transferAccount").read[AccountTransfer]
@@ -105,14 +103,12 @@ trait JsonFormats {
 
   implicit val createLisaAccountCreationRequestWrites: Writes[CreateLisaAccountCreationRequest] = (
     (JsPath \ "investorID").write[String] and
-    (JsPath \ "lisaManagerReferenceNumber").write[String] and
     (JsPath \ "accountID").write[String] and
     (JsPath \ "firstSubscriptionDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd"))
   )(unlift(CreateLisaAccountCreationRequest.unapply))
 
   implicit val createLisaAccountTransferRequestWrites: Writes[CreateLisaAccountTransferRequest] = (
     (JsPath \ "investorID").write[String] and
-    (JsPath \ "lisaManagerReferenceNumber").write[String] and
     (JsPath \ "accountID").write[String] and
     (JsPath \ "firstSubscriptionDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
     (JsPath \ "transferAccount").write[AccountTransfer]
