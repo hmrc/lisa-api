@@ -14,7 +14,6 @@
             <td><p>Create Account endpoint with valid Account details and Lisa manager</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                     	    "lisaManagerReferenceNumber":"Z4321",<br>
                                      	    "investorID":"9876543210",<br>
                                      	    "creationReason":"New",<br>
                                      	    "accountID":"8765432100",<br>
@@ -38,7 +37,6 @@
             <td><p>Create Account endpoint with invalid investorID in the payload</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                     	    "lisaManagerReferenceNumber":"Z4321",<br>
                                      	    "investorID":"9876543",<br>
                                      	    "creationReason":"New",<br>
                                      	    "accountID":"8765432100",<br>
@@ -58,7 +56,6 @@
             <td><p>Create Account endpoint with an investorID that already exist</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                            "lisaManagerReferenceNumber":"Z4321",<br>
                                             "investorID":"1234567899",<br>
                                             "creationReason":"New",<br>
                                             "accountID":"8765432100",<br>
@@ -75,30 +72,9 @@
             </td>
         </tr>
         <tr>
-            <td><p>Create Account endpoint with an invalid Lisamanager in the payload</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
-            <td>
-                <p class ="code--block"> {<br>
-                                            "lisaManagerReferenceNumber":"43210",<br>
-                                            "investorID":"1234567899",<br>
-                                            "creationReason":"New",<br>
-                                            "accountID":"8765432100",<br>
-                                            "firstSubscriptionDate":"2011-03-23"<br>
-                                        }
-                </p>
-            </td>
-            <td><p>HTTP status: <code class="code--slim">400(Bad Request)</code></p>
-                <p class ="code--block"> {<br>
-                                         "code": "BAD_REQUEST",<br>
-                                         "message": "Bad Request"<br>
-                                       }
-                </p>
-            </td>
-        </tr>
-        <tr>
             <td><p>Create Account endpoint with an invalid creationReason in the payload</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                            "lisaManagerReferenceNumber":"Z4321",<br>
                                             "investorID":"1234567899",<br>
                                             "creationReason":"Invalid Reason",<br>
                                             "accountID":"8765432100",<br>
@@ -118,7 +94,6 @@
             <td><p>Create Account endpoint with an investor with details that doesnot match the HMRC records</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                            "lisaManagerReferenceNumber":"Z4321",<br>
                                             "investorID":"1234567890",<br>
                                             "creationReason":"New",<br>
                                             "accountID":"8765432100",<br>
@@ -138,7 +113,6 @@
             <td><p>Create Account endpoint with valid Lisa manager and an investor not eligible for LISA account</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                            "lisaManagerReferenceNumber":"Z4321",<br>
                                             "investorID":"1234567891",<br>
                                             "creationReason":"New",<br>
                                             "accountID":"8765432100",<br>
@@ -158,7 +132,6 @@
             <td><p>Create Account endpoint with valid Lisa manager and an investor with failed compliance check</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                            "lisaManagerReferenceNumber":"Z4321",<br>
                                             "investorID":"1234567892",<br>
                                             "creationReason":"New",<br>
                                             "accountID":"8765432100",<br>
@@ -178,7 +151,6 @@
             <td><p>Create Account endpoint with transfer details in the payload</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                             "lisaManagerReferenceNumber":"Z4321",<br>
                                              "investorID":"1234500892",<br>
                                              "creationReason":"New",<br>
                                              "accountID":"8765432100",<br>
@@ -200,10 +172,9 @@
             </td>
         </tr>
         <tr>
-            <td><p>Transfer Account endpoint with valid investor details and lisa manager in the payload</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
+            <td><p>Transfer Account endpoint with valid investor details in the payload</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                             "lisaManagerReferenceNumber":"Z4321",<br>
                                               "investorID":"9876543210",<br>
                                               "creationReason":"Transferred",<br>
                                               "accountID":"87654321",<br>
@@ -232,7 +203,6 @@
             <td><p>Transfer Account endpoint without transfer details in the payload</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                               "lisaManagerReferenceNumber":"Z4321",<br>
                                                "investorID":"9876543210",<br>
                                                "creationReason":"Transferred",<br>
                                                "accountID":"87654321",<br>
@@ -252,7 +222,6 @@
             <td><p>Transfer Account endpoint with transferredFromAccountID and transferredFromLMRN in the payload doesn't match HMRC records</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                         "lisaManagerReferenceNumber":"Z4321",<br>
                                          "investorID":"1234567889",<br>
                                          "creationReason":"Transferred",<br>
                                          "accountID":"1234567890",<br>
@@ -277,7 +246,6 @@
             <td><p>Create Account endpoint with invalid Accept Header</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>Accept:application/vnd.hmrc.1.0</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                            "lisaManagerReferenceNumber":"Z4321",<br>
                                             "investorID":"1234500892",<br>
                                             "creationReason":"New",<br>
                                             "accountID":"8765432100",<br>
@@ -297,7 +265,6 @@
             <td><p>Create Account endpoint with invalid Authorisation Bearer token in the header</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                            "lisaManagerReferenceNumber":"Z4321",<br>
                                             "investorID":"1234500892",<br>
                                             "creationReason":"New",<br>
                                             "accountID":"8765432100",<br>
