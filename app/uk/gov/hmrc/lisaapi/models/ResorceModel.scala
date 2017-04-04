@@ -104,7 +104,7 @@ case class Bonuses(bonusDueForPeriod:Float,
 case class HelpToBuyTransfer(htbTransferInForPeriod:Float, htbTransferTotalYTD:Float)
 
 case class InboundPayments(
-  newSubsForPeriod: Float,
+  newSubsForPeriod: Option[Float],
   newSubsYTD: Float,
   totalSubsForPeriod: Float,
   totalSubsYTD: Float

@@ -67,6 +67,8 @@ case object ErrorAccountNotFound extends ErrorResponse(404, "INVESTOR_ACCOUNTID_
 
 case object ErrorTransferAccountDataNotProvided extends ErrorResponse(403, "TRANSFER_ACCOUNT_DATA_NOT_PROVIDED", "The transferredFromAccountID, transferredFromLMRN and transferInDate are not provided and are required for transfer of an account.")
 
+case object ErrorTransferAccountDataProvided extends ErrorResponse(403, "TRANSFER_ACCOUNT_DATA_PROVIDED", "transferredFromAccountID, transferedFromLMRN, and transferInDate fields should only be completed when the creationReason is \"Transferred\".")
+
 case object ErrorLifeEventInappropriate extends ErrorResponse(403, "LIFE_EVENT_INAPPROPRIATE","The life event conflicts with previous life event reported")
 
 case object ErrorLifeEventAlreadyExists extends ErrorResponse(409,"LIFE_EVENT_ALREADY_EXISTS","The investor’s life event has already been reported")
@@ -78,3 +80,5 @@ object ErrorInvestorAlreadyExists {
   }
 
 }
+
+case object ErrorLifeEventNotProvided extends ErrorResponse(403,"LIFE_EVENT_NOT_PROVIDED","lifeEventID is required when the claimReason is \"Life Event\"")

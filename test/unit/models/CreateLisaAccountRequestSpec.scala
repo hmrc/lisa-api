@@ -30,7 +30,6 @@ class CreateLisaAccountRequestSpec extends PlaySpec with JsonFormats {
   val validAccountTransferRequest =
     s"""{
        |"investorID": "9876543210",
-       |"lisaManagerReferenceNumber": "Z4321",
        |"accountID": "8765432100",
        |"creationReason": "Transferred",
        |"firstSubscriptionDate": "2011-03-23",
@@ -40,7 +39,6 @@ class CreateLisaAccountRequestSpec extends PlaySpec with JsonFormats {
   val validAccountCreationRequest =
     s"""{
        |"investorID": "9876543210",
-       |"lisaManagerReferenceNumber": "Z4321",
        |"accountID": "8765432100",
        |"creationReason": "New",
        |"firstSubscriptionDate": "2011-03-23"
@@ -57,7 +55,6 @@ class CreateLisaAccountRequestSpec extends PlaySpec with JsonFormats {
           data match {
             case req: CreateLisaAccountTransferRequest => {
               req.investorID mustBe "9876543210"
-              req.lisaManagerReferenceNumber mustBe "Z4321"
               req.accountID mustBe "8765432100"
               req.firstSubscriptionDate.getYear mustBe 2011
               req.firstSubscriptionDate.getMonthOfYear mustBe 3
@@ -79,7 +76,6 @@ class CreateLisaAccountRequestSpec extends PlaySpec with JsonFormats {
           data match {
             case req: CreateLisaAccountCreationRequest => {
               req.investorID mustBe "9876543210"
-              req.lisaManagerReferenceNumber mustBe "Z4321"
               req.accountID mustBe "8765432100"
               req.firstSubscriptionDate.getYear mustBe 2011
               req.firstSubscriptionDate.getMonthOfYear mustBe 3
@@ -94,7 +90,6 @@ class CreateLisaAccountRequestSpec extends PlaySpec with JsonFormats {
     "deserialize transfer request to json" in {
       val request = CreateLisaAccountTransferRequest(
         investorID = "9876543210",
-        lisaManagerReferenceNumber = "Z4321",
         accountID = "8765432100",
         firstSubscriptionDate = new DateTime("2011-03-23"),
         transferAccount = AccountTransfer("Z543210", "Z543333", new DateTime("2015-12-13"))
@@ -108,7 +103,6 @@ class CreateLisaAccountRequestSpec extends PlaySpec with JsonFormats {
     "deserialize creation request to json" in {
       val request = CreateLisaAccountCreationRequest(
         investorID = "9876543210",
-        lisaManagerReferenceNumber = "Z4321",
         accountID = "8765432100",
         firstSubscriptionDate = new DateTime("2011-03-23")
       )
@@ -116,22 +110,6 @@ class CreateLisaAccountRequestSpec extends PlaySpec with JsonFormats {
       val json = Json.toJson[CreateLisaAccountRequest](request)
 
       json mustBe Json.parse(validAccountCreationRequest.replace(""""creationReason": "New",""", ""))
-    }
-
-    "catch an invalid lisaManagerReferenceNumber" in {
-      val req = validAccountTransferRequest.replace("Z4321", "A123")
-      val res = Json.parse(req).validate[CreateLisaAccountRequest]
-
-      res match {
-        case JsError(errors) => {
-          errors.count {
-            case (path: JsPath, errors: Seq[ValidationError]) => {
-              path.toString() == "/lisaManagerReferenceNumber" && errors.contains(ValidationError("error.formatting.lmrn"))
-            }
-          } mustBe 1
-        }
-        case _ => fail()
-      }
     }
 
     "catch an invalid firstSubscriptionDate" in {

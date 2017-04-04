@@ -465,7 +465,7 @@ class AccountServiceSpec extends PlaySpec
   }
 
   private def doCreateRequest(callback: (CreateLisaAccountResponse) => Unit) = {
-    val request = CreateLisaAccountCreationRequest("1234567890", "Z019283", "9876543210", new DateTime("2000-01-01"))
+    val request = CreateLisaAccountCreationRequest("1234567890",  "9876543210", new DateTime("2000-01-01"))
     val response = Await.result(SUT.createAccount("Z019283", request)(HeaderCarrier()), Duration.Inf)
 
     callback(response)
@@ -473,7 +473,7 @@ class AccountServiceSpec extends PlaySpec
 
   private def doTransferRequest(callback: (CreateLisaAccountResponse) => Unit) = {
     val accountTransfer = AccountTransfer("123456", "123456", new DateTime("2000-01-01"))
-    val request = CreateLisaAccountTransferRequest("1234567890", "Z019283", "9876543210", new DateTime("2000-01-01"), accountTransfer)
+    val request = CreateLisaAccountTransferRequest("1234567890", "9876543210", new DateTime("2000-01-01"), accountTransfer)
     val response = Await.result(SUT.transferAccount("Z019283", request)(HeaderCarrier()), Duration.Inf)
 
     callback(response)

@@ -16,6 +16,7 @@
 
 package unit.controllers
 
+import org.joda.time.DateTime
 import org.mockito.Matchers._
 import org.mockito.Mockito.when
 import org.scalatest.mock.MockitoSugar
@@ -46,10 +47,8 @@ class LifeEventControllerSpec  extends PlaySpec with MockitoSugar with OneAppPer
   val reportLifeEventJson =
     """
       |{
-      |  "accountId" : "1234567890",
-      |  "lisaManagerReferenceNumber" : "Z543210",
       |  "eventType" : "LISA Investor Terminal Ill Health",
-      |  "eventDate" : "2017-04-06"
+      |  "eventDate" : "2017-01-01"
       |}
     """.stripMargin
 
@@ -64,19 +63,24 @@ class LifeEventControllerSpec  extends PlaySpec with MockitoSugar with OneAppPer
       }
     }
 
-    "return with status 400 bad request and a code of BAD_REQUEST" in {
-      val invalidJson =    """
-                             |{
-                             |  "accountId" : "1234567890",
-                             |  "lisaManagerReferenceNumber" : "Z543210",
-                             |  "eventType" : "LISA Wanted to Come Out",
-                             |  "eventDate" : "2017-04-06"
-                             |}
-                           """.stripMargin
+    "return with status 400 bad request and a code of BAD_REQUEST" when {
+      "given an invalid event type" in {
+        val invalidJson = reportLifeEventJson.replace("LISA Investor Terminal Ill Health", "Invalid Event Type")
 
-      doReportLifeEventRequest(invalidJson) { res =>
-        status(res) mustBe (BAD_REQUEST)
-        (contentAsJson(res) \ "code").as[String] mustBe ("BAD_REQUEST")
+        doReportLifeEventRequest(invalidJson) {
+          res =>
+          status(res) mustBe (BAD_REQUEST)
+          (contentAsJson(res) \ "code").as[String] mustBe ("BAD_REQUEST")
+        }
+      }
+      "given a future eventDate" in {
+        val invalidJson = reportLifeEventJson.replace("2017-01-01", DateTime.now.plusDays(1).toString("yyyy-MM-dd"))
+
+        doReportLifeEventRequest(invalidJson) {
+          res =>
+            status(res) mustBe (BAD_REQUEST)
+            (contentAsJson(res) \ "code").as[String] mustBe ("BAD_REQUEST")
+        }
       }
     }
 

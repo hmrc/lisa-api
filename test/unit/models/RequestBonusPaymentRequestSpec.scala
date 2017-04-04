@@ -37,12 +37,12 @@ class RequestBonusPaymentRequestSpec extends PlaySpec with JsonFormats {
       res match {
         case JsError(errors) => fail(s"Failed to serialize. Errors: ${errors.toString()}")
         case JsSuccess(data, path) => {
-          data.lifeEventID mustBe "1234567891"
+          data.lifeEventID mustBe Some("1234567891")
           data.periodStartDate mustBe new DateTime("2016-05-22")
           data.periodEndDate mustBe new DateTime("2017-05-22")
           data.transactionType mustBe "Bonus"
-          data.htbTransfer mustBe HelpToBuyTransfer(0f, 0f)
-          data.inboundPayments mustBe InboundPayments(4000f, 4000f, 4000f, 4000f)
+          data.htbTransfer mustBe Some(HelpToBuyTransfer(0f, 0f))
+          data.inboundPayments mustBe InboundPayments(Some(4000f), 4000f, 4000f, 4000f)
           data.bonuses mustBe Bonuses(1000f, 1000f, None, "Life Event")
         }
       }
@@ -50,12 +50,12 @@ class RequestBonusPaymentRequestSpec extends PlaySpec with JsonFormats {
 
     "deserialize to json" in {
       val data = RequestBonusPaymentRequest(
-        lifeEventID = "1234567891",
+        lifeEventID = Some("1234567891"),
         periodStartDate = new DateTime("2016-05-22"),
         periodEndDate = new DateTime("2017-05-22"),
         transactionType = "Bonus",
-        htbTransfer = HelpToBuyTransfer(0f, 0f),
-        inboundPayments = InboundPayments(4000f, 4000f, 4000f, 4000f),
+        htbTransfer = Some(HelpToBuyTransfer(0f, 0f)),
+        inboundPayments = InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
         bonuses = Bonuses(1000f, 1000f, None, "Life Event")
       )
 

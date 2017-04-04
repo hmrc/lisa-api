@@ -546,7 +546,7 @@ class DesConnectorSpec extends PlaySpec
   }
 
   private def doCreateAccountRequest(callback: ((Int, Option[DesAccountResponse])) => Unit) = {
-    val request = CreateLisaAccountCreationRequest("1234567890", "Z019283", "9876543210", new DateTime("2000-01-01"))
+    val request = CreateLisaAccountCreationRequest("1234567890",  "9876543210", new DateTime("2000-01-01"))
     val response = Await.result(SUT.createAccount("Z019283", request), Duration.Inf)
 
     callback(response)
@@ -554,7 +554,7 @@ class DesConnectorSpec extends PlaySpec
 
   private def doTransferAccountRequest(callback: ((Int, Option[DesAccountResponse])) => Unit) = {
     val transferAccount = AccountTransfer("1234", "1234", new DateTime("2000-01-01"))
-    val request = CreateLisaAccountTransferRequest("1234567890", "Z019283", "9876543210", new DateTime("2000-01-01"), transferAccount)
+    val request = CreateLisaAccountTransferRequest("1234567890",  "9876543210", new DateTime("2000-01-01"), transferAccount)
     val response = Await.result(SUT.transferAccount("Z019283", request), Duration.Inf)
 
     callback(response)
@@ -576,12 +576,12 @@ class DesConnectorSpec extends PlaySpec
 
   private def doRequestBonusPaymentRequest(callback: ((Int, DesResponse)) => Unit) = {
     val request = RequestBonusPaymentRequest(
-      lifeEventID = "1234567891",
+      lifeEventID = Some("1234567891"),
       periodStartDate = new DateTime("2016-05-22"),
       periodEndDate = new DateTime("2017-05-22"),
       transactionType = "Bonus",
-      htbTransfer = HelpToBuyTransfer(0f, 0f),
-      inboundPayments = InboundPayments(4000f, 4000f, 4000f, 4000f),
+      htbTransfer = Some(HelpToBuyTransfer(0f, 0f)),
+      inboundPayments = InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
       bonuses = Bonuses(1000f, 1000f, None, "Life Event")
     )
 
