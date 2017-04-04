@@ -22,14 +22,12 @@ sealed trait CreateLisaAccountRequest
 
 case class CreateLisaAccountCreationRequest (
   investorID: String,
-  lisaManagerReferenceNumber: String,
   accountID: String,
   firstSubscriptionDate: DateTime
 ) extends CreateLisaAccountRequest
 
 case class CreateLisaAccountTransferRequest (
   investorID: String,
-  lisaManagerReferenceNumber: String,
   accountID: String,
   firstSubscriptionDate: DateTime,
   transferAccount: AccountTransfer
