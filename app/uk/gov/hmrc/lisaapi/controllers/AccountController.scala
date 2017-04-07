@@ -18,7 +18,7 @@ package uk.gov.hmrc.lisaapi.controllers
 
 import play.api.Logger
 import play.api.data.validation.ValidationError
-import play.api.libs.json.{JsPath, Json}
+import play.api.libs.json.{JsObject, JsPath, JsValue, Json}
 import play.api.libs.json.Json.toJson
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.lisaapi.models._
@@ -32,13 +32,18 @@ class AccountController extends LisaController {
 
   val service: AccountService = AccountService
 
-  implicit val hc: HeaderCarrier = new HeaderCarrier()
-
   def createOrTransferLisaAccount(lisaManager: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
     withValidJson[CreateLisaAccountRequest] (
-      (request) => {
-        request match {
-          case createRequest: CreateLisaAccountCreationRequest => processAccountCreation(lisaManager, createRequest)
+      (req) => {
+        req match {
+          case createRequest: CreateLisaAccountCreationRequest => {
+            if (hasAccountTransferData(request.body.asJson.get.as[JsObject])) {
+              Future.successful(Forbidden(toJson(ErrorTransferAccountDataProvided)))
+            }
+            else {
+              processAccountCreation(lisaManager, createRequest)
+            }
+          }
           case transferRequest: CreateLisaAccountTransferRequest => processAccountTransfer(lisaManager, transferRequest)
         }
       },
@@ -64,11 +69,11 @@ class AccountController extends LisaController {
   }
 
   def closeLisaAccount(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
-    withValidJson[CloseLisaAccountRequest] ( request =>
-      processAccountClosure(lisaManager, accountId, request) ,lisaManager=lisaManager)
+    withValidJson[CloseLisaAccountRequest] ( closeRequest =>
+      processAccountClosure(lisaManager, accountId, closeRequest) ,lisaManager=lisaManager)
   }
 
-  private def processAccountCreation(lisaManager: String, request: CreateLisaAccountCreationRequest) = {
+  private def processAccountCreation(lisaManager: String, request: CreateLisaAccountCreationRequest)(implicit hc: HeaderCarrier) = {
     service.createAccount(lisaManager, request).map { result =>
       result match {
         case CreateLisaAccountSuccessResponse(accountId) => {
@@ -85,7 +90,7 @@ class AccountController extends LisaController {
     }
   }
 
-  private def processAccountTransfer(lisaManager: String, request: CreateLisaAccountTransferRequest) = {
+  private def processAccountTransfer(lisaManager: String, request: CreateLisaAccountTransferRequest)(implicit hc: HeaderCarrier) = {
     service.transferAccount(lisaManager, request).map { result =>
       result match {
         case CreateLisaAccountSuccessResponse(accountId) => {
@@ -102,7 +107,7 @@ class AccountController extends LisaController {
     }
   }
 
-  private def processAccountClosure(lisaManager: String, accountId: String, request: CloseLisaAccountRequest) = {
+  private def processAccountClosure(lisaManager: String, accountId: String, request: CloseLisaAccountRequest)(implicit hc: HeaderCarrier) = {
     service.closeAccount(lisaManager, accountId, request).map { result =>
       result match {
         case CloseLisaAccountSuccessResponse(accountId) => {
@@ -115,6 +120,10 @@ class AccountController extends LisaController {
         case _ => InternalServerError(Json.toJson(ErrorInternalServerError))
       }
     }
+  }
+
+  private def hasAccountTransferData(js:JsObject): Boolean = {
+    js.keys.contains("transferAccount")
   }
 
 }

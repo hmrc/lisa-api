@@ -16,6 +16,7 @@
 
 package unit.controllers
 
+import org.joda.time.DateTime
 import org.mockito.Matchers._
 import org.mockito.Mockito.when
 import org.scalatest.mock.MockitoSugar
@@ -25,10 +26,11 @@ import play.api.mvc.{AnyContentAsJson, Result}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
+import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
 import uk.gov.hmrc.lisaapi.controllers.LifeEventController
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.LifeEventService
-
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 /**
@@ -42,19 +44,19 @@ class LifeEventControllerSpec  extends PlaySpec with MockitoSugar with OneAppPer
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
   val lisaManager = "Z019283"
   val accountId = "ABC12345"
+  val mockAuthCon = mock[LisaAuthConnector]
 
   val reportLifeEventJson =
     """
       |{
-      |  "accountId" : "1234567890",
-      |  "lisaManagerReferenceNumber" : "Z543210",
       |  "eventType" : "LISA Investor Terminal Ill Health",
-      |  "eventDate" : "2017-04-06"
+      |  "eventDate" : "2017-01-01"
       |}
     """.stripMargin
 
 
   "The Life Event Controller" should {
+    when(mockAuthCon.authorise[Option[String]](any(),any())(any())).thenReturn(Future(Some("1234")))
 
     "return with status 201 created" in {
       when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful((ReportLifeEventSuccessResponse("1928374"))))
@@ -64,19 +66,24 @@ class LifeEventControllerSpec  extends PlaySpec with MockitoSugar with OneAppPer
       }
     }
 
-    "return with status 400 bad request and a code of BAD_REQUEST" in {
-      val invalidJson =    """
-                             |{
-                             |  "accountId" : "1234567890",
-                             |  "lisaManagerReferenceNumber" : "Z543210",
-                             |  "eventType" : "LISA Wanted to Come Out",
-                             |  "eventDate" : "2017-04-06"
-                             |}
-                           """.stripMargin
+    "return with status 400 bad request and a code of BAD_REQUEST" when {
+      "given an invalid event type" in {
+        val invalidJson = reportLifeEventJson.replace("LISA Investor Terminal Ill Health", "Invalid Event Type")
 
-      doReportLifeEventRequest(invalidJson) { res =>
-        status(res) mustBe (BAD_REQUEST)
-        (contentAsJson(res) \ "code").as[String] mustBe ("BAD_REQUEST")
+        doReportLifeEventRequest(invalidJson) {
+          res =>
+          status(res) mustBe (BAD_REQUEST)
+          (contentAsJson(res) \ "code").as[String] mustBe ("BAD_REQUEST")
+        }
+      }
+      "given a future eventDate" in {
+        val invalidJson = reportLifeEventJson.replace("2017-01-01", DateTime.now.plusDays(1).toString("yyyy-MM-dd"))
+
+        doReportLifeEventRequest(invalidJson) {
+          res =>
+            status(res) mustBe (BAD_REQUEST)
+            (contentAsJson(res) \ "code").as[String] mustBe ("BAD_REQUEST")
+        }
       }
     }
 
@@ -123,5 +130,6 @@ class LifeEventControllerSpec  extends PlaySpec with MockitoSugar with OneAppPer
   val mockService = mock[LifeEventService]
   val SUT = new LifeEventController {
     override val service: LifeEventService = mockService
+    override val authConnector = mockAuthCon
   }
 }

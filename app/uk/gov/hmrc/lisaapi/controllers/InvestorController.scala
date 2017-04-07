@@ -29,14 +29,10 @@ class InvestorController extends LisaController {
 
   val service: InvestorService = InvestorService
 
-//  implicit val hc: HeaderCarrier = new HeaderCarrier()
-
   def createLisaInvestor( lisaManager: String): Action[AnyContent] =
-    Action.async {
+    validateAccept(acceptHeaderValidationRules).async {
       implicit request =>
       Logger.debug(s"LISA HTTP Request: ${request.uri}  and method: ${request.method} and headers :${request.headers} and parameters : ${lisaManager}")
-//        protected def withValidJson[CreateLisaInvestorRequest] ( success: (CreateLisaInvestorRequest) => Future[Result],
-//      invalid: Option[(Seq[(JsPath, Seq[ValidationError])]) => Future[Result]] = None   )
        withValidJson[CreateLisaInvestorRequest] (
                createRequest => {
           service.createInvestor(lisaManager, createRequest).map { result =>

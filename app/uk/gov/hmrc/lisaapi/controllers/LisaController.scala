@@ -35,15 +35,14 @@ import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 
 trait LisaController extends BaseController with HeaderValidator with RunMode with JsonFormats with AuthorisedFunctions{
-//  implicit val hc: HeaderCarrier
-val authConnector = new LisaAuthConnector()
+val authConnector: LisaAuthConnector = LisaAuthConnector
 
   protected def withValidJson[T] (
     success: (T) => Future[Result],
     invalid: Option[(Seq[(JsPath, Seq[ValidationError])]) => Future[Result]] = None,
     lisaManager: String)
     (implicit request: Request[AnyContent], reads: Reads[T]): Future[Result] = {
-    authorised((Enrolment("HMRC-LISA-ORG")).withIdentifier("ZREF", lisaManager)) {
+    authorised((Enrolment("HMRC-LISA-ORG")).withIdentifier("ZREF", lisaManager)).retrieve(internalId) {id =>
 
       request.body.asJson match {
         case Some(json) =>

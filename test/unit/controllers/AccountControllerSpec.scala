@@ -26,9 +26,11 @@ import play.api.mvc.{Action, AnyContent, AnyContentAsJson, Result}
 import play.api.test.Helpers._
 import play.api.test._
 import play.mvc.Http.HeaderNames
+import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
 import uk.gov.hmrc.lisaapi.controllers.AccountController
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.AccountService
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
 
@@ -38,18 +40,37 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
   val lisaManager = "Z019283"
   val accountId = "ABC12345"
+  val mockAuthCon = mock[LisaAuthConnector]
 
   val createAccountJson = """{
                               |  "investorID" : "9876543210",
-                              |  "lisaManagerReferenceNumber" : "Z4321",
                               |  "accountID" :"8765432100",
                               |  "creationReason" : "New",
                               |  "firstSubscriptionDate" : "2011-03-23"
                               |}""".stripMargin
 
+  val createAccountJsonWithTransfer = """{
+                            |  "investorID" : "9876543210",
+                            |  "accountID" :"8765432100",
+                            |  "creationReason" : "New",
+                            |  "firstSubscriptionDate" : "2011-03-23",
+                            |  "transferAccount": {
+                            |    "transferredFromAccountID": "Z543210",
+                            |    "transferredFromLMRN": "Z543333",
+                            |    "transferInDate": "2015-12-13"
+                            |  }
+                            |}""".stripMargin
+
+  val createAccountJsonWithInvalidTransfer = """{
+                                        |  "investorID" : "9876543210",
+                                        |  "accountID" :"8765432100",
+                                        |  "creationReason" : "New",
+                                        |  "firstSubscriptionDate" : "2011-03-23",
+                                        |  "transferAccount": "X"
+                                        |}""".stripMargin
+
   val transferAccountJson = """{
                             |  "investorID" : "9876543210",
-                            |  "lisaManagerReferenceNumber" : "Z4321",
                             |  "accountID" :"8765432100",
                             |  "creationReason" : "Transferred",
                             |  "firstSubscriptionDate" : "2011-03-23",
@@ -62,7 +83,6 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
   val transferAccountJsonIncomplete = """{
                               |  "investorID" : "9876543210",
-                              |  "lisaManagerReferenceNumber" : "Z4321",
                               |  "accountID" :"8765432100",
                               |  "creationReason" : "Transferred",
                               |  "firstSubscriptionDate" : "2011-03-23"
@@ -71,6 +91,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
   val closeAccountJson = """{"accountClosureReason" : "Voided", "closureDate" : "2000-06-23"}"""
 
   "The Create / Transfer Account endpoint" must {
+    when(mockAuthCon.authorise[Option[String]](any(),any())(any())).thenReturn(Future(Some("1234")))
 
     "return with status 201 created and an account Id" when {
       "submitted a valid create account request" in {
@@ -171,6 +192,27 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
       }
     }
 
+    "return with status 403 forbidden and a code of TRANSFER_ACCOUNT_DATA_PROVIDED" when {
+      "sent a create request json with full transferAccount data" in {
+        doCreateOrTransferRequest(createAccountJsonWithTransfer) { res =>
+          status(res) mustBe (FORBIDDEN)
+          (contentAsJson(res) \ "code").as[String] mustBe ("TRANSFER_ACCOUNT_DATA_PROVIDED")
+        }
+      }
+      "sent a create request json with partial transferAccount data" in {
+        doCreateOrTransferRequest(createAccountJsonWithTransfer.replace("\"transferredFromAccountID\": \"Z543210\",", "")) { res =>
+          status(res) mustBe (FORBIDDEN)
+          (contentAsJson(res) \ "code").as[String] mustBe ("TRANSFER_ACCOUNT_DATA_PROVIDED")
+        }
+      }
+      "sent a create request json with invalid transferAccount data" in {
+        doCreateOrTransferRequest(createAccountJsonWithInvalidTransfer) { res =>
+          status(res) mustBe (FORBIDDEN)
+          (contentAsJson(res) \ "code").as[String] mustBe ("TRANSFER_ACCOUNT_DATA_PROVIDED")
+        }
+      }
+    }
+
     "return with status 409 conflict and a code of INVESTOR_ACCOUNT_ALREADY_EXISTS" when {
       "the data service returns a CreateLisaAccountAlreadyExistsResponse for a create request" in {
         when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountAlreadyExistsResponse))
@@ -224,6 +266,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
   }
 
   "The Close Account endpoint" must {
+    when(mockAuthCon.authorise[Option[String]](any(),any())(any())).thenReturn(Future(Some("1234")))
 
     "return with status 200 ok" when {
       "submitted a valid close account request" in {
@@ -294,9 +337,10 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
   }
 
   val mockService = mock[AccountService]
-
   val SUT = new AccountController{
     override val service: AccountService = mockService
+    override val authConnector = mockAuthCon
+
   }
 
 }

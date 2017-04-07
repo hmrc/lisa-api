@@ -44,8 +44,10 @@ import scala.concurrent.Future
 class LisaControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
 
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
+  val mockAuthCon :LisaAuthConnector = mock[LisaAuthConnector]
 
   case class TestType(prop1: String, prop2: String)
+
   implicit val testTypeReads: Reads[TestType] = (
     (JsPath \ "prop1").read[Int].map[String](i => throw new RuntimeException("Deliberate Test Exception")) and
     (JsPath \ "prop2").read[String]
@@ -54,8 +56,9 @@ class LisaControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite 
   "The withValidJson method" must {
 
     "return with an Internal Server Error" when {
-      "an exception is thrown by one of our Json reads" in{
-//      "an exception is thrown by one of our Json reads" in {
+      when(mockAuthCon.authorise[Option[String]](any(),any())(any())).thenReturn(Future(Some("1234")))
+
+      "an exception is thrown by one of our Json reads" in {
         val jsonString = """{"prop1": 123, "prop2": "123"}"""
         val res = SUT.testJsonValidator().apply(FakeRequest(Helpers.PUT, "/")
                     .withHeaders(acceptHeader)
@@ -69,56 +72,16 @@ class LisaControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite 
   }
 
   val mockService = mock[AccountService]
-  val mockServicesConfig = mock[ServicesConfig]
-  val mockAuthConnector = mock[LisaAuthConnector]
-
-/*
-  trait AuthSetup extends AuthorisedFunctions {
-    override val authConnector = mockAuthConnector
-
-    case class TestPredicate1(value: String) extends Predicate {
-      override def toJson: JsValue = Json.obj("testPredicate1" -> value)
-    }
-    def testFunction() = authorised(TestPredicate1("someValue")) {Future("works")}
-    val result = testFunction()
-  }
-  object AuthSetup extends AuthSetup
-*/
-
-
   val SUT = new AccountController{
     override val service: AccountService = mockService
-    override val authConnector = mockAuthConnector
-    val mockAuthFunctions = mock[AuthorisedFunctions]
+    override val authConnector = mockAuthCon
 
-    private trait Setup extends AuthorisedFunctions {
-
-      implicit lazy val hc = HeaderCarrier()
-
-      def success: Any = ()
-
-      def exception: Option[AuthorisationException] = None
-
-      val authConnector: AuthConnector = new AuthConnector {
-        def authorise[A](predicate: Predicate, retrieval: Retrieval[A])(implicit hc: HeaderCarrier): Future[A] = {
-          exception.fold(Future.successful(success.asInstanceOf[A]))(Future.failed(_))
-        }
-      }
-    }
-//    case class TestPredicate1(value: String) extends Predicate {
-//      override def toJson: JsValue = Json.obj("testPredicate1" -> value)
-//    }
-////    def testFunction() = authorised(TestPredicate1("someValue")) {Future("works")}
-////    val result = testFunction()
-//
-//    when(mockAuthFunctions.authorised(any())).thenReturn(mockAuthFunctions.authorised(TestPredicate1("")))
     def testJsonValidator(): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
       withValidJson[TestType] ( _ =>
-        Future.successful(PreconditionFailed), // we don't ever want this to return
-        lisaManager = ""
+        Future.successful(PreconditionFailed) // we don't ever want this to return
+        ,lisaManager = ""
       )
     }
   }
 
 }
-

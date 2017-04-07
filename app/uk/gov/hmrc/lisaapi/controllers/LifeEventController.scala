@@ -30,8 +30,6 @@ class LifeEventController extends LisaController {
 
   val service: LifeEventService = LifeEventService
 
-  implicit val hc: HeaderCarrier = new HeaderCarrier()
-
   def reportLisaLifeEvent(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async {
     implicit request =>
 

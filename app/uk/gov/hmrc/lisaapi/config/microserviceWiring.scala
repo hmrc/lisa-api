@@ -35,9 +35,9 @@ object MicroserviceAuditConnector extends AuditConnector with RunMode {
 object MicroserviceAuthConnector extends AuthConnector with ServicesConfig {
   override val authBaseUrl = baseUrl("auth")
 }*/
-
-
-class LisaAuthConnector extends  PlayAuthConnector with ServicesConfig {
+trait LisaAuthConnector extends PlayAuthConnector with ServicesConfig {
   lazy val serviceUrl = baseUrl("auth")
   lazy val http = WSHttp
 }
+
+object LisaAuthConnector extends LisaAuthConnector
