@@ -18,7 +18,7 @@ package uk.gov.hmrc.lisaapi.models
 
 sealed trait CreateLisaAccountResponse
 
-case class CreateLisaAccountSuccessResponse(accountId: String) extends CreateLisaAccountResponse
+case class CreateLisaAccountSuccessResponse(accountID: String) extends CreateLisaAccountResponse
 
 case object CreateLisaAccountInvestorNotFoundResponse extends CreateLisaAccountResponse
 case object CreateLisaAccountInvestorNotEligibleResponse extends CreateLisaAccountResponse

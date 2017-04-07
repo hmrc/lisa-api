@@ -21,111 +21,64 @@ import org.mockito.Matchers._
 import org.mockito.Mockito.when
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import play.api.test.Helpers._
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
-import uk.gov.hmrc.lisaapi.models.{CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse, _}
-import uk.gov.hmrc.lisaapi.models.des.{DesAccountResponseOld, DesCreateInvestorResponse}
-import uk.gov.hmrc.lisaapi.services.{AccountService, InvestorService}
+import uk.gov.hmrc.lisaapi.models._
+import uk.gov.hmrc.lisaapi.models.des.{DesAccountResponse, DesAccountResponseOld, DesFailureResponse}
+import uk.gov.hmrc.lisaapi.services.AccountService
 import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
+// scalastyle:off multiple.string.literals
 class AccountServiceSpec extends PlaySpec
   with MockitoSugar
   with OneAppPerSuite {
 
-  val httpStatusOk = 200
-  val httpStatusCreated = 201
-  val unknownRdsCode = 99999
-
-  /*
-
   "Create Account" must {
 
     "return a Success Response" when {
+      "a success response comes from DES" in {
+        val testAccountId = "AB123456"
 
-      "given no rds code and an account id" in {
         when(mockDesConnector.createAccount(any(), any())(any()))
-          .thenReturn(
-            Future.successful((
-              httpStatusOk,
-              Some(DesAccountResponse(None, accountId = Some("AB123456")))
-            ))
-          )
+          .thenReturn(Future.successful(DesAccountResponse(accountID = testAccountId)))
 
         doCreateRequest { response =>
-          response mustBe CreateLisaAccountSuccessResponse("AB123456")
+          response mustBe CreateLisaAccountSuccessResponse(accountID = testAccountId)
         }
       }
-
     }
 
     "return a Error Response" when {
-
-      "given a status code other than 200" in {
+      "a error response comes from DES" in {
         when(mockDesConnector.createAccount(any(), any())(any()))
-          .thenReturn(
-            Future.successful((
-              httpStatusCreated,
-              None
-            ))
-          )
+          .thenReturn(Future.successful(DesFailureResponse(code = "INTERNAL_SERVER_ERROR")))
 
         doCreateRequest { response =>
           response mustBe CreateLisaAccountErrorResponse
         }
       }
-
-      "given no data" in {
+      "a not found response comes from DES" in {
         when(mockDesConnector.createAccount(any(), any())(any()))
-          .thenReturn(
-            Future.successful((
-              httpStatusOk,
-              None
-            ))
-          )
+          .thenReturn(Future.successful(DesFailureResponse(code = "NOT_FOUND")))
 
         doCreateRequest { response =>
           response mustBe CreateLisaAccountErrorResponse
         }
       }
-
-      "given empty data" in {
+      "a unexpected error response comes from DES" in {
         when(mockDesConnector.createAccount(any(), any())(any()))
-          .thenReturn(
-            Future.successful((
-              httpStatusOk,
-              Some(DesAccountResponse(rdsCode = None, accountId = None))
-            ))
-          )
+          .thenReturn(Future.successful(DesFailureResponse(code = "UNEXPECTED_ERROR")))
 
         doCreateRequest { response =>
           response mustBe CreateLisaAccountErrorResponse
         }
       }
-
-      "given the RDS code for a Investor Previous Account Does Not Exist Response" in {
+      "a PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST response comes from DES" in {
         when(mockDesConnector.createAccount(any(), any())(any()))
-          .thenReturn(
-            Future.successful((
-              200,
-              Some(DesAccountResponse(rdsCode = Some(SUT.INVESTOR_PREVIOUS_ACCOUNT_DOES_NOT_EXIST)))
-            ))
-          )
-
-        doCreateRequest { response =>
-          response mustBe CreateLisaAccountErrorResponse
-        }
-      }
-
-      "given an rds code which is not recognised" in {
-        when(mockDesConnector.createAccount(any(), any())(any()))
-          .thenReturn(
-            Future.successful((
-              httpStatusOk,
-              Some(DesAccountResponse(rdsCode = Some(unknownRdsCode)))
-            ))
-          )
+          .thenReturn(Future.successful(DesFailureResponse(code = "PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST")))
 
         doCreateRequest { response =>
           response mustBe CreateLisaAccountErrorResponse
@@ -134,63 +87,46 @@ class AccountServiceSpec extends PlaySpec
     }
 
     "return the type-appropriate response" when {
-
-      "given the RDS code for a Investor Not Found Response" in {
+      "a INVESTOR_NOT_FOUND response comes from DES" in {
         when(mockDesConnector.createAccount(any(), any())(any()))
-          .thenReturn(
-            Future.successful((
-              httpStatusOk,
-              Some(DesAccountResponse(rdsCode = Some(SUT.INVESTOR_NOT_FOUND)))
-            ))
-          )
+          .thenReturn(Future.successful(DesFailureResponse(code = "INVESTOR_NOT_FOUND")))
 
         doCreateRequest { response =>
           response mustBe CreateLisaAccountInvestorNotFoundResponse
         }
       }
-
-      "given the RDS code for a Investor Not Eligible Response" in {
+      "a INVESTOR_ELIGIBILITY_CHECK_FAILED response comes from DES" in {
         when(mockDesConnector.createAccount(any(), any())(any()))
-          .thenReturn(
-            Future.successful((
-              httpStatusOk,
-              Some(DesAccountResponse(rdsCode = Some(SUT.INVESTOR_NOT_ELIGIBLE)))
-            ))
-          )
+          .thenReturn(Future.successful(DesFailureResponse(code = "INVESTOR_ELIGIBILITY_CHECK_FAILED")))
 
         doCreateRequest { response =>
           response mustBe CreateLisaAccountInvestorNotEligibleResponse
         }
       }
-
-      "given the RDS code for a Investor Compliance Failed Response" in {
+      "a INVESTOR_COMPLIANCE_CHECK_FAILED response comes from DES" in {
         when(mockDesConnector.createAccount(any(), any())(any()))
-          .thenReturn(
-            Future.successful((
-              httpStatusOk,
-              Some(DesAccountResponse(rdsCode = Some(SUT.INVESTOR_COMPLIANCE_FAILED)))
-            ))
-          )
+          .thenReturn(Future.successful(DesFailureResponse(code = "INVESTOR_COMPLIANCE_CHECK_FAILED")))
 
         doCreateRequest { response =>
           response mustBe CreateLisaAccountInvestorComplianceCheckFailedResponse
         }
       }
-
-      "given the RDS code for a Investor Account Already Exists Response" in {
+      "a INVESTOR_ACCOUNT_ALREADY_EXISTS response comes from DES" in {
         when(mockDesConnector.createAccount(any(), any())(any()))
-          .thenReturn(
-            Future.successful((
-              httpStatusOk,
-              Some(DesAccountResponse(rdsCode = Some(SUT.INVESTOR_ACCOUNT_ALREADY_EXISTS)))
-            ))
-          )
+          .thenReturn(Future.successful(DesFailureResponse(code = "INVESTOR_ACCOUNT_ALREADY_EXISTS")))
 
         doCreateRequest { response =>
           response mustBe CreateLisaAccountAlreadyExistsResponse
         }
       }
+      "a INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID response comes from DES" in {
+        when(mockDesConnector.createAccount(any(), any())(any()))
+          .thenReturn(Future.successful(DesFailureResponse(code = "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID")))
 
+        doCreateRequest { response =>
+          response mustBe CreateLisaAccountInvestorAccountAlreadyClosedOrVoidedResponse
+        }
+      }
     }
 
   }
@@ -198,160 +134,97 @@ class AccountServiceSpec extends PlaySpec
   "Transfer Account" must {
 
     "return a Success Response" when {
+      "a success response comes from DES" in {
+        val testAccountId = "AB123456"
 
-      "given no rds code and an account id" in {
         when(mockDesConnector.transferAccount(any(), any())(any()))
-          .thenReturn(
-            Future.successful((
-              httpStatusOk,
-              Some(DesAccountResponse(None, accountId = Some("AB123456")))
-            ))
-          )
+          .thenReturn(Future.successful(DesAccountResponse(accountID = testAccountId)))
 
         doTransferRequest { response =>
-          response mustBe CreateLisaAccountSuccessResponse("AB123456")
+          response mustBe CreateLisaAccountSuccessResponse(accountID = testAccountId)
         }
       }
-
     }
 
     "return a Error Response" when {
-
-      "given a status code other than 200" in {
+      "a error response comes from DES" in {
         when(mockDesConnector.transferAccount(any(), any())(any()))
-          .thenReturn(
-            Future.successful((
-              httpStatusCreated,
-              None
-            ))
-          )
+          .thenReturn(Future.successful(DesFailureResponse(code = "INTERNAL_SERVER_ERROR")))
 
         doTransferRequest { response =>
           response mustBe CreateLisaAccountErrorResponse
         }
       }
-
-      "given no data" in {
+      "a not found response comes from DES" in {
         when(mockDesConnector.transferAccount(any(), any())(any()))
-          .thenReturn(
-            Future.successful((
-              httpStatusOk,
-              None
-            ))
-          )
+          .thenReturn(Future.successful(DesFailureResponse(code = "NOT_FOUND")))
 
         doTransferRequest { response =>
           response mustBe CreateLisaAccountErrorResponse
         }
       }
-
-      "given empty data" in {
+      "a unexpected error response comes from DES" in {
         when(mockDesConnector.transferAccount(any(), any())(any()))
-          .thenReturn(
-            Future.successful((
-              httpStatusOk,
-              Some(DesAccountResponse(rdsCode = None, accountId = None))
-            ))
-          )
+          .thenReturn(Future.successful(DesFailureResponse(code = "UNEXPECTED_ERROR")))
 
         doTransferRequest { response =>
           response mustBe CreateLisaAccountErrorResponse
         }
       }
-
-      "given the RDS code for a Investor Not Eligible Response" in {
+      "a INVESTOR_ELIGIBILITY_CHECK_FAILED response comes from DES" in {
         when(mockDesConnector.transferAccount(any(), any())(any()))
-          .thenReturn(
-            Future.successful((
-              200,
-              Some(DesAccountResponse(rdsCode = Some(SUT.INVESTOR_NOT_ELIGIBLE)))
-            ))
-          )
+          .thenReturn(Future.successful(DesFailureResponse(code = "INVESTOR_ELIGIBILITY_CHECK_FAILED")))
 
         doTransferRequest { response =>
           response mustBe CreateLisaAccountErrorResponse
         }
       }
-
-      "given an rds code which is not recognised" in {
-        when(mockDesConnector.transferAccount(any(), any())(any()))
-          .thenReturn(
-            Future.successful((
-              httpStatusOk,
-              Some(DesAccountResponse(rdsCode = Some(unknownRdsCode)))
-            ))
-          )
-
-        doTransferRequest { response =>
-          response mustBe CreateLisaAccountErrorResponse
-        }
-      }
-
     }
 
     "return the type-appropriate response" when {
-
-      "given the RDS code for a Investor Not Found Response" in {
+      "a INVESTOR_NOT_FOUND response comes from DES" in {
         when(mockDesConnector.transferAccount(any(), any())(any()))
-          .thenReturn(
-            Future.successful((
-              httpStatusOk,
-              Some(DesAccountResponse(rdsCode = Some(SUT.INVESTOR_NOT_FOUND)))
-            ))
-          )
+          .thenReturn(Future.successful(DesFailureResponse(code = "INVESTOR_NOT_FOUND")))
 
         doTransferRequest { response =>
           response mustBe CreateLisaAccountInvestorNotFoundResponse
         }
       }
-
-      "given the RDS code for a Investor Compliance Failed Response" in {
+      "a INVESTOR_COMPLIANCE_CHECK_FAILED response comes from DES" in {
         when(mockDesConnector.transferAccount(any(), any())(any()))
-          .thenReturn(
-            Future.successful((
-              httpStatusOk,
-              Some(DesAccountResponse(rdsCode = Some(SUT.INVESTOR_COMPLIANCE_FAILED)))
-            ))
-          )
+          .thenReturn(Future.successful(DesFailureResponse(code = "INVESTOR_COMPLIANCE_CHECK_FAILED")))
 
         doTransferRequest { response =>
           response mustBe CreateLisaAccountInvestorComplianceCheckFailedResponse
         }
       }
-
-      "given the RDS code for a Investor Account Already Exists Response" in {
+      "a PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST response comes from DES" in {
         when(mockDesConnector.transferAccount(any(), any())(any()))
-          .thenReturn(
-            Future.successful((
-              httpStatusOk,
-              Some(DesAccountResponse(rdsCode = Some(SUT.INVESTOR_ACCOUNT_ALREADY_EXISTS)))
-            ))
-          )
-
-        doTransferRequest { response =>
-          response mustBe CreateLisaAccountAlreadyExistsResponse
-        }
-      }
-
-      "given the RDS code for a Investor Previous Account Does Not Exist Response" in {
-        when(mockDesConnector.transferAccount(any(), any())(any()))
-          .thenReturn(
-            Future.successful((
-              httpStatusOk,
-              Some(DesAccountResponse(rdsCode = Some(SUT.INVESTOR_PREVIOUS_ACCOUNT_DOES_NOT_EXIST)))
-            ))
-          )
+          .thenReturn(Future.successful(DesFailureResponse(code = "PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST")))
 
         doTransferRequest { response =>
           response mustBe CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse
         }
       }
+      "a INVESTOR_ACCOUNT_ALREADY_EXISTS response comes from DES" in {
+        when(mockDesConnector.transferAccount(any(), any())(any()))
+          .thenReturn(Future.successful(DesFailureResponse(code = "INVESTOR_ACCOUNT_ALREADY_EXISTS")))
 
+        doTransferRequest { response =>
+          response mustBe CreateLisaAccountAlreadyExistsResponse
+        }
+      }
+      "a INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID response comes from DES" in {
+        when(mockDesConnector.transferAccount(any(), any())(any()))
+          .thenReturn(Future.successful(DesFailureResponse(code = "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID")))
+
+        doTransferRequest { response =>
+          response mustBe CreateLisaAccountInvestorAccountAlreadyClosedOrVoidedResponse
+        }
+      }
     }
 
   }
-
-  */
 
   "Close Account" must {
 
@@ -361,7 +234,7 @@ class AccountServiceSpec extends PlaySpec
         when(mockDesConnector.closeAccount(any(), any(), any())(any()))
           .thenReturn(
             Future.successful((
-              httpStatusOk,
+              OK,
               Some(DesAccountResponseOld(None, accountId = Some("AB123456")))
             ))
           )
@@ -379,7 +252,7 @@ class AccountServiceSpec extends PlaySpec
         when(mockDesConnector.closeAccount(any(), any(), any())(any()))
           .thenReturn(
             Future.successful((
-              httpStatusCreated,
+              GATEWAY_TIMEOUT,
               None
             ))
           )
@@ -393,7 +266,7 @@ class AccountServiceSpec extends PlaySpec
         when(mockDesConnector.closeAccount(any(), any(), any())(any()))
           .thenReturn(
             Future.successful((
-              httpStatusOk,
+              OK,
               None
             ))
           )
@@ -407,7 +280,7 @@ class AccountServiceSpec extends PlaySpec
         when(mockDesConnector.closeAccount(any(), any(), any())(any()))
           .thenReturn(
             Future.successful((
-              httpStatusOk,
+              OK,
               Some(DesAccountResponseOld(rdsCode = None, accountId = None))
             ))
           )
@@ -421,8 +294,8 @@ class AccountServiceSpec extends PlaySpec
         when(mockDesConnector.closeAccount(any(), any(), any())(any()))
           .thenReturn(
             Future.successful((
-              httpStatusOk,
-              Some(DesAccountResponseOld(rdsCode = Some(unknownRdsCode)))
+              OK,
+              Some(DesAccountResponseOld(rdsCode = Some(99999)))
             ))
           )
 
@@ -438,7 +311,7 @@ class AccountServiceSpec extends PlaySpec
         when(mockDesConnector.closeAccount(any(), any(), any())(any()))
           .thenReturn(
             Future.successful((
-              httpStatusOk,
+              OK,
               Some(DesAccountResponseOld(rdsCode = Some(SUT.INVESTOR_ACCOUNT_ALREADY_CLOSED)))
             ))
           )
@@ -452,7 +325,7 @@ class AccountServiceSpec extends PlaySpec
         when(mockDesConnector.closeAccount(any(), any(), any())(any()))
           .thenReturn(
             Future.successful((
-              httpStatusOk,
+              OK,
               Some(DesAccountResponseOld(rdsCode = Some(SUT.INVESTOR_ACCOUNT_NOT_FOUND)))
             ))
           )
@@ -467,28 +340,32 @@ class AccountServiceSpec extends PlaySpec
   }
 
   private def doCreateRequest(callback: (CreateLisaAccountResponse) => Unit) = {
-    val request = CreateLisaAccountCreationRequest("1234567890",  "9876543210", new DateTime("2000-01-01"))
-    val response = Await.result(SUT.createAccount("Z019283", request)(HeaderCarrier()), Duration.Inf)
+    val request = CreateLisaAccountCreationRequest("1234567890",  "9876543210", testDate)
+    val response = Await.result(SUT.createAccount(testLMRN, request)(HeaderCarrier()), Duration.Inf)
 
     callback(response)
   }
 
   private def doTransferRequest(callback: (CreateLisaAccountResponse) => Unit) = {
-    val accountTransfer = AccountTransfer("123456", "123456", new DateTime("2000-01-01"))
-    val request = CreateLisaAccountTransferRequest("1234567890", "9876543210", new DateTime("2000-01-01"), accountTransfer)
-    val response = Await.result(SUT.transferAccount("Z019283", request)(HeaderCarrier()), Duration.Inf)
+    val accountTransfer = AccountTransfer("123456", "123456", testDate)
+    val request = CreateLisaAccountTransferRequest("1234567890", "9876543210", testDate, accountTransfer)
+    val response = Await.result(SUT.transferAccount(testLMRN, request)(HeaderCarrier()), Duration.Inf)
 
     callback(response)
   }
 
   private def doCloseRequest(callback: (CloseLisaAccountResponse) => Unit) = {
-    val request = CloseLisaAccountRequest("Voided", new DateTime("2000-01-01"))
-    val response = Await.result(SUT.closeAccount("Z019283", "A123456", request)(HeaderCarrier()), Duration.Inf)
+    val request = CloseLisaAccountRequest("Voided", testDate)
+    val response = Await.result(SUT.closeAccount(testLMRN, "A123456", request)(HeaderCarrier()), Duration.Inf)
 
     callback(response)
   }
 
-  val mockDesConnector = mock[DesConnector]
+  val testDate = new DateTime("2000-01-01")
+  val testLMRN = "Z019283"
+
+  val mockDesConnector: DesConnector = mock[DesConnector]
+
   object SUT extends AccountService {
     override val desConnector: DesConnector = mockDesConnector
   }
