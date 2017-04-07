@@ -24,11 +24,12 @@ import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.InvestorService
 import uk.gov.hmrc.play.http.HeaderCarrier
+import uk.gov.hmrc.auth.core.Retrievals.internalId
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class InvestorController extends LisaController {
-  val authConnector = LisaAuthConnector
+  val authConnector: LisaAuthConnector = LisaAuthConnector
 
   val service: InvestorService = InvestorService
 
@@ -36,7 +37,7 @@ class InvestorController extends LisaController {
 
   def createLisaInvestor(lisaManager: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async {
     implicit request =>
-      authorised((Enrolment("HMRC-LISA-ORG")).withIdentifier("ZREF", lisaManager)) {
+      authorised((Enrolment("HMRC-LISA-ORG")).withIdentifier("ZREF", lisaManager)).retrieve(internalId) {id =>
         Logger.debug(s"LISA HTTP Request: ${request.uri}  and method: ${request.method} and headers :${request.headers} and parameters : ${lisaManager}")
         withValidJson[CreateLisaInvestorRequest] {
         createRequest => {
