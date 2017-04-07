@@ -52,6 +52,7 @@ trait JsonFormats {
   )(unlift(CreateLisaInvestorRequest.unapply))
 
   implicit val desCreateAccountResponseFormats = Json.format[DesAccountResponse]
+  implicit val desCreateAccountResponseFormatsOld = Json.format[DesAccountResponseOld]
   implicit val desCreateInvestorResponseFormats = Json.format[DesCreateInvestorResponse]
   implicit val desLifeEventResponseFormats = Json.format[DesLifeEventResponse]
   implicit val desTransactionResponseFormats = Json.format[DesTransactionResponse]

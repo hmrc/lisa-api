@@ -87,6 +87,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
   val closeAccountJson = """{"accountClosureReason" : "Voided", "closureDate" : "2000-06-23"}"""
 
+  /*
   "The Create / Transfer Account endpoint" must {
 
     "return with status 201 created and an account Id" when {
@@ -260,6 +261,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
     }
 
   }
+  */
 
   "The Close Account endpoint" must {
 

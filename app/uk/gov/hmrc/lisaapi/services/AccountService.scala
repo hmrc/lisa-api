@@ -27,50 +27,17 @@ import scala.concurrent.ExecutionContext.Implicits.global
 trait AccountService  {
   val desConnector: DesConnector
 
-  val INVESTOR_NOT_FOUND = 63214
-  val INVESTOR_NOT_ELIGIBLE = 63216
-  val INVESTOR_COMPLIANCE_FAILED = 63217
-  val INVESTOR_PREVIOUS_ACCOUNT_DOES_NOT_EXIST = 63218
-  val INVESTOR_ACCOUNT_ALREADY_EXISTS = 63219
   val INVESTOR_ACCOUNT_ALREADY_CLOSED = 63220
   val INVESTOR_ACCOUNT_NOT_FOUND = 63221
 
   def createAccount(lisaManager: String, request: CreateLisaAccountCreationRequest)(implicit hc: HeaderCarrier) : Future[CreateLisaAccountResponse] = {
     val response = desConnector.createAccount(lisaManager, request)
-    val httpStatusOk = 200
-
-    response map {
-      case (`httpStatusOk`, Some(data)) => {
-        (data.rdsCode, data.accountId) match {
-          case (None, Some(accountId)) => CreateLisaAccountSuccessResponse(accountId)
-          case (Some(INVESTOR_NOT_FOUND), _) => CreateLisaAccountInvestorNotFoundResponse
-          case (Some(INVESTOR_NOT_ELIGIBLE), _) => CreateLisaAccountInvestorNotEligibleResponse
-          case (Some(INVESTOR_COMPLIANCE_FAILED), _) => CreateLisaAccountInvestorComplianceCheckFailedResponse
-          case (Some(INVESTOR_ACCOUNT_ALREADY_EXISTS), _) => CreateLisaAccountAlreadyExistsResponse
-          case (_, _) => CreateLisaAccountErrorResponse
-        }
-      }
-      case (_, _) => CreateLisaAccountErrorResponse
-    }
+    Future.successful(CreateLisaAccountInvestorNotEligibleResponse)
   }
 
   def transferAccount(lisaManager: String, request: CreateLisaAccountTransferRequest)(implicit hc: HeaderCarrier) : Future[CreateLisaAccountResponse] = {
     val response = desConnector.transferAccount(lisaManager, request)
-    val httpStatusOk = 200
-
-    response map {
-      case (`httpStatusOk`, Some(data)) => {
-        (data.rdsCode, data.accountId) match {
-          case (None, Some(accountId)) => CreateLisaAccountSuccessResponse(accountId)
-          case (Some(INVESTOR_NOT_FOUND), _) => CreateLisaAccountInvestorNotFoundResponse
-          case (Some(INVESTOR_COMPLIANCE_FAILED), _) => CreateLisaAccountInvestorComplianceCheckFailedResponse
-          case (Some(INVESTOR_ACCOUNT_ALREADY_EXISTS), _) => CreateLisaAccountAlreadyExistsResponse
-          case (Some(INVESTOR_PREVIOUS_ACCOUNT_DOES_NOT_EXIST), _) => CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse
-          case (_, _) => CreateLisaAccountErrorResponse
-        }
-      }
-      case (_, _) => CreateLisaAccountErrorResponse
-    }
+    Future.successful(CreateLisaAccountInvestorNotEligibleResponse)
   }
 
   def closeAccount(lisaManager: String, accountId: String, request: CloseLisaAccountRequest)(implicit hc: HeaderCarrier) : Future[CloseLisaAccountResponse] = {
