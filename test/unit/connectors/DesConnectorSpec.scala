@@ -35,24 +35,19 @@ class DesConnectorSpec extends PlaySpec
   with MockitoSugar
   with OneAppPerSuite {
 
-  val statusCodeSuccess = 200
-  val statusCodeServiceUnavailable = 503
-  val rdsCodeInvestorNotFound = 63214
-  val rdsCodeAccountAlreadyExists = 63219
-  val statusCodeCreated = 201
-  val statusCodeForbidden = 403
-
-
   "Create Lisa Investor endpoint" must {
+
+    val rdsCodeInvestorNotFound = 63214
+    val rdsCodeAccountAlreadyExists = 63219
 
     "Return a status code of 200" when {
       "Given a 200 response from DES" in {
         when(mockHttpPost.POST[CreateLisaInvestorRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(HttpResponse(responseStatus = statusCodeSuccess, responseJson = None)))
+          .thenReturn(Future.successful(HttpResponse(responseStatus = OK, responseJson = None)))
 
         doCreateInvestorRequest { response =>
           response must be((
-            statusCodeSuccess,
+            OK,
             None
           ))
         }
@@ -65,7 +60,7 @@ class DesConnectorSpec extends PlaySpec
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = statusCodeServiceUnavailable,
+                responseStatus = SERVICE_UNAVAILABLE,
                 responseJson = None
               )
             )
@@ -73,7 +68,7 @@ class DesConnectorSpec extends PlaySpec
 
         doCreateInvestorRequest { response =>
           response must be((
-            statusCodeServiceUnavailable,
+            SERVICE_UNAVAILABLE,
             None
           ))
         }
@@ -86,7 +81,7 @@ class DesConnectorSpec extends PlaySpec
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = statusCodeSuccess,
+                responseStatus = OK,
                 responseJson = Some(Json.parse("""[1,2,3]"""))
               )
             )
@@ -94,7 +89,7 @@ class DesConnectorSpec extends PlaySpec
 
         doCreateInvestorRequest { response =>
           response must be((
-            statusCodeSuccess,
+            OK,
             Some(DesCreateInvestorResponse(None, None))
           ))
         }
@@ -107,7 +102,7 @@ class DesConnectorSpec extends PlaySpec
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = statusCodeSuccess,
+                responseStatus = OK,
                 responseJson = Some(Json.parse(s"""{"rdsCode":$rdsCodeInvestorNotFound, "investorId": "AB123456"}"""))
               )
             )
@@ -115,7 +110,7 @@ class DesConnectorSpec extends PlaySpec
 
         doCreateInvestorRequest { response =>
           response must be((
-            statusCodeSuccess,
+            OK,
             Some(DesCreateInvestorResponse(rdsCode = Some(rdsCodeInvestorNotFound), investorId = Some("AB123456")))
           ))
         }
@@ -295,11 +290,11 @@ class DesConnectorSpec extends PlaySpec
     "Return a status code of 200" when {
       "Given a 200 response from DES" in {
         when(mockHttpPost.POST[CloseLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(HttpResponse(responseStatus = statusCodeSuccess, responseJson = None)))
+          .thenReturn(Future.successful(HttpResponse(responseStatus = OK, responseJson = None)))
 
         doCloseAccountRequest { response =>
           response must be((
-            statusCodeSuccess,
+            OK,
             None
           ))
         }
@@ -312,7 +307,7 @@ class DesConnectorSpec extends PlaySpec
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = statusCodeServiceUnavailable,
+                responseStatus = SERVICE_UNAVAILABLE,
                 responseJson = None
               )
             )
@@ -320,7 +315,7 @@ class DesConnectorSpec extends PlaySpec
 
         doCloseAccountRequest { response =>
           response must be((
-            statusCodeServiceUnavailable,
+            SERVICE_UNAVAILABLE,
             None
           ))
         }
@@ -333,7 +328,7 @@ class DesConnectorSpec extends PlaySpec
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = statusCodeSuccess,
+                responseStatus = OK,
                 responseJson = Some(Json.parse("""[1,2,3]"""))
               )
             )
@@ -341,7 +336,7 @@ class DesConnectorSpec extends PlaySpec
 
         doCloseAccountRequest { response =>
           response must be((
-            statusCodeSuccess,
+            OK,
             Some(DesAccountResponseOld(None, None))
           ))
         }
@@ -354,7 +349,7 @@ class DesConnectorSpec extends PlaySpec
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = statusCodeSuccess,
+                responseStatus = OK,
                 responseJson = Some(Json.parse(s"""{"rdsCode": null, "accountId": "AB123456"}"""))
               )
             )
@@ -362,7 +357,7 @@ class DesConnectorSpec extends PlaySpec
 
         doCloseAccountRequest { response =>
           response must be((
-            statusCodeSuccess,
+            OK,
             Some(DesAccountResponseOld(rdsCode = None, accountId = Some("AB123456")))
           ))
         }
@@ -379,7 +374,7 @@ class DesConnectorSpec extends PlaySpec
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = statusCodeServiceUnavailable,
+                responseStatus = SERVICE_UNAVAILABLE,
                 responseJson = None
               )
             )
@@ -397,7 +392,7 @@ class DesConnectorSpec extends PlaySpec
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = statusCodeSuccess,
+                responseStatus = OK,
                 responseJson = Some(Json.parse("""[1,2,3]"""))
               )
             )
@@ -415,7 +410,7 @@ class DesConnectorSpec extends PlaySpec
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = statusCodeCreated,
+                responseStatus = CREATED,
                 responseJson = Some(Json.parse(s"""{"lifeEventID": "87654321"}"""))
               )
             )
@@ -433,7 +428,7 @@ class DesConnectorSpec extends PlaySpec
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = statusCodeCreated,
+                responseStatus = CREATED,
                 responseJson = Some(Json.parse(s"""{"lifeEvent": "87654321"}"""))
               )
             )
@@ -452,7 +447,7 @@ class DesConnectorSpec extends PlaySpec
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = statusCodeForbidden,
+                responseStatus = FORBIDDEN,
                 responseJson = Some(Json.parse(s"""{"code": "LIFE_EVENT_INAPPROPRIATE","reason": "The life event conflicts with previous life event reported."}"""))
               )
             )

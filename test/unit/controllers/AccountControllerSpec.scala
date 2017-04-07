@@ -87,7 +87,6 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
   val closeAccountJson = """{"accountClosureReason" : "Voided", "closureDate" : "2000-06-23"}"""
 
-  /*
   "The Create / Transfer Account endpoint" must {
 
     "return with status 201 created and an account Id" when {
@@ -210,6 +209,25 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
       }
     }
 
+    "return with status 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID" when {
+      "the data service returns a CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse for a create request" in {
+        when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorAccountAlreadyClosedOrVoidedResponse))
+
+        doCreateOrTransferRequest(createAccountJson) { res =>
+          status(res) mustBe (FORBIDDEN)
+          (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID")
+        }
+      }
+      "the data service returns a CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse for a transfer request" in {
+        when(mockService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorAccountAlreadyClosedOrVoidedResponse))
+
+        doCreateOrTransferRequest(transferAccountJson) { res =>
+          status(res) mustBe (FORBIDDEN)
+          (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID")
+        }
+      }
+    }
+
     "return with status 409 conflict and a code of INVESTOR_ACCOUNT_ALREADY_EXISTS" when {
       "the data service returns a CreateLisaAccountAlreadyExistsResponse for a create request" in {
         when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountAlreadyExistsResponse))
@@ -261,7 +279,6 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
     }
 
   }
-  */
 
   "The Close Account endpoint" must {
 
