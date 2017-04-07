@@ -52,15 +52,15 @@ class AccountServiceSpec extends PlaySpec
     }
 
     "return a Error Response" when {
-      "a error response comes from DES" in {
+      "a unexpected error response comes from DES" in {
         when(mockDesConnector.createAccount(any(), any())(any()))
-          .thenReturn(Future.successful(DesFailureResponse(code = "INTERNAL_SERVER_ERROR")))
+          .thenReturn(Future.successful(DesFailureResponse(code = "UNEXPECTED_ERROR")))
 
         doCreateRequest { response =>
           response mustBe CreateLisaAccountErrorResponse
         }
       }
-      "a not found response comes from DES" in {
+      "a NOT_FOUND response comes from DES" in {
         when(mockDesConnector.createAccount(any(), any())(any()))
           .thenReturn(Future.successful(DesFailureResponse(code = "NOT_FOUND")))
 
@@ -68,9 +68,9 @@ class AccountServiceSpec extends PlaySpec
           response mustBe CreateLisaAccountErrorResponse
         }
       }
-      "a unexpected error response comes from DES" in {
+      "a INTERNAL_SERVER_ERROR response comes from DES" in {
         when(mockDesConnector.createAccount(any(), any())(any()))
-          .thenReturn(Future.successful(DesFailureResponse(code = "UNEXPECTED_ERROR")))
+          .thenReturn(Future.successful(DesFailureResponse(code = "INTERNAL_SERVER_ERROR")))
 
         doCreateRequest { response =>
           response mustBe CreateLisaAccountErrorResponse
@@ -147,15 +147,15 @@ class AccountServiceSpec extends PlaySpec
     }
 
     "return a Error Response" when {
-      "a error response comes from DES" in {
+      "a unexpected error response comes from DES" in {
         when(mockDesConnector.transferAccount(any(), any())(any()))
-          .thenReturn(Future.successful(DesFailureResponse(code = "INTERNAL_SERVER_ERROR")))
+          .thenReturn(Future.successful(DesFailureResponse(code = "UNEXPECTED_ERROR")))
 
         doTransferRequest { response =>
           response mustBe CreateLisaAccountErrorResponse
         }
       }
-      "a not found response comes from DES" in {
+      "a NOT_FOUND response comes from DES" in {
         when(mockDesConnector.transferAccount(any(), any())(any()))
           .thenReturn(Future.successful(DesFailureResponse(code = "NOT_FOUND")))
 
@@ -163,9 +163,9 @@ class AccountServiceSpec extends PlaySpec
           response mustBe CreateLisaAccountErrorResponse
         }
       }
-      "a unexpected error response comes from DES" in {
+      "a INTERNAL_SERVER_ERROR response comes from DES" in {
         when(mockDesConnector.transferAccount(any(), any())(any()))
-          .thenReturn(Future.successful(DesFailureResponse(code = "UNEXPECTED_ERROR")))
+          .thenReturn(Future.successful(DesFailureResponse(code = "INTERNAL_SERVER_ERROR")))
 
         doTransferRequest { response =>
           response mustBe CreateLisaAccountErrorResponse
