@@ -97,7 +97,7 @@ class CreateLisaAccountRequestSpec extends PlaySpec with JsonFormats {
 
       val json = Json.toJson[CreateLisaAccountRequest](request)
 
-      json mustBe Json.parse(validAccountTransferRequest.replace(""""creationReason": "Transferred",""", ""))
+      json mustBe Json.parse(validAccountTransferRequest)
     }
 
     "deserialize creation request to json" in {
@@ -109,7 +109,7 @@ class CreateLisaAccountRequestSpec extends PlaySpec with JsonFormats {
 
       val json = Json.toJson[CreateLisaAccountRequest](request)
 
-      json mustBe Json.parse(validAccountCreationRequest.replace(""""creationReason": "New",""", ""))
+      json mustBe Json.parse(validAccountCreationRequest)
     }
 
     "catch an invalid firstSubscriptionDate" in {

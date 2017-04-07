@@ -119,171 +119,153 @@ class DesConnectorSpec extends PlaySpec
 
   }
 
-  /*
+  "Create Account endpoint" must {
 
-  "Create Lisa Account endpoint" must {
-
-    "Return a status code of 200" when {
-      "Given a 200 response from DES" in {
-        when(mockHttpPost.POST[CreateLisaAccountCreationRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(HttpResponse(responseStatus = statusCodeSuccess, responseJson = None)))
+    "return a populated success response" when {
+      "the DES response has a json body that is in the correct format" in {
+        when(mockHttpPost.POST[CreateLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = CREATED,
+                responseJson = Some(Json.parse(s"""{"accountID": "87654321"}"""))
+              )
+            )
+          )
 
         doCreateAccountRequest { response =>
-          response must be((
-            statusCodeSuccess,
-            None
-          ))
+          response mustBe DesAccountResponse("87654321")
         }
       }
     }
 
-    "Return no DesAccountResponse" when {
-      "The DES response has no json body" in {
-        when(mockHttpPost.POST[CreateLisaAccountCreationRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+    "return a generic failure response" when {
+      "the DES response has no json body" in {
+        when(mockHttpPost.POST[CreateLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = statusCodeServiceUnavailable,
+                responseStatus = SERVICE_UNAVAILABLE,
                 responseJson = None
               )
             )
           )
 
         doCreateAccountRequest { response =>
-          response must be((
-            statusCodeServiceUnavailable,
-            None
-          ))
+          response mustBe DesFailureResponse()
         }
       }
-    }
 
-    "Return any empty DesAccountResponse" when {
-      "The DES response has a json body that is in an incorrect format" in {
-        when(mockHttpPost.POST[CreateLisaAccountCreationRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+      "the DES response has a json body that is not in the correct format" in {
+        when(mockHttpPost.POST[CreateLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = statusCodeSuccess,
-                responseJson = Some(Json.parse("""[1,2,3]"""))
+                responseStatus = CREATED,
+                responseJson = Some(Json.parse(s"""{"account": "87654321"}"""))
               )
             )
           )
 
         doCreateAccountRequest { response =>
-          response must be((
-            statusCodeSuccess,
-            Some(DesAccountResponse(None, None))
-          ))
+          response mustBe DesFailureResponse()
         }
       }
     }
 
-    "Return a populated DesAccountResponse" when {
-      "The DES response has a json body that is in the correct format" in {
-        when(mockHttpPost.POST[CreateLisaAccountCreationRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+    "return a type-appropriate failure response" when {
+      "a specific failure is returned" in {
+        when(mockHttpPost.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = statusCodeSuccess,
-                responseJson = Some(Json.parse(s"""{"rdsCode":$rdsCodeAccountAlreadyExists, "accountId": "AB123456"}"""))
+                responseStatus = FORBIDDEN,
+                responseJson = Some(Json.parse(s"""{"code": "INVESTOR_NOT_FOUND", "reason": "The investorID given does not match with HMRC’s records."}"""))
               )
             )
           )
 
         doCreateAccountRequest { response =>
-          response must be((
-            statusCodeSuccess,
-            Some(DesAccountResponse(rdsCode = Some(rdsCodeAccountAlreadyExists), accountId = Some("AB123456")))
-          ))
+          response mustBe DesFailureResponse("INVESTOR_NOT_FOUND", "The investorID given does not match with HMRC’s records.")
         }
       }
     }
 
   }
 
-  "Transfer Lisa Account endpoint" must {
+  "Transfer Account endpoint" must {
 
-    "Return a status code of 200" when {
-      "Given a 200 response from DES" in {
-        when(mockHttpPost.POST[CreateLisaAccountTransferRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(HttpResponse(responseStatus = statusCodeSuccess, responseJson = None)))
+    "return a populated success response" when {
+      "the DES response has a json body that is in the correct format" in {
+        when(mockHttpPost.POST[CreateLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = CREATED,
+                responseJson = Some(Json.parse(s"""{"accountID": "87654321"}"""))
+              )
+            )
+          )
 
         doTransferAccountRequest { response =>
-          response must be((
-            statusCodeSuccess,
-            None
-          ))
+          response mustBe DesAccountResponse("87654321")
         }
       }
     }
 
-    "Return no DesAccountResponse" when {
-      "The DES response has no json body" in {
-        when(mockHttpPost.POST[CreateLisaAccountTransferRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+    "return a generic failure response" when {
+      "the DES response has no json body" in {
+        when(mockHttpPost.POST[CreateLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = statusCodeServiceUnavailable,
+                responseStatus = SERVICE_UNAVAILABLE,
                 responseJson = None
               )
             )
           )
 
         doTransferAccountRequest { response =>
-          response must be((
-            statusCodeServiceUnavailable,
-            None
-          ))
+          response mustBe DesFailureResponse()
         }
       }
-    }
 
-    "Return any empty DesAccountResponse" when {
-      "The DES response has a json body that is in an incorrect format" in {
-        when(mockHttpPost.POST[CreateLisaAccountTransferRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+      "the DES response has a json body that is not in the correct format" in {
+        when(mockHttpPost.POST[CreateLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = statusCodeSuccess,
-                responseJson = Some(Json.parse("""[1,2,3]"""))
+                responseStatus = CREATED,
+                responseJson = Some(Json.parse(s"""{"account": "87654321"}"""))
               )
             )
           )
 
         doTransferAccountRequest { response =>
-          response must be((
-            statusCodeSuccess,
-            Some(DesAccountResponse(None, None))
-          ))
+          response mustBe DesFailureResponse()
         }
       }
     }
 
-    "Return a populated DesAccountResponse" when {
-      "The DES response has a json body that is in the correct format" in {
-        when(mockHttpPost.POST[CreateLisaAccountTransferRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+    "return a type-appropriate failure response" when {
+      "a specific failure is returned" in {
+        when(mockHttpPost.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = statusCodeSuccess,
-                responseJson = Some(Json.parse(s"""{"rdsCode":$rdsCodeAccountAlreadyExists, "accountId": "AB123456"}"""))
+                responseStatus = FORBIDDEN,
+                responseJson = Some(Json.parse(s"""{"code": "INVESTOR_NOT_FOUND", "reason": "The investorID given does not match with HMRC’s records."}"""))
               )
             )
           )
 
         doTransferAccountRequest { response =>
-          response must be((
-            statusCodeSuccess,
-            Some(DesAccountResponse(rdsCode = Some(rdsCodeAccountAlreadyExists), accountId = Some("AB123456")))
-          ))
+          response mustBe DesFailureResponse("INVESTOR_NOT_FOUND", "The investorID given does not match with HMRC’s records.")
         }
       }
     }
 
   }
-
-  */
 
   "Close Lisa Account endpoint" must {
 
@@ -590,6 +572,7 @@ class DesConnectorSpec extends PlaySpec
   }
 
   val mockHttpPost = mock[HttpPost]
+
   implicit val hc = HeaderCarrier()
 
   object SUT extends DesConnector {

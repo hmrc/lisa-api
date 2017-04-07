@@ -105,15 +105,17 @@ trait JsonFormats {
   implicit val createLisaAccountCreationRequestWrites: Writes[CreateLisaAccountCreationRequest] = (
     (JsPath \ "investorID").write[String] and
     (JsPath \ "accountID").write[String] and
-    (JsPath \ "firstSubscriptionDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd"))
-  )(unlift(CreateLisaAccountCreationRequest.unapply))
+    (JsPath \ "firstSubscriptionDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
+    (JsPath \ "creationReason").write[String]
+  ){req: CreateLisaAccountCreationRequest => (req.investorID, req.accountID, req.firstSubscriptionDate, "New")}
 
   implicit val createLisaAccountTransferRequestWrites: Writes[CreateLisaAccountTransferRequest] = (
     (JsPath \ "investorID").write[String] and
     (JsPath \ "accountID").write[String] and
     (JsPath \ "firstSubscriptionDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
-    (JsPath \ "transferAccount").write[AccountTransfer]
-  )(unlift(CreateLisaAccountTransferRequest.unapply))
+    (JsPath \ "transferAccount").write[AccountTransfer] and
+    (JsPath \ "creationReason").write[String]
+  ){req: CreateLisaAccountTransferRequest => (req.investorID, req.accountID, req.firstSubscriptionDate, req.transferAccount, "Transferred")}
 
   implicit val reportLifeEventRequestReads: Reads[ReportLifeEventRequest] = (
     (JsPath \ "eventType").read(Reads.pattern(lifeEventTypeRegex, "error.formatting.eventType")) and
