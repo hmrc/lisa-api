@@ -16,4 +16,5 @@
 
 package uk.gov.hmrc.lisaapi.models.des
 
-case class DesAccountResponse(rdsCode: Option[Int] = None, accountId: Option[String] = None)
+// todo: refactor away completely
+case class DesAccountResponseOld(rdsCode: Option[Int] = None, accountId: Option[String] = None)
