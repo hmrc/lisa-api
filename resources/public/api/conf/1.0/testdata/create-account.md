@@ -72,7 +72,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Create Account endpoint with an investorID that already exist</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
+            <td><p>The LISA account has already been closed or voided</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
             <td>
                 <p class ="code--block"> {<br>
                                             "investorID":"0000000403",<br>
