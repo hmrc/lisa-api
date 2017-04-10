@@ -60,39 +60,27 @@ trait DesConnector extends ServicesConfig with JsonFormats {
 
   /**
     * Attempts to create a new LISA account
-    *
-    * @return A tuple of the http status code and an (optional) data response
     */
-  def createAccount(lisaManager: String, request: CreateLisaAccountCreationRequest)(implicit hc: HeaderCarrier): Future[(Int, Option[DesAccountResponse])] = {
-    val uri = s"$lisaServiceUrl/$lisaManager/createaccount"
+  def createAccount(lisaManager: String, request: CreateLisaAccountCreationRequest)(implicit hc: HeaderCarrier): Future[DesResponse] = {
+    val uri = s"$lisaServiceUrl/$lisaManager/accounts"
 
     val result = httpPost.POST[CreateLisaAccountCreationRequest, HttpResponse](uri, request)(implicitly, httpReads, implicitly)
 
-    result.map(r => {
-      // catch any NullPointerExceptions that may occur from r.json being a null
-      Try(r.json.asOpt[DesAccountResponse]) match {
-        case Success(data) => (r.status, data)
-        case Failure(_) => (r.status, None)
-      }
+    result.map(res => {
+      parseDesResponse[DesAccountResponse](res)._2
     })
   }
 
   /**
-    * Attempts to transfer a LISA account
-    *
-    * @return A tuple of the http status code and an (optional) data response
+    * Attempts to transfer an existing LISA account
     */
-  def transferAccount(lisaManager: String, request: CreateLisaAccountTransferRequest)(implicit hc: HeaderCarrier): Future[(Int, Option[DesAccountResponse])] = {
-    val uri = s"$lisaServiceUrl/$lisaManager/transferaccount"
+  def transferAccount(lisaManager: String, request: CreateLisaAccountTransferRequest)(implicit hc: HeaderCarrier): Future[DesResponse] = {
+    val uri = s"$lisaServiceUrl/$lisaManager/accounts"
 
     val result = httpPost.POST[CreateLisaAccountTransferRequest, HttpResponse](uri, request)(implicitly, httpReads, implicitly)
 
-    result.map(r => {
-      // catch any NullPointerExceptions that may occur from r.json being a null
-      Try(r.json.asOpt[DesAccountResponse]) match {
-        case Success(data) => (r.status, data)
-        case Failure(_) => (r.status, None)
-      }
+    result.map(res => {
+      parseDesResponse[DesAccountResponse](res)._2
     })
   }
 
@@ -101,14 +89,14 @@ trait DesConnector extends ServicesConfig with JsonFormats {
     *
     * @return A tuple of the http status code and an (optional) data response
     */
-  def closeAccount(lisaManager: String, accountId: String, request: CloseLisaAccountRequest)(implicit hc: HeaderCarrier): Future[(Int, Option[DesAccountResponse])] = {
+  def closeAccount(lisaManager: String, accountId: String, request: CloseLisaAccountRequest)(implicit hc: HeaderCarrier): Future[(Int, Option[DesAccountResponseOld])] = {
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId/close-account"
 
     val result = httpPost.POST[CloseLisaAccountRequest, HttpResponse](uri, request)(implicitly, httpReads, implicitly)
 
     result.map(r => {
       // catch any NullPointerExceptions that may occur from r.json being a null
-      Try(r.json.asOpt[DesAccountResponse]) match {
+      Try(r.json.asOpt[DesAccountResponseOld]) match {
         case Success(data) => (r.status, data)
         case Failure(_) => (r.status, None)
       }
@@ -117,8 +105,6 @@ trait DesConnector extends ServicesConfig with JsonFormats {
 
   /**
     * Attempts to report a LISA Life Event
-    *
-    * @return A tuple of the http status code and an (optional) data response
     */
   def reportLifeEvent(lisaManager: String, accountId: String, request: ReportLifeEventRequest)
                      (implicit hc: HeaderCarrier): Future[DesResponse] = {
@@ -135,7 +121,7 @@ trait DesConnector extends ServicesConfig with JsonFormats {
   /**
     * Attempts to request a bonus payment
     *
-    * @return DesResponse
+    * @return A tuple of the http status code and a des response
     */
   def requestBonusPayment(lisaManager: String, accountId: String, request: RequestBonusPaymentRequest)
                      (implicit hc: HeaderCarrier): Future[(Int, DesResponse)] = {

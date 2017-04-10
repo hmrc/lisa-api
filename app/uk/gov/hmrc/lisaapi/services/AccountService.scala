@@ -16,60 +16,66 @@
 
 package uk.gov.hmrc.lisaapi.services
 
+import play.api.Logger
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
+import uk.gov.hmrc.lisaapi.models.des.{DesAccountResponse, DesFailureResponse, DesLifeEventResponse}
 import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
-
 import scala.concurrent.ExecutionContext.Implicits.global
 
 trait AccountService  {
   val desConnector: DesConnector
 
-  val INVESTOR_NOT_FOUND = 63214
-  val INVESTOR_NOT_ELIGIBLE = 63216
-  val INVESTOR_COMPLIANCE_FAILED = 63217
-  val INVESTOR_PREVIOUS_ACCOUNT_DOES_NOT_EXIST = 63218
-  val INVESTOR_ACCOUNT_ALREADY_EXISTS = 63219
   val INVESTOR_ACCOUNT_ALREADY_CLOSED = 63220
   val INVESTOR_ACCOUNT_NOT_FOUND = 63221
 
   def createAccount(lisaManager: String, request: CreateLisaAccountCreationRequest)(implicit hc: HeaderCarrier) : Future[CreateLisaAccountResponse] = {
     val response = desConnector.createAccount(lisaManager, request)
-    val httpStatusOk = 200
 
     response map {
-      case (`httpStatusOk`, Some(data)) => {
-        (data.rdsCode, data.accountId) match {
-          case (None, Some(accountId)) => CreateLisaAccountSuccessResponse(accountId)
-          case (Some(INVESTOR_NOT_FOUND), _) => CreateLisaAccountInvestorNotFoundResponse
-          case (Some(INVESTOR_NOT_ELIGIBLE), _) => CreateLisaAccountInvestorNotEligibleResponse
-          case (Some(INVESTOR_COMPLIANCE_FAILED), _) => CreateLisaAccountInvestorComplianceCheckFailedResponse
-          case (Some(INVESTOR_ACCOUNT_ALREADY_EXISTS), _) => CreateLisaAccountAlreadyExistsResponse
-          case (_, _) => CreateLisaAccountErrorResponse
+      case successResponse: DesAccountResponse => {
+        Logger.debug("Matched DesAccountResponse")
+
+        CreateLisaAccountSuccessResponse(successResponse.accountID)
+      }
+      case failureResponse: DesFailureResponse => {
+        Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
+
+        failureResponse.code match {
+          case "INVESTOR_NOT_FOUND" => CreateLisaAccountInvestorNotFoundResponse
+          case "INVESTOR_ELIGIBILITY_CHECK_FAILED" => CreateLisaAccountInvestorNotEligibleResponse
+          case "INVESTOR_COMPLIANCE_CHECK_FAILED" => CreateLisaAccountInvestorComplianceCheckFailedResponse
+          case "INVESTOR_ACCOUNT_ALREADY_EXISTS" => CreateLisaAccountAlreadyExistsResponse
+          case "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID" => CreateLisaAccountInvestorAccountAlreadyClosedOrVoidedResponse
+          case _ => CreateLisaAccountErrorResponse
         }
       }
-      case (_, _) => CreateLisaAccountErrorResponse
     }
   }
 
   def transferAccount(lisaManager: String, request: CreateLisaAccountTransferRequest)(implicit hc: HeaderCarrier) : Future[CreateLisaAccountResponse] = {
     val response = desConnector.transferAccount(lisaManager, request)
-    val httpStatusOk = 200
 
     response map {
-      case (`httpStatusOk`, Some(data)) => {
-        (data.rdsCode, data.accountId) match {
-          case (None, Some(accountId)) => CreateLisaAccountSuccessResponse(accountId)
-          case (Some(INVESTOR_NOT_FOUND), _) => CreateLisaAccountInvestorNotFoundResponse
-          case (Some(INVESTOR_COMPLIANCE_FAILED), _) => CreateLisaAccountInvestorComplianceCheckFailedResponse
-          case (Some(INVESTOR_ACCOUNT_ALREADY_EXISTS), _) => CreateLisaAccountAlreadyExistsResponse
-          case (Some(INVESTOR_PREVIOUS_ACCOUNT_DOES_NOT_EXIST), _) => CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse
-          case (_, _) => CreateLisaAccountErrorResponse
+      case successResponse: DesAccountResponse => {
+        Logger.debug("Matched DesAccountResponse")
+
+        CreateLisaAccountSuccessResponse(successResponse.accountID)
+      }
+      case failureResponse: DesFailureResponse => {
+        Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
+
+        failureResponse.code match {
+          case "INVESTOR_NOT_FOUND" => CreateLisaAccountInvestorNotFoundResponse
+          case "INVESTOR_COMPLIANCE_CHECK_FAILED" => CreateLisaAccountInvestorComplianceCheckFailedResponse
+          case "PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST" => CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse
+          case "INVESTOR_ACCOUNT_ALREADY_EXISTS" => CreateLisaAccountAlreadyExistsResponse
+          case "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID" => CreateLisaAccountInvestorAccountAlreadyClosedOrVoidedResponse
+          case _ => CreateLisaAccountErrorResponse
         }
       }
-      case (_, _) => CreateLisaAccountErrorResponse
     }
   }
 

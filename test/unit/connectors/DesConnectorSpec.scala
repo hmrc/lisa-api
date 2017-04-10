@@ -35,24 +35,19 @@ class DesConnectorSpec extends PlaySpec
   with MockitoSugar
   with OneAppPerSuite {
 
-  val statusCodeSuccess = 200
-  val statusCodeServiceUnavailable = 503
-  val rdsCodeInvestorNotFound = 63214
-  val rdsCodeAccountAlreadyExists = 63219
-  val statusCodeCreated = 201
-  val statusCodeForbidden = 403
-
-
   "Create Lisa Investor endpoint" must {
+
+    val rdsCodeInvestorNotFound = 63214
+    val rdsCodeAccountAlreadyExists = 63219
 
     "Return a status code of 200" when {
       "Given a 200 response from DES" in {
         when(mockHttpPost.POST[CreateLisaInvestorRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(HttpResponse(responseStatus = statusCodeSuccess, responseJson = None)))
+          .thenReturn(Future.successful(HttpResponse(responseStatus = OK, responseJson = None)))
 
         doCreateInvestorRequest { response =>
           response must be((
-            statusCodeSuccess,
+            OK,
             None
           ))
         }
@@ -65,7 +60,7 @@ class DesConnectorSpec extends PlaySpec
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = statusCodeServiceUnavailable,
+                responseStatus = SERVICE_UNAVAILABLE,
                 responseJson = None
               )
             )
@@ -73,7 +68,7 @@ class DesConnectorSpec extends PlaySpec
 
         doCreateInvestorRequest { response =>
           response must be((
-            statusCodeServiceUnavailable,
+            SERVICE_UNAVAILABLE,
             None
           ))
         }
@@ -86,7 +81,7 @@ class DesConnectorSpec extends PlaySpec
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = statusCodeSuccess,
+                responseStatus = OK,
                 responseJson = Some(Json.parse("""[1,2,3]"""))
               )
             )
@@ -94,7 +89,7 @@ class DesConnectorSpec extends PlaySpec
 
         doCreateInvestorRequest { response =>
           response must be((
-            statusCodeSuccess,
+            OK,
             Some(DesCreateInvestorResponse(None, None))
           ))
         }
@@ -107,7 +102,7 @@ class DesConnectorSpec extends PlaySpec
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = statusCodeSuccess,
+                responseStatus = OK,
                 responseJson = Some(Json.parse(s"""{"rdsCode":$rdsCodeInvestorNotFound, "investorId": "AB123456"}"""))
               )
             )
@@ -115,7 +110,7 @@ class DesConnectorSpec extends PlaySpec
 
         doCreateInvestorRequest { response =>
           response must be((
-            statusCodeSuccess,
+            OK,
             Some(DesCreateInvestorResponse(rdsCode = Some(rdsCodeInvestorNotFound), investorId = Some("AB123456")))
           ))
         }
@@ -124,162 +119,148 @@ class DesConnectorSpec extends PlaySpec
 
   }
 
-  "Create Lisa Account endpoint" must {
+  "Create Account endpoint" must {
 
-    "Return a status code of 200" when {
-      "Given a 200 response from DES" in {
-        when(mockHttpPost.POST[CreateLisaAccountCreationRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(HttpResponse(responseStatus = statusCodeSuccess, responseJson = None)))
+    "return a populated success response" when {
+      "the DES response has a json body that is in the correct format" in {
+        when(mockHttpPost.POST[CreateLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = CREATED,
+                responseJson = Some(Json.parse(s"""{"accountID": "87654321"}"""))
+              )
+            )
+          )
 
         doCreateAccountRequest { response =>
-          response must be((
-            statusCodeSuccess,
-            None
-          ))
+          response mustBe DesAccountResponse("87654321")
         }
       }
     }
 
-    "Return no DesAccountResponse" when {
-      "The DES response has no json body" in {
-        when(mockHttpPost.POST[CreateLisaAccountCreationRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+    "return a generic failure response" when {
+      "the DES response has no json body" in {
+        when(mockHttpPost.POST[CreateLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = statusCodeServiceUnavailable,
+                responseStatus = SERVICE_UNAVAILABLE,
                 responseJson = None
               )
             )
           )
 
         doCreateAccountRequest { response =>
-          response must be((
-            statusCodeServiceUnavailable,
-            None
-          ))
+          response mustBe DesFailureResponse()
         }
       }
-    }
 
-    "Return any empty DesAccountResponse" when {
-      "The DES response has a json body that is in an incorrect format" in {
-        when(mockHttpPost.POST[CreateLisaAccountCreationRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+      "the DES response has a json body that is not in the correct format" in {
+        when(mockHttpPost.POST[CreateLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = statusCodeSuccess,
-                responseJson = Some(Json.parse("""[1,2,3]"""))
+                responseStatus = CREATED,
+                responseJson = Some(Json.parse(s"""{"account": "87654321"}"""))
               )
             )
           )
 
         doCreateAccountRequest { response =>
-          response must be((
-            statusCodeSuccess,
-            Some(DesAccountResponse(None, None))
-          ))
+          response mustBe DesFailureResponse()
         }
       }
     }
 
-    "Return a populated DesAccountResponse" when {
-      "The DES response has a json body that is in the correct format" in {
-        when(mockHttpPost.POST[CreateLisaAccountCreationRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+    "return a type-appropriate failure response" when {
+      "a specific failure is returned" in {
+        when(mockHttpPost.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = statusCodeSuccess,
-                responseJson = Some(Json.parse(s"""{"rdsCode":$rdsCodeAccountAlreadyExists, "accountId": "AB123456"}"""))
+                responseStatus = FORBIDDEN,
+                responseJson = Some(Json.parse(s"""{"code": "INVESTOR_NOT_FOUND", "reason": "The investorID given does not match with HMRC’s records."}"""))
               )
             )
           )
 
         doCreateAccountRequest { response =>
-          response must be((
-            statusCodeSuccess,
-            Some(DesAccountResponse(rdsCode = Some(rdsCodeAccountAlreadyExists), accountId = Some("AB123456")))
-          ))
+          response mustBe DesFailureResponse("INVESTOR_NOT_FOUND", "The investorID given does not match with HMRC’s records.")
         }
       }
     }
 
   }
 
-  "Transfer Lisa Account endpoint" must {
+  "Transfer Account endpoint" must {
 
-    "Return a status code of 200" when {
-      "Given a 200 response from DES" in {
-        when(mockHttpPost.POST[CreateLisaAccountTransferRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(HttpResponse(responseStatus = statusCodeSuccess, responseJson = None)))
+    "return a populated success response" when {
+      "the DES response has a json body that is in the correct format" in {
+        when(mockHttpPost.POST[CreateLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = CREATED,
+                responseJson = Some(Json.parse(s"""{"accountID": "87654321"}"""))
+              )
+            )
+          )
 
         doTransferAccountRequest { response =>
-          response must be((
-            statusCodeSuccess,
-            None
-          ))
+          response mustBe DesAccountResponse("87654321")
         }
       }
     }
 
-    "Return no DesAccountResponse" when {
-      "The DES response has no json body" in {
-        when(mockHttpPost.POST[CreateLisaAccountTransferRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+    "return a generic failure response" when {
+      "the DES response has no json body" in {
+        when(mockHttpPost.POST[CreateLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = statusCodeServiceUnavailable,
+                responseStatus = SERVICE_UNAVAILABLE,
                 responseJson = None
               )
             )
           )
 
         doTransferAccountRequest { response =>
-          response must be((
-            statusCodeServiceUnavailable,
-            None
-          ))
+          response mustBe DesFailureResponse()
         }
       }
-    }
 
-    "Return any empty DesAccountResponse" when {
-      "The DES response has a json body that is in an incorrect format" in {
-        when(mockHttpPost.POST[CreateLisaAccountTransferRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+      "the DES response has a json body that is not in the correct format" in {
+        when(mockHttpPost.POST[CreateLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = statusCodeSuccess,
-                responseJson = Some(Json.parse("""[1,2,3]"""))
+                responseStatus = CREATED,
+                responseJson = Some(Json.parse(s"""{"account": "87654321"}"""))
               )
             )
           )
 
         doTransferAccountRequest { response =>
-          response must be((
-            statusCodeSuccess,
-            Some(DesAccountResponse(None, None))
-          ))
+          response mustBe DesFailureResponse()
         }
       }
     }
 
-    "Return a populated DesAccountResponse" when {
-      "The DES response has a json body that is in the correct format" in {
-        when(mockHttpPost.POST[CreateLisaAccountTransferRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+    "return a type-appropriate failure response" when {
+      "a specific failure is returned" in {
+        when(mockHttpPost.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = statusCodeSuccess,
-                responseJson = Some(Json.parse(s"""{"rdsCode":$rdsCodeAccountAlreadyExists, "accountId": "AB123456"}"""))
+                responseStatus = FORBIDDEN,
+                responseJson = Some(Json.parse(s"""{"code": "INVESTOR_NOT_FOUND", "reason": "The investorID given does not match with HMRC’s records."}"""))
               )
             )
           )
 
         doTransferAccountRequest { response =>
-          response must be((
-            statusCodeSuccess,
-            Some(DesAccountResponse(rdsCode = Some(rdsCodeAccountAlreadyExists), accountId = Some("AB123456")))
-          ))
+          response mustBe DesFailureResponse("INVESTOR_NOT_FOUND", "The investorID given does not match with HMRC’s records.")
         }
       }
     }
@@ -291,11 +272,11 @@ class DesConnectorSpec extends PlaySpec
     "Return a status code of 200" when {
       "Given a 200 response from DES" in {
         when(mockHttpPost.POST[CloseLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(HttpResponse(responseStatus = statusCodeSuccess, responseJson = None)))
+          .thenReturn(Future.successful(HttpResponse(responseStatus = OK, responseJson = None)))
 
         doCloseAccountRequest { response =>
           response must be((
-            statusCodeSuccess,
+            OK,
             None
           ))
         }
@@ -308,7 +289,7 @@ class DesConnectorSpec extends PlaySpec
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = statusCodeServiceUnavailable,
+                responseStatus = SERVICE_UNAVAILABLE,
                 responseJson = None
               )
             )
@@ -316,7 +297,7 @@ class DesConnectorSpec extends PlaySpec
 
         doCloseAccountRequest { response =>
           response must be((
-            statusCodeServiceUnavailable,
+            SERVICE_UNAVAILABLE,
             None
           ))
         }
@@ -329,7 +310,7 @@ class DesConnectorSpec extends PlaySpec
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = statusCodeSuccess,
+                responseStatus = OK,
                 responseJson = Some(Json.parse("""[1,2,3]"""))
               )
             )
@@ -337,8 +318,8 @@ class DesConnectorSpec extends PlaySpec
 
         doCloseAccountRequest { response =>
           response must be((
-            statusCodeSuccess,
-            Some(DesAccountResponse(None, None))
+            OK,
+            Some(DesAccountResponseOld(None, None))
           ))
         }
       }
@@ -350,7 +331,7 @@ class DesConnectorSpec extends PlaySpec
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = statusCodeSuccess,
+                responseStatus = OK,
                 responseJson = Some(Json.parse(s"""{"rdsCode": null, "accountId": "AB123456"}"""))
               )
             )
@@ -358,8 +339,8 @@ class DesConnectorSpec extends PlaySpec
 
         doCloseAccountRequest { response =>
           response must be((
-            statusCodeSuccess,
-            Some(DesAccountResponse(rdsCode = None, accountId = Some("AB123456")))
+            OK,
+            Some(DesAccountResponseOld(rdsCode = None, accountId = Some("AB123456")))
           ))
         }
       }
@@ -375,7 +356,7 @@ class DesConnectorSpec extends PlaySpec
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = statusCodeServiceUnavailable,
+                responseStatus = SERVICE_UNAVAILABLE,
                 responseJson = None
               )
             )
@@ -393,7 +374,7 @@ class DesConnectorSpec extends PlaySpec
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = statusCodeSuccess,
+                responseStatus = OK,
                 responseJson = Some(Json.parse("""[1,2,3]"""))
               )
             )
@@ -411,7 +392,7 @@ class DesConnectorSpec extends PlaySpec
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = statusCodeCreated,
+                responseStatus = CREATED,
                 responseJson = Some(Json.parse(s"""{"lifeEventID": "87654321"}"""))
               )
             )
@@ -429,7 +410,7 @@ class DesConnectorSpec extends PlaySpec
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = statusCodeCreated,
+                responseStatus = CREATED,
                 responseJson = Some(Json.parse(s"""{"lifeEvent": "87654321"}"""))
               )
             )
@@ -448,7 +429,7 @@ class DesConnectorSpec extends PlaySpec
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = statusCodeForbidden,
+                responseStatus = FORBIDDEN,
                 responseJson = Some(Json.parse(s"""{"code": "LIFE_EVENT_INAPPROPRIATE","reason": "The life event conflicts with previous life event reported."}"""))
               )
             )
@@ -545,14 +526,14 @@ class DesConnectorSpec extends PlaySpec
     callback(response)
   }
 
-  private def doCreateAccountRequest(callback: ((Int, Option[DesAccountResponse])) => Unit) = {
+  private def doCreateAccountRequest(callback: (DesResponse) => Unit) = {
     val request = CreateLisaAccountCreationRequest("1234567890",  "9876543210", new DateTime("2000-01-01"))
     val response = Await.result(SUT.createAccount("Z019283", request), Duration.Inf)
 
     callback(response)
   }
 
-  private def doTransferAccountRequest(callback: ((Int, Option[DesAccountResponse])) => Unit) = {
+  private def doTransferAccountRequest(callback: (DesResponse) => Unit) = {
     val transferAccount = AccountTransfer("1234", "1234", new DateTime("2000-01-01"))
     val request = CreateLisaAccountTransferRequest("1234567890",  "9876543210", new DateTime("2000-01-01"), transferAccount)
     val response = Await.result(SUT.transferAccount("Z019283", request), Duration.Inf)
@@ -560,7 +541,7 @@ class DesConnectorSpec extends PlaySpec
     callback(response)
   }
 
-  private def doCloseAccountRequest(callback: ((Int, Option[DesAccountResponse])) => Unit) = {
+  private def doCloseAccountRequest(callback: ((Int, Option[DesAccountResponseOld])) => Unit) = {
     val request = CloseLisaAccountRequest("Voided", new DateTime("2000-01-01"))
     val response = Await.result(SUT.closeAccount("Z123456", "ABC12345", request), Duration.Inf)
 
@@ -591,6 +572,7 @@ class DesConnectorSpec extends PlaySpec
   }
 
   val mockHttpPost = mock[HttpPost]
+
   implicit val hc = HeaderCarrier()
 
   object SUT extends DesConnector {
