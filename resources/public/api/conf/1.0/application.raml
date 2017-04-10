@@ -309,6 +309,13 @@ types:
                           "code" : "TRANSFER_ACCOUNT_DATA_PROVIDED",
                           "message" : "transfer account data provided"
                         }
+                    accountClosedOrVoided:
+                      description: The LISA account has already been closed or voided
+                      value: |
+                        {
+                          "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID",
+                          "message": "The LISA account has already been closed or voided"
+                        }
 
             404:
               body:
