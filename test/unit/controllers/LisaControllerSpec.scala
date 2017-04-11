@@ -67,6 +67,14 @@ class LisaControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite 
         status(res) mustBe (INTERNAL_SERVER_ERROR)
       }
 
+      "return with 401 " in {
+        when(mockAuthCon.authorise[Option[String]](any(),any())(any())).thenReturn(Future.failed(new Exception()))
+        val jsonString = """{"prop1": 123, "prop2": "123"}"""
+        val res = SUT.testJsonValidator().apply(FakeRequest(Helpers.PUT, "/")
+          .withHeaders(acceptHeader)
+          .withBody(AnyContentAsJson(Json.parse(jsonString))))
+        status(res) mustBe (UNAUTHORIZED)
+      }
     }
 
   }

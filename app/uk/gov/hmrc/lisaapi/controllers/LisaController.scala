@@ -19,7 +19,7 @@ package uk.gov.hmrc.lisaapi.controllers
 import play.api.Logger
 import play.api.data.validation.ValidationError
 import play.api.libs.json.Json.toJson
-import play.api.libs.json.{JsError, JsPath, JsSuccess, Reads}
+import play.api.libs.json._
 import play.api.mvc.{AnyContent, Request, Result}
 import uk.gov.hmrc.api.controllers.HeaderValidator
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
@@ -30,6 +30,7 @@ import uk.gov.hmrc.lisaapi.models.LisaManager
 import uk.gov.hmrc.play.config.RunMode
 import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.microservice.controller.BaseController
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
@@ -79,7 +80,7 @@ val authConnector: LisaAuthConnector = LisaAuthConnector
 
 def handleFailure(implicit request: Request[_]) = PartialFunction[Throwable, Future[Result]] {
 // todo: dont assume any controller exception is related to auth - it may be an error in the application code
-case _ => Future.successful(Unauthorized("The lisaManagerReferenceNumber path parameter you've used doesn't match with an authorised LISA provider in HMRC's records."))
+case _ => Future.successful(Unauthorized(Json.toJson(ErrorInvalidLisaManager)))
 }
 
 }
