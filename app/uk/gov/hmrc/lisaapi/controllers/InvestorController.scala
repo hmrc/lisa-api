@@ -21,7 +21,8 @@ import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.api.controllers.HeaderValidator
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.services.InvestorService
+import uk.gov.hmrc.lisaapi.services.{AuditService, InvestorService}
+import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.microservice.controller.BaseController
 
@@ -30,6 +31,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class InvestorController extends LisaController {
 
   val service: InvestorService = InvestorService
+  val auditService: AuditService = AuditService
 
   implicit val hc: HeaderCarrier = new HeaderCarrier()
 
@@ -41,13 +43,24 @@ class InvestorController extends LisaController {
           service.createInvestor(lisaManager, createRequest).map { result =>
             result match {
               case CreateLisaInvestorSuccessResponse(investorId) => {
+                auditService.sendEvent(DataEvent("test", "test"))
+
                 val data = ApiResponseData(message = "Investor Created.", investorId = Some(investorId))
 
                 Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = 201)))
               }
-              case CreateLisaInvestorNotFoundResponse => Forbidden(Json.toJson(ErrorInvestorNotFound))
-              case CreateLisaInvestorAlreadyExistsResponse(investorId) => Conflict(Json.toJson(ErrorInvestorAlreadyExists(investorId)))
-              case CreateLisaInvestorErrorResponse => InternalServerError(Json.toJson(ErrorInternalServerError))
+              case CreateLisaInvestorNotFoundResponse => {
+                auditService.sendEvent(DataEvent("test", "test"))
+                Forbidden(Json.toJson(ErrorInvestorNotFound))
+              }
+              case CreateLisaInvestorAlreadyExistsResponse(investorId) => {
+                auditService.sendEvent(DataEvent("test", "test"))
+                Conflict(Json.toJson(ErrorInvestorAlreadyExists(investorId)))
+              }
+              case CreateLisaInvestorErrorResponse => {
+                auditService.sendEvent(DataEvent("test", "test"))
+                InternalServerError(Json.toJson(ErrorInternalServerError))
+              }
             }
           }
         }
