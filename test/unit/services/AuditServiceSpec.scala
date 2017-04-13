@@ -53,6 +53,14 @@ class AuditServiceSpec extends PlaySpec
       event.detail must contain key "Authorization"
     }
 
+    "send an event via the audit connector" in {
+      val event = SUT.createEvent("investorCreated", "/create", Map("investorID" -> "1234567890"))
+
+      val auditResult = SUT.sendEvent(event)
+
+      verify(mockAuditConnector).sendEvent(any())(any(), any())
+    }
+
   }
 
   implicit val hc:HeaderCarrier = HeaderCarrier()

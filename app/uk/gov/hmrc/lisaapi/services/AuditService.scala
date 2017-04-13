@@ -39,9 +39,8 @@ trait AuditService extends AppName {
 
   }
 
-  def audit(event:DataEvent): Future[AuditResult] = {
-    ???
-    //connector.sendEvent(event)
+  def sendEvent(event:DataEvent): Future[AuditResult] = {
+    connector.sendEvent(event)
   }
 
 }
