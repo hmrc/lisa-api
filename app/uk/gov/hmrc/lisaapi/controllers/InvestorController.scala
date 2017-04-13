@@ -43,7 +43,15 @@ class InvestorController extends LisaController {
           service.createInvestor(lisaManager, createRequest).map { result =>
             result match {
               case CreateLisaInvestorSuccessResponse(investorId) => {
-                val auditEvent = auditService.createEvent("investorCreated", routes.InvestorController.createLisaInvestor(lisaManager).url, Map())
+                val auditEvent = auditService.createEvent(
+                  auditType = "investorCreated",
+                  path = routes.InvestorController.createLisaInvestor(lisaManager).url,
+                  auditData = Map(
+                    "lisaManagerReferenceNumber" -> lisaManager,
+                    "investorNINO" -> createRequest.investorNINO,
+                    "investorID" -> investorId
+                  )
+                )
                 val auditResult = auditService.sendEvent(auditEvent)
 
                 val data = ApiResponseData(message = "Investor Created.", investorId = Some(investorId))

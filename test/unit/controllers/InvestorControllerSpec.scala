@@ -94,7 +94,9 @@ class InvestorControllerSpec extends WordSpec with MockitoSugar with ShouldMatch
       event.auditType shouldBe "investorCreated"
       event.tags should contain ("transactionName" -> "investorCreated")
       event.tags should contain ("path" -> s"/manager/${lisaManager}/investors")
-      //event.detail should contain ("lisaManagerReferenceNumber" -> lisaManager)
+      event.detail should contain ("lisaManagerReferenceNumber" -> lisaManager)
+      event.detail should contain ("investorNINO" -> "AB123456D")
+      event.detail should contain ("investorID" -> "AB123456")
     }
 
 
