@@ -17,12 +17,26 @@
 package uk.gov.hmrc.lisaapi.services
 
 import uk.gov.hmrc.lisaapi.config.MicroserviceAuditConnector
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
+import uk.gov.hmrc.play.audit.model.DataEvent
+import uk.gov.hmrc.play.audit.AuditExtensions._
+import uk.gov.hmrc.play.config.AppName
+import uk.gov.hmrc.play.http.HeaderCarrier
 
-trait AuditService {
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
+
+trait AuditService extends AppName {
   val connector: AuditConnector
 
-  def audit(auditType: String, path: String, auditData: Map[String, String]) = ???
+  def audit(auditType: String, path: String, auditData: Map[String, String])(implicit hc:HeaderCarrier): Future[AuditResult] = {
+    connector.sendEvent(DataEvent(
+      auditSource = appName,
+      auditType = auditType,
+      tags = hc.toAuditTags(auditType, path),
+      detail = hc.toAuditDetails() ++ auditData
+    ))
+  }
 
 }
 

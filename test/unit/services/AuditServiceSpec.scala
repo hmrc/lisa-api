@@ -22,6 +22,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import uk.gov.hmrc.lisaapi.services.AuditService
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.http.HeaderCarrier
 
 class AuditServiceSpec extends PlaySpec
   with MockitoSugar
@@ -31,14 +32,15 @@ class AuditServiceSpec extends PlaySpec
 
     "call sendEvent" in {
 
-      verify(mockAuditConnector).sendEvent(any())(any(), any())
-
       SUT.audit("investorCreated", "/create", Map("investorID" -> "1234567890"))
+
+      verify(mockAuditConnector).sendEvent(any())(any(), any())
 
     }
 
   }
 
+  implicit val hc:HeaderCarrier = HeaderCarrier()
   val mockAuditConnector = mock[AuditConnector]
 
   object SUT extends AuditService {
