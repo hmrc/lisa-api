@@ -29,13 +29,19 @@ import scala.concurrent.ExecutionContext.Implicits.global
 trait AuditService extends AppName {
   val connector: AuditConnector
 
-  def audit(auditType: String, path: String, auditData: Map[String, String])(implicit hc:HeaderCarrier): Future[AuditResult] = {
-    connector.sendEvent(DataEvent(
+  def createEvent(auditType: String, path: String, auditData: Map[String, String])(implicit hc:HeaderCarrier):DataEvent = {
+    DataEvent(
       auditSource = appName,
       auditType = auditType,
       tags = hc.toAuditTags(auditType, path),
       detail = hc.toAuditDetails() ++ auditData
-    ))
+    )
+
+  }
+
+  def audit(event:DataEvent): Future[AuditResult] = {
+    ???
+    //connector.sendEvent(event)
   }
 
 }

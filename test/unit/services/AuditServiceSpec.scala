@@ -30,12 +30,27 @@ class AuditServiceSpec extends PlaySpec
 
   "AuditService" must {
 
-    "call sendEvent" in {
+    "build an audit event with the correct mandatory details" in {
+      val event = SUT.createEvent("investorCreated", "/create", Map("investorID" -> "1234567890"))
 
-      SUT.audit("investorCreated", "/create", Map("investorID" -> "1234567890"))
+      event.auditSource mustBe "lisa-api"
+      event.auditType mustBe "investorCreated"
+    }
 
-      verify(mockAuditConnector).sendEvent(any())(any(), any())
+    "build an audit event with the correct tags" in {
+      val event = SUT.createEvent("investorCreated", "/create", Map("investorID" -> "1234567890"))
 
+      event.tags must contain ("path" -> "/create")
+      event.tags must contain ("transactionName" -> "investorCreated")
+      event.tags must contain key "clientIP"
+    }
+
+    "build an audit event with the correct detail" in {
+      val event = SUT.createEvent("investorCreated", "/create", Map("investorID" -> "1234567890", "investorNINO" -> "AB123456D"))
+
+      event.detail must contain ("investorID" -> "1234567890")
+      event.detail must contain ("investorNINO" -> "AB123456D")
+      event.detail must contain key "Authorization"
     }
 
   }
