@@ -16,28 +16,35 @@
 
 package unit.controllers
 
+import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.any
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.{BeforeAndAfter, ShouldMatchers, WordSpec}
 import org.scalatestplus.play.OneAppPerSuite
-import play.api.data.validation.ValidationError
-import play.api.libs.json.{JsError, JsPath, Json}
-import play.api.mvc.{AnyContentAsJson, Results}
+import play.api.libs.json.Json
+import play.api.mvc.AnyContentAsJson
 import play.api.test.Helpers._
 import play.api.test._
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.lisaapi.controllers.InvestorController
 import uk.gov.hmrc.lisaapi.models.{CreateLisaInvestorAlreadyExistsResponse, CreateLisaInvestorErrorResponse, CreateLisaInvestorNotFoundResponse, CreateLisaInvestorSuccessResponse}
-import uk.gov.hmrc.lisaapi.services.{AccountService, AuditService, InvestorService}
+import uk.gov.hmrc.lisaapi.services.{AuditService, InvestorService}
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.audit.model.DataEvent
 
 import scala.concurrent.Future
 
-
 class InvestorControllerSpec extends WordSpec with MockitoSugar with ShouldMatchers with OneAppPerSuite with BeforeAndAfter {
 
-  val mockService = mock[InvestorService]
-  val mockAuditService: AuditService = mock[AuditService]
+  val mockAuditConnector: AuditConnector = mock[AuditConnector]
+
+  object MockAuditService extends AuditService {
+    override val connector: AuditConnector = mockAuditConnector
+  }
+
+  val mockAuditService: AuditService = MockAuditService
+  val mockService: InvestorService = mock[InvestorService]
 
   val mockInvestorController = new InvestorController{
     override val service: InvestorService = mockService
@@ -64,7 +71,7 @@ class InvestorControllerSpec extends WordSpec with MockitoSugar with ShouldMatch
   val lisaManager = "Z019283"
 
   before {
-    reset(mockAuditService)
+    reset(mockAuditConnector)
   }
 
   "The Investor Controller" should {
@@ -76,7 +83,18 @@ class InvestorControllerSpec extends WordSpec with MockitoSugar with ShouldMatch
 
       status(res) should be (CREATED)
 
-      verify(mockAuditService).sendEvent(any())
+      val captor = ArgumentCaptor.forClass(classOf[DataEvent])
+
+      verify(mockAuditConnector).sendEvent(captor.capture())(any(), any())
+
+      val event = captor.getValue
+
+      event shouldNot be (null)
+      event.auditSource shouldBe "lisa-api"
+      event.auditType shouldBe "investorCreated"
+      event.tags should contain ("transactionName" -> "investorCreated")
+      event.tags should contain ("path" -> s"/manager/${lisaManager}/investors")
+      //event.detail should contain ("lisaManagerReferenceNumber" -> lisaManager)
     }
 
 
@@ -88,7 +106,7 @@ class InvestorControllerSpec extends WordSpec with MockitoSugar with ShouldMatch
 
         status(res) should be(FORBIDDEN)
 
-        verify(mockAuditService).sendEvent(any())
+        verify(mockAuditConnector).sendEvent(any())(any(), any())
       }
     }
 
@@ -100,7 +118,7 @@ class InvestorControllerSpec extends WordSpec with MockitoSugar with ShouldMatch
 
         status(res) should be(CONFLICT)
 
-        verify(mockAuditService).sendEvent(any())
+        verify(mockAuditConnector).sendEvent(any())(any(), any())
       }
     }
 
@@ -128,7 +146,7 @@ class InvestorControllerSpec extends WordSpec with MockitoSugar with ShouldMatch
           withBody(AnyContentAsJson(Json.parse(investorJson))))
         status(res) should be(INTERNAL_SERVER_ERROR)
 
-        verify(mockAuditService).sendEvent(any())
+        verify(mockAuditConnector).sendEvent(any())(any(), any())
       }
 
       "given an error response from the service layer" in {
@@ -137,7 +155,7 @@ class InvestorControllerSpec extends WordSpec with MockitoSugar with ShouldMatch
           withBody(AnyContentAsJson(Json.parse(investorJson))))
         status(res) should be (INTERNAL_SERVER_ERROR)
 
-        verify(mockAuditService).sendEvent(any())
+        verify(mockAuditConnector).sendEvent(any())(any(), any())
       }
     }
 
