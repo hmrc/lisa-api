@@ -29,7 +29,7 @@ import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.lisaapi.controllers.BonusPaymentController
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des.DesFailureResponse
-import uk.gov.hmrc.lisaapi.services.BonusPaymentService
+import uk.gov.hmrc.lisaapi.services.{AuditService, BonusPaymentService}
 
 import scala.concurrent.Future
 import scala.io.Source
@@ -120,7 +120,7 @@ class BonusPaymentControllerSpec  extends PlaySpec with MockitoSugar with OneApp
     callback(res)
   }
 
-  val mockService = mock[BonusPaymentService]
+  val mockService: BonusPaymentService = mock[BonusPaymentService]
   val SUT = new BonusPaymentController {
     override val service: BonusPaymentService = mockService
   }

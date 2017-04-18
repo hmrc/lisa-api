@@ -28,7 +28,7 @@ import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.lisaapi.controllers.LifeEventController
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.services.LifeEventService
+import uk.gov.hmrc.lisaapi.services.{AuditService, LifeEventService}
 
 import scala.concurrent.Future
 
