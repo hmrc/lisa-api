@@ -19,52 +19,69 @@ package uk.gov.hmrc.lisaapi.controllers
 import play.api.Logger
 import play.api.data.validation.ValidationError
 import play.api.libs.json.Json.toJson
-import play.api.libs.json.{JsError, JsPath, JsSuccess, Reads}
+import play.api.libs.json._
 import play.api.mvc.{AnyContent, Request, Result}
 import uk.gov.hmrc.api.controllers.HeaderValidator
+import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
+import uk.gov.hmrc.auth.core.Retrievals._
+import uk.gov.hmrc.auth.core.{AuthProviders, AuthorisedFunctions, Enrolment}
+import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
+import uk.gov.hmrc.lisaapi.models.LisaManager
 import uk.gov.hmrc.play.config.RunMode
 import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.microservice.controller.BaseController
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 
-trait LisaController extends BaseController with HeaderValidator with RunMode with JsonFormats {
-  implicit val hc: HeaderCarrier
+trait LisaController extends BaseController with HeaderValidator with RunMode with JsonFormats with AuthorisedFunctions{
+val authConnector: LisaAuthConnector = LisaAuthConnector
 
   protected def withValidJson[T] (
     success: (T) => Future[Result],
-    invalid: Option[(Seq[(JsPath, Seq[ValidationError])]) => Future[Result]] = None
-  )(implicit request: Request[AnyContent], reads: Reads[T]): Future[Result] = {
+    invalid: Option[(Seq[(JsPath, Seq[ValidationError])]) => Future[Result]] = None,
+    lisaManager: String)
+    (implicit request: Request[AnyContent], reads: Reads[T]): Future[Result] = {
+    authorised((Enrolment("HMRC-LISA-ORG")).withIdentifier("ZREF", lisaManager)).retrieve(internalId) {id =>
 
-    request.body.asJson match {
-      case Some(json) =>
-        Try(json.validate[T]) match {
-          case Success(JsSuccess(payload, _)) => {
+      request.body.asJson match {
+        case Some(json) =>
+          Try(json.validate[T]) match {
+            case Success(JsSuccess(payload, _)) => {
 
-            Try(success(payload)) match {
-              case Success(result) => result
-              case Failure(ex:Exception) => {
-                Logger.info(s"An error occurred ${ex.getMessage}")
-                Future.successful(InternalServerError(toJson(ErrorInternalServerError)))
+              Try(success(payload)) match {
+                case Success(result) => result
+                case Failure(ex: Exception) => {
+                  Logger.info(s"An error occurred ${ex.getMessage}")
+                  Future.successful(InternalServerError(toJson(ErrorInternalServerError)))
+                }
               }
             }
-          }
-          case Success(JsError(errors)) => {
-            invalid match {
-              case Some(invalidCallback) => invalidCallback(errors)
-              case None => {
-                Logger.info(s"The errors are ${errors.toString()}")
-                Future.successful(BadRequest(toJson(ErrorGenericBadRequest)))
+            case Success(JsError(errors)) => {
+              invalid match {
+                case Some(invalidCallback) => invalidCallback(errors)
+                case None => {
+                  Logger.info(s"The errors are ${errors.toString()}")
+                  Future.successful(BadRequest(toJson(ErrorGenericBadRequest)))
+                }
               }
             }
+            case Failure(e) => Future.successful(InternalServerError(toJson(ErrorInternalServerError)))
           }
-          case Failure(e) => Future.successful(InternalServerError(toJson(ErrorInternalServerError)))
-        }
-      case None => Future.successful(BadRequest(toJson(EmptyJson)))
+        case None => Future.successful(BadRequest(toJson(EmptyJson)))
+      }
+
+    } recoverWith {
+      handleFailure
     }
-
   }
+
+
+def handleFailure(implicit request: Request[_]) = PartialFunction[Throwable, Future[Result]] {
+// todo: dont assume any controller exception is related to auth - it may be an error in the application code
+case _ => Future.successful(Unauthorized(Json.toJson(ErrorInvalidLisaManager)))
+}
 
 }
 

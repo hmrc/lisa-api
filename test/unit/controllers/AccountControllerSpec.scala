@@ -26,9 +26,11 @@ import play.api.mvc.{Action, AnyContent, AnyContentAsJson, Result}
 import play.api.test.Helpers._
 import play.api.test._
 import play.mvc.Http.HeaderNames
+import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
 import uk.gov.hmrc.lisaapi.controllers.AccountController
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.AccountService
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
 
@@ -38,6 +40,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
   val lisaManager = "Z019283"
   val accountId = "ABC12345"
+  val mockAuthCon = mock[LisaAuthConnector]
 
   val createAccountJson = """{
                               |  "investorID" : "9876543210",
@@ -88,6 +91,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
   val closeAccountJson = """{"accountClosureReason" : "Voided", "closureDate" : "2000-06-23"}"""
 
   "The Create / Transfer Account endpoint" must {
+    when(mockAuthCon.authorise[Option[String]](any(),any())(any())).thenReturn(Future(Some("1234")))
 
     "return with status 201 created and an account Id" when {
       "submitted a valid create account request" in {
@@ -281,6 +285,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
   }
 
   "The Close Account endpoint" must {
+    when(mockAuthCon.authorise[Option[String]](any(),any())(any())).thenReturn(Future(Some("1234")))
 
     "return with status 200 ok" when {
       "submitted a valid close account request" in {
@@ -353,6 +358,8 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
   val mockService = mock[AccountService]
   val SUT = new AccountController{
     override val service: AccountService = mockService
+    override val authConnector = mockAuthCon
+
   }
 
 }

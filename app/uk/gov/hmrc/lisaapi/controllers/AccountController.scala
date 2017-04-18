@@ -32,8 +32,6 @@ class AccountController extends LisaController {
 
   val service: AccountService = AccountService
 
-  implicit val hc: HeaderCarrier = new HeaderCarrier()
-
   def createOrTransferLisaAccount(lisaManager: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
     withValidJson[CreateLisaAccountRequest] (
       (req) => {
@@ -66,17 +64,16 @@ class AccountController extends LisaController {
             Future.successful(BadRequest(toJson(ErrorGenericBadRequest)))
           }
         }
-      )
+      ), lisaManager=lisaManager
     )
   }
 
   def closeLisaAccount(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
-    withValidJson[CloseLisaAccountRequest] { request =>
-      processAccountClosure(lisaManager, accountId, request)
-    }
+    withValidJson[CloseLisaAccountRequest] ( closeRequest =>
+      processAccountClosure(lisaManager, accountId, closeRequest) ,lisaManager=lisaManager)
   }
 
-  private def processAccountCreation(lisaManager: String, request: CreateLisaAccountCreationRequest) = {
+  private def processAccountCreation(lisaManager: String, request: CreateLisaAccountCreationRequest)(implicit hc: HeaderCarrier) = {
     service.createAccount(lisaManager, request).map { result =>
       result match {
         case CreateLisaAccountSuccessResponse(accountId) => {
@@ -94,7 +91,7 @@ class AccountController extends LisaController {
     }
   }
 
-  private def processAccountTransfer(lisaManager: String, request: CreateLisaAccountTransferRequest) = {
+  private def processAccountTransfer(lisaManager: String, request: CreateLisaAccountTransferRequest)(implicit hc: HeaderCarrier) = {
     service.transferAccount(lisaManager, request).map { result =>
       result match {
         case CreateLisaAccountSuccessResponse(accountId) => {
@@ -112,7 +109,7 @@ class AccountController extends LisaController {
     }
   }
 
-  private def processAccountClosure(lisaManager: String, accountId: String, request: CloseLisaAccountRequest) = {
+  private def processAccountClosure(lisaManager: String, accountId: String, request: CloseLisaAccountRequest)(implicit hc: HeaderCarrier) = {
     service.closeAccount(lisaManager, accountId, request).map { result =>
       result match {
         case CloseLisaAccountSuccessResponse(accountId) => {

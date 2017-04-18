@@ -17,29 +17,36 @@
 package unit.controllers
 
 import org.mockito.Matchers.any
-import org.mockito.Mockito.when
+import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.{ShouldMatchers, WordSpec}
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.data.validation.ValidationError
-import play.api.libs.json.{JsError, JsPath, Json}
+import play.api.libs.json.{JsError, JsPath, JsValue, Json}
 import play.api.mvc.{AnyContentAsJson, Results}
 import play.api.test.Helpers._
 import play.api.test._
 import play.mvc.Http.HeaderNames
+import uk.gov.hmrc.auth.core.PlayAuthConnector
 import uk.gov.hmrc.lisaapi.controllers.InvestorController
 import uk.gov.hmrc.lisaapi.models.{CreateLisaInvestorAlreadyExistsResponse, CreateLisaInvestorErrorResponse, CreateLisaInvestorNotFoundResponse, CreateLisaInvestorSuccessResponse}
 import uk.gov.hmrc.lisaapi.services.InvestorService
+import uk.gov.hmrc.lisaapi.config.{AppContext, LisaAuthConnector, WSHttp}
+import uk.gov.hmrc.play.http.HeaderCarrier
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 
 class InvestorControllerSpec extends WordSpec with MockitoSugar with ShouldMatchers with OneAppPerSuite {
 
   val mockService = mock[InvestorService]
+val mockAuthCon = mock[LisaAuthConnector]
 
   val mockInvestorController = new InvestorController{
+    //implicit override val hc: HeaderCarrier = new HeaderCarrier()
     override val service: InvestorService = mockService
+    override val authConnector = mockAuthCon
   }
 
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
@@ -62,11 +69,13 @@ class InvestorControllerSpec extends WordSpec with MockitoSugar with ShouldMatch
   val lisaManager = "Z019283"
 
   "The Investor Controller" should {
+   when(mockAuthCon.authorise[Option[String]](any(),any())(any())).thenReturn(Future(Some("Z019283")))
     "return with status 201 created" in
       {
         when(mockService.createInvestor(any(), any())(any())).thenReturn(Future.successful(CreateLisaInvestorSuccessResponse("AB123456")))
         val res = mockInvestorController.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT,"/").withHeaders(acceptHeader).
           withBody(AnyContentAsJson(Json.parse(investorJson))))
+        verify(mockAuthCon,times(1)).authorise[JsValue](any(),any())(any())
         status(res) should be (CREATED)
       }
 
@@ -124,7 +133,7 @@ class InvestorControllerSpec extends WordSpec with MockitoSugar with ShouldMatch
     "return with status 406 createInvestor " in
       {
         when(mockService.createInvestor(any(), any())(any())).thenReturn(Future.successful(CreateLisaInvestorSuccessResponse("AB123456")))
-        val res = mockInvestorController.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT,"/").withHeaders(("accept","application/vnd.hmrc.2.0+json")))
+        val res = mockInvestorController.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT,"/").withHeaders(("accept","application/")))
         status(res) should be (406)
       }
 
