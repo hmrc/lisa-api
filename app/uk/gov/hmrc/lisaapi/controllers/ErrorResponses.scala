@@ -77,8 +77,6 @@ case object ErrorLifeEventInappropriate extends ErrorResponse(403, "LIFE_EVENT_I
 
 case object ErrorLifeEventAlreadyExists extends ErrorResponse(409,"LIFE_EVENT_ALREADY_EXISTS","The investor’s life event has already been reported")
 
-case object ErrorInvalidLisaManager extends ErrorResponse(401,"UNAUTHORIZED","The lisaManagerReferenceNumber path parameter you've used doesn't match with an authorised LISA provider in HMRC's records.")
-
 object ErrorInvestorAlreadyExists {
 
   def apply(investorId: String) = {

@@ -18,10 +18,9 @@ package uk.gov.hmrc.lisaapi.controllers
 
 import play.api.Logger
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent}
-import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
+import play.api.mvc.{Action, AnyContent, Result}
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.services.BonusPaymentService
+import uk.gov.hmrc.lisaapi.services.{BonusPaymentService, LifeEventService}
 import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -31,10 +30,12 @@ class BonusPaymentController extends LisaController {
 
   val service: BonusPaymentService = BonusPaymentService
 
+  implicit val hc: HeaderCarrier = new HeaderCarrier()
+
   def requestBonusPayment(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async {
     implicit request =>
 
-    withValidJson[RequestBonusPaymentRequest] ( req =>
+    withValidJson[RequestBonusPaymentRequest] { req =>
 
       if (req.lifeEventID.isEmpty && req.bonuses.claimReason == "Life Event") {
         Future.successful(Forbidden(Json.toJson(ErrorLifeEventNotProvided)))
@@ -58,8 +59,7 @@ class BonusPaymentController extends LisaController {
           case _ => InternalServerError(Json.toJson(ErrorInternalServerError))
         }
       }
-    ,
-      lisaManager=lisaManager)
+    }
   }
 
 }
