@@ -26,12 +26,10 @@ import play.api.mvc.{AnyContentAsJson, Result}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
-import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
 import uk.gov.hmrc.lisaapi.controllers.BonusPaymentController
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des.DesFailureResponse
 import uk.gov.hmrc.lisaapi.services.BonusPaymentService
-import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
 import scala.io.Source
@@ -43,12 +41,9 @@ class BonusPaymentControllerSpec  extends PlaySpec with MockitoSugar with OneApp
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
   val lisaManager = "Z019283"
   val accountId = "ABC12345"
-  val mockAuthCon :LisaAuthConnector = mock[LisaAuthConnector]
-
   val validBonusPaymentJson = Source.fromInputStream(getClass().getResourceAsStream("/json/request.valid.bonus-payment.json")).mkString
 
-  "The BonusPayment Controller" should {
-    when(mockAuthCon.authorise[Option[String]](any(),any())(any())).thenReturn(Future(Some("1234")))
+  "The Life Event Controller" should {
 
     "return with status 201 created" when {
       "given a Success Response from the service layer" in {
@@ -128,7 +123,5 @@ class BonusPaymentControllerSpec  extends PlaySpec with MockitoSugar with OneApp
   val mockService = mock[BonusPaymentService]
   val SUT = new BonusPaymentController {
     override val service: BonusPaymentService = mockService
-    override val authConnector = mockAuthCon
-
   }
 }

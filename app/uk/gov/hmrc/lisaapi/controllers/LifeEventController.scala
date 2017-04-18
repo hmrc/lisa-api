@@ -19,7 +19,6 @@ package uk.gov.hmrc.lisaapi.controllers
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
-import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.LifeEventService
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -30,10 +29,12 @@ class LifeEventController extends LisaController {
 
   val service: LifeEventService = LifeEventService
 
+  implicit val hc: HeaderCarrier = new HeaderCarrier()
+
   def reportLisaLifeEvent(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async {
     implicit request =>
 
-    withValidJson[ReportLifeEventRequest] ( req =>
+    withValidJson[ReportLifeEventRequest] { req =>
       service.reportLifeEvent(lisaManager, accountId, req) map { res =>
         Logger.debug("Entering LifeEvent Controller and the response is " + res.toString)
         res match {
@@ -58,8 +59,8 @@ class LifeEventController extends LisaController {
             InternalServerError(Json.toJson(ErrorInternalServerError))
           }
         }
-      }, lisaManager=lisaManager
-    )
+      }
+    }
   }
 
 }
