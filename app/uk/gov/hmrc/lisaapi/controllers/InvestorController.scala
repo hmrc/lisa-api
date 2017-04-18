@@ -52,7 +52,7 @@ class InvestorController extends LisaController {
                     "investorID" -> investorId
                   )
                 )
-                val auditResult = auditService.sendEvent(auditEvent)
+                auditService.sendEvent(auditEvent)
 
                 val data = ApiResponseData(message = "Investor Created.", investorId = Some(investorId))
 
