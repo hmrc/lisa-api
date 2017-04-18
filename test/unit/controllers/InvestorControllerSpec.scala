@@ -16,9 +16,11 @@
 
 package unit.controllers
 
-import org.mockito.ArgumentCaptor
-import org.mockito.Matchers.any
+import org.hamcrest.TypeSafeMatcher
+import org.mockito.{ArgumentCaptor, ArgumentMatcher}
+import org.mockito.Matchers._
 import org.mockito.Mockito._
+import org.parboiled.matchers.StringMatcher
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.{BeforeAndAfter, ShouldMatchers, WordSpec}
 import org.scalatestplus.play.OneAppPerSuite
@@ -30,20 +32,14 @@ import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.lisaapi.controllers.InvestorController
 import uk.gov.hmrc.lisaapi.models.{CreateLisaInvestorAlreadyExistsResponse, CreateLisaInvestorErrorResponse, CreateLisaInvestorNotFoundResponse, CreateLisaInvestorSuccessResponse}
 import uk.gov.hmrc.lisaapi.services.{AuditService, InvestorService}
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.DataEvent
+import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
 
 class InvestorControllerSpec extends WordSpec with MockitoSugar with ShouldMatchers with OneAppPerSuite with BeforeAndAfter {
 
-  val mockAuditConnector: AuditConnector = mock[AuditConnector]
-
-  object MockAuditService extends AuditService {
-    override val connector: AuditConnector = mockAuditConnector
-  }
-
-  val mockAuditService: AuditService = MockAuditService
+  val mockAuditService: AuditService = mock[AuditService]
   val mockService: InvestorService = mock[InvestorService]
 
   val mockInvestorController = new InvestorController{
@@ -71,32 +67,31 @@ class InvestorControllerSpec extends WordSpec with MockitoSugar with ShouldMatch
   val lisaManager = "Z019283"
 
   before {
-    reset(mockAuditConnector)
+    reset(mockAuditService)
   }
 
   "The Investor Controller" should {
 
     "return with status 201 created" in {
+      val mockEvent = DataEvent("lisa-api", "investorCreated")
+      when(mockAuditService.createEvent(any(), any(), any())(any())).thenReturn(mockEvent)
       when(mockService.createInvestor(any(), any())(any())).thenReturn(Future.successful(CreateLisaInvestorSuccessResponse("AB123456")))
+
       val res = mockInvestorController.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT,"/").withHeaders(acceptHeader).
         withBody(AnyContentAsJson(Json.parse(investorJson))))
 
       status(res) should be (CREATED)
 
-      val captor = ArgumentCaptor.forClass(classOf[DataEvent])
+      verify(mockAuditService).createEvent(
+        auditType = "investorCreated",
+        path = s"/manager/${lisaManager}/investors",
+        auditData = Map(
+          "lisaManagerReferenceNumber" -> lisaManager,
+          "investorNINO" -> "AB123456D",
+          "investorID" -> "AB123456"
+        ))(mockInvestorController.hc)
 
-      verify(mockAuditConnector).sendEvent(captor.capture())(any(), any())
-
-      val event = captor.getValue
-
-      event shouldNot be (null)
-      event.auditSource shouldBe "lisa-api"
-      event.auditType shouldBe "investorCreated"
-      event.tags should contain ("transactionName" -> "investorCreated")
-      event.tags should contain ("path" -> s"/manager/${lisaManager}/investors")
-      event.detail should contain ("lisaManagerReferenceNumber" -> lisaManager)
-      event.detail should contain ("investorNINO" -> "AB123456D")
-      event.detail should contain ("investorID" -> "AB123456")
+      verify(mockAuditService).sendEvent(mockEvent)
     }
 
 
@@ -108,7 +103,7 @@ class InvestorControllerSpec extends WordSpec with MockitoSugar with ShouldMatch
 
         status(res) should be(FORBIDDEN)
 
-        verify(mockAuditConnector).sendEvent(any())(any(), any())
+        verify(mockAuditService).sendEvent(any())
       }
     }
 
@@ -120,7 +115,7 @@ class InvestorControllerSpec extends WordSpec with MockitoSugar with ShouldMatch
 
         status(res) should be(CONFLICT)
 
-        verify(mockAuditConnector).sendEvent(any())(any(), any())
+        verify(mockAuditService).sendEvent(any())
       }
     }
 
@@ -148,7 +143,7 @@ class InvestorControllerSpec extends WordSpec with MockitoSugar with ShouldMatch
           withBody(AnyContentAsJson(Json.parse(investorJson))))
         status(res) should be(INTERNAL_SERVER_ERROR)
 
-        verify(mockAuditConnector).sendEvent(any())(any(), any())
+        verify(mockAuditService).sendEvent(any())
       }
 
       "given an error response from the service layer" in {
@@ -157,7 +152,7 @@ class InvestorControllerSpec extends WordSpec with MockitoSugar with ShouldMatch
           withBody(AnyContentAsJson(Json.parse(investorJson))))
         status(res) should be (INTERNAL_SERVER_ERROR)
 
-        verify(mockAuditConnector).sendEvent(any())(any(), any())
+        verify(mockAuditService).sendEvent(any())
       }
     }
 

@@ -36,7 +36,6 @@ trait AuditService extends AppName {
       tags = hc.toAuditTags(auditType, path),
       detail = hc.toAuditDetails() ++ auditData
     )
-
   }
 
   def sendEvent(event:DataEvent): Future[AuditResult] = {
