@@ -28,7 +28,7 @@ import play.api.test._
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.lisaapi.controllers.AccountController
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.services.AccountService
+import uk.gov.hmrc.lisaapi.services.{AccountService, AuditService}
 
 import scala.concurrent.Future
 
@@ -350,7 +350,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
     callback(res)
   }
 
-  val mockService = mock[AccountService]
+  val mockService: AccountService = mock[AccountService]
   val SUT = new AccountController{
     override val service: AccountService = mockService
   }

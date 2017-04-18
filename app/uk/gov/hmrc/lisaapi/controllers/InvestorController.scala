@@ -43,7 +43,7 @@ class InvestorController extends LisaController {
           service.createInvestor(lisaManager, createRequest).map { result =>
             result match {
               case CreateLisaInvestorSuccessResponse(investorId) => {
-                val auditEvent = auditService.createEvent(
+                auditService.audit(
                   auditType = "investorCreated",
                   path = routes.InvestorController.createLisaInvestor(lisaManager).url,
                   auditData = Map(
@@ -52,22 +52,18 @@ class InvestorController extends LisaController {
                     "investorID" -> investorId
                   )
                 )
-                auditService.sendEvent(auditEvent)
 
                 val data = ApiResponseData(message = "Investor Created.", investorId = Some(investorId))
 
                 Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = 201)))
               }
               case CreateLisaInvestorNotFoundResponse => {
-                auditService.sendEvent(DataEvent("test", "test"))
                 Forbidden(Json.toJson(ErrorInvestorNotFound))
               }
               case CreateLisaInvestorAlreadyExistsResponse(investorId) => {
-                auditService.sendEvent(DataEvent("test", "test"))
                 Conflict(Json.toJson(ErrorInvestorAlreadyExists(investorId)))
               }
               case CreateLisaInvestorErrorResponse => {
-                auditService.sendEvent(DataEvent("test", "test"))
                 InternalServerError(Json.toJson(ErrorInternalServerError))
               }
             }

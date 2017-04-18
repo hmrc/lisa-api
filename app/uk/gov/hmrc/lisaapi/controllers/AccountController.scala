@@ -31,7 +31,6 @@ import scala.concurrent.Future
 class AccountController extends LisaController {
 
   val service: AccountService = AccountService
-  val auditService: AuditService = AuditService
 
   implicit val hc: HeaderCarrier = new HeaderCarrier()
 

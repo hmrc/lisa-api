@@ -16,29 +16,47 @@
 
 package unit.services
 
+import org.mockito.ArgumentCaptor
 import org.mockito.Matchers._
 import org.mockito.Mockito._
+import org.scalatest.BeforeAndAfter
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import uk.gov.hmrc.lisaapi.services.AuditService
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.play.http.HeaderCarrier
 
 class AuditServiceSpec extends PlaySpec
   with MockitoSugar
-  with OneAppPerSuite {
+  with OneAppPerSuite
+  with BeforeAndAfter {
 
   "AuditService" must {
 
+    before {
+      reset(mockAuditConnector)
+    }
+
     "build an audit event with the correct mandatory details" in {
-      val event = SUT.createEvent("investorCreated", "/create", Map("investorID" -> "1234567890"))
+      val res = SUT.audit("investorCreated", "/create", Map("investorID" -> "1234567890"))
+      val captor = ArgumentCaptor.forClass(classOf[DataEvent])
+
+      verify(mockAuditConnector).sendEvent(captor.capture())(any(), any())
+
+      val event = captor.getValue
 
       event.auditSource mustBe "lisa-api"
       event.auditType mustBe "investorCreated"
     }
 
     "build an audit event with the correct tags" in {
-      val event = SUT.createEvent("investorCreated", "/create", Map("investorID" -> "1234567890"))
+      val res = SUT.audit("investorCreated", "/create", Map("investorID" -> "1234567890"))
+      val captor = ArgumentCaptor.forClass(classOf[DataEvent])
+
+      verify(mockAuditConnector).sendEvent(captor.capture())(any(), any())
+
+      val event = captor.getValue
 
       event.tags must contain ("path" -> "/create")
       event.tags must contain ("transactionName" -> "investorCreated")
@@ -46,7 +64,12 @@ class AuditServiceSpec extends PlaySpec
     }
 
     "build an audit event with the correct detail" in {
-      val event = SUT.createEvent("investorCreated", "/create", Map("investorID" -> "1234567890", "investorNINO" -> "AB123456D"))
+      val res = SUT.audit("investorCreated", "/create", Map("investorID" -> "1234567890", "investorNINO" -> "AB123456D"))
+      val captor = ArgumentCaptor.forClass(classOf[DataEvent])
+
+      verify(mockAuditConnector).sendEvent(captor.capture())(any(), any())
+
+      val event = captor.getValue
 
       event.detail must contain ("investorID" -> "1234567890")
       event.detail must contain ("investorNINO" -> "AB123456D")
@@ -54,13 +77,10 @@ class AuditServiceSpec extends PlaySpec
     }
 
     "send an event via the audit connector" in {
-      val event = SUT.createEvent("investorCreated", "/create", Map("investorID" -> "1234567890"))
-
-      val auditResult = SUT.sendEvent(event)
+      val event = SUT.audit("investorCreated", "/create", Map("investorID" -> "1234567890"))
 
       verify(mockAuditConnector).sendEvent(any())(any(), any())
     }
-
   }
 
   implicit val hc:HeaderCarrier = HeaderCarrier()
