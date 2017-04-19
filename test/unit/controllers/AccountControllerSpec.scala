@@ -251,6 +251,15 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
         doCreateOrTransferRequest(createAccountJson) { res =>
           status(res) mustBe (FORBIDDEN)
           (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID")
+          verify(mockAuditService).audit(
+            auditType = "accountNotCreated",
+            path=s"/manager/$lisaManager/accounts",
+            auditData = Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "investorID" -> "9876543210",
+              "accountID" -> "8765432100",
+              "reasonNotCreated" -> "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID"
+            ))(SUT.hc)
         }
       }
       "the data service returns a CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse for a transfer request" in {
@@ -270,6 +279,15 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
         doCreateOrTransferRequest(createAccountJson) { res =>
           status(res) mustBe (CONFLICT)
           (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ACCOUNT_ALREADY_EXISTS")
+          verify(mockAuditService).audit(
+            auditType = "accountNotCreated",
+            path=s"/manager/$lisaManager/accounts",
+            auditData = Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "investorID" -> "9876543210",
+              "accountID" -> "8765432100",
+              "reasonNotCreated" -> "INVESTOR_ACCOUNT_ALREADY_EXISTS"
+            ))(SUT.hc)
         }
       }
       "the data service returns a CreateLisaAccountAlreadyExistsResponse for a transfer request" in {
@@ -288,6 +306,15 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
         doCreateOrTransferRequest(createAccountJson) { res =>
           status(res) mustBe (INTERNAL_SERVER_ERROR)
+          verify(mockAuditService).audit(
+            auditType = "accountNotCreated",
+            path=s"/manager/$lisaManager/accounts",
+            auditData = Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "investorID" -> "9876543210",
+              "accountID" -> "8765432100",
+              "reasonNotCreated" -> "INTERNAL_SERVER_ERROR"
+            ))(SUT.hc)
         }
       }
       "the data service returns an error for a transfer request" in {

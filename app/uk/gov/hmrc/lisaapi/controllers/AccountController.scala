@@ -133,9 +133,45 @@ class AccountController extends LisaController {
           )
           Forbidden(Json.toJson(ErrorInvestorComplianceCheckFailed))
         }
-        case CreateLisaAccountInvestorAccountAlreadyClosedOrVoidedResponse => Forbidden(Json.toJson(ErrorAccountAlreadyClosedOrVoid))
-        case CreateLisaAccountAlreadyExistsResponse => Conflict(Json.toJson(ErrorAccountAlreadyExists))
-        case _ => InternalServerError(Json.toJson(ErrorInternalServerError))
+        case CreateLisaAccountInvestorAccountAlreadyClosedOrVoidedResponse => {
+          auditService.audit(
+            auditType = "accountNotCreated",
+            path = getEndpointUrl(lisaManager),
+            auditData = Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "investorID" -> request.investorID,
+              "accountID" -> request.accountID,
+              "reasonNotCreated" -> ErrorAccountAlreadyClosedOrVoid.errorCode
+            )
+          )
+          Forbidden(Json.toJson(ErrorAccountAlreadyClosedOrVoid))
+        }
+        case CreateLisaAccountAlreadyExistsResponse => {
+          auditService.audit(
+            auditType = "accountNotCreated",
+            path = getEndpointUrl(lisaManager),
+            auditData = Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "investorID" -> request.investorID,
+              "accountID" -> request.accountID,
+              "reasonNotCreated" -> ErrorAccountAlreadyExists.errorCode
+            )
+          )
+          Conflict(Json.toJson(ErrorAccountAlreadyExists))
+        }
+        case _ => {
+          auditService.audit(
+            auditType = "accountNotCreated",
+            path = getEndpointUrl(lisaManager),
+            auditData = Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "investorID" -> request.investorID,
+              "accountID" -> request.accountID,
+              "reasonNotCreated" -> ErrorInternalServerError.errorCode
+            )
+          )
+          InternalServerError(Json.toJson(ErrorInternalServerError))
+        }
       }
     }
   }
