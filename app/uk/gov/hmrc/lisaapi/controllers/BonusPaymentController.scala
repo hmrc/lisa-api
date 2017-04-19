@@ -20,9 +20,10 @@ import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, Result}
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.services.{BonusPaymentService, LifeEventService, AuditService}
+import uk.gov.hmrc.lisaapi.services.{AuditService, BonusPaymentService, LifeEventService}
 import uk.gov.hmrc.play.http.HeaderCarrier
 
+import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -70,7 +71,15 @@ class BonusPaymentController extends LisaController {
   }
 
   private def createAuditData(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest): Map[String, String] = {
-    var auditData = Map(
+    getRequiredFieldAuditData(lisaManager, accountId, req) ++
+    getOptionalLifeEventAuditData(req) ++
+    getOptionalHelpToBuyAuditData(req) ++
+    getOptionalInboundPaymentAuditData(req) ++
+    getOptionalBonusesAuditData(req)
+  }
+
+  private def getRequiredFieldAuditData(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest): Map[String, String] = {
+    Map(
       "lisaManagerReferenceNumber" -> lisaManager,
       "accountID" -> accountId,
       "transactionType" -> req.transactionType,
@@ -83,33 +92,47 @@ class BonusPaymentController extends LisaController {
       "totalBonusDueYTD" -> req.bonuses.totalBonusDueYTD.toString,
       "claimReason" -> req.bonuses.claimReason
     )
+  }
 
-    if(req.lifeEventID.nonEmpty) {
-      auditData = auditData ++ Map(
-        "lifeEventID" -> req.lifeEventID.get
-      )
+  private def getOptionalLifeEventAuditData(req: RequestBonusPaymentRequest): Map[String, String] = {
+    if (req.lifeEventID.nonEmpty) {
+      Map("lifeEventID" -> req.lifeEventID.get)
     }
+    else {
+      Map()
+    }
+  }
 
+  private def getOptionalHelpToBuyAuditData(req: RequestBonusPaymentRequest): Map[String, String] = {
     if (req.htbTransfer.nonEmpty) {
-      auditData = auditData ++ Map(
+      Map(
         "htbTransferInForPeriod" -> req.htbTransfer.get.htbTransferInForPeriod.toString,
         "htbTransferTotalYTD" -> req.htbTransfer.get.htbTransferTotalYTD.toString
       )
     }
-
-    if (req.inboundPayments.newSubsForPeriod.nonEmpty) {
-      auditData = auditData ++ Map(
-        "newSubsForPeriod" -> req.inboundPayments.newSubsForPeriod.get.toString
-      )
+    else {
+      Map()
     }
+  }
 
+  private def getOptionalInboundPaymentAuditData(req: RequestBonusPaymentRequest): Map[String, String] = {
+    if (req.inboundPayments.newSubsForPeriod.nonEmpty) {
+      Map("newSubsForPeriod" -> req.inboundPayments.newSubsForPeriod.get.toString)
+    }
+    else {
+      Map()
+    }
+  }
+
+  private def getOptionalBonusesAuditData(req: RequestBonusPaymentRequest): Map[String, String] = {
     if (req.bonuses.bonusPaidYTD.nonEmpty) {
-      auditData = auditData ++ Map(
+      Map(
         "bonusPaidYTD" -> req.bonuses.bonusPaidYTD.get.toString
       )
     }
-
-    auditData
+    else {
+      Map()
+    }
   }
 
   private def getEndpointUrl(lisaManager: String, accountId: String):String = {
