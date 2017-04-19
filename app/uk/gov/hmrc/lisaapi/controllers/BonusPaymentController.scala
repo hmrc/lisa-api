@@ -20,7 +20,7 @@ import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, Result}
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.services.{BonusPaymentService, LifeEventService}
+import uk.gov.hmrc.lisaapi.services.{BonusPaymentService, LifeEventService, AuditService}
 import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -29,6 +29,7 @@ import scala.concurrent.Future
 class BonusPaymentController extends LisaController {
 
   val service: BonusPaymentService = BonusPaymentService
+  val auditService: AuditService = AuditService
 
   implicit val hc: HeaderCarrier = new HeaderCarrier()
 
@@ -48,6 +49,28 @@ class BonusPaymentController extends LisaController {
               Logger.debug("Matched success response")
               val data = ApiResponseData(message = "Bonus transaction created", transactionId = Some(transactionID))
 
+              auditService.audit(
+                auditType = "bonusPaymentRequested",
+                path = getEndpointUrl(lisaManager, accountId),
+                auditData = Map(
+                  "lisaManagerReferenceNumber" -> lisaManager,
+                  "accountID" -> accountId,
+                  "lifeEventID" -> req.lifeEventID.get,
+                  "transactionType" -> req.transactionType,
+                  "periodStartDate" -> req.periodStartDate.toString("yyyy-MM-dd"),
+                  "periodEndDate" -> req.periodEndDate.toString("yyyy-MM-dd"),
+                  "htbTransferInForPeriod" -> req.htbTransfer.get.htbTransferInForPeriod.toString,
+                  "htbTransferTotalYTD" -> req.htbTransfer.get.htbTransferTotalYTD.toString,
+                  "newSubsForPeriod" -> req.inboundPayments.newSubsForPeriod.get.toString,
+                  "newSubsYTD" -> req.inboundPayments.newSubsYTD.toString,
+                  "totalSubsForPeriod" -> req.inboundPayments.totalSubsForPeriod.toString,
+                  "totalSubsYTD" -> req.inboundPayments.totalSubsYTD.toString,
+                  "bonusDueForPeriod" -> req.bonuses.bonusDueForPeriod.toString,
+                  "totalBonusDueYTD" -> req.bonuses.totalBonusDueYTD.toString,
+                  "claimReason" -> req.bonuses.claimReason
+                )
+              )
+
               Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = 201)))
             }
             case errorResponse: RequestBonusPaymentErrorResponse => {
@@ -60,6 +83,10 @@ class BonusPaymentController extends LisaController {
         }
       }
     }
+  }
+
+  private def getEndpointUrl(lisaManager: String, accountId: String):String = {
+    s"/manager/$lisaManager/accounts/$accountId/transactions"
   }
 
 }

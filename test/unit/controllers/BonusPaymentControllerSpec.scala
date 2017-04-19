@@ -17,16 +17,16 @@
 package unit.controllers
 
 import org.mockito.Matchers._
-import org.mockito.Mockito.when
-import org.mockito.Mockito.reset
+import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
+import org.scalatest._
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.libs.json.Json
+import play.api.libs.json._
 import play.api.mvc.{AnyContentAsJson, Result}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
-import uk.gov.hmrc.lisaapi.controllers.BonusPaymentController
+import uk.gov.hmrc.lisaapi.controllers.{BonusPaymentController, JsonFormats}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des.DesFailureResponse
 import uk.gov.hmrc.lisaapi.services.{AuditService, BonusPaymentService}
@@ -36,12 +36,20 @@ import scala.io.Source
 
 case object TestBonusPaymentResponse extends RequestBonusPaymentResponse
 
-class BonusPaymentControllerSpec  extends PlaySpec with MockitoSugar with OneAppPerSuite {
+class BonusPaymentControllerSpec extends PlaySpec
+  with MockitoSugar
+  with OneAppPerSuite
+  with BeforeAndAfterEach
+  with JsonFormats {
 
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
   val lisaManager = "Z019283"
   val accountId = "ABC12345"
   val validBonusPaymentJson = Source.fromInputStream(getClass().getResourceAsStream("/json/request.valid.bonus-payment.json")).mkString
+
+  override def beforeEach() {
+    reset(mockAuditService)
+  }
 
   "The Life Event Controller" should {
 
@@ -111,6 +119,45 @@ class BonusPaymentControllerSpec  extends PlaySpec with MockitoSugar with OneApp
       }
     }
 
+    "audit bonusPaymentRequested" when {
+      "given a Success Response from the service layer" in {
+        when(mockService.requestBonusPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(RequestBonusPaymentSuccessResponse("1928374")))
+
+        doRequest(validBonusPaymentJson) { res =>
+
+          val apiRes = contentAsJson(res).as[ApiResponse]
+
+          val json = Json.parse(validBonusPaymentJson)
+          val htb = json \ "htbTransfer"
+          val inboundPayments = json \ "inboundPayments"
+          val bonuses = json \ "bonuses"
+
+          verify(mockAuditService).audit(
+            auditType = "bonusPaymentRequested",
+            path = s"/manager/$lisaManager/accounts/$accountId/transactions",
+            auditData = Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountID" -> accountId,
+              "lifeEventID" -> (json \ "lifeEventID").as[String],
+              "transactionType" -> (json \ "transactionType").as[String],
+              "periodStartDate" -> (json \ "periodStartDate").as[String],
+              "periodEndDate" -> (json \ "periodEndDate").as[String],
+              "htbTransferInForPeriod" -> (htb \ "htbTransferInForPeriod").as[Float].toString,
+              "htbTransferTotalYTD" -> (htb \ "htbTransferTotalYTD").as[Float].toString,
+              "newSubsForPeriod" -> (inboundPayments \ "newSubsForPeriod").as[Float].toString,
+              "newSubsYTD" -> (inboundPayments \ "newSubsYTD").as[Float].toString,
+              "totalSubsForPeriod" -> (inboundPayments \ "totalSubsForPeriod").as[Float].toString,
+              "totalSubsYTD" -> (inboundPayments \ "totalSubsYTD").as[Float].toString,
+              "bonusDueForPeriod" -> (bonuses \ "bonusDueForPeriod").as[Float].toString,
+              "totalBonusDueYTD" -> (bonuses \ "totalBonusDueYTD").as[Float].toString,
+              "claimReason" -> (bonuses \ "claimReason").as[String]
+            )
+          )(SUT.hc)
+        }
+      }
+    }
+
   }
 
   def doRequest(jsonString: String)(callback: (Future[Result]) =>  Unit): Unit = {
@@ -121,7 +168,9 @@ class BonusPaymentControllerSpec  extends PlaySpec with MockitoSugar with OneApp
   }
 
   val mockService: BonusPaymentService = mock[BonusPaymentService]
+  val mockAuditService: AuditService = mock[AuditService]
   val SUT = new BonusPaymentController {
     override val service: BonusPaymentService = mockService
+    override val auditService: AuditService = mockAuditService
   }
 }
