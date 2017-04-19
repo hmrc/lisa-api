@@ -16,8 +16,8 @@
 
 package unit.controllers
 
-import org.mockito.Matchers.any
-import org.mockito.Mockito.when
+import org.mockito.Matchers._
+import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.{ShouldMatchers, WordSpec}
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
@@ -92,12 +92,19 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
     "return with status 201 created and an account Id" when {
       "submitted a valid create account request" in {
         when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountSuccessResponse("AB123456")))
-
         doCreateOrTransferRequest(createAccountJson) { res =>
           status(res) mustBe (CREATED)
           (contentAsJson(res) \ "data" \ "accountId").as[String] mustBe ("AB123456")
+          verify(mockAuditService).audit(
+            auditType = "accountCreated",
+            path=s"/manager/$lisaManager/accounts",
+            auditData = Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "investorID" -> "9876543210",
+              "accountID" -> "AB123456"
+            ))(SUT.hc)
         }
-      }
+       }
       "submitted a valid transfer account request" in {
         when(mockService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountSuccessResponse("AB123456")))
 
@@ -124,8 +131,18 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
         when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorNotFoundResponse))
 
         doCreateOrTransferRequest(createAccountJson) { res =>
+
           status(res) mustBe (FORBIDDEN)
           (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_NOT_FOUND")
+          verify(mockAuditService).audit(
+            auditType = "accountNotCreated",
+            path=s"/manager/$lisaManager/accounts",
+            auditData = Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "investorID" -> "9876543210",
+              "accountID" -> "8765432100",
+              "reasonNotCreated" -> "INVESTOR_NOT_FOUND"
+            ))(SUT.hc)
         }
       }
       "the data service returns a CreateLisaAccountInvestorNotFoundResponse for a transfer request" in {
@@ -145,6 +162,15 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
         doCreateOrTransferRequest(createAccountJson) { res =>
           status(res) mustBe (FORBIDDEN)
           (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ELIGIBILITY_CHECK_FAILED")
+          verify(mockAuditService).audit(
+            auditType = "accountNotCreated",
+            path=s"/manager/$lisaManager/accounts",
+            auditData = Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "investorID" -> "9876543210",
+              "accountID" -> "8765432100",
+              "reasonNotCreated" -> "INVESTOR_ELIGIBILITY_CHECK_FAILED"
+            ))(SUT.hc)
         }
       }
     }
@@ -156,6 +182,15 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
         doCreateOrTransferRequest(createAccountJson) { res =>
           status(res) mustBe (FORBIDDEN)
           (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_COMPLIANCE_CHECK_FAILED")
+          verify(mockAuditService).audit(
+            auditType = "accountNotCreated",
+            path=s"/manager/$lisaManager/accounts",
+            auditData = Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "investorID" -> "9876543210",
+              "accountID" -> "8765432100",
+              "reasonNotCreated" -> "INVESTOR_COMPLIANCE_CHECK_FAILED"
+            ))(SUT.hc)
         }
       }
       "the data service returns a CreateLisaAccountInvestorComplianceCheckFailedResponse for a transfer request" in {
@@ -351,8 +386,10 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
   }
 
   val mockService: AccountService = mock[AccountService]
+  val mockAuditService: AuditService = mock[AuditService]
   val SUT = new AccountController{
     override val service: AccountService = mockService
+    override val auditService: AuditService = mockAuditService
   }
 
 }

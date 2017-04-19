@@ -31,6 +31,7 @@ import scala.concurrent.Future
 class AccountController extends LisaController {
 
   val service: AccountService = AccountService
+  val auditService: AuditService = AuditService
 
   implicit val hc: HeaderCarrier = new HeaderCarrier()
 
@@ -80,13 +81,58 @@ class AccountController extends LisaController {
     service.createAccount(lisaManager, request).map { result =>
       result match {
         case CreateLisaAccountSuccessResponse(accountId) => {
+          auditService.audit(
+            auditType = "accountCreated",
+            path = getEndpointUrl(lisaManager),
+            auditData = Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "investorID" -> request.investorID,
+              "accountID" -> accountId
+            )
+          )
           val data = ApiResponseData(message = "Account Created.", accountId = Some(accountId))
 
           Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = 201)))
         }
-        case CreateLisaAccountInvestorNotFoundResponse => Forbidden(Json.toJson(ErrorInvestorNotFound))
-        case CreateLisaAccountInvestorNotEligibleResponse => Forbidden(Json.toJson(ErrorInvestorNotEligible))
-        case CreateLisaAccountInvestorComplianceCheckFailedResponse => Forbidden(Json.toJson(ErrorInvestorComplianceCheckFailed))
+        case CreateLisaAccountInvestorNotFoundResponse => {
+          auditService.audit(
+            auditType = "accountNotCreated",
+            path = getEndpointUrl(lisaManager),
+            auditData = Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "investorID" -> request.investorID,
+              "accountID" -> request.accountID,
+              "reasonNotCreated" -> ErrorInvestorNotFound.errorCode
+            )
+          )
+          Forbidden(Json.toJson(ErrorInvestorNotFound))
+        }
+        case CreateLisaAccountInvestorNotEligibleResponse => {
+          auditService.audit(
+            auditType = "accountNotCreated",
+            path = getEndpointUrl(lisaManager),
+            auditData = Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "investorID" -> request.investorID,
+              "accountID" -> request.accountID,
+              "reasonNotCreated" -> ErrorInvestorNotEligible.errorCode
+            )
+          )
+          Forbidden(Json.toJson(ErrorInvestorNotEligible))
+        }
+        case CreateLisaAccountInvestorComplianceCheckFailedResponse => {
+          auditService.audit(
+            auditType = "accountNotCreated",
+            path = getEndpointUrl(lisaManager),
+            auditData = Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "investorID" -> request.investorID,
+              "accountID" -> request.accountID,
+              "reasonNotCreated" -> ErrorInvestorComplianceCheckFailed.errorCode
+            )
+          )
+          Forbidden(Json.toJson(ErrorInvestorComplianceCheckFailed))
+        }
         case CreateLisaAccountInvestorAccountAlreadyClosedOrVoidedResponse => Forbidden(Json.toJson(ErrorAccountAlreadyClosedOrVoid))
         case CreateLisaAccountAlreadyExistsResponse => Conflict(Json.toJson(ErrorAccountAlreadyExists))
         case _ => InternalServerError(Json.toJson(ErrorInternalServerError))
@@ -131,4 +177,7 @@ class AccountController extends LisaController {
     js.keys.contains("transferAccount")
   }
 
+  private def getEndpointUrl(lisaManagerReferenceNumber: String):String = {
+    s"/manager/$lisaManagerReferenceNumber/accounts"
+  }
 }
