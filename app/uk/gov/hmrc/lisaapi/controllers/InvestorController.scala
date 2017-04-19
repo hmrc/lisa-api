@@ -58,7 +58,7 @@ class InvestorController extends LisaController {
   private def handleCreatedResponse(lisaManager: String, createRequest: CreateLisaInvestorRequest, investorId: String) = {
     auditService.audit(
       auditType = "investorCreated",
-      path = routes.InvestorController.createLisaInvestor(lisaManager).url,
+      path = getEndpointUrl(lisaManager),
       auditData = Map(
         "lisaManagerReferenceNumber" -> lisaManager,
         "investorNINO" -> createRequest.investorNINO,
@@ -74,7 +74,7 @@ class InvestorController extends LisaController {
   private def handleNotFoundResponse(lisaManager: String, createRequest: CreateLisaInvestorRequest) = {
     auditService.audit(
       auditType = "investorNotCreated",
-      path = routes.InvestorController.createLisaInvestor(lisaManager).url,
+      path = getEndpointUrl(lisaManager),
       auditData = Map(
         "lisaManagerReferenceNumber" -> lisaManager,
         "investorNINO" -> createRequest.investorNINO,
@@ -88,7 +88,7 @@ class InvestorController extends LisaController {
   private def handleAlreadyExistsResponse(lisaManager: String, createRequest: CreateLisaInvestorRequest, investorId: String) = {
     auditService.audit(
       auditType = "investorNotCreated",
-      path = routes.InvestorController.createLisaInvestor(lisaManager).url,
+      path = getEndpointUrl(lisaManager),
       auditData = Map(
         "lisaManagerReferenceNumber" -> lisaManager,
         "investorNINO" -> createRequest.investorNINO,
@@ -103,7 +103,7 @@ class InvestorController extends LisaController {
   private def handleErrorResponse(lisaManager: String, createRequest: CreateLisaInvestorRequest) = {
     auditService.audit(
       auditType = "investorNotCreated",
-      path = routes.InvestorController.createLisaInvestor(lisaManager).url,
+      path = getEndpointUrl(lisaManager),
       auditData = Map(
         "lisaManagerReferenceNumber" -> lisaManager,
         "investorNINO" -> createRequest.investorNINO,
@@ -112,6 +112,10 @@ class InvestorController extends LisaController {
     )
 
     InternalServerError(Json.toJson(ErrorInternalServerError))
+  }
+
+  private def getEndpointUrl(lisaManagerReferenceNumber: String):String = {
+    s"/manager/$lisaManagerReferenceNumber/investors"
   }
 
 }
