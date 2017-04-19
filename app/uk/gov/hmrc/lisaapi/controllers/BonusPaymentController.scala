@@ -52,23 +52,7 @@ class BonusPaymentController extends LisaController {
               auditService.audit(
                 auditType = "bonusPaymentRequested",
                 path = getEndpointUrl(lisaManager, accountId),
-                auditData = Map(
-                  "lisaManagerReferenceNumber" -> lisaManager,
-                  "accountID" -> accountId,
-                  "lifeEventID" -> req.lifeEventID.get,
-                  "transactionType" -> req.transactionType,
-                  "periodStartDate" -> req.periodStartDate.toString("yyyy-MM-dd"),
-                  "periodEndDate" -> req.periodEndDate.toString("yyyy-MM-dd"),
-                  "htbTransferInForPeriod" -> req.htbTransfer.get.htbTransferInForPeriod.toString,
-                  "htbTransferTotalYTD" -> req.htbTransfer.get.htbTransferTotalYTD.toString,
-                  "newSubsForPeriod" -> req.inboundPayments.newSubsForPeriod.get.toString,
-                  "newSubsYTD" -> req.inboundPayments.newSubsYTD.toString,
-                  "totalSubsForPeriod" -> req.inboundPayments.totalSubsForPeriod.toString,
-                  "totalSubsYTD" -> req.inboundPayments.totalSubsYTD.toString,
-                  "bonusDueForPeriod" -> req.bonuses.bonusDueForPeriod.toString,
-                  "totalBonusDueYTD" -> req.bonuses.totalBonusDueYTD.toString,
-                  "claimReason" -> req.bonuses.claimReason
-                )
+                auditData = createAuditData(lisaManager, accountId, req)
               )
 
               Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = 201)))
@@ -83,6 +67,49 @@ class BonusPaymentController extends LisaController {
         }
       }
     }
+  }
+
+  private def createAuditData(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest): Map[String, String] = {
+    var auditData = Map(
+      "lisaManagerReferenceNumber" -> lisaManager,
+      "accountID" -> accountId,
+      "transactionType" -> req.transactionType,
+      "periodStartDate" -> req.periodStartDate.toString("yyyy-MM-dd"),
+      "periodEndDate" -> req.periodEndDate.toString("yyyy-MM-dd"),
+      "newSubsYTD" -> req.inboundPayments.newSubsYTD.toString,
+      "totalSubsForPeriod" -> req.inboundPayments.totalSubsForPeriod.toString,
+      "totalSubsYTD" -> req.inboundPayments.totalSubsYTD.toString,
+      "bonusDueForPeriod" -> req.bonuses.bonusDueForPeriod.toString,
+      "totalBonusDueYTD" -> req.bonuses.totalBonusDueYTD.toString,
+      "claimReason" -> req.bonuses.claimReason
+    )
+
+    if(req.lifeEventID.nonEmpty) {
+      auditData = auditData ++ Map(
+        "lifeEventID" -> req.lifeEventID.get
+      )
+    }
+
+    if (req.htbTransfer.nonEmpty) {
+      auditData = auditData ++ Map(
+        "htbTransferInForPeriod" -> req.htbTransfer.get.htbTransferInForPeriod.toString,
+        "htbTransferTotalYTD" -> req.htbTransfer.get.htbTransferTotalYTD.toString
+      )
+    }
+
+    if (req.inboundPayments.newSubsForPeriod.nonEmpty) {
+      auditData = auditData ++ Map(
+        "newSubsForPeriod" -> req.inboundPayments.newSubsForPeriod.get.toString
+      )
+    }
+
+    if (req.bonuses.bonusPaidYTD.nonEmpty) {
+      auditData = auditData ++ Map(
+        "bonusPaidYTD" -> req.bonuses.bonusPaidYTD.get.toString
+      )
+    }
+
+    auditData
   }
 
   private def getEndpointUrl(lisaManager: String, accountId: String):String = {
