@@ -27,6 +27,7 @@ import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
 
 class AccountController extends LisaController {
 
@@ -84,11 +85,7 @@ class AccountController extends LisaController {
           auditService.audit(
             auditType = "accountCreated",
             path = getEndpointUrl(lisaManager),
-            auditData = Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "investorID" -> request.investorID,
-              "accountID" -> accountId
-            )
+            auditData = request.toStringMap + ("lisaManagerReferenceNumber" -> lisaManager)
           )
           val data = ApiResponseData(message = "Account Created.", accountId = Some(accountId))
 
@@ -98,25 +95,16 @@ class AccountController extends LisaController {
           auditService.audit(
             auditType = "accountNotCreated",
             path = getEndpointUrl(lisaManager),
-            auditData = Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "investorID" -> request.investorID,
-              "accountID" -> request.accountID,
-              "reasonNotCreated" -> ErrorInvestorNotFound.errorCode
-            )
+            auditData = request.toStringMap  + ("lisaManagerReferenceNumber" -> lisaManager) + ("reasonNotCreated" -> ErrorInvestorNotFound.errorCode)
           )
+
           Forbidden(Json.toJson(ErrorInvestorNotFound))
         }
         case CreateLisaAccountInvestorNotEligibleResponse => {
           auditService.audit(
             auditType = "accountNotCreated",
             path = getEndpointUrl(lisaManager),
-            auditData = Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "investorID" -> request.investorID,
-              "accountID" -> request.accountID,
-              "reasonNotCreated" -> ErrorInvestorNotEligible.errorCode
-            )
+            auditData = request.toStringMap  + ("lisaManagerReferenceNumber" -> lisaManager) + ("reasonNotCreated" -> ErrorInvestorNotEligible.errorCode)
           )
           Forbidden(Json.toJson(ErrorInvestorNotEligible))
         }
@@ -124,25 +112,15 @@ class AccountController extends LisaController {
           auditService.audit(
             auditType = "accountNotCreated",
             path = getEndpointUrl(lisaManager),
-            auditData = Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "investorID" -> request.investorID,
-              "accountID" -> request.accountID,
-              "reasonNotCreated" -> ErrorInvestorComplianceCheckFailed.errorCode
-            )
-          )
+            auditData =  request.toStringMap  + ("lisaManagerReferenceNumber" -> lisaManager) + ("reasonNotCreated" -> ErrorInvestorComplianceCheckFailed.errorCode)
+           )
           Forbidden(Json.toJson(ErrorInvestorComplianceCheckFailed))
         }
         case CreateLisaAccountInvestorAccountAlreadyClosedOrVoidedResponse => {
           auditService.audit(
             auditType = "accountNotCreated",
             path = getEndpointUrl(lisaManager),
-            auditData = Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "investorID" -> request.investorID,
-              "accountID" -> request.accountID,
-              "reasonNotCreated" -> ErrorAccountAlreadyClosedOrVoid.errorCode
-            )
+            auditData = request.toStringMap  + ("lisaManagerReferenceNumber" -> lisaManager) + ("reasonNotCreated" -> ErrorAccountAlreadyClosedOrVoid.errorCode)
           )
           Forbidden(Json.toJson(ErrorAccountAlreadyClosedOrVoid))
         }
@@ -150,12 +128,7 @@ class AccountController extends LisaController {
           auditService.audit(
             auditType = "accountNotCreated",
             path = getEndpointUrl(lisaManager),
-            auditData = Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "investorID" -> request.investorID,
-              "accountID" -> request.accountID,
-              "reasonNotCreated" -> ErrorAccountAlreadyExists.errorCode
-            )
+            auditData = request.toStringMap  + ("lisaManagerReferenceNumber" -> lisaManager) + ("reasonNotCreated" -> ErrorAccountAlreadyExists.errorCode)
           )
           Conflict(Json.toJson(ErrorAccountAlreadyExists))
         }
@@ -163,12 +136,7 @@ class AccountController extends LisaController {
           auditService.audit(
             auditType = "accountNotCreated",
             path = getEndpointUrl(lisaManager),
-            auditData = Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "investorID" -> request.investorID,
-              "accountID" -> request.accountID,
-              "reasonNotCreated" -> ErrorInternalServerError.errorCode
-            )
+            auditData =request.toStringMap  + ("lisaManagerReferenceNumber" -> lisaManager) + ("reasonNotCreated" -> ErrorInternalServerError.errorCode)
           )
           InternalServerError(Json.toJson(ErrorInternalServerError))
         }

@@ -101,7 +101,8 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
             auditData = Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorID" -> "9876543210",
-              "accountID" -> "AB123456"
+              "accountID" -> "8765432100",
+              "firstSubscriptionDate" -> "2011-03-23"
             ))(SUT.hc)
         }
        }
@@ -141,6 +142,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorID" -> "9876543210",
               "accountID" -> "8765432100",
+              "firstSubscriptionDate" -> "2011-03-23",
               "reasonNotCreated" -> "INVESTOR_NOT_FOUND"
             ))(SUT.hc)
         }
@@ -169,6 +171,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorID" -> "9876543210",
               "accountID" -> "8765432100",
+              "firstSubscriptionDate" -> "2011-03-23",
               "reasonNotCreated" -> "INVESTOR_ELIGIBILITY_CHECK_FAILED"
             ))(SUT.hc)
         }
@@ -189,6 +192,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorID" -> "9876543210",
               "accountID" -> "8765432100",
+              "firstSubscriptionDate" -> "2011-03-23",
               "reasonNotCreated" -> "INVESTOR_COMPLIANCE_CHECK_FAILED"
             ))(SUT.hc)
         }
@@ -258,6 +262,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorID" -> "9876543210",
               "accountID" -> "8765432100",
+              "firstSubscriptionDate" -> "2011-03-23",
               "reasonNotCreated" -> "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID"
             ))(SUT.hc)
         }
@@ -286,6 +291,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorID" -> "9876543210",
               "accountID" -> "8765432100",
+              "firstSubscriptionDate" -> "2011-03-23",
               "reasonNotCreated" -> "INVESTOR_ACCOUNT_ALREADY_EXISTS"
             ))(SUT.hc)
         }
@@ -313,6 +319,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorID" -> "9876543210",
               "accountID" -> "8765432100",
+              "firstSubscriptionDate" -> "2011-03-23",
               "reasonNotCreated" -> "INTERNAL_SERVER_ERROR"
             ))(SUT.hc)
         }
