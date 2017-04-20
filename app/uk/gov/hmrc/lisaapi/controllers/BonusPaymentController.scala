@@ -38,61 +38,72 @@ class BonusPaymentController extends LisaController {
     implicit request =>
 
     withValidJson[RequestBonusPaymentRequest] { req =>
-
-      if (req.lifeEventID.isEmpty && req.bonuses.claimReason == "Life Event") {
-        Logger.debug("Life event not provided")
-
-        auditService.audit(
-          auditType = "bonusPaymentNotRequested",
-          path = getEndpointUrl(lisaManager, accountId),
-          auditData = createAuditData(lisaManager, accountId, req) ++ Map("reasonNotRequested" -> ErrorLifeEventNotProvided.errorCode)
-        )
-
-        Future.successful(Forbidden(Json.toJson(ErrorLifeEventNotProvided)))
-      }
-      else {
-        service.requestBonusPayment(lisaManager, accountId, req) map { res =>
-          Logger.debug("Entering Bonus Payment Controller and the response is " + res.toString)
-          res match {
-            case RequestBonusPaymentSuccessResponse(transactionID) => {
-              Logger.debug("Matched success response")
-              val data = ApiResponseData(message = "Bonus transaction created", transactionId = Some(transactionID))
-
-              auditService.audit(
-                auditType = "bonusPaymentRequested",
-                path = getEndpointUrl(lisaManager, accountId),
-                auditData = createAuditData(lisaManager, accountId, req)
-              )
-
-              Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = 201)))
+      (req.bonuses.claimReason, req.lifeEventID) match {
+        case ("Life Event", None) =>
+          handleLifeEventNotProvided(lisaManager, accountId, req)
+        case _ =>
+          service.requestBonusPayment(lisaManager, accountId, req) map { res =>
+            Logger.debug("Entering Bonus Payment Controller and the response is " + res.toString)
+            res match {
+              case RequestBonusPaymentSuccessResponse(transactionID) =>
+                handleSuccess(lisaManager, accountId, req, transactionID)
+              case errorResponse: RequestBonusPaymentErrorResponse =>
+                handleFailure(lisaManager, accountId, req, errorResponse)
             }
-            case errorResponse: RequestBonusPaymentErrorResponse => {
-              Logger.debug("Matched error response")
-
-              auditService.audit(
-                auditType = "bonusPaymentNotRequested",
-                path = getEndpointUrl(lisaManager, accountId),
-                auditData = createAuditData(lisaManager, accountId, req) ++ Map("reasonNotRequested" -> errorResponse.data.code)
-              )
-
-              Status(errorResponse.status).apply(Json.toJson(errorResponse.data))
-            }
+          } recover {
+            case _ => handleError(lisaManager, accountId, req)
           }
-        } recover {
-          case _ => {
-            Logger.debug("An error occurred")
-
-            auditService.audit(
-              auditType = "bonusPaymentNotRequested",
-              path = getEndpointUrl(lisaManager, accountId),
-              auditData = createAuditData(lisaManager, accountId, req) ++ Map("reasonNotRequested" -> ErrorInternalServerError.errorCode)
-            )
-
-            InternalServerError(Json.toJson(ErrorInternalServerError))
-          }
-        }
       }
     }
+  }
+
+  private def handleLifeEventNotProvided(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest) = {
+    Logger.debug("Life event not provided")
+
+    auditService.audit(
+      auditType = "bonusPaymentNotRequested",
+      path = getEndpointUrl(lisaManager, accountId),
+      auditData = createAuditData(lisaManager, accountId, req) ++ Map("reasonNotRequested" -> ErrorLifeEventNotProvided.errorCode)
+    )
+
+    Future.successful(Forbidden(Json.toJson(ErrorLifeEventNotProvided)))
+  }
+
+  private def handleSuccess(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest, transactionID: String) = {
+    Logger.debug("Matched success response")
+    val data = ApiResponseData(message = "Bonus transaction created", transactionId = Some(transactionID))
+
+    auditService.audit(
+      auditType = "bonusPaymentRequested",
+      path = getEndpointUrl(lisaManager, accountId),
+      auditData = createAuditData(lisaManager, accountId, req)
+    )
+
+    Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = 201)))
+  }
+
+  private def handleFailure(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest, errorResponse: RequestBonusPaymentErrorResponse) = {
+    Logger.debug("Matched failure response")
+
+    auditService.audit(
+      auditType = "bonusPaymentNotRequested",
+      path = getEndpointUrl(lisaManager, accountId),
+      auditData = createAuditData(lisaManager, accountId, req) ++ Map("reasonNotRequested" -> errorResponse.data.code)
+    )
+
+    Status(errorResponse.status).apply(Json.toJson(errorResponse.data))
+  }
+
+  private def handleError(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest) = {
+    Logger.debug("An error occurred")
+
+    auditService.audit(
+      auditType = "bonusPaymentNotRequested",
+      path = getEndpointUrl(lisaManager, accountId),
+      auditData = createAuditData(lisaManager, accountId, req) ++ Map("reasonNotRequested" -> ErrorInternalServerError.errorCode)
+    )
+
+    InternalServerError(Json.toJson(ErrorInternalServerError))
   }
 
   private def createAuditData(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest): Map[String, String] = {
