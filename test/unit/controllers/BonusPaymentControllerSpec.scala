@@ -55,6 +55,7 @@ class BonusPaymentControllerSpec extends PlaySpec
   "The Life Event Controller" should {
 
     "return with status 201 created" when {
+
       "given a Success Response from the service layer" in {
         when(mockService.requestBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(RequestBonusPaymentSuccessResponse("1928374")))
@@ -64,9 +65,11 @@ class BonusPaymentControllerSpec extends PlaySpec
           (contentAsJson(res) \ "data" \ "transactionId").as[String] mustBe ("1928374")
         }
       }
+
     }
 
     "return with status 403 forbidden" when {
+
       "given a BONUS_CLAIM_ERROR from the service layer" in {
         when(mockService.requestBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(RequestBonusPaymentErrorResponse(403, DesFailureResponse("BONUS_CLAIM_ERROR", "xyz"))))
@@ -77,6 +80,7 @@ class BonusPaymentControllerSpec extends PlaySpec
           (contentAsJson(res) \ "message").as[String] mustBe ("xyz")
         }
       }
+
       "the bonus claim reason is life event and no life event id is provided" in {
         doRequest(validBonusPaymentJson.replace(""""lifeEventID": "1234567891",""", "")) { res =>
           status(res) mustBe (FORBIDDEN)
@@ -84,9 +88,11 @@ class BonusPaymentControllerSpec extends PlaySpec
           (contentAsJson(res) \ "message").as[String] mustBe ("lifeEventID is required when the claimReason is \"Life Event\"")
         }
       }
+
     }
 
     "return with status 400 bad request" when {
+
       "provided an invalid json object" in {
         doRequest(validBonusPaymentJson.replace("1234567891","X")) { res =>
           status(res) mustBe (BAD_REQUEST)
@@ -94,9 +100,11 @@ class BonusPaymentControllerSpec extends PlaySpec
           (contentAsJson(res) \ "message").as[String] mustBe ("Bad Request")
         }
       }
+
     }
 
     "return with status 500 internal server error" when {
+
       "an exception gets thrown" in {
         when(mockService.requestBonusPayment(any(), any(), any())(any())).
           thenThrow(new RuntimeException("Test"))
@@ -118,9 +126,11 @@ class BonusPaymentControllerSpec extends PlaySpec
           (contentAsJson(res) \ "code").as[String] mustBe ("INTERNAL_SERVER_ERROR")
         }
       }
+
     }
 
     "audit bonusPaymentRequested" when {
+
       "given a success response from the service layer and all optional fields" in {
         when(mockService.requestBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(RequestBonusPaymentSuccessResponse("1928374")))
@@ -156,6 +166,7 @@ class BonusPaymentControllerSpec extends PlaySpec
           )(SUT.hc)
         }
       }
+
       "given a success response from the service layer and no optional fields" in {
         when(mockService.requestBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(RequestBonusPaymentSuccessResponse("1928374")))
@@ -185,9 +196,11 @@ class BonusPaymentControllerSpec extends PlaySpec
           )(SUT.hc)
         }
       }
+
     }
 
     "audit bonusPaymentNotRequested" when {
+
       "given an error response from the service layer" in {
         when(mockService.requestBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(RequestBonusPaymentErrorResponse(404, DesFailureResponse("LIFE_EVENT_NOT_FOUND", ""))))
@@ -218,7 +231,8 @@ class BonusPaymentControllerSpec extends PlaySpec
           )(SUT.hc)
         }
       }
-      "a life event is not provided" in {
+
+      "the bonus claim reason is life event and no life event id is provided" in {
         when(mockService.requestBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.failed(new RuntimeException("Test")))
 
@@ -256,6 +270,7 @@ class BonusPaymentControllerSpec extends PlaySpec
           )(SUT.hc)
         }
       }
+
       "an error occurs" in {
         when(mockService.requestBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.failed(new RuntimeException("Test")))
@@ -287,6 +302,7 @@ class BonusPaymentControllerSpec extends PlaySpec
           )(SUT.hc)
         }
       }
+
     }
 
   }
