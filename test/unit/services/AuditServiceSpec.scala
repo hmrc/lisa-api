@@ -29,6 +29,8 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.play.http.HeaderCarrier
 
+import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
+
 class AuditServiceSpec extends PlaySpec
   with MockitoSugar
   with OneAppPerSuite
@@ -84,11 +86,11 @@ class AuditServiceSpec extends PlaySpec
         periodStartDate = new DateTime("2016-05-22"),
         periodEndDate = new DateTime("2017-05-22"),
         transactionType = "Bonus",
-        htbTransfer = Some(HelpToBuyTransfer(0f, 0f)),
+        htbTransfer = Some(HelpToBuyTransfer(1f, 0f)),
         inboundPayments = InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
         bonuses = Bonuses(1000f, 1000f, Some(1000f), "Life Event")
       )
-      val res = SUT.auditCaseClass("investorCreated", "/create", data)
+      val res = SUT.audit("investorCreated", "/create", data.toStringMap)
       val captor = ArgumentCaptor.forClass(classOf[DataEvent])
 
       verify(mockAuditConnector).sendEvent(captor.capture())(any(), any())
@@ -99,7 +101,7 @@ class AuditServiceSpec extends PlaySpec
       event.detail must contain ("periodStartDate" -> "2016-05-22")
       event.detail must contain ("periodEndDate" -> "2017-05-22")
       event.detail must contain ("transactionType" -> "Bonus")
-      event.detail must contain ("htbTransferInForPeriod" -> "0.0")
+      event.detail must contain ("htbTransferInForPeriod" -> "1.0")
       event.detail must contain ("htbTransferTotalYTD" -> "0.0")
       event.detail must contain ("newSubsForPeriod" -> "4000.0")
       event.detail must contain ("newSubsYTD" -> "4000.0")
