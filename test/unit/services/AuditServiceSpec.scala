@@ -16,12 +16,14 @@
 
 package unit.services
 
+import org.joda.time.DateTime
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import uk.gov.hmrc.lisaapi.models.{Bonuses, HelpToBuyTransfer, InboundPayments, RequestBonusPaymentRequest}
 import uk.gov.hmrc.lisaapi.services.AuditService
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.DataEvent
@@ -73,6 +75,41 @@ class AuditServiceSpec extends PlaySpec
 
       event.detail must contain ("investorID" -> "1234567890")
       event.detail must contain ("investorNINO" -> "AB123456D")
+      event.detail must contain key "Authorization"
+    }
+
+    "build an audit event with the correct when passed a BonusRequest Object" in {
+      val data = RequestBonusPaymentRequest(
+        lifeEventID = Some("1234567891"),
+        periodStartDate = new DateTime("2016-05-22"),
+        periodEndDate = new DateTime("2017-05-22"),
+        transactionType = "Bonus",
+        htbTransfer = Some(HelpToBuyTransfer(0f, 0f)),
+        inboundPayments = InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
+        bonuses = Bonuses(1000f, 1000f, Some(1000f), "Life Event")
+      )
+      val res = SUT.auditCaseClass("investorCreated", "/create", data)
+      val captor = ArgumentCaptor.forClass(classOf[DataEvent])
+
+      verify(mockAuditConnector).sendEvent(captor.capture())(any(), any())
+
+      val event = captor.getValue
+
+      event.detail must contain ("lifeEventID" -> "1234567891")
+      event.detail must contain ("periodStartDate" -> "2016-05-22")
+      event.detail must contain ("periodEndDate" -> "2017-05-22")
+      event.detail must contain ("transactionType" -> "Bonus")
+      event.detail must contain ("htbTransferInForPeriod" -> "0.0")
+      event.detail must contain ("htbTransferTotalYTD" -> "0.0")
+      event.detail must contain ("newSubsForPeriod" -> "4000.0")
+      event.detail must contain ("newSubsYTD" -> "4000.0")
+      event.detail must contain ("totalSubsForPeriod" -> "4000.0")
+      event.detail must contain ("totalSubsYTD" -> "4000.0")
+      event.detail must contain ("bonusDueForPeriod" -> "1000.0")
+      event.detail must contain ("totalBonusDueYTD" -> "1000.0")
+      event.detail must contain ("bonusPaidYTD" -> "1000.0")
+      event.detail must contain ("claimReason" -> "Life Event")
+
       event.detail must contain key "Authorization"
     }
 
