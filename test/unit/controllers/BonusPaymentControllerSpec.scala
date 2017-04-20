@@ -46,6 +46,7 @@ class BonusPaymentControllerSpec extends PlaySpec
   val lisaManager = "Z019283"
   val accountId = "ABC12345"
   val validBonusPaymentJson = Source.fromInputStream(getClass().getResourceAsStream("/json/request.valid.bonus-payment.json")).mkString
+  val validBonusPaymentMinimumFieldsJson = Source.fromInputStream(getClass().getResourceAsStream("/json/request.valid.bonus-payment.min.json")).mkString
 
   override def beforeEach() {
     reset(mockAuditService)
@@ -120,7 +121,7 @@ class BonusPaymentControllerSpec extends PlaySpec
     }
 
     "audit bonusPaymentRequested" when {
-      "given a Success Response from the service layer" in {
+      "given a Success Response from the service layer and all optional fields" in {
         when(mockService.requestBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(RequestBonusPaymentSuccessResponse("1928374")))
 
@@ -146,6 +147,39 @@ class BonusPaymentControllerSpec extends PlaySpec
               "htbTransferInForPeriod" -> (htb \ "htbTransferInForPeriod").as[Float].toString,
               "htbTransferTotalYTD" -> (htb \ "htbTransferTotalYTD").as[Float].toString,
               "newSubsForPeriod" -> (inboundPayments \ "newSubsForPeriod").as[Float].toString,
+              "newSubsYTD" -> (inboundPayments \ "newSubsYTD").as[Float].toString,
+              "totalSubsForPeriod" -> (inboundPayments \ "totalSubsForPeriod").as[Float].toString,
+              "totalSubsYTD" -> (inboundPayments \ "totalSubsYTD").as[Float].toString,
+              "bonusDueForPeriod" -> (bonuses \ "bonusDueForPeriod").as[Float].toString,
+              "bonusPaidYTD" -> (bonuses \ "bonusPaidYTD").as[Float].toString,
+              "totalBonusDueYTD" -> (bonuses \ "totalBonusDueYTD").as[Float].toString,
+              "claimReason" -> (bonuses \ "claimReason").as[String]
+            )
+          )(SUT.hc)
+        }
+      }
+      "given a Success Response from the service layer and no optional fields" in {
+        when(mockService.requestBonusPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(RequestBonusPaymentSuccessResponse("1928374")))
+
+        doRequest(validBonusPaymentMinimumFieldsJson) { res =>
+
+          val apiRes = contentAsJson(res).as[ApiResponse]
+
+          val json = Json.parse(validBonusPaymentMinimumFieldsJson)
+          val htb = json \ "htbTransfer"
+          val inboundPayments = json \ "inboundPayments"
+          val bonuses = json \ "bonuses"
+
+          verify(mockAuditService).audit(
+            auditType = "bonusPaymentRequested",
+            path = s"/manager/$lisaManager/accounts/$accountId/transactions",
+            auditData = Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountID" -> accountId,
+              "transactionType" -> (json \ "transactionType").as[String],
+              "periodStartDate" -> (json \ "periodStartDate").as[String],
+              "periodEndDate" -> (json \ "periodEndDate").as[String],
               "newSubsYTD" -> (inboundPayments \ "newSubsYTD").as[Float].toString,
               "totalSubsForPeriod" -> (inboundPayments \ "totalSubsForPeriod").as[Float].toString,
               "totalSubsYTD" -> (inboundPayments \ "totalSubsYTD").as[Float].toString,
