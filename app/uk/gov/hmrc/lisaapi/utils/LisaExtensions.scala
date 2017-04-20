@@ -33,7 +33,7 @@ object LisaExtensions {
         case Some(v) => v
         case None => None
         case x: Product => getMap(x)
-        case v => v
+        case (v) => v
       }))
       .toMap
   }
