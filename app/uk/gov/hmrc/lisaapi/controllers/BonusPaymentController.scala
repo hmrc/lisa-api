@@ -60,6 +60,13 @@ class BonusPaymentController extends LisaController {
             }
             case errorResponse: RequestBonusPaymentErrorResponse => {
               Logger.debug("Matched error response")
+
+              auditService.audit(
+                auditType = "bonusPaymentNotRequested",
+                path = getEndpointUrl(lisaManager, accountId),
+                auditData = createAuditData(lisaManager, accountId, req) ++ Map("reasonNotRequested" -> errorResponse.data.code)
+              )
+
               Status(errorResponse.status).apply(Json.toJson(errorResponse.data))
             }
           }

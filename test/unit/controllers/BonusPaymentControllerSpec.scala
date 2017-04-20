@@ -121,13 +121,11 @@ class BonusPaymentControllerSpec extends PlaySpec
     }
 
     "audit bonusPaymentRequested" when {
-      "given a Success Response from the service layer and all optional fields" in {
+      "given a success response from the service layer and all optional fields" in {
         when(mockService.requestBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(RequestBonusPaymentSuccessResponse("1928374")))
 
         doRequest(validBonusPaymentJson) { res =>
-
-          val apiRes = contentAsJson(res).as[ApiResponse]
 
           val json = Json.parse(validBonusPaymentJson)
           val htb = json \ "htbTransfer"
@@ -158,16 +156,13 @@ class BonusPaymentControllerSpec extends PlaySpec
           )(SUT.hc)
         }
       }
-      "given a Success Response from the service layer and no optional fields" in {
+      "given a success response from the service layer and no optional fields" in {
         when(mockService.requestBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(RequestBonusPaymentSuccessResponse("1928374")))
 
         doRequest(validBonusPaymentMinimumFieldsJson) { res =>
 
-          val apiRes = contentAsJson(res).as[ApiResponse]
-
           val json = Json.parse(validBonusPaymentMinimumFieldsJson)
-          val htb = json \ "htbTransfer"
           val inboundPayments = json \ "inboundPayments"
           val bonuses = json \ "bonuses"
 
@@ -186,6 +181,39 @@ class BonusPaymentControllerSpec extends PlaySpec
               "bonusDueForPeriod" -> (bonuses \ "bonusDueForPeriod").as[Float].toString,
               "totalBonusDueYTD" -> (bonuses \ "totalBonusDueYTD").as[Float].toString,
               "claimReason" -> (bonuses \ "claimReason").as[String]
+            )
+          )(SUT.hc)
+        }
+      }
+    }
+
+    "audit bonusPaymentNotRequested" when {
+      "given an error response from the service layer" in {
+        when(mockService.requestBonusPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(RequestBonusPaymentErrorResponse(404, DesFailureResponse("LIFE_EVENT_NOT_FOUND", ""))))
+
+        doRequest(validBonusPaymentMinimumFieldsJson) { res =>
+
+          val json = Json.parse(validBonusPaymentMinimumFieldsJson)
+          val inboundPayments = json \ "inboundPayments"
+          val bonuses = json \ "bonuses"
+
+          verify(mockAuditService).audit(
+            auditType = "bonusPaymentNotRequested",
+            path = s"/manager/$lisaManager/accounts/$accountId/transactions",
+            auditData = Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountID" -> accountId,
+              "transactionType" -> (json \ "transactionType").as[String],
+              "periodStartDate" -> (json \ "periodStartDate").as[String],
+              "periodEndDate" -> (json \ "periodEndDate").as[String],
+              "newSubsYTD" -> (inboundPayments \ "newSubsYTD").as[Float].toString,
+              "totalSubsForPeriod" -> (inboundPayments \ "totalSubsForPeriod").as[Float].toString,
+              "totalSubsYTD" -> (inboundPayments \ "totalSubsYTD").as[Float].toString,
+              "bonusDueForPeriod" -> (bonuses \ "bonusDueForPeriod").as[Float].toString,
+              "totalBonusDueYTD" -> (bonuses \ "totalBonusDueYTD").as[Float].toString,
+              "claimReason" -> (bonuses \ "claimReason").as[String],
+              "reasonNotRequested" -> "LIFE_EVENT_NOT_FOUND"
             )
           )(SUT.hc)
         }
