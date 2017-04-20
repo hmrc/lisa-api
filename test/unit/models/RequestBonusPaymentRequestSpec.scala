@@ -43,7 +43,7 @@ class RequestBonusPaymentRequestSpec extends PlaySpec with JsonFormats {
           data.transactionType mustBe "Bonus"
           data.htbTransfer mustBe Some(HelpToBuyTransfer(0f, 0f))
           data.inboundPayments mustBe InboundPayments(Some(4000f), 4000f, 4000f, 4000f)
-          data.bonuses mustBe Bonuses(1000f, 1000f, None, "Life Event")
+          data.bonuses mustBe Bonuses(1000f, 1000f, Some(1000f), "Life Event")
         }
       }
     }
@@ -56,7 +56,7 @@ class RequestBonusPaymentRequestSpec extends PlaySpec with JsonFormats {
         transactionType = "Bonus",
         htbTransfer = Some(HelpToBuyTransfer(0f, 0f)),
         inboundPayments = InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
-        bonuses = Bonuses(1000f, 1000f, None, "Life Event")
+        bonuses = Bonuses(1000f, 1000f, Some(1000f), "Life Event")
       )
 
       val json = Json.toJson[RequestBonusPaymentRequest](data)
