@@ -40,6 +40,14 @@ class BonusPaymentController extends LisaController {
     withValidJson[RequestBonusPaymentRequest] { req =>
 
       if (req.lifeEventID.isEmpty && req.bonuses.claimReason == "Life Event") {
+        Logger.debug("Life event not provided")
+
+        auditService.audit(
+          auditType = "bonusPaymentNotRequested",
+          path = getEndpointUrl(lisaManager, accountId),
+          auditData = createAuditData(lisaManager, accountId, req) ++ Map("reasonNotRequested" -> ErrorLifeEventNotProvided.errorCode)
+        )
+
         Future.successful(Forbidden(Json.toJson(ErrorLifeEventNotProvided)))
       }
       else {
@@ -71,7 +79,17 @@ class BonusPaymentController extends LisaController {
             }
           }
         } recover {
-          case _ => InternalServerError(Json.toJson(ErrorInternalServerError))
+          case _ => {
+            Logger.debug("An error occurred")
+
+            auditService.audit(
+              auditType = "bonusPaymentNotRequested",
+              path = getEndpointUrl(lisaManager, accountId),
+              auditData = createAuditData(lisaManager, accountId, req) ++ Map("reasonNotRequested" -> ErrorInternalServerError.errorCode)
+            )
+
+            InternalServerError(Json.toJson(ErrorInternalServerError))
+          }
         }
       }
     }

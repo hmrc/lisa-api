@@ -218,6 +218,75 @@ class BonusPaymentControllerSpec extends PlaySpec
           )(SUT.hc)
         }
       }
+      "a life event is not provided" in {
+        when(mockService.requestBonusPayment(any(), any(), any())(any())).
+          thenReturn(Future.failed(new RuntimeException("Test")))
+
+        val invalidJson = validBonusPaymentJson.replace("\"lifeEventID\": \"1234567891\",", "")
+
+        doRequest(invalidJson) { res =>
+          reset(mockService) // removes the thenThrow
+
+          val json = Json.parse(invalidJson)
+          val htb = json \ "htbTransfer"
+          val inboundPayments = json \ "inboundPayments"
+          val bonuses = json \ "bonuses"
+
+          verify(mockAuditService).audit(
+            auditType = "bonusPaymentNotRequested",
+            path = s"/manager/$lisaManager/accounts/$accountId/transactions",
+            auditData = Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountID" -> accountId,
+              "transactionType" -> (json \ "transactionType").as[String],
+              "periodStartDate" -> (json \ "periodStartDate").as[String],
+              "periodEndDate" -> (json \ "periodEndDate").as[String],
+              "htbTransferInForPeriod" -> (htb \ "htbTransferInForPeriod").as[Float].toString,
+              "htbTransferTotalYTD" -> (htb \ "htbTransferTotalYTD").as[Float].toString,
+              "newSubsForPeriod" -> (inboundPayments \ "newSubsForPeriod").as[Float].toString,
+              "newSubsYTD" -> (inboundPayments \ "newSubsYTD").as[Float].toString,
+              "totalSubsForPeriod" -> (inboundPayments \ "totalSubsForPeriod").as[Float].toString,
+              "totalSubsYTD" -> (inboundPayments \ "totalSubsYTD").as[Float].toString,
+              "bonusDueForPeriod" -> (bonuses \ "bonusDueForPeriod").as[Float].toString,
+              "bonusPaidYTD" -> (bonuses \ "bonusPaidYTD").as[Float].toString,
+              "totalBonusDueYTD" -> (bonuses \ "totalBonusDueYTD").as[Float].toString,
+              "claimReason" -> (bonuses \ "claimReason").as[String],
+              "reasonNotRequested" -> "LIFE_EVENT_NOT_PROVIDED"
+            )
+          )(SUT.hc)
+        }
+      }
+      "an error occurs" in {
+        when(mockService.requestBonusPayment(any(), any(), any())(any())).
+          thenReturn(Future.failed(new RuntimeException("Test")))
+
+        doRequest(validBonusPaymentMinimumFieldsJson) { res =>
+          reset(mockService) // removes the thenThrow
+
+          val json = Json.parse(validBonusPaymentMinimumFieldsJson)
+          val inboundPayments = json \ "inboundPayments"
+          val bonuses = json \ "bonuses"
+
+          verify(mockAuditService).audit(
+            auditType = "bonusPaymentNotRequested",
+            path = s"/manager/$lisaManager/accounts/$accountId/transactions",
+            auditData = Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountID" -> accountId,
+              "transactionType" -> (json \ "transactionType").as[String],
+              "periodStartDate" -> (json \ "periodStartDate").as[String],
+              "periodEndDate" -> (json \ "periodEndDate").as[String],
+              "newSubsYTD" -> (inboundPayments \ "newSubsYTD").as[Float].toString,
+              "totalSubsForPeriod" -> (inboundPayments \ "totalSubsForPeriod").as[Float].toString,
+              "totalSubsYTD" -> (inboundPayments \ "totalSubsYTD").as[Float].toString,
+              "bonusDueForPeriod" -> (bonuses \ "bonusDueForPeriod").as[Float].toString,
+              "totalBonusDueYTD" -> (bonuses \ "totalBonusDueYTD").as[Float].toString,
+              "claimReason" -> (bonuses \ "claimReason").as[String],
+              "reasonNotRequested" -> "INTERNAL_SERVER_ERROR"
+            )
+          )(SUT.hc)
+        }
+      }
     }
 
   }
