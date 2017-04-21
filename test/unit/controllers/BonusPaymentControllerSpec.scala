@@ -135,7 +135,7 @@ class BonusPaymentControllerSpec extends PlaySpec
         when(mockService.requestBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(RequestBonusPaymentSuccessResponse("1928374")))
 
-        doRequest(validBonusPaymentJson) { res =>
+        doSyncRequest(validBonusPaymentJson) { res =>
 
           val json = Json.parse(validBonusPaymentJson)
           val htb = json \ "htbTransfer"
@@ -171,7 +171,7 @@ class BonusPaymentControllerSpec extends PlaySpec
         when(mockService.requestBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(RequestBonusPaymentSuccessResponse("1928374")))
 
-        doRequest(validBonusPaymentMinimumFieldsJson) { res =>
+        doSyncRequest(validBonusPaymentMinimumFieldsJson) { res =>
 
           val json = Json.parse(validBonusPaymentMinimumFieldsJson)
           val inboundPayments = json \ "inboundPayments"
@@ -205,7 +205,7 @@ class BonusPaymentControllerSpec extends PlaySpec
         when(mockService.requestBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(RequestBonusPaymentErrorResponse(404, DesFailureResponse("LIFE_EVENT_NOT_FOUND", ""))))
 
-        doRequest(validBonusPaymentMinimumFieldsJson) { res =>
+        doSyncRequest(validBonusPaymentMinimumFieldsJson) { res =>
 
           val json = Json.parse(validBonusPaymentMinimumFieldsJson)
           val inboundPayments = json \ "inboundPayments"
@@ -238,7 +238,7 @@ class BonusPaymentControllerSpec extends PlaySpec
 
         val invalidJson = validBonusPaymentJson.replace("\"lifeEventID\": \"1234567891\",", "")
 
-        doRequest(invalidJson) { res =>
+        doSyncRequest(invalidJson) { res =>
           reset(mockService) // removes the thenThrow
 
           val json = Json.parse(invalidJson)
@@ -275,7 +275,7 @@ class BonusPaymentControllerSpec extends PlaySpec
         when(mockService.requestBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.failed(new RuntimeException("Test")))
 
-        doRequest(validBonusPaymentMinimumFieldsJson) { res =>
+        doSyncRequest(validBonusPaymentMinimumFieldsJson) { res =>
           reset(mockService) // removes the thenThrow
 
           val json = Json.parse(validBonusPaymentMinimumFieldsJson)
@@ -310,6 +310,13 @@ class BonusPaymentControllerSpec extends PlaySpec
   def doRequest(jsonString: String)(callback: (Future[Result]) =>  Unit): Unit = {
     val res = SUT.requestBonusPayment(lisaManager, accountId).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
       withBody(AnyContentAsJson(Json.parse(jsonString))))
+
+    callback(res)
+  }
+
+  def doSyncRequest(jsonString: String)(callback: (Result) =>  Unit): Unit = {
+    val res = await(SUT.requestBonusPayment(lisaManager, accountId).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
+      withBody(AnyContentAsJson(Json.parse(jsonString)))))
 
     callback(res)
   }
