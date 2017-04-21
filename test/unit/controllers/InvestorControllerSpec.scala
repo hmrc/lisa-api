@@ -75,10 +75,10 @@ class InvestorControllerSpec extends PlaySpec
         when(mockService.createInvestor(any(), any())(any())).
           thenReturn(Future.successful(CreateLisaInvestorSuccessResponse("AB123456")))
 
-        SUT.createLisaInvestor(lisaManager).
+        await(SUT.createLisaInvestor(lisaManager).
           apply(FakeRequest(Helpers.PUT,"/").
           withHeaders(acceptHeader).
-          withBody(AnyContentAsJson(Json.parse(investorJson))))
+          withBody(AnyContentAsJson(Json.parse(investorJson)))))
 
         verify(mockAuditService).audit(
           auditType = "investorCreated",
@@ -96,10 +96,10 @@ class InvestorControllerSpec extends PlaySpec
         when(mockService.createInvestor(any(), any())(any())).
           thenReturn(Future.successful(CreateLisaInvestorNotFoundResponse))
 
-        SUT.createLisaInvestor(lisaManager).
+        await(SUT.createLisaInvestor(lisaManager).
           apply(FakeRequest(Helpers.PUT, "/").
           withHeaders(acceptHeader).
-          withBody(AnyContentAsJson(Json.parse(investorJson))))
+          withBody(AnyContentAsJson(Json.parse(investorJson)))))
 
         verify(mockAuditService).audit(
           auditType = "investorNotCreated",
@@ -117,10 +117,10 @@ class InvestorControllerSpec extends PlaySpec
         when(mockService.createInvestor(any(), any())(any())).
           thenReturn(Future.successful(CreateLisaInvestorAlreadyExistsResponse(investorId)))
 
-        SUT.createLisaInvestor(lisaManager).
+        await(SUT.createLisaInvestor(lisaManager).
           apply(FakeRequest(Helpers.PUT, "/").
           withHeaders(acceptHeader).
-          withBody(AnyContentAsJson(Json.parse(investorJson))))
+          withBody(AnyContentAsJson(Json.parse(investorJson)))))
 
         verify(mockAuditService).audit(
           auditType = "investorNotCreated",
@@ -137,10 +137,10 @@ class InvestorControllerSpec extends PlaySpec
         when(mockService.createInvestor(any(), any())(any())).
           thenReturn(Future.successful(CreateLisaInvestorErrorResponse))
 
-        SUT.createLisaInvestor(lisaManager).
+        await(SUT.createLisaInvestor(lisaManager).
           apply(FakeRequest(Helpers.PUT, "/").
           withHeaders(acceptHeader).
-          withBody(AnyContentAsJson(Json.parse(investorJson))))
+          withBody(AnyContentAsJson(Json.parse(investorJson)))))
 
         verify(mockAuditService).audit(
           auditType = "investorNotCreated",
