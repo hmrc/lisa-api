@@ -40,50 +40,50 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
   val accountId = "ABC12345"
 
   val createAccountJson = """{
-                              |  "investorID" : "9876543210",
-                              |  "accountID" :"8765432100",
-                              |  "creationReason" : "New",
-                              |  "firstSubscriptionDate" : "2011-03-23"
-                              |}""".stripMargin
-
-  val createAccountJsonWithTransfer = """{
                             |  "investorID" : "9876543210",
                             |  "accountID" :"8765432100",
                             |  "creationReason" : "New",
-                            |  "firstSubscriptionDate" : "2011-03-23",
-                            |  "transferAccount": {
-                            |    "transferredFromAccountID": "Z543210",
-                            |    "transferredFromLMRN": "Z543333",
-                            |    "transferInDate": "2015-12-13"
-                            |  }
+                            |  "firstSubscriptionDate" : "2011-03-23"
                             |}""".stripMargin
 
-  val createAccountJsonWithInvalidTransfer = """{
+  val createAccountJsonWithTransfer = """{
                                         |  "investorID" : "9876543210",
                                         |  "accountID" :"8765432100",
                                         |  "creationReason" : "New",
                                         |  "firstSubscriptionDate" : "2011-03-23",
-                                        |  "transferAccount": "X"
+                                        |  "transferAccount": {
+                                        |    "transferredFromAccountID": "Z543210",
+                                        |    "transferredFromLMRN": "Z543333",
+                                        |    "transferInDate": "2015-12-13"
+                                        |  }
                                         |}""".stripMargin
 
-  val transferAccountJson = """{
-                            |  "investorID" : "9876543210",
-                            |  "accountID" :"8765432100",
-                            |  "creationReason" : "Transferred",
-                            |  "firstSubscriptionDate" : "2011-03-23",
-                            |  "transferAccount": {
-                            |    "transferredFromAccountID": "Z543210",
-                            |    "transferredFromLMRN": "Z543333",
-                            |    "transferInDate": "2015-12-13"
-                            |  }
-                            |}""".stripMargin
+  val createAccountJsonWithInvalidTransfer = """{
+                                               |  "investorID" : "9876543210",
+                                               |  "accountID" :"8765432100",
+                                               |  "creationReason" : "New",
+                                               |  "firstSubscriptionDate" : "2011-03-23",
+                                               |  "transferAccount": "X"
+                                               |}""".stripMargin
 
-  val transferAccountJsonIncomplete = """{
+  val transferAccountJson = """{
                               |  "investorID" : "9876543210",
                               |  "accountID" :"8765432100",
                               |  "creationReason" : "Transferred",
-                              |  "firstSubscriptionDate" : "2011-03-23"
+                              |  "firstSubscriptionDate" : "2011-03-23",
+                              |  "transferAccount": {
+                              |    "transferredFromAccountID": "Z543210",
+                              |    "transferredFromLMRN": "Z543333",
+                              |    "transferInDate": "2015-12-13"
+                              |  }
                               |}""".stripMargin
+
+  val transferAccountJsonIncomplete = """{
+                                        |  "investorID" : "9876543210",
+                                        |  "accountID" :"8765432100",
+                                        |  "creationReason" : "Transferred",
+                                        |  "firstSubscriptionDate" : "2011-03-23"
+                                        |}""".stripMargin
 
   val closeAccountJson = """{"accountClosureReason" : "Voided", "closureDate" : "2000-06-23"}"""
 
@@ -99,7 +99,8 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
             auditData = Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorID" -> "9876543210",
-              "accountID" -> "AB123456"
+              "accountID" -> "8765432100",
+              "firstSubscriptionDate" -> "2011-03-23"
             ))(SUT.hc)
         }
       }
@@ -117,8 +118,9 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorID" -> "9876543210",
               "accountID" -> "8765432100",
+              "firstSubscriptionDate" -> "2011-03-23",
               "reasonNotCreated" -> "INVESTOR_NOT_FOUND"
-          ))(SUT.hc)
+            ))(SUT.hc)
         }
       }
       "the data service returns a CreateLisaAccountInvestorNotEligibleResponse" in {
@@ -132,6 +134,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorID" -> "9876543210",
               "accountID" -> "8765432100",
+              "firstSubscriptionDate" -> "2011-03-23",
               "reasonNotCreated" -> "INVESTOR_ELIGIBILITY_CHECK_FAILED"
             )
           )(SUT.hc)
@@ -148,6 +151,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorID" -> "9876543210",
               "accountID" -> "8765432100",
+              "firstSubscriptionDate" -> "2011-03-23",
               "reasonNotCreated" -> "INVESTOR_COMPLIANCE_CHECK_FAILED"
             )
           )(SUT.hc)
@@ -164,6 +168,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorID" -> "9876543210",
               "accountID" -> "8765432100",
+              "firstSubscriptionDate" -> "2011-03-23",
               "reasonNotCreated" -> "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID"
             )
           )(SUT.hc)
@@ -180,6 +185,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorID" -> "9876543210",
               "accountID" -> "8765432100",
+              "firstSubscriptionDate" -> "2011-03-23",
               "reasonNotCreated" -> "INVESTOR_ACCOUNT_ALREADY_EXISTS"
             )
           )(SUT.hc)
@@ -196,9 +202,152 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorID" -> "9876543210",
               "accountID" -> "8765432100",
+              "firstSubscriptionDate" -> "2011-03-23",
               "reasonNotCreated" -> "INTERNAL_SERVER_ERROR"
             )
           )(SUT.hc)
+        }
+      }
+    }
+
+    "audit an accountTransferred event" when {
+      "submitted a valid transfer account request" in {
+        when(mockService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountSuccessResponse("AB123456")))
+        doSyncCreateOrTransferRequest(transferAccountJson) { res =>
+          verify(mockAuditService).audit(
+            auditType = "accountTransferred",
+            path = s"/manager/$lisaManager/accounts",
+            auditData = Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "investorID" -> "9876543210",
+              "accountID" -> "8765432100",
+              "firstSubscriptionDate" -> "2011-03-23",
+              "transferredFromAccountID" -> "Z543210",
+              "transferredFromLMRN" -> "Z543333",
+              "transferInDate" -> "2015-12-13"
+            ))(SUT.hc)
+        }
+      }
+    }
+
+    "audit and accountNotTransferred event" when {
+      "the data service returns a CreateLisaAccountInvestorNotFoundResponse for a transfer request" in {
+        when(mockService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorNotFoundResponse))
+
+        doSyncCreateOrTransferRequest(transferAccountJson) { res =>
+          verify(mockAuditService).audit(
+            auditType = "accountNotTransferred",
+            path = s"/manager/$lisaManager/accounts",
+            auditData = Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "investorID" -> "9876543210",
+              "accountID" -> "8765432100",
+              "firstSubscriptionDate" -> "2011-03-23",
+              "transferredFromAccountID" -> "Z543210",
+              "transferredFromLMRN" -> "Z543333",
+              "transferInDate" -> "2015-12-13",
+              "reasonNotCreated" -> "INVESTOR_NOT_FOUND"
+            ))(SUT.hc)
+        }
+      }
+
+      "the data service returns a CreateLisaAccountInvestorComplianceCheckFailedResponse for a transfer request" in {
+        when(mockService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorComplianceCheckFailedResponse))
+
+        doSyncCreateOrTransferRequest(transferAccountJson) { res =>
+          verify(mockAuditService).audit(
+            auditType = "accountNotTransferred",
+            path = s"/manager/$lisaManager/accounts",
+            auditData = Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "investorID" -> "9876543210",
+              "accountID" -> "8765432100",
+              "firstSubscriptionDate" -> "2011-03-23",
+              "transferredFromAccountID" -> "Z543210",
+              "transferredFromLMRN" -> "Z543333",
+              "transferInDate" -> "2015-12-13",
+              "reasonNotCreated" -> "INVESTOR_COMPLIANCE_CHECK_FAILED"
+            ))(SUT.hc)
+        }
+      }
+
+      "the data service returns a CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse for a transfer request" in {
+        when(mockService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse))
+
+        doSyncCreateOrTransferRequest(transferAccountJson) { res =>
+          verify(mockAuditService).audit(
+            auditType = "accountNotTransferred",
+            path = s"/manager/$lisaManager/accounts",
+            auditData = Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "investorID" -> "9876543210",
+              "accountID" -> "8765432100",
+              "firstSubscriptionDate" -> "2011-03-23",
+              "transferredFromAccountID" -> "Z543210",
+              "transferredFromLMRN" -> "Z543333",
+              "transferInDate" -> "2015-12-13",
+              "reasonNotCreated" -> "PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST"
+            ))(SUT.hc)
+        }
+      }
+
+      "the data service returns a CreateLisaAccountInvestorAccountAlreadyClosedOrVoidedResponse for a transfer request" in {
+        when(mockService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorAccountAlreadyClosedOrVoidedResponse))
+
+        doSyncCreateOrTransferRequest(transferAccountJson) { res =>
+          verify(mockAuditService).audit(
+            auditType = "accountNotTransferred",
+            path = s"/manager/$lisaManager/accounts",
+            auditData = Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "investorID" -> "9876543210",
+              "accountID" -> "8765432100",
+              "firstSubscriptionDate" -> "2011-03-23",
+              "transferredFromAccountID" -> "Z543210",
+              "transferredFromLMRN" -> "Z543333",
+              "transferInDate" -> "2015-12-13",
+              "reasonNotCreated" -> "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID"
+            ))(SUT.hc)
+        }
+      }
+
+      "the data service returns a CreateLisaAccountAlreadyExistsResponse for a transfer request" in {
+        when(mockService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountAlreadyExistsResponse))
+
+        doSyncCreateOrTransferRequest(transferAccountJson) { res =>
+          verify(mockAuditService).audit(
+            auditType = "accountNotTransferred",
+            path = s"/manager/$lisaManager/accounts",
+            auditData = Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "investorID" -> "9876543210",
+              "accountID" -> "8765432100",
+              "firstSubscriptionDate" -> "2011-03-23",
+              "transferredFromAccountID" -> "Z543210",
+              "transferredFromLMRN" -> "Z543333",
+              "transferInDate" -> "2015-12-13",
+              "reasonNotCreated" -> "INVESTOR_ACCOUNT_ALREADY_EXISTS"
+            ))(SUT.hc)
+        }
+      }
+
+      "the data service returns an error for a transfer request" in {
+        when(mockService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountErrorResponse))
+
+        doSyncCreateOrTransferRequest(transferAccountJson) { res =>
+          verify(mockAuditService).audit(
+            auditType = "accountNotTransferred",
+            path = s"/manager/$lisaManager/accounts",
+            auditData = Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "investorID" -> "9876543210",
+              "accountID" -> "8765432100",
+              "firstSubscriptionDate" -> "2011-03-23",
+              "transferredFromAccountID" -> "Z543210",
+              "transferredFromLMRN" -> "Z543333",
+              "transferInDate" -> "2015-12-13",
+              "reasonNotCreated" -> "INTERNAL_SERVER_ERROR"
+            ))(SUT.hc)
         }
       }
     }
@@ -210,7 +359,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
           status(res) mustBe (CREATED)
           (contentAsJson(res) \ "data" \ "accountId").as[String] mustBe ("AB123456")
         }
-       }
+      }
       "submitted a valid transfer account request" in {
         when(mockService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountSuccessResponse("AB123456")))
 

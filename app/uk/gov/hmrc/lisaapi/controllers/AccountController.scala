@@ -27,6 +27,7 @@ import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
 
 class AccountController extends LisaController {
 
@@ -77,18 +78,14 @@ class AccountController extends LisaController {
     }
   }
 
-  private def processAccountCreation(lisaManager: String, request: CreateLisaAccountCreationRequest) = {
-    service.createAccount(lisaManager, request).map { result =>
+  private def processAccountCreation(lisaManager: String, creationRequest: CreateLisaAccountCreationRequest) = {
+    service.createAccount(lisaManager, creationRequest).map { result =>
       result match {
         case CreateLisaAccountSuccessResponse(accountId) => {
           auditService.audit(
             auditType = "accountCreated",
             path = getEndpointUrl(lisaManager),
-            auditData = Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "investorID" -> request.investorID,
-              "accountID" -> accountId
-            )
+            auditData = creationRequest.toStringMap + ("lisaManagerReferenceNumber" -> lisaManager)
           )
           val data = ApiResponseData(message = "Account Created.", accountId = Some(accountId))
 
@@ -98,25 +95,16 @@ class AccountController extends LisaController {
           auditService.audit(
             auditType = "accountNotCreated",
             path = getEndpointUrl(lisaManager),
-            auditData = Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "investorID" -> request.investorID,
-              "accountID" -> request.accountID,
-              "reasonNotCreated" -> ErrorInvestorNotFound.errorCode
-            )
+            auditData = creationRequest.toStringMap  + ("lisaManagerReferenceNumber" -> lisaManager) + ("reasonNotCreated" -> ErrorInvestorNotFound.errorCode)
           )
+
           Forbidden(Json.toJson(ErrorInvestorNotFound))
         }
         case CreateLisaAccountInvestorNotEligibleResponse => {
           auditService.audit(
             auditType = "accountNotCreated",
             path = getEndpointUrl(lisaManager),
-            auditData = Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "investorID" -> request.investorID,
-              "accountID" -> request.accountID,
-              "reasonNotCreated" -> ErrorInvestorNotEligible.errorCode
-            )
+            auditData = creationRequest.toStringMap  + ("lisaManagerReferenceNumber" -> lisaManager) + ("reasonNotCreated" -> ErrorInvestorNotEligible.errorCode)
           )
           Forbidden(Json.toJson(ErrorInvestorNotEligible))
         }
@@ -124,25 +112,15 @@ class AccountController extends LisaController {
           auditService.audit(
             auditType = "accountNotCreated",
             path = getEndpointUrl(lisaManager),
-            auditData = Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "investorID" -> request.investorID,
-              "accountID" -> request.accountID,
-              "reasonNotCreated" -> ErrorInvestorComplianceCheckFailed.errorCode
-            )
-          )
+            auditData =  creationRequest.toStringMap  + ("lisaManagerReferenceNumber" -> lisaManager) + ("reasonNotCreated" -> ErrorInvestorComplianceCheckFailed.errorCode)
+           )
           Forbidden(Json.toJson(ErrorInvestorComplianceCheckFailed))
         }
         case CreateLisaAccountInvestorAccountAlreadyClosedOrVoidedResponse => {
           auditService.audit(
             auditType = "accountNotCreated",
             path = getEndpointUrl(lisaManager),
-            auditData = Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "investorID" -> request.investorID,
-              "accountID" -> request.accountID,
-              "reasonNotCreated" -> ErrorAccountAlreadyClosedOrVoid.errorCode
-            )
+            auditData = creationRequest.toStringMap  + ("lisaManagerReferenceNumber" -> lisaManager) + ("reasonNotCreated" -> ErrorAccountAlreadyClosedOrVoid.errorCode)
           )
           Forbidden(Json.toJson(ErrorAccountAlreadyClosedOrVoid))
         }
@@ -150,12 +128,7 @@ class AccountController extends LisaController {
           auditService.audit(
             auditType = "accountNotCreated",
             path = getEndpointUrl(lisaManager),
-            auditData = Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "investorID" -> request.investorID,
-              "accountID" -> request.accountID,
-              "reasonNotCreated" -> ErrorAccountAlreadyExists.errorCode
-            )
+            auditData = creationRequest.toStringMap  + ("lisaManagerReferenceNumber" -> lisaManager) + ("reasonNotCreated" -> ErrorAccountAlreadyExists.errorCode)
           )
           Conflict(Json.toJson(ErrorAccountAlreadyExists))
         }
@@ -163,12 +136,7 @@ class AccountController extends LisaController {
           auditService.audit(
             auditType = "accountNotCreated",
             path = getEndpointUrl(lisaManager),
-            auditData = Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "investorID" -> request.investorID,
-              "accountID" -> request.accountID,
-              "reasonNotCreated" -> ErrorInternalServerError.errorCode
-            )
+            auditData =creationRequest.toStringMap  + ("lisaManagerReferenceNumber" -> lisaManager) + ("reasonNotCreated" -> ErrorInternalServerError.errorCode)
           )
           InternalServerError(Json.toJson(ErrorInternalServerError))
         }
@@ -176,26 +144,73 @@ class AccountController extends LisaController {
     }
   }
 
-  private def processAccountTransfer(lisaManager: String, request: CreateLisaAccountTransferRequest) = {
-    service.transferAccount(lisaManager, request).map { result =>
+  private def processAccountTransfer(lisaManager: String, transferRequest: CreateLisaAccountTransferRequest) = {
+    service.transferAccount(lisaManager, transferRequest).map { result =>
       result match {
         case CreateLisaAccountSuccessResponse(accountId) => {
+          auditService.audit(
+            auditType = "accountTransferred",
+            path = getEndpointUrl(lisaManager),
+            auditData = transferRequest.toStringMap + ("lisaManagerReferenceNumber" -> lisaManager)
+          )
           val data = ApiResponseData(message = "Account Transferred.", accountId = Some(accountId))
 
           Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = 201)))
         }
-        case CreateLisaAccountInvestorNotFoundResponse => Forbidden(Json.toJson(ErrorInvestorNotFound))
-        case CreateLisaAccountInvestorComplianceCheckFailedResponse => Forbidden(Json.toJson(ErrorInvestorComplianceCheckFailed))
-        case CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse => Forbidden(Json.toJson(ErrorPreviousAccountDoesNotExist))
-        case CreateLisaAccountInvestorAccountAlreadyClosedOrVoidedResponse => Forbidden(Json.toJson(ErrorAccountAlreadyClosedOrVoid))
-        case CreateLisaAccountAlreadyExistsResponse => Conflict(Json.toJson(ErrorAccountAlreadyExists))
-        case _ => InternalServerError(Json.toJson(ErrorInternalServerError))
+        case CreateLisaAccountInvestorNotFoundResponse => {
+          auditService.audit(
+            auditType = "accountNotTransferred",
+            path = getEndpointUrl(lisaManager),
+            auditData = transferRequest.toStringMap + ("lisaManagerReferenceNumber" -> lisaManager)+ ("reasonNotCreated" -> ErrorInvestorNotFound.errorCode)
+          )
+          Forbidden(Json.toJson(ErrorInvestorNotFound))
+        }
+        case CreateLisaAccountInvestorComplianceCheckFailedResponse => {
+          auditService.audit(
+            auditType = "accountNotTransferred",
+            path = getEndpointUrl(lisaManager),
+            auditData = transferRequest.toStringMap + ("lisaManagerReferenceNumber" -> lisaManager)+ ("reasonNotCreated" -> ErrorInvestorComplianceCheckFailed.errorCode)
+          )
+          Forbidden(Json.toJson(ErrorInvestorComplianceCheckFailed))
+        }
+        case CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse => {
+          auditService.audit(
+            auditType = "accountNotTransferred",
+            path = getEndpointUrl(lisaManager),
+            auditData = transferRequest.toStringMap + ("lisaManagerReferenceNumber" -> lisaManager)+ ("reasonNotCreated" -> ErrorPreviousAccountDoesNotExist.errorCode)
+          )
+          Forbidden(Json.toJson(ErrorPreviousAccountDoesNotExist))
+        }
+        case CreateLisaAccountInvestorAccountAlreadyClosedOrVoidedResponse => {
+          auditService.audit(
+            auditType = "accountNotTransferred",
+            path = getEndpointUrl(lisaManager),
+            auditData = transferRequest.toStringMap + ("lisaManagerReferenceNumber" -> lisaManager)+ ("reasonNotCreated" -> ErrorAccountAlreadyClosedOrVoid.errorCode)
+          )
+          Forbidden(Json.toJson(ErrorAccountAlreadyClosedOrVoid))
+        }
+        case CreateLisaAccountAlreadyExistsResponse => {
+          auditService.audit(
+            auditType = "accountNotTransferred",
+            path = getEndpointUrl(lisaManager),
+            auditData = transferRequest.toStringMap + ("lisaManagerReferenceNumber" -> lisaManager)+ ("reasonNotCreated" -> ErrorAccountAlreadyExists.errorCode)
+          )
+          Conflict(Json.toJson(ErrorAccountAlreadyExists))
+        }
+        case _ => {
+          auditService.audit(
+            auditType = "accountNotTransferred",
+            path = getEndpointUrl(lisaManager),
+            auditData = transferRequest.toStringMap + ("lisaManagerReferenceNumber" -> lisaManager)+ ("reasonNotCreated" -> ErrorInternalServerError.errorCode)
+          )
+          InternalServerError(Json.toJson(ErrorInternalServerError))
+        }
       }
     }
   }
 
-  private def processAccountClosure(lisaManager: String, accountId: String, request: CloseLisaAccountRequest) = {
-    service.closeAccount(lisaManager, accountId, request).map { result =>
+  private def processAccountClosure(lisaManager: String, accountId: String, closeLisaAccountRequest: CloseLisaAccountRequest) = {
+    service.closeAccount(lisaManager, accountId, closeLisaAccountRequest).map { result =>
       result match {
         case CloseLisaAccountSuccessResponse(accountId) => {
           val data = ApiResponseData(message = "LISA Account Closed", accountId = Some(accountId))

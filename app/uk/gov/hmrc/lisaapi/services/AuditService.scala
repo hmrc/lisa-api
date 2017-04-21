@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.lisaapi.services
 
+import org.joda.time.DateTime
 import uk.gov.hmrc.lisaapi.config.MicroserviceAuditConnector
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.audit.model.DataEvent
@@ -39,6 +40,7 @@ trait AuditService extends AppName {
 
     connector.sendEvent(event)
   }
+
 }
 
 object AuditService extends AuditService {
