@@ -213,6 +213,13 @@ class AccountController extends LisaController {
     service.closeAccount(lisaManager, accountId, closeLisaAccountRequest).map { result =>
       result match {
         case CloseLisaAccountSuccessResponse(accountId) => {
+
+          auditService.audit(
+            auditType = "accountClosed",
+            path = getCloseEndpointUrl(lisaManager,accountId),
+            auditData = closeLisaAccountRequest.toStringMap + ("lisaManagerReferenceNumber" -> lisaManager)+ ("accountID" -> accountId)
+          )
+
           val data = ApiResponseData(message = "LISA Account Closed", accountId = Some(accountId))
 
           Ok(Json.toJson(ApiResponse(data = Some(data), success = true, status = 200)))
@@ -230,5 +237,9 @@ class AccountController extends LisaController {
 
   private def getEndpointUrl(lisaManagerReferenceNumber: String):String = {
     s"/manager/$lisaManagerReferenceNumber/accounts"
+  }
+
+  private def getCloseEndpointUrl(lisaManagerReferenceNumber: String, accountID: String):String = {
+    s"/manager/$lisaManagerReferenceNumber/accounts/$accountID/close-account"
   }
 }
