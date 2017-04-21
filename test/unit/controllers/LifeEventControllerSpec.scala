@@ -84,7 +84,7 @@ class LifeEventControllerSpec extends PlaySpec
         doReportLifeEventRequest(reportLifeEventJson){res =>
           await(res)
           verify(mockAuditService).audit(
-            auditType = "lifeEventReported",
+            auditType = "lifeEventNotReported",
             path = s"/manager/$lisaManager/accounts/$accountId/events",
             auditData = Map(
               "lisaManagerReferenceNumber" -> lisaManager,
@@ -101,7 +101,7 @@ class LifeEventControllerSpec extends PlaySpec
         doReportLifeEventRequest(reportLifeEventJson){res =>
           await(res)
           verify(mockAuditService).audit(
-            auditType = "lifeEventReported",
+            auditType = "lifeEventNotReported",
             path = s"/manager/$lisaManager/accounts/$accountId/events",
             auditData = Map(
               "lisaManagerReferenceNumber" -> lisaManager,
@@ -118,7 +118,7 @@ class LifeEventControllerSpec extends PlaySpec
         doReportLifeEventRequest(reportLifeEventJson){res =>
           await(res)
           verify(mockAuditService).audit(
-            auditType = "lifeEventReported",
+            auditType = "lifeEventNotReported",
             path = s"/manager/$lisaManager/accounts/$accountId/events",
             auditData = Map(
               "lisaManagerReferenceNumber" -> lisaManager,
@@ -137,7 +137,7 @@ class LifeEventControllerSpec extends PlaySpec
         doReportLifeEventRequest(reportLifeEventJson){res =>
           await(res)
           verify(mockAuditService).audit(
-            auditType = "lifeEventReported",
+            auditType = "lifeEventNotReported",
             path = s"/manager/$lisaManager/accounts/$accountId/events",
             auditData = Map(
               "lisaManagerReferenceNumber" -> lisaManager,

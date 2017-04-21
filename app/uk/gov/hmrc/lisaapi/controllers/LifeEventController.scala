@@ -43,81 +43,54 @@ class LifeEventController extends LisaController {
           case ReportLifeEventSuccessResponse(lifeEventId) => {
             Logger.debug("Matched Valid Response ")
 
-            auditService.audit(
-              auditType = "lifeEventReported",
-              path = getEndpointUrl(lisaManager, accountId),
-              auditData = req.toStringMap ++ Map(
-                "lisaManagerReferenceNumber" -> lisaManager,
-                "accountID" -> accountId
-              )
-            )
+            doAudit(lisaManager, accountId, req, "lifeEventReported")
 
             val data = ApiResponseData(message = "Life Event Created", lifeEventId = Some(lifeEventId))
 
             Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = 201)))
           }
           case ReportLifeEventInappropriateResponse => {
-            Logger.debug(("Matched Inappropriate"))
+            Logger.debug("Matched Inappropriate")
 
-            auditService.audit(
-              auditType = "lifeEventReported",
-              path = getEndpointUrl(lisaManager, accountId),
-              auditData = req.toStringMap ++ Map(
-                "lisaManagerReferenceNumber" -> lisaManager,
-                "accountID" -> accountId,
-                "reasonNotReported" -> ErrorLifeEventInappropriate.errorCode
-              )
-            )
+            doAudit(lisaManager, accountId, req, "lifeEventNotReported", Map("reasonNotReported" -> ErrorLifeEventInappropriate.errorCode))
 
             Forbidden(Json.toJson(ErrorLifeEventInappropriate))
           }
           case ReportLifeEventAlreadyExistsResponse => {
             Logger.debug("Matched Already Exists")
 
-            auditService.audit(
-              auditType = "lifeEventReported",
-              path = getEndpointUrl(lisaManager, accountId),
-              auditData = req.toStringMap ++ Map(
-                "lisaManagerReferenceNumber" -> lisaManager,
-                "accountID" -> accountId,
-                "reasonNotReported" -> ErrorLifeEventAlreadyExists.errorCode
-              )
-            )
+            doAudit(lisaManager, accountId, req, "lifeEventNotReported", Map("reasonNotReported" -> ErrorLifeEventAlreadyExists.errorCode))
 
             Conflict(Json.toJson(ErrorLifeEventAlreadyExists))
           }
           case ReportLifeEventAccountNotFoundResponse => {
+            Logger.debug("Matched Not Found")
 
-            auditService.audit(
-              auditType = "lifeEventReported",
-              path = getEndpointUrl(lisaManager, accountId),
-              auditData = req.toStringMap ++ Map(
-                "lisaManagerReferenceNumber" -> lisaManager,
-                "accountID" -> accountId,
-                "reasonNotReported" -> ErrorAccountNotFound.errorCode
-              )
-            )
+            doAudit(lisaManager, accountId, req, "lifeEventNotReported", Map("reasonNotReported" -> ErrorAccountNotFound.errorCode))
 
             NotFound(Json.toJson(ErrorAccountNotFound))
           }
           case _ => {
             Logger.debug("Matched Error")
 
-            auditService.audit(
-              auditType = "lifeEventReported",
-              path = getEndpointUrl(lisaManager, accountId),
-              auditData = req.toStringMap ++ Map(
-                "lisaManagerReferenceNumber" -> lisaManager,
-                "accountID" -> accountId,
-                "reasonNotReported" -> ErrorInternalServerError.errorCode
-              )
-            )
+            doAudit(lisaManager, accountId, req, "lifeEventNotReported", Map("reasonNotReported" -> ErrorInternalServerError.errorCode))
 
             InternalServerError(Json.toJson(ErrorInternalServerError))
           }
         }
       }
     }
+  }
+
+  private def doAudit(lisaManager: String, accountId: String, req: ReportLifeEventRequest, auditType: String, extraData: Map[String, String] = Map()) = {
+    auditService.audit(
+      auditType = auditType,
+      path = getEndpointUrl(lisaManager, accountId),
+      auditData = req.toStringMap ++ Map(
+        "lisaManagerReferenceNumber" -> lisaManager,
+        "accountID" -> accountId
+      ) ++ extraData
+    )
   }
 
   private def getEndpointUrl(lisaManager: String, accountId: String): String = {
