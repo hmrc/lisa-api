@@ -20,7 +20,7 @@ import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.services.LifeEventService
+import uk.gov.hmrc.lisaapi.services.{AuditService, LifeEventService}
 import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -28,6 +28,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class LifeEventController extends LisaController {
 
   val service: LifeEventService = LifeEventService
+  val auditService: AuditService = AuditService
 
   implicit val hc: HeaderCarrier = new HeaderCarrier()
 
@@ -39,7 +40,19 @@ class LifeEventController extends LisaController {
         Logger.debug("Entering LifeEvent Controller and the response is " + res.toString)
         res match {
           case ReportLifeEventSuccessResponse(lifeEventId) => {
-            Logger.debug("Matched Valid repsponse ")
+            Logger.debug("Matched Valid Response ")
+
+            auditService.audit(
+              auditType = "lifeEventReported",
+              path = getEndpointUrl(lisaManager, accountId),
+              auditData = Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "accountID" -> accountId,
+                "lifeEventType" -> req.eventType,
+                "lifeEventDate" -> req.eventDate.toString("yyyy-MM-dd")
+              )
+            )
+
             val data = ApiResponseData(message = "Life Event Created", lifeEventId = Some(lifeEventId))
 
             Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = 201)))
@@ -61,6 +74,10 @@ class LifeEventController extends LisaController {
         }
       }
     }
+  }
+
+  private def getEndpointUrl(lisaManager: String, accountId: String): String = {
+    s"/manager/$lisaManager/accounts/$accountId/events"
   }
 
 }

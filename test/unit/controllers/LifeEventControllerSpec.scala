@@ -18,7 +18,8 @@ package unit.controllers
 
 import org.joda.time.DateTime
 import org.mockito.Matchers._
-import org.mockito.Mockito.when
+import org.mockito.Mockito._
+import org.scalatest.BeforeAndAfter
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
@@ -26,19 +27,20 @@ import play.api.mvc.{AnyContentAsJson, Result}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
-import uk.gov.hmrc.lisaapi.controllers.LifeEventController
+import uk.gov.hmrc.lisaapi.controllers.{JsonFormats, LifeEventController}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, LifeEventService}
+import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
 
 import scala.concurrent.Future
 
-/**
-  * Created by mark on 20/03/17.
-  */
 case object ReportTest extends ReportLifeEventResponse
 
-class LifeEventControllerSpec  extends PlaySpec with MockitoSugar with OneAppPerSuite {
-
+class LifeEventControllerSpec extends PlaySpec
+  with MockitoSugar
+  with OneAppPerSuite
+  with BeforeAndAfter
+  with JsonFormats {
 
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
   val lisaManager = "Z019283"
@@ -52,8 +54,30 @@ class LifeEventControllerSpec  extends PlaySpec with MockitoSugar with OneAppPer
       |}
     """.stripMargin
 
+  before {
+    reset(mockAuditService)
+  }
 
   "The Life Event Controller" should {
+
+    "audit lifeEventReported" when {
+      "the request has been successful" in {
+        when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful((ReportLifeEventSuccessResponse("1928374"))))
+        doReportLifeEventRequest(reportLifeEventJson){res =>
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = "lifeEventReported",
+            path = s"/manager/$lisaManager/accounts/$accountId/events",
+            auditData = Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountID" -> accountId,
+              "lifeEventType" -> "LISA Investor Terminal Ill Health",
+              "lifeEventDate" -> "2017-01-01"
+            )
+          )(SUT.hc)
+        }
+      }
+    }
 
     "return with status 201 created" in {
       when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful((ReportLifeEventSuccessResponse("1928374"))))
@@ -124,8 +148,10 @@ class LifeEventControllerSpec  extends PlaySpec with MockitoSugar with OneAppPer
     callback(res)
   }
 
-  val mockService = mock[LifeEventService]
+  val mockService: LifeEventService = mock[LifeEventService]
+  val mockAuditService: AuditService = mock[AuditService]
   val SUT = new LifeEventController {
     override val service: LifeEventService = mockService
+    override val auditService: AuditService = mockAuditService
   }
 }
