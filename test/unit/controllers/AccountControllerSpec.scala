@@ -571,6 +571,62 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
       }
     }
 
+    "Audit an accountNotClosed event" when {
+      "the data service returns a CloseLisaAccountAlreadyClosedResponse" in {
+        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountAlreadyClosedResponse))
+
+        doSyncCloseRequest(closeAccountJson) { res =>
+          verify(mockAuditService).audit(
+            auditType = "accountNotClosed",
+            path=s"/manager/$lisaManager/accounts/ABC12345/close-account",
+            auditData = Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountClosureReason" -> "Voided",
+              "closureDate" -> "2000-06-23",
+              "accountID" -> "ABC12345",
+              "reasonNotClosed" -> "INVESTOR_ACCOUNT_ALREADY_CLOSED"
+            ))(SUT.hc)
+        }
+      }
+
+      "the data service returns a CloseLisaAccountNotFoundResponse" in {
+        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountNotFoundResponse))
+
+        doSyncCloseRequest(closeAccountJson) { res =>
+          verify(mockAuditService).audit(
+            auditType = "accountNotClosed",
+            path=s"/manager/$lisaManager/accounts/ABC12345/close-account",
+            auditData = Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountClosureReason" -> "Voided",
+              "closureDate" -> "2000-06-23",
+              "accountID" -> "ABC12345",
+              "reasonNotClosed" -> "INVESTOR_ACCOUNTID_NOT_FOUND"
+            ))(SUT.hc)
+
+        }
+      }
+
+      "return with status 500 internal server error" when {
+        "the data service returns an error" in {
+          when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountErrorResponse))
+
+          doSyncCloseRequest(closeAccountJson) { res =>
+            verify(mockAuditService).audit(
+              auditType = "accountNotClosed",
+              path=s"/manager/$lisaManager/accounts/ABC12345/close-account",
+              auditData = Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "accountClosureReason" -> "Voided",
+                "closureDate" -> "2000-06-23",
+                "accountID" -> "ABC12345",
+                "reasonNotClosed" -> "INTERNAL_SERVER_ERROR"
+              ))(SUT.hc)
+
+          }
+        }
+      }
+    }
     "return with status 200 ok" when {
       "submitted a valid close account request" in {
         when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountSuccessResponse("AB123456")))
@@ -645,7 +701,6 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
     callback(res)
   }
-
 
   def doSyncCloseRequest(jsonString: String)(callback: Result => Unit) {
     val res = await(SUT.closeLisaAccount(lisaManager, accountId).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).

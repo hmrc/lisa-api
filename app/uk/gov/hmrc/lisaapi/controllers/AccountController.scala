@@ -224,9 +224,30 @@ class AccountController extends LisaController {
 
           Ok(Json.toJson(ApiResponse(data = Some(data), success = true, status = 200)))
         }
-        case CloseLisaAccountAlreadyClosedResponse => Forbidden(Json.toJson(ErrorAccountAlreadyClosed))
-        case CloseLisaAccountNotFoundResponse => NotFound(Json.toJson(ErrorAccountNotFound))
-        case _ => InternalServerError(Json.toJson(ErrorInternalServerError))
+        case CloseLisaAccountAlreadyClosedResponse => {
+          auditService.audit(
+            auditType = "accountNotClosed",
+            path = getCloseEndpointUrl(lisaManager,accountId),
+            auditData = closeLisaAccountRequest.toStringMap + ("lisaManagerReferenceNumber" -> lisaManager)+ ("accountID" -> accountId) + ("reasonNotClosed" -> ErrorAccountAlreadyClosed.errorCode)
+          )
+          Forbidden(Json.toJson(ErrorAccountAlreadyClosed))
+        }
+        case CloseLisaAccountNotFoundResponse => {
+          auditService.audit(
+            auditType = "accountNotClosed",
+            path = getCloseEndpointUrl(lisaManager,accountId),
+            auditData = closeLisaAccountRequest.toStringMap + ("lisaManagerReferenceNumber" -> lisaManager)+ ("accountID" -> accountId) + ("reasonNotClosed" -> ErrorAccountNotFound.errorCode)
+          )
+          NotFound(Json.toJson(ErrorAccountNotFound))
+        }
+        case _ => {
+          auditService.audit(
+            auditType = "accountNotClosed",
+            path = getCloseEndpointUrl(lisaManager,accountId),
+            auditData = closeLisaAccountRequest.toStringMap + ("lisaManagerReferenceNumber" -> lisaManager)+ ("accountID" -> accountId) + ("reasonNotClosed" -> ErrorInternalServerError.errorCode)
+          )
+          InternalServerError(Json.toJson(ErrorInternalServerError))
+        }
       }
     }
   }
