@@ -71,8 +71,80 @@ class LifeEventControllerSpec extends PlaySpec
             auditData = Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountID" -> accountId,
-              "lifeEventType" -> "LISA Investor Terminal Ill Health",
-              "lifeEventDate" -> "2017-01-01"
+              "eventType" -> "LISA Investor Terminal Ill Health",
+              "eventDate" -> "2017-01-01"
+            )
+          )(SUT.hc)
+        }
+      }
+    }
+    "audit lifeEventNotReported" when {
+      "the request results in a ReportLifeEventInappropriateResponse" in {
+        when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventInappropriateResponse))
+        doReportLifeEventRequest(reportLifeEventJson){res =>
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = "lifeEventReported",
+            path = s"/manager/$lisaManager/accounts/$accountId/events",
+            auditData = Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountID" -> accountId,
+              "eventType" -> "LISA Investor Terminal Ill Health",
+              "eventDate" -> "2017-01-01",
+              "reasonNotReported" -> "LIFE_EVENT_INAPPROPRIATE"
+            )
+          )(SUT.hc)
+        }
+      }
+      "the request results in a ReportLifeEventAlreadyExistsResponse" in {
+        when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventAlreadyExistsResponse))
+        doReportLifeEventRequest(reportLifeEventJson){res =>
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = "lifeEventReported",
+            path = s"/manager/$lisaManager/accounts/$accountId/events",
+            auditData = Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountID" -> accountId,
+              "eventType" -> "LISA Investor Terminal Ill Health",
+              "eventDate" -> "2017-01-01",
+              "reasonNotReported" -> "LIFE_EVENT_ALREADY_EXISTS"
+            )
+          )(SUT.hc)
+        }
+      }
+      "the request results in a ReportLifeEventAccountNotFoundResponse" in {
+        when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventAccountNotFoundResponse))
+        doReportLifeEventRequest(reportLifeEventJson){res =>
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = "lifeEventReported",
+            path = s"/manager/$lisaManager/accounts/$accountId/events",
+            auditData = Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountID" -> accountId,
+              "eventType" -> "LISA Investor Terminal Ill Health",
+              "eventDate" -> "2017-01-01",
+              "reasonNotReported" -> "INVESTOR_ACCOUNTID_NOT_FOUND"
+            )
+          )(SUT.hc)
+        }
+      }
+      "the request results in a ReportLifeEventErrorResponse" in {
+        when(mockService.reportLifeEvent(any(), any(),any())(any()))
+          .thenReturn(Future.successful(ReportLifeEventErrorResponse))
+
+        doReportLifeEventRequest(reportLifeEventJson){res =>
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = "lifeEventReported",
+            path = s"/manager/$lisaManager/accounts/$accountId/events",
+            auditData = Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountID" -> accountId,
+              "eventType" -> "LISA Investor Terminal Ill Health",
+              "eventDate" -> "2017-01-01",
+              "reasonNotReported" -> "INTERNAL_SERVER_ERROR"
             )
           )(SUT.hc)
         }

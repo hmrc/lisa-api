@@ -22,6 +22,7 @@ import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, LifeEventService}
 import uk.gov.hmrc.play.http.HeaderCarrier
+import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -45,11 +46,9 @@ class LifeEventController extends LisaController {
             auditService.audit(
               auditType = "lifeEventReported",
               path = getEndpointUrl(lisaManager, accountId),
-              auditData = Map(
+              auditData = req.toStringMap ++ Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
-                "accountID" -> accountId,
-                "lifeEventType" -> req.eventType,
-                "lifeEventDate" -> req.eventDate.toString("yyyy-MM-dd")
+                "accountID" -> accountId
               )
             )
 
@@ -57,18 +56,63 @@ class LifeEventController extends LisaController {
 
             Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = 201)))
           }
-          case ReportLifeEventInappropriateResponse => {Logger.debug(("Matched Inappropriate"))
+          case ReportLifeEventInappropriateResponse => {
+            Logger.debug(("Matched Inappropriate"))
+
+            auditService.audit(
+              auditType = "lifeEventReported",
+              path = getEndpointUrl(lisaManager, accountId),
+              auditData = req.toStringMap ++ Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "accountID" -> accountId,
+                "reasonNotReported" -> ErrorLifeEventInappropriate.errorCode
+              )
+            )
+
             Forbidden(Json.toJson(ErrorLifeEventInappropriate))
           }
           case ReportLifeEventAlreadyExistsResponse => {
             Logger.debug("Matched Already Exists")
+
+            auditService.audit(
+              auditType = "lifeEventReported",
+              path = getEndpointUrl(lisaManager, accountId),
+              auditData = req.toStringMap ++ Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "accountID" -> accountId,
+                "reasonNotReported" -> ErrorLifeEventAlreadyExists.errorCode
+              )
+            )
+
             Conflict(Json.toJson(ErrorLifeEventAlreadyExists))
           }
           case ReportLifeEventAccountNotFoundResponse => {
+
+            auditService.audit(
+              auditType = "lifeEventReported",
+              path = getEndpointUrl(lisaManager, accountId),
+              auditData = req.toStringMap ++ Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "accountID" -> accountId,
+                "reasonNotReported" -> ErrorAccountNotFound.errorCode
+              )
+            )
+
             NotFound(Json.toJson(ErrorAccountNotFound))
           }
           case _ => {
             Logger.debug("Matched Error")
+
+            auditService.audit(
+              auditType = "lifeEventReported",
+              path = getEndpointUrl(lisaManager, accountId),
+              auditData = req.toStringMap ++ Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "accountID" -> accountId,
+                "reasonNotReported" -> ErrorInternalServerError.errorCode
+              )
+            )
+
             InternalServerError(Json.toJson(ErrorInternalServerError))
           }
         }
