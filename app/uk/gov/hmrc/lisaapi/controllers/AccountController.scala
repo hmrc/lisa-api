@@ -165,11 +165,46 @@ class AccountController extends LisaController {
           )
           Forbidden(Json.toJson(ErrorInvestorNotFound))
         }
-        case CreateLisaAccountInvestorComplianceCheckFailedResponse => Forbidden(Json.toJson(ErrorInvestorComplianceCheckFailed))
-        case CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse => Forbidden(Json.toJson(ErrorPreviousAccountDoesNotExist))
-        case CreateLisaAccountInvestorAccountAlreadyClosedOrVoidedResponse => Forbidden(Json.toJson(ErrorAccountAlreadyClosedOrVoid))
-        case CreateLisaAccountAlreadyExistsResponse => Conflict(Json.toJson(ErrorAccountAlreadyExists))
-        case _ => InternalServerError(Json.toJson(ErrorInternalServerError))
+        case CreateLisaAccountInvestorComplianceCheckFailedResponse => {
+          auditService.audit(
+            auditType = "accountNotTransferred",
+            path = getEndpointUrl(lisaManager),
+            auditData = transferRequest.toStringMap + ("lisaManagerReferenceNumber" -> lisaManager)+ ("reasonNotCreated" -> ErrorInvestorComplianceCheckFailed.errorCode)
+          )
+          Forbidden(Json.toJson(ErrorInvestorComplianceCheckFailed))
+        }
+        case CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse => {
+          auditService.audit(
+            auditType = "accountNotTransferred",
+            path = getEndpointUrl(lisaManager),
+            auditData = transferRequest.toStringMap + ("lisaManagerReferenceNumber" -> lisaManager)+ ("reasonNotCreated" -> ErrorPreviousAccountDoesNotExist.errorCode)
+          )
+          Forbidden(Json.toJson(ErrorPreviousAccountDoesNotExist))
+        }
+        case CreateLisaAccountInvestorAccountAlreadyClosedOrVoidedResponse => {
+          auditService.audit(
+            auditType = "accountNotTransferred",
+            path = getEndpointUrl(lisaManager),
+            auditData = transferRequest.toStringMap + ("lisaManagerReferenceNumber" -> lisaManager)+ ("reasonNotCreated" -> ErrorAccountAlreadyClosedOrVoid.errorCode)
+          )
+          Forbidden(Json.toJson(ErrorAccountAlreadyClosedOrVoid))
+        }
+        case CreateLisaAccountAlreadyExistsResponse => {
+          auditService.audit(
+            auditType = "accountNotTransferred",
+            path = getEndpointUrl(lisaManager),
+            auditData = transferRequest.toStringMap + ("lisaManagerReferenceNumber" -> lisaManager)+ ("reasonNotCreated" -> ErrorAccountAlreadyExists.errorCode)
+          )
+          Conflict(Json.toJson(ErrorAccountAlreadyExists))
+        }
+        case _ => {
+          auditService.audit(
+            auditType = "accountNotTransferred",
+            path = getEndpointUrl(lisaManager),
+            auditData = transferRequest.toStringMap + ("lisaManagerReferenceNumber" -> lisaManager)+ ("reasonNotCreated" -> ErrorInternalServerError.errorCode)
+          )
+          InternalServerError(Json.toJson(ErrorInternalServerError))
+        }
       }
     }
   }
