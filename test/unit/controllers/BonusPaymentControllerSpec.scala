@@ -89,6 +89,17 @@ class BonusPaymentControllerSpec extends PlaySpec
         }
       }
 
+      "when account is closed return with INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID code " in {
+          when(mockService.requestBonusPayment(any(), any(),any())(any())).thenReturn(
+            Future.successful(RequestBonusPaymentErrorResponse(403, DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID", "xyz"))))
+
+        doRequest(validBonusPaymentJson)  { res =>
+          status(res) mustBe (FORBIDDEN)
+          (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID")
+        }
+
+      }
+
     }
 
     "return with status 400 bad request" when {

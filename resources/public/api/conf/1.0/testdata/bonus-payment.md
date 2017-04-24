@@ -85,6 +85,40 @@
             </td>
         </tr>
         <tr>
+            <td><p>Request Bonus payment endpoint with an accountId that has already been closed or voided</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountID: 0000000903</p></td>
+            <td>
+                <p class ="code--block"> {<br>
+                                               "lifeEventID" : "1234567891",<br>
+                                                "periodStartDate" : "2016-05-22",<br>
+                                                "periodEndDate" : "2017-05-22",<br>
+                                                "transactionType" : "Penalty",<br>
+                                                "htbTransfer": {<br>
+                                                  "htbTransferInForPeriod": 0.00,<br>
+                                                  "htbTransferTotalYTD": 0.00<br>
+                                                },<br>
+                                                "inboundPayments" : {<br>
+                                                  "newSubsForPeriod" : 4000.00,<br>
+                                                  "newSubsYTD" : 4000.00,<br>
+                                                  "totalSubsForPeriod" : 40000.00,<br>
+                                                  "totalSubsYTD" : 40000.00<br>
+                                                },<br>
+                                                "bonuses" : {<br>
+                                                  "bonusPaidYTD" : 0.0,<br>
+                                                  "bonusDueForPeriod" : 10000.00,<br>
+                                                  "totalBonusDueYTD" : 10000.00,<br>
+                                                  "claimReason" : "Life Event"<br>
+                                                }<br>
+                                              }
+                </p>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">403(Forbidden)</code></p>
+                <p class ="code--block"> {<br>"code": "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID",<br>
+                                            "message": "The LISA account has already been closed or voided."<br>
+                                          }
+                </p>
+            </td>
+        </tr>
+        <tr>
             <td><p>Request Bonus payment endpoint with bonus in the payload that exceeds the maximum amount level</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountID: 0000000403</p></td>
             <td>
                 <p class ="code--block"> {<br>

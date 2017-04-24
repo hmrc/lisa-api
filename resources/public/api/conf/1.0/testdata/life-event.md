@@ -83,6 +83,22 @@
             </td>
         </tr>
         <tr>
+            <td><p>Report Life Event endpoint with an account that has already been closed or voided</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountId :0000000903</p></td>
+            <td>
+                <p class ="code--block"> {<br>
+                                            "eventType" : "LISA Investor Terminal Ill Health",<br>
+                                            "eventDate" : "2017-04-06"<br>
+                                        }
+                </p>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">403(Forbidden)</code></p>
+                <p class ="code--block"> {<br>"code": "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID",<br>
+                                            "message": "The LISA account has already been closed or voided."<br>
+                                          }
+                </p>
+            </td>
+        </tr>
+        <tr>
             <td><p>Report Life Event endpoint with a life event that is already reported</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountId :0000000409</p></td>
             <td>
                 <p class ="code--block"> {<br>
