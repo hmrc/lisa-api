@@ -26,6 +26,7 @@ import uk.gov.hmrc.play.http.HeaderCarrier
 import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
 
 class BonusPaymentController extends LisaController {
 
@@ -37,24 +38,24 @@ class BonusPaymentController extends LisaController {
   def requestBonusPayment(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async {
     implicit request =>
 
-    withValidJson[RequestBonusPaymentRequest] { req =>
-      (req.bonuses.claimReason, req.lifeEventID) match {
-        case ("Life Event", None) =>
-          handleLifeEventNotProvided(lisaManager, accountId, req)
-        case _ =>
-          service.requestBonusPayment(lisaManager, accountId, req) map { res =>
-            Logger.debug("Entering Bonus Payment Controller and the response is " + res.toString)
-            res match {
-              case RequestBonusPaymentSuccessResponse(transactionID) =>
-                handleSuccess(lisaManager, accountId, req, transactionID)
-              case errorResponse: RequestBonusPaymentErrorResponse =>
-                handleFailure(lisaManager, accountId, req, errorResponse)
+      withValidJson[RequestBonusPaymentRequest] { req =>
+        (req.bonuses.claimReason, req.lifeEventID) match {
+          case ("Life Event", None) =>
+            handleLifeEventNotProvided(lisaManager, accountId, req)
+          case _ =>
+            service.requestBonusPayment(lisaManager, accountId, req) map { res =>
+              Logger.debug("Entering Bonus Payment Controller and the response is " + res.toString)
+              res match {
+                case RequestBonusPaymentSuccessResponse(transactionID) =>
+                  handleSuccess(lisaManager, accountId, req, transactionID)
+                case errorResponse: RequestBonusPaymentErrorResponse =>
+                  handleFailure(lisaManager, accountId, req, errorResponse)
+              }
+            } recover {
+              case _ => handleError(lisaManager, accountId, req)
             }
-          } recover {
-            case _ => handleError(lisaManager, accountId, req)
-          }
+        }
       }
-    }
   }
 
   private def handleLifeEventNotProvided(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest) = {
@@ -107,71 +108,11 @@ class BonusPaymentController extends LisaController {
   }
 
   private def createAuditData(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest): Map[String, String] = {
-    getRequiredFieldAuditData(lisaManager, accountId, req) ++
-    getOptionalLifeEventAuditData(req) ++
-    getOptionalHelpToBuyAuditData(req) ++
-    getOptionalInboundPaymentAuditData(req) ++
-    getOptionalBonusesAuditData(req)
+    req.toStringMap ++ Map("lisaManagerReferenceNumber" -> lisaManager,
+      "accountID" -> accountId)
   }
 
-  private def getRequiredFieldAuditData(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest): Map[String, String] = {
-    Map(
-      "lisaManagerReferenceNumber" -> lisaManager,
-      "accountID" -> accountId,
-      "transactionType" -> req.transactionType,
-      "periodStartDate" -> req.periodStartDate.toString("yyyy-MM-dd"),
-      "periodEndDate" -> req.periodEndDate.toString("yyyy-MM-dd"),
-      "newSubsYTD" -> req.inboundPayments.newSubsYTD.toString,
-      "totalSubsForPeriod" -> req.inboundPayments.totalSubsForPeriod.toString,
-      "totalSubsYTD" -> req.inboundPayments.totalSubsYTD.toString,
-      "bonusDueForPeriod" -> req.bonuses.bonusDueForPeriod.toString,
-      "totalBonusDueYTD" -> req.bonuses.totalBonusDueYTD.toString,
-      "claimReason" -> req.bonuses.claimReason
-    )
-  }
-
-  private def getOptionalLifeEventAuditData(req: RequestBonusPaymentRequest): Map[String, String] = {
-    if (req.lifeEventID.nonEmpty) {
-      Map("lifeEventID" -> req.lifeEventID.get)
-    }
-    else {
-      Map()
-    }
-  }
-
-  private def getOptionalHelpToBuyAuditData(req: RequestBonusPaymentRequest): Map[String, String] = {
-    if (req.htbTransfer.nonEmpty) {
-      Map(
-        "htbTransferInForPeriod" -> req.htbTransfer.get.htbTransferInForPeriod.toString,
-        "htbTransferTotalYTD" -> req.htbTransfer.get.htbTransferTotalYTD.toString
-      )
-    }
-    else {
-      Map()
-    }
-  }
-
-  private def getOptionalInboundPaymentAuditData(req: RequestBonusPaymentRequest): Map[String, String] = {
-    if (req.inboundPayments.newSubsForPeriod.nonEmpty) {
-      Map("newSubsForPeriod" -> req.inboundPayments.newSubsForPeriod.get.toString)
-    }
-    else {
-      Map()
-    }
-  }
-
-  private def getOptionalBonusesAuditData(req: RequestBonusPaymentRequest): Map[String, String] = {
-    if (req.bonuses.bonusPaidYTD.nonEmpty) {
-      Map(
-        "bonusPaidYTD" -> req.bonuses.bonusPaidYTD.get.toString
-      )
-    }
-    else {
-      Map()
-    }
-  }
-
-  private def getEndpointUrl(lisaManager: String, accountId: String):String = {
+  private def getEndpointUrl(lisaManager: String, accountId: String): String = {
     s"/manager/$lisaManager/accounts/$accountId/transactions"
   }
 
