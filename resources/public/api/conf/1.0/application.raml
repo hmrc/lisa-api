@@ -55,18 +55,6 @@ types:
                         application/json:
                           type: !include schemas/LISAManager.get.schema.json
                           example: !include examples/LISAManager.get.json
-                    400:
-                      body:
-                        application/json:
-                          type: !include schemas/ErrorCodes.schema.json
-                          examples:
-                            notOpenStatus:
-                              description: Bad Request
-                              value: |
-                                {
-                                  "code" : "BAD_REQUEST",
-                                  "message" : "Bad Request"
-                                }
                     404:
                       body:
                         application/json:
@@ -310,11 +298,11 @@ types:
                           "message" : "transfer account data provided"
                         }
                     accountClosedOrVoided:
-                      description: The LISA account has already been closed or voided
+                      description: The LISA account has already been closed or voided.
                       value: |
                         {
                           "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID",
-                          "message": "The LISA account has already been closed or voided"
+                          "message": "The LISA account has already been closed or voided."
                         }
 
             404:
@@ -537,6 +525,14 @@ types:
                                       "code" : "LIFE_EVENT_INAPPROPRIATE",
                                       "message" : "The Life Event conflicts with previous Life Event reported."
                                     }
+                                accountClosedOrVoided:
+                                  description: The LISA account has already been closed or voided.
+                                  value: |
+                                    {
+                                      "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID",
+                                      "message": "The LISA account has already been closed or voided."
+                                    }
+
                         404:
                           body:
                             application/json:
@@ -641,6 +637,14 @@ types:
                                       "code" : "BONUS_CLAIM_ERROR",
                                       "message" : "Bonus Claim Error"
                                     }
+                                accountClosedOrVoided:
+                                  description: The LISA account has already been closed or voided.
+                                  value: |
+                                    {
+                                      "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID",
+                                      "message": "The LISA account has already been closed or voided."
+                                    }
+
                         404:
                           body:
                             application/json:

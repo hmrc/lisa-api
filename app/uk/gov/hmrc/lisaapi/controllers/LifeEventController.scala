@@ -56,6 +56,9 @@ class LifeEventController extends LisaController {
 
             Forbidden(Json.toJson(ErrorLifeEventInappropriate))
           }
+          case ReportLifeEventAccountClosedResponse => {Logger.error(("Account Closed or VOID"))
+            Forbidden(Json.toJson(ErrorAccountAlreadyClosedOrVoid))
+            }
           case ReportLifeEventAlreadyExistsResponse => {
             Logger.debug("Matched Already Exists")
 

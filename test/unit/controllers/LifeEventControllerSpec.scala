@@ -187,6 +187,14 @@ class LifeEventControllerSpec extends PlaySpec
         (contentAsJson(res) \"code").as[String] mustBe ("LIFE_EVENT_INAPPROPRIATE")
       }
     }
+    "return with 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID" in {
+      when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful((ReportLifeEventAccountClosedResponse)))
+      doReportLifeEventRequest(reportLifeEventJson){res =>
+        status(res) mustBe (FORBIDDEN)
+        (contentAsJson(res) \"code").as[String] mustBe ("INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID")
+        (contentAsJson(res) \"message").as[String] mustBe ("The LISA account has already been closed or voided.")
+      }
+    }
 
     "return with 404 Notfound and a code of INVESTOR_ACCOUNTID_NOT_FOUND" in {
       when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful((ReportLifeEventAccountNotFoundResponse)))

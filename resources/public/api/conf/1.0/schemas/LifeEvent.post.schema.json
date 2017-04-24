@@ -7,7 +7,7 @@
           "description": "The event that has occurred and triggers eligibility for the bonus payment.",
           "$ref": "#/definitions/eventType"},
 		"eventDate" : {
-          "description": "The date the life event occurred.",
+          "description": "The date the life event occurred. This can't be in the future.",
           "$ref": "#/definitions/ISO8601-Date"}
 	},
 	"required": [

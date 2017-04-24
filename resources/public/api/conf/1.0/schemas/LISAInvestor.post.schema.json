@@ -19,7 +19,7 @@
           "example": "lastNameDough"
         },
 		"dateOfBirth": {
-          "description": "The investor’s date of birth.",
+          "description": "The investor’s date of birth. This can't be in the future.",
           "$ref": "#/definitions/ISO8601-Date"}
 	},
 	"required": ["investorNINO","firstName","lastName","dateOfBirth"],

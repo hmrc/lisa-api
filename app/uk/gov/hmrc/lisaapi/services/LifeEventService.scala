@@ -46,6 +46,7 @@ trait LifeEventService {
             case "LIFE_EVENT_INAPPROPRIATE" => ReportLifeEventInappropriateResponse
             case "LIFE_EVENT_ALREADY_EXISTS" => ReportLifeEventAlreadyExistsResponse
             case "INVESTOR_ACCOUNTID_NOT_FOUND" => ReportLifeEventAccountNotFoundResponse
+            case "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID" => ReportLifeEventAccountClosedResponse
             case "INTERNAL_SERVER_ERROR" => ReportLifeEventErrorResponse
             case _ => {
               ReportLifeEventErrorResponse
