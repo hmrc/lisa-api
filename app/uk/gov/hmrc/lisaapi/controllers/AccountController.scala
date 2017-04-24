@@ -95,7 +95,8 @@ class AccountController extends LisaController {
           auditService.audit(
             auditType = "accountNotCreated",
             path = getEndpointUrl(lisaManager),
-            auditData = creationRequest.toStringMap ++ Map("lisaManagerReferenceNumber" -> lisaManager, "reasonNotCreated" -> ErrorInvestorNotFound.errorCode)
+            auditData = creationRequest.toStringMap ++ Map("lisaManagerReferenceNumber" -> lisaManager,
+              "reasonNotCreated" -> ErrorInvestorNotFound.errorCode)
           )
 
           Forbidden(Json.toJson(ErrorInvestorNotFound))
@@ -104,7 +105,8 @@ class AccountController extends LisaController {
           auditService.audit(
             auditType = "accountNotCreated",
             path = getEndpointUrl(lisaManager),
-            auditData = creationRequest.toStringMap ++ Map("lisaManagerReferenceNumber" -> lisaManager, "reasonNotCreated" -> ErrorInvestorNotEligible.errorCode)
+            auditData = creationRequest.toStringMap ++ Map("lisaManagerReferenceNumber" -> lisaManager,
+              "reasonNotCreated" -> ErrorInvestorNotEligible.errorCode)
           )
           Forbidden(Json.toJson(ErrorInvestorNotEligible))
         }
@@ -112,7 +114,8 @@ class AccountController extends LisaController {
           auditService.audit(
             auditType = "accountNotCreated",
             path = getEndpointUrl(lisaManager),
-            auditData = creationRequest.toStringMap ++ Map("lisaManagerReferenceNumber" -> lisaManager, "reasonNotCreated" -> ErrorInvestorComplianceCheckFailed.errorCode)
+            auditData = creationRequest.toStringMap ++ Map("lisaManagerReferenceNumber" -> lisaManager,
+              "reasonNotCreated" -> ErrorInvestorComplianceCheckFailed.errorCode)
           )
           Forbidden(Json.toJson(ErrorInvestorComplianceCheckFailed))
         }
@@ -120,7 +123,8 @@ class AccountController extends LisaController {
           auditService.audit(
             auditType = "accountNotCreated",
             path = getEndpointUrl(lisaManager),
-            auditData = creationRequest.toStringMap ++ Map("lisaManagerReferenceNumber" -> lisaManager, "reasonNotCreated" -> ErrorAccountAlreadyClosedOrVoid.errorCode)
+            auditData = creationRequest.toStringMap ++ Map("lisaManagerReferenceNumber" -> lisaManager,
+              "reasonNotCreated" -> ErrorAccountAlreadyClosedOrVoid.errorCode)
           )
           Forbidden(Json.toJson(ErrorAccountAlreadyClosedOrVoid))
         }
@@ -128,7 +132,8 @@ class AccountController extends LisaController {
           auditService.audit(
             auditType = "accountNotCreated",
             path = getEndpointUrl(lisaManager),
-            auditData = creationRequest.toStringMap ++ Map("lisaManagerReferenceNumber" -> lisaManager, "reasonNotCreated" -> ErrorAccountAlreadyExists.errorCode)
+            auditData = creationRequest.toStringMap ++ Map("lisaManagerReferenceNumber" -> lisaManager,
+              "reasonNotCreated" -> ErrorAccountAlreadyExists.errorCode)
           )
           Conflict(Json.toJson(ErrorAccountAlreadyExists))
         }
@@ -136,7 +141,8 @@ class AccountController extends LisaController {
           auditService.audit(
             auditType = "accountNotCreated",
             path = getEndpointUrl(lisaManager),
-            auditData = creationRequest.toStringMap ++ Map("lisaManagerReferenceNumber" -> lisaManager, "reasonNotCreated" -> ErrorInternalServerError.errorCode)
+            auditData = creationRequest.toStringMap ++ Map("lisaManagerReferenceNumber" -> lisaManager,
+              "reasonNotCreated" -> ErrorInternalServerError.errorCode)
           )
           InternalServerError(Json.toJson(ErrorInternalServerError))
         }
@@ -161,7 +167,8 @@ class AccountController extends LisaController {
           auditService.audit(
             auditType = "accountNotTransferred",
             path = getEndpointUrl(lisaManager),
-            auditData = transferRequest.toStringMap ++ Map("lisaManagerReferenceNumber" -> lisaManager, "reasonNotCreated" -> ErrorInvestorNotFound.errorCode)
+            auditData = transferRequest.toStringMap ++ Map("lisaManagerReferenceNumber" -> lisaManager,
+              "reasonNotCreated" -> ErrorInvestorNotFound.errorCode)
           )
           Forbidden(Json.toJson(ErrorInvestorNotFound))
         }
@@ -169,7 +176,8 @@ class AccountController extends LisaController {
           auditService.audit(
             auditType = "accountNotTransferred",
             path = getEndpointUrl(lisaManager),
-            auditData = transferRequest.toStringMap ++ Map("lisaManagerReferenceNumber" -> lisaManager, "reasonNotCreated" -> ErrorInvestorComplianceCheckFailed.errorCode)
+            auditData = transferRequest.toStringMap ++ Map("lisaManagerReferenceNumber" -> lisaManager,
+              "reasonNotCreated" -> ErrorInvestorComplianceCheckFailed.errorCode)
           )
           Forbidden(Json.toJson(ErrorInvestorComplianceCheckFailed))
         }
@@ -177,7 +185,8 @@ class AccountController extends LisaController {
           auditService.audit(
             auditType = "accountNotTransferred",
             path = getEndpointUrl(lisaManager),
-            auditData = transferRequest.toStringMap ++ Map("lisaManagerReferenceNumber" -> lisaManager, "reasonNotCreated" -> ErrorPreviousAccountDoesNotExist.errorCode)
+            auditData = transferRequest.toStringMap ++ Map("lisaManagerReferenceNumber" -> lisaManager,
+              "reasonNotCreated" -> ErrorPreviousAccountDoesNotExist.errorCode)
           )
           Forbidden(Json.toJson(ErrorPreviousAccountDoesNotExist))
         }
@@ -185,7 +194,8 @@ class AccountController extends LisaController {
           auditService.audit(
             auditType = "accountNotTransferred",
             path = getEndpointUrl(lisaManager),
-            auditData = transferRequest.toStringMap ++ Map("lisaManagerReferenceNumber" -> lisaManager, "reasonNotCreated" -> ErrorAccountAlreadyClosedOrVoid.errorCode)
+            auditData = transferRequest.toStringMap ++ Map("lisaManagerReferenceNumber" -> lisaManager,
+              "reasonNotCreated" -> ErrorAccountAlreadyClosedOrVoid.errorCode)
           )
           Forbidden(Json.toJson(ErrorAccountAlreadyClosedOrVoid))
         }
@@ -193,7 +203,8 @@ class AccountController extends LisaController {
           auditService.audit(
             auditType = "accountNotTransferred",
             path = getEndpointUrl(lisaManager),
-            auditData = transferRequest.toStringMap ++ Map("lisaManagerReferenceNumber" -> lisaManager, "reasonNotCreated" -> ErrorAccountAlreadyExists.errorCode)
+            auditData = transferRequest.toStringMap ++ Map("lisaManagerReferenceNumber" -> lisaManager,
+              "reasonNotCreated" -> ErrorAccountAlreadyExists.errorCode)
           )
           Conflict(Json.toJson(ErrorAccountAlreadyExists))
         }
@@ -201,7 +212,8 @@ class AccountController extends LisaController {
           auditService.audit(
             auditType = "accountNotTransferred",
             path = getEndpointUrl(lisaManager),
-            auditData = transferRequest.toStringMap ++ Map("lisaManagerReferenceNumber" -> lisaManager, "reasonNotCreated" -> ErrorInternalServerError.errorCode)
+            auditData = transferRequest.toStringMap ++ Map("lisaManagerReferenceNumber" -> lisaManager,
+              "reasonNotCreated" -> ErrorInternalServerError.errorCode)
           )
           InternalServerError(Json.toJson(ErrorInternalServerError))
         }

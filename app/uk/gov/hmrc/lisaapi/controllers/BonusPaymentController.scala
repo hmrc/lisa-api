@@ -38,24 +38,24 @@ class BonusPaymentController extends LisaController {
   def requestBonusPayment(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async {
     implicit request =>
 
-    withValidJson[RequestBonusPaymentRequest] { req =>
-      (req.bonuses.claimReason, req.lifeEventID) match {
-        case ("Life Event", None) =>
-          handleLifeEventNotProvided(lisaManager, accountId, req)
-        case _ =>
-          service.requestBonusPayment(lisaManager, accountId, req) map { res =>
-            Logger.debug("Entering Bonus Payment Controller and the response is " + res.toString)
-            res match {
-              case RequestBonusPaymentSuccessResponse(transactionID) =>
-                handleSuccess(lisaManager, accountId, req, transactionID)
-              case errorResponse: RequestBonusPaymentErrorResponse =>
-                handleFailure(lisaManager, accountId, req, errorResponse)
+      withValidJson[RequestBonusPaymentRequest] { req =>
+        (req.bonuses.claimReason, req.lifeEventID) match {
+          case ("Life Event", None) =>
+            handleLifeEventNotProvided(lisaManager, accountId, req)
+          case _ =>
+            service.requestBonusPayment(lisaManager, accountId, req) map { res =>
+              Logger.debug("Entering Bonus Payment Controller and the response is " + res.toString)
+              res match {
+                case RequestBonusPaymentSuccessResponse(transactionID) =>
+                  handleSuccess(lisaManager, accountId, req, transactionID)
+                case errorResponse: RequestBonusPaymentErrorResponse =>
+                  handleFailure(lisaManager, accountId, req, errorResponse)
+              }
+            } recover {
+              case _ => handleError(lisaManager, accountId, req)
             }
-          } recover {
-            case _ => handleError(lisaManager, accountId, req)
-          }
+        }
       }
-    }
   }
 
   private def handleLifeEventNotProvided(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest) = {
@@ -112,7 +112,7 @@ class BonusPaymentController extends LisaController {
       "accountID" -> accountId)
   }
 
-  private def getEndpointUrl(lisaManager: String, accountId: String):String = {
+  private def getEndpointUrl(lisaManager: String, accountId: String): String = {
     s"/manager/$lisaManager/accounts/$accountId/transactions"
   }
 
