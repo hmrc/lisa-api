@@ -12,7 +12,7 @@
       ]
     },
     "closureDate": {
-      "description": "The date the account was closed.",
+      "description": "The date the account was closed. This can't be in the future.",
       "$ref": "#/definitions/ISO8601-Date"
     }
   },

@@ -65,7 +65,7 @@ case object ErrorAccountAlreadyExists extends ErrorResponse(409, "INVESTOR_ACCOU
 @deprecated
 case object ErrorAccountAlreadyClosed extends ErrorResponse(403, "INVESTOR_ACCOUNT_ALREADY_CLOSED", "The LISA account is already closed")
 
-case object ErrorAccountAlreadyClosedOrVoid extends ErrorResponse(403, "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID", "The LISA account has already been closed or voided")
+case object ErrorAccountAlreadyClosedOrVoid extends ErrorResponse(403, "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID", "The LISA account has already been closed or voided.")
 
 case object ErrorAccountNotFound extends ErrorResponse(404, "INVESTOR_ACCOUNTID_NOT_FOUND", "The accountID given does not match with HMRC’s records")
 
@@ -76,8 +76,6 @@ case object ErrorTransferAccountDataProvided extends ErrorResponse(403, "TRANSFE
 case object ErrorLifeEventInappropriate extends ErrorResponse(403, "LIFE_EVENT_INAPPROPRIATE","The life event conflicts with previous life event reported")
 
 case object ErrorLifeEventAlreadyExists extends ErrorResponse(409,"LIFE_EVENT_ALREADY_EXISTS","The investor’s life event has already been reported")
-
-case object ErrorInvalidLisaManager extends ErrorResponse(401,"UNAUTHORIZED","The lisaManagerReferenceNumber path parameter you've used doesn't match with an authorised LISA provider in HMRC's records.")
 
 object ErrorInvestorAlreadyExists {
 

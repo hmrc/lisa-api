@@ -25,6 +25,7 @@ import play.api.test._
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.lisaapi.controllers.DiscoverController
 import uk.gov.hmrc.lisaapi.models._
+import uk.gov.hmrc.lisaapi.services.AuditService
 
 import scala.concurrent.Future
 
@@ -51,5 +52,5 @@ class DiscoverControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSu
 
   }
 
-  val SUT = new DiscoverController()
+  val SUT = new DiscoverController {}
 }
