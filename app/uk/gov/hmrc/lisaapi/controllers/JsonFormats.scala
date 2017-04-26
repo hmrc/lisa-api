@@ -39,8 +39,8 @@ trait JsonFormats {
 
   implicit val createLisaInvestorRequestReads: Reads[CreateLisaInvestorRequest] = (
     (JsPath \ "investorNINO").read(Reads.pattern(ninoRegex, "error.formatting.nino")) and
-    (JsPath \ "firstName").read(Reads.pattern(nameRegex, "error.formatting.firstName")) and
-    (JsPath \ "lastName").read(Reads.pattern(nameRegex, "error.formatting.lastName")) and
+    (JsPath \ "firstName").read(Reads.pattern(nameRegex, "error.formatting.firstName")).map[String](_.toUpperCase) and
+    (JsPath \ "lastName").read(Reads.pattern(nameRegex, "error.formatting.lastName")).map[String](_.toUpperCase) and
     (JsPath \ "dateOfBirth").read(isoDateReads(allowFutureDates = false)).map(new DateTime(_))
   )(CreateLisaInvestorRequest.apply _)
 
