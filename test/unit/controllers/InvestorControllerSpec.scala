@@ -16,6 +16,7 @@
 
 package unit.controllers
 
+import org.joda.time.DateTime
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
@@ -57,6 +58,7 @@ class InvestorControllerSpec extends PlaySpec
 
   override def beforeEach() {
     reset(mockAuditService)
+    reset(mockService)
   }
 
   "The Investor Controller" should {
@@ -211,6 +213,41 @@ class InvestorControllerSpec extends PlaySpec
         when(mockService.createInvestor(any(), any())(any())).thenReturn(Future.successful(CreateLisaInvestorSuccessResponse("AB123456")))
         val res = SUT.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT, "/").withHeaders(("accept", "application/vnd.hmrcc.1.0+json")))
         status(res) must be(406)
+      }
+    }
+
+    "convert names to uppercase" when {
+      "given standard a-z characters" in {
+        when(mockService.createInvestor(any(), any())(any())).thenReturn(Future.successful(CreateLisaInvestorSuccessResponse("AB123456")))
+
+        val json = investorJson.replace("Ex first Name", "rick").replace("Ample", "Sanchez")
+
+        val res = SUT.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT,"/").withHeaders(acceptHeader).
+          withBody(AnyContentAsJson(Json.parse(json))))
+
+        await(res)
+
+        verify(mockService).createInvestor(lisaManager, CreateLisaInvestorRequest(
+          investorNINO = "AB123456D",
+          firstName = "RICK",
+          lastName = "SANCHEZ",
+          dateOfBirth = new DateTime("1973-03-24")
+        ))(SUT.hc)
+      }
+    }
+
+    "reject names" when {
+      "they contain diacritics" in {
+        when(mockService.createInvestor(any(), any())(any())).thenReturn(Future.successful(CreateLisaInvestorSuccessResponse("AB123456")))
+
+        val json = investorJson.replace("Ex first Name", "riçk").replace("Ample", "Sånchez")
+
+        val res = SUT.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT,"/").withHeaders(acceptHeader).
+          withBody(AnyContentAsJson(Json.parse(json))))
+
+        status(res) mustBe BAD_REQUEST
+
+        verify(mockService, times(0)).createInvestor(any(), any())(any())
       }
     }
 
