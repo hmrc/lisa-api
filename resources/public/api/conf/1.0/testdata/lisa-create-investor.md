@@ -147,7 +147,7 @@
            <td><p class ="code--block">{<br>
                                       "investorNINO":"AA111110A",<br>
                                        "firstName":"First Name",<br>
-                                       "lastName":"Last Name",<br>
+                                       "lastName":"Last Name" <br>
                                        }</p>
            </td>
            <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
