@@ -16,6 +16,7 @@
 
 package unit.controllers
 
+import org.joda.time.DateTime
 import org.mockito.Matchers._
 import org.mockito.Matchers.{eq=>matchersEquals, _}
 import org.mockito.Mockito._
@@ -60,6 +61,7 @@ class InvestorControllerSpec extends PlaySpec
 
   override def beforeEach() {
     reset(mockAuditService)
+    reset(mockService)
   }
 
   "The Investor Controller" should {
@@ -89,6 +91,7 @@ class InvestorControllerSpec extends PlaySpec
           auditData = matchersEquals(Map(
             "lisaManagerReferenceNumber" -> lisaManager,
             "investorNINO" -> "AB123456D",
+            "dateOfBirth" -> "1973-03-24",
             "investorID" -> "AB123456")
           ))(any())
       }
@@ -110,6 +113,7 @@ class InvestorControllerSpec extends PlaySpec
           auditData = matchersEquals(Map(
             "lisaManagerReferenceNumber" -> lisaManager,
             "investorNINO" -> "AB123456D",
+            "dateOfBirth" -> "1973-03-24",
             "reasonNotCreated" -> ErrorInvestorNotFound.errorCode
           )))(any())
       }
@@ -132,6 +136,7 @@ class InvestorControllerSpec extends PlaySpec
             "lisaManagerReferenceNumber" -> lisaManager,
             "investorNINO" -> "AB123456D",
             "investorID" -> investorId,
+            "dateOfBirth" -> "1973-03-24",
             "reasonNotCreated" -> ErrorInvestorAlreadyExists(investorId).errorCode
           )))(any())
       }
@@ -151,6 +156,7 @@ class InvestorControllerSpec extends PlaySpec
           auditData = matchersEquals(Map(
             "lisaManagerReferenceNumber" -> lisaManager,
             "investorNINO" -> "AB123456D",
+            "dateOfBirth" -> "1973-03-24",
             "reasonNotCreated" -> ErrorInternalServerError.errorCode
           )))(any())
       }
@@ -214,6 +220,41 @@ class InvestorControllerSpec extends PlaySpec
         when(mockService.createInvestor(any(), any())(any())).thenReturn(Future.successful(CreateLisaInvestorSuccessResponse("AB123456")))
         val res = SUT.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT, "/").withHeaders(("accept", "application/vnd.hmrcc.1.0+json")))
         status(res) must be(406)
+      }
+    }
+
+    "convert names to uppercase" when {
+      "given standard a-z characters" in {
+        when(mockService.createInvestor(any(), any())(any())).thenReturn(Future.successful(CreateLisaInvestorSuccessResponse("AB123456")))
+
+        val json = investorJson.replace("Ex first Name", "rick").replace("Ample", "Sanchez")
+
+        val res = SUT.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT,"/").withHeaders(acceptHeader).
+          withBody(AnyContentAsJson(Json.parse(json))))
+
+        await(res)
+
+        verify(mockService).createInvestor(matchersEquals(lisaManager), matchersEquals(CreateLisaInvestorRequest(
+          investorNINO = "AB123456D",
+          firstName = "RICK",
+          lastName = "SANCHEZ",
+          dateOfBirth = new DateTime("1973-03-24"))
+        ))(any())
+      }
+    }
+
+    "reject names" when {
+      "they contain diacritics" in {
+        when(mockService.createInvestor(any(), any())(any())).thenReturn(Future.successful(CreateLisaInvestorSuccessResponse("AB123456")))
+
+        val json = investorJson.replace("Ex first Name", "riçk").replace("Ample", "Sånchez")
+
+        val res = SUT.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT,"/").withHeaders(acceptHeader).
+          withBody(AnyContentAsJson(Json.parse(json))))
+
+        status(res) mustBe BAD_REQUEST
+
+        verify(mockService, times(0)).createInvestor(any(), any())(any())
       }
     }
 
