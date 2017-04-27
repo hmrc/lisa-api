@@ -31,8 +31,6 @@ class LifeEventController extends LisaController {
   val service: LifeEventService = LifeEventService
   val auditService: AuditService = AuditService
 
-  implicit val hc: HeaderCarrier = new HeaderCarrier()
-
   def reportLisaLifeEvent(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async {
     implicit request =>
 
@@ -85,7 +83,7 @@ class LifeEventController extends LisaController {
     }
   }
 
-  private def doAudit(lisaManager: String, accountId: String, req: ReportLifeEventRequest, auditType: String, extraData: Map[String, String] = Map()) = {
+  private def doAudit(lisaManager: String, accountId: String, req: ReportLifeEventRequest, auditType: String, extraData: Map[String, String] = Map())(implicit hc: HeaderCarrier) = {
     auditService.audit(
       auditType = auditType,
       path = getEndpointUrl(lisaManager, accountId),

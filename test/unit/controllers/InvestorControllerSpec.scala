@@ -18,6 +18,7 @@ package unit.controllers
 
 import org.joda.time.DateTime
 import org.mockito.Matchers._
+import org.mockito.Matchers.{eq=>matchersEquals, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatest._
@@ -30,6 +31,8 @@ import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.lisaapi.controllers._
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, InvestorService}
+import uk.gov.hmrc.play.http.HeaderCarrier
+
 
 import scala.concurrent.Future
 
@@ -83,14 +86,14 @@ class InvestorControllerSpec extends PlaySpec
           withBody(AnyContentAsJson(Json.parse(investorJson)))))
 
         verify(mockAuditService).audit(
-          auditType = "investorCreated",
-          path = s"/manager/$lisaManager/investors",
-          auditData = Map(
+          auditType = matchersEquals("investorCreated"),
+          path = matchersEquals(s"/manager/$lisaManager/investors"),
+          auditData = matchersEquals(Map(
             "lisaManagerReferenceNumber" -> lisaManager,
             "investorNINO" -> "AB123456D",
-            "investorID" -> "AB123456",
-            "dateOfBirth" -> "1973-03-24"
-          ))(SUT.hc)
+            "dateOfBirth" -> "1973-03-24",
+            "investorID" -> "AB123456")
+          ))(any())
       }
     }
 
@@ -105,14 +108,14 @@ class InvestorControllerSpec extends PlaySpec
           withBody(AnyContentAsJson(Json.parse(investorJson)))))
 
         verify(mockAuditService).audit(
-          auditType = "investorNotCreated",
-          path = s"/manager/$lisaManager/investors",
-          auditData = Map(
+          auditType = matchersEquals("investorNotCreated"),
+          path = matchersEquals(s"/manager/$lisaManager/investors"),
+          auditData = matchersEquals(Map(
             "lisaManagerReferenceNumber" -> lisaManager,
             "investorNINO" -> "AB123456D",
-            "reasonNotCreated" -> ErrorInvestorNotFound.errorCode,
-            "dateOfBirth" -> "1973-03-24"
-          ))(SUT.hc)
+            "dateOfBirth" -> "1973-03-24",
+            "reasonNotCreated" -> ErrorInvestorNotFound.errorCode
+          )))(any())
       }
 
       "a investor already exists response is returned" in {
@@ -127,15 +130,15 @@ class InvestorControllerSpec extends PlaySpec
           withBody(AnyContentAsJson(Json.parse(investorJson)))))
 
         verify(mockAuditService).audit(
-          auditType = "investorNotCreated",
-          path = s"/manager/$lisaManager/investors",
-          auditData = Map(
+          auditType = matchersEquals("investorNotCreated"),
+          path = matchersEquals(s"/manager/$lisaManager/investors"),
+          auditData = matchersEquals(Map(
             "lisaManagerReferenceNumber" -> lisaManager,
             "investorNINO" -> "AB123456D",
             "investorID" -> investorId,
-            "reasonNotCreated" -> ErrorInvestorAlreadyExists(investorId).errorCode,
-            "dateOfBirth" -> "1973-03-24"
-          ))(SUT.hc)
+            "dateOfBirth" -> "1973-03-24",
+            "reasonNotCreated" -> ErrorInvestorAlreadyExists(investorId).errorCode
+          )))(any())
       }
 
       "a error response is returned" in {
@@ -148,14 +151,14 @@ class InvestorControllerSpec extends PlaySpec
           withBody(AnyContentAsJson(Json.parse(investorJson)))))
 
         verify(mockAuditService).audit(
-          auditType = "investorNotCreated",
-          path = s"/manager/$lisaManager/investors",
-          auditData = Map(
+          auditType = matchersEquals("investorNotCreated"),
+          path = matchersEquals(s"/manager/$lisaManager/investors"),
+          auditData = matchersEquals(Map(
             "lisaManagerReferenceNumber" -> lisaManager,
             "investorNINO" -> "AB123456D",
-            "reasonNotCreated" -> ErrorInternalServerError.errorCode,
-            "dateOfBirth" -> "1973-03-24"
-          ))(SUT.hc)
+            "dateOfBirth" -> "1973-03-24",
+            "reasonNotCreated" -> ErrorInternalServerError.errorCode
+          )))(any())
       }
     }
 
@@ -231,12 +234,12 @@ class InvestorControllerSpec extends PlaySpec
 
         await(res)
 
-        verify(mockService).createInvestor(lisaManager, CreateLisaInvestorRequest(
+        verify(mockService).createInvestor(matchersEquals(lisaManager), matchersEquals(CreateLisaInvestorRequest(
           investorNINO = "AB123456D",
           firstName = "RICK",
           lastName = "SANCHEZ",
-          dateOfBirth = new DateTime("1973-03-24")
-        ))(SUT.hc)
+          dateOfBirth = new DateTime("1973-03-24"))
+        ))(any())
       }
     }
 

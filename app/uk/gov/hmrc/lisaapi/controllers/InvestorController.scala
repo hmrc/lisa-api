@@ -33,8 +33,6 @@ class InvestorController extends LisaController {
   val service: InvestorService = InvestorService
   val auditService: AuditService = AuditService
 
-  implicit val hc: HeaderCarrier = new HeaderCarrier()
-
   def createLisaInvestor(lisaManager: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async {
     implicit request =>
       Logger.debug(s"LISA HTTP Request: ${request.uri} and method: ${request.method}")
@@ -55,7 +53,7 @@ class InvestorController extends LisaController {
       }
   }
 
-  private def handleCreatedResponse(lisaManager: String, createRequest: CreateLisaInvestorRequest, investorId: String) = {
+  private def handleCreatedResponse(lisaManager: String, createRequest: CreateLisaInvestorRequest, investorId: String)(implicit hc: HeaderCarrier) = {
     auditService.audit(
       auditType = "investorCreated",
       path = getEndpointUrl(lisaManager),
@@ -72,7 +70,7 @@ class InvestorController extends LisaController {
     Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = 201)))
   }
 
-  private def handleNotFoundResponse(lisaManager: String, createRequest: CreateLisaInvestorRequest) = {
+  private def handleNotFoundResponse(lisaManager: String, createRequest: CreateLisaInvestorRequest)(implicit hc: HeaderCarrier) = {
     auditService.audit(
       auditType = "investorNotCreated",
       path = getEndpointUrl(lisaManager),
@@ -87,7 +85,7 @@ class InvestorController extends LisaController {
     Forbidden(Json.toJson(ErrorInvestorNotFound))
   }
 
-  private def handleAlreadyExistsResponse(lisaManager: String, createRequest: CreateLisaInvestorRequest, investorId: String) = {
+  private def handleAlreadyExistsResponse(lisaManager: String, createRequest: CreateLisaInvestorRequest, investorId: String)(implicit hc: HeaderCarrier) = {
     auditService.audit(
       auditType = "investorNotCreated",
       path = getEndpointUrl(lisaManager),
@@ -103,7 +101,7 @@ class InvestorController extends LisaController {
     Conflict(Json.toJson(ErrorInvestorAlreadyExists(investorId)))
   }
 
-  private def handleErrorResponse(lisaManager: String, createRequest: CreateLisaInvestorRequest) = {
+  private def handleErrorResponse(lisaManager: String, createRequest: CreateLisaInvestorRequest)(implicit hc: HeaderCarrier) = {
     auditService.audit(
       auditType = "investorNotCreated",
       path = getEndpointUrl(lisaManager),

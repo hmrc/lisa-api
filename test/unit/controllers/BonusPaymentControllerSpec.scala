@@ -17,6 +17,7 @@
 package unit.controllers
 
 import org.mockito.Matchers._
+import org.mockito.Matchers.{eq=>MatcherEquals, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatest._
@@ -30,6 +31,7 @@ import uk.gov.hmrc.lisaapi.controllers.{BonusPaymentController, JsonFormats}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des.DesFailureResponse
 import uk.gov.hmrc.lisaapi.services.{AuditService, BonusPaymentService}
+import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
 import scala.io.Source
@@ -47,6 +49,7 @@ class BonusPaymentControllerSpec extends PlaySpec
   val accountId = "ABC12345"
   val validBonusPaymentJson = Source.fromInputStream(getClass().getResourceAsStream("/json/request.valid.bonus-payment.json")).mkString
   val validBonusPaymentMinimumFieldsJson = Source.fromInputStream(getClass().getResourceAsStream("/json/request.valid.bonus-payment.min.json")).mkString
+  implicit val hc:HeaderCarrier = HeaderCarrier()
 
   override def beforeEach() {
     reset(mockAuditService)
@@ -154,9 +157,9 @@ class BonusPaymentControllerSpec extends PlaySpec
           val bonuses = json \ "bonuses"
 
           verify(mockAuditService).audit(
-            auditType = "bonusPaymentRequested",
-            path = s"/manager/$lisaManager/accounts/$accountId/transactions",
-            auditData = Map(
+            auditType = MatcherEquals("bonusPaymentRequested"),
+            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions"),
+            auditData = MatcherEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountID" -> accountId,
               "lifeEventID" -> (json \ "lifeEventID").as[String],
@@ -173,8 +176,8 @@ class BonusPaymentControllerSpec extends PlaySpec
               "bonusPaidYTD" -> (bonuses \ "bonusPaidYTD").as[Float].toString,
               "totalBonusDueYTD" -> (bonuses \ "totalBonusDueYTD").as[Float].toString,
               "claimReason" -> (bonuses \ "claimReason").as[String]
-            )
-          )(SUT.hc)
+            ))
+          )(any())
         }
       }
 
@@ -189,9 +192,9 @@ class BonusPaymentControllerSpec extends PlaySpec
           val bonuses = json \ "bonuses"
 
           verify(mockAuditService).audit(
-            auditType = "bonusPaymentRequested",
-            path = s"/manager/$lisaManager/accounts/$accountId/transactions",
-            auditData = Map(
+            auditType = MatcherEquals("bonusPaymentRequested"),
+            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions"),
+            auditData = MatcherEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountID" -> accountId,
               "transactionType" -> (json \ "transactionType").as[String],
@@ -204,7 +207,7 @@ class BonusPaymentControllerSpec extends PlaySpec
               "totalBonusDueYTD" -> (bonuses \ "totalBonusDueYTD").as[Float].toString,
               "claimReason" -> (bonuses \ "claimReason").as[String]
             )
-          )(SUT.hc)
+          ))(any())
         }
       }
 
@@ -223,9 +226,9 @@ class BonusPaymentControllerSpec extends PlaySpec
           val bonuses = json \ "bonuses"
 
           verify(mockAuditService).audit(
-            auditType = "bonusPaymentNotRequested",
-            path = s"/manager/$lisaManager/accounts/$accountId/transactions",
-            auditData = Map(
+            auditType = MatcherEquals("bonusPaymentNotRequested"),
+            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions"),
+            auditData = MatcherEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountID" -> accountId,
               "transactionType" -> (json \ "transactionType").as[String],
@@ -239,7 +242,7 @@ class BonusPaymentControllerSpec extends PlaySpec
               "claimReason" -> (bonuses \ "claimReason").as[String],
               "reasonNotRequested" -> "LIFE_EVENT_NOT_FOUND"
             )
-          )(SUT.hc)
+          ))(any())
         }
       }
 
@@ -258,9 +261,9 @@ class BonusPaymentControllerSpec extends PlaySpec
           val bonuses = json \ "bonuses"
 
           verify(mockAuditService).audit(
-            auditType = "bonusPaymentNotRequested",
-            path = s"/manager/$lisaManager/accounts/$accountId/transactions",
-            auditData = Map(
+            auditType = MatcherEquals("bonusPaymentNotRequested"),
+            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions"),
+            auditData = MatcherEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountID" -> accountId,
               "transactionType" -> (json \ "transactionType").as[String],
@@ -278,7 +281,7 @@ class BonusPaymentControllerSpec extends PlaySpec
               "claimReason" -> (bonuses \ "claimReason").as[String],
               "reasonNotRequested" -> "LIFE_EVENT_NOT_PROVIDED"
             )
-          )(SUT.hc)
+          ))(any())
         }
       }
 
@@ -294,9 +297,9 @@ class BonusPaymentControllerSpec extends PlaySpec
           val bonuses = json \ "bonuses"
 
           verify(mockAuditService).audit(
-            auditType = "bonusPaymentNotRequested",
-            path = s"/manager/$lisaManager/accounts/$accountId/transactions",
-            auditData = Map(
+            auditType = MatcherEquals("bonusPaymentNotRequested"),
+            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions"),
+            auditData = MatcherEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountID" -> accountId,
               "transactionType" -> (json \ "transactionType").as[String],
@@ -310,7 +313,7 @@ class BonusPaymentControllerSpec extends PlaySpec
               "claimReason" -> (bonuses \ "claimReason").as[String],
               "reasonNotRequested" -> "INTERNAL_SERVER_ERROR"
             )
-          )(SUT.hc)
+          ))(any())
         }
       }
 

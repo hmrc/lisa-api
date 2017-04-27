@@ -33,8 +33,6 @@ class BonusPaymentController extends LisaController {
   val service: BonusPaymentService = BonusPaymentService
   val auditService: AuditService = AuditService
 
-  implicit val hc: HeaderCarrier = new HeaderCarrier()
-
   def requestBonusPayment(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async {
     implicit request =>
 
@@ -58,7 +56,7 @@ class BonusPaymentController extends LisaController {
       }
   }
 
-  private def handleLifeEventNotProvided(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest) = {
+  private def handleLifeEventNotProvided(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest)(implicit hc: HeaderCarrier) = {
     Logger.debug("Life event not provided")
 
     auditService.audit(
@@ -70,7 +68,7 @@ class BonusPaymentController extends LisaController {
     Future.successful(Forbidden(Json.toJson(ErrorLifeEventNotProvided)))
   }
 
-  private def handleSuccess(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest, transactionID: String) = {
+  private def handleSuccess(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest, transactionID: String)(implicit hc: HeaderCarrier) = {
     Logger.debug("Matched success response")
     val data = ApiResponseData(message = "Bonus transaction created", transactionId = Some(transactionID))
 
@@ -83,7 +81,7 @@ class BonusPaymentController extends LisaController {
     Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = 201)))
   }
 
-  private def handleFailure(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest, errorResponse: RequestBonusPaymentErrorResponse) = {
+  private def handleFailure(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest, errorResponse: RequestBonusPaymentErrorResponse)(implicit hc: HeaderCarrier) = {
     Logger.debug("Matched failure response")
 
     auditService.audit(
@@ -95,7 +93,7 @@ class BonusPaymentController extends LisaController {
     Status(errorResponse.status).apply(Json.toJson(errorResponse.data))
   }
 
-  private def handleError(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest) = {
+  private def handleError(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest)(implicit hc: HeaderCarrier) = {
     Logger.debug("An error occurred")
 
     auditService.audit(

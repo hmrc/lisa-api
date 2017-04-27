@@ -24,7 +24,6 @@ import scala.concurrent.Future
 
 class DiscoverController extends LisaController {
 
-  implicit val hc: HeaderCarrier = new HeaderCarrier()
 
   def discover(lisaManagerReferenceNumber: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
     val result = s"""{
