@@ -88,7 +88,8 @@ class InvestorControllerSpec extends PlaySpec
           auditData = Map(
             "lisaManagerReferenceNumber" -> lisaManager,
             "investorNINO" -> "AB123456D",
-            "investorID" -> "AB123456"
+            "investorID" -> "AB123456",
+            "dateOfBirth" -> "1973-03-24"
           ))(SUT.hc)
       }
     }
@@ -109,7 +110,8 @@ class InvestorControllerSpec extends PlaySpec
           auditData = Map(
             "lisaManagerReferenceNumber" -> lisaManager,
             "investorNINO" -> "AB123456D",
-            "reasonNotCreated" -> ErrorInvestorNotFound.errorCode
+            "reasonNotCreated" -> ErrorInvestorNotFound.errorCode,
+            "dateOfBirth" -> "1973-03-24"
           ))(SUT.hc)
       }
 
@@ -131,7 +133,8 @@ class InvestorControllerSpec extends PlaySpec
             "lisaManagerReferenceNumber" -> lisaManager,
             "investorNINO" -> "AB123456D",
             "investorID" -> investorId,
-            "reasonNotCreated" -> ErrorInvestorAlreadyExists(investorId).errorCode
+            "reasonNotCreated" -> ErrorInvestorAlreadyExists(investorId).errorCode,
+            "dateOfBirth" -> "1973-03-24"
           ))(SUT.hc)
       }
 
@@ -150,7 +153,8 @@ class InvestorControllerSpec extends PlaySpec
           auditData = Map(
             "lisaManagerReferenceNumber" -> lisaManager,
             "investorNINO" -> "AB123456D",
-            "reasonNotCreated" -> ErrorInternalServerError.errorCode
+            "reasonNotCreated" -> ErrorInternalServerError.errorCode,
+            "dateOfBirth" -> "1973-03-24"
           ))(SUT.hc)
       }
     }
