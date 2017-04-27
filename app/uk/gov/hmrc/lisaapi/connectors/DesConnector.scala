@@ -42,7 +42,7 @@ trait DesConnector extends ServicesConfig with JsonFormats {
 
   private def updateHeaderCarrier(headerCarrier: HeaderCarrier) =
     headerCarrier.copy(extraHeaders = Seq(("Environment" -> AppContext.desUrlHeaderEnv)),
-          authorization = Some(Authorization(AppContext.desAuthToken)))
+          authorization = Some(Authorization(s"Bearer ${AppContext.desAuthToken}")))
 
   /**
     * Attempts to create a new LISA investor
@@ -71,7 +71,7 @@ trait DesConnector extends ServicesConfig with JsonFormats {
   def createAccount(lisaManager: String, request: CreateLisaAccountCreationRequest)(implicit hc: HeaderCarrier): Future[DesResponse] = {
     val uri = s"$lisaServiceUrl/$lisaManager/accounts"
 
-    val result = httpPost.POST[CreateLisaAccountCreationRequest, HttpResponse](uri, request)(implicitly, httpReads, implicitly)
+    val result = httpPost.POST[CreateLisaAccountCreationRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc))
 
     result.map(res => {
       parseDesResponse[DesAccountResponse](res)._2
@@ -84,7 +84,7 @@ trait DesConnector extends ServicesConfig with JsonFormats {
   def transferAccount(lisaManager: String, request: CreateLisaAccountTransferRequest)(implicit hc: HeaderCarrier): Future[DesResponse] = {
     val uri = s"$lisaServiceUrl/$lisaManager/accounts"
 
-    val result = httpPost.POST[CreateLisaAccountTransferRequest, HttpResponse](uri, request)(implicitly, httpReads, implicitly)
+    val result = httpPost.POST[CreateLisaAccountTransferRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc))
 
     result.map(res => {
       parseDesResponse[DesAccountResponse](res)._2
@@ -99,7 +99,7 @@ trait DesConnector extends ServicesConfig with JsonFormats {
   def closeAccount(lisaManager: String, accountId: String, request: CloseLisaAccountRequest)(implicit hc: HeaderCarrier): Future[(Int, Option[DesAccountResponseOld])] = {
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId/close-account"
 
-    val result = httpPost.POST[CloseLisaAccountRequest, HttpResponse](uri, request)(implicitly, httpReads, implicitly)
+    val result = httpPost.POST[CloseLisaAccountRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc))
 
     result.map(r => {
       // catch any NullPointerExceptions that may occur from r.json being a null
@@ -118,7 +118,7 @@ trait DesConnector extends ServicesConfig with JsonFormats {
 
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId/events"
 
-    val result = httpPost.POST[ReportLifeEventRequest, HttpResponse](uri, request)(implicitly, httpReads, implicitly)
+    val result = httpPost.POST[ReportLifeEventRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc))
 
     result.map(res => {
       parseDesResponse[DesLifeEventResponse](res)._2
@@ -135,7 +135,7 @@ trait DesConnector extends ServicesConfig with JsonFormats {
 
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId/transactions"
 
-    val result = httpPost.POST[RequestBonusPaymentRequest, HttpResponse](uri, request)(implicitly, httpReads, implicitly)
+    val result = httpPost.POST[RequestBonusPaymentRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc))
 
     result.map(res => {
       parseDesResponse[DesTransactionResponse](res)
