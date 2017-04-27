@@ -60,6 +60,7 @@ class InvestorController extends LisaController {
       auditData = Map(
         "lisaManagerReferenceNumber" -> lisaManager,
         "investorNINO" -> createRequest.investorNINO,
+        "dateOfBirth" -> createRequest.dateOfBirth.toString("yyyy-MM-dd"),
         "investorID" -> investorId
       )
     )
@@ -76,6 +77,7 @@ class InvestorController extends LisaController {
       auditData = Map(
         "lisaManagerReferenceNumber" -> lisaManager,
         "investorNINO" -> createRequest.investorNINO,
+        "dateOfBirth" -> createRequest.dateOfBirth.toString("yyyy-MM-dd"),
         "reasonNotCreated" -> ErrorInvestorNotFound.errorCode
       )
     )
@@ -91,6 +93,7 @@ class InvestorController extends LisaController {
         "lisaManagerReferenceNumber" -> lisaManager,
         "investorNINO" -> createRequest.investorNINO,
         "investorID" -> investorId,
+        "dateOfBirth" -> createRequest.dateOfBirth.toString("yyyy-MM-dd"),
         "reasonNotCreated" -> ErrorInvestorAlreadyExists(investorId).errorCode
       )
     )
@@ -105,6 +108,7 @@ class InvestorController extends LisaController {
       auditData = Map(
         "lisaManagerReferenceNumber" -> lisaManager,
         "investorNINO" -> createRequest.investorNINO,
+        "dateOfBirth" -> createRequest.dateOfBirth.toString("yyyy-MM-dd"),
         "reasonNotCreated" -> ErrorInternalServerError.errorCode
       )
     )
