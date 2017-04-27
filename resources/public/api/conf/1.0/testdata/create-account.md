@@ -85,7 +85,7 @@
             <td><p>HTTP status: <code class="code--slim">403(Forbidden)</code></p>
                 <p class ="code--block"> {<br>
                                          "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID",<br>
-                                         "message": "The LISA account has already been closed or voided"<br>
+                                         "message": "The LISA account has already been closed or voided."<br>
                                        }
                 </p>
             </td>
@@ -182,7 +182,7 @@
                                         }
                 </p>
             </td>
-            <td><p>HTTP status: <code class="code--slim">401(Unauthorized)</code></p>
+            <td><p>HTTP status: <code class="code--slim">403(Forbidden)</code></p>
                 <p class ="code--block"> {<br>
                                          "code": "TRANSFER_ACCOUNT_DATA_PROVIDED",<br>
                                          "message": "transferredFromAccountID, transferedFromLMRN, and transferInDate fields should only be completed when the creationReason is \"Transferred\"."<br>

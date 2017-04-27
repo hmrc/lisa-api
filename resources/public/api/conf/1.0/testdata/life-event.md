@@ -69,7 +69,7 @@
             <td><p>Report Life Event endpoint with a life event that conflicts with a previously reported life event</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountId :0000000403</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                            "eventType" : "LISA Investor Terminal Ill Health",<br>
+                                            "eventType" : "House Purchase",<br>
                                             "eventDate" : "2017-04-06"<br>
                                         }
                 </p>

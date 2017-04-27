@@ -90,7 +90,7 @@
                                         }
                 </p>
             </td>
-            <td><p>HTTP status: <code class="code--slim">403(Forbidden)</code></p>
+            <td><p>HTTP status: <code class="code--slim">404</code></p>
                 <p class ="code--block"> {<br>
                                             "code": "NOT_FOUND",<br>
                                             "message": "Resource was not found"<br>
@@ -99,7 +99,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Close Account endpoint with an invalid Authorization Bearer token</p><p class ="code--block">lisaManagerReferenceNumber :Z123456789<br>accountId :A1234561</p></td>
+            <td><p>Close Account endpoint with an invalid Authorization Bearer token</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountId :A12345</p></td>
             <td>
                 <p class ="code--block"> {<br>
                                           "accountClosureReason" : "All funds withdrawn",
@@ -124,7 +124,7 @@
                                         }
                 </p>
             </td>
-            <td><p>HTTP status: <code class="code--slim">401(Unauthorized)</code></p>
+            <td><p>HTTP status: <code class="code--slim">406(Not Acceptable)</code></p>
                 <p class ="code--block"> {<br>
                                             "code": "ACCEPT_HEADER_INVALID",<br>
                                             "message": "The accept header is missing or invalid"<br>

@@ -322,7 +322,7 @@
                                               }
                 </p>
             </td>
-            <td><p>HTTP status: <code class="code--slim">401(Created)</code></p>
+            <td><p>HTTP status: <code class="code--slim">404(Not Found)</code></p>
                 <p class ="code--block"> {<br>
                                            "code": "NOT_FOUND",<br>
                                            "message": "Resource was not found"<br>
@@ -331,7 +331,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request Bonus payment endpoint with invalid Accept Header</p><p class ="code--block">lisaManagerReferenceNumber :Z123456789<br>accountID: 10000000900<br> Accept:application/vnd.hmrc.1.0</p></td>
+            <td><p>Request Bonus payment endpoint with invalid Accept Header</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountID: 10000000900<br> Accept:application/vnd.hmrc.1.0</p></td>
             <td>
                 <p class ="code--block"> {<br>
                                                "lifeEventID" : "1234567891",<br>
@@ -357,7 +357,7 @@
                                               }
                 </p>
             </td>
-            <td><p>HTTP status: <code class="code--slim">406(Not AcceptableCreated)</code></p>
+            <td><p>HTTP status: <code class="code--slim">406(Not Acceptable)</code></p>
                 <p class ="code--block"> {<br>
                                            "code": "ACCEPT_HEADER_INVALID",<br>
                                            "message": "The accept header is missing or invalid"<br>
