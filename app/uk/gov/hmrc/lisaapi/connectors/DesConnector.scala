@@ -17,11 +17,12 @@
 package uk.gov.hmrc.lisaapi.connectors
 
 import play.api.Logger
-import uk.gov.hmrc.lisaapi.config.WSHttp
+import uk.gov.hmrc.lisaapi.config.{AppContext, WSHttp}
 import uk.gov.hmrc.lisaapi.controllers.JsonFormats
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des._
 import uk.gov.hmrc.play.config.ServicesConfig
+import uk.gov.hmrc.play.http.logging.Authorization
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpReads, HttpResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -39,6 +40,10 @@ trait DesConnector extends ServicesConfig with JsonFormats {
     override def read(method: String, url: String, response: HttpResponse) = response
   }
 
+  private def updateHeaderCarrier(headerCarrier: HeaderCarrier) =
+    headerCarrier.copy(extraHeaders = Seq(("Environment" -> AppContext.desUrlHeaderEnv)),
+          authorization = Some(Authorization(AppContext.desAuthToken)))
+
   /**
     * Attempts to create a new LISA investor
     *
@@ -47,13 +52,15 @@ trait DesConnector extends ServicesConfig with JsonFormats {
   def createInvestor(lisaManager: String, request: CreateLisaInvestorRequest)(implicit hc: HeaderCarrier): Future[(Int, Option[DesCreateInvestorResponse])] = {
     val uri = s"$lisaServiceUrl/$lisaManager/investors"
 
-    val result = httpPost.POST[CreateLisaInvestorRequest, HttpResponse](uri, request)(implicitly, httpReads, implicitly)
+    val result = httpPost.POST[CreateLisaInvestorRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc))
 
     result.map(r => {
+      Logger.debug(s"DES Response for CreateInvestor : $r")
       // catch any NullPointerExceptions that may occur from r.json being a null
+      val res = Try(r.json.asOpt[DesCreateInvestorResponse])
       Try(r.json.asOpt[DesCreateInvestorResponse]) match {
         case Success(data) => (r.status, data)
-        case Failure(_) => (r.status, None)
+        case Failure(_) => Logger.error(s"ERROR from DES $uri + Not able to create a response"); (r.status, None)
       }
     })
   }
@@ -97,8 +104,8 @@ trait DesConnector extends ServicesConfig with JsonFormats {
     result.map(r => {
       // catch any NullPointerExceptions that may occur from r.json being a null
       Try(r.json.asOpt[DesAccountResponseOld]) match {
-        case Success(data) => (r.status, data)
-        case Failure(_) => (r.status, None)
+        case Success(data) => Logger.debug(s"DES Success Response : ${r.json}") ;(r.status, data)
+        case Failure(_) => Logger.error(s"DES failure response for $uri and response : ${r.status}" ); (r.status, None)
       }
     })
   }
@@ -139,16 +146,19 @@ trait DesConnector extends ServicesConfig with JsonFormats {
   def parseDesResponse[A <: DesResponse](res: HttpResponse)(implicit reads:Reads[A]): (Int, DesResponse) = {
     res.status match {
       case 201 => Try(res.json.as[A]) match {
-        case Success(data) => (201, data)
+        case Success(data) =>
+          Logger.debug(s"DES success Response : ${res.json}")
+                (201, data)
         case Failure(ex) => {
-          Logger.debug(s"Unexpected DES response. Exception: ${ex.getMessage}")
+          Logger.error(s"DES failure response.${res} Exception: ${ex.getMessage}")
           (500, DesFailureResponse())
         }
       }
       case status:Int => Try(res.json.as[DesFailureResponse]) match {
-        case Success(data) => (status, data)
+        case Success(data) =>       Logger.debug(s"DES Response : ${res.json}")
+          (status, data)
         case Failure(ex) => {
-          Logger.debug(s"Unexpected DES response. Exception: ${ex.getMessage}")
+          Logger.error(s"DES failure response. ${res} Exception: ${ex.getMessage}")
           (500, DesFailureResponse())
         }
       }

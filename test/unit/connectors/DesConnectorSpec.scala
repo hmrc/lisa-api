@@ -35,6 +35,7 @@ class DesConnectorSpec extends PlaySpec
   with MockitoSugar
   with OneAppPerSuite {
 
+
   "Create Lisa Investor endpoint" must {
 
     val rdsCodeInvestorNotFound = 63214

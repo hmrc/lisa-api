@@ -17,6 +17,7 @@
 package unit.controllers
 
 import org.mockito.Matchers._
+import org.mockito.Matchers.{eq=>matchersEquals,_}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.{BeforeAndAfterEach, ShouldMatchers, WordSpec}
@@ -38,6 +39,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
   val lisaManager = "Z019283"
   val accountId = "ABC12345"
+
 
   override def beforeEach() {
     reset(mockAuditService)
@@ -99,14 +101,14 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
         when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountSuccessResponse("AB123456")))
         doSyncCreateOrTransferRequest(createAccountJson) { _ =>
           verify(mockAuditService).audit(
-            auditType = "accountCreated",
-            path=s"/manager/$lisaManager/accounts",
-            auditData = Map(
+            auditType = matchersEquals("accountCreated"),
+            path= matchersEquals(s"/manager/$lisaManager/accounts"),
+            auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorID" -> "9876543210",
               "accountID" -> "8765432100",
               "firstSubscriptionDate" -> "2011-03-23"
-            ))(SUT.hc)
+            )))(any())
         }
       }
     }
@@ -117,15 +119,15 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
         doSyncCreateOrTransferRequest(createAccountJson) { _ =>
           verify(mockAuditService).audit(
-            auditType = "accountNotCreated",
-            path=s"/manager/$lisaManager/accounts",
-            auditData = Map(
+            auditType = matchersEquals("accountNotCreated"),
+            path= matchersEquals(s"/manager/$lisaManager/accounts"),
+            auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorID" -> "9876543210",
               "accountID" -> "8765432100",
               "firstSubscriptionDate" -> "2011-03-23",
               "reasonNotCreated" -> "INVESTOR_NOT_FOUND"
-            ))(SUT.hc)
+            )))(any())
         }
       }
       "the data service returns a CreateLisaAccountInvestorNotEligibleResponse" in {
@@ -133,16 +135,16 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
         doSyncCreateOrTransferRequest(createAccountJson) { _ =>
           verify(mockAuditService).audit(
-            auditType = "accountNotCreated",
-            path=s"/manager/$lisaManager/accounts",
-            auditData = Map(
+            auditType = matchersEquals("accountNotCreated"),
+            path= matchersEquals(s"/manager/$lisaManager/accounts"),
+            auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorID" -> "9876543210",
               "accountID" -> "8765432100",
               "firstSubscriptionDate" -> "2011-03-23",
               "reasonNotCreated" -> "INVESTOR_ELIGIBILITY_CHECK_FAILED"
-            )
-          )(SUT.hc)
+            ))
+          )(any())
         }
       }
       "the data service returns a CreateLisaAccountInvestorComplianceCheckFailedResponse for a create request" in {
@@ -150,16 +152,16 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
         doSyncCreateOrTransferRequest(createAccountJson) { _ =>
           verify(mockAuditService).audit(
-            auditType = "accountNotCreated",
-            path=s"/manager/$lisaManager/accounts",
-            auditData = Map(
+            auditType = matchersEquals("accountNotCreated"),
+            path=matchersEquals(s"/manager/$lisaManager/accounts"),
+            auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorID" -> "9876543210",
               "accountID" -> "8765432100",
               "firstSubscriptionDate" -> "2011-03-23",
               "reasonNotCreated" -> "INVESTOR_COMPLIANCE_CHECK_FAILED"
-            )
-          )(SUT.hc)
+            ))
+          )(any())
         }
       }
       "the data service returns a CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse for a create request" in {
@@ -167,16 +169,16 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
         doSyncCreateOrTransferRequest(createAccountJson) { _ =>
           verify(mockAuditService).audit(
-            auditType = "accountNotCreated",
-            path=s"/manager/$lisaManager/accounts",
-            auditData = Map(
+            auditType = matchersEquals("accountNotCreated"),
+            path=matchersEquals(s"/manager/$lisaManager/accounts"),
+            auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorID" -> "9876543210",
               "accountID" -> "8765432100",
               "firstSubscriptionDate" -> "2011-03-23",
               "reasonNotCreated" -> "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID"
-            )
-          )(SUT.hc)
+            ))
+          )(any())
         }
       }
       "the data service returns a CreateLisaAccountAlreadyExistsResponse for a create request" in {
@@ -184,16 +186,16 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
         doSyncCreateOrTransferRequest(createAccountJson) { _ =>
           verify(mockAuditService).audit(
-            auditType = "accountNotCreated",
-            path=s"/manager/$lisaManager/accounts",
-            auditData = Map(
+            auditType = matchersEquals("accountNotCreated"),
+            path= matchersEquals(s"/manager/$lisaManager/accounts"),
+            auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorID" -> "9876543210",
               "accountID" -> "8765432100",
               "firstSubscriptionDate" -> "2011-03-23",
               "reasonNotCreated" -> "INVESTOR_ACCOUNT_ALREADY_EXISTS"
-            )
-          )(SUT.hc)
+            ))
+          )(any())
         }
       }
       "the data service returns an error for a create request" in {
@@ -201,16 +203,16 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
         doSyncCreateOrTransferRequest(createAccountJson) { _ =>
           verify(mockAuditService).audit(
-            auditType = "accountNotCreated",
-            path=s"/manager/$lisaManager/accounts",
-            auditData = Map(
+            auditType = matchersEquals("accountNotCreated"),
+            path= matchersEquals(s"/manager/$lisaManager/accounts"),
+            auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorID" -> "9876543210",
               "accountID" -> "8765432100",
               "firstSubscriptionDate" -> "2011-03-23",
               "reasonNotCreated" -> "INTERNAL_SERVER_ERROR"
-            )
-          )(SUT.hc)
+            ))
+          )(any())
         }
       }
     }
@@ -220,9 +222,9 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
         when(mockService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountSuccessResponse("AB123456")))
         doSyncCreateOrTransferRequest(transferAccountJson) { res =>
           verify(mockAuditService).audit(
-            auditType = "accountTransferred",
-            path = s"/manager/$lisaManager/accounts",
-            auditData = Map(
+            auditType = matchersEquals("accountTransferred"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts"),
+            auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorID" -> "9876543210",
               "accountID" -> "8765432100",
@@ -230,7 +232,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               "transferredFromAccountID" -> "Z543210",
               "transferredFromLMRN" -> "Z543333",
               "transferInDate" -> "2015-12-13"
-            ))(SUT.hc)
+            )))(any())
         }
       }
     }
@@ -241,9 +243,9 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
         doSyncCreateOrTransferRequest(transferAccountJson) { res =>
           verify(mockAuditService).audit(
-            auditType = "accountNotTransferred",
-            path = s"/manager/$lisaManager/accounts",
-            auditData = Map(
+            auditType = matchersEquals("accountNotTransferred"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts"),
+            auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorID" -> "9876543210",
               "accountID" -> "8765432100",
@@ -252,7 +254,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               "transferredFromLMRN" -> "Z543333",
               "transferInDate" -> "2015-12-13",
               "reasonNotCreated" -> "INVESTOR_NOT_FOUND"
-            ))(SUT.hc)
+            )))(any())
         }
       }
 
@@ -261,9 +263,9 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
         doSyncCreateOrTransferRequest(transferAccountJson) { res =>
           verify(mockAuditService).audit(
-            auditType = "accountNotTransferred",
-            path = s"/manager/$lisaManager/accounts",
-            auditData = Map(
+            auditType = matchersEquals("accountNotTransferred"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts"),
+            auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorID" -> "9876543210",
               "accountID" -> "8765432100",
@@ -272,7 +274,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               "transferredFromLMRN" -> "Z543333",
               "transferInDate" -> "2015-12-13",
               "reasonNotCreated" -> "INVESTOR_COMPLIANCE_CHECK_FAILED"
-            ))(SUT.hc)
+            )))(any())
         }
       }
 
@@ -281,9 +283,9 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
         doSyncCreateOrTransferRequest(transferAccountJson) { res =>
           verify(mockAuditService).audit(
-            auditType = "accountNotTransferred",
-            path = s"/manager/$lisaManager/accounts",
-            auditData = Map(
+            auditType = matchersEquals("accountNotTransferred"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts"),
+            auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorID" -> "9876543210",
               "accountID" -> "8765432100",
@@ -292,7 +294,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               "transferredFromLMRN" -> "Z543333",
               "transferInDate" -> "2015-12-13",
               "reasonNotCreated" -> "PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST"
-            ))(SUT.hc)
+            )))(any())
         }
       }
 
@@ -301,9 +303,9 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
         doSyncCreateOrTransferRequest(transferAccountJson) { res =>
           verify(mockAuditService).audit(
-            auditType = "accountNotTransferred",
-            path = s"/manager/$lisaManager/accounts",
-            auditData = Map(
+            auditType = matchersEquals("accountNotTransferred"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts"),
+            auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorID" -> "9876543210",
               "accountID" -> "8765432100",
@@ -312,7 +314,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               "transferredFromLMRN" -> "Z543333",
               "transferInDate" -> "2015-12-13",
               "reasonNotCreated" -> "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID"
-            ))(SUT.hc)
+            )))(any())
         }
       }
 
@@ -321,9 +323,9 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
         doSyncCreateOrTransferRequest(transferAccountJson) { res =>
           verify(mockAuditService).audit(
-            auditType = "accountNotTransferred",
-            path = s"/manager/$lisaManager/accounts",
-            auditData = Map(
+            auditType = matchersEquals("accountNotTransferred"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts"),
+            auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorID" -> "9876543210",
               "accountID" -> "8765432100",
@@ -332,7 +334,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               "transferredFromLMRN" -> "Z543333",
               "transferInDate" -> "2015-12-13",
               "reasonNotCreated" -> "INVESTOR_ACCOUNT_ALREADY_EXISTS"
-            ))(SUT.hc)
+            )))(any())
         }
       }
 
@@ -341,9 +343,9 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
         doSyncCreateOrTransferRequest(transferAccountJson) { res =>
           verify(mockAuditService).audit(
-            auditType = "accountNotTransferred",
-            path = s"/manager/$lisaManager/accounts",
-            auditData = Map(
+            auditType = matchersEquals("accountNotTransferred"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts"),
+            auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorID" -> "9876543210",
               "accountID" -> "8765432100",
@@ -352,7 +354,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               "transferredFromLMRN" -> "Z543333",
               "transferInDate" -> "2015-12-13",
               "reasonNotCreated" -> "INTERNAL_SERVER_ERROR"
-            ))(SUT.hc)
+            )))(any())
         }
       }
     }
@@ -558,14 +560,14 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
           doSyncCloseRequest(closeAccountJson) { res =>
             verify(mockAuditService).audit(
-              auditType = "accountClosed",
-              path=s"/manager/$lisaManager/accounts/AB123456/close-account",
-              auditData = Map(
+              auditType = matchersEquals("accountClosed"),
+              path=matchersEquals(s"/manager/$lisaManager/accounts/AB123456/close-account"),
+              auditData = matchersEquals(Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountClosureReason" -> "Voided",
                 "closureDate" -> "2000-06-23",
                 "accountID" -> "AB123456"
-               ))(SUT.hc)
+               )))(any())
           }
         }
       }
@@ -577,15 +579,15 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
         doSyncCloseRequest(closeAccountJson) { res =>
           verify(mockAuditService).audit(
-            auditType = "accountNotClosed",
-            path=s"/manager/$lisaManager/accounts/ABC12345/close-account",
-            auditData = Map(
+            auditType = matchersEquals("accountNotClosed"),
+            path=matchersEquals(s"/manager/$lisaManager/accounts/ABC12345/close-account"),
+            auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountClosureReason" -> "Voided",
               "closureDate" -> "2000-06-23",
               "accountID" -> "ABC12345",
               "reasonNotClosed" -> "INVESTOR_ACCOUNT_ALREADY_CLOSED"
-            ))(SUT.hc)
+            )))(any())
         }
       }
 
@@ -594,15 +596,15 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
         doSyncCloseRequest(closeAccountJson) { res =>
           verify(mockAuditService).audit(
-            auditType = "accountNotClosed",
-            path=s"/manager/$lisaManager/accounts/ABC12345/close-account",
-            auditData = Map(
+            auditType = matchersEquals("accountNotClosed"),
+            path=matchersEquals(s"/manager/$lisaManager/accounts/ABC12345/close-account"),
+            auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountClosureReason" -> "Voided",
               "closureDate" -> "2000-06-23",
               "accountID" -> "ABC12345",
               "reasonNotClosed" -> "INVESTOR_ACCOUNTID_NOT_FOUND"
-            ))(SUT.hc)
+            )))(any())
 
         }
       }
@@ -613,15 +615,15 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
           doSyncCloseRequest(closeAccountJson) { res =>
             verify(mockAuditService).audit(
-              auditType = "accountNotClosed",
-              path=s"/manager/$lisaManager/accounts/ABC12345/close-account",
-              auditData = Map(
+              auditType = matchersEquals("accountNotClosed"),
+              path=matchersEquals(s"/manager/$lisaManager/accounts/ABC12345/close-account"),
+              auditData = matchersEquals(Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountClosureReason" -> "Voided",
                 "closureDate" -> "2000-06-23",
                 "accountID" -> "ABC12345",
                 "reasonNotClosed" -> "INTERNAL_SERVER_ERROR"
-              ))(SUT.hc)
+              )))(any())
 
           }
         }

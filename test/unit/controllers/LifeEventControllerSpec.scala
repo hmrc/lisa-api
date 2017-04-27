@@ -17,20 +17,20 @@
 package unit.controllers
 
 import org.joda.time.DateTime
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => matchersEquals, _}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
-import play.api.mvc.{AnyContentAsJson, Result}
+import play.api.mvc.{ AnyContentAsJson, Result}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.lisaapi.controllers.{JsonFormats, LifeEventController}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, LifeEventService}
-import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
+import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
 
@@ -45,6 +45,8 @@ class LifeEventControllerSpec extends PlaySpec
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
   val lisaManager = "Z019283"
   val accountId = "ABC12345"
+
+  implicit val hc:HeaderCarrier = HeaderCarrier()
 
   val reportLifeEventJson =
     """
@@ -66,15 +68,15 @@ class LifeEventControllerSpec extends PlaySpec
         doReportLifeEventRequest(reportLifeEventJson){res =>
           await(res)
           verify(mockAuditService).audit(
-            auditType = "lifeEventReported",
-            path = s"/manager/$lisaManager/accounts/$accountId/events",
-            auditData = Map(
+            auditType = matchersEquals("lifeEventReported"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events"),
+            auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountID" -> accountId,
               "eventType" -> "LISA Investor Terminal Ill Health",
               "eventDate" -> "2017-01-01"
-            )
-          )(SUT.hc)
+            ))
+          )(any())
         }
       }
     }
@@ -84,16 +86,16 @@ class LifeEventControllerSpec extends PlaySpec
         doReportLifeEventRequest(reportLifeEventJson){res =>
           await(res)
           verify(mockAuditService).audit(
-            auditType = "lifeEventNotReported",
-            path = s"/manager/$lisaManager/accounts/$accountId/events",
-            auditData = Map(
+            auditType = matchersEquals("lifeEventNotReported"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events"),
+            auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountID" -> accountId,
               "eventType" -> "LISA Investor Terminal Ill Health",
               "eventDate" -> "2017-01-01",
               "reasonNotReported" -> "LIFE_EVENT_INAPPROPRIATE"
-            )
-          )(SUT.hc)
+            ))
+          )(any())
         }
       }
       "the request results in a ReportLifeEventAlreadyExistsResponse" in {
@@ -101,16 +103,16 @@ class LifeEventControllerSpec extends PlaySpec
         doReportLifeEventRequest(reportLifeEventJson){res =>
           await(res)
           verify(mockAuditService).audit(
-            auditType = "lifeEventNotReported",
-            path = s"/manager/$lisaManager/accounts/$accountId/events",
-            auditData = Map(
+            auditType = matchersEquals("lifeEventNotReported"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events"),
+            auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountID" -> accountId,
               "eventType" -> "LISA Investor Terminal Ill Health",
               "eventDate" -> "2017-01-01",
               "reasonNotReported" -> "LIFE_EVENT_ALREADY_EXISTS"
-            )
-          )(SUT.hc)
+            ))
+          )(any())
         }
       }
       "the request results in a ReportLifeEventAccountNotFoundResponse" in {
@@ -118,16 +120,16 @@ class LifeEventControllerSpec extends PlaySpec
         doReportLifeEventRequest(reportLifeEventJson){res =>
           await(res)
           verify(mockAuditService).audit(
-            auditType = "lifeEventNotReported",
-            path = s"/manager/$lisaManager/accounts/$accountId/events",
-            auditData = Map(
+            auditType = matchersEquals("lifeEventNotReported"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events"),
+            auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountID" -> accountId,
               "eventType" -> "LISA Investor Terminal Ill Health",
               "eventDate" -> "2017-01-01",
               "reasonNotReported" -> "INVESTOR_ACCOUNTID_NOT_FOUND"
-            )
-          )(SUT.hc)
+            ))
+          )(any())
         }
       }
       "the request results in a ReportLifeEventErrorResponse" in {
@@ -137,16 +139,16 @@ class LifeEventControllerSpec extends PlaySpec
         doReportLifeEventRequest(reportLifeEventJson){res =>
           await(res)
           verify(mockAuditService).audit(
-            auditType = "lifeEventNotReported",
-            path = s"/manager/$lisaManager/accounts/$accountId/events",
-            auditData = Map(
+            auditType = matchersEquals("lifeEventNotReported"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events"),
+            auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountID" -> accountId,
               "eventType" -> "LISA Investor Terminal Ill Health",
               "eventDate" -> "2017-01-01",
               "reasonNotReported" -> "INTERNAL_SERVER_ERROR"
-            )
-          )(SUT.hc)
+            ))
+          )(any())
         }
       }
     }
@@ -222,7 +224,8 @@ class LifeEventControllerSpec extends PlaySpec
   }
 
   def doReportLifeEventRequest(jsonString: String)(callback: (Future[Result]) =>  Unit): Unit = {
-    val res = SUT.reportLisaLifeEvent(lisaManager, accountId).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
+    val req = FakeRequest(Helpers.PUT, "/")
+    val res = SUT.reportLisaLifeEvent(lisaManager, accountId).apply(req.withHeaders(acceptHeader).
       withBody(AnyContentAsJson(Json.parse(jsonString))))
 
     callback(res)
@@ -233,5 +236,7 @@ class LifeEventControllerSpec extends PlaySpec
   val SUT = new LifeEventController {
     override val service: LifeEventService = mockService
     override val auditService: AuditService = mockAuditService
+
+
   }
 }
