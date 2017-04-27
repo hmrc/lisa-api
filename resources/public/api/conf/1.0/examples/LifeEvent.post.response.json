@@ -1,6 +1,6 @@
 {
   "data": {
-    "lifeEventID": "87654321",
+    "lifeEventId": "87654321",
     "message": "Life Event Created."
   },
   "success": true,

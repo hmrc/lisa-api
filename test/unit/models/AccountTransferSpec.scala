@@ -25,7 +25,7 @@ import uk.gov.hmrc.lisaapi.models.AccountTransfer
 
 class AccountTransferSpec extends PlaySpec with JsonFormats {
 
-  val validAccountTransferJson = """{"transferredFromAccountID":"Z543210", "transferredFromLMRN":"Z543333", "transferInDate":"2015-12-13"}"""
+  val validAccountTransferJson = """{"transferredFromAccountId":"Z543210", "transferredFromLMRN":"Z543333", "transferInDate":"2015-12-13"}"""
 
   "AccountTransfer" must {
 
@@ -35,7 +35,7 @@ class AccountTransferSpec extends PlaySpec with JsonFormats {
       res match {
         case JsError(errors) => fail()
         case JsSuccess(data, path) => {
-          data.transferredFromAccountID mustBe "Z543210"
+          data.transferredFromAccountId mustBe "Z543210"
           data.transferredFromLMRN mustBe "Z543333"
           data.transferInDate.getYear mustBe 2015
           data.transferInDate.getMonthOfYear mustBe 12

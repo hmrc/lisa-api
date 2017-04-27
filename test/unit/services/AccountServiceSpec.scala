@@ -43,10 +43,10 @@ class AccountServiceSpec extends PlaySpec
         val testAccountId = "AB123456"
 
         when(mockDesConnector.createAccount(any(), any())(any()))
-          .thenReturn(Future.successful(DesAccountResponse(accountID = testAccountId)))
+          .thenReturn(Future.successful(DesAccountResponse(accountId = testAccountId)))
 
         doCreateRequest { response =>
-          response mustBe CreateLisaAccountSuccessResponse(accountID = testAccountId)
+          response mustBe CreateLisaAccountSuccessResponse(accountId = testAccountId)
         }
       }
     }
@@ -138,10 +138,10 @@ class AccountServiceSpec extends PlaySpec
         val testAccountId = "AB123456"
 
         when(mockDesConnector.transferAccount(any(), any())(any()))
-          .thenReturn(Future.successful(DesAccountResponse(accountID = testAccountId)))
+          .thenReturn(Future.successful(DesAccountResponse(accountId = testAccountId)))
 
         doTransferRequest { response =>
-          response mustBe CreateLisaAccountSuccessResponse(accountID = testAccountId)
+          response mustBe CreateLisaAccountSuccessResponse(accountId = testAccountId)
         }
       }
     }

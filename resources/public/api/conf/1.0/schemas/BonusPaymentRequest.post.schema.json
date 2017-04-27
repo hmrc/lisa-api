@@ -3,7 +3,7 @@
 	"type": "object",
 	"properties":
 	{
-        "lifeEventID" : {
+        "lifeEventId" : {
           "description": "The reference number you get when you report a life event.",
           "$ref": "#/definitions/IDType"},
 		"periodStartDate" : {

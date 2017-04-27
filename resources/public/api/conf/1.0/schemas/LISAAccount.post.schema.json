@@ -2,12 +2,12 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "properties": {
-    "investorID": {
+    "investorId": {
       "description": "The investor’s ID reference number.",
       "$ref": "#/definitions/IDType",
       "example": "9876543210"
     },
-    "accountID": {
+    "accountId": {
       "description": "The financial organisation’s own unique reference number for the investor’s LISA account.",
       "$ref": "#/definitions/accountIdType",
       "example": "AB76543210"
@@ -29,7 +29,7 @@
       "type": "object",
       "description" : "If the creationReason is ‘Transferred’, then this is required.",
       "properties": {
-        "transferredFromAccountID": {
+        "transferredFromAccountId": {
           "description" : "The previous financial organisation’s own unique reference number for the investor’s LISA account.",
           "$ref": "#/definitions/accountIdType",
           "example": "987654320"

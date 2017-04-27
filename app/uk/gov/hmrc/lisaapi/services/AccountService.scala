@@ -38,7 +38,7 @@ trait AccountService  {
       case successResponse: DesAccountResponse => {
         Logger.debug("Matched DesAccountResponse")
 
-        CreateLisaAccountSuccessResponse(successResponse.accountID)
+        CreateLisaAccountSuccessResponse(successResponse.accountId)
       }
       case failureResponse: DesFailureResponse => {
         Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
@@ -62,7 +62,7 @@ trait AccountService  {
       case successResponse: DesAccountResponse => {
         Logger.debug("Matched DesAccountResponse")
 
-        CreateLisaAccountSuccessResponse(successResponse.accountID)
+        CreateLisaAccountSuccessResponse(successResponse.accountId)
       }
       case failureResponse: DesFailureResponse => {
         Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)

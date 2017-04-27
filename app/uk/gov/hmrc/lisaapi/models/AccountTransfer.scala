@@ -19,7 +19,7 @@ package uk.gov.hmrc.lisaapi.models
 import org.joda.time.DateTime
 
 case class AccountTransfer(
-  transferredFromAccountID: String,
+  transferredFromAccountId: String,
   transferredFromLMRN: String,
   transferInDate: DateTime
 )

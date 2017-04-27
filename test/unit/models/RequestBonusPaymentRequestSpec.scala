@@ -37,7 +37,7 @@ class RequestBonusPaymentRequestSpec extends PlaySpec with JsonFormats {
       res match {
         case JsError(errors) => fail(s"Failed to serialize. Errors: ${errors.toString()}")
         case JsSuccess(data, path) => {
-          data.lifeEventID mustBe Some("1234567891")
+          data.lifeEventId mustBe Some("1234567891")
           data.periodStartDate mustBe new DateTime("2016-05-22")
           data.periodEndDate mustBe new DateTime("2017-05-22")
           data.transactionType mustBe "Bonus"
@@ -50,7 +50,7 @@ class RequestBonusPaymentRequestSpec extends PlaySpec with JsonFormats {
 
     "deserialize to json" in {
       val data = RequestBonusPaymentRequest(
-        lifeEventID = Some("1234567891"),
+        lifeEventId = Some("1234567891"),
         periodStartDate = new DateTime("2016-05-22"),
         periodEndDate = new DateTime("2017-05-22"),
         transactionType = "Bonus",
@@ -71,7 +71,7 @@ class RequestBonusPaymentRequestSpec extends PlaySpec with JsonFormats {
         case JsError(errors) => {
           errors.count {
             case (path: JsPath, errors: Seq[ValidationError]) => {
-              path.toString() == "/lifeEventID" && errors.contains(ValidationError("error.formatting.lifeEventID"))
+              path.toString() == "/lifeEventId" && errors.contains(ValidationError("error.formatting.lifeEventID"))
             }
           } mustBe 1
         }

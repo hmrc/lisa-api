@@ -37,7 +37,7 @@ class BonusPaymentController extends LisaController {
     implicit request =>
 
       withValidJson[RequestBonusPaymentRequest] { req =>
-        (req.bonuses.claimReason, req.lifeEventID) match {
+        (req.bonuses.claimReason, req.lifeEventId) match {
           case ("Life Event", None) =>
             handleLifeEventNotProvided(lisaManager, accountId, req)
           case _ =>
@@ -107,7 +107,7 @@ class BonusPaymentController extends LisaController {
 
   private def createAuditData(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest): Map[String, String] = {
     req.toStringMap ++ Map("lisaManagerReferenceNumber" -> lisaManager,
-      "accountID" -> accountId)
+      "accountId" -> accountId)
   }
 
   private def getEndpointUrl(lisaManager: String, accountId: String): String = {

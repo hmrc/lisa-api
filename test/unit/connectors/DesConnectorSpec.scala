@@ -129,7 +129,7 @@ class DesConnectorSpec extends PlaySpec
             Future.successful(
               HttpResponse(
                 responseStatus = CREATED,
-                responseJson = Some(Json.parse(s"""{"accountID": "87654321"}"""))
+                responseJson = Some(Json.parse(s"""{"accountId": "87654321"}"""))
               )
             )
           )
@@ -181,13 +181,13 @@ class DesConnectorSpec extends PlaySpec
             Future.successful(
               HttpResponse(
                 responseStatus = FORBIDDEN,
-                responseJson = Some(Json.parse(s"""{"code": "INVESTOR_NOT_FOUND", "reason": "The investorID given does not match with HMRC’s records."}"""))
+                responseJson = Some(Json.parse(s"""{"code": "INVESTOR_NOT_FOUND", "reason": "The investorId given does not match with HMRC’s records."}"""))
               )
             )
           )
 
         doCreateAccountRequest { response =>
-          response mustBe DesFailureResponse("INVESTOR_NOT_FOUND", "The investorID given does not match with HMRC’s records.")
+          response mustBe DesFailureResponse("INVESTOR_NOT_FOUND", "The investorId given does not match with HMRC’s records.")
         }
       }
     }
@@ -203,7 +203,7 @@ class DesConnectorSpec extends PlaySpec
             Future.successful(
               HttpResponse(
                 responseStatus = CREATED,
-                responseJson = Some(Json.parse(s"""{"accountID": "87654321"}"""))
+                responseJson = Some(Json.parse(s"""{"accountId": "87654321"}"""))
               )
             )
           )
@@ -255,13 +255,13 @@ class DesConnectorSpec extends PlaySpec
             Future.successful(
               HttpResponse(
                 responseStatus = FORBIDDEN,
-                responseJson = Some(Json.parse(s"""{"code": "INVESTOR_NOT_FOUND", "reason": "The investorID given does not match with HMRC’s records."}"""))
+                responseJson = Some(Json.parse(s"""{"code": "INVESTOR_NOT_FOUND", "reason": "The investorId given does not match with HMRC’s records."}"""))
               )
             )
           )
 
         doTransferAccountRequest { response =>
-          response mustBe DesFailureResponse("INVESTOR_NOT_FOUND", "The investorID given does not match with HMRC’s records.")
+          response mustBe DesFailureResponse("INVESTOR_NOT_FOUND", "The investorId given does not match with HMRC’s records.")
         }
       }
     }
@@ -394,7 +394,7 @@ class DesConnectorSpec extends PlaySpec
             Future.successful(
               HttpResponse(
                 responseStatus = CREATED,
-                responseJson = Some(Json.parse(s"""{"lifeEventID": "87654321"}"""))
+                responseJson = Some(Json.parse(s"""{"lifeEventId": "87654321"}"""))
               )
             )
           )
@@ -453,7 +453,7 @@ class DesConnectorSpec extends PlaySpec
             Future.successful(
               HttpResponse(
                 responseStatus = CREATED,
-                responseJson = Some(Json.parse(s"""{"transactionID": "87654321"}"""))
+                responseJson = Some(Json.parse(s"""{"transactionId": "87654321"}"""))
               )
             )
           )
@@ -506,13 +506,13 @@ class DesConnectorSpec extends PlaySpec
             Future.successful(
               HttpResponse(
                 responseStatus = NOT_FOUND,
-                responseJson = Some(Json.parse(s"""{"code": "LIFE_EVENT_DOES_NOT_EXIST","reason": "The lifeEventID does not match with HMRC’s records."}"""))
+                responseJson = Some(Json.parse(s"""{"code": "LIFE_EVENT_DOES_NOT_EXIST","reason": "The lifeEventId does not match with HMRC’s records."}"""))
               )
             )
           )
 
         doRequestBonusPaymentRequest { response =>
-          response must be((NOT_FOUND, DesFailureResponse("LIFE_EVENT_DOES_NOT_EXIST", "The lifeEventID does not match with HMRC’s records.")))
+          response must be((NOT_FOUND, DesFailureResponse("LIFE_EVENT_DOES_NOT_EXIST", "The lifeEventId does not match with HMRC’s records.")))
         }
       }
 
@@ -558,7 +558,7 @@ class DesConnectorSpec extends PlaySpec
 
   private def doRequestBonusPaymentRequest(callback: ((Int, DesResponse)) => Unit) = {
     val request = RequestBonusPaymentRequest(
-      lifeEventID = Some("1234567891"),
+      lifeEventId = Some("1234567891"),
       periodStartDate = new DateTime("2016-05-22"),
       periodEndDate = new DateTime("2017-05-22"),
       transactionType = "Bonus",

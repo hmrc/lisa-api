@@ -32,7 +32,7 @@ trait BonusPaymentService {
     val response = desConnector.requestBonusPayment(lisaManager, accountId, request)
 
     response map {
-      case (_, successResponse: DesTransactionResponse) => RequestBonusPaymentSuccessResponse(successResponse.transactionID)
+      case (_, successResponse: DesTransactionResponse) => RequestBonusPaymentSuccessResponse(successResponse.transactionId)
       case (status: Int, errorResponse: DesFailureResponse) => RequestBonusPaymentErrorResponse(status, errorResponse)
     }
   }

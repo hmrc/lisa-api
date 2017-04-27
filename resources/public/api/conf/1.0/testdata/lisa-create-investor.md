@@ -23,7 +23,7 @@
             <td><p>HTTP status: <code class="code--slim">201 (Created)</code></p>
                 <p class ="code--block">{<br>
                      "data": {<br>
-                                "investorID": "9876543210",<br>
+                                "investorId": "9876543210",<br>
                                 "message": "Investor Created."<br>
                      },<br>
                      "success": true,<br>
@@ -192,7 +192,6 @@
                                  </p>
            </td>
         </tr>
-
         <tr>
            <td><p>Create Investor endpoint with an invalid Authorisation Bearer token</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
            <td><p class ="code--block">{<br>

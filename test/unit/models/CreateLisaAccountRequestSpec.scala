@@ -25,12 +25,12 @@ import uk.gov.hmrc.lisaapi.models.{AccountTransfer, CreateLisaAccountCreationReq
 
 class CreateLisaAccountRequestSpec extends PlaySpec with JsonFormats {
 
-  val validAccountTransferJson = """{"transferredFromAccountID":"Z543210", "transferredFromLMRN":"Z543333", "transferInDate":"2015-12-13"}"""
+  val validAccountTransferJson = """{"transferredFromAccountId":"Z543210", "transferredFromLMRN":"Z543333", "transferInDate":"2015-12-13"}"""
 
   val validAccountTransferRequest =
     s"""{
-       |"investorID": "9876543210",
-       |"accountID": "8765432100",
+       |"investorId": "9876543210",
+       |"accountId": "8765432100",
        |"creationReason": "Transferred",
        |"firstSubscriptionDate": "2011-03-23",
        |"transferAccount": $validAccountTransferJson
@@ -38,8 +38,8 @@ class CreateLisaAccountRequestSpec extends PlaySpec with JsonFormats {
 
   val validAccountCreationRequest =
     s"""{
-       |"investorID": "9876543210",
-       |"accountID": "8765432100",
+       |"investorId": "9876543210",
+       |"accountId": "8765432100",
        |"creationReason": "New",
        |"firstSubscriptionDate": "2011-03-23"
        |}""".stripMargin
@@ -54,8 +54,8 @@ class CreateLisaAccountRequestSpec extends PlaySpec with JsonFormats {
         case JsSuccess(data, path) => {
           data match {
             case req: CreateLisaAccountTransferRequest => {
-              req.investorID mustBe "9876543210"
-              req.accountID mustBe "8765432100"
+              req.investorId mustBe "9876543210"
+              req.accountId mustBe "8765432100"
               req.firstSubscriptionDate.getYear mustBe 2011
               req.firstSubscriptionDate.getMonthOfYear mustBe 3
               req.firstSubscriptionDate.getDayOfMonth mustBe 23
@@ -75,8 +75,8 @@ class CreateLisaAccountRequestSpec extends PlaySpec with JsonFormats {
         case JsSuccess(data, path) => {
           data match {
             case req: CreateLisaAccountCreationRequest => {
-              req.investorID mustBe "9876543210"
-              req.accountID mustBe "8765432100"
+              req.investorId mustBe "9876543210"
+              req.accountId mustBe "8765432100"
               req.firstSubscriptionDate.getYear mustBe 2011
               req.firstSubscriptionDate.getMonthOfYear mustBe 3
               req.firstSubscriptionDate.getDayOfMonth mustBe 23
@@ -89,8 +89,8 @@ class CreateLisaAccountRequestSpec extends PlaySpec with JsonFormats {
 
     "deserialize transfer request to json" in {
       val request = CreateLisaAccountTransferRequest(
-        investorID = "9876543210",
-        accountID = "8765432100",
+        investorId = "9876543210",
+        accountId = "8765432100",
         firstSubscriptionDate = new DateTime("2011-03-23"),
         transferAccount = AccountTransfer("Z543210", "Z543333", new DateTime("2015-12-13"))
       )
@@ -102,8 +102,8 @@ class CreateLisaAccountRequestSpec extends PlaySpec with JsonFormats {
 
     "deserialize creation request to json" in {
       val request = CreateLisaAccountCreationRequest(
-        investorID = "9876543210",
-        accountID = "8765432100",
+        investorId = "9876543210",
+        accountId = "8765432100",
         firstSubscriptionDate = new DateTime("2011-03-23")
       )
 
@@ -128,7 +128,7 @@ class CreateLisaAccountRequestSpec extends PlaySpec with JsonFormats {
       }
     }
 
-    "catch an invalid investorID" in {
+    "catch an invalid investorId" in {
       val req = validAccountTransferRequest.replace("9876543210", "2011")
       val res = Json.parse(req).validate[CreateLisaAccountRequest]
 
@@ -136,7 +136,7 @@ class CreateLisaAccountRequestSpec extends PlaySpec with JsonFormats {
         case JsError(errors) => {
           errors.count {
             case (path: JsPath, errors: Seq[ValidationError]) => {
-              path.toString() == "/investorID" && errors.contains(ValidationError("error.formatting.investorID"))
+              path.toString() == "/investorId" && errors.contains(ValidationError("error.formatting.investorID"))
             }
           } mustBe 1
         }
