@@ -104,7 +104,7 @@ class DesConnectorSpec extends PlaySpec
             Future.successful(
               HttpResponse(
                 responseStatus = OK,
-                responseJson = Some(Json.parse(s"""{"rdsCode":$rdsCodeInvestorNotFound, "investorID": "AB123456"}"""))
+                responseJson = Some(Json.parse(s"""{"rdsCode":$rdsCodeInvestorNotFound, "investorId": "AB123456"}"""))
               )
             )
           )
@@ -112,7 +112,7 @@ class DesConnectorSpec extends PlaySpec
         doCreateInvestorRequest { response =>
           response must be((
             OK,
-            Some(DesCreateInvestorResponse(rdsCode = Some(rdsCodeInvestorNotFound), investorID = Some("AB123456")))
+            Some(DesCreateInvestorResponse(rdsCode = Some(rdsCodeInvestorNotFound), investorId = Some("AB123456")))
           ))
         }
       }

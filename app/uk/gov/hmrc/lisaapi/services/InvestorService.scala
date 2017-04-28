@@ -36,7 +36,7 @@ trait InvestorService  {
 
     response map {
       case (`httpStatusOk`, Some(data)) => {
-        (data.rdsCode, data.investorID) match {
+        (data.rdsCode, data.investorId) match {
           case (None, Some(investorId)) => CreateLisaInvestorSuccessResponse(investorId)
           case (Some(INVESTOR_NOT_FOUND), _) => CreateLisaInvestorNotFoundResponse
           case (Some(INVESTOR_ALREADY_EXISTS), Some(investorId)) => CreateLisaInvestorAlreadyExistsResponse(investorId)
