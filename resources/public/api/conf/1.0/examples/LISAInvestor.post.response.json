@@ -1,6 +1,6 @@
 {
   "data": {
-    "investorID": "9876543210",
+    "investorId": "9876543210",
     "message": "Investor Created."
   },
   "success": true,

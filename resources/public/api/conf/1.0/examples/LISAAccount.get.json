@@ -1,7 +1,7 @@
 {
-  "accountID" : "1234567890",
+  "accountId" : "1234567890",
   "LISAManagerReferenceNumber" : "Z543210",
-  "investorID" : "8765432100",
+  "investorId" : "8765432100",
 
   "status" : "open",
   "openDate" : "2011-02-02",

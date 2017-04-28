@@ -1,7 +1,7 @@
 [
   {
-    "lisaTransactionID" : "3333333333",
-    "accountID" : "1234567890",
+    "lisaTransactionId" : "3333333333",
+    "accountId" : "1234567890",
     "LISAManagerReferenceNumber" : "Z543210",
 
     "transactionType" :  "deposit",
@@ -29,7 +29,7 @@
      "transferFromLISA"   :
     {
       "LISAManagerReferenceNumber" : "Z543222",
-      "accountID" : "1234567890",
+      "accountId" : "1234567890",
       "transferDate" : "2012-12-22",
       "_links" :
       {
@@ -74,7 +74,7 @@
 
   {
     "lisaTransactionID" : "4444444444",
-    "accountID" : "1234567890",
+    "accountId" : "1234567890",
     "LISAManagerReferenceNumber" : "Z543210",
 
     "transactionType" :  "deposit",
@@ -101,7 +101,7 @@
      "transferFromLISA"   :
     {
       "LISAManagerReferenceNumber" : "Z543222",
-      "accountID" : "1234567890",
+      "accountId" : "1234567890",
       "transferDate" : "2012-12-22",
       "_links" :
       {

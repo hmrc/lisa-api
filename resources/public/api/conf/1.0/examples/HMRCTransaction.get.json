@@ -1,6 +1,6 @@
 {
-  "hmrcTransactionID" : "1111111111",
-  "accountID" : "1234567890",
+  "hmrcTransactionId" : "1111111111",
+  "accountId" : "1234567890",
   "LISAManagerReferenceNumber" : "Z543210",
   "paymentReference" : "1234565432",
 

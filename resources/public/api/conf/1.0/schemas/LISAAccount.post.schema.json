@@ -45,7 +45,7 @@
         }
       },
       "required": [
-        "transferredFromAccountID",
+        "transferredFromAccountId",
         "transferredFromLMRN",
         "transferInDate"
       ]
@@ -54,8 +54,8 @@
   ,
 
   "required": [
-      "investorID",
-      "accountID",
+      "investorId",
+      "accountId",
       "creationReason",
       "firstSubscriptionDate"
     ],

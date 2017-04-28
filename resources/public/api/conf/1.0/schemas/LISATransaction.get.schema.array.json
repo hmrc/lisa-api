@@ -9,7 +9,7 @@
 		"properties":
 		{
 			"lisaTransactionID" : {"$ref": "#/definitions/IDType"},
-			"accountID" : {"$ref": "#/definitions/IDType"},
+			"accountId" : {"$ref": "#/definitions/IDType"},
 			"LISAManagerReferenceNumber" :
 			{
 				"$ref": "#/definitions/LISAManagerReferenceNumberType"
@@ -47,13 +47,13 @@
 					{
 						"$ref": "#/definitions/LISAManagerReferenceNumberType"
 					},
-					"accountID" : {"$ref": "#/definitions/IDType"},
+					"accountId" : {"$ref": "#/definitions/IDType"},
 					"transferDate" : {"$ref": "#/definitions/ISO8601-Date"},
 					"_links" : {"type" : "object"}
 				},
 				"required":
 				[
-					"LISAManagerReferenceNumber", "accountID", "transferDate"
+					"LISAManagerReferenceNumber", "accountId", "transferDate"
 				]
 			},
 			"incurredCharge" :
@@ -92,7 +92,7 @@
 		},
 		"required": [
 			"lisaTransactionID",
-			"accountID",
+			"accountId",
 			"LISAManagerReferenceNumber",
 			"amount",
 			"transactionType",

@@ -9,7 +9,7 @@
   	"properties":
   	{
   		"hmrcTransactionID" : {"$ref": "#/definitions/IDType"},
-  		"accountID" : {"$ref": "#/definitions/IDType"},
+  		"accountId" : {"$ref": "#/definitions/IDType"},
   		"paymentReference" : {"$ref": "#/definitions/IDType"},
   		"transactionType" : {"$ref": "#/definitions/transactionTypeType"},
   		"transactionTimestamp" : {"$ref": "#/definitions/ISO8601-Timestamp"},
@@ -33,7 +33,7 @@
   	},
   	"required": [
   		"hmrcTransactionID",
-  		"accountID",
+  		"accountId",
   		"LISAManagerReferenceNumber",
   		"paymentReference",
   		"amount",
