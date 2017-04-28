@@ -71,7 +71,7 @@ class RequestBonusPaymentRequestSpec extends PlaySpec with JsonFormats {
         case JsError(errors) => {
           errors.count {
             case (path: JsPath, errors: Seq[ValidationError]) => {
-              path.toString() == "/lifeEventId" && errors.contains(ValidationError("error.formatting.lifeEventID"))
+              path.toString() == "/lifeEventId" && errors.contains(ValidationError("error.formatting.lifeEventId"))
             }
           } mustBe 1
         }

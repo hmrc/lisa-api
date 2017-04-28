@@ -71,7 +71,7 @@ trait JsonFormats {
   implicit val apiResponseFormats = Json.format[ApiResponse]
 
   implicit val accountTransferReads: Reads[AccountTransfer] = (
-    (JsPath \ "transferredFromAccountId").read(Reads.pattern(accountIDRegex, "error.formatting.accountID")) and
+    (JsPath \ "transferredFromAccountId").read(Reads.pattern(accountIDRegex, "error.formatting.accountId")) and
     (JsPath \ "transferredFromLMRN").read(Reads.pattern(lmrnRegex, "error.formatting.lmrn")) and
     (JsPath \ "transferInDate").read(isoDateReads()).map(new DateTime(_))
   )(AccountTransfer.apply _)
@@ -83,14 +83,14 @@ trait JsonFormats {
   )(unlift(AccountTransfer.unapply))
 
   implicit val createLisaAccountCreationRequestReads: Reads[CreateLisaAccountCreationRequest] = (
-    (JsPath \ "investorId").read(Reads.pattern(investorIDRegex, "error.formatting.investorID")) and
-    (JsPath \ "accountId").read(Reads.pattern(accountIDRegex, "error.formatting.accountID")) and
+    (JsPath \ "investorId").read(Reads.pattern(investorIDRegex, "error.formatting.investorId")) and
+    (JsPath \ "accountId").read(Reads.pattern(accountIDRegex, "error.formatting.accountId")) and
     (JsPath \ "firstSubscriptionDate").read(isoDateReads()).map(new DateTime(_))
   )(CreateLisaAccountCreationRequest.apply _)
 
   implicit val createLisaAccountTransferRequestReads: Reads[CreateLisaAccountTransferRequest] = (
-    (JsPath \ "investorId").read(Reads.pattern(investorIDRegex, "error.formatting.investorID")) and
-    (JsPath \ "accountId").read(Reads.pattern(accountIDRegex, "error.formatting.accountID")) and
+    (JsPath \ "investorId").read(Reads.pattern(investorIDRegex, "error.formatting.investorId")) and
+    (JsPath \ "accountId").read(Reads.pattern(accountIDRegex, "error.formatting.accountId")) and
     (JsPath \ "firstSubscriptionDate").read(isoDateReads()).map(new DateTime(_)) and
     (JsPath \ "transferAccount").read[AccountTransfer]
   )(CreateLisaAccountTransferRequest.apply _)
@@ -160,7 +160,7 @@ trait JsonFormats {
   )(unlift(Bonuses.unapply))
 
   implicit val requestBonusPaymentReads: Reads[RequestBonusPaymentRequest] = (
-    (JsPath \ "lifeEventId").readNullable(Reads.pattern(lifeEventIDRegex, "error.formatting.lifeEventID")) and
+    (JsPath \ "lifeEventId").readNullable(Reads.pattern(lifeEventIDRegex, "error.formatting.lifeEventId")) and
     (JsPath \ "periodStartDate").read(isoDateReads()).map(new DateTime(_)) and
     (JsPath \ "periodEndDate").read(isoDateReads()).map(new DateTime(_)) and
     (JsPath \ "transactionType").read(Reads.pattern(transactionTypeRegex, "error.formatting.transactionType")) and

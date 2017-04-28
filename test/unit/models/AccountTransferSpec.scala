@@ -49,11 +49,11 @@ class AccountTransferSpec extends PlaySpec with JsonFormats {
 
       val json = Json.toJson[AccountTransfer](request)
 
-      json mustBe Json.parse(validAccountTransferJson)
+      json mustBe Json.parse(validAccountTransferJson.replace("Id", "ID"))
     }
 
     "catch an invalid transferredFromLMRN" in {
-      val req = """{"transferredFromAccountID":"Z543210", "transferredFromLMRN":"A123", "transferInDate":"2015-12-13"}"""
+      val req = """{"transferredFromAccountId":"Z543210", "transferredFromLMRN":"A123", "transferInDate":"2015-12-13"}"""
       val res = Json.parse(req).validate[AccountTransfer]
 
       res match {
@@ -69,7 +69,7 @@ class AccountTransferSpec extends PlaySpec with JsonFormats {
     }
 
     "catch an invalid transferInDate" in {
-      val req = """{"transferredFromAccountID":"Z543210", "transferredFromLMRN":"Z543333", "transferInDate":"12/13/2015"}"""
+      val req = """{"transferredFromAccountId":"Z543210", "transferredFromLMRN":"Z543333", "transferInDate":"12/13/2015"}"""
       val res = Json.parse(req).validate[AccountTransfer]
 
       res match {

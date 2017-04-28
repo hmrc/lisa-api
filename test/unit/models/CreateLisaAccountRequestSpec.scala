@@ -97,7 +97,7 @@ class CreateLisaAccountRequestSpec extends PlaySpec with JsonFormats {
 
       val json = Json.toJson[CreateLisaAccountRequest](request)
 
-      json mustBe Json.parse(validAccountTransferRequest)
+      json mustBe Json.parse(validAccountTransferRequest.replace("Id", "ID"))
     }
 
     "deserialize creation request to json" in {
@@ -109,7 +109,7 @@ class CreateLisaAccountRequestSpec extends PlaySpec with JsonFormats {
 
       val json = Json.toJson[CreateLisaAccountRequest](request)
 
-      json mustBe Json.parse(validAccountCreationRequest)
+      json mustBe Json.parse(validAccountCreationRequest.replace("Id", "ID"))
     }
 
     "catch an invalid firstSubscriptionDate" in {
@@ -136,7 +136,7 @@ class CreateLisaAccountRequestSpec extends PlaySpec with JsonFormats {
         case JsError(errors) => {
           errors.count {
             case (path: JsPath, errors: Seq[ValidationError]) => {
-              path.toString() == "/investorId" && errors.contains(ValidationError("error.formatting.investorID"))
+              path.toString() == "/investorId" && errors.contains(ValidationError("error.formatting.investorId"))
             }
           } mustBe 1
         }

@@ -104,7 +104,7 @@ class DesConnectorSpec extends PlaySpec
             Future.successful(
               HttpResponse(
                 responseStatus = OK,
-                responseJson = Some(Json.parse(s"""{"rdsCode":$rdsCodeInvestorNotFound, "investorId": "AB123456"}"""))
+                responseJson = Some(Json.parse(s"""{"rdsCode":$rdsCodeInvestorNotFound, "investorID": "AB123456"}"""))
               )
             )
           )
@@ -129,7 +129,7 @@ class DesConnectorSpec extends PlaySpec
             Future.successful(
               HttpResponse(
                 responseStatus = CREATED,
-                responseJson = Some(Json.parse(s"""{"accountId": "87654321"}"""))
+                responseJson = Some(Json.parse(s"""{"accountID": "87654321"}"""))
               )
             )
           )
@@ -203,7 +203,7 @@ class DesConnectorSpec extends PlaySpec
             Future.successful(
               HttpResponse(
                 responseStatus = CREATED,
-                responseJson = Some(Json.parse(s"""{"accountId": "87654321"}"""))
+                responseJson = Some(Json.parse(s"""{"accountID": "87654321"}"""))
               )
             )
           )
@@ -394,7 +394,7 @@ class DesConnectorSpec extends PlaySpec
             Future.successful(
               HttpResponse(
                 responseStatus = CREATED,
-                responseJson = Some(Json.parse(s"""{"lifeEventId": "87654321"}"""))
+                responseJson = Some(Json.parse(s"""{"lifeEventID": "87654321"}"""))
               )
             )
           )
@@ -453,7 +453,7 @@ class DesConnectorSpec extends PlaySpec
             Future.successful(
               HttpResponse(
                 responseStatus = CREATED,
-                responseJson = Some(Json.parse(s"""{"transactionId": "87654321"}"""))
+                responseJson = Some(Json.parse(s"""{"transactionID": "87654321"}"""))
               )
             )
           )
