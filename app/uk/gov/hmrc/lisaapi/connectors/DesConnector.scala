@@ -49,19 +49,13 @@ trait DesConnector extends ServicesConfig with JsonFormats {
     *
     * @return A tuple of the http status code and an (optional) data response
     */
-  def createInvestor(lisaManager: String, request: CreateLisaInvestorRequest)(implicit hc: HeaderCarrier): Future[(Int, Option[DesCreateInvestorResponse])] = {
+  def createInvestor(lisaManager: String, request: CreateLisaInvestorRequest)(implicit hc: HeaderCarrier): Future[(Int, DesResponse)] = {
     val uri = s"$lisaServiceUrl/$lisaManager/investors"
 
     val result = httpPost.POST[CreateLisaInvestorRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc))
 
-    result.map(r => {
-      Logger.debug(s"DES Response for CreateInvestor : $r")
-      // catch any NullPointerExceptions that may occur from r.json being a null
-      val res = Try(r.json.asOpt[DesCreateInvestorResponse])
-      Try(r.json.asOpt[DesCreateInvestorResponse]) match {
-        case Success(data) => (r.status, data)
-        case Failure(_) => Logger.error(s"ERROR from DES $uri + Not able to create a response"); (r.status, None)
-      }
+    result.map(res => {
+      parseDesResponse[DesCreateInvestorResponse](res)
     })
   }
 

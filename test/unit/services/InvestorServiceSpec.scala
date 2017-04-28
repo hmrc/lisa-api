@@ -23,7 +23,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.models.des.DesCreateInvestorResponse
+import uk.gov.hmrc.lisaapi.models.des.{DesCreateInvestorResponse, DesFailureResponse}
 import uk.gov.hmrc.lisaapi.services.InvestorService
 import uk.gov.hmrc.play.http.HeaderCarrier
 
@@ -42,8 +42,9 @@ class InvestorServiceSpec extends PlaySpec
         when(mockDesConnector.createInvestor(any(), any())(any()))
           .thenReturn(
             Future.successful((
-              200,
-              Some(DesCreateInvestorResponse(investorId = Some("AB123456")))
+              201,
+
+              DesCreateInvestorResponse(investorID = "AB123456")
             ))
           )
 
@@ -54,117 +55,22 @@ class InvestorServiceSpec extends PlaySpec
 
     }
 
-    "return a Not Found Response" when {
-
-      "given an RDS code of 63214 from the DES connector" in {
+    "return an Error Response" when {
+      "given an error response from the DES connector" in {
         when(mockDesConnector.createInvestor(any(), any())(any()))
           .thenReturn(
-            Future.successful((
-              200,
-              Some(DesCreateInvestorResponse(rdsCode = Some(63214)))
-            ))
+            Future.successful((500, DesFailureResponse("code1", "reason1"))
+          )
           )
 
-        doRequest { response =>
-          response mustBe CreateLisaInvestorNotFoundResponse
+        doRequest{response =>
+          response mustBe CreateLisaInvestorErrorResponse(500, DesFailureResponse("code1", "reason1"))
         }
-      }
 
+      }
     }
 
-    "return a Already Exists Response" when {
-
-      "given an RDS code of 63215 and an investor ID from the DES connector" in {
-        when(mockDesConnector.createInvestor(any(), any())(any()))
-          .thenReturn(
-            Future.successful((
-              200,
-              Some(DesCreateInvestorResponse(rdsCode = Some(63215), investorId = Some("AB1234")))
-            ))
-          )
-
-        doRequest { response =>
-          response mustBe CreateLisaInvestorAlreadyExistsResponse("AB1234")
-        }
-      }
-
     }
-
-    "return a Error Response" when {
-
-      "given no data from the DES connector" in {
-        when(mockDesConnector.createInvestor(any(), any())(any()))
-          .thenReturn(
-            Future.successful((
-              200,
-              None
-            ))
-          )
-
-        doRequest { response =>
-          response mustBe CreateLisaInvestorErrorResponse
-        }
-      }
-
-      "given an empty data object from the DES connector" in {
-        when(mockDesConnector.createInvestor(any(), any())(any()))
-          .thenReturn(
-            Future.successful((
-              200,
-              Some(DesCreateInvestorResponse())
-            ))
-          )
-
-        doRequest { response =>
-          response mustBe CreateLisaInvestorErrorResponse
-        }
-      }
-
-      "given a status code other than 200" in {
-        when(mockDesConnector.createInvestor(any(), any())(any()))
-          .thenReturn(
-            Future.successful((
-              201,
-              Some(DesCreateInvestorResponse(investorId = Some("AB123456")))
-            ))
-          )
-
-        doRequest { response =>
-          response mustBe CreateLisaInvestorErrorResponse
-        }
-      }
-
-      "given an RDS code other than the ones for Not Found and Already Exists" in {
-        when(mockDesConnector.createInvestor(any(), any())(any()))
-          .thenReturn(
-            Future.successful((
-              200,
-              Some(DesCreateInvestorResponse(rdsCode = Some(63216)))
-            ))
-          )
-
-        doRequest { response =>
-          response mustBe CreateLisaInvestorErrorResponse
-        }
-      }
-
-      "given an RDS code for Already Exists, but no investor ID" in {
-        when(mockDesConnector.createInvestor(any(), any())(any()))
-          .thenReturn(
-            Future.successful((
-              200,
-              Some(DesCreateInvestorResponse(rdsCode = Some(63215), investorId = None))
-            ))
-          )
-
-        doRequest { response =>
-          response mustBe CreateLisaInvestorErrorResponse
-        }
-      }
-
-    }
-
-  }
 
   private def doRequest(callback: (CreateLisaInvestorResponse) => Unit) = {
     val request = CreateLisaInvestorRequest("AB123456A", "A", "B", new DateTime("2000-01-01"))

@@ -38,25 +38,31 @@ class DesConnectorSpec extends PlaySpec
 
   "Create Lisa Investor endpoint" must {
 
-    val rdsCodeInvestorNotFound = 63214
-    val rdsCodeAccountAlreadyExists = 63219
 
-    "Return a status code of 200" when {
-      "Given a 200 response from DES" in {
+    "Return a populated DesCreateInvestorResponse" when {
+      "The DES response has a json body that is in the correct format" in {
         when(mockHttpPost.POST[CreateLisaInvestorRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(HttpResponse(responseStatus = OK, responseJson = None)))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = CREATED,
+                responseJson = Some(Json.parse(s"""{"investorID": "AB123456"}"""))
+              )
+            )
+          )
 
         doCreateInvestorRequest { response =>
           response must be((
-            OK,
-            None
+            CREATED,
+            DesCreateInvestorResponse(investorID = "AB123456")
           ))
         }
       }
     }
 
-    "Return no DesCreateInvestorResponse" when {
-      "The DES response has no json body" in {
+    "return the default DesFailureResponse" when {
+      "the DES response has no json body" in {
+
         when(mockHttpPost.POST[CreateLisaInvestorRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
@@ -68,16 +74,11 @@ class DesConnectorSpec extends PlaySpec
           )
 
         doCreateInvestorRequest { response =>
-          response must be((
-            SERVICE_UNAVAILABLE,
-            None
-          ))
+          response must be((INTERNAL_SERVER_ERROR, DesFailureResponse()))
         }
       }
-    }
 
-    "Return any empty DesCreateInvestorResponse" when {
-      "The DES response has a json body that is in an incorrect format" in {
+      "the DES response has a json body that is in an incorrect format" in {
         when(mockHttpPost.POST[CreateLisaInvestorRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
@@ -89,35 +90,30 @@ class DesConnectorSpec extends PlaySpec
           )
 
         doCreateInvestorRequest { response =>
-          response must be((
-            OK,
-            Some(DesCreateInvestorResponse(None, None))
-          ))
+          response must be((INTERNAL_SERVER_ERROR, DesFailureResponse()))
         }
       }
     }
 
-    "Return a populated DesCreateInvestorResponse" when {
-      "The DES response has a json body that is in the correct format" in {
+    "return a specific DesFailureResponse" when {
+
+      "a specific failure is returned" in {
         when(mockHttpPost.POST[CreateLisaInvestorRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = OK,
-                responseJson = Some(Json.parse(s"""{"rdsCode":$rdsCodeInvestorNotFound, "investorId": "AB123456"}"""))
+                responseStatus = FORBIDDEN,
+                responseJson = Some(Json.parse(s"""{"code": "INVESTOR_NOT_FOUND","reason": "The investor details given do not match with HMRC’s records."}"""))
               )
             )
           )
 
-        doCreateInvestorRequest { response =>
-          response must be((
-            OK,
-            Some(DesCreateInvestorResponse(rdsCode = Some(rdsCodeInvestorNotFound), investorId = Some("AB123456")))
-          ))
+        doRequestBonusPaymentRequest { response =>
+          response must be((FORBIDDEN, DesFailureResponse("INVESTOR_NOT_FOUND", "The investor details given do not match with HMRC’s records.")))
         }
       }
-    }
 
+    }
   }
 
   "Create Account endpoint" must {
@@ -520,7 +516,7 @@ class DesConnectorSpec extends PlaySpec
 
   }
 
-  private def doCreateInvestorRequest(callback: ((Int, Option[DesCreateInvestorResponse])) => Unit) = {
+  private def doCreateInvestorRequest(callback: ((Int,DesResponse)) => Unit) = {
     val request = CreateLisaInvestorRequest("AB123456A", "A", "B", new DateTime("2000-01-01"))
     val response = Await.result(SUT.createInvestor("Z019283", request), Duration.Inf)
 
