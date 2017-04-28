@@ -209,10 +209,5 @@
                                  </p>
            </td>
         </tr>
-        <tr>
-            <td><p>The lisaManagerReferenceNumber path parameter you've used doesn't match with an authorised LISA provider in HMRC's records.</p></td>
-            <td><p>lisaManagerRefNumber = Z1234<br>&lt;all other parameters syntactically valid&gt;</p></td>
-            <td><p>401 (Unauthorized)</p><p>{ &quot;code&quot; : &quot;UNAUTHORIZED&quot; }</p></td>
-        </tr>
     </tbody>
 </table>
