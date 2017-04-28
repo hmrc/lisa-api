@@ -16,4 +16,4 @@
 
 package uk.gov.hmrc.lisaapi.models.des
 
-case class DesCreateInvestorResponse(rdsCode: Option[Int] = None, investorId: Option[String] = None)
+case class DesCreateInvestorResponse(rdsCode: Option[Int] = None, investorID: Option[String] = None)

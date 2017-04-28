@@ -112,7 +112,7 @@ class DesConnectorSpec extends PlaySpec
         doCreateInvestorRequest { response =>
           response must be((
             OK,
-            Some(DesCreateInvestorResponse(rdsCode = Some(rdsCodeInvestorNotFound), investorId = Some("AB123456")))
+            Some(DesCreateInvestorResponse(rdsCode = Some(rdsCodeInvestorNotFound), investorID = Some("AB123456")))
           ))
         }
       }

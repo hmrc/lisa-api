@@ -43,7 +43,7 @@ class InvestorServiceSpec extends PlaySpec
           .thenReturn(
             Future.successful((
               200,
-              Some(DesCreateInvestorResponse(investorId = Some("AB123456")))
+              Some(DesCreateInvestorResponse(investorID = Some("AB123456")))
             ))
           )
 
@@ -79,7 +79,7 @@ class InvestorServiceSpec extends PlaySpec
           .thenReturn(
             Future.successful((
               200,
-              Some(DesCreateInvestorResponse(rdsCode = Some(63215), investorId = Some("AB1234")))
+              Some(DesCreateInvestorResponse(rdsCode = Some(63215), investorID = Some("AB1234")))
             ))
           )
 
@@ -125,7 +125,7 @@ class InvestorServiceSpec extends PlaySpec
           .thenReturn(
             Future.successful((
               201,
-              Some(DesCreateInvestorResponse(investorId = Some("AB123456")))
+              Some(DesCreateInvestorResponse(investorID = Some("AB123456")))
             ))
           )
 
@@ -153,7 +153,7 @@ class InvestorServiceSpec extends PlaySpec
           .thenReturn(
             Future.successful((
               200,
-              Some(DesCreateInvestorResponse(rdsCode = Some(63215), investorId = None))
+              Some(DesCreateInvestorResponse(rdsCode = Some(63215), investorID = None))
             ))
           )
 

@@ -77,7 +77,7 @@ trait JsonFormats {
   )(AccountTransfer.apply _)
 
   implicit val accountTransferWrites: Writes[AccountTransfer] = (
-    (JsPath \ "transferredFromAccountId").write[String] and
+    (JsPath \ "transferredFromAccountID").write[String] and
     (JsPath \ "transferredFromLMRN").write[String] and
     (JsPath \ "transferInDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd"))
   )(unlift(AccountTransfer.unapply))
@@ -103,15 +103,15 @@ trait JsonFormats {
   }
 
   implicit val createLisaAccountCreationRequestWrites: Writes[CreateLisaAccountCreationRequest] = (
-    (JsPath \ "investorId").write[String] and
-    (JsPath \ "accountId").write[String] and
+    (JsPath \ "investorID").write[String] and
+    (JsPath \ "accountID").write[String] and
     (JsPath \ "firstSubscriptionDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
     (JsPath \ "creationReason").write[String]
   ){req: CreateLisaAccountCreationRequest => (req.investorId, req.accountId, req.firstSubscriptionDate, "New")}
 
   implicit val createLisaAccountTransferRequestWrites: Writes[CreateLisaAccountTransferRequest] = (
-    (JsPath \ "investorId").write[String] and
-    (JsPath \ "accountId").write[String] and
+    (JsPath \ "investorID").write[String] and
+    (JsPath \ "accountID").write[String] and
     (JsPath \ "firstSubscriptionDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
     (JsPath \ "transferAccount").write[AccountTransfer] and
     (JsPath \ "creationReason").write[String]
