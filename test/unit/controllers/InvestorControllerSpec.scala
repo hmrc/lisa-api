@@ -84,13 +84,30 @@ class InvestorControllerSpec extends PlaySpec
     }
 
     "return with status 403 FORBIDDEN" when {
-      "given the the Investor details cannot be found" in {
+      "given the Investor details cannot be found" in {
         when(mockService.createInvestor(any(), any())(any())).
           thenReturn(Future.successful(CreateLisaInvestorErrorResponse(403,
             DesFailureResponse("INVESTOR_NOT_FOUND","The investor details given do not match with HMRC’s records"))))
         val res = SUT.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT,"/").withHeaders(acceptHeader).
           withBody(AnyContentAsJson(Json.parse(investorJson))))
         status(res) must be (FORBIDDEN)
+      }
+    }
+
+    "return with status already exists" when {
+      "given the investor already exists on the system" in {
+        when(mockService.createInvestor(any(), any())(any())).
+          thenReturn(Future.successful(CreateLisaInvestorErrorResponse(409,
+            DesFailureResponse("INVESTOR_ALREADY_EXISTS","The investor already has a record with HMRC"))))
+
+
+       val res = SUT.createLisaInvestor(lisaManager).
+          apply(FakeRequest(Helpers.PUT, "/").
+            withHeaders(acceptHeader).
+            withBody(AnyContentAsJson(Json.parse(investorJson))))
+
+        status(res) must be (CONFLICT)
+
       }
     }
 
@@ -170,7 +187,7 @@ class InvestorControllerSpec extends PlaySpec
           auditData = matchersEquals(Map(
             "lisaManagerReferenceNumber" -> lisaManager,
             "investorNINO" -> "AB123456D",
-            //            "investorID" -> investorId,
+ //           "investorID" -> investorId,
             "dateOfBirth" -> "1973-03-24",
             "reasonNotCreated" -> ErrorInvestorAlreadyExists(investorId).errorCode
           )))(any())
