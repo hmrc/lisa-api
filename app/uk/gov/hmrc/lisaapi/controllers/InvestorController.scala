@@ -19,12 +19,9 @@ package uk.gov.hmrc.lisaapi.controllers
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
-import uk.gov.hmrc.api.controllers.HeaderValidator
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, InvestorService}
-import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.play.http.HeaderCarrier
-import uk.gov.hmrc.play.microservice.controller.BaseController
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -39,15 +36,13 @@ class InvestorController extends LisaController {
 
       withValidJson[CreateLisaInvestorRequest] {
         createRequest => {
-          service.createInvestor(lisaManager, createRequest).map {
-            case CreateLisaInvestorSuccessResponse(investorId) =>
-              handleCreatedResponse(lisaManager, createRequest, investorId)
-            case CreateLisaInvestorNotFoundResponse =>
-              handleNotFoundResponse(lisaManager, createRequest)
-            case CreateLisaInvestorAlreadyExistsResponse(investorId) =>
-              handleAlreadyExistsResponse(lisaManager, createRequest, investorId)
-            case CreateLisaInvestorErrorResponse =>
-              handleErrorResponse(lisaManager, createRequest)
+          service.createInvestor(lisaManager, createRequest).map { res =>
+            res match {
+              case CreateLisaInvestorSuccessResponse(investorId) =>
+                handleCreatedResponse(lisaManager, createRequest, investorId)
+              case errorResponse: CreateLisaInvestorErrorResponse =>
+                handleFailureResponse(lisaManager, createRequest, errorResponse)
+            }
           }
         }
       }
@@ -70,7 +65,8 @@ class InvestorController extends LisaController {
     Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = 201)))
   }
 
-  private def handleNotFoundResponse(lisaManager: String, createRequest: CreateLisaInvestorRequest)(implicit hc: HeaderCarrier) = {
+  private def handleFailureResponse(lisaManager: String, createRequest: CreateLisaInvestorRequest, errorResponse: CreateLisaInvestorErrorResponse)(implicit hc: HeaderCarrier) = {
+
     auditService.audit(
       auditType = "investorNotCreated",
       path = getEndpointUrl(lisaManager),
@@ -78,42 +74,11 @@ class InvestorController extends LisaController {
         "lisaManagerReferenceNumber" -> lisaManager,
         "investorNINO" -> createRequest.investorNINO,
         "dateOfBirth" -> createRequest.dateOfBirth.toString("yyyy-MM-dd"),
-        "reasonNotCreated" -> ErrorInvestorNotFound.errorCode
+        "reasonNotCreated" -> errorResponse.data.code
       )
     )
 
-    Forbidden(Json.toJson(ErrorInvestorNotFound))
-  }
-
-  private def handleAlreadyExistsResponse(lisaManager: String, createRequest: CreateLisaInvestorRequest, investorId: String)(implicit hc: HeaderCarrier) = {
-    auditService.audit(
-      auditType = "investorNotCreated",
-      path = getEndpointUrl(lisaManager),
-      auditData = Map(
-        "lisaManagerReferenceNumber" -> lisaManager,
-        "investorNINO" -> createRequest.investorNINO,
-        "investorID" -> investorId,
-        "dateOfBirth" -> createRequest.dateOfBirth.toString("yyyy-MM-dd"),
-        "reasonNotCreated" -> ErrorInvestorAlreadyExists(investorId).errorCode
-      )
-    )
-
-    Conflict(Json.toJson(ErrorInvestorAlreadyExists(investorId)))
-  }
-
-  private def handleErrorResponse(lisaManager: String, createRequest: CreateLisaInvestorRequest)(implicit hc: HeaderCarrier) = {
-    auditService.audit(
-      auditType = "investorNotCreated",
-      path = getEndpointUrl(lisaManager),
-      auditData = Map(
-        "lisaManagerReferenceNumber" -> lisaManager,
-        "investorNINO" -> createRequest.investorNINO,
-        "dateOfBirth" -> createRequest.dateOfBirth.toString("yyyy-MM-dd"),
-        "reasonNotCreated" -> ErrorInternalServerError.errorCode
-      )
-    )
-
-    InternalServerError(Json.toJson(ErrorInternalServerError))
+    Status(errorResponse.status).apply(Json.toJson(errorResponse.data))
   }
 
   private def getEndpointUrl(lisaManagerReferenceNumber: String):String = {

@@ -16,35 +16,26 @@
 
 package uk.gov.hmrc.lisaapi.services
 
+import play.api.Logger
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
+import uk.gov.hmrc.lisaapi.models.des.{DesCreateInvestorResponse, DesFailureResponse, DesLifeEventResponse, DesTransactionResponse}
 import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
-
 import scala.concurrent.ExecutionContext.Implicits.global
 
 trait InvestorService  {
   val desConnector: DesConnector
 
-  val INVESTOR_NOT_FOUND = 63214
-  val INVESTOR_ALREADY_EXISTS = 63215
 
   def createInvestor(lisaManager: String, request: CreateLisaInvestorRequest)(implicit hc: HeaderCarrier) : Future[CreateLisaInvestorResponse] = {
     val response = desConnector.createInvestor(lisaManager, request)
-    val httpStatusOk = 200
 
     response map {
-      case (`httpStatusOk`, Some(data)) => {
-        (data.rdsCode, data.investorId) match {
-          case (None, Some(investorId)) => CreateLisaInvestorSuccessResponse(investorId)
-          case (Some(INVESTOR_NOT_FOUND), _) => CreateLisaInvestorNotFoundResponse
-          case (Some(INVESTOR_ALREADY_EXISTS), Some(investorId)) => CreateLisaInvestorAlreadyExistsResponse(investorId)
-          case (_, _) => CreateLisaInvestorErrorResponse
-        }
+      case (_, successResponse: DesCreateInvestorResponse) => CreateLisaInvestorSuccessResponse(successResponse.investorID)
+      case (status: Int, errorResponse: DesFailureResponse) => CreateLisaInvestorErrorResponse(status, errorResponse)
       }
-      case (_, _) => CreateLisaInvestorErrorResponse
-    }
   }
 
 }
