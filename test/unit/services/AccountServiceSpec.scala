@@ -46,7 +46,7 @@ class AccountServiceSpec extends PlaySpec
           .thenReturn(Future.successful(DesAccountResponse(accountID = testAccountId)))
 
         doCreateRequest { response =>
-          response mustBe CreateLisaAccountSuccessResponse(accountID = testAccountId)
+          response mustBe CreateLisaAccountSuccessResponse(accountId = testAccountId)
         }
       }
     }
@@ -141,7 +141,7 @@ class AccountServiceSpec extends PlaySpec
           .thenReturn(Future.successful(DesAccountResponse(accountID = testAccountId)))
 
         doTransferRequest { response =>
-          response mustBe CreateLisaAccountSuccessResponse(accountID = testAccountId)
+          response mustBe CreateLisaAccountSuccessResponse(accountId = testAccountId)
         }
       }
     }

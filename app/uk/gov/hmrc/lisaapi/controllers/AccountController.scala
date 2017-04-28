@@ -228,7 +228,7 @@ class AccountController extends LisaController {
             auditType = "accountClosed",
             path = getCloseEndpointUrl(lisaManager, accountId),
             auditData = closeLisaAccountRequest.toStringMap ++ Map("lisaManagerReferenceNumber" -> lisaManager,
-              "accountID" -> accountId)
+              "accountId" -> accountId)
           )
 
           val data = ApiResponseData(message = "LISA Account Closed", accountId = Some(accountId))
@@ -240,7 +240,7 @@ class AccountController extends LisaController {
             auditType = "accountNotClosed",
             path = getCloseEndpointUrl(lisaManager, accountId),
             auditData = closeLisaAccountRequest.toStringMap ++ Map("lisaManagerReferenceNumber" -> lisaManager,
-              "accountID" -> accountId,
+              "accountId" -> accountId,
               "reasonNotClosed" -> ErrorAccountAlreadyClosed.errorCode)
           )
           Forbidden(Json.toJson(ErrorAccountAlreadyClosed))
@@ -250,7 +250,7 @@ class AccountController extends LisaController {
             auditType = "accountNotClosed",
             path = getCloseEndpointUrl(lisaManager, accountId),
             auditData = closeLisaAccountRequest.toStringMap ++ Map("lisaManagerReferenceNumber" -> lisaManager,
-              "accountID" -> accountId,
+              "accountId" -> accountId,
               "reasonNotClosed" -> ErrorAccountNotFound.errorCode)
           )
           NotFound(Json.toJson(ErrorAccountNotFound))
@@ -260,7 +260,7 @@ class AccountController extends LisaController {
             auditType = "accountNotClosed",
             path = getCloseEndpointUrl(lisaManager, accountId),
             auditData = closeLisaAccountRequest.toStringMap ++ Map("lisaManagerReferenceNumber" -> lisaManager,
-              "accountID" -> accountId,
+              "accountId" -> accountId,
               "reasonNotClosed" -> ErrorInternalServerError.errorCode)
           )
           InternalServerError(Json.toJson(ErrorInternalServerError))

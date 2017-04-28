@@ -59,7 +59,7 @@
             <td><p>HTTP status: <code class="code--slim">404(Not Found)</code></p>
                 <p class ="code--block"> {<br>
                                             "code": "INVESTOR_ACCOUNTID_NOT_FOUND",<br>
-                                            "message": "The accountID given does not match with HMRC’s records"<br>
+                                            "message": "The accountId given does not match with HMRC’s records"<br>
                                        }
                 </p>
             </td>

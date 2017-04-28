@@ -68,21 +68,21 @@ class AuditServiceSpec extends PlaySpec
     }
 
     "build an audit event with the correct detail" in {
-      val res = SUT.audit("investorCreated", "/create", Map("investorID" -> "1234567890", "investorNINO" -> "AB123456D"))
+      val res = SUT.audit("investorCreated", "/create", Map("investorId" -> "1234567890", "investorNINO" -> "AB123456D"))
       val captor = ArgumentCaptor.forClass(classOf[DataEvent])
 
       verify(mockAuditConnector).sendEvent(captor.capture())(any(), any())
 
       val event = captor.getValue
 
-      event.detail must contain ("investorID" -> "1234567890")
+      event.detail must contain ("investorId" -> "1234567890")
       event.detail must contain ("investorNINO" -> "AB123456D")
       event.detail must contain key "Authorization"
     }
 
-    "build an audit event with the correct when passed a BonusRequest Object" in {
+    "build an audit event with the correct detail when passed a RequestBonusPaymentRequest" in {
       val data = RequestBonusPaymentRequest(
-        lifeEventID = Some("1234567891"),
+        lifeEventId = Some("1234567891"),
         periodStartDate = new DateTime("2016-05-22"),
         periodEndDate = new DateTime("2017-05-22"),
         transactionType = "Bonus",
@@ -97,7 +97,7 @@ class AuditServiceSpec extends PlaySpec
 
       val event = captor.getValue
 
-      event.detail must contain ("lifeEventID" -> "1234567891")
+      event.detail must contain ("lifeEventId" -> "1234567891")
       event.detail must contain ("periodStartDate" -> "2016-05-22")
       event.detail must contain ("periodEndDate" -> "2017-05-22")
       event.detail must contain ("transactionType" -> "Bonus")
@@ -116,7 +116,7 @@ class AuditServiceSpec extends PlaySpec
     }
 
     "send an event via the audit connector" in {
-      val event = SUT.audit("investorCreated", "/create", Map("investorID" -> "1234567890"))
+      val event = SUT.audit("investorCreated", "/create", Map("investorId" -> "1234567890"))
 
       verify(mockAuditConnector).sendEvent(any())(any(), any())
     }

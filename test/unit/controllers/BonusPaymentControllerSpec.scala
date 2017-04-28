@@ -85,10 +85,10 @@ class BonusPaymentControllerSpec extends PlaySpec
       }
 
       "the bonus claim reason is life event and no life event id is provided" in {
-        doRequest(validBonusPaymentJson.replace(""""lifeEventID": "1234567891",""", "")) { res =>
+        doRequest(validBonusPaymentJson.replace(""""lifeEventId": "1234567891",""", "")) { res =>
           status(res) mustBe (FORBIDDEN)
           (contentAsJson(res) \ "code").as[String] mustBe ("LIFE_EVENT_NOT_PROVIDED")
-          (contentAsJson(res) \ "message").as[String] mustBe ("lifeEventID is required when the claimReason is \"Life Event\"")
+          (contentAsJson(res) \ "message").as[String] mustBe ("lifeEventId is required when the claimReason is \"Life Event\"")
         }
       }
 
@@ -161,8 +161,8 @@ class BonusPaymentControllerSpec extends PlaySpec
             path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions"),
             auditData = MatcherEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
-              "accountID" -> accountId,
-              "lifeEventID" -> (json \ "lifeEventID").as[String],
+              "accountId" -> accountId,
+              "lifeEventId" -> (json \ "lifeEventId").as[String],
               "transactionType" -> (json \ "transactionType").as[String],
               "periodStartDate" -> (json \ "periodStartDate").as[String],
               "periodEndDate" -> (json \ "periodEndDate").as[String],
@@ -196,7 +196,7 @@ class BonusPaymentControllerSpec extends PlaySpec
             path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions"),
             auditData = MatcherEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
-              "accountID" -> accountId,
+              "accountId" -> accountId,
               "transactionType" -> (json \ "transactionType").as[String],
               "periodStartDate" -> (json \ "periodStartDate").as[String],
               "periodEndDate" -> (json \ "periodEndDate").as[String],
@@ -230,7 +230,7 @@ class BonusPaymentControllerSpec extends PlaySpec
             path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions"),
             auditData = MatcherEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
-              "accountID" -> accountId,
+              "accountId" -> accountId,
               "transactionType" -> (json \ "transactionType").as[String],
               "periodStartDate" -> (json \ "periodStartDate").as[String],
               "periodEndDate" -> (json \ "periodEndDate").as[String],
@@ -250,7 +250,7 @@ class BonusPaymentControllerSpec extends PlaySpec
         when(mockService.requestBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.failed(new RuntimeException("Test")))
 
-        val invalidJson = validBonusPaymentJson.replace("\"lifeEventID\": \"1234567891\",", "")
+        val invalidJson = validBonusPaymentJson.replace("\"lifeEventId\": \"1234567891\",", "")
 
         doSyncRequest(invalidJson) { res =>
           reset(mockService) // removes the thenThrow
@@ -265,7 +265,7 @@ class BonusPaymentControllerSpec extends PlaySpec
             path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions"),
             auditData = MatcherEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
-              "accountID" -> accountId,
+              "accountId" -> accountId,
               "transactionType" -> (json \ "transactionType").as[String],
               "periodStartDate" -> (json \ "periodStartDate").as[String],
               "periodEndDate" -> (json \ "periodEndDate").as[String],
@@ -301,7 +301,7 @@ class BonusPaymentControllerSpec extends PlaySpec
             path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions"),
             auditData = MatcherEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
-              "accountID" -> accountId,
+              "accountId" -> accountId,
               "transactionType" -> (json \ "transactionType").as[String],
               "periodStartDate" -> (json \ "periodStartDate").as[String],
               "periodEndDate" -> (json \ "periodEndDate").as[String],

@@ -21,14 +21,14 @@ import org.joda.time.DateTime
 sealed trait CreateLisaAccountRequest
 
 case class CreateLisaAccountCreationRequest (
-  investorID: String,
-  accountID: String,
-  firstSubscriptionDate: DateTime
+                                              investorId: String,
+                                              accountId: String,
+                                              firstSubscriptionDate: DateTime
 ) extends CreateLisaAccountRequest
 
 case class CreateLisaAccountTransferRequest (
-  investorID: String,
-  accountID: String,
-  firstSubscriptionDate: DateTime,
-  transferAccount: AccountTransfer
+                                              investorId: String,
+                                              accountId: String,
+                                              firstSubscriptionDate: DateTime,
+                                              transferAccount: AccountTransfer
 ) extends CreateLisaAccountRequest

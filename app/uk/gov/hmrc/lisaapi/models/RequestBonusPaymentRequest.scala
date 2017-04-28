@@ -19,11 +19,11 @@ package uk.gov.hmrc.lisaapi.models
 import org.joda.time.DateTime
 
 case class RequestBonusPaymentRequest(
-  lifeEventID: Option[String],
-  periodStartDate: DateTime,
-  periodEndDate: DateTime,
-  transactionType: String,
-  htbTransfer: Option[HelpToBuyTransfer],
-  inboundPayments: InboundPayments,
-  bonuses: Bonuses
+                                       lifeEventId: Option[String],
+                                       periodStartDate: DateTime,
+                                       periodEndDate: DateTime,
+                                       transactionType: String,
+                                       htbTransfer: Option[HelpToBuyTransfer],
+                                       inboundPayments: InboundPayments,
+                                       bonuses: Bonuses
 )

@@ -11,10 +11,10 @@
     </thead>
     <tbody>
         <tr>
-            <td><p>Request Bonus payment endpoint with valid bonus details</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountID: 10000000900</p></td>
+            <td><p>Request Bonus payment endpoint with valid bonus details</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountId: 10000000900</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                               "lifeEventID" : "1234567891",<br>
+                                               "lifeEventId" : "1234567891",<br>
                                                 "periodStartDate" : "2016-05-22",<br>
                                                 "periodEndDate" : "2017-05-22",<br>
                                                 "transactionType" : "Penalty",<br>
@@ -50,10 +50,10 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request Bonus payment endpoint with an accountId that does not exist</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountID: 0000000404</p></td>
+            <td><p>Request Bonus payment endpoint with an accountId that does not exist</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountId: 0000000404</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                               "lifeEventID" : "1234567891",<br>
+                                               "lifeEventId" : "1234567891",<br>
                                                 "periodStartDate" : "2016-05-22",<br>
                                                 "periodEndDate" : "2017-05-22",<br>
                                                 "transactionType" : "Penalty",<br>
@@ -79,16 +79,16 @@
             <td><p>HTTP status: <code class="code--slim">404(Not Found)</code></p>
                 <p class ="code--block"> {<br>
                                            "code": "INVESTOR_ACCOUNTID_NOT_FOUND",<br>
-                                           "message": "The accountID given does not match with HMRC’s records."<br>
+                                           "message": "The accountId given does not match with HMRC’s records."<br>
                                        }
                 </p>
             </td>
         </tr>
         <tr>
-            <td><p>Request Bonus payment endpoint with an accountId that has already been closed or voided</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountID: 0000000903</p></td>
+            <td><p>Request Bonus payment endpoint with an accountId that has already been closed or voided</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountId: 0000000903</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                               "lifeEventID" : "1234567891",<br>
+                                               "lifeEventId" : "1234567891",<br>
                                                 "periodStartDate" : "2016-05-22",<br>
                                                 "periodEndDate" : "2017-05-22",<br>
                                                 "transactionType" : "Penalty",<br>
@@ -119,10 +119,10 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request Bonus payment endpoint with bonus in the payload that exceeds the maximum amount level</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountID: 0000000403</p></td>
+            <td><p>Request Bonus payment endpoint with bonus in the payload that exceeds the maximum amount level</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountId: 0000000403</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                               "lifeEventID" : "1234567891",<br>
+                                               "lifeEventId" : "1234567891",<br>
                                                  "periodStartDate" : "2016-05-22",<br>
                                                  "periodEndDate" : "2017-05-22",<br>
                                                  "transactionType" : "Bonus",<br>
@@ -154,10 +154,10 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request Bonus payment endpoint with a life event that does not match the HMRC records</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountID: 1000000404</p></td>
+            <td><p>Request Bonus payment endpoint with a life event that does not match the HMRC records</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountId: 1000000404</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                               "lifeEventID" : "1234567891",<br>
+                                               "lifeEventId" : "1234567891",<br>
                                                  "periodStartDate" : "2016-05-22",<br>
                                                  "periodEndDate" : "2017-05-22",<br>
                                                  "transactionType" : "Bonus",<br>
@@ -183,16 +183,16 @@
             <td><p>HTTP status: <code class="code--slim">404(Not Found)</code></p>
                 <p class ="code--block"> {<br>
                                            "code": "LIFE_EVENT_NOT_FOUND",<br>
-                                           "message": "The lifeEventID does not match with HMRC’s records."<br>
+                                           "message": "The lifeEventId does not match with HMRC’s records."<br>
                                        }
                 </p>
             </td>
         </tr>
         <tr>
-            <td><p>Request Bonus payment endpoint with an invalid transaction type in the payload</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountID: 1001100404</p></td>
+            <td><p>Request Bonus payment endpoint with an invalid transaction type in the payload</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountId: 1001100404</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                               "lifeEventID" : "1234567891",<br>
+                                               "lifeEventId" : "1234567891",<br>
                                                  "periodStartDate" : "2016-05-22",<br>
                                                  "periodEndDate" : "2017-05-22",<br>
                                                  "transactionType" : "Invalid Transaction Type",<br>
@@ -224,7 +224,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request Bonus payment endpoint without lifeEventID and Life Event as claimReason</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountID: 1110000503</p></td>
+            <td><p>Request Bonus payment endpoint without lifeEventId and Life Event as claimReason</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountId: 1110000503</p></td>
             <td>
                 <p class ="code--block"> {<br>
                                                	"periodStartDate" : "2016-05-22",<br>
@@ -252,13 +252,13 @@
             <td><p>HTTP status: <code class="code--slim">403(Forbidden)</code></p>
                 <p class ="code--block"> {<br>
                                            "code": "LIFE_EVENT_NOT_PROVIDED",<br>
-                                           "message": "lifeEventID is required when the claimReason is \"Life Event\""<br>
+                                           "message": "lifeEventId is required when the claimReason is \"Life Event\""<br>
                                        }
                 </p>
             </td>
         </tr>
         <tr>
-            <td><p>Request Bonus payment endpoint with Regular Bonus as claim Reason and without lifeEventID (lifeEventID as an optional element)</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountID: 1110000503</p></td>
+            <td><p>Request Bonus payment endpoint with Regular Bonus as claim Reason and without lifeEventId (lifeEventId as an optional element)</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountId: 1110000503</p></td>
             <td>
                 <p class ="code--block"> {<br>
                                               "periodStartDate" : "2016-05-22",<br>
@@ -296,10 +296,10 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request Bonus payment endpoint with invalid Lisa Manager</p><p class ="code--block">lisaManagerReferenceNumber :Z123456789<br>accountID: 10000000900</p></td>
+            <td><p>Request Bonus payment endpoint with invalid Lisa Manager</p><p class ="code--block">lisaManagerReferenceNumber :Z123456789<br>accountId: 10000000900</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                               "lifeEventID" : "1234567891",<br>
+                                               "lifeEventId" : "1234567891",<br>
                                                 "periodStartDate" : "2016-05-22",<br>
                                                 "periodEndDate" : "2017-05-22",<br>
                                                 "transactionType" : "Penalty",<br>
@@ -331,10 +331,10 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request Bonus payment endpoint with invalid Accept Header</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountID: 10000000900<br> Accept:application/vnd.hmrc.1.0</p></td>
+            <td><p>Request Bonus payment endpoint with invalid Accept Header</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountId: 10000000900<br> Accept:application/vnd.hmrc.1.0</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                               "lifeEventID" : "1234567891",<br>
+                                               "lifeEventId" : "1234567891",<br>
                                                 "periodStartDate" : "2016-05-22",<br>
                                                 "periodEndDate" : "2017-05-22",<br>
                                                 "transactionType" : "Penalty",<br>
@@ -366,10 +366,10 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request Bonus payment endpoint with invalid Authorization bearer token</p><p class ="code--block">lisaManagerReferenceNumber :Z123456789<br>accountID: 10000000900</p></td>
+            <td><p>Request Bonus payment endpoint with invalid Authorization bearer token</p><p class ="code--block">lisaManagerReferenceNumber :Z123456789<br>accountId: 10000000900</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                               "lifeEventID" : "1234567891",<br>
+                                               "lifeEventId" : "1234567891",<br>
                                                 "periodStartDate" : "2016-05-22",<br>
                                                 "periodEndDate" : "2017-05-22",<br>
                                                 "transactionType" : "Penalty",<br>

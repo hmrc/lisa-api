@@ -59,7 +59,7 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
 
   private def doRequest(callback: (RequestBonusPaymentResponse) => Unit) = {
     val request = RequestBonusPaymentRequest(
-      lifeEventID = Some("1234567891"),
+      lifeEventId = Some("1234567891"),
       periodStartDate = new DateTime("2016-05-22"),
       periodEndDate = new DateTime("2017-05-22"),
       transactionType = "Bonus",

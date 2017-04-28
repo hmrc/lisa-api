@@ -57,7 +57,7 @@ case object ErrorInvestorNotEligible extends ErrorResponse(403, "INVESTOR_ELIGIB
 
 case object ErrorInvestorComplianceCheckFailed extends ErrorResponse(403, "INVESTOR_COMPLIANCE_CHECK_FAILED", "The investor has failed a compliance check - they may have breached ISA guidelines or regulations")
 
-case object ErrorPreviousAccountDoesNotExist extends ErrorResponse(403, "PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST", "The transferredFromAccountID and transferredFromLMRN given don’t match with an account on HMRC’s records")
+case object ErrorPreviousAccountDoesNotExist extends ErrorResponse(403, "PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST", "The transferredFromAccountId and transferredFromLMRN given don’t match with an account on HMRC’s records")
 
 case object ErrorAccountAlreadyExists extends ErrorResponse(409, "INVESTOR_ACCOUNT_ALREADY_EXISTS", "The LISA account already exists")
 
@@ -67,11 +67,11 @@ case object ErrorAccountAlreadyClosed extends ErrorResponse(403, "INVESTOR_ACCOU
 
 case object ErrorAccountAlreadyClosedOrVoid extends ErrorResponse(403, "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID", "The LISA account has already been closed or voided.")
 
-case object ErrorAccountNotFound extends ErrorResponse(404, "INVESTOR_ACCOUNTID_NOT_FOUND", "The accountID given does not match with HMRC’s records")
+case object ErrorAccountNotFound extends ErrorResponse(404, "INVESTOR_ACCOUNTID_NOT_FOUND", "The accountId given does not match with HMRC’s records")
 
-case object ErrorTransferAccountDataNotProvided extends ErrorResponse(403, "TRANSFER_ACCOUNT_DATA_NOT_PROVIDED", "The transferredFromAccountID, transferredFromLMRN and transferInDate are not provided and are required for transfer of an account.")
+case object ErrorTransferAccountDataNotProvided extends ErrorResponse(403, "TRANSFER_ACCOUNT_DATA_NOT_PROVIDED", "The transferredFromAccountId, transferredFromLMRN and transferInDate are not provided and are required for transfer of an account.")
 
-case object ErrorTransferAccountDataProvided extends ErrorResponse(403, "TRANSFER_ACCOUNT_DATA_PROVIDED", "transferredFromAccountID, transferedFromLMRN, and transferInDate fields should only be completed when the creationReason is \"Transferred\".")
+case object ErrorTransferAccountDataProvided extends ErrorResponse(403, "TRANSFER_ACCOUNT_DATA_PROVIDED", "transferredFromAccountId, transferedFromLMRN, and transferInDate fields should only be completed when the creationReason is \"Transferred\".")
 
 case object ErrorLifeEventInappropriate extends ErrorResponse(403, "LIFE_EVENT_INAPPROPRIATE","The life event conflicts with previous life event reported")
 
@@ -85,4 +85,4 @@ object ErrorInvestorAlreadyExists {
 
 }
 
-case object ErrorLifeEventNotProvided extends ErrorResponse(403,"LIFE_EVENT_NOT_PROVIDED","lifeEventID is required when the claimReason is \"Life Event\"")
+case object ErrorLifeEventNotProvided extends ErrorResponse(403,"LIFE_EVENT_NOT_PROVIDED","lifeEventId is required when the claimReason is \"Life Event\"")
