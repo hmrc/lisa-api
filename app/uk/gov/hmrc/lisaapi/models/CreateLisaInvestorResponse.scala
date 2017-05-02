@@ -21,5 +21,6 @@ import uk.gov.hmrc.lisaapi.models.des.DesFailureResponse
 trait CreateLisaInvestorResponse
 
 case class CreateLisaInvestorSuccessResponse(investorId: String) extends CreateLisaInvestorResponse
+case class CreateLisaInvestorAlreadyExistsResponse(investorId: String) extends CreateLisaInvestorResponse
 case class CreateLisaInvestorErrorResponse(status: Int, data: DesFailureResponse) extends CreateLisaInvestorResponse
 

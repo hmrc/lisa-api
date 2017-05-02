@@ -35,11 +35,10 @@ class DesConnectorSpec extends PlaySpec
   with MockitoSugar
   with OneAppPerSuite {
 
-
   "Create Lisa Investor endpoint" must {
 
-
     "Return a populated DesCreateInvestorResponse" when {
+
       "The DES response has a json body that is in the correct format" in {
         when(mockHttpPost.POST[CreateLisaInvestorRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
@@ -58,6 +57,7 @@ class DesConnectorSpec extends PlaySpec
           ))
         }
       }
+
     }
 
     "return the default DesFailureResponse" when {
@@ -95,6 +95,27 @@ class DesConnectorSpec extends PlaySpec
       }
     }
 
+    "return an investor already exists response" when {
+
+      "the investor already exists response is returned" in {
+        val investorID = "1234567890"
+        when(mockHttpPost.POST[CreateLisaInvestorRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = CONFLICT,
+                responseJson = Some(Json.parse(s"""{"investorID": "$investorID"}"""))
+              )
+            )
+          )
+
+        doCreateInvestorRequest { response =>
+          response must be((CONFLICT, DesCreateInvestorResponse(investorID)))
+        }
+      }
+
+    }
+
     "return a specific DesFailureResponse" when {
 
       "a specific failure is returned" in {
@@ -108,12 +129,13 @@ class DesConnectorSpec extends PlaySpec
             )
           )
 
-        doRequestBonusPaymentRequest { response =>
+        doCreateInvestorRequest { response =>
           response must be((FORBIDDEN, DesFailureResponse("INVESTOR_NOT_FOUND", "The investor details given do not match with HMRC’s records.")))
         }
       }
 
     }
+
   }
 
   "Create Account endpoint" must {

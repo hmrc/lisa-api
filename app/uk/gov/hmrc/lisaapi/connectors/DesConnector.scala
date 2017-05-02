@@ -138,26 +138,22 @@ trait DesConnector extends ServicesConfig with JsonFormats {
 
   // scalastyle:off magic.number
   def parseDesResponse[A <: DesResponse](res: HttpResponse)(implicit reads:Reads[A]): (Int, DesResponse) = {
-    res.status match {
-      case 201 => Try(res.json.as[A]) match {
-        case Success(data) =>
-          Logger.debug(s"DES success Response : ${res.json}")
-                (201, data)
-        case Failure(ex) => {
-          Logger.error(s"DES failure response.${res} Exception: ${ex.getMessage}")
-          (500, DesFailureResponse())
+    Try(res.json.as[A]) match {
+      case Success(data) =>
+        Logger.debug(s"DES success Response : ${res.json}")
+        (res.status, data)
+      case Failure(_) =>
+        Try(res.json.as[DesFailureResponse]) match {
+          case Success(data) =>
+            Logger.debug(s"DES Response : ${res.json}")
+            (res.status, data)
+          case Failure(ex) =>
+            Logger.error(s"DES failure response. $res Exception: ${ex.getMessage}")
+            (500, DesFailureResponse())
         }
-      }
-      case status:Int => Try(res.json.as[DesFailureResponse]) match {
-        case Success(data) =>       Logger.debug(s"DES Response : ${res.json}")
-          (status, data)
-        case Failure(ex) => {
-          Logger.error(s"DES failure response. ${res} Exception: ${ex.getMessage}")
-          (500, DesFailureResponse())
-        }
-      }
     }
   }
+
 }
 
 

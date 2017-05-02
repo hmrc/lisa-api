@@ -70,7 +70,25 @@ class InvestorServiceSpec extends PlaySpec
       }
     }
 
+    "return an Investor Already Exists Response" when {
+
+      "given a 409 status and CreateInvestor response from DES" in {
+        val investorID = "1234567890"
+
+        when(mockDesConnector.createInvestor(any(), any())(any()))
+          .thenReturn(
+            Future.successful((409, DesCreateInvestorResponse(investorID))
+            )
+          )
+
+        doRequest{response =>
+          response mustBe CreateLisaInvestorAlreadyExistsResponse(investorID)
+        }
+      }
+
     }
+
+  }
 
   private def doRequest(callback: (CreateLisaInvestorResponse) => Unit) = {
     val request = CreateLisaInvestorRequest("AB123456A", "A", "B", new DateTime("2000-01-01"))
