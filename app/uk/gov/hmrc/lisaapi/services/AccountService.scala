@@ -19,7 +19,7 @@ package uk.gov.hmrc.lisaapi.services
 import play.api.Logger
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.models.des.{DesAccountResponse, DesFailureResponse, DesLifeEventResponse}
+import uk.gov.hmrc.lisaapi.models.des.{DesAccountResponse, DesEmptySuccessResponse, DesFailureResponse}
 import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
@@ -27,9 +27,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 trait AccountService {
   val desConnector: DesConnector
-
-  val INVESTOR_ACCOUNT_ALREADY_CLOSED = 63220
-  val INVESTOR_ACCOUNT_NOT_FOUND = 63221
 
   def createAccount(lisaManager: String, request: CreateLisaAccountCreationRequest)(implicit hc: HeaderCarrier): Future[CreateLisaAccountResponse] = {
     val response = desConnector.createAccount(lisaManager, request)
@@ -84,13 +81,13 @@ trait AccountService {
     val response = desConnector.closeAccount(lisaManager, accountId, request)
 
     response map {
-      case successResponse: DesAccountResponse => {
+      case DesEmptySuccessResponse => {
         CloseLisaAccountSuccessResponse(accountId)
       }
       case failureResponse: DesFailureResponse => {
         failureResponse.code match {
           case "INVESTOR_ACCOUNT_ALREADY_CLOSED" => CloseLisaAccountAlreadyClosedResponse
-          case "INVESTOR_ACCOUNT_NOT_FOUND" => CloseLisaAccountNotFoundResponse
+          case "INVESTOR_ACCOUNTID_NOT_FOUND" => CloseLisaAccountNotFoundResponse
           case _ => CloseLisaAccountErrorResponse
         }
       }

@@ -97,9 +97,7 @@ class InvestorControllerSpec extends PlaySpec
     "return with status already exists" when {
       "given the investor already exists on the system" in {
         when(mockService.createInvestor(any(), any())(any())).
-          thenReturn(Future.successful(CreateLisaInvestorErrorResponse(409,
-            DesFailureResponse("INVESTOR_ALREADY_EXISTS","The investor already has a record with HMRC"))))
-
+          thenReturn(Future.successful(CreateLisaInvestorAlreadyExistsResponse("1234567890")))
 
        val res = SUT.createLisaInvestor(lisaManager).
           apply(FakeRequest(Helpers.PUT, "/").
@@ -107,6 +105,12 @@ class InvestorControllerSpec extends PlaySpec
             withBody(AnyContentAsJson(Json.parse(investorJson))))
 
         status(res) must be (CONFLICT)
+
+        val json = contentAsJson(res)
+
+        (json \ "code").as[String] mustBe "INVESTOR_ALREADY_EXISTS"
+        (json \ "message").as[String] mustBe "The investor already has a record with HMRC"
+        (json \ "id").as[String] mustBe "1234567890"
 
       }
     }
@@ -187,8 +191,7 @@ class InvestorControllerSpec extends PlaySpec
         val investorId = "9876543210"
 
         when(mockService.createInvestor(any(), any())(any())).
-          thenReturn(Future.successful(CreateLisaInvestorErrorResponse(409,
-            DesFailureResponse("INVESTOR_ALREADY_EXISTS","The investor already has a record with HMRC"))))
+          thenReturn(Future.successful(CreateLisaInvestorAlreadyExistsResponse(investorId)))
 
 
         await(SUT.createLisaInvestor(lisaManager).
@@ -202,12 +205,12 @@ class InvestorControllerSpec extends PlaySpec
           auditData = matchersEquals(Map(
             "lisaManagerReferenceNumber" -> lisaManager,
             "investorNINO" -> "AB123456D",
- //           "investorID" -> investorId,
+            "investorID" -> investorId,
             "dateOfBirth" -> "1973-03-24",
             "reasonNotCreated" -> ErrorInvestorAlreadyExists(investorId).errorCode
           )))(any())
       }
-      //
+
       //      "a error response is returned" in {
       //        when(mockService.createInvestor(any(), any())(any())).
       //          thenThrow(new RuntimeException)

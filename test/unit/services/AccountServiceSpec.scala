@@ -24,7 +24,7 @@ import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.test.Helpers._
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.models.des.{DesAccountResponse, DesAccountResponseOld, DesFailureResponse}
+import uk.gov.hmrc.lisaapi.models.des.{DesAccountResponse, DesAccountResponseOld, DesEmptySuccessResponse, DesFailureResponse}
 import uk.gov.hmrc.lisaapi.services.AccountService
 import uk.gov.hmrc.play.http.HeaderCarrier
 
@@ -234,12 +234,12 @@ class AccountServiceSpec extends PlaySpec
         when(mockDesConnector.closeAccount(any(), any(), any())(any()))
           .thenReturn(
             Future.successful((
-              DesAccountResponse("AB123456")
+             DesEmptySuccessResponse
             ))
           )
 
         doCloseRequest { response =>
-          response mustBe CloseLisaAccountSuccessResponse("AB123456")
+          response mustBe CloseLisaAccountSuccessResponse("A123456")
         }
       }
 
@@ -271,17 +271,6 @@ class AccountServiceSpec extends PlaySpec
           response mustBe CloseLisaAccountNotFoundResponse
         }
       }
-
-      "given an exception return InternalServerError" in {
-        when(mockDesConnector.closeAccount(any(), any(), any())(any())).
-        thenThrow(new RuntimeException("Test"))
-
-        doCloseRequest { response =>
-          response mustBe CloseLisaAccountErrorResponse
-        }
-
-      }
-
     }
 
   }

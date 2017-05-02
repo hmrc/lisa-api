@@ -96,10 +96,8 @@ trait DesConnector extends ServicesConfig with JsonFormats {
     val result = httpPost.POST[CloseLisaAccountRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc))
 
     result.map(r => {
-      r.status match {
-        case 200 => DesEmptySuccessResponse
-        case _ => parseDesResponse[DesAccountResponse](r)._2
-      }
+      // catch any NullPointerExceptions that may occur from r.json being a null
+      parseDesResponse[DesAccountResponse](r)._2
     })
   }
 
@@ -139,15 +137,38 @@ trait DesConnector extends ServicesConfig with JsonFormats {
   def parseDesResponse[A <: DesResponse](res: HttpResponse)(implicit reads:Reads[A]): (Int, DesResponse) = {
     Try(res.json.as[A]) match {
       case Success(data) =>
+        Logger.debug(s"DES success Response : ${res.json}")
         (res.status, data)
       case Failure(_) =>
         Try(res.json.as[DesFailureResponse]) match {
           case Success(data) =>
-             (res.status, data)
+            Logger.debug(s"DES Response : ${res.json}")
+            (res.status, data)
           case Failure(ex) =>
-             (500, DesFailureResponse())
+            Logger.error(s"DES failure response. $res Exception: ${ex.getMessage}")
+            (500, DesFailureResponse())
         }
-
+<<<<<<< HEAD
+      }
+      case 200 => Try(res.json.as[A]) match {
+        case Success(data) =>
+          Logger.debug(s"DES success Response : ${res.json}")
+          (200, data)
+        case Failure(ex) => {
+          Logger.error(s"DES failure response.${res} Exception: ${ex.getMessage}")
+          (500, DesFailureResponse())
+        }
+      }
+      case status:Int => Try(res.json.as[DesFailureResponse]) match {
+        case Success(data) =>       Logger.debug(s"DES Response : ${res.json}")
+          (status, data)
+        case Failure(ex) => {
+          Logger.error(s"DES failure response. ${res} Exception: ${ex.getMessage}")
+          (500, DesFailureResponse())
+        }
+      }
+=======
+>>>>>>> ac88975bad6e5fd0fe527be6c52230378c519725
     }
   }
 

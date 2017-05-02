@@ -80,7 +80,7 @@ case object ErrorLifeEventAlreadyExists extends ErrorResponse(409,"LIFE_EVENT_AL
 object ErrorInvestorAlreadyExists {
 
   def apply(investorId: String) = {
-    ErrorResponseWithId(409, "INVESTOR_ALREADY_EXISTS", "The investor already has a record with HMRC ", investorId)
+    ErrorResponseWithId(409, "INVESTOR_ALREADY_EXISTS", "The investor already has a record with HMRC", investorId)
   }
 
 }

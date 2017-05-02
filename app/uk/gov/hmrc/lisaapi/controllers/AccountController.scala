@@ -145,6 +145,8 @@ class AccountController extends LisaController {
           InternalServerError(Json.toJson(ErrorInternalServerError))
         }
       }
+    } recover {
+      case _ => InternalServerError(Json.toJson(ErrorInternalServerError))
     }
   }
 
@@ -216,6 +218,8 @@ class AccountController extends LisaController {
           InternalServerError(Json.toJson(ErrorInternalServerError))
         }
       }
+    } recover {
+      case _ => InternalServerError(Json.toJson(ErrorInternalServerError))
     }
   }
 
@@ -266,6 +270,8 @@ class AccountController extends LisaController {
           InternalServerError(Json.toJson(ErrorInternalServerError))
         }
       }
+    } recover {
+      case _ => InternalServerError(Json.toJson(ErrorInternalServerError))
     }
   }
 
