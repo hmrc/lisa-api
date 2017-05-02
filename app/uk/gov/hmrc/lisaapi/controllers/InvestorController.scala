@@ -40,6 +40,8 @@ class InvestorController extends LisaController {
             res match {
               case CreateLisaInvestorSuccessResponse(investorId) =>
                 handleCreatedResponse(lisaManager, createRequest, investorId)
+              case CreateLisaInvestorAlreadyExistsResponse(investorId) =>
+                handleExistsResponse(lisaManager, createRequest, investorId)
               case errorResponse: CreateLisaInvestorErrorResponse =>
                 handleFailureResponse(lisaManager, createRequest, errorResponse)
             }
@@ -63,6 +65,24 @@ class InvestorController extends LisaController {
     val data = ApiResponseData(message = "Investor Created.", investorId = Some(investorId))
 
     Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = 201)))
+  }
+
+  private def handleExistsResponse(lisaManager: String, createRequest: CreateLisaInvestorRequest, investorId: String)(implicit hc: HeaderCarrier) = {
+    val result = ErrorInvestorAlreadyExists(investorId)
+
+    auditService.audit(
+      auditType = "investorNotCreated",
+      path = getEndpointUrl(lisaManager),
+      auditData = Map(
+        "lisaManagerReferenceNumber" -> lisaManager,
+        "investorNINO" -> createRequest.investorNINO,
+        "dateOfBirth" -> createRequest.dateOfBirth.toString("yyyy-MM-dd"),
+        "investorID" -> investorId,
+        "reasonNotCreated" -> result.errorCode
+      )
+    )
+
+    Conflict(Json.toJson(result))
   }
 
   private def handleFailureResponse(lisaManager: String, createRequest: CreateLisaInvestorRequest, errorResponse: CreateLisaInvestorErrorResponse)(implicit hc: HeaderCarrier) = {

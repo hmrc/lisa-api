@@ -33,9 +33,10 @@ trait InvestorService  {
     val response = desConnector.createInvestor(lisaManager, request)
 
     response map {
+      case (409, existsResponse: DesCreateInvestorResponse) => CreateLisaInvestorAlreadyExistsResponse(existsResponse.investorID)
       case (_, successResponse: DesCreateInvestorResponse) => CreateLisaInvestorSuccessResponse(successResponse.investorID)
       case (status: Int, errorResponse: DesFailureResponse) => CreateLisaInvestorErrorResponse(status, errorResponse)
-      }
+    }
   }
 
 }
