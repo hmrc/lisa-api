@@ -40,11 +40,9 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
   val lisaManager = "Z019283"
   val accountId = "ABC12345"
 
-
   override def beforeEach() {
     reset(mockAuditService)
   }
-
 
   val createAccountJson = """{
                             |  "investorId" : "9876543210",
@@ -533,18 +531,19 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
         }
       }
       "the data service throws an exception for a create request" in {
-        when(mockService.createAccount(any(), any())(any())).thenThrow(new RuntimeException("Test"))
+        when(mockService.createAccount(any(), any())(any())).thenReturn(Future.failed(new RuntimeException("Test")))
 
-        val res = doSyncCreateOrTransferRequest(createAccountJson)
-res
+        doCreateOrTransferRequest(createAccountJson) { res =>
+          status(res) mustBe (INTERNAL_SERVER_ERROR)
+        }
       }
-//      "the data service throws an exception for a transfer request" in {
-//        when(mockService.transferAccount(any(), any())(any())).thenThrow(new RuntimeException("Test"))
-//
-//        doCreateOrTransferRequest(transferAccountJson) { res =>
-//          status(res) mustBe (INTERNAL_SERVER_ERROR)
-//        }
-//      }
+      "the data service throws an exception for a transfer request" in {
+        when(mockService.transferAccount(any(), any())(any())).thenReturn(Future.failed(new RuntimeException("Test")))
+
+        doCreateOrTransferRequest(transferAccountJson) { res =>
+          status(res) mustBe (INTERNAL_SERVER_ERROR)
+        }
+      }
       "the data service returns a CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse for a create request" in {
         when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse))
 
