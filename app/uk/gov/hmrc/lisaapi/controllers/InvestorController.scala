@@ -68,6 +68,8 @@ class InvestorController extends LisaController {
   }
 
   private def handleExistsResponse(lisaManager: String, createRequest: CreateLisaInvestorRequest, investorId: String)(implicit hc: HeaderCarrier) = {
+    val result = ErrorInvestorAlreadyExists(investorId)
+
     auditService.audit(
       auditType = "investorNotCreated",
       path = getEndpointUrl(lisaManager),
@@ -76,11 +78,11 @@ class InvestorController extends LisaController {
         "investorNINO" -> createRequest.investorNINO,
         "dateOfBirth" -> createRequest.dateOfBirth.toString("yyyy-MM-dd"),
         "investorID" -> investorId,
-        "reasonNotCreated" -> "INVESTOR_ALREADY_EXISTS"
+        "reasonNotCreated" -> result.errorCode
       )
     )
 
-    Conflict(Json.toJson(ErrorInvestorAlreadyExists(investorId)))
+    Conflict(Json.toJson(result))
   }
 
   private def handleFailureResponse(lisaManager: String, createRequest: CreateLisaInvestorRequest, errorResponse: CreateLisaInvestorErrorResponse)(implicit hc: HeaderCarrier) = {
