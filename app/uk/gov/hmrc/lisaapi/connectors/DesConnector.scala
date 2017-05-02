@@ -68,7 +68,10 @@ trait DesConnector extends ServicesConfig with JsonFormats {
     val result = httpPost.POST[CreateLisaAccountCreationRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc))
 
     result.map(res => {
-      parseDesResponse[DesAccountResponse](res)._2
+      res.status match {
+        case 201 => DesAccountResponse(request.accountId)
+        case _ => parseDesResponse[DesFailureResponse](res)._2
+      }
     })
   }
 
@@ -81,7 +84,10 @@ trait DesConnector extends ServicesConfig with JsonFormats {
     val result = httpPost.POST[CreateLisaAccountTransferRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc))
 
     result.map(res => {
-      parseDesResponse[DesAccountResponse](res)._2
+      res.status match {
+        case 201 => DesAccountResponse(request.accountId)
+        case _ => parseDesResponse[DesFailureResponse](res)._2
+      }
     })
   }
 
@@ -98,7 +104,7 @@ trait DesConnector extends ServicesConfig with JsonFormats {
     result.map(r => {
       r.status match {
         case 200 => DesEmptySuccessResponse
-        case _ => parseDesResponse[DesAccountResponse](r)._2
+        case _ => parseDesResponse[DesFailureResponse](r)._2
       }
     })
   }
