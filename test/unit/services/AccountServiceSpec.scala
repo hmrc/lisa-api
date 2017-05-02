@@ -234,8 +234,7 @@ class AccountServiceSpec extends PlaySpec
         when(mockDesConnector.closeAccount(any(), any(), any())(any()))
           .thenReturn(
             Future.successful((
-              OK,
-              Some(DesAccountResponseOld(None, accountId = Some("AB123456")))
+              DesAccountResponse("AB123456")
             ))
           )
 
@@ -246,74 +245,15 @@ class AccountServiceSpec extends PlaySpec
 
     }
 
-    "return a Error Response" when {
-
-      "given a status code other than 200" in {
-        when(mockDesConnector.closeAccount(any(), any(), any())(any()))
-          .thenReturn(
-            Future.successful((
-              GATEWAY_TIMEOUT,
-              None
-            ))
-          )
-
-        doCloseRequest { response =>
-          response mustBe CloseLisaAccountErrorResponse
-        }
-      }
-
-      "given no data" in {
-        when(mockDesConnector.closeAccount(any(), any(), any())(any()))
-          .thenReturn(
-            Future.successful((
-              OK,
-              None
-            ))
-          )
-
-        doCloseRequest { response =>
-          response mustBe CloseLisaAccountErrorResponse
-        }
-      }
-
-      "given empty data" in {
-        when(mockDesConnector.closeAccount(any(), any(), any())(any()))
-          .thenReturn(
-            Future.successful((
-              OK,
-              Some(DesAccountResponseOld(rdsCode = None, accountId = None))
-            ))
-          )
-
-        doCloseRequest { response =>
-          response mustBe CloseLisaAccountErrorResponse
-        }
-      }
-
-      "given an rds code which is not recognised" in {
-        when(mockDesConnector.closeAccount(any(), any(), any())(any()))
-          .thenReturn(
-            Future.successful((
-              OK,
-              Some(DesAccountResponseOld(rdsCode = Some(99999)))
-            ))
-          )
-
-        doCloseRequest { response =>
-          response mustBe CloseLisaAccountErrorResponse
-        }
-      }
-    }
 
     "return the type-appropriate response" when {
 
-      "given the RDS code for a Account Already Closed Response" in {
+      "given failureResponse for a Account Already Closed Response" in {
         when(mockDesConnector.closeAccount(any(), any(), any())(any()))
           .thenReturn(
-            Future.successful((
-              OK,
-              Some(DesAccountResponseOld(rdsCode = Some(SUT.INVESTOR_ACCOUNT_ALREADY_CLOSED)))
-            ))
+            Future.successful(
+              DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_CLOSED")
+            )
           )
 
         doCloseRequest { response =>
@@ -321,18 +261,25 @@ class AccountServiceSpec extends PlaySpec
         }
       }
 
-      "given the RDS code for a Account Not Found Response" in {
+      "given failureResponse for a Account Not Found Response" in {
         when(mockDesConnector.closeAccount(any(), any(), any())(any()))
           .thenReturn(
-            Future.successful((
-              OK,
-              Some(DesAccountResponseOld(rdsCode = Some(SUT.INVESTOR_ACCOUNT_NOT_FOUND)))
-            ))
+            Future.successful(DesFailureResponse("INVESTOR_ACCOUNTID_NOT_FOUND"))
           )
 
         doCloseRequest { response =>
           response mustBe CloseLisaAccountNotFoundResponse
         }
+      }
+
+      "given an exception return InternalServerError" in {
+        when(mockDesConnector.closeAccount(any(), any(), any())(any())).
+        thenThrow(new RuntimeException("Test"))
+
+        doCloseRequest { response =>
+          response mustBe CloseLisaAccountErrorResponse
+        }
+
       }
 
     }

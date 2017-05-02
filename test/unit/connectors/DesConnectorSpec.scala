@@ -293,10 +293,7 @@ class DesConnectorSpec extends PlaySpec
           )
 
         doCloseAccountRequest { response =>
-          response must be((
-            SERVICE_UNAVAILABLE,
-            None
-          ))
+          response must be(DesFailureResponse())
         }
       }
     }
@@ -314,35 +311,10 @@ class DesConnectorSpec extends PlaySpec
           )
 
         doCloseAccountRequest { response =>
-          response must be((
-            OK,
-            Some(DesAccountResponseOld(None, None))
-          ))
+          response must be(DesFailureResponse())
         }
       }
     }
-
-    "Return a populated DesAccountResponse" when {
-      "The DES response has a json body that is in the correct format" in {
-        when(mockHttpPost.POST[CloseLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                responseStatus = OK,
-                responseJson = Some(Json.parse(s"""{"rdsCode": null, "accountId": "AB123456"}"""))
-              )
-            )
-          )
-
-        doCloseAccountRequest { response =>
-          response must be((
-            OK,
-            Some(DesAccountResponseOld(rdsCode = None, accountId = Some("AB123456")))
-          ))
-        }
-      }
-    }
-
   }
 
   "Report Life Event endpoint" must {
@@ -538,7 +510,7 @@ class DesConnectorSpec extends PlaySpec
     callback(response)
   }
 
-  private def doCloseAccountRequest(callback: ((Int, Option[DesAccountResponseOld])) => Unit) = {
+  private def doCloseAccountRequest(callback: (DesResponse) => Unit) = {
     val request = CloseLisaAccountRequest("Voided", new DateTime("2000-01-01"))
     val response = Await.result(SUT.closeAccount("Z123456", "ABC12345", request), Duration.Inf)
 
