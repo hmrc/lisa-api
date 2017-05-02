@@ -40,11 +40,9 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
   val lisaManager = "Z019283"
   val accountId = "ABC12345"
 
-
   override def beforeEach() {
     reset(mockAuditService)
   }
-
 
   val createAccountJson = """{
                             |  "investorId" : "9876543210",
@@ -532,6 +530,20 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
           status(res) mustBe (INTERNAL_SERVER_ERROR)
         }
       }
+      "the data service throws an exception for a create request" in {
+        when(mockService.createAccount(any(), any())(any())).thenReturn(Future.failed(new RuntimeException("Test")))
+
+        doCreateOrTransferRequest(createAccountJson) { res =>
+          status(res) mustBe (INTERNAL_SERVER_ERROR)
+        }
+      }
+      "the data service throws an exception for a transfer request" in {
+        when(mockService.transferAccount(any(), any())(any())).thenReturn(Future.failed(new RuntimeException("Test")))
+
+        doCreateOrTransferRequest(transferAccountJson) { res =>
+          status(res) mustBe (INTERNAL_SERVER_ERROR)
+        }
+      }
       "the data service returns a CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse for a create request" in {
         when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse))
 
@@ -674,6 +686,14 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
     "return with status 500 internal server error" when {
       "the data service returns an error" in {
         when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountErrorResponse))
+
+        doCloseRequest(closeAccountJson) { res =>
+          status(res) mustBe (INTERNAL_SERVER_ERROR)
+        }
+      }
+
+      "An exception is thrown" in {
+        when(mockService.closeAccount(any(), any(), any())(any())).thenThrow(new RuntimeException("Test"))
 
         doCloseRequest(closeAccountJson) { res =>
           status(res) mustBe (INTERNAL_SERVER_ERROR)

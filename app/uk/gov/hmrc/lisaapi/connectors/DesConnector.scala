@@ -90,16 +90,15 @@ trait DesConnector extends ServicesConfig with JsonFormats {
     *
     * @return A tuple of the http status code and an (optional) data response
     */
-  def closeAccount(lisaManager: String, accountId: String, request: CloseLisaAccountRequest)(implicit hc: HeaderCarrier): Future[(Int, Option[DesAccountResponseOld])] = {
+  def closeAccount(lisaManager: String, accountId: String, request: CloseLisaAccountRequest)(implicit hc: HeaderCarrier): Future[DesResponse] = {
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId/close-account"
 
     val result = httpPost.POST[CloseLisaAccountRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc))
 
     result.map(r => {
-      // catch any NullPointerExceptions that may occur from r.json being a null
-      Try(r.json.asOpt[DesAccountResponseOld]) match {
-        case Success(data) => Logger.debug(s"DES Success Response : ${r.json}") ;(r.status, data)
-        case Failure(_) => Logger.error(s"DES failure response for $uri and response : ${r.status}" ); (r.status, None)
+      r.status match {
+        case 200 => DesEmptySuccessResponse
+        case _ => parseDesResponse[DesAccountResponse](r)._2
       }
     })
   }
@@ -140,17 +139,15 @@ trait DesConnector extends ServicesConfig with JsonFormats {
   def parseDesResponse[A <: DesResponse](res: HttpResponse)(implicit reads:Reads[A]): (Int, DesResponse) = {
     Try(res.json.as[A]) match {
       case Success(data) =>
-        Logger.debug(s"DES success Response : ${res.json}")
         (res.status, data)
       case Failure(_) =>
         Try(res.json.as[DesFailureResponse]) match {
           case Success(data) =>
-            Logger.debug(s"DES Response : ${res.json}")
-            (res.status, data)
+             (res.status, data)
           case Failure(ex) =>
-            Logger.error(s"DES failure response. $res Exception: ${ex.getMessage}")
-            (500, DesFailureResponse())
+             (500, DesFailureResponse())
         }
+
     }
   }
 

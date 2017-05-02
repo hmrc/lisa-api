@@ -45,6 +45,8 @@ class InvestorController extends LisaController {
               case errorResponse: CreateLisaInvestorErrorResponse =>
                 handleFailureResponse(lisaManager, createRequest, errorResponse)
             }
+          } recover {
+            case _  => handleError(lisaManager, createRequest)
           }
         }
       }
@@ -99,6 +101,20 @@ class InvestorController extends LisaController {
     )
 
     Status(errorResponse.status).apply(Json.toJson(errorResponse.data))
+  }
+
+  private def handleError(lisaManager: String, createRequest: CreateLisaInvestorRequest)(implicit hc: HeaderCarrier) = {
+    auditService.audit(
+      auditType = "investorNotCreated",
+      path = getEndpointUrl(lisaManager),
+      auditData = Map(
+        "lisaManagerReferenceNumber" -> lisaManager,
+        "investorNINO" -> createRequest.investorNINO,
+        "dateOfBirth" -> createRequest.dateOfBirth.toString("yyyy-MM-dd"),
+        "reasonNotCreated" -> ErrorInternalServerError.errorCode
+      )
+    )
+    InternalServerError(Json.toJson(ErrorInternalServerError))
   }
 
   private def getEndpointUrl(lisaManagerReferenceNumber: String):String = {

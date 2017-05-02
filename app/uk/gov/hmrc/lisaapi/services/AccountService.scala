@@ -19,19 +19,16 @@ package uk.gov.hmrc.lisaapi.services
 import play.api.Logger
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.models.des.{DesAccountResponse, DesFailureResponse, DesLifeEventResponse}
+import uk.gov.hmrc.lisaapi.models.des.{DesAccountResponse, DesEmptySuccessResponse, DesFailureResponse}
 import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-trait AccountService  {
+trait AccountService {
   val desConnector: DesConnector
 
-  val INVESTOR_ACCOUNT_ALREADY_CLOSED = 63220
-  val INVESTOR_ACCOUNT_NOT_FOUND = 63221
-
-  def createAccount(lisaManager: String, request: CreateLisaAccountCreationRequest)(implicit hc: HeaderCarrier) : Future[CreateLisaAccountResponse] = {
+  def createAccount(lisaManager: String, request: CreateLisaAccountCreationRequest)(implicit hc: HeaderCarrier): Future[CreateLisaAccountResponse] = {
     val response = desConnector.createAccount(lisaManager, request)
 
     response map {
@@ -55,7 +52,7 @@ trait AccountService  {
     }
   }
 
-  def transferAccount(lisaManager: String, request: CreateLisaAccountTransferRequest)(implicit hc: HeaderCarrier) : Future[CreateLisaAccountResponse] = {
+  def transferAccount(lisaManager: String, request: CreateLisaAccountTransferRequest)(implicit hc: HeaderCarrier): Future[CreateLisaAccountResponse] = {
     val response = desConnector.transferAccount(lisaManager, request)
 
     response map {
@@ -79,23 +76,23 @@ trait AccountService  {
     }
   }
 
-  def closeAccount(lisaManager: String, accountId: String, request: CloseLisaAccountRequest)(implicit hc: HeaderCarrier) : Future[CloseLisaAccountResponse] = {
+  def closeAccount(lisaManager: String, accountId: String, request: CloseLisaAccountRequest)(implicit hc: HeaderCarrier): Future[CloseLisaAccountResponse] = {
+
     val response = desConnector.closeAccount(lisaManager, accountId, request)
-    val httpStatusOk = 200
 
     response map {
-      case (`httpStatusOk`, Some(data)) => {
-        (data.rdsCode, data.accountId) match {
-          case (None, Some(accountId)) => CloseLisaAccountSuccessResponse(accountId)
-          case (Some(INVESTOR_ACCOUNT_ALREADY_CLOSED), _) => CloseLisaAccountAlreadyClosedResponse
-          case (Some(INVESTOR_ACCOUNT_NOT_FOUND), _) => CloseLisaAccountNotFoundResponse
-          case (_, _) => CloseLisaAccountErrorResponse
+      case DesEmptySuccessResponse => {
+        CloseLisaAccountSuccessResponse(accountId)
+      }
+      case failureResponse: DesFailureResponse => {
+        failureResponse.code match {
+          case "INVESTOR_ACCOUNT_ALREADY_CLOSED" => CloseLisaAccountAlreadyClosedResponse
+          case "INVESTOR_ACCOUNTID_NOT_FOUND" => CloseLisaAccountNotFoundResponse
+          case _ => CloseLisaAccountErrorResponse
         }
       }
-      case (_, _) => CloseLisaAccountErrorResponse
     }
   }
-
 }
 
 object AccountService extends AccountService {

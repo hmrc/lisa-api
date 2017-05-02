@@ -115,6 +115,21 @@ class InvestorControllerSpec extends PlaySpec
       }
     }
 
+    "return with status 500 internal server error" when {
+
+      "an exception gets thrown" in {
+        when(mockService.createInvestor(any(), any())(any())).
+          thenThrow(new RuntimeException("Test"))
+
+        val res = SUT.createLisaInvestor(lisaManager).
+          apply(FakeRequest(Helpers.PUT, "/").
+            withHeaders(acceptHeader).
+            withBody(AnyContentAsJson(Json.parse(investorJson))))
+
+        status(res) mustBe (INTERNAL_SERVER_ERROR)
+        (contentAsJson(res) \ "code").as[String] mustBe ("INTERNAL_SERVER_ERROR")
+      }
+    }
     "convert names to uppercase" when {
       "given standard a-z characters" in {
         when(mockService.createInvestor(any(), any())(any())).thenReturn(Future.successful(CreateLisaInvestorSuccessResponse("AB123456")))
