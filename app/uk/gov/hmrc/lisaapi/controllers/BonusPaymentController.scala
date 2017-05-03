@@ -50,8 +50,10 @@ class BonusPaymentController extends LisaController {
                   handleFailure(lisaManager, accountId, req, errorResponse)
               }
             } recover {
-              case _ => handleError(lisaManager, accountId, req)
-            }
+                case e:Exception  =>  Logger.error(s"requestBonusPayment : An error occurred due to ${e.getMessage} returning internal server error")
+                  handleError(lisaManager, accountId, req)
+
+           }
         }
       }
   }

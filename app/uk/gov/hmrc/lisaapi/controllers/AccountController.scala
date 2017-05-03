@@ -142,11 +142,13 @@ class AccountController extends LisaController {
             auditData = creationRequest.toStringMap ++ Map("lisaManagerReferenceNumber" -> lisaManager,
               "reasonNotCreated" -> ErrorInternalServerError.errorCode)
           )
+          Logger.error(s"AccontController :createAccount unknown case from DES returning internal server error" )
           InternalServerError(Json.toJson(ErrorInternalServerError))
         }
       }
     } recover {
-      case _ => InternalServerError(Json.toJson(ErrorInternalServerError))
+      case e:Exception  =>     Logger.error(s"AccontController : An error occurred due to ${e.getMessage} returning internal server error")
+        InternalServerError(Json.toJson(ErrorInternalServerError))
     }
   }
 
@@ -215,11 +217,13 @@ class AccountController extends LisaController {
             auditData = transferRequest.toStringMap ++ Map("lisaManagerReferenceNumber" -> lisaManager,
               "reasonNotCreated" -> ErrorInternalServerError.errorCode)
           )
+          Logger.error(s"AccontController : transferAccount unknown case from DES returning internal server error" )
           InternalServerError(Json.toJson(ErrorInternalServerError))
         }
       }
     } recover {
-      case _ => InternalServerError(Json.toJson(ErrorInternalServerError))
+      case e:Exception  =>     Logger.error(s"AccontController : An error occurred in due to ${e.getMessage} returning internal server error")
+        InternalServerError(Json.toJson(ErrorInternalServerError))
     }
   }
 
@@ -267,12 +271,14 @@ class AccountController extends LisaController {
               "accountId" -> accountId,
               "reasonNotClosed" -> ErrorInternalServerError.errorCode)
           )
+          Logger.error(s"AccountController: closeAccount unknown case from DES returning internal server error" )
           InternalServerError(Json.toJson(ErrorInternalServerError))
         }
       }
     } recover {
-      case _ => InternalServerError(Json.toJson(ErrorInternalServerError))
-    }
+        case e:Exception  =>     Logger.error(s"AccountController: closeAccount: An error occurred due to ${e.getMessage} returning internal server error")
+                                  InternalServerError(Json.toJson(ErrorInternalServerError))
+       }
   }
 
   private def hasAccountTransferData(js: JsObject): Boolean = {

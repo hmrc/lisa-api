@@ -46,7 +46,8 @@ class InvestorController extends LisaController {
                 handleFailureResponse(lisaManager, createRequest, errorResponse)
             }
           } recover {
-            case _  => handleError(lisaManager, createRequest)
+            case e:Exception  =>   Logger.error(s"createLisaInvestor: An error occurred due to ${e.getMessage} returning internal server error")
+            handleError(lisaManager, createRequest)
           }
         }
       }
