@@ -43,7 +43,7 @@ trait LisaController extends BaseController with HeaderValidator with RunMode wi
             Try(success(payload)) match {
               case Success(result) => result
               case Failure(ex:Exception) => {
-                Logger.info(s"An error occurred ${ex.getMessage}")
+                Logger.error(s"LisaController An error occurred in Json payload validation ${ex.getMessage}")
                 Future.successful(InternalServerError(toJson(ErrorInternalServerError)))
               }
             }
@@ -52,12 +52,13 @@ trait LisaController extends BaseController with HeaderValidator with RunMode wi
             invalid match {
               case Some(invalidCallback) => invalidCallback(errors)
               case None => {
-                Logger.info(s"The errors are ${errors.toString()}")
+                Logger.error(s"The errors are ${errors.toString()}")
                 Future.successful(BadRequest(toJson(ErrorGenericBadRequest)))
               }
             }
           }
-          case Failure(e) => Future.successful(InternalServerError(toJson(ErrorInternalServerError)))
+          case Failure(e) =>                 Logger.error(s"LisaController: An error occurred in lisa-api due to ${e.getMessage} returning internal server error")
+            Future.successful(InternalServerError(toJson(ErrorInternalServerError)))
         }
       case None => Future.successful(BadRequest(toJson(EmptyJson)))
     }

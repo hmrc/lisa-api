@@ -76,6 +76,8 @@ class LifeEventController extends LisaController {
 
             doAudit(lisaManager, accountId, req, "lifeEventNotReported", Map("reasonNotReported" -> ErrorInternalServerError.errorCode))
 
+            Logger.error(s"Life Event Not reported : DES unknown case , returning internal server error")
+
             InternalServerError(Json.toJson(ErrorInternalServerError))
           }
         }

@@ -148,9 +148,9 @@ trait DesConnector extends ServicesConfig with JsonFormats {
         (res.status, data)
       case Failure(_) =>
         Try(res.json.as[DesFailureResponse]) match {
-          case Success(data) =>
+          case Success(data) => Logger.info(s"DesFailureResponse from DES :${data}")
              (res.status, data)
-          case Failure(ex) =>
+          case Failure(ex) => Logger.error(s"Error from DES :${ex.getMessage}")
              (500, DesFailureResponse())
         }
 
