@@ -19,9 +19,9 @@
                                         }
                 </p>
             </td>
-            <td><p>HTTP status: <code class="code--slim">201(OK)</code></p>
+            <td><p>HTTP status: <code class="code--slim">200 OK</code></p>
                 <p class ="code--block"> {<br>
-                                         "status": 201,<br>
+                                         "status": 200,<br>
                                          "success": true,<br>
                                          "data": {<br>
                                            "message": "LISA Account Closed",<br>
