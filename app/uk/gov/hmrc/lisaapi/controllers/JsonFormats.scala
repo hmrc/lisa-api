@@ -73,7 +73,7 @@ trait JsonFormats {
   implicit val accountTransferReads: Reads[AccountTransfer] = (
     (JsPath \ "transferredFromAccountId").read(Reads.pattern(accountIDRegex, "error.formatting.accountId")) and
     (JsPath \ "transferredFromLMRN").read(Reads.pattern(lmrnRegex, "error.formatting.lmrn")) and
-    (JsPath \ "transferInDate").read(isoDateReads()).map(new DateTime(_))
+    (JsPath \ "transferInDate").read(isoDateReads(allowFutureDates = false)).map(new DateTime(_))
   )(AccountTransfer.apply _)
 
   implicit val accountTransferWrites: Writes[AccountTransfer] = (
@@ -85,7 +85,7 @@ trait JsonFormats {
   implicit val createLisaAccountCreationRequestReads: Reads[CreateLisaAccountCreationRequest] = (
     (JsPath \ "investorId").read(Reads.pattern(investorIDRegex, "error.formatting.investorId")) and
     (JsPath \ "accountId").read(Reads.pattern(accountIDRegex, "error.formatting.accountId")) and
-    (JsPath \ "firstSubscriptionDate").read(isoDateReads()).map(new DateTime(_))
+    (JsPath \ "firstSubscriptionDate").read(isoDateReads(allowFutureDates = false)).map(new DateTime(_))
   )(CreateLisaAccountCreationRequest.apply _)
 
   implicit val createLisaAccountTransferRequestReads: Reads[CreateLisaAccountTransferRequest] = (
