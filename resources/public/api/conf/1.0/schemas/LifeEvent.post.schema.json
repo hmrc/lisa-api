@@ -25,7 +25,7 @@
 		},
 		"eventType" : {
 			"type" : "string",
-			"enum": ["LISA Investor Terminal Ill Health", "LISA Investor Death", "House Purchase"]
+			"enum": ["LISA Investor Terminal Ill Health", "LISA Investor Death"]
 		}
 	}
 }
