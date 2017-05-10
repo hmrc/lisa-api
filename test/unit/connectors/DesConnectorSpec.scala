@@ -540,8 +540,8 @@ class DesConnectorSpec extends PlaySpec
   private def doRequestBonusPaymentRequest(callback: ((Int, DesResponse)) => Unit) = {
     val request = RequestBonusPaymentRequest(
       lifeEventId = Some("1234567891"),
-      periodStartDate = new DateTime("2016-05-22"),
-      periodEndDate = new DateTime("2017-05-22"),
+      periodStartDate = new DateTime("2017-04-06"),
+      periodEndDate = new DateTime("2017-05-05"),
       transactionType = "Bonus",
       htbTransfer = Some(HelpToBuyTransfer(0f, 0f)),
       inboundPayments = InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
