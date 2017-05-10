@@ -32,7 +32,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Close Account endpoint without accountClosureReason and (or) closereDate in the payload</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountId :A1234568</p></td>
+            <td><p>Close Account endpoint without accountClosureReason and (or) closureDate in the payload</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountId :A1234568</p></td>
             <td>
                 <p class ="code--block"> {<br>
                                      	  "closureDate":"2017-01-03"<br>
@@ -48,7 +48,24 @@
             </td>
         </tr>
         <tr>
-            <td><p>Close Account endpoint with an accountId that doesnot exist</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountId :A1234562</p></td>
+            <td><p>Close Account endpoint with a closureDate set in the future</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountId :A1234568</p></td>
+            <td>
+                <p class ="code--block"> {<br>
+                                          "accountClosureReason" : "All funds withdrawn",<br>
+                                     	  "closureDate":"3000-01-01"<br>
+                                        }
+                </p>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">400(Bad RequestOK)</code></p>
+                <p class ="code--block"> {<br>
+                                            "code": "BAD_REQUEST",<br>
+                                            "message": "Bad Request"<br>
+                                       }
+                </p>
+            </td>
+        </tr>
+        <tr>
+            <td><p>Close Account endpoint with an accountId that doesn't exist</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountId :A1234562</p></td>
             <td>
                 <p class ="code--block"> {<br>
                                           "accountClosureReason" : "All funds withdrawn",
@@ -82,7 +99,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Close Account endpoint with a Lisamanager in the URI doesnot exist</p><p class ="code--block">lisaManagerReferenceNumber :Z123456789<br>accountId :A1234561</p></td>
+            <td><p>Close Account endpoint with a Lisa Manager ID in the URI which doesn't exist</p><p class ="code--block">lisaManagerReferenceNumber :Z123456789<br>accountId :A1234561</p></td>
             <td>
                 <p class ="code--block"> {<br>
                                           "accountClosureReason" : "All funds withdrawn",
