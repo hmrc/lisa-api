@@ -15,8 +15,8 @@
             <td>
                 <p class ="code--block"> {<br>
                                                "lifeEventId" : "1234567891",<br>
-                                                "periodStartDate" : "2016-05-22",<br>
-                                                "periodEndDate" : "2017-05-22",<br>
+                                                "periodStartDate" : "2017-04-06",<br>
+                                                "periodEndDate" : "2017-05-05",<br>
                                                 "transactionType" : "Penalty",<br>
                                                 "htbTransfer": {<br>
                                                   "htbTransferInForPeriod": 0.00,<br>
@@ -54,8 +54,8 @@
             <td>
                 <p class ="code--block"> {<br>
                                                "lifeEventId" : "1234567891",<br>
-                                                "periodStartDate" : "2016-05-22",<br>
-                                                "periodEndDate" : "2017-05-22",<br>
+                                                "periodStartDate" : "2017-04-06",<br>
+                                                "periodEndDate" : "2017-05-05",<br>
                                                 "transactionType" : "Penalty",<br>
                                                 "htbTransfer": {<br>
                                                   "htbTransferInForPeriod": 0.00,<br>
@@ -89,8 +89,8 @@
             <td>
                 <p class ="code--block"> {<br>
                                                "lifeEventId" : "1234567891",<br>
-                                                "periodStartDate" : "2016-05-22",<br>
-                                                "periodEndDate" : "2017-05-22",<br>
+                                                "periodStartDate" : "2017-04-06",<br>
+                                                "periodEndDate" : "2017-05-05",<br>
                                                 "transactionType" : "Penalty",<br>
                                                 "htbTransfer": {<br>
                                                   "htbTransferInForPeriod": 0.00,<br>
@@ -123,8 +123,8 @@
             <td>
                 <p class ="code--block"> {<br>
                                                "lifeEventId" : "1234567891",<br>
-                                                 "periodStartDate" : "2016-05-22",<br>
-                                                 "periodEndDate" : "2017-05-22",<br>
+                                                 "periodStartDate" : "2017-04-06",<br>
+                                                 "periodEndDate" : "2017-05-05",<br>
                                                  "transactionType" : "Bonus",<br>
                                                  "htbTransfer": {<br>
                                                    "htbTransferInForPeriod": 0.00,<br>
@@ -158,8 +158,8 @@
             <td>
                 <p class ="code--block"> {<br>
                                                "lifeEventId" : "1234567891",<br>
-                                                 "periodStartDate" : "2016-05-22",<br>
-                                                 "periodEndDate" : "2017-05-22",<br>
+                                                 "periodStartDate" : "2017-04-06",<br>
+                                                 "periodEndDate" : "2017-05-05",<br>
                                                  "transactionType" : "Bonus",<br>
                                                  "htbTransfer": {<br>
                                                    "htbTransferInForPeriod": 0.00,<br>
@@ -193,8 +193,8 @@
             <td>
                 <p class ="code--block"> {<br>
                                                "lifeEventId" : "1234567891",<br>
-                                                 "periodStartDate" : "2016-05-22",<br>
-                                                 "periodEndDate" : "2017-05-22",<br>
+                                                 "periodStartDate" : "2017-04-06",<br>
+                                                 "periodEndDate" : "2017-05-05",<br>
                                                  "transactionType" : "Invalid Transaction Type",<br>
                                                  "htbTransfer": {<br>
                                                    "htbTransferInForPeriod": 0.00,<br>
@@ -227,8 +227,8 @@
             <td><p>Request Bonus payment endpoint without lifeEventId and Life Event as claimReason</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountId: 1110000503</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                               	"periodStartDate" : "2016-05-22",<br>
-                                               	"periodEndDate" : "2017-05-22",<br>
+                                               	"periodStartDate" : "2017-04-06",<br>
+                                               	"periodEndDate" : "2017-05-05",<br>
                                                	"transactionType" : "Bonus",<br>
                                                	"htbTransfer": {<br>
                                                	"htbTransferInForPeriod": 0.00,<br>
@@ -261,8 +261,8 @@
             <td><p>Request Bonus payment endpoint with Regular Bonus as claim Reason and without lifeEventId (lifeEventId as an optional element)</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountId: 1110000503</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                              "periodStartDate" : "2016-05-22",<br>
-                                              "periodEndDate" : "2017-05-22",<br>
+                                              "periodStartDate" : "2017-04-06",<br>
+                                              "periodEndDate" : "2017-05-05",<br>
                                               "transactionType" : "Bonus",<br>
                                               "htbTransfer": {<br>
                                                 "htbTransferInForPeriod": 0.00,<br>
@@ -300,8 +300,8 @@
             <td>
                 <p class ="code--block"> {<br>
                                                "lifeEventId" : "1234567891",<br>
-                                                "periodStartDate" : "2016-05-22",<br>
-                                                "periodEndDate" : "2017-05-22",<br>
+                                                "periodStartDate" : "2017-04-06",<br>
+                                                "periodEndDate" : "2017-05-05",<br>
                                                 "transactionType" : "Penalty",<br>
                                                 "htbTransfer": {<br>
                                                   "htbTransferInForPeriod": 0.00,<br>
@@ -335,8 +335,8 @@
             <td>
                 <p class ="code--block"> {<br>
                                                "lifeEventId" : "1234567891",<br>
-                                                "periodStartDate" : "2016-05-22",<br>
-                                                "periodEndDate" : "2017-05-22",<br>
+                                                "periodStartDate" : "2017-04-06",<br>
+                                                "periodEndDate" : "2017-05-05",<br>
                                                 "transactionType" : "Penalty",<br>
                                                 "htbTransfer": {<br>
                                                   "htbTransferInForPeriod": 0.00,<br>
@@ -370,8 +370,8 @@
             <td>
                 <p class ="code--block"> {<br>
                                                "lifeEventId" : "1234567891",<br>
-                                                "periodStartDate" : "2016-05-22",<br>
-                                                "periodEndDate" : "2017-05-22",<br>
+                                                "periodStartDate" : "2017-04-06",<br>
+                                                "periodEndDate" : "2017-05-05",<br>
                                                 "transactionType" : "Penalty",<br>
                                                 "htbTransfer": {<br>
                                                   "htbTransferInForPeriod": 0.00,<br>

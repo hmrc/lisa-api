@@ -83,8 +83,8 @@ class AuditServiceSpec extends PlaySpec
     "build an audit event with the correct detail when passed a RequestBonusPaymentRequest" in {
       val data = RequestBonusPaymentRequest(
         lifeEventId = Some("1234567891"),
-        periodStartDate = new DateTime("2016-05-22"),
-        periodEndDate = new DateTime("2017-05-22"),
+        periodStartDate = new DateTime("2017-04-06"),
+        periodEndDate = new DateTime("2017-05-05"),
         transactionType = "Bonus",
         htbTransfer = Some(HelpToBuyTransfer(1f, 0f)),
         inboundPayments = InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
@@ -98,8 +98,8 @@ class AuditServiceSpec extends PlaySpec
       val event = captor.getValue
 
       event.detail must contain ("lifeEventId" -> "1234567891")
-      event.detail must contain ("periodStartDate" -> "2016-05-22")
-      event.detail must contain ("periodEndDate" -> "2017-05-22")
+      event.detail must contain ("periodStartDate" -> "2017-04-06")
+      event.detail must contain ("periodEndDate" -> "2017-05-05")
       event.detail must contain ("transactionType" -> "Bonus")
       event.detail must contain ("htbTransferInForPeriod" -> "1.0")
       event.detail must contain ("htbTransferTotalYTD" -> "0.0")

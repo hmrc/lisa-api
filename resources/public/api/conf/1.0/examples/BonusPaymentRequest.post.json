@@ -1,7 +1,7 @@
 {
   "lifeEventId" : "1234567891",
-  "periodStartDate" : "2016-05-22",
-  "periodEndDate" : "2017-05-22",
+  "periodStartDate" : "2017-04-06",
+  "periodEndDate" : "2017-05-05",
   "transactionType" : "Bonus",
 
   "htbTransfer" : {
