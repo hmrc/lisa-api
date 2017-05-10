@@ -35,7 +35,7 @@ trait JsonFormats {
   implicit val accountClosureRegex = "^(Transferred out|All funds withdrawn|Voided)$".r
   implicit val transactionTypeRegex = "^(Bonus|Penalty)$".r
   implicit val bonusClaimReasonRegex = "^(Life Event|Regular Bonus)$".r
-  implicit val lifeEventTypeRegex = "^(LISA Investor Terminal Ill Health|LISA Investor Death|House Purchase)$".r
+  implicit val lifeEventTypeRegex = "^(LISA Investor Terminal Ill Health|LISA Investor Death)$".r
 
   implicit val createLisaInvestorRequestReads: Reads[CreateLisaInvestorRequest] = (
     (JsPath \ "investorNINO").read(Reads.pattern(ninoRegex, "error.formatting.nino")) and
