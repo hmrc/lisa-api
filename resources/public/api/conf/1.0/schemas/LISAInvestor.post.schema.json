@@ -10,13 +10,13 @@
           "description": "The investor’s first name.",
           "type" : "string",
           "pattern": "^[a-zA-Z &`\\-\\'^]{1,35}$",
-		  "example": "FirstNameMe"
+		  "example": "FirstName"
         },
 		"lastName" : {
           "description": "The investor’s last name.",
           "type" : "string",
           "pattern": "^[a-zA-Z &`\\-\\'^]{1,35}$",
-          "example": "lastNameDough"
+          "example": "LastName"
         },
 		"dateOfBirth": {
           "description": "The investor’s date of birth. This can't be in the future.",
