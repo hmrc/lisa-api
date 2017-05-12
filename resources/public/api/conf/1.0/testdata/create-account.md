@@ -98,25 +98,9 @@
                 </p>
             </td>
         </tr>
-        <tr>
-            <td><p>The LISA account has already been closed or voided</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
-            <td>
-                <p class ="code--block"> {<br>
-                                            "investorId":"0000000403",<br>
-                                            "creationReason":"New",<br>
-                                            "accountId":"8765432100",<br>
-                                            "firstSubscriptionDate":"2011-03-23"<br>
-                                        }
-                </p>
-            </td>
-            <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
-                <p class ="code--block"> {<br>
-                                         "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID",<br>
-                                         "message": "The LISA account has already been closed or voided."<br>
-                                       }
-                </p>
-            </td>
-        </tr>
+        
+        
+        
         <tr>
             <td><p>Create Account endpoint with an investor with details that doesnot match the HMRC records</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
             <td>
@@ -175,49 +159,6 @@
             </td>
         </tr>
         <tr>
-            <td><p>Create Account endpoint with transfer details in the payload</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
-            <td>
-                <p class ="code--block"> {<br>
-                                             "investorId":"1234500892",<br>
-                                             "creationReason":"New",<br>
-                                             "accountId":"8765432100",<br>
-                                             "firstSubscriptionDate":"2011-03-23",<br>
-                                             "transferAccount": {<br>
-                                               "transferredFromAccountId": "98123459898",<br>
-                                               "transferredFromLMRN": "Z543333",<br>
-                                               "transferInDate": "2015-12-13"<br>
-                                             }
-                                        }
-                </p>
-            </td>
-            <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
-                <p class ="code--block"> {<br>
-                                         "code": "TRANSFER_ACCOUNT_DATA_PROVIDED",<br>
-                                         "message": "transferredFromAccountId, transferedFromLMRN, and transferInDate fields should only be completed when the creationReason is \"Transferred\"."<br>
-                                       }
-                </p>
-            </td>
-        </tr>
-        <tr>
-            <td><p>Transfer Account endpoint without transfer details in the payload</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
-            <td>
-                <p class ="code--block"> {<br>
-                                               "investorId":"9876543210",<br>
-                                               "creationReason":"Transferred",<br>
-                                               "accountId":"87654321",<br>
-                                               "firstSubscriptionDate":"2011-03-23"<br>
-                                        }
-                </p>
-            </td>
-            <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
-                <p class ="code--block"> {<br>
-                                         "code": "TRANSFER_ACCOUNT_DATA_NOT_PROVIDED",<br>
-                                          "message": "The transferredFromAccountId, transferredFromLMRN and transferInDate are not provided and are required for transfer of an account."<br>
-                                       }
-                </p>
-            </td>
-        </tr>
-        <tr>
             <td><p>Transfer Account endpoint with transferredFromAccountId and transferredFromLMRN in the payload doesn't match HMRC records</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
             <td>
                 <p class ="code--block"> {<br>
@@ -242,6 +183,90 @@
             </td>
         </tr>
         <tr>
+            <td><p>Transfer Account endpoint without transfer details in the payload</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
+            <td>
+                <p class ="code--block"> {<br>
+                                               "investorId":"9876543210",<br>
+                                               "creationReason":"Transferred",<br>
+                                               "accountId":"87654321",<br>
+                                               "firstSubscriptionDate":"2011-03-23"<br>
+                                        }
+                </p>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
+                <p class ="code--block"> {<br>
+                                         "code": "TRANSFER_ACCOUNT_DATA_NOT_PROVIDED",<br>
+                                          "message": "The transferredFromAccountId, transferredFromLMRN and transferInDate are not provided and are required for transfer of an account."<br>
+                                       }
+                </p>
+            </td>
+        </tr>
+        <tr>
+            <td><p>Create Account endpoint with transfer details in the payload</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
+            <td>
+                <p class ="code--block"> {<br>
+                                             "investorId":"1234500892",<br>
+                                             "creationReason":"New",<br>
+                                             "accountId":"8765432100",<br>
+                                             "firstSubscriptionDate":"2011-03-23",<br>
+                                             "transferAccount": {<br>
+                                               "transferredFromAccountId": "98123459898",<br>
+                                               "transferredFromLMRN": "Z543333",<br>
+                                               "transferInDate": "2015-12-13"<br>
+                                             }
+                                        }
+                </p>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
+                <p class ="code--block"> {<br>
+                                         "code": "TRANSFER_ACCOUNT_DATA_PROVIDED",<br>
+                                         "message": "transferredFromAccountId, transferedFromLMRN, and transferInDate fields should only be completed when the creationReason is \"Transferred\"."<br>
+                                       }
+                </p>
+            </td>
+        </tr>
+        <tr>
+            <td><p>The LISA account has already been closed or voided</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
+            <td>
+                <p class ="code--block"> {<br>
+                                            "investorId":"0000000403",<br>
+                                            "creationReason":"New",<br>
+                                            "accountId":"8765432100",<br>
+                                            "firstSubscriptionDate":"2011-03-23"<br>
+                                        }
+                </p>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
+                <p class ="code--block"> {<br>
+                                         "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID",<br>
+                                         "message": "The LISA account has already been closed or voided."<br>
+                                       }
+                </p>
+            </td>
+        </tr>
+        
+        
+        
+        <tr>
+            <td><p>Request containing a LISA Manager Reference Number that doesn't exist</p><p class ="code--block">lisaManagerReferenceNumber: Z123456789</p></td>
+            <td>
+                <p class ="code--block"> {<br>
+                                            "investorId":"0000000403",<br>
+                                            "creationReason":"New",<br>
+                                            "accountId":"8765432100",<br>
+                                            "firstSubscriptionDate":"2011-03-23"<br>
+                                        }
+                </p>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">404 (Not Found)</code></p>
+                <p class ="code--block"> {<br>
+                                            "code": "NOT_FOUND",<br>
+                                            "message": "Resource was not found"<br>
+                                          }
+                </p>
+            </td>
+        </tr> 
+        <tr>
             <td><p>Request with an invalid 'Accept' header</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br><br>Accept: application/vnd.hmrc.1.0</p></td>
             <td>
                 <p class ="code--block"> {<br>
@@ -259,7 +284,27 @@
                                           }
                 </p>
             </td>
-        </tr>        <tr>
+        </tr>
+        <tr>
+            <td><p>Create Request containing a pre-existing account</p><p class ="code--block">lisaManagerReferenceNumber: Z123456789</p></td>
+            <td>
+                <p class ="code--block"> {<br>
+                                     	    "investorId": "1234567899",<br>
+                                     	    "creationReason": "New",<br>
+                                     	    "accountId": "1234567890",<br>
+                                     	    "firstSubscriptionDate": "2011-03-23"<br>
+                                        }
+                </p>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">409 (Conflict)</code></p>
+                <p class ="code--block"> {<br>
+                                            "code": "INVESTOR_ACCOUNT_ALREADY_EXISTS",<br>
+                                            "message": "The LISA account already exists"<br>
+                                          }
+                </p>
+            </td>
+        </tr> 
+        <tr>
             <td><p>Request which fails due to an unexpected error</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
             <td>
                 <p class ="code--block"> {<br>
