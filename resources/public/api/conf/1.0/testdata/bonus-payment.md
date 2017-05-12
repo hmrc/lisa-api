@@ -17,7 +17,7 @@
                                                "lifeEventId" : "1234567891",<br>
                                                 "periodStartDate" : "2017-04-06",<br>
                                                 "periodEndDate" : "2017-05-05",<br>
-                                                "transactionType" : "Penalty",<br>
+                                                "transactionType" : "Bonus",<br>
                                                 "htbTransfer": {<br>
                                                   "htbTransferInForPeriod": 0.00,<br>
                                                   "htbTransferTotalYTD": 0.00<br>
@@ -56,7 +56,7 @@
                                                "lifeEventId" : "1234567891",<br>
                                                 "periodStartDate" : "2017-04-06",<br>
                                                 "periodEndDate" : "2017-05-05",<br>
-                                                "transactionType" : "Penalty",<br>
+                                                "transactionType" : "Bonus",<br>
                                                 "htbTransfer": {<br>
                                                   "htbTransferInForPeriod": 0.00,<br>
                                                   "htbTransferTotalYTD": 0.00<br>
@@ -91,7 +91,7 @@
                                                "lifeEventId" : "1234567891",<br>
                                                 "periodStartDate" : "2017-04-06",<br>
                                                 "periodEndDate" : "2017-05-05",<br>
-                                                "transactionType" : "Penalty",<br>
+                                                "transactionType" : "Bonus",<br>
                                                 "htbTransfer": {<br>
                                                   "htbTransferInForPeriod": 0.00,<br>
                                                   "htbTransferTotalYTD": 0.00<br>
@@ -302,7 +302,7 @@
                                                "lifeEventId" : "1234567891",<br>
                                                 "periodStartDate" : "2017-04-06",<br>
                                                 "periodEndDate" : "2017-05-05",<br>
-                                                "transactionType" : "Penalty",<br>
+                                                "transactionType" : "Bonus",<br>
                                                 "htbTransfer": {<br>
                                                   "htbTransferInForPeriod": 0.00,<br>
                                                   "htbTransferTotalYTD": 0.00<br>
@@ -337,7 +337,7 @@
                                                "lifeEventId" : "1234567891",<br>
                                                 "periodStartDate" : "2017-04-06",<br>
                                                 "periodEndDate" : "2017-05-05",<br>
-                                                "transactionType" : "Penalty",<br>
+                                                "transactionType" : "Bonus",<br>
                                                 "htbTransfer": {<br>
                                                   "htbTransferInForPeriod": 0.00,<br>
                                                   "htbTransferTotalYTD": 0.00<br>
@@ -372,7 +372,7 @@
                                                "lifeEventId" : "1234567891",<br>
                                                 "periodStartDate" : "2017-04-06",<br>
                                                 "periodEndDate" : "2017-05-05",<br>
-                                                "transactionType" : "Penalty",<br>
+                                                "transactionType" : "Bonus",<br>
                                                 "htbTransfer": {<br>
                                                   "htbTransferInForPeriod": 0.00,<br>
                                                   "htbTransferTotalYTD": 0.00<br>

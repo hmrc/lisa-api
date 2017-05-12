@@ -98,7 +98,7 @@
 		},
       "transactionTypeType" : {
         "type" : "string",
-        "enum": ["Bonus", "Penalty"]
+        "enum": ["Bonus"]
       },
       "claimReasonType" : {
         "type" : "string",

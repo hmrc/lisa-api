@@ -41,7 +41,7 @@ object Constants {
   case object CLAIM_REASON extends EnumKey
   case object CLOSURE_REASON extends EnumKey
 
-  val elements = Map(TRANSACTION.toString -> List("Penalty", "Bonus"),
+  val elements = Map(TRANSACTION.toString -> List("Bonus"),
     EVENT_TYPE.toString -> List("LISA Investor Terminal Ill Health", "LISA Investor Death", "House Purchase"),
     CREATION_REASON.toString -> List("New", "Transferred"),
     CLAIM_REASON.toString -> List("Life Event", "Regular Bonus"),

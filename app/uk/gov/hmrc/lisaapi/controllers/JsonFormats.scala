@@ -33,7 +33,7 @@ trait JsonFormats {
   implicit val lifeEventIDRegex = "^\\d{10}$".r
   implicit val accountIDRegex = "^[a-zA-Z0-9 :\\-]{1,20}$".r
   implicit val accountClosureRegex = "^(Transferred out|All funds withdrawn|Voided)$".r
-  implicit val transactionTypeRegex = "^(Bonus|Penalty)$".r
+  implicit val transactionTypeRegex = "^(Bonus)$".r
   implicit val bonusClaimReasonRegex = "^(Life Event|Regular Bonus)$".r
   implicit val lifeEventTypeRegex = "^(LISA Investor Terminal Ill Health|LISA Investor Death)$".r
 
