@@ -21,7 +21,7 @@
                                         }
                 </p>
             </td>
-            <td><p>HTTP status: <code class="code--slim">201(Created)</code></p>
+            <td><p>HTTP status: <code class="code--slim">201 (Created)</code></p>
                 <p class ="code--block"> {<br>
                                          "status": 201,<br>
                                          "success": true,<br>
