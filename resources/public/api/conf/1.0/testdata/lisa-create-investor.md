@@ -11,13 +11,13 @@
     </thead>
     <tbody>
         <tr>
-            <td><p>Create Investor with valid payload and lisaManagerReferenceNumber</p> <p class="code--block">lisaManagerReferenceNumber : Z123456</p></td>
+            <td><p>Request with a valid payload and LISA Manager Reference Number</p> <p class="code--block">lisaManagerReferenceNumber: Z123456</p></td>
             <td><p class ="code--block">
                     {<br>
-                     "investorNINO" : "AA123456A",<br>
-                     "firstName" : "First Name",<br>
-                     "lastName" : "Last Name",<br>
-                     "dateOfBirth" : "1985-03-25"<br>
+                     "investorNINO": "AA123456A",<br>
+                     "firstName": "First Name",<br>
+                     "lastName": "Last Name",<br>
+                     "dateOfBirth": "1985-03-25"<br>
                    }
                        </p></td>
             <td><p>HTTP status: <code class="code--slim">201 (Created)</code></p>
@@ -31,45 +31,46 @@
                    }</p></td>
         </tr>
         <tr>
-            <td><p>Create Investor with valid lisaManagerReferenceNumber and an already existing Lisa investor</p> <p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
+            <td><p>Request containing a pre-existing investor's details</p> <p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
             <td><p class ="code--block">{<br>
-                                        "investorNINO" : "AA222222A",<br>
-                                        "firstName" : "First Name",<br>
-                                        "lastName" : "Last Name",<br>
-                                        "dateOfBirth" : "1985-03-25"<br>
+                                        "investorNINO": "AA222222A",<br>
+                                        "firstName": "First Name",<br>
+                                        "lastName": "Last Name",<br>
+                                        "dateOfBirth": "1985-03-25"<br>
                                       }
                                           </p></td>
-            <td><p>HTTP status: <code class="code--slim">409(Conflict)</code></p><p class ="code--block">{<br>
-                                    "code":"INVESTOR_ALREADY_EXISTS",<br>
-                                    "message":"The investor already has a record with HMRC ","id":"A33339484"<br>
+            <td><p>HTTP status: <code class="code--slim">409 (Conflict)</code></p><p class ="code--block">{<br>
+                                    "code": "INVESTOR_ALREADY_EXISTS",<br>
+                                    "message": "The investor already has a record with HMRC",<br>
+                                    "id": "1234567890"<br>
                                     }
             </p>
             </td>
         </tr>
         <tr>
-            <td><p>Create Investor endpoint with valid Lisa manager and an investor with details that doesnot match with HMRC records</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
+            <td><p>Request containing investor details which don't match HMRC's records</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
             <td><p class ="code--block">{<br>
-                                        "investorNINO":"AA111111A",<br>
-                                        "firstName":"First Name",<br>
-                                        "lastName":"Last Name",<br>
-                                        "dateOfBirth":"1985-03-25"<br>
+                                        "investorNINO": "AA111111A",<br>
+                                        "firstName": "First Name",<br>
+                                        "lastName": "Last Name",<br>
+                                        "dateOfBirth": "1985-03-25"<br>
                                         }</p>
             </td>
             <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
                                   <p class ="code--block">{<br>
-                                            "code":"INVESTOR_NOT_FOUND",<br>
-                                            "message":"The investor details given do not match with HMRC’s records"
+                                            "code": "INVESTOR_NOT_FOUND",<br>
+                                            "message": "The investor details given do not match with HMRC’s records"<br>
                                             }
                                             </p>
              </td>
         </tr>
         <tr>
-            <td><p>Create Investor endpoint with a Lisa manager that doesnot exist</p><p class="code--block">lisaManagerReferenceNumber : Z123456789</p></td>
+            <td><p>Request containing a LISA Manager Reference Number that doesn't exist</p><p class="code--block">lisaManagerReferenceNumber: Z123456789</p></td>
             <td><p class ="code--block">{<br>
-                   "investorNINO":"AA111110A",<br>
-                   "firstName":"First Name",<br>
-                   "lastName":"Last Name",<br>
-                   "dateOfBirth":"1985-03-25"<br>
+                   "investorNINO": "AA111110A",<br>
+                   "firstName": "First Name",<br>
+                   "lastName": "Last Name",<br>
+                   "dateOfBirth": "1985-03-25"<br>
                    }</p></td>
             <td><p>HTTP status: <code class="code--slim">404 (Not Found)</code></p><p class="code--block">{<br>
                                            "code": "NOT_FOUND",<br>
@@ -78,12 +79,12 @@
             </td>
         </tr>
         <tr>
-            <td><p>Create Investor endpoint with valid an invalid investor NINO in the payload</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
+            <td><p>Request containing an invalid investor NINO</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
             <td><p class ="code--block">{<br>
-                                        "investorNINO":"A1234567A",<br>
-                                        "firstName":"First Name",<br>
-                                        "lastName":"Last Name",<br>
-                                        "dateOfBirth":"1985-03-25"<br>
+                                        "investorNINO": "A1234567A",<br>
+                                        "firstName": "First Name",<br>
+                                        "lastName": "Last Name",<br>
+                                        "dateOfBirth": "1985-03-25"<br>
                                         }</p>
             </td>
             <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
@@ -95,11 +96,11 @@
             </td>
         </tr>
         <tr>
-           <td><p>Create Investor endpoint with out investor NINO in the payload</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
+           <td><p>Request missing an investor NINO</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
            <td><p class ="code--block">{<br>
-                                       "firstName":"First Name",<br>
-                                       "lastName":"Last Name",<br>
-                                       "dateOfBirth":"1985-03-25"<br>
+                                       "firstName": "First Name",<br>
+                                       "lastName": "Last Name",<br>
+                                       "dateOfBirth": "1985-03-25"<br>
                                        }</p>
            </td>
            <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
@@ -111,11 +112,11 @@
            </td>
        </tr>
        <tr>
-           <td><p>Create Investor endpoint with out investor First name in the payload</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
+           <td><p>Request missing a first name</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
            <td><p class ="code--block">{<br>
-                                      "investorNINO":"AA111110A",<br>
-                                       "lastName":"Last Name",<br>
-                                       "dateOfBirth":"1985-03-25"<br>
+                                      "investorNINO": "AA111110A",<br>
+                                       "lastName": "Last Name",<br>
+                                       "dateOfBirth": "1985-03-25"<br>
                                        }</p>
            </td>
            <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
@@ -127,11 +128,11 @@
            </td>
        </tr>
         <tr>
-           <td><p>Create Investor endpoint with out investor Last name in the payload</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
+           <td><p>Request missing a last name</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
            <td><p class ="code--block">{<br>
-                                      "investorNINO":"AA111110A",<br>
-                                       "firstName":"First Name",<br>
-                                       "dateOfBirth":"1985-03-25"<br>
+                                      "investorNINO": "AA111110A",<br>
+                                       "firstName": "First Name",<br>
+                                       "dateOfBirth": "1985-03-25"<br>
                                        }</p>
            </td>
            <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
@@ -143,11 +144,11 @@
            </td>
         </tr>
         <tr>
-           <td><p>Create Investor endpoint with out investor dateOfBirth in the payload</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
+           <td><p>Request missing a date of birth</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
            <td><p class ="code--block">{<br>
-                                      "investorNINO":"AA111110A",<br>
-                                       "firstName":"First Name",<br>
-                                       "lastName":"Last Name" <br>
+                                      "investorNINO": "AA111110A",<br>
+                                       "firstName": "First Name",<br>
+                                       "lastName": "Last Name" <br>
                                        }</p>
            </td>
            <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
@@ -159,12 +160,12 @@
            </td>
         </tr>
         <tr>
-           <td><p>Create Investor endpoint with investor dateOfBirth set in the future</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
+           <td><p>Request containing a date of birth set in the future</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
            <td><p class ="code--block">{<br>
-                                      "investorNINO":"AA111110A",<br>
-                                       "firstName":"First Name",<br>
-                                       "lastName":"Last Name",<br>
-                                       "dateOfBirth":"3000-01-01"<br>
+                                      "investorNINO": "AA111110A",<br>
+                                       "firstName": "First Name",<br>
+                                       "lastName": "Last Name",<br>
+                                       "dateOfBirth": "3000-01-01"<br>
                                        }</p>
            </td>
            <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
@@ -176,12 +177,12 @@
            </td>
         </tr>
         <tr>
-           <td><p>Create Investor endpoint with investor dateOfBirth in invalid format in the payload</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
+           <td><p>Request containing a date of birth in an invalid format</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
            <td><p class ="code--block">{<br>
-                                      "investorNINO":"AA111110A",<br>
-                                       "firstName":"First Name",<br>
-                                       "lastName":"Last Name",<br>
-                                       "dateOfBirth":"25-03-1985"<br>
+                                      "investorNINO": "AA111110A",<br>
+                                       "firstName": "First Name",<br>
+                                       "lastName": "Last Name",<br>
+                                       "dateOfBirth": "25-03-1985"<br>
                                        }</p>
            </td>
            <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
@@ -193,13 +194,13 @@
            </td>
         </tr>
         <tr>
-           <td><p>Create Investor endpoint with an invalid Accept Header</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>Accept:application/vnd.hmrc.1.0</p></td>
+           <td><p>Request with an invalid 'Accept' header</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br>Accept: application/vnd.hmrc.1.0</p></td>
            <td><p class ="code--block">{<br>
-                                      "investorNINO":"AA111110A",<br>
-                                       "firstName":"First Name",<br>
-                                       "lastName":"Last Name",<br>
-                                       "dateOfBirth":"25-03-1985"<br>
-                                       }</p>
+                     "investorNINO": "AA123456A",<br>
+                     "firstName": "First Name",<br>
+                     "lastName": "Last Name",<br>
+                     "dateOfBirth": "1985-03-25"<br>
+                   }</p>
            </td>
            <td><p>HTTP status: <code class="code--slim">406 (Not Acceptable)</code></p>
                                  <p class ="code--block">{<br>
@@ -210,13 +211,13 @@
            </td>
         </tr>
         <tr>
-           <td><p>Create Investor endpoint with an invalid Authorisation Bearer token</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
+           <td><p>Request with an invalid 'Authorization' bearer token</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
            <td><p class ="code--block">{<br>
-                                      "investorNINO":"AA111110A",<br>
-                                       "firstName":"First Name",<br>
-                                       "lastName":"Last Name",<br>
-                                       "dateOfBirth":"25-03-1985"<br>
-                                       }</p>
+                     "investorNINO": "AA123456A",<br>
+                     "firstName": "First Name",<br>
+                     "lastName": "Last Name",<br>
+                     "dateOfBirth": "1985-03-25"<br>
+                   }</p>
            </td>
            <td><p>HTTP status: <code class="code--slim">401 (Unauthorized)</code></p>
                                  <p class ="code--block">{<br>
