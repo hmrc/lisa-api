@@ -40,7 +40,6 @@ class RequestBonusPaymentRequestSpec extends PlaySpec with JsonFormats {
           data.lifeEventId mustBe Some("1234567891")
           data.periodStartDate mustBe new DateTime("2017-04-06")
           data.periodEndDate mustBe new DateTime("2017-05-05")
-          data.transactionType mustBe "Bonus"
           data.htbTransfer mustBe Some(HelpToBuyTransfer(0f, 0f))
           data.inboundPayments mustBe InboundPayments(Some(4000f), 4000f, 4000f, 4000f)
           data.bonuses mustBe Bonuses(1000f, 1000f, Some(1000f), "Life Event")
@@ -53,7 +52,6 @@ class RequestBonusPaymentRequestSpec extends PlaySpec with JsonFormats {
         lifeEventId = Some("1234567891"),
         periodStartDate = new DateTime("2017-04-06"),
         periodEndDate = new DateTime("2017-05-05"),
-        transactionType = "Bonus",
         htbTransfer = Some(HelpToBuyTransfer(0f, 0f)),
         inboundPayments = InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
         bonuses = Bonuses(1000f, 1000f, Some(1000f), "Life Event")
@@ -78,22 +76,6 @@ class RequestBonusPaymentRequestSpec extends PlaySpec with JsonFormats {
         case _ => fail()
       }
     }
-
-    "catch an invalid transaction type" in {
-      val res = Json.parse(validBonusPaymentJson.replace("Bonus", "X")).validate[RequestBonusPaymentRequest]
-
-      res match {
-        case JsError(errors) => {
-          errors.count {
-            case (path: JsPath, errors: Seq[ValidationError]) => {
-              path.toString() == "/transactionType" && errors.contains(ValidationError("error.formatting.transactionType"))
-            }
-          } mustBe 1
-        }
-        case _ => fail()
-      }
-    }
-
   }
 
 }

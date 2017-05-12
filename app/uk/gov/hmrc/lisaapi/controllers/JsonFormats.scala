@@ -163,7 +163,6 @@ trait JsonFormats {
     (JsPath \ "lifeEventId").readNullable(Reads.pattern(lifeEventIDRegex, "error.formatting.lifeEventId")) and
     (JsPath \ "periodStartDate").read(isoDateReads()).map(new DateTime(_)) and
     (JsPath \ "periodEndDate").read(isoDateReads()).map(new DateTime(_)) and
-    (JsPath \ "transactionType").read(Reads.pattern(transactionTypeRegex, "error.formatting.transactionType")) and
     (JsPath \ "htbTransfer").readNullable[HelpToBuyTransfer] and
     (JsPath \ "inboundPayments").read[InboundPayments] and
     (JsPath \ "bonuses").read[Bonuses]
@@ -177,7 +176,7 @@ trait JsonFormats {
     (JsPath \ "htbTransfer").writeNullable[HelpToBuyTransfer] and
     (JsPath \ "inboundPayments").write[InboundPayments] and
     (JsPath \ "bonuses").write[Bonuses]
-  )(unlift(RequestBonusPaymentRequest.unapply))
+  ){req: RequestBonusPaymentRequest => (req.lifeEventId, req.periodStartDate, req.periodEndDate, "Bonus", req.htbTransfer, req.inboundPayments, req.bonuses)}
 
   private def isoDateReads(allowFutureDates: Boolean = true): Reads[org.joda.time.DateTime] = new Reads[org.joda.time.DateTime] {
 

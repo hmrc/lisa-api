@@ -17,7 +17,6 @@
                                                "lifeEventId": "1234567891",<br>
                                                "periodStartDate": "2017-04-06",<br>
                                                "periodEndDate": "2017-05-05",<br>
-                                               "transactionType": "Bonus",<br>
                                                "htbTransfer": {<br>
                                                   "htbTransferInForPeriod": 0.00,<br>
                                                   "htbTransferTotalYTD": 0.00<br>
@@ -55,7 +54,6 @@
 	            <p class ="code--block"> {<br>
 	                                           "periodStartDate": 2017,<br>
 	                                           "periodEndDate": "05-05-2017",<br>
-	                                           "transactionType": 2,<br>
 	                                           "htbTransfer": 0.0,<br>
 	                                           "inboundPayments": []<br>
 	                                         }
@@ -71,30 +69,30 @@
         </tr>
         <tr>
         	 <td><p>Request with a 'claimReason' of 'Life Event', but without a lifeEventId</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br>accountId: 1234567890</p></td>
-	        <td>
-	            <p class ="code--block"> {<br>
-	                                           "periodStartDate": "2017-04-06",<br>
-	                                           "periodEndDate": "2017-05-05",<br>
-	                                           "transactionType": "Bonus",<br>
-	                                           "htbTransfer": {<br>
-	                                              "htbTransferInForPeriod": 0.00,<br>
-	                                              "htbTransferTotalYTD": 0.00<br>
-	                                           },<br>
-	                                           "inboundPayments": {<br>
-	                                             "newSubsForPeriod": 4000.00,<br>
-	                                             "newSubsYTD": 4000.00,<br>
-	                                             "totalSubsForPeriod": 40000.00,<br>
-	                                             "totalSubsYTD": 40000.00<br>
-	                                           },<br>
-	                                           "bonuses": {<br>
-	                                             "bonusPaidYTD": 0.0,<br>
-	                                             "bonusDueForPeriod": 10000.00,<br>
-	                                             "totalBonusDueYTD": 10000.00,<br>
-	                                             "claimReason": "Life Event"<br>
-	                                           }<br>
-	                                         }
-	            </p>
-	        </td>
+            <td>
+                <p class ="code--block"> {<br>
+                                               "lifeEventId": "1234567891",<br>
+                                               "periodStartDate": "2017-04-06",<br>
+                                               "periodEndDate": "2017-05-05",<br>
+                                               "htbTransfer": {<br>
+                                                  "htbTransferInForPeriod": 0.00,<br>
+                                                  "htbTransferTotalYTD": 0.00<br>
+                                               },<br>
+                                               "inboundPayments": {<br>
+                                                 "newSubsForPeriod": 4000.00,<br>
+                                                 "newSubsYTD": 4000.00,<br>
+                                                 "totalSubsForPeriod": 40000.00,<br>
+                                                 "totalSubsYTD": 40000.00<br>
+                                               },<br>
+                                               "bonuses": {<br>
+                                                 "bonusPaidYTD": 0.0,<br>
+                                                 "bonusDueForPeriod": 10000.00,<br>
+                                                 "totalBonusDueYTD": 10000.00,<br>
+                                                 "claimReason": "Life Event"<br>
+                                               }<br>
+                                             }
+                </p>
+            </td>
 	        <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
 	            <p class ="code--block"> {<br>
 	                                        "code": "LIFE_EVENT_NOT_PROVIDED",<br>
@@ -110,7 +108,6 @@
                                                "lifeEventId": "1234567891",<br>
                                                "periodStartDate": "2017-04-06",<br>
                                                "periodEndDate": "2017-05-05",<br>
-                                               "transactionType": "Bonus",<br>
                                                "htbTransfer": {<br>
                                                   "htbTransferInForPeriod": 0.00,<br>
                                                   "htbTransferTotalYTD": 0.00<br>
@@ -145,7 +142,6 @@
                                                "lifeEventId": "1234567891",<br>
                                                "periodStartDate": "2017-04-06",<br>
                                                "periodEndDate": "2017-05-05",<br>
-                                               "transactionType": "Bonus",<br>
                                                "htbTransfer": {<br>
                                                   "htbTransferInForPeriod": 0.00,<br>
                                                   "htbTransferTotalYTD": 0.00<br>
@@ -179,7 +175,6 @@
                                                "lifeEventId": "1234567891",<br>
                                                "periodStartDate": "2017-04-06",<br>
                                                "periodEndDate": "2017-05-05",<br>
-                                               "transactionType": "Bonus",<br>
                                                "htbTransfer": {<br>
                                                   "htbTransferInForPeriod": 0.00,<br>
                                                   "htbTransferTotalYTD": 0.00<br>
@@ -208,13 +203,12 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request containing an Account ID that does not exist</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br>accountId: 0000000404</p></td>
+            <td><p>Request containing an Account ID that doesn't exist</p><p class ="code--block">lisaManagerReferenceNumber: Z123456789<br>accountId: 0000000404</p></td>
             <td>
                 <p class ="code--block"> {<br>
                                                "lifeEventId": "1234567891",<br>
                                                "periodStartDate": "2017-04-06",<br>
                                                "periodEndDate": "2017-05-05",<br>
-                                               "transactionType": "Bonus",<br>
                                                "htbTransfer": {<br>
                                                   "htbTransferInForPeriod": 0.00,<br>
                                                   "htbTransferTotalYTD": 0.00<br>
@@ -236,9 +230,9 @@
             </td>
             <td><p>HTTP status: <code class="code--slim">404 (Not Found)</code></p>
                 <p class ="code--block"> {<br>
-                                           "code": "INVESTOR_ACCOUNTID_NOT_FOUND",<br>
-                                           "message": "The accountId given does not match with HMRC’s records."<br>
-                                       }
+                                            "code": "INVESTOR_ACCOUNTID_NOT_FOUND",<br>
+                                            "message": "The accountId given does not match with HMRC’s records."<br>
+                                          }
                 </p>
             </td>
         </tr>
@@ -249,7 +243,6 @@
                                                "lifeEventId": "1234567891",<br>
                                                "periodStartDate": "2017-04-06",<br>
                                                "periodEndDate": "2017-05-05",<br>
-                                               "transactionType": "Bonus",<br>
                                                "htbTransfer": {<br>
                                                   "htbTransferInForPeriod": 0.00,<br>
                                                   "htbTransferTotalYTD": 0.00<br>
@@ -284,7 +277,6 @@
                                                "lifeEventId": "1234567891",<br>
                                                "periodStartDate": "2017-04-06",<br>
                                                "periodEndDate": "2017-05-05",<br>
-                                               "transactionType": "Bonus",<br>
                                                "htbTransfer": {<br>
                                                   "htbTransferInForPeriod": 0.00,<br>
                                                   "htbTransferTotalYTD": 0.00<br>
@@ -319,7 +311,6 @@
                                                "lifeEventId": "1234567891",<br>
                                                "periodStartDate": "2017-04-06",<br>
                                                "periodEndDate": "2017-05-05",<br>
-                                               "transactionType": "Bonus",<br>
                                                "htbTransfer": {<br>
                                                   "htbTransferInForPeriod": 0.00,<br>
                                                   "htbTransferTotalYTD": 0.00<br>
