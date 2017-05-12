@@ -11,35 +11,35 @@
     </thead>
     <tbody>
         <tr>
-            <td><p>Close Account endpoint with valid accountId and Lisa Manager</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountId :A1234568</p></td>
+            <td><p>Request with a valid payload, LISA Manager Reference Number and Account ID</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br>accountId: 1234567890</p></td>
             <td>
                 <p class ="code--block"> {<br>
                                      	  "accountClosureReason":"All funds withdrawn",<br>
-                                     	  "closureDate":"2017-01-03"<br>
+                                     	  "closureDate": "2017-01-03"<br>
                                         }
                 </p>
             </td>
-            <td><p>HTTP status: <code class="code--slim">200 OK</code></p>
+            <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
                 <p class ="code--block"> {<br>
                                          "status": 200,<br>
                                          "success": true,<br>
                                          "data": {<br>
                                            "message": "LISA Account Closed",<br>
-                                           "accountId": "A1234568"<br>
+                                           "accountId": "1234567890"<br>
                                          }<br>
                                        }
                 </p>
             </td>
         </tr>
         <tr>
-            <td><p>Close Account endpoint without accountClosureReason and (or) closureDate in the payload</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountId :A1234568</p></td>
+            <td><p>Request containing invalid and/or missing data</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br>accountId: 1234567890</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                     	  "closureDate":"2017-01-03"<br>
+                                     	  "closureDate": "3000-01-01"<br>
                                         }
                 </p>
             </td>
-            <td><p>HTTP status: <code class="code--slim">400(Bad RequestOK)</code></p>
+            <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
                 <p class ="code--block"> {<br>
                                             "code": "BAD_REQUEST",<br>
                                             "message": "Bad Request"<br>
@@ -48,83 +48,15 @@
             </td>
         </tr>
         <tr>
-            <td><p>Close Account endpoint with a closureDate set in the future</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountId :A1234568</p></td>
+            <td><p>Request with an invalid 'Authorization' bearer token</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br>accountId: 1234567890<br><br>Authorization: Bearer X</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                          "accountClosureReason" : "All funds withdrawn",<br>
-                                     	  "closureDate":"3000-01-01"<br>
+                                     	  "accountClosureReason": "All funds withdrawn",<br>
+                                     	  "closureDate": "2017-01-03"<br>
                                         }
                 </p>
             </td>
-            <td><p>HTTP status: <code class="code--slim">400(Bad RequestOK)</code></p>
-                <p class ="code--block"> {<br>
-                                            "code": "BAD_REQUEST",<br>
-                                            "message": "Bad Request"<br>
-                                       }
-                </p>
-            </td>
-        </tr>
-        <tr>
-            <td><p>Close Account endpoint with an accountId that doesn't exist</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountId :A1234562</p></td>
-            <td>
-                <p class ="code--block"> {<br>
-                                          "accountClosureReason" : "All funds withdrawn",
-                                          "closureDate" : "2017-01-03"
-                                        }
-                </p>
-            </td>
-            <td><p>HTTP status: <code class="code--slim">404(Not Found)</code></p>
-                <p class ="code--block"> {<br>
-                                            "code": "INVESTOR_ACCOUNTID_NOT_FOUND",<br>
-                                            "message": "The accountId given does not match with HMRC’s records"<br>
-                                       }
-                </p>
-            </td>
-        </tr>
-        <tr>
-            <td><p>Close Account endpoint with an accountId that is already closed</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountId :A1234561</p></td>
-            <td>
-                <p class ="code--block"> {<br>
-                                          "accountClosureReason" : "All funds withdrawn",
-                                          "closureDate" : "2017-01-03"
-                                        }
-                </p>
-            </td>
-            <td><p>HTTP status: <code class="code--slim">403(Forbidden)</code></p>
-                <p class ="code--block"> {<br>
-                                            "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED",<br>
-                                            "message": "The LISA account is already closed"<br>
-                                       }
-                </p>
-            </td>
-        </tr>
-        <tr>
-            <td><p>Close Account endpoint with a Lisa Manager ID in the URI which doesn't exist</p><p class ="code--block">lisaManagerReferenceNumber :Z123456789<br>accountId :A1234561</p></td>
-            <td>
-                <p class ="code--block"> {<br>
-                                          "accountClosureReason" : "All funds withdrawn",
-                                          "closureDate" : "2017-01-03"
-                                        }
-                </p>
-            </td>
-            <td><p>HTTP status: <code class="code--slim">404</code></p>
-                <p class ="code--block"> {<br>
-                                            "code": "NOT_FOUND",<br>
-                                            "message": "Resource was not found"<br>
-                                       }
-                </p>
-            </td>
-        </tr>
-        <tr>
-            <td><p>Close Account endpoint with an invalid Authorization Bearer token</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountId :A12345</p></td>
-            <td>
-                <p class ="code--block"> {<br>
-                                          "accountClosureReason" : "All funds withdrawn",
-                                          "closureDate" : "2017-01-03"
-                                        }
-                </p>
-            </td>
-            <td><p>HTTP status: <code class="code--slim">401(Unauthorized)</code></p>
+            <td><p>HTTP status: <code class="code--slim">401 (Unauthorized)</code></p>
                 <p class ="code--block"> {<br>
                                             "code": "INVALID_CREDENTIALS",<br>
                                             "message": "Invalid Authentication information provided"<br>
@@ -133,19 +65,87 @@
             </td>
         </tr>
         <tr>
-            <td><p>Close Account endpoint with an invalid Accept header</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountId :A1234551<br>Accept:application/vnd.hmrc.1.0</p></td>
+            <td><p>Request for an account that has already been closed</p><p class="code--block">lisaManagerReferenceNumber: Z123456<br>accountId: A1234561</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                          "accountClosureReason" : "All funds withdrawn",
-                                          "closureDate" : "2017-01-03"
+                                     	  "accountClosureReason": "All funds withdrawn",<br>
+                                     	  "closureDate": "2017-01-03"<br>
                                         }
                 </p>
             </td>
-            <td><p>HTTP status: <code class="code--slim">406(Not Acceptable)</code></p>
+            <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
+                <p class ="code--block"> {<br>
+                                            "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED",<br>
+                                            "message": "The LISA account is already closed"<br>
+                                       }
+                </p>
+            </td>
+        </tr>
+        <tr>
+            <td><p>Request containing an Account ID that does not exist</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br>accountId: A1234562</p></td>
+            <td>
+                <p class ="code--block"> {<br>
+                                     	  "accountClosureReason": "All funds withdrawn",<br>
+                                     	  "closureDate": "2017-01-03"<br>
+                                        }
+                </p>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">404 (Not Found)</code></p>
+                <p class ="code--block"> {<br>
+                                            "code": "INVESTOR_ACCOUNTID_NOT_FOUND",<br>
+                                            "message": "The accountId given does not match with HMRC’s records"<br>
+                                       }
+                </p>
+            </td>
+        </tr>
+        <tr>
+            <td><p>Request containing a LISA Manager Reference Number that doesn't exist</p><p class="code--block">lisaManagerReferenceNumber: Z123456789<br>accountId: A1234561</p></td>
+            <td>
+                <p class ="code--block"> {<br>
+                                     	  "accountClosureReason": "All funds withdrawn",<br>
+                                     	  "closureDate": "2017-01-03"<br>
+                                        }
+                </p>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">404 (Not Found)</code></p>
+                <p class ="code--block"> {<br>
+                                            "code": "NOT_FOUND",<br>
+                                            "message": "Resource was not found"<br>
+                                       }
+                </p>
+            </td>
+        </tr>
+        <tr>
+            <td><p>Request with an invalid 'Accept' header</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br>accountId: 1234567890<br><br>Accept: application/vnd.hmrc.1.0</p></td>
+            <td>
+                <p class ="code--block"> {<br>
+                                          "accountClosureReason": "All funds withdrawn",<br>
+                                          "closureDate": "2017-01-03"<br>
+                                        }
+                </p>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">406 (Not Acceptable)</code></p>
                 <p class ="code--block"> {<br>
                                             "code": "ACCEPT_HEADER_INVALID",<br>
                                             "message": "The accept header is missing or invalid"<br>
                                        }
+                </p>
+            </td>
+        </tr>
+        <tr>
+            <td><p>Request which fails due to an unexpected error</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br>accountId: A1234563</p></td>
+            <td>
+                <p class ="code--block"> {<br>
+                                          "accountClosureReason": "All funds withdrawn",<br>
+                                          "closureDate": "2017-01-03"<br>
+                                        }
+                </p>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">500 (Internal Server Error)</code></p>
+                <p class ="code--block"> {<br>
+                                            "code": "INTERNAL_SERVER_ERROR",<br>
+                                            "message": "Internal server error"<br>
+                                          }
                 </p>
             </td>
         </tr>
