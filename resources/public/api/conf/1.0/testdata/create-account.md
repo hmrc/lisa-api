@@ -62,13 +62,12 @@
             </td>
         </tr>
         <tr>
-            <td><p>Create Account endpoint with invalid investorId in the payload</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
+            <td><p>Request containing invalid and/or missing data</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                     	    "investorId":"9876543",<br>
-                                     	    "creationReason":"New",<br>
-                                     	    "accountId":"8765432100",<br>
-                                     	    "firstSubscriptionDate":"2011-03-23"<br>
+                                     	    "investorId": "9876543",<br>
+                                     	    "creationReason": "Unknown",<br>
+                                     	    "firstSubscriptionDate": 2011<br>
                                         }
                 </p>
             </td>
@@ -81,32 +80,13 @@
             </td>
         </tr>
         <tr>
-            <td><p>Create Account endpoint with an invalid creationReason in the payload</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
+            <td><p>Request with an invalid 'Authorization' bearer token</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br><br>Authorization: Bearer X</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                            "investorId":"1234567899",<br>
-                                            "creationReason":"Invalid Reason",<br>
-                                            "accountId":"8765432100",<br>
-                                            "firstSubscriptionDate":"2011-03-23"<br>
-                                        }
-                </p>
-            </td>
-            <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
-                <p class ="code--block"> {<br>
-                                         "code": "BAD_REQUEST",<br>
-                                         "message": "Bad Request"<br>
-                                       }
-                </p>
-            </td>
-        </tr>
-        <tr>
-            <td><p>Create Account endpoint with invalid Authorisation Bearer token in the header</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br><br>Authorization: Bearer X</p></td>
-            <td>
-                <p class ="code--block"> {<br>
-                                            "investorId":"1234500892",<br>
-                                            "creationReason":"New",<br>
-                                            "accountId":"8765432100",<br>
-                                            "firstSubscriptionDate":"2011-03-23"<br>
+                                     	    "investorId": "9876543210",<br>
+                                     	    "creationReason": "New",<br>
+                                     	    "accountId": "1234567890",<br>
+                                     	    "firstSubscriptionDate": "2011-03-23"<br>
                                         }
                 </p>
             </td>
@@ -262,43 +242,41 @@
             </td>
         </tr>
         <tr>
-            <td><p>Create Account endpoint with invalid Accept Header</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br><br>Accept: application/vnd.hmrc.1.0</p></td>
+            <td><p>Request with an invalid 'Accept' header</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br><br>Accept: application/vnd.hmrc.1.0</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                            "investorId":"1234500892",<br>
-                                            "creationReason":"New",<br>
-                                            "accountId":"8765432100",<br>
-                                            "firstSubscriptionDate":"2011-03-23"<br>
+                                     	    "investorId": "9876543210",<br>
+                                     	    "creationReason": "New",<br>
+                                     	    "accountId": "1234567890",<br>
+                                     	    "firstSubscriptionDate": "2011-03-23"<br>
                                         }
                 </p>
             </td>
             <td><p>HTTP status: <code class="code--slim">406 (Not Acceptable)</code></p>
                 <p class ="code--block"> {<br>
-                                         "code": "ACCEPT_HEADER_INVALID",<br>
-                                         "message": "The accept header is missing or invalid"<br>
-                                       }
+                                            "code": "ACCEPT_HEADER_INVALID",<br>
+                                            "message": "The accept header is missing or invalid"<br>
+                                          }
                 </p>
             </td>
-        </tr>
-        <tr>
-            <td><p>Create Account endpoint with an investorId that already exist</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
+        </tr>        <tr>
+            <td><p>Request which fails due to an unexpected error</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                            "investorId":"1234567899",<br>
-                                            "creationReason":"New",<br>
-                                            "accountId":"8765432100",<br>
-                                            "firstSubscriptionDate":"2011-03-23"<br>
+                                     	    "investorId": "1234567894",<br>
+                                     	    "creationReason": "New",<br>
+                                     	    "accountId": "1234567890",<br>
+                                     	    "firstSubscriptionDate": "2011-03-23"<br>
                                         }
                 </p>
             </td>
-            <td><p>HTTP status: <code class="code--slim">409 (Conflict)</code></p>
+            <td><p>HTTP status: <code class="code--slim">500 (Internal Server Error)</code></p>
                 <p class ="code--block"> {<br>
-                                         "code": "INVESTOR_ACCOUNT_ALREADY_EXISTS",<br>
-                                         "message": "The LISA account already exists"<br>
-                                       }
+                                            "code": "INTERNAL_SERVER_ERROR",<br>
+                                            "message": "Internal server error"<br>
+                                          }
                 </p>
             </td>
         </tr>
-
     </tbody>
 </table>
