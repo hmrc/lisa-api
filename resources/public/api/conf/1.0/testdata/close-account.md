@@ -99,7 +99,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request containing a LISA Manager Reference Number that doesn't exist</p><p class="code--block">lisaManagerReferenceNumber: Z123456789<br>accountId: A1234561</p></td>
+            <td><p>Request containing a LISA Manager Reference Number that doesn't exist</p><p class="code--block">lisaManagerReferenceNumber: Z123456789<br>accountId: 1234567890</p></td>
             <td>
                 <p class ="code--block"> {<br>
                                      	  "accountClosureReason": "All funds withdrawn",<br>
