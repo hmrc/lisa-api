@@ -71,7 +71,6 @@
         	 <td><p>Request with a 'claimReason' of 'Life Event', but without a lifeEventId</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br>accountId: 1234567890</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                               "lifeEventId": "1234567891",<br>
                                                "periodStartDate": "2017-04-06",<br>
                                                "periodEndDate": "2017-05-05",<br>
                                                "htbTransfer": {<br>
