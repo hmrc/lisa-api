@@ -31,12 +31,11 @@
                    }</p></td>
         </tr>
         <tr>
-            <td><p>Request containing an invalid investor NINO</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
+            <td><p>Request containing invalid and/or missing data</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
             <td><p class ="code--block">{<br>
                                         "investorNINO": "A1234567A",<br>
-                                        "firstName": "First Name",<br>
-                                        "lastName": "Last Name",<br>
-                                        "dateOfBirth": "1985-03-25"<br>
+                                        "firstName": "",<br>
+                                        "dateOfBirth": "25-03-1985"<br>
                                         }</p>
             </td>
             <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
@@ -46,104 +45,6 @@
                                                           }
                                   </p>
             </td>
-        </tr>
-        <tr>
-           <td><p>Request missing an investor NINO</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
-           <td><p class ="code--block">{<br>
-                                       "firstName": "First Name",<br>
-                                       "lastName": "Last Name",<br>
-                                       "dateOfBirth": "1985-03-25"<br>
-                                       }</p>
-           </td>
-           <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
-                                 <p class ="code--block">{<br>
-                                                           "code": "BAD_REQUEST",<br>
-                                                           "message": "Bad Request"<br>
-                                                         }
-                                 </p>
-           </td>
-       </tr>
-       <tr>
-           <td><p>Request missing a first name</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
-           <td><p class ="code--block">{<br>
-                                      "investorNINO": "AA123456A",<br>
-                                       "lastName": "Last Name",<br>
-                                       "dateOfBirth": "1985-03-25"<br>
-                                       }</p>
-           </td>
-           <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
-                                 <p class ="code--block">{<br>
-                                                           "code": "BAD_REQUEST",<br>
-                                                           "message": "Bad Request"<br>
-                                                         }
-                                 </p>
-           </td>
-       </tr>
-        <tr>
-           <td><p>Request missing a last name</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
-           <td><p class ="code--block">{<br>
-                                      "investorNINO": "AA123456A",<br>
-                                       "firstName": "First Name",<br>
-                                       "dateOfBirth": "1985-03-25"<br>
-                                       }</p>
-           </td>
-           <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
-                                 <p class ="code--block">{<br>
-                                                           "code": "BAD_REQUEST",<br>
-                                                           "message": "Bad Request"<br>
-                                                         }
-                                 </p>
-           </td>
-        </tr>
-        <tr>
-           <td><p>Request missing a date of birth</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
-           <td><p class ="code--block">{<br>
-                                      "investorNINO": "AA123456A",<br>
-                                       "firstName": "First Name",<br>
-                                       "lastName": "Last Name" <br>
-                                       }</p>
-           </td>
-           <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
-                                 <p class ="code--block">{<br>
-                                                           "code": "BAD_REQUEST",<br>
-                                                           "message": "Bad Request"<br>
-                                                         }
-                                 </p>
-           </td>
-        </tr>
-        <tr>
-           <td><p>Request containing a date of birth set in the future</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
-           <td><p class ="code--block">{<br>
-                                      "investorNINO": "AA123456A",<br>
-                                       "firstName": "First Name",<br>
-                                       "lastName": "Last Name",<br>
-                                       "dateOfBirth": "3000-01-01"<br>
-                                       }</p>
-           </td>
-           <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
-                                 <p class ="code--block">{<br>
-                                                           "code": "BAD_REQUEST",<br>
-                                                           "message": "Bad Request"<br>
-                                                         }
-                                 </p>
-           </td>
-        </tr>
-        <tr>
-           <td><p>Request containing a date of birth in an invalid format</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
-           <td><p class ="code--block">{<br>
-                                      "investorNINO": "AA123456A",<br>
-                                       "firstName": "First Name",<br>
-                                       "lastName": "Last Name",<br>
-                                       "dateOfBirth": "25-03-1985"<br>
-                                       }</p>
-           </td>
-           <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
-                                 <p class ="code--block">{<br>
-                                                           "code": "BAD_REQUEST",<br>
-                                                           "message": "Bad Request"<br>
-                                                         }
-                                 </p>
-           </td>
         </tr>
         <tr>
            <td><p>Request with an invalid 'Authorization' bearer token</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br><br>Authorization: Bearer X</p></td>

@@ -32,28 +32,10 @@
             </td>
         </tr>  
         <tr>
-            <td><p>Request containing an invalid event type</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br>accountId: 1234567890</p></td>
+            <td><p>Request containing invalid and/or missing data</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br>accountId: 1234567890</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                            "eventType" : "Invalid Event Type",<br>
-                                            "eventDate" : "2017-04-06"<br>
-                                        }
-                </p>
-            </td>
-            <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
-                <p class ="code--block"> {<br>
-                                            "code": "BAD_REQUEST",<br>
-                                            "message": "Bad Request"<br>
-                                          }
-                </p>
-            </td>
-        </tr>
-        <tr>
-            <td><p>Request containing an invalid event date</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br>accountId: 1234567890</p></td>
-            <td>
-                <p class ="code--block"> {<br>
-                                            "eventType" : "LISA Investor Terminal Ill Health",<br>
-                                            "eventDate" : "06-04-2017"<br>
+                                            "eventType" : "Invalid Event Type"
                                         }
                 </p>
             </td>
