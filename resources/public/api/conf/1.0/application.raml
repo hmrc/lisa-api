@@ -545,6 +545,25 @@ types:
                                       "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
                                       "message": "The accountId given does not match with HMRC’s records."
                                     }
+                                resourceNotFound:
+                                  description: Resource Not Found
+                                  value: |
+                                    {
+                                      "code" : "NOT_FOUND",
+                                      "message" : "Resource Not Found"
+                                    }
+                        406:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                headerInvalid:
+                                  description: Accept header invalid
+                                  value: |
+                                    {
+                                      "code" : "ACCEPT_HEADER_INVALID",
+                                      "message" : "Accept header invalid"
+                                    }
                         409:
                           body:
                             application/json:
