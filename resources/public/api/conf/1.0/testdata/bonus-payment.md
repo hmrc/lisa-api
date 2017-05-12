@@ -70,41 +70,6 @@
 	        </td>
         </tr>
         <tr>
-            <td><p>Request with an invalid 'Authorization' bearer token</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br>accountId: 1234567890<br><br>Authorization: Bearer X</p></td>
-            <td>
-                <p class ="code--block"> {<br>
-                                               "lifeEventId": "1234567891",<br>
-                                               "periodStartDate": "2017-04-06",<br>
-                                               "periodEndDate": "2017-05-05",<br>
-                                               "transactionType": "Bonus",<br>
-                                               "htbTransfer": {<br>
-                                                  "htbTransferInForPeriod": 0.00,<br>
-                                                  "htbTransferTotalYTD": 0.00<br>
-                                               },<br>
-                                               "inboundPayments": {<br>
-                                                 "newSubsForPeriod": 4000.00,<br>
-                                                 "newSubsYTD": 4000.00,<br>
-                                                 "totalSubsForPeriod": 40000.00,<br>
-                                                 "totalSubsYTD": 40000.00<br>
-                                               },<br>
-                                               "bonuses": {<br>
-                                                 "bonusPaidYTD": 0.0,<br>
-                                                 "bonusDueForPeriod": 10000.00,<br>
-                                                 "totalBonusDueYTD": 10000.00,<br>
-                                                 "claimReason": "Life Event"<br>
-                                               }<br>
-                                             }
-                </p>
-            </td>
-            <td><p>HTTP status: <code class="code--slim">401 (Unauthorized)</code></p>
-                <p class ="code--block"> {<br>
-                                            "code": "INVALID_CREDENTIALS",<br>
-                                            "message": "Invalid Authentication information provided"<br>
-                                          }
-                </p>
-            </td>
-        </tr> 
-        <tr>
         	 <td><p>Request with a 'claimReason' of 'Life Event', but without a lifeEventId</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br>accountId: 1234567890</p></td>
 	        <td>
 	            <p class ="code--block"> {<br>

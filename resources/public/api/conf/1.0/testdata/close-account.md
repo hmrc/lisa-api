@@ -48,23 +48,6 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request with an invalid 'Authorization' bearer token</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br>accountId: 1234567890<br><br>Authorization: Bearer X</p></td>
-            <td>
-                <p class ="code--block"> {<br>
-                                     	  "accountClosureReason": "All funds withdrawn",<br>
-                                     	  "closureDate": "2017-01-03"<br>
-                                        }
-                </p>
-            </td>
-            <td><p>HTTP status: <code class="code--slim">401 (Unauthorized)</code></p>
-                <p class ="code--block"> {<br>
-                                            "code": "INVALID_CREDENTIALS",<br>
-                                            "message": "Invalid Authentication information provided"<br>
-                                       }
-                </p>
-            </td>
-        </tr>
-        <tr>
             <td><p>Request for an account that has already been closed</p><p class="code--block">lisaManagerReferenceNumber: Z123456<br>accountId: A1234561</p></td>
             <td>
                 <p class ="code--block"> {<br>

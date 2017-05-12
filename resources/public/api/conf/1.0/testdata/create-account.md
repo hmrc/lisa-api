@@ -80,25 +80,6 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request with an invalid 'Authorization' bearer token</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br><br>Authorization: Bearer X</p></td>
-            <td>
-                <p class ="code--block"> {<br>
-                                     	    "investorId": "9876543210",<br>
-                                     	    "creationReason": "New",<br>
-                                     	    "accountId": "1234567890",<br>
-                                     	    "firstSubscriptionDate": "2011-03-23"<br>
-                                        }
-                </p>
-            </td>
-            <td><p>HTTP status: <code class="code--slim">401 (Unauthorized)</code></p>
-                <p class ="code--block"> {<br>
-                                         "code": "INVALID_CREDENTIALS",<br>
-                                         "message": "Invalid Authentication information provided"<br>
-                                       }
-                </p>
-            </td>
-        </tr>
-        <tr>
             <td><p>Request containing investor details which can't be found</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
             <td>
                 <p class ="code--block"> {<br>
