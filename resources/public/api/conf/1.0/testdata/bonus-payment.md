@@ -11,32 +11,32 @@
     </thead>
     <tbody>
         <tr>
-            <td><p>Request Bonus payment endpoint with valid bonus details</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountId: 10000000900</p></td>
+            <td><p>Request with a valid payload, LISA Manager Reference Number and Account ID</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br>accountId: 1234567890</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                               "lifeEventId" : "1234567891",<br>
-                                                "periodStartDate" : "2017-04-06",<br>
-                                                "periodEndDate" : "2017-05-05",<br>
-                                                "htbTransfer": {<br>
+                                               "lifeEventId": "1234567891",<br>
+                                               "periodStartDate": "2017-04-06",<br>
+                                               "periodEndDate": "2017-05-05",<br>
+                                               "htbTransfer": {<br>
                                                   "htbTransferInForPeriod": 0.00,<br>
                                                   "htbTransferTotalYTD": 0.00<br>
-                                                },<br>
-                                                "inboundPayments" : {<br>
-                                                  "newSubsForPeriod" : 4000.00,<br>
-                                                  "newSubsYTD" : 4000.00,<br>
-                                                  "totalSubsForPeriod" : 40000.00,<br>
-                                                  "totalSubsYTD" : 40000.00<br>
-                                                },<br>
-                                                "bonuses" : {<br>
-                                                  "bonusPaidYTD" : 0.0,<br>
-                                                  "bonusDueForPeriod" : 10000.00,<br>
-                                                  "totalBonusDueYTD" : 10000.00,<br>
-                                                  "claimReason" : "Life Event"<br>
-                                                }<br>
-                                              }
+                                               },<br>
+                                               "inboundPayments": {<br>
+                                                 "newSubsForPeriod": 4000.00,<br>
+                                                 "newSubsYTD": 4000.00,<br>
+                                                 "totalSubsForPeriod": 40000.00,<br>
+                                                 "totalSubsYTD": 40000.00<br>
+                                               },<br>
+                                               "bonuses": {<br>
+                                                 "bonusPaidYTD": 0.0,<br>
+                                                 "bonusDueForPeriod": 10000.00,<br>
+                                                 "totalBonusDueYTD": 10000.00,<br>
+                                                 "claimReason": "Life Event"<br>
+                                               }<br>
+                                             }
                 </p>
             </td>
-            <td><p>HTTP status: <code class="code--slim">401(Created)</code></p>
+            <td><p>HTTP status: <code class="code--slim">201 (Created)</code></p>
                 <p class ="code--block"> {<br>
                                            "status": 201,<br>
                                            "success": true,<br>
@@ -49,99 +49,85 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request Bonus payment endpoint with an accountId that does not exist</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountId: 0000000404</p></td>
-            <td>
-                <p class ="code--block"> {<br>
-                                               "lifeEventId" : "1234567891",<br>
-                                                "periodStartDate" : "2017-04-06",<br>
-                                                "periodEndDate" : "2017-05-05",<br>
-                                                "htbTransfer": {<br>
-                                                  "htbTransferInForPeriod": 0.00,<br>
-                                                  "htbTransferTotalYTD": 0.00<br>
-                                                },<br>
-                                                "inboundPayments" : {<br>
-                                                  "newSubsForPeriod" : 4000.00,<br>
-                                                  "newSubsYTD" : 4000.00,<br>
-                                                  "totalSubsForPeriod" : 40000.00,<br>
-                                                  "totalSubsYTD" : 40000.00<br>
-                                                },<br>
-                                                "bonuses" : {<br>
-                                                  "bonusPaidYTD" : 0.0,<br>
-                                                  "bonusDueForPeriod" : 10000.00,<br>
-                                                  "totalBonusDueYTD" : 10000.00,<br>
-                                                  "claimReason" : "Life Event"<br>
-                                                }<br>
-                                              }
-                </p>
-            </td>
-            <td><p>HTTP status: <code class="code--slim">404(Not Found)</code></p>
-                <p class ="code--block"> {<br>
-                                           "code": "INVESTOR_ACCOUNTID_NOT_FOUND",<br>
-                                           "message": "The accountId given does not match with HMRC’s records."<br>
-                                       }
-                </p>
-            </td>
+        	 <td><p>Request containing invalid and/or missing data</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br>accountId: 1234567890</p></td>
+	        <td>
+	            <p class ="code--block"> {<br>
+	                                           "periodStartDate": 2017,<br>
+	                                           "periodEndDate": "05-05-2017",<br>
+	                                           "htbTransfer": 0.0,<br>
+	                                           "inboundPayments": []<br>
+	                                         }
+	            </p>
+	        </td>
+	        <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
+	            <p class ="code--block"> {<br>
+	                                        "code": "BAD_REQUEST",<br>
+	                                        "message": "Bad Request"<br>
+	                                      }
+	            </p>
+	        </td>
         </tr>
         <tr>
-            <td><p>Request Bonus payment endpoint with an accountId that has already been closed or voided</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountId: 0000000903</p></td>
+        	 <td><p>Request with a 'claimReason' of 'Life Event', but without a lifeEventId</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br>accountId: 1234567890</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                               "lifeEventId" : "1234567891",<br>
-                                                "periodStartDate" : "2017-04-06",<br>
-                                                "periodEndDate" : "2017-05-05",<br>
-                                                "htbTransfer": {<br>
+                                               "lifeEventId": "1234567891",<br>
+                                               "periodStartDate": "2017-04-06",<br>
+                                               "periodEndDate": "2017-05-05",<br>
+                                               "htbTransfer": {<br>
                                                   "htbTransferInForPeriod": 0.00,<br>
                                                   "htbTransferTotalYTD": 0.00<br>
-                                                },<br>
-                                                "inboundPayments" : {<br>
-                                                  "newSubsForPeriod" : 4000.00,<br>
-                                                  "newSubsYTD" : 4000.00,<br>
-                                                  "totalSubsForPeriod" : 40000.00,<br>
-                                                  "totalSubsYTD" : 40000.00<br>
-                                                },<br>
-                                                "bonuses" : {<br>
-                                                  "bonusPaidYTD" : 0.0,<br>
-                                                  "bonusDueForPeriod" : 10000.00,<br>
-                                                  "totalBonusDueYTD" : 10000.00,<br>
-                                                  "claimReason" : "Life Event"<br>
-                                                }<br>
-                                              }
+                                               },<br>
+                                               "inboundPayments": {<br>
+                                                 "newSubsForPeriod": 4000.00,<br>
+                                                 "newSubsYTD": 4000.00,<br>
+                                                 "totalSubsForPeriod": 40000.00,<br>
+                                                 "totalSubsYTD": 40000.00<br>
+                                               },<br>
+                                               "bonuses": {<br>
+                                                 "bonusPaidYTD": 0.0,<br>
+                                                 "bonusDueForPeriod": 10000.00,<br>
+                                                 "totalBonusDueYTD": 10000.00,<br>
+                                                 "claimReason": "Life Event"<br>
+                                               }<br>
+                                             }
                 </p>
             </td>
-            <td><p>HTTP status: <code class="code--slim">403(Forbidden)</code></p>
-                <p class ="code--block"> {<br>"code": "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID",<br>
-                                            "message": "The LISA account has already been closed or voided."<br>
-                                          }
-                </p>
-            </td>
+	        <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
+	            <p class ="code--block"> {<br>
+	                                        "code": "LIFE_EVENT_NOT_PROVIDED",<br>
+	                                        "message": "lifeEventId is required when the claimReason is \"Life Event\""<br>
+	                                      }
+	            </p>
+	        </td>
         </tr>
-        <tr>
-            <td><p>Request Bonus payment endpoint with bonus in the payload that exceeds the maximum amount level</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountId: 0000000403</p></td>
+       <tr>
+            <td><p>Request containing invalid bonus payment figures</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br>accountId: 0000000403</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                               "lifeEventId" : "1234567891",<br>
-                                                 "periodStartDate" : "2017-04-06",<br>
-                                                 "periodEndDate" : "2017-05-05",<br>
-                                                 "htbTransfer": {<br>
-                                                   "htbTransferInForPeriod": 0.00,<br>
-                                                   "htbTransferTotalYTD": 0.00<br>
-                                                 },<br>
-                                                 "inboundPayments" : {<br>
-                                                   "newSubsForPeriod" : 4000.00,<br>
-                                                   "newSubsYTD" : 4000.00,<br>
-                                                   "totalSubsForPeriod" : 40000.00,<br>
-                                                   "totalSubsYTD" : 40000.00<br>
-                                                 },<br>
-                                                 "bonuses" : {<br>
-                                                   "bonusPaidYTD" : 0.0,<br>
-                                                   "bonusDueForPeriod" : 10000.00,<br>
-                                                   "totalBonusDueYTD" : 10000.00,<br>
-                                                   "claimReason" : "Life Event"<br>
-                                                 }<br>
-                                              }
+                                               "lifeEventId": "1234567891",<br>
+                                               "periodStartDate": "2017-04-06",<br>
+                                               "periodEndDate": "2017-05-05",<br>
+                                               "htbTransfer": {<br>
+                                                  "htbTransferInForPeriod": 0.00,<br>
+                                                  "htbTransferTotalYTD": 0.00<br>
+                                               },<br>
+                                               "inboundPayments": {<br>
+                                                 "newSubsForPeriod": 4000.00,<br>
+                                                 "newSubsYTD": 4000.00,<br>
+                                                 "totalSubsForPeriod": 40000.00,<br>
+                                                 "totalSubsYTD": 40000.00<br>
+                                               },<br>
+                                               "bonuses": {<br>
+                                                 "bonusPaidYTD": 0.0,<br>
+                                                 "bonusDueForPeriod": 10000.00,<br>
+                                                 "totalBonusDueYTD": 10000.00,<br>
+                                                 "claimReason": "Life Event"<br>
+                                               }<br>
+                                             }
                 </p>
             </td>
-            <td><p>HTTP status: <code class="code--slim">403(Forbidden)</code></p>
+            <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
                 <p class ="code--block"> {<br>
                                            "code": "BONUS_CLAIM_ERROR",<br>
                                            "message": "The bonus information given exceeds the maximum annual amount, the qualifying deposits exceed the maximum annual amount, or the bonus claim doesn't equal the correct percentage of stated qualifying funds."<br>
@@ -150,32 +136,65 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request Bonus payment endpoint with a life event that does not match the HMRC records</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountId: 1000000404</p></td>
+            <td><p>Request for an account that has already been closed or voided</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br>accountId: 0000000903</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                               "lifeEventId" : "1234567891",<br>
-                                                 "periodStartDate" : "2017-04-06",<br>
-                                                 "periodEndDate" : "2017-05-05",<br>
-                                                 "htbTransfer": {<br>
-                                                   "htbTransferInForPeriod": 0.00,<br>
-                                                   "htbTransferTotalYTD": 0.00<br>
-                                                 },<br>
-                                                 "inboundPayments" : {<br>
-                                                   "newSubsForPeriod" : 4000.00,<br>
-                                                   "newSubsYTD" : 4000.00,<br>
-                                                   "totalSubsForPeriod" : 40000.00,<br>
-                                                   "totalSubsYTD" : 40000.00<br>
-                                                 },<br>
-                                                 "bonuses" : {<br>
-                                                   "bonusPaidYTD" : 0.0,<br>
-                                                   "bonusDueForPeriod" : 10000.00,<br>
-                                                   "totalBonusDueYTD" : 10000.00,<br>
-                                                   "claimReason" : "Life Event"<br>
-                                                 }<br>
-                                              }
+                                               "lifeEventId": "1234567891",<br>
+                                               "periodStartDate": "2017-04-06",<br>
+                                               "periodEndDate": "2017-05-05",<br>
+                                               "htbTransfer": {<br>
+                                                  "htbTransferInForPeriod": 0.00,<br>
+                                                  "htbTransferTotalYTD": 0.00<br>
+                                               },<br>
+                                               "inboundPayments": {<br>
+                                                 "newSubsForPeriod": 4000.00,<br>
+                                                 "newSubsYTD": 4000.00,<br>
+                                                 "totalSubsForPeriod": 40000.00,<br>
+                                                 "totalSubsYTD": 40000.00<br>
+                                               },<br>
+                                               "bonuses": {<br>
+                                                 "bonusPaidYTD": 0.0,<br>
+                                                 "bonusDueForPeriod": 10000.00,<br>
+                                                 "totalBonusDueYTD": 10000.00,<br>
+                                                 "claimReason": "Life Event"<br>
+                                               }<br>
+                                             }
                 </p>
             </td>
-            <td><p>HTTP status: <code class="code--slim">404(Not Found)</code></p>
+            <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
+                <p class ="code--block"> {<br>"code": "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID",<br>
+                                            "message": "The LISA account has already been closed or voided."<br>
+                                          }
+                </p>
+            </td>
+       </tr>
+        <tr>
+            <td><p>Request containing a Life Event ID that does not exist</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br>accountId: 1000000404</p></td>
+            <td>
+                <p class ="code--block"> {<br>
+                                               "lifeEventId": "1234567891",<br>
+                                               "periodStartDate": "2017-04-06",<br>
+                                               "periodEndDate": "2017-05-05",<br>
+                                               "htbTransfer": {<br>
+                                                  "htbTransferInForPeriod": 0.00,<br>
+                                                  "htbTransferTotalYTD": 0.00<br>
+                                               },<br>
+                                               "inboundPayments": {<br>
+                                                 "newSubsForPeriod": 4000.00,<br>
+                                                 "newSubsYTD": 4000.00,<br>
+                                                 "totalSubsForPeriod": 40000.00,<br>
+                                                 "totalSubsYTD": 40000.00<br>
+                                               },<br>
+                                               "bonuses": {<br>
+                                                 "bonusPaidYTD": 0.0,<br>
+                                                 "bonusDueForPeriod": 10000.00,<br>
+                                                 "totalBonusDueYTD": 10000.00,<br>
+                                                 "claimReason": "Life Event"<br>
+                                               }<br>
+                                             }
+                </p>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">404 (Not Found)</code></p>
                 <p class ="code--block"> {<br>
                                            "code": "LIFE_EVENT_NOT_FOUND",<br>
                                            "message": "The lifeEventId does not match with HMRC’s records."<br>
@@ -184,176 +203,140 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request Bonus payment endpoint without lifeEventId and Life Event as claimReason</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountId: 1110000503</p></td>
+            <td><p>Request containing an Account ID that doesn't exist</p><p class ="code--block">lisaManagerReferenceNumber: Z123456789<br>accountId: 0000000404</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                               	"periodStartDate" : "2017-04-06",<br>
-                                               	"periodEndDate" : "2017-05-05",<br>
-                                               	"htbTransfer": {<br>
-                                               	"htbTransferInForPeriod": 0.00,<br>
-                                               	"htbTransferTotalYTD": 0.00<br>
-                                               	},<br>
-                                               	"inboundPayments" : {<br>
-                                               	"newSubsForPeriod" : 4000.00,<br>
-                                               	"newSubsYTD" : 4000.00,<br>
-                                               	"totalSubsForPeriod" : 40000.00,<br>
-                                               	"totalSubsYTD" : 40000.00<br>
-                                               	},<br>
-                                               	"bonuses" : {<br>
-                                               	"bonusPaidYTD" : 0.0,<br>
-                                               	"bonusDueForPeriod" : 10000.00,<br>
-                                               	"totalBonusDueYTD" : 10000.00,<br>
-                                               	"claimReason" : "Life Event"<br>
-                                               	}<br>
-                                              }
+                                               "lifeEventId": "1234567891",<br>
+                                               "periodStartDate": "2017-04-06",<br>
+                                               "periodEndDate": "2017-05-05",<br>
+                                               "htbTransfer": {<br>
+                                                  "htbTransferInForPeriod": 0.00,<br>
+                                                  "htbTransferTotalYTD": 0.00<br>
+                                               },<br>
+                                               "inboundPayments": {<br>
+                                                 "newSubsForPeriod": 4000.00,<br>
+                                                 "newSubsYTD": 4000.00,<br>
+                                                 "totalSubsForPeriod": 40000.00,<br>
+                                                 "totalSubsYTD": 40000.00<br>
+                                               },<br>
+                                               "bonuses": {<br>
+                                                 "bonusPaidYTD": 0.0,<br>
+                                                 "bonusDueForPeriod": 10000.00,<br>
+                                                 "totalBonusDueYTD": 10000.00,<br>
+                                                 "claimReason": "Life Event"<br>
+                                               }<br>
+                                             }
                 </p>
             </td>
-            <td><p>HTTP status: <code class="code--slim">403(Forbidden)</code></p>
+            <td><p>HTTP status: <code class="code--slim">404 (Not Found)</code></p>
                 <p class ="code--block"> {<br>
-                                           "code": "LIFE_EVENT_NOT_PROVIDED",<br>
-                                           "message": "lifeEventId is required when the claimReason is \"Life Event\""<br>
-                                       }
-                </p>
-            </td>
-        </tr>
-        <tr>
-            <td><p>Request Bonus payment endpoint with Regular Bonus as claim Reason and without lifeEventId (lifeEventId as an optional element)</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountId: 1110000503</p></td>
-            <td>
-                <p class ="code--block"> {<br>
-                                              "periodStartDate" : "2017-04-06",<br>
-                                              "periodEndDate" : "2017-05-05",<br>
-                                              "htbTransfer": {<br>
-                                                "htbTransferInForPeriod": 0.00,<br>
-                                                "htbTransferTotalYTD": 0.00<br>
-                                              },<br>
-                                              "inboundPayments" : {<br>
-                                                "newSubsForPeriod" : 4000.00,<br>
-                                                "newSubsYTD" : 4000.00,<br>
-                                                "totalSubsForPeriod" : 40000.00,<br>
-                                                "totalSubsYTD" : 40000.00<br>
-                                              },<br>
-                                              "bonuses" : {<br>
-                                                "bonusPaidYTD" : 0.0,<br>
-                                                "bonusDueForPeriod" : 10000.00,<br>
-                                                "totalBonusDueYTD" : 10000.00,<br>
-                                                "claimReason" : "Regular Bonus"<br>
-                                              }<br>
+                                            "code": "INVESTOR_ACCOUNTID_NOT_FOUND",<br>
+                                            "message": "The accountId given does not match with HMRC’s records."<br>
                                           }
                 </p>
             </td>
-            <td><p>HTTP status: <code class="code--slim">201(Created)</code></p>
+        </tr>
+        <tr>
+            <td><p>Request containing a LISA Manager Reference Number that doesn't exist</p><p class ="code--block">lisaManagerReferenceNumber: Z123456789<br>accountId: 1234567890 </p></td>
+            <td>
                 <p class ="code--block"> {<br>
-                                           "status": 201,<br>
-                                             "success": true,<br>
-                                             "data": {<br>
-                                               "message": "Bonus transaction created",<br>
-                                               "transactionId": "7777777777"<br>
-                                             }<br>
-                                       }
+                                               "lifeEventId": "1234567891",<br>
+                                               "periodStartDate": "2017-04-06",<br>
+                                               "periodEndDate": "2017-05-05",<br>
+                                               "htbTransfer": {<br>
+                                                  "htbTransferInForPeriod": 0.00,<br>
+                                                  "htbTransferTotalYTD": 0.00<br>
+                                               },<br>
+                                               "inboundPayments": {<br>
+                                                 "newSubsForPeriod": 4000.00,<br>
+                                                 "newSubsYTD": 4000.00,<br>
+                                                 "totalSubsForPeriod": 40000.00,<br>
+                                                 "totalSubsYTD": 40000.00<br>
+                                               },<br>
+                                               "bonuses": {<br>
+                                                 "bonusPaidYTD": 0.0,<br>
+                                                 "bonusDueForPeriod": 10000.00,<br>
+                                                 "totalBonusDueYTD": 10000.00,<br>
+                                                 "claimReason": "Life Event"<br>
+                                               }<br>
+                                             }
+                </p>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">404 (Not Found)</code></p>
+                <p class ="code--block"> {<br>
+                                            "code": "NOT_FOUND",<br>
+                                            "message": "Resource was not found"<br>
+                                          }
                 </p>
             </td>
         </tr>
         <tr>
-            <td><p>Request Bonus payment endpoint with invalid Lisa Manager</p><p class ="code--block">lisaManagerReferenceNumber :Z123456789<br>accountId: 10000000900</p></td>
+            <td><p>Request with an invalid 'Accept' header</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br>accountId: 1234567890<br><br>Accept: application/vnd.hmrc.1.0</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                               "lifeEventId" : "1234567891",<br>
-                                                "periodStartDate" : "2017-04-06",<br>
-                                                "periodEndDate" : "2017-05-05",<br>
-                                                "htbTransfer": {<br>
+                                               "lifeEventId": "1234567891",<br>
+                                               "periodStartDate": "2017-04-06",<br>
+                                               "periodEndDate": "2017-05-05",<br>
+                                               "htbTransfer": {<br>
                                                   "htbTransferInForPeriod": 0.00,<br>
                                                   "htbTransferTotalYTD": 0.00<br>
-                                                },<br>
-                                                "inboundPayments" : {<br>
-                                                  "newSubsForPeriod" : 4000.00,<br>
-                                                  "newSubsYTD" : 4000.00,<br>
-                                                  "totalSubsForPeriod" : 40000.00,<br>
-                                                  "totalSubsYTD" : 40000.00<br>
-                                                },<br>
-                                                "bonuses" : {<br>
-                                                  "bonusPaidYTD" : 0.0,<br>
-                                                  "bonusDueForPeriod" : 10000.00,<br>
-                                                  "totalBonusDueYTD" : 10000.00,<br>
-                                                  "claimReason" : "Life Event"<br>
-                                                }<br>
-                                              }
+                                               },<br>
+                                               "inboundPayments": {<br>
+                                                 "newSubsForPeriod": 4000.00,<br>
+                                                 "newSubsYTD": 4000.00,<br>
+                                                 "totalSubsForPeriod": 40000.00,<br>
+                                                 "totalSubsYTD": 40000.00<br>
+                                               },<br>
+                                               "bonuses": {<br>
+                                                 "bonusPaidYTD": 0.0,<br>
+                                                 "bonusDueForPeriod": 10000.00,<br>
+                                                 "totalBonusDueYTD": 10000.00,<br>
+                                                 "claimReason": "Life Event"<br>
+                                               }<br>
+                                             }
                 </p>
             </td>
-            <td><p>HTTP status: <code class="code--slim">404(Not Found)</code></p>
+            <td><p>HTTP status: <code class="code--slim">406 (Not Acceptable)</code></p>
                 <p class ="code--block"> {<br>
-                                           "code": "NOT_FOUND",<br>
-                                           "message": "Resource was not found"<br>
-                                        }
+                                            "code": "ACCEPT_HEADER_INVALID",<br>
+                                            "message": "The accept header is missing or invalid"<br>
+                                          }
                 </p>
             </td>
         </tr>
         <tr>
-            <td><p>Request Bonus payment endpoint with invalid Accept Header</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>accountId: 10000000900<br> Accept:application/vnd.hmrc.1.0</p></td>
+            <td><p>Request which fails due to an unexpected error</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br>accountId: 0000000500</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                               "lifeEventId" : "1234567891",<br>
-                                                "periodStartDate" : "2017-04-06",<br>
-                                                "periodEndDate" : "2017-05-05",<br>
-                                                "htbTransfer": {<br>
+                                               "lifeEventId": "1234567891",<br>
+                                               "periodStartDate": "2017-04-06",<br>
+                                               "periodEndDate": "2017-05-05",<br>
+                                               "htbTransfer": {<br>
                                                   "htbTransferInForPeriod": 0.00,<br>
                                                   "htbTransferTotalYTD": 0.00<br>
-                                                },<br>
-                                                "inboundPayments" : {<br>
-                                                  "newSubsForPeriod" : 4000.00,<br>
-                                                  "newSubsYTD" : 4000.00,<br>
-                                                  "totalSubsForPeriod" : 40000.00,<br>
-                                                  "totalSubsYTD" : 40000.00<br>
-                                                },<br>
-                                                "bonuses" : {<br>
-                                                  "bonusPaidYTD" : 0.0,<br>
-                                                  "bonusDueForPeriod" : 10000.00,<br>
-                                                  "totalBonusDueYTD" : 10000.00,<br>
-                                                  "claimReason" : "Life Event"<br>
-                                                }<br>
-                                              }
+                                               },<br>
+                                               "inboundPayments": {<br>
+                                                 "newSubsForPeriod": 4000.00,<br>
+                                                 "newSubsYTD": 4000.00,<br>
+                                                 "totalSubsForPeriod": 40000.00,<br>
+                                                 "totalSubsYTD": 40000.00<br>
+                                               },<br>
+                                               "bonuses": {<br>
+                                                 "bonusPaidYTD": 0.0,<br>
+                                                 "bonusDueForPeriod": 10000.00,<br>
+                                                 "totalBonusDueYTD": 10000.00,<br>
+                                                 "claimReason": "Life Event"<br>
+                                               }<br>
+                                             }
                 </p>
             </td>
-            <td><p>HTTP status: <code class="code--slim">406(Not Acceptable)</code></p>
+            <td><p>HTTP status: <code class="code--slim">500 (Internal Server Error)</code></p>
                 <p class ="code--block"> {<br>
-                                           "code": "ACCEPT_HEADER_INVALID",<br>
-                                           "message": "The accept header is missing or invalid"<br>
-                                        }
+                                            "code": "INTERNAL_SERVER_ERROR",<br>
+                                            "message": "Internal server error"<br>
+                                          }
                 </p>
             </td>
         </tr>
-        <tr>
-            <td><p>Request Bonus payment endpoint with invalid Authorization bearer token</p><p class ="code--block">lisaManagerReferenceNumber :Z123456789<br>accountId: 10000000900</p></td>
-            <td>
-                <p class ="code--block"> {<br>
-                                               "lifeEventId" : "1234567891",<br>
-                                                "periodStartDate" : "2017-04-06",<br>
-                                                "periodEndDate" : "2017-05-05",<br>
-                                                "htbTransfer": {<br>
-                                                  "htbTransferInForPeriod": 0.00,<br>
-                                                  "htbTransferTotalYTD": 0.00<br>
-                                                },<br>
-                                                "inboundPayments" : {<br>
-                                                  "newSubsForPeriod" : 4000.00,<br>
-                                                  "newSubsYTD" : 4000.00,<br>
-                                                  "totalSubsForPeriod" : 40000.00,<br>
-                                                  "totalSubsYTD" : 40000.00<br>
-                                                },<br>
-                                                "bonuses" : {<br>
-                                                  "bonusPaidYTD" : 0.0,<br>
-                                                  "bonusDueForPeriod" : 10000.00,<br>
-                                                  "totalBonusDueYTD" : 10000.00,<br>
-                                                  "claimReason" : "Life Event"<br>
-                                                }<br>
-                                              }
-                </p>
-            </td>
-            <td><p>HTTP status: <code class="code--slim">401(Unauthorized)</code></p>
-                <p class ="code--block"> {<br>
-                                           "code": "INVALID_CREDENTIALS",<br>
-                                           "message": "Invalid Authentication information provided"<br>
-                                        }
-                </p>
-            </td>
-        </tr>
-    </tbody>
+	</tbody>
 </table>
