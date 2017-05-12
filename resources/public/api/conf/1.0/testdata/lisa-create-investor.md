@@ -22,12 +22,12 @@
                        </p></td>
             <td><p>HTTP status: <code class="code--slim">201 (Created)</code></p>
                 <p class ="code--block">{<br>
+                     "status": 201,<br>
+                     "success": true,<br>
                      "data": {<br>
                                 "investorId": "9876543210",<br>
                                 "message": "Investor Created."<br>
-                     },<br>
-                     "success": true,<br>
-                     "status": 201<br>
+                     }<br>
                    }</p></td>
         </tr>
         <tr>
@@ -194,7 +194,7 @@
            </td>
         </tr>
         <tr>
-           <td><p>Request with an invalid 'Accept' header</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br>Accept: application/vnd.hmrc.1.0</p></td>
+           <td><p>Request with an invalid 'Accept' header</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br><br>Accept: application/vnd.hmrc.1.0</p></td>
            <td><p class ="code--block">{<br>
                      "investorNINO": "AA123456A",<br>
                      "firstName": "First Name",<br>
@@ -211,7 +211,7 @@
            </td>
         </tr>
         <tr>
-           <td><p>Request with an invalid 'Authorization' bearer token</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
+           <td><p>Request with an invalid 'Authorization' bearer token</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br><br>Authorization: Bearer X</p></td>
            <td><p class ="code--block">{<br>
                      "investorNINO": "AA123456A",<br>
                      "firstName": "First Name",<br>
