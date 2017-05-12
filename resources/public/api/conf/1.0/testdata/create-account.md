@@ -98,17 +98,14 @@
                 </p>
             </td>
         </tr>
-        
-        
-        
         <tr>
-            <td><p>Create Account endpoint with an investor with details that doesnot match the HMRC records</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
+            <td><p>Request containing investor details which can't be found</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                            "investorId":"1234567890",<br>
-                                            "creationReason":"New",<br>
-                                            "accountId":"8765432100",<br>
-                                            "firstSubscriptionDate":"2011-03-23"<br>
+                                     	    "investorId": "1234567890",<br>
+                                     	    "creationReason": "New",<br>
+                                     	    "accountId": "1234567890",<br>
+                                     	    "firstSubscriptionDate": "2011-03-23"<br>
                                         }
                 </p>
             </td>
@@ -121,13 +118,13 @@
             </td>
         </tr>
         <tr>
-            <td><p>Create Account endpoint with valid Lisa manager and an investor not eligible for LISA account</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
+            <td><p>Request containing an investor who isn't eligible for a LISA account</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                            "investorId":"1234567891",<br>
-                                            "creationReason":"New",<br>
-                                            "accountId":"8765432100",<br>
-                                            "firstSubscriptionDate":"2011-03-23"<br>
+                                     	    "investorId": "1234567891",<br>
+                                     	    "creationReason": "New",<br>
+                                     	    "accountId": "1234567890",<br>
+                                     	    "firstSubscriptionDate": "2011-03-23"<br>
                                         }
                 </p>
             </td>
@@ -140,13 +137,13 @@
             </td>
         </tr>
         <tr>
-            <td><p>Create Account endpoint with valid Lisa manager and an investor with failed compliance check</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
+            <td><p>Request containing an investor who hasn't past the compliance check</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
             <td>
                 <p class ="code--block"> {<br>
                                             "investorId": "1234567892",<br>
-                                            "creationReason": "New",<br>
-                                            "accountId": "8765432100",<br>
-                                            "firstSubscriptionDate": "2011-03-23"<br>
+                                     	    "creationReason": "New",<br>
+                                     	    "accountId": "1234567890",<br>
+                                     	    "firstSubscriptionDate": "2011-03-23"<br>
                                         }
                 </p>
             </td>
@@ -159,18 +156,18 @@
             </td>
         </tr>
         <tr>
-            <td><p>Transfer Account endpoint with transferredFromAccountId and transferredFromLMRN in the payload doesn't match HMRC records</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
+            <td><p>Transfer Request containing transfer details which can't be found in HMRC's records</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                         "investorId":"1234567889",<br>
-                                         "creationReason":"Transferred",<br>
-                                         "accountId":"1234567890",<br>
-                                         "firstSubscriptionDate":"2011-03-23",<br>
-                                         "transferAccount": {<br>
-                                           "transferredFromAccountId": "8765432102",<br>
-                                           "transferredFromLMRN": "Z123456",<br>
-                                           "transferInDate": "2015-12-13"<br>
-                                         }<br>
+                                              "investorId": "1234567889",<br>
+                                              "creationReason": "Transferred",<br>
+                                              "accountId": "1234567890",<br>
+                                              "firstSubscriptionDate": "2011-03-23",<br>
+                                              "transferAccount": {<br>
+                                                "transferredFromAccountId": "8765432100",<br>
+                                                "transferredFromLMRN": "Z654321",<br>
+                                                "transferInDate": "2015-12-13"<br>
+                                              }<br>
                                         }
                 </p>
             </td>
@@ -183,12 +180,12 @@
             </td>
         </tr>
         <tr>
-            <td><p>Transfer Account endpoint without transfer details in the payload</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
+            <td><p>Transfer Request without transfer details</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
             <td>
                 <p class ="code--block"> {<br>
                                                "investorId":"9876543210",<br>
                                                "creationReason":"Transferred",<br>
-                                               "accountId":"87654321",<br>
+                                               "accountId":"1234567890",<br>
                                                "firstSubscriptionDate":"2011-03-23"<br>
                                         }
                 </p>
@@ -202,18 +199,18 @@
             </td>
         </tr>
         <tr>
-            <td><p>Create Account endpoint with transfer details in the payload</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
+            <td><p>Create request containing transfer details</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                             "investorId":"1234500892",<br>
-                                             "creationReason":"New",<br>
-                                             "accountId":"8765432100",<br>
-                                             "firstSubscriptionDate":"2011-03-23",<br>
-                                             "transferAccount": {<br>
-                                               "transferredFromAccountId": "98123459898",<br>
-                                               "transferredFromLMRN": "Z543333",<br>
-                                               "transferInDate": "2015-12-13"<br>
-                                             }
+                                     	     "investorId": "9876543210",<br>
+                                     	     "creationReason": "New",<br>
+                                     	     "accountId": "1234567890",<br>
+                                     	     "firstSubscriptionDate": "2011-03-23",<br>
+	                                          "transferAccount": {<br>
+	                                            "transferredFromAccountId": "8765432100",<br>
+	                                            "transferredFromLMRN": "Z654321",<br>
+	                                            "transferInDate": "2015-12-13"<br>
+	                                          }<br>
                                         }
                 </p>
             </td>
@@ -225,14 +222,15 @@
                 </p>
             </td>
         </tr>
+        
         <tr>
-            <td><p>The LISA account has already been closed or voided</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
+            <td><p>Request containing a LISA account which has already been closed or voided</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                            "investorId":"0000000403",<br>
-                                            "creationReason":"New",<br>
-                                            "accountId":"8765432100",<br>
-                                            "firstSubscriptionDate":"2011-03-23"<br>
+                                     	    "investorId": "0000000403",<br>
+                                     	    "creationReason": "New",<br>
+                                     	    "accountId": "1234567890",<br>
+                                     	    "firstSubscriptionDate": "2011-03-23"<br>
                                         }
                 </p>
             </td>
@@ -244,17 +242,14 @@
                 </p>
             </td>
         </tr>
-        
-        
-        
         <tr>
             <td><p>Request containing a LISA Manager Reference Number that doesn't exist</p><p class ="code--block">lisaManagerReferenceNumber: Z123456789</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                            "investorId":"0000000403",<br>
-                                            "creationReason":"New",<br>
-                                            "accountId":"8765432100",<br>
-                                            "firstSubscriptionDate":"2011-03-23"<br>
+                                     	    "investorId": "9876543210",<br>
+                                     	    "creationReason": "New",<br>
+                                     	    "accountId": "1234567890",<br>
+                                     	    "firstSubscriptionDate": "2011-03-23"<br>
                                         }
                 </p>
             </td>
@@ -286,7 +281,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Create Request for a pre-existing account</p><p class ="code--block">lisaManagerReferenceNumber: Z123456789</p></td>
+            <td><p>Request for a pre-existing account</p><p class ="code--block">lisaManagerReferenceNumber: Z123456789</p></td>
             <td>
                 <p class ="code--block"> {<br>
                                      	    "investorId": "1234567899",<br>
@@ -303,31 +298,7 @@
                                           }
                 </p>
             </td>
-        </tr> 
-        <tr>
-            <td><p>Transfer Request for a pre-existing account</p><p class ="code--block">lisaManagerReferenceNumber: Z123456789</p></td>
-            <td>
-                <p class ="code--block"> {<br>
-                                              "investorId": "1234567890",<br>
-                                              "creationReason": "Transferred",<br>
-                                              "accountId": "1234567890",<br>
-                                              "firstSubscriptionDate": "2011-03-23",<br>
-                                              "transferAccount": {<br>
-                                                "transferredFromAccountId": "8765432100",<br>
-                                                "transferredFromLMRN": "Z654321",<br>
-                                                "transferInDate": "2015-12-13"<br>
-                                              }<br>
-                                        }
-                </p>
-            </td>
-            <td><p>HTTP status: <code class="code--slim">409 (Conflict)</code></p>
-                <p class ="code--block"> {<br>
-                                            "code": "INVESTOR_ACCOUNT_ALREADY_EXISTS",<br>
-                                            "message": "The LISA account already exists"<br>
-                                          }
-                </p>
-            </td>
-        </tr> 
+        </tr>
         <tr>
             <td><p>Request which fails due to an unexpected error</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
             <td>
