@@ -238,7 +238,7 @@
                                           </p></td>
             <td><p>HTTP status: <code class="code--slim">500 (Internal Server Error)</code></p><p class ="code--block">{<br>
                                     "code": "INTERNAL_SERVER_ERROR",<br>
-                                    "message": "Internal Server Error"<br>
+                                    "message": "Internal server error"<br>
                                     }
             </p>
             </td>

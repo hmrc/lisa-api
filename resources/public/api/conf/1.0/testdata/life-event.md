@@ -183,5 +183,22 @@
                 </p>
             </td>
         </tr>
+        <tr>
+            <td><p>Request which fails due to an unexpected error</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br>accountId: 0000000500</p></td>
+            <td>
+                <p class ="code--block"> {<br>
+                                            "eventType" : "LISA Investor Terminal Ill Health",<br>
+                                            "eventDate" : "2017-04-06"<br>
+                                        }
+                </p>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">500 (Internal Server Error)</code></p>
+                <p class ="code--block"> {<br>
+                                            "code": "INTERNAL_SERVER_ERROR",<br>
+                                            "message": "Internal server error"<br>
+                                          }
+                </p>
+            </td>
+        </tr>
     </tbody>
 </table>
