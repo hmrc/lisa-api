@@ -67,7 +67,7 @@
         <tr>
             <td><p>Request containing a LISA Manager Reference Number that doesn't exist</p><p class="code--block">lisaManagerReferenceNumber: Z123456789</p></td>
             <td><p class ="code--block">{<br>
-                   "investorNINO": "AA111110A",<br>
+                   "investorNINO": "AA123456A",<br>
                    "firstName": "First Name",<br>
                    "lastName": "Last Name",<br>
                    "dateOfBirth": "1985-03-25"<br>
@@ -114,7 +114,7 @@
        <tr>
            <td><p>Request missing a first name</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
            <td><p class ="code--block">{<br>
-                                      "investorNINO": "AA111110A",<br>
+                                      "investorNINO": "AA123456A",<br>
                                        "lastName": "Last Name",<br>
                                        "dateOfBirth": "1985-03-25"<br>
                                        }</p>
@@ -130,7 +130,7 @@
         <tr>
            <td><p>Request missing a last name</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
            <td><p class ="code--block">{<br>
-                                      "investorNINO": "AA111110A",<br>
+                                      "investorNINO": "AA123456A",<br>
                                        "firstName": "First Name",<br>
                                        "dateOfBirth": "1985-03-25"<br>
                                        }</p>
@@ -146,7 +146,7 @@
         <tr>
            <td><p>Request missing a date of birth</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
            <td><p class ="code--block">{<br>
-                                      "investorNINO": "AA111110A",<br>
+                                      "investorNINO": "AA123456A",<br>
                                        "firstName": "First Name",<br>
                                        "lastName": "Last Name" <br>
                                        }</p>
@@ -162,7 +162,7 @@
         <tr>
            <td><p>Request containing a date of birth set in the future</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
            <td><p class ="code--block">{<br>
-                                      "investorNINO": "AA111110A",<br>
+                                      "investorNINO": "AA123456A",<br>
                                        "firstName": "First Name",<br>
                                        "lastName": "Last Name",<br>
                                        "dateOfBirth": "3000-01-01"<br>
@@ -179,7 +179,7 @@
         <tr>
            <td><p>Request containing a date of birth in an invalid format</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
            <td><p class ="code--block">{<br>
-                                      "investorNINO": "AA111110A",<br>
+                                      "investorNINO": "AA123456A",<br>
                                        "firstName": "First Name",<br>
                                        "lastName": "Last Name",<br>
                                        "dateOfBirth": "25-03-1985"<br>
