@@ -286,13 +286,37 @@
             </td>
         </tr>
         <tr>
-            <td><p>Create Request containing a pre-existing account</p><p class ="code--block">lisaManagerReferenceNumber: Z123456789</p></td>
+            <td><p>Create Request for a pre-existing account</p><p class ="code--block">lisaManagerReferenceNumber: Z123456789</p></td>
             <td>
                 <p class ="code--block"> {<br>
                                      	    "investorId": "1234567899",<br>
                                      	    "creationReason": "New",<br>
                                      	    "accountId": "1234567890",<br>
                                      	    "firstSubscriptionDate": "2011-03-23"<br>
+                                        }
+                </p>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">409 (Conflict)</code></p>
+                <p class ="code--block"> {<br>
+                                            "code": "INVESTOR_ACCOUNT_ALREADY_EXISTS",<br>
+                                            "message": "The LISA account already exists"<br>
+                                          }
+                </p>
+            </td>
+        </tr> 
+        <tr>
+            <td><p>Transfer Request for a pre-existing account</p><p class ="code--block">lisaManagerReferenceNumber: Z123456789</p></td>
+            <td>
+                <p class ="code--block"> {<br>
+                                              "investorId": "1234567890",<br>
+                                              "creationReason": "Transferred",<br>
+                                              "accountId": "1234567890",<br>
+                                              "firstSubscriptionDate": "2011-03-23",<br>
+                                              "transferAccount": {<br>
+                                                "transferredFromAccountId": "8765432100",<br>
+                                                "transferredFromLMRN": "Z654321",<br>
+                                                "transferInDate": "2015-12-13"<br>
+                                              }<br>
                                         }
                 </p>
             </td>
