@@ -22,7 +22,6 @@ case class RequestBonusPaymentRequest(
                                        lifeEventId: Option[String],
                                        periodStartDate: DateTime,
                                        periodEndDate: DateTime,
-                                       transactionType: String,
                                        htbTransfer: Option[HelpToBuyTransfer],
                                        inboundPayments: InboundPayments,
                                        bonuses: Bonuses

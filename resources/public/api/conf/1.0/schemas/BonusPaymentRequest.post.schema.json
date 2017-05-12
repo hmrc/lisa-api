@@ -12,9 +12,6 @@
 	    "periodEndDate" : {
           "description": "The end date of the claim period.",
           "$ref": "#/definitions/ISO8601-Date"},
-        "transactionType" : {
-          "description": "The type of transaction.",
-          "$ref": "#/definitions/transactionTypeType"},
 
 		"htbTransfer" :
 		{
@@ -78,7 +75,6 @@
 	"required": [
 		"periodStartDate",
 		"periodEndDate",
-        "transactionType",
 		"inboundPayments",
         "bonuses"
     ],
@@ -96,10 +92,6 @@
 			"pattern": "^\\d{10}$",
           "example": "0987654321"
 		},
-      "transactionTypeType" : {
-        "type" : "string",
-        "enum": ["Bonus"]
-      },
       "claimReasonType" : {
         "type" : "string",
         "enum": ["Life Event", "Regular Bonus"]
