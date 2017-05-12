@@ -31,54 +31,6 @@
                    }</p></td>
         </tr>
         <tr>
-            <td><p>Request containing a pre-existing investor's details</p> <p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
-            <td><p class ="code--block">{<br>
-                                        "investorNINO": "AA222222A",<br>
-                                        "firstName": "First Name",<br>
-                                        "lastName": "Last Name",<br>
-                                        "dateOfBirth": "1985-03-25"<br>
-                                      }
-                                          </p></td>
-            <td><p>HTTP status: <code class="code--slim">409 (Conflict)</code></p><p class ="code--block">{<br>
-                                    "code": "INVESTOR_ALREADY_EXISTS",<br>
-                                    "message": "The investor already has a record with HMRC",<br>
-                                    "id": "1234567890"<br>
-                                    }
-            </p>
-            </td>
-        </tr>
-        <tr>
-            <td><p>Request containing investor details which don't match HMRC's records</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
-            <td><p class ="code--block">{<br>
-                                        "investorNINO": "AA111111A",<br>
-                                        "firstName": "First Name",<br>
-                                        "lastName": "Last Name",<br>
-                                        "dateOfBirth": "1985-03-25"<br>
-                                        }</p>
-            </td>
-            <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
-                                  <p class ="code--block">{<br>
-                                            "code": "INVESTOR_NOT_FOUND",<br>
-                                            "message": "The investor details given do not match with HMRC’s records"<br>
-                                            }
-                                            </p>
-             </td>
-        </tr>
-        <tr>
-            <td><p>Request containing a LISA Manager Reference Number that doesn't exist</p><p class="code--block">lisaManagerReferenceNumber: Z123456789</p></td>
-            <td><p class ="code--block">{<br>
-                   "investorNINO": "AA123456A",<br>
-                   "firstName": "First Name",<br>
-                   "lastName": "Last Name",<br>
-                   "dateOfBirth": "1985-03-25"<br>
-                   }</p></td>
-            <td><p>HTTP status: <code class="code--slim">404 (Not Found)</code></p><p class="code--block">{<br>
-                                           "code": "NOT_FOUND",<br>
-                                           "message": "Resource was not found"<br>
-                                         }</p>
-            </td>
-        </tr>
-        <tr>
             <td><p>Request containing an invalid investor NINO</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
             <td><p class ="code--block">{<br>
                                         "investorNINO": "A1234567A",<br>
@@ -194,6 +146,54 @@
            </td>
         </tr>
         <tr>
+           <td><p>Request with an invalid 'Authorization' bearer token</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br><br>Authorization: Bearer X</p></td>
+           <td><p class ="code--block">{<br>
+                     "investorNINO": "AA123456A",<br>
+                     "firstName": "First Name",<br>
+                     "lastName": "Last Name",<br>
+                     "dateOfBirth": "1985-03-25"<br>
+                   }</p>
+           </td>
+           <td><p>HTTP status: <code class="code--slim">401 (Unauthorized)</code></p>
+                                 <p class ="code--block">{<br>
+                                                           "code": "INVALID_CREDENTIALS",<br>
+                                                           "message": "Invalid Authentication information provided"<br>
+                                                         }
+                                 </p>
+           </td>
+        </tr>
+        <tr>
+            <td><p>Request containing investor details which don't match HMRC's records</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
+            <td><p class ="code--block">{<br>
+                                        "investorNINO": "AA111111A",<br>
+                                        "firstName": "First Name",<br>
+                                        "lastName": "Last Name",<br>
+                                        "dateOfBirth": "1985-03-25"<br>
+                                        }</p>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
+                                  <p class ="code--block">{<br>
+                                            "code": "INVESTOR_NOT_FOUND",<br>
+                                            "message": "The investor details given do not match with HMRC’s records"<br>
+                                            }
+                                            </p>
+             </td>
+        </tr>
+        <tr>
+            <td><p>Request containing a LISA Manager Reference Number that doesn't exist</p><p class="code--block">lisaManagerReferenceNumber: Z123456789</p></td>
+            <td><p class ="code--block">{<br>
+                   "investorNINO": "AA123456A",<br>
+                   "firstName": "First Name",<br>
+                   "lastName": "Last Name",<br>
+                   "dateOfBirth": "1985-03-25"<br>
+                   }</p></td>
+            <td><p>HTTP status: <code class="code--slim">404 (Not Found)</code></p><p class="code--block">{<br>
+                                           "code": "NOT_FOUND",<br>
+                                           "message": "Resource was not found"<br>
+                                         }</p>
+            </td>
+        </tr>
+        <tr>
            <td><p>Request with an invalid 'Accept' header</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br><br>Accept: application/vnd.hmrc.1.0</p></td>
            <td><p class ="code--block">{<br>
                      "investorNINO": "AA123456A",<br>
@@ -211,21 +211,37 @@
            </td>
         </tr>
         <tr>
-           <td><p>Request with an invalid 'Authorization' bearer token</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br><br>Authorization: Bearer X</p></td>
-           <td><p class ="code--block">{<br>
-                     "investorNINO": "AA123456A",<br>
-                     "firstName": "First Name",<br>
-                     "lastName": "Last Name",<br>
-                     "dateOfBirth": "1985-03-25"<br>
-                   }</p>
-           </td>
-           <td><p>HTTP status: <code class="code--slim">401 (Unauthorized)</code></p>
-                                 <p class ="code--block">{<br>
-                                                           "code": "INVALID_CREDENTIALS",<br>
-                                                           "message": "Invalid Authentication information provided"<br>
-                                                         }
-                                 </p>
-           </td>
+            <td><p>Request containing a pre-existing investor's details</p> <p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
+            <td><p class ="code--block">{<br>
+                                        "investorNINO": "AA222222A",<br>
+                                        "firstName": "First Name",<br>
+                                        "lastName": "Last Name",<br>
+                                        "dateOfBirth": "1985-03-25"<br>
+                                      }
+                                          </p></td>
+            <td><p>HTTP status: <code class="code--slim">409 (Conflict)</code></p><p class ="code--block">{<br>
+                                    "code": "INVESTOR_ALREADY_EXISTS",<br>
+                                    "message": "The investor already has a record with HMRC",<br>
+                                    "id": "1234567890"<br>
+                                    }
+            </p>
+            </td>
+        </tr>
+        <tr>
+            <td><p>Request which fails due to an unexpected error</p> <p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
+            <td><p class ="code--block">{<br>
+                                        "investorNINO": "AA333333A",<br>
+                                        "firstName": "First Name",<br>
+                                        "lastName": "Last Name",<br>
+                                        "dateOfBirth": "1985-03-25"<br>
+                                      }
+                                          </p></td>
+            <td><p>HTTP status: <code class="code--slim">500 (Internal Server Error)</code></p><p class ="code--block">{<br>
+                                    "code": "INTERNAL_SERVER_ERROR",<br>
+                                    "message": "Internal Server Error"<br>
+                                    }
+            </p>
+            </td>
         </tr>
     </tbody>
 </table>

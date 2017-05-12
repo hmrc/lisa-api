@@ -65,6 +65,23 @@
             </td>
         </tr>
         <tr>
+            <td><p>Request containing an Account ID that does not exist</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br>accountId: 0000000404</p></td>
+            <td>
+                <p class ="code--block"> {<br>
+                                            "eventType" : "LISA Investor Terminal Ill Health",<br>
+                                            "eventDate" : "2017-04-06"<br>
+                                        }
+                </p>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">404 (Not found)</code></p>
+                <p class ="code--block"> {<br>
+                                            "code": "INVESTOR_ACCOUNTID_NOT_FOUND",<br>
+                                            "message": "The accountId given does not match with HMRC’s records"<br>
+                                          }
+                </p>
+            </td>
+        </tr>
+        <tr>
             <td><p>Request containing an already reported event</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br>accountId: 0000000409</p></td>
             <td>
                 <p class ="code--block"> {<br>
@@ -82,23 +99,39 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request containing an Account ID that does not exist</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br>accountId: 0000000404</p></td>
+            <td><p>Request containing an invalid event type</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br>accountId: 1234567890</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                            "eventType" : "LISA Investor Terminal Ill Health",<br>
+                                            "eventType" : "Invalid Event Type",<br>
                                             "eventDate" : "2017-04-06"<br>
                                         }
                 </p>
             </td>
-            <td><p>HTTP status: <code class="code--slim">404 (Not found)</code></p>
+            <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
                 <p class ="code--block"> {<br>
-                                            "code": "INVESTOR_ACCOUNTID_NOT_FOUND",<br>
-                                            "message": "The accountId given does not match with HMRC’s records"<br>
+                                            "code": "BAD_REQUEST",<br>
+                                            "message": "Bad Request"<br>
                                           }
                 </p>
             </td>
         </tr>
-        
+        <tr>
+            <td><p>Request containing an invalid event date</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br>accountId: 1234567890</p></td>
+            <td>
+                <p class ="code--block"> {<br>
+                                            "eventType" : "LISA Investor Terminal Ill Health",<br>
+                                            "eventDate" : "06-04-2017"<br>
+                                        }
+                </p>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
+                <p class ="code--block"> {<br>
+                                            "code": "BAD_REQUEST",<br>
+                                            "message": "Bad Request"<br>
+                                          }
+                </p>
+            </td>
+        </tr>
         <tr>
             <td><p>Request containing a LISA Manager Reference Number that doesn't exist</p><p class ="code--block">lisaManagerReferenceNumber: Z123456789<br>accountId: 1234567890 </p></td>
             <td>
@@ -112,23 +145,6 @@
                 <p class ="code--block"> {<br>
                                             "code": "NOT_FOUND",<br>
                                             "message": "Resource was not found"<br>
-                                          }
-                </p>
-            </td>
-        </tr>
-        <tr>
-            <td><p>Request containing an invalid event type</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br>accountId: 1234567890</p></td>
-            <td>
-                <p class ="code--block"> {<br>
-                                            "eventType" : "Invalid Event Type",<br>
-                                            "eventDate" : "2017-04-06"<br>
-                                        }
-                </p>
-            </td>
-            <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
-                <p class ="code--block"> {<br>
-                                            "code": "BAD_REQUEST",<br>
-                                            "message": "Bad Request"<br>
                                           }
                 </p>
             </td>
