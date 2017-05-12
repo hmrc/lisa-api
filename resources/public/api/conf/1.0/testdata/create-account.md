@@ -81,25 +81,6 @@
             </td>
         </tr>
         <tr>
-            <td><p>The LISA account has already been closed or voided</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
-            <td>
-                <p class ="code--block"> {<br>
-                                            "investorId":"0000000403",<br>
-                                            "creationReason":"New",<br>
-                                            "accountId":"8765432100",<br>
-                                            "firstSubscriptionDate":"2011-03-23"<br>
-                                        }
-                </p>
-            </td>
-            <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
-                <p class ="code--block"> {<br>
-                                         "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID",<br>
-                                         "message": "The LISA account has already been closed or voided."<br>
-                                       }
-                </p>
-            </td>
-        </tr>
-        <tr>
             <td><p>Create Account endpoint with an invalid creationReason in the payload</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
             <td>
                 <p class ="code--block"> {<br>
@@ -114,6 +95,44 @@
                 <p class ="code--block"> {<br>
                                          "code": "BAD_REQUEST",<br>
                                          "message": "Bad Request"<br>
+                                       }
+                </p>
+            </td>
+        </tr>
+        <tr>
+            <td><p>Create Account endpoint with invalid Authorisation Bearer token in the header</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br><br>Authorization: Bearer X</p></td>
+            <td>
+                <p class ="code--block"> {<br>
+                                            "investorId":"1234500892",<br>
+                                            "creationReason":"New",<br>
+                                            "accountId":"8765432100",<br>
+                                            "firstSubscriptionDate":"2011-03-23"<br>
+                                        }
+                </p>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">401 (Unauthorized)</code></p>
+                <p class ="code--block"> {<br>
+                                         "code": "INVALID_CREDENTIALS",<br>
+                                         "message": "Invalid Authentication information provided"<br>
+                                       }
+                </p>
+            </td>
+        </tr>
+        <tr>
+            <td><p>The LISA account has already been closed or voided</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
+            <td>
+                <p class ="code--block"> {<br>
+                                            "investorId":"0000000403",<br>
+                                            "creationReason":"New",<br>
+                                            "accountId":"8765432100",<br>
+                                            "firstSubscriptionDate":"2011-03-23"<br>
+                                        }
+                </p>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
+                <p class ="code--block"> {<br>
+                                         "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID",<br>
+                                         "message": "The LISA account has already been closed or voided."<br>
                                        }
                 </p>
             </td>
@@ -157,13 +176,13 @@
             </td>
         </tr>
         <tr>
-            <td><p>Create Account endpoint with valid Lisa manager and an investor with failed compliance check</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
+            <td><p>Create Account endpoint with valid Lisa manager and an investor with failed compliance check</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                            "investorId":"1234567892",<br>
-                                            "creationReason":"New",<br>
-                                            "accountId":"8765432100",<br>
-                                            "firstSubscriptionDate":"2011-03-23"<br>
+                                            "investorId": "1234567892",<br>
+                                            "creationReason": "New",<br>
+                                            "accountId": "8765432100",<br>
+                                            "firstSubscriptionDate": "2011-03-23"<br>
                                         }
                 </p>
             </td>
@@ -210,7 +229,7 @@
                                         }
                 </p>
             </td>
-            <td><p>HTTP status: <code class="code--slim">403(Forbidden)</code></p>
+            <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
                 <p class ="code--block"> {<br>
                                          "code": "TRANSFER_ACCOUNT_DATA_NOT_PROVIDED",<br>
                                           "message": "The transferredFromAccountId, transferredFromLMRN and transferInDate are not provided and are required for transfer of an account."<br>
@@ -234,7 +253,7 @@
                                         }
                 </p>
             </td>
-            <td><p>HTTP status: <code class="code--slim">403(Forbidden)</code></p>
+            <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
                 <p class ="code--block"> {<br>
                                          "code": "PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST",<br>
                                           "message": "The transferredFromAccountId and transferredFromLMRN given don’t match with an account on HMRC’s records"<br>
@@ -243,7 +262,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Create Account endpoint with invalid Accept Header</p><p class ="code--block">lisaManagerReferenceNumber :Z123456<br>Accept:application/vnd.hmrc.1.0</p></td>
+            <td><p>Create Account endpoint with invalid Accept Header</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br><br>Accept: application/vnd.hmrc.1.0</p></td>
             <td>
                 <p class ="code--block"> {<br>
                                             "investorId":"1234500892",<br>
@@ -253,7 +272,7 @@
                                         }
                 </p>
             </td>
-            <td><p>HTTP status: <code class="code--slim">406(Not Acceptable)</code></p>
+            <td><p>HTTP status: <code class="code--slim">406 (Not Acceptable)</code></p>
                 <p class ="code--block"> {<br>
                                          "code": "ACCEPT_HEADER_INVALID",<br>
                                          "message": "The accept header is missing or invalid"<br>
@@ -262,26 +281,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Create Account endpoint with invalid Authorisation Bearer token in the header</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
-            <td>
-                <p class ="code--block"> {<br>
-                                            "investorId":"1234500892",<br>
-                                            "creationReason":"New",<br>
-                                            "accountId":"8765432100",<br>
-                                            "firstSubscriptionDate":"2011-03-23"<br>
-                                        }
-                </p>
-            </td>
-            <td><p>HTTP status: <code class="code--slim">401(Unauthorized)</code></p>
-                <p class ="code--block"> {<br>
-                                         "code": "INVALID_CREDENTIALS",<br>
-                                         "message": "Invalid Authentication information provided"<br>
-                                       }
-                </p>
-            </td>
-        </tr>
-        <tr>
-            <td><p>Create Account endpoint with an investorId that already exist</p><p class ="code--block">lisaManagerReferenceNumber :Z123456</p></td>
+            <td><p>Create Account endpoint with an investorId that already exist</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
             <td>
                 <p class ="code--block"> {<br>
                                             "investorId":"1234567899",<br>
