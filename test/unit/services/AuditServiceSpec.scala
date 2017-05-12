@@ -85,7 +85,6 @@ class AuditServiceSpec extends PlaySpec
         lifeEventId = Some("1234567891"),
         periodStartDate = new DateTime("2017-04-06"),
         periodEndDate = new DateTime("2017-05-05"),
-        transactionType = "Bonus",
         htbTransfer = Some(HelpToBuyTransfer(1f, 0f)),
         inboundPayments = InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
         bonuses = Bonuses(1000f, 1000f, Some(1000f), "Life Event")
@@ -100,7 +99,6 @@ class AuditServiceSpec extends PlaySpec
       event.detail must contain ("lifeEventId" -> "1234567891")
       event.detail must contain ("periodStartDate" -> "2017-04-06")
       event.detail must contain ("periodEndDate" -> "2017-05-05")
-      event.detail must contain ("transactionType" -> "Bonus")
       event.detail must contain ("htbTransferInForPeriod" -> "1.0")
       event.detail must contain ("htbTransferTotalYTD" -> "0.0")
       event.detail must contain ("newSubsForPeriod" -> "4000.0")

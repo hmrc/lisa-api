@@ -163,7 +163,6 @@ class BonusPaymentControllerSpec extends PlaySpec
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountId" -> accountId,
               "lifeEventId" -> (json \ "lifeEventId").as[String],
-              "transactionType" -> (json \ "transactionType").as[String],
               "periodStartDate" -> (json \ "periodStartDate").as[String],
               "periodEndDate" -> (json \ "periodEndDate").as[String],
               "htbTransferInForPeriod" -> (htb \ "htbTransferInForPeriod").as[Float].toString,
@@ -197,7 +196,6 @@ class BonusPaymentControllerSpec extends PlaySpec
             auditData = MatcherEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountId" -> accountId,
-              "transactionType" -> (json \ "transactionType").as[String],
               "periodStartDate" -> (json \ "periodStartDate").as[String],
               "periodEndDate" -> (json \ "periodEndDate").as[String],
               "newSubsYTD" -> (inboundPayments \ "newSubsYTD").as[Float].toString,
@@ -231,7 +229,6 @@ class BonusPaymentControllerSpec extends PlaySpec
             auditData = MatcherEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountId" -> accountId,
-              "transactionType" -> (json \ "transactionType").as[String],
               "periodStartDate" -> (json \ "periodStartDate").as[String],
               "periodEndDate" -> (json \ "periodEndDate").as[String],
               "newSubsYTD" -> (inboundPayments \ "newSubsYTD").as[Float].toString,
@@ -266,7 +263,6 @@ class BonusPaymentControllerSpec extends PlaySpec
             auditData = MatcherEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountId" -> accountId,
-              "transactionType" -> (json \ "transactionType").as[String],
               "periodStartDate" -> (json \ "periodStartDate").as[String],
               "periodEndDate" -> (json \ "periodEndDate").as[String],
               "htbTransferInForPeriod" -> (htb \ "htbTransferInForPeriod").as[Float].toString,
@@ -302,7 +298,6 @@ class BonusPaymentControllerSpec extends PlaySpec
             auditData = MatcherEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountId" -> accountId,
-              "transactionType" -> (json \ "transactionType").as[String],
               "periodStartDate" -> (json \ "periodStartDate").as[String],
               "periodEndDate" -> (json \ "periodEndDate").as[String],
               "newSubsYTD" -> (inboundPayments \ "newSubsYTD").as[Float].toString,
