@@ -45,7 +45,7 @@ trait AccountService {
           case "INVESTOR_ELIGIBILITY_CHECK_FAILED" => CreateLisaAccountInvestorNotEligibleResponse
           case "INVESTOR_COMPLIANCE_CHECK_FAILED" => CreateLisaAccountInvestorComplianceCheckFailedResponse
           case "INVESTOR_ACCOUNT_ALREADY_EXISTS" => CreateLisaAccountAlreadyExistsResponse
-          case "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID" => CreateLisaAccountInvestorAccountAlreadyClosedOrVoidedResponse
+          case "INVESTOR_ACCOUNT_ALREADY_CLOSED" => CreateLisaAccountInvestorAccountAlreadyClosedOrVoidedResponse
           case _ => CreateLisaAccountErrorResponse
         }
       }
@@ -69,7 +69,7 @@ trait AccountService {
           case "INVESTOR_COMPLIANCE_CHECK_FAILED" => CreateLisaAccountInvestorComplianceCheckFailedResponse
           case "PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST" => CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse
           case "INVESTOR_ACCOUNT_ALREADY_EXISTS" => CreateLisaAccountAlreadyExistsResponse
-          case "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID" => CreateLisaAccountInvestorAccountAlreadyClosedOrVoidedResponse
+          case "INVESTOR_ACCOUNT_ALREADY_CLOSED" => CreateLisaAccountInvestorAccountAlreadyClosedOrVoidedResponse
           case _ => CreateLisaAccountErrorResponse
         }
       }
