@@ -16,27 +16,32 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
+import java.util.concurrent.TimeUnit
+
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
+import uk.gov.hmrc.lisaapi.metrics.LisaMetrics
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, InvestorService}
 import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class InvestorController extends LisaController {
+class InvestorController extends LisaController  {
 
   val service: InvestorService = InvestorService
   val auditService: AuditService = AuditService
-
   def createLisaInvestor(lisaManager: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async {
     implicit request =>
+      val startTime = System.currentTimeMillis()
+      runMetrics(startTime)
       Logger.debug(s"LISA HTTP Request: ${request.uri} and method: ${request.method}")
 
       withValidJson[CreateLisaInvestorRequest] {
         createRequest => {
           service.createInvestor(lisaManager, createRequest).map { res =>
+                runMetrics(startTime)
             res match {
               case CreateLisaInvestorSuccessResponse(investorId) =>
                 handleCreatedResponse(lisaManager, createRequest, investorId)
@@ -122,4 +127,7 @@ class InvestorController extends LisaController {
     s"/manager/$lisaManagerReferenceNumber/investors"
   }
 
+  def runMetrics(startTime: Long): Unit = {
+    LisaMetrics.timer(System.currentTimeMillis() - startTime, TimeUnit.MILLISECONDS, "createLisaInvestor")
+  }
 }
