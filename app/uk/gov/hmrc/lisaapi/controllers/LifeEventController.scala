@@ -19,6 +19,7 @@ package uk.gov.hmrc.lisaapi.controllers
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
+import uk.gov.hmrc.lisaapi.metrics.{MetricsEnum, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, LifeEventService}
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -33,9 +34,12 @@ class LifeEventController extends LisaController {
 
   def reportLisaLifeEvent(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async {
     implicit request =>
+      val startTime = System.currentTimeMillis()
+      LisaMetrics.startMetrics(startTime,MetricsEnum.LIFE_EVENT)
 
     withValidJson[ReportLifeEventRequest] { req =>
       service.reportLifeEvent(lisaManager, accountId, req) map { res =>
+            LisaMetrics.startMetrics(startTime,MetricsEnum.LIFE_EVENT)
         Logger.debug("Entering LifeEvent Controller and the response is " + res.toString)
         res match {
           case ReportLifeEventSuccessResponse(lifeEventId) => {

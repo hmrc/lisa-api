@@ -18,6 +18,7 @@ package uk.gov.hmrc.lisaapi.metrics
 
 import java.util.concurrent.TimeUnit
 import com.codahale.metrics.MetricRegistry
+import uk.gov.hmrc.lisaapi.metrics.MetricsEnum.MetricsEnum
 
 import uk.gov.hmrc.play.graphite.MicroserviceMetrics
 
@@ -31,8 +32,21 @@ object LisaMetrics extends LisaMetrics with MicroserviceMetrics {
   val registry: MetricRegistry = metrics.defaultRegistry
 
   override def timer(diff: Long, unit: TimeUnit, metricType: String) =   registry.timer(s"${metricType}").update(diff, unit)
+
+  def startMetrics(startTime: Long, api: MetricsEnum): Unit =  LisaMetrics.timer(startTime, TimeUnit.MILLISECONDS, api.toString)
+
+  def incrementMetrics(startTime: Long, api: MetricsEnum): Unit = {
+    LisaMetrics.timer(System.currentTimeMillis() - startTime, TimeUnit.MILLISECONDS, api.toString)
+  }
+
 }
 
-//trait Metrics {
-//  val metrics:LisaMetrics = LisaMetrics
-//}
+object MetricsEnum extends Enumeration {
+  type MetricsEnum = Value
+  val LISA_INVESTOR = Value
+  val CREATE_ACCOUNT = Value
+  val CLOSE_ACCOUNT = Value
+  val LIFE_EVENT = Value
+  val BONUS_PAYMENT = Value
+
+}
