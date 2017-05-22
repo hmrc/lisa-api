@@ -44,8 +44,8 @@ object LisaMetrics extends LisaMetrics with MicroserviceMetrics {
 object MetricsEnum extends Enumeration {
   type MetricsEnum = Value
   val LISA_INVESTOR = Value
-  val CREATE_ACCOUNT = Value
-  val CLOSE_ACCOUNT = Value
+  val CREATE_OR_TRANSFER_ACCOUNT = Value
+ val  CLOSE_ACCOUNT = Value
   val LIFE_EVENT = Value
   val BONUS_PAYMENT = Value
 

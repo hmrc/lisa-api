@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
+import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.metrics.{MetricsEnum, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, InvestorService}
@@ -28,7 +29,7 @@ import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class InvestorController extends LisaController  {
+class InvestorController extends LisaController with LisaConstants  {
 
   val service: InvestorService = InvestorService
   val auditService: AuditService = AuditService
@@ -65,7 +66,7 @@ class InvestorController extends LisaController  {
       auditType = "investorCreated",
       path = getEndpointUrl(lisaManager),
       auditData = Map(
-        "lisaManagerReferenceNumber" -> lisaManager,
+        ZREF -> lisaManager,
         "investorNINO" -> createRequest.investorNINO,
         "dateOfBirth" -> createRequest.dateOfBirth.toString("yyyy-MM-dd"),
         "investorID" -> investorId
@@ -84,7 +85,7 @@ class InvestorController extends LisaController  {
       auditType = "investorNotCreated",
       path = getEndpointUrl(lisaManager),
       auditData = Map(
-        "lisaManagerReferenceNumber" -> lisaManager,
+        ZREF -> lisaManager,
         "investorNINO" -> createRequest.investorNINO,
         "dateOfBirth" -> createRequest.dateOfBirth.toString("yyyy-MM-dd"),
         "investorID" -> investorId,
@@ -101,7 +102,7 @@ class InvestorController extends LisaController  {
       auditType = "investorNotCreated",
       path = getEndpointUrl(lisaManager),
       auditData = Map(
-        "lisaManagerReferenceNumber" -> lisaManager,
+        ZREF -> lisaManager,
         "investorNINO" -> createRequest.investorNINO,
         "dateOfBirth" -> createRequest.dateOfBirth.toString("yyyy-MM-dd"),
         "reasonNotCreated" -> errorResponse.data.code
@@ -116,7 +117,7 @@ class InvestorController extends LisaController  {
       auditType = "investorNotCreated",
       path = getEndpointUrl(lisaManager),
       auditData = Map(
-        "lisaManagerReferenceNumber" -> lisaManager,
+        ZREF -> lisaManager,
         "investorNINO" -> createRequest.investorNINO,
         "dateOfBirth" -> createRequest.dateOfBirth.toString("yyyy-MM-dd"),
         "reasonNotCreated" -> ErrorInternalServerError.errorCode

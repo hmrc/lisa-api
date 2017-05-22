@@ -19,6 +19,8 @@ package uk.gov.hmrc.lisaapi.controllers
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, Result}
+import uk.gov.hmrc.lisaapi.LisaConstants
+import uk.gov.hmrc.lisaapi.metrics.{MetricsEnum, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, BonusPaymentService, LifeEventService}
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -28,13 +30,15 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
 
-class BonusPaymentController extends LisaController {
+class BonusPaymentController extends LisaController with LisaConstants {
 
   val service: BonusPaymentService = BonusPaymentService
   val auditService: AuditService = AuditService
 
   def requestBonusPayment(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async {
     implicit request =>
+      val startTime = System.currentTimeMillis()
+      LisaMetrics.startMetrics(startTime,MetricsEnum.BONUS_PAYMENT)
 
       withValidJson[RequestBonusPaymentRequest] { req =>
         (req.bonuses.claimReason, req.lifeEventId) match {
@@ -43,6 +47,8 @@ class BonusPaymentController extends LisaController {
           case _ =>
             service.requestBonusPayment(lisaManager, accountId, req) map { res =>
               Logger.debug("Entering Bonus Payment Controller and the response is " + res.toString)
+
+              LisaMetrics.incrementMetrics(System.currentTimeMillis(),MetricsEnum.BONUS_PAYMENT)
               res match {
                 case RequestBonusPaymentSuccessResponse(transactionID) =>
                   handleSuccess(lisaManager, accountId, req, transactionID)
@@ -108,7 +114,7 @@ class BonusPaymentController extends LisaController {
   }
 
   private def createAuditData(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest): Map[String, String] = {
-    req.toStringMap ++ Map("lisaManagerReferenceNumber" -> lisaManager,
+    req.toStringMap ++ Map(ZREF -> lisaManager,
       "accountId" -> accountId)
   }
 
