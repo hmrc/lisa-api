@@ -27,3 +27,6 @@ package object controllers {
     def writes(e: ErrorResponseWithId): JsValue = Json.obj("code" -> e.errorCode, "message" -> e.message, "id" -> e.id)
   }
 }
+trait LisaConstants {
+  val ZREF: String =  "lisaManagerReferenceNumber"
+}
