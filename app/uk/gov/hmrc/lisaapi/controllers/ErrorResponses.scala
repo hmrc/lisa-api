@@ -22,7 +22,7 @@ sealed abstract class ErrorResponse(
                                      val httpStatusCode: Int,
                                      val errorCode: String,
                                      val message: String,
-                                     val errors: Option[List[LisaValidationError]] = None
+                                     val errors: Option[List[ErrorValidation]] = None
                                    )
 
 case class ErrorResponseWithId(
@@ -32,13 +32,13 @@ case class ErrorResponseWithId(
                                 id: String
                               )
 
-case class LisaValidationError(
+case class ErrorValidation(
                              errorCode: String,
                              message: String,
                              path: Option[String] = None
                            )
 
-case class ErrorBadRequest(errs: List[LisaValidationError]) extends ErrorResponse(400, "BAD_REQUEST", "Bad Request", errors = Some(errs))
+case class ErrorBadRequest(errs: List[ErrorValidation]) extends ErrorResponse(400, "BAD_REQUEST", "Bad Request", errors = Some(errs))
 
 case object ErrorNotImplemented extends ErrorResponse(501, "NOT_IMPLEMENTED", "Not implemented")
 
