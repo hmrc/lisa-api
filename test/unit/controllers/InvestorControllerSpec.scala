@@ -59,6 +59,12 @@ class InvestorControllerSpec extends PlaySpec
                          "dateOfBirth" : "1973-03-24"
                        }""".stripMargin
 
+  val dobMissing = """{
+                         "investorNINO" : 123456,
+                         "firstName" : "Ex first Name",
+                         "lastName" : "Ample"
+                       }""".stripMargin
+
   val lisaManager = "Z019283"
 
   override def beforeEach() {
@@ -93,6 +99,21 @@ class InvestorControllerSpec extends PlaySpec
         val res = SUT.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT,"/").withHeaders(acceptHeader).
           withBody(AnyContentAsJson(Json.parse(investorJson))))
         status(res) must be (FORBIDDEN)
+      }
+    }
+
+    "return with status 400 BAD_REQUEST" when {
+      "dateOfBirth is missing" in {
+        val res = SUT.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
+          withBody(AnyContentAsJson(Json.parse(dobMissing))))
+        status(res) must be(BAD_REQUEST)
+        contentAsJson(res).as[String]  contains "MISSING_FIELD"
+      }
+      "Nino is invalid" in {
+        val res = SUT.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
+          withBody(AnyContentAsJson(Json.parse(invalidInvestorJson))))
+        status(res) must be(BAD_REQUEST)
+
       }
     }
 
@@ -212,27 +233,6 @@ class InvestorControllerSpec extends PlaySpec
             "reasonNotCreated" -> ErrorInvestorAlreadyExists(investorId).errorCode
           )))(any())
       }
-
-      //      "a error response is returned" in {
-      //        when(mockService.createInvestor(any(), any())(any())).
-      //          thenThrow(new RuntimeException)
-      //
-      //
-      //        await(SUT.createLisaInvestor(lisaManager).
-      //          apply(FakeRequest(Helpers.PUT, "/").
-      //          withHeaders(acceptHeader).
-      //          withBody(AnyContentAsJson(Json.parse(investorJson)))))
-      //
-      //        verify(mockAuditService).audit(
-      //          auditType = matchersEquals("investorNotCreated"),
-      //          path = matchersEquals(s"/manager/$lisaManager/investors"),
-      //          auditData = matchersEquals(Map(
-      //            "lisaManagerReferenceNumber" -> lisaManager,
-      //            "investorNINO" -> "AB123456D",
-      //            "dateOfBirth" -> "1973-03-24",
-      //            "reasonNotCreated" -> ErrorInternalServerError.errorCode
-      //          )))(any())
-      //      }
     }
 
     "audit an investorCreated event" when {
