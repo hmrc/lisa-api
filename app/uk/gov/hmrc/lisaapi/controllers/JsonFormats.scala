@@ -203,4 +203,15 @@ trait JsonFormats {
 
   }
 
+  def monetaryReads(): Reads[Float] = {
+    val isNotFractionsOfAPenny = (value:Float) => {
+      val split = value.toString.split("\\.")
+
+      split.size == 1 || split(1).length < 3
+    }
+    val isNotNegative = (value:Float) => {value >= 0f}
+
+    Reads.verifying[Float]((f) => isNotFractionsOfAPenny(f) && isNotNegative(f))
+  }
+
 }

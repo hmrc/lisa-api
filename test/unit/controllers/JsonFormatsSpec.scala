@@ -19,31 +19,20 @@ package unit.controllers
 import org.scalatestplus.play.PlaySpec
 import play.api.data.validation.ValidationError
 import play.api.libs.json._
+import uk.gov.hmrc.lisaapi.controllers.JsonFormats
 
 class JsonFormatsSpec extends PlaySpec {
 
   val monetaryField = "monetaryValue"
   val invalidError = "error.invalid"
 
-  implicit val testReads: Reads[TestObject] = (JsPath \ monetaryField).read(monetaryReads()).map(TestObject.apply)
-
-  /***
-    * Method *should* read the number sent in the Json request and ensure it's *always* to
-    * 2 decimal places and is *never* a negative value - otherwise it should return an error
-    */
-  def monetaryReads(): Reads[Float] = {
-    val isTwoDp = (value:Float) => {value.toString.split("\\.")(1).length == 2}
-    val isNotNegative = (value:Float) => {value >= 0f}
-
-    Reads.verifying[Float]((f) => isTwoDp(f) && isNotNegative(f))
-  }
-  /* ****** */
+  implicit val testReads: Reads[TestObject] = (JsPath \ monetaryField).read(SUT.monetaryReads()).map(TestObject.apply)
 
   "Monetary reads" must {
 
     "pass validation" when {
 
-      "given 0.00" in {
+      "given a value of zero" in {
         val res = createJson("0.00").validate[TestObject]
 
         res match {
@@ -52,7 +41,16 @@ class JsonFormatsSpec extends PlaySpec {
         }
       }
 
-      "given a 2dp positive number" in {
+      "given a 1dp number" in {
+        val res = createJson("1.5").validate[TestObject]
+
+        res match {
+          case JsSuccess(data, _) => data.monetaryValue mustBe 1.5f
+          case _ => fail("failed validation")
+        }
+      }
+
+      "given a 2dp number" in {
         val res = createJson("2.99").validate[TestObject]
 
         res match {
@@ -61,20 +59,11 @@ class JsonFormatsSpec extends PlaySpec {
         }
       }
 
-      "given a 2dp positive number ending in a zero" in {
-        val res = createJson("2.50").validate[TestObject]
+      "given a Xdp number - if it has no more than 2 significant figures" in {
+        val res = createJson("2.99000").validate[TestObject]
 
         res match {
-          case JsSuccess(data, _) => data.monetaryValue mustBe 2.5f
-          case _ => fail("failed validation")
-        }
-      }
-
-      "given a 2dp positive number ending in two zeros" in {
-        val res = createJson("2.00").validate[TestObject]
-
-        res match {
-          case JsSuccess(data, _) => data.monetaryValue mustBe 2f
+          case JsSuccess(data, _) => data.monetaryValue mustBe 2.99f
           case _ => fail("failed validation")
         }
       }
@@ -83,19 +72,8 @@ class JsonFormatsSpec extends PlaySpec {
 
     "fail validation" when {
 
-      "given a positive number ending .0" in {
-        val res = createJson("2.0").validate[TestObject]
-
-        res match {
-          case JsError(errors) => {
-            errors mustBe Seq((JsPath \ monetaryField, Seq(ValidationError(invalidError))))
-          }
-          case _ => fail("passed validation")
-        }
-      }
-
-      "given a positive number ending .000" in {
-        val res = createJson("2.000").validate[TestObject]
+      "given a number with 3 significant figures" in {
+        val res = createJson("2.005").validate[TestObject]
 
         res match {
           case JsError(errors) => {
@@ -125,5 +103,7 @@ class JsonFormatsSpec extends PlaySpec {
   }
 
   case class TestObject(monetaryValue: Float)
+
+  object SUT extends JsonFormats {}
 
 }
