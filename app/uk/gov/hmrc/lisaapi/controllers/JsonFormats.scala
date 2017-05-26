@@ -95,7 +95,7 @@ trait JsonFormats {
     (JsPath \ "transferAccount").read[AccountTransfer]
   )(CreateLisaAccountTransferRequest.apply _)
 
-  implicit val createLisaAccountRequestReads = Reads[CreateLisaAccountRequest] { json =>
+  implicit val createLisaAccountRequestReads: Reads[CreateLisaAccountRequest] = Reads[CreateLisaAccountRequest] { json =>
     (json \ "creationReason").validate[String](Reads.pattern("^(New|Transferred)$".r, "error.formatting.creationReason")).flatMap {
       case "New" => createLisaAccountCreationRequestReads.reads(json)
       case "Transferred" => createLisaAccountTransferRequestReads.reads(json)
@@ -148,8 +148,8 @@ trait JsonFormats {
   )(HelpToBuyTransfer.apply _)
 
   implicit val htbWrites: Writes[HelpToBuyTransfer] = (
-    (JsPath \ "htbTransferInForPeriod").write[Double] and
-    (JsPath \ "htbTransferTotalYTD").write[Double]
+    (JsPath \ "htbTransferInForPeriod").write[BigDecimal] and
+    (JsPath \ "htbTransferTotalYTD").write[BigDecimal]
   )(unlift(HelpToBuyTransfer.unapply))
 
   implicit val ibpReads: Reads[InboundPayments] = (
@@ -160,23 +160,23 @@ trait JsonFormats {
   )(InboundPayments.apply _)
 
   implicit val ibpWrites: Writes[InboundPayments] = (
-    (JsPath \ "newSubsForPeriod").writeNullable[Double] and
-    (JsPath \ "newSubsYTD").write[Double] and
-    (JsPath \ "totalSubsForPeriod").write[Double] and
-    (JsPath \ "totalSubsYTD").write[Double]
+    (JsPath \ "newSubsForPeriod").writeNullable[BigDecimal] and
+    (JsPath \ "newSubsYTD").write[BigDecimal] and
+    (JsPath \ "totalSubsForPeriod").write[BigDecimal] and
+    (JsPath \ "totalSubsYTD").write[BigDecimal]
   )(unlift(InboundPayments.unapply))
 
   implicit val bonusesReads: Reads[Bonuses] = (
     (JsPath \ "bonusDueForPeriod").read(monetaryReads()) and
     (JsPath \ "totalBonusDueYTD").read(monetaryReads()) and
     (JsPath \ "bonusPaidYTD").readNullable(monetaryReads()) and
-    (JsPath \ "claimReason").read((Reads.pattern(bonusClaimReasonRegex, "error.formatting.claimReason")))
+    (JsPath \ "claimReason").read(Reads.pattern(bonusClaimReasonRegex, "error.formatting.claimReason"))
   )(Bonuses.apply _)
 
   implicit val bonusesWrites: Writes[Bonuses] = (
-    (JsPath \ "bonusDueForPeriod").write[Double] and
-    (JsPath \ "totalBonusDueYTD").write[Double] and
-    (JsPath \ "bonusPaidYTD").writeNullable[Double] and
+    (JsPath \ "bonusDueForPeriod").write[BigDecimal] and
+    (JsPath \ "totalBonusDueYTD").write[BigDecimal] and
+    (JsPath \ "bonusPaidYTD").writeNullable[BigDecimal] and
     (JsPath \ "claimReason").write[String]
   )(unlift(Bonuses.unapply))
 
@@ -224,11 +224,11 @@ trait JsonFormats {
 
   }
 
-  def monetaryReads(): Reads[Double] = {
+  def monetaryReads(): Reads[BigDecimal] = {
     val isTwoDp = (value:BigDecimal) => {value.scale == 2}
     val isNegative = (value:BigDecimal) => {value < 0}
 
-    Reads.verifying[BigDecimal]((f) => isTwoDp(f) && !isNegative(f)).map(_.toDouble)
+    Reads.verifying[BigDecimal]((f) => isTwoDp(f) && !isNegative(f))
   }
 
 }
