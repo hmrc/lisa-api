@@ -41,15 +41,6 @@ class JsonFormatsSpec extends PlaySpec {
         }
       }
 
-      "given a 1dp number" in {
-        val res = createJson("1.5").validate[TestObject]
-
-        res match {
-          case JsSuccess(data, _) => data.monetaryValue mustBe 1.5f
-          case _ => fail("failed validation")
-        }
-      }
-
       "given a 2dp number" in {
         val res = createJson("2.99").validate[TestObject]
 
@@ -59,11 +50,11 @@ class JsonFormatsSpec extends PlaySpec {
         }
       }
 
-      "given a Xdp number - if it has no more than 2 significant figures" in {
-        val res = createJson("2.99000").validate[TestObject]
+      "given a large 2dp number" in {
+        val res = createJson("1000000000.01").validate[TestObject]
 
         res match {
-          case JsSuccess(data, _) => data.monetaryValue mustBe 2.99f
+          case JsSuccess(data, _) => data.monetaryValue mustBe 1000000000.01f
           case _ => fail("failed validation")
         }
       }
@@ -72,8 +63,41 @@ class JsonFormatsSpec extends PlaySpec {
 
     "fail validation" when {
 
-      "given a number with 3 significant figures" in {
+      "given a whole number" in {
+        val res = createJson("15").validate[TestObject]
+
+        res match {
+          case JsError(errors) => {
+            errors mustBe Seq((JsPath \ monetaryField, Seq(ValidationError(invalidError))))
+          }
+          case _ => fail("passed validation")
+        }
+      }
+
+      "given a 1dp number" in {
+        val res = createJson("1.5").validate[TestObject]
+
+        res match {
+          case JsError(errors) => {
+            errors mustBe Seq((JsPath \ monetaryField, Seq(ValidationError(invalidError))))
+          }
+          case _ => fail("passed validation")
+        }
+      }
+
+      "given a 3dp number" in {
         val res = createJson("2.005").validate[TestObject]
+
+        res match {
+          case JsError(errors) => {
+            errors mustBe Seq((JsPath \ monetaryField, Seq(ValidationError(invalidError))))
+          }
+          case _ => fail("passed validation")
+        }
+      }
+
+      "given a large 3dp number" in {
+        val res = createJson("100000000000000000000000000000000000.001").validate[TestObject]
 
         res match {
           case JsError(errors) => {
