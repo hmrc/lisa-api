@@ -142,13 +142,34 @@ trait JsonFormats {
     (JsPath \ "closureDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd"))
   )(unlift(CloseLisaAccountRequest.unapply))
 
-  implicit val htbFormats = Json.format[HelpToBuyTransfer]
-  implicit val ibpFormats = Json.format[InboundPayments]
+  implicit val htbReads: Reads[HelpToBuyTransfer] = (
+    (JsPath \ "htbTransferInForPeriod").read(monetaryReads()) and
+    (JsPath \ "htbTransferTotalYTD").read(monetaryReads())
+  )(HelpToBuyTransfer.apply _)
+
+  implicit val htbWrites: Writes[HelpToBuyTransfer] = (
+    (JsPath \ "htbTransferInForPeriod").write[Float] and
+    (JsPath \ "htbTransferTotalYTD").write[Float]
+  )(unlift(HelpToBuyTransfer.unapply))
+
+  implicit val ibpReads: Reads[InboundPayments] = (
+    (JsPath \ "newSubsForPeriod").readNullable(monetaryReads()) and
+    (JsPath \ "newSubsYTD").read(monetaryReads()) and
+    (JsPath \ "totalSubsForPeriod").read(monetaryReads()) and
+    (JsPath \ "totalSubsYTD").read(monetaryReads())
+  )(InboundPayments.apply _)
+
+  implicit val ibpWrites: Writes[InboundPayments] = (
+    (JsPath \ "newSubsForPeriod").writeNullable[Float] and
+    (JsPath \ "newSubsYTD").write[Float] and
+    (JsPath \ "totalSubsForPeriod").write[Float] and
+    (JsPath \ "totalSubsYTD").write[Float]
+  )(unlift(InboundPayments.unapply))
 
   implicit val bonusesReads: Reads[Bonuses] = (
-    (JsPath \ "bonusDueForPeriod").read[Float] and
-    (JsPath \ "totalBonusDueYTD").read[Float] and
-    (JsPath \ "bonusPaidYTD").readNullable[Float] and
+    (JsPath \ "bonusDueForPeriod").read(monetaryReads()) and
+    (JsPath \ "totalBonusDueYTD").read(monetaryReads()) and
+    (JsPath \ "bonusPaidYTD").readNullable(monetaryReads()) and
     (JsPath \ "claimReason").read((Reads.pattern(bonusClaimReasonRegex, "error.formatting.claimReason")))
   )(Bonuses.apply _)
 
