@@ -148,8 +148,8 @@ trait JsonFormats {
   )(HelpToBuyTransfer.apply _)
 
   implicit val htbWrites: Writes[HelpToBuyTransfer] = (
-    (JsPath \ "htbTransferInForPeriod").write[Float] and
-    (JsPath \ "htbTransferTotalYTD").write[Float]
+    (JsPath \ "htbTransferInForPeriod").write[Double] and
+    (JsPath \ "htbTransferTotalYTD").write[Double]
   )(unlift(HelpToBuyTransfer.unapply))
 
   implicit val ibpReads: Reads[InboundPayments] = (
@@ -160,10 +160,10 @@ trait JsonFormats {
   )(InboundPayments.apply _)
 
   implicit val ibpWrites: Writes[InboundPayments] = (
-    (JsPath \ "newSubsForPeriod").writeNullable[Float] and
-    (JsPath \ "newSubsYTD").write[Float] and
-    (JsPath \ "totalSubsForPeriod").write[Float] and
-    (JsPath \ "totalSubsYTD").write[Float]
+    (JsPath \ "newSubsForPeriod").writeNullable[Double] and
+    (JsPath \ "newSubsYTD").write[Double] and
+    (JsPath \ "totalSubsForPeriod").write[Double] and
+    (JsPath \ "totalSubsYTD").write[Double]
   )(unlift(InboundPayments.unapply))
 
   implicit val bonusesReads: Reads[Bonuses] = (
@@ -174,9 +174,9 @@ trait JsonFormats {
   )(Bonuses.apply _)
 
   implicit val bonusesWrites: Writes[Bonuses] = (
-    (JsPath \ "bonusDueForPeriod").write[Float] and
-    (JsPath \ "totalBonusDueYTD").write[Float] and
-    (JsPath \ "bonusPaidYTD").writeNullable[Float] and
+    (JsPath \ "bonusDueForPeriod").write[Double] and
+    (JsPath \ "totalBonusDueYTD").write[Double] and
+    (JsPath \ "bonusPaidYTD").writeNullable[Double] and
     (JsPath \ "claimReason").write[String]
   )(unlift(Bonuses.unapply))
 
@@ -224,11 +224,11 @@ trait JsonFormats {
 
   }
 
-  def monetaryReads(): Reads[Float] = {
+  def monetaryReads(): Reads[Double] = {
     val isTwoDp = (value:BigDecimal) => {value.scale == 2}
-    val isNotNegative = (value:BigDecimal) => {value >= 0d}
+    val isNegative = (value:BigDecimal) => {value < 0}
 
-    Reads.verifying[BigDecimal]((f) => isTwoDp(f) && isNotNegative(f)).map(_.toFloat)
+    Reads.verifying[BigDecimal]((f) => isTwoDp(f) && !isNegative(f)).map(_.toDouble)
   }
 
 }
