@@ -118,6 +118,17 @@ class JsonFormatsSpec extends PlaySpec {
         }
       }
 
+      "given a non-numeric value" in {
+        val res = createJson(""""x"""").validate[TestObject]
+
+        res match {
+          case JsError(errors) => {
+            errors mustBe Seq((JsPath \ monetaryField, Seq(ValidationError("error.expected.numberformatexception"))))
+          }
+          case _ => fail("passed validation")
+        }
+      }
+
     }
 
   }

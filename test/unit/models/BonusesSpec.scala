@@ -69,25 +69,6 @@ class BonusesSpec extends PlaySpec with JsonFormats {
       json mustBe Json.parse(validBonusJson)
     }
 
-    "catch invalid floats" in {
-      val req = validBonusJson.replace("1000.50", "\"x\"").replace("500.50", "\"x\"")
-      val res = Json.parse(req).validate[Bonuses]
-
-      res match {
-        case JsError(errors) => {
-          println(errors)
-
-          errors.count {
-            case (path: JsPath, errors: Seq[ValidationError]) => {
-              (path.toString() == "/bonusDueForPeriod" || path.toString() == "/totalBonusDueYTD" ||
-                path.toString() == "/bonusPaidYTD") && errors.contains(ValidationError("error.expected.numberformatexception"))
-            }
-          } mustBe 3
-        }
-        case _ => fail()
-      }
-    }
-
     "catch an invalid claim reason" in {
       val req = validBonusJson.replace("Life Event", "X")
       val res = Json.parse(req).validate[Bonuses]
