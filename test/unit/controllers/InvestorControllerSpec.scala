@@ -107,7 +107,7 @@ class InvestorControllerSpec extends PlaySpec
         val res = SUT.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
           withBody(AnyContentAsJson(Json.parse(dobMissing))))
         status(res) must be(BAD_REQUEST)
-        contentAsJson(res).as[String]  contains "MISSING_FIELD"
+        assert(contentAsJson(res).toString()  contains "MISSING_FIELD")
       }
       "Nino is invalid" in {
         val res = SUT.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).

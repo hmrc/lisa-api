@@ -53,7 +53,9 @@ trait LisaController extends BaseController with HeaderValidator with RunMode wi
               case Some(invalidCallback) => invalidCallback(errors)
               case None => {
                 Logger.error(s"The errors are ${errors.toString()}")
-                Future.successful(BadRequest(toJson(ErrorGenericBadRequest)))
+                val returnErr = ErrorGenericBadRequest
+                Logger.error(s"The retrun object is " + returnErr.errors.toString)
+                Future.successful(BadRequest(toJson(returnErr)))
               }
             }
           }
