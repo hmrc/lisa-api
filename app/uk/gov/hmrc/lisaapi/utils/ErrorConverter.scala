@@ -20,7 +20,7 @@ import play.api.data.validation.ValidationError
 import play.api.libs.json.JsPath
 import uk.gov.hmrc.lisaapi.controllers.ErrorValidation
 
-object ErrorConverter {
+trait ErrorConverter {
 
   def convert(error: Seq[(JsPath, Seq[ValidationError])]):List[ErrorValidation] = {
     error.map(e => {
@@ -36,9 +36,14 @@ object ErrorConverter {
 
   private def getErrorDetails(key: String):(String, String) = {
     key match {
-      case f: String if f.matches("error\\.expected\\.js.*") => ("INVALID_DATA_TYPE", "Invalid data type")
-      case "error.path.missing" => ("FIELD_MISSING", "Field missing")
+      case f: String if f.matches("error\\.expected\\.js.*") => ("INVALID_DATA_TYPE", "An invalid data type has been used")
+      case f2: String if f2.matches("error\\.formatting\\.date.*") => ("INVALID_DATE", "A date is invalid")
+      case f3: String if f3.matches("error\\.formatting\\..*") => ("INVALID_FORMAT", "An invalid format has been used")
+      case "error.path.missing" => ("MISSING_FIELD", "A required field is missing")
+      case _ => throw new MatchError("Could not match the JSON Validation error")
     }
   }
 
 }
+
+object ErrorConverter extends ErrorConverter

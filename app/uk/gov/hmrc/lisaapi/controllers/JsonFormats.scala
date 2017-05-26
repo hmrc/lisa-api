@@ -168,15 +168,22 @@ trait JsonFormats {
     (JsPath \ "bonuses").read[Bonuses]
   )(RequestBonusPaymentRequest.apply _)
 
+
   implicit val requestBonusPaymentWrites: Writes[RequestBonusPaymentRequest] = (
-    (JsPath \ "lifeEventId").writeNullable[String] and
-    (JsPath \ "periodStartDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
-    (JsPath \ "periodEndDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
-    (JsPath \ "transactionType").write[String] and
-    (JsPath \ "htbTransfer").writeNullable[HelpToBuyTransfer] and
-    (JsPath \ "inboundPayments").write[InboundPayments] and
-    (JsPath \ "bonuses").write[Bonuses]
+  (JsPath \ "lifeEventId").writeNullable[String] and
+  (JsPath \ "periodStartDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
+  (JsPath \ "periodEndDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
+  (JsPath \ "transactionType").write[String] and
+  (JsPath \ "htbTransfer").writeNullable[HelpToBuyTransfer] and
+  (JsPath \ "inboundPayments").write[InboundPayments] and
+  (JsPath \ "bonuses").write[Bonuses]
   ){req: RequestBonusPaymentRequest => (req.lifeEventId, req.periodStartDate, req.periodEndDate, "Bonus", req.htbTransfer, req.inboundPayments, req.bonuses)}
+
+  implicit val errorValidationRead: Reads[ErrorValidation] = (
+    (JsPath \ "code").read[String] and
+      (JsPath \ "message").read[String] and
+      (JsPath \ "path").readNullable[String]
+    )(ErrorValidation.apply _)
 
   private def isoDateReads(allowFutureDates: Boolean = true): Reads[org.joda.time.DateTime] = new Reads[org.joda.time.DateTime] {
 

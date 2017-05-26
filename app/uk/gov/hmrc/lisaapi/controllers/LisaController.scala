@@ -22,6 +22,7 @@ import play.api.libs.json.Json.toJson
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Reads}
 import play.api.mvc.{AnyContent, Request, Result}
 import uk.gov.hmrc.api.controllers.HeaderValidator
+import uk.gov.hmrc.lisaapi.utils.ErrorConverter
 import uk.gov.hmrc.play.config.RunMode
 import uk.gov.hmrc.play.microservice.controller.BaseController
 
@@ -30,10 +31,12 @@ import scala.util.{Failure, Success, Try}
 
 trait LisaController extends BaseController with HeaderValidator with RunMode with JsonFormats {
 
-  protected def withValidJson[T] (
-    success: (T) => Future[Result],
-    invalid: Option[(Seq[(JsPath, Seq[ValidationError])]) => Future[Result]] = None
-  )(implicit request: Request[AnyContent], reads: Reads[T]): Future[Result] = {
+  val errorConverter: ErrorConverter = ErrorConverter
+
+  protected def withValidJson[T](
+                                  success: (T) => Future[Result],
+                                  invalid: Option[(Seq[(JsPath, Seq[ValidationError])]) => Future[Result]] = None
+                                )(implicit request: Request[AnyContent], reads: Reads[T]): Future[Result] = {
 
     request.body.asJson match {
       case Some(json) =>
@@ -42,7 +45,7 @@ trait LisaController extends BaseController with HeaderValidator with RunMode wi
 
             Try(success(payload)) match {
               case Success(result) => result
-              case Failure(ex:Exception) => {
+              case Failure(ex: Exception) => {
                 Logger.error(s"LisaController An error occurred in Json payload validation ${ex.getMessage}")
                 Future.successful(InternalServerError(toJson(ErrorInternalServerError)))
               }
@@ -53,13 +56,11 @@ trait LisaController extends BaseController with HeaderValidator with RunMode wi
               case Some(invalidCallback) => invalidCallback(errors)
               case None => {
                 Logger.error(s"The errors are ${errors.toString()}")
-                val returnErr = ErrorGenericBadRequest
-                Logger.error(s"The retrun object is " + returnErr.errors.toString)
-                Future.successful(BadRequest(toJson(returnErr)))
+                Future.successful(BadRequest(toJson(ErrorBadRequest(errorConverter.convert(errors)))))
               }
             }
           }
-          case Failure(e) =>                 Logger.error(s"LisaController: An error occurred in lisa-api due to ${e.getMessage} returning internal server error")
+          case Failure(e) => Logger.error(s"LisaController: An error occurred in lisa-api due to ${e.getMessage} returning internal server error")
             Future.successful(InternalServerError(toJson(ErrorInternalServerError)))
         }
       case None => Future.successful(BadRequest(toJson(EmptyJson)))

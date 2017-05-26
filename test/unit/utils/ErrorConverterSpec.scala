@@ -45,11 +45,11 @@ class ErrorConverterSpec extends PlaySpec
 
           res.size mustBe 5
 
-          res must contain(ErrorValidation("INVALID_DATA_TYPE", "Invalid data type", Some("/str")))
-          res must contain(ErrorValidation("INVALID_DATA_TYPE", "Invalid data type", Some("/num")))
-          res must contain(ErrorValidation("INVALID_DATA_TYPE", "Invalid data type", Some("/arr")))
-          res must contain(ErrorValidation("FIELD_MISSING", "Field missing", Some("/obj/str")))
-          res must contain(ErrorValidation("FIELD_MISSING", "Field missing", Some("/obj/num")))
+          res must contain(ErrorValidation("INVALID_DATA_TYPE", "An invalid data type has been used", Some("/str")))
+          res must contain(ErrorValidation("INVALID_DATA_TYPE", "An invalid data type has been used", Some("/num")))
+          res must contain(ErrorValidation("INVALID_DATA_TYPE", "An invalid data type has been used", Some("/arr")))
+          res must contain(ErrorValidation("MISSING_FIELD", "A required field is missing", Some("/obj/str")))
+          res must contain(ErrorValidation("MISSING_FIELD", "A required field is missing", Some("/obj/num")))
         }
       }
     }

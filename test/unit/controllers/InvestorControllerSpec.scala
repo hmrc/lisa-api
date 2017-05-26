@@ -29,8 +29,8 @@ import play.api.mvc.AnyContentAsJson
 import play.api.test.Helpers._
 import play.api.test._
 import play.mvc.Http.HeaderNames
-import uk.gov.hmrc.lisaapi.controllers._
-import uk.gov.hmrc.lisaapi.metrics.{LisaMetrics}
+import uk.gov.hmrc.lisaapi.controllers.{ErrorInvestorAlreadyExists, ErrorInvestorNotFound, ErrorValidation, InvestorController, JsonFormats}
+import uk.gov.hmrc.lisaapi.metrics.LisaMetrics
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des.DesFailureResponse
 import uk.gov.hmrc.lisaapi.services.{AuditService, InvestorService}
@@ -40,7 +40,8 @@ import scala.concurrent.Future
 class InvestorControllerSpec extends PlaySpec
   with MockitoSugar
   with OneAppPerSuite
-  with BeforeAndAfterEach {
+  with BeforeAndAfterEach
+  with JsonFormats {
 
 
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
@@ -52,6 +53,13 @@ class InvestorControllerSpec extends PlaySpec
                          "dateOfBirth" : "1973-03-24"
                        }""".stripMargin
 
+  val invalidDobJson = """{
+                         "investorNINO" : "AB123456D",
+                         "firstName" : "Ex first Name",
+                         "lastName" : "Ample",
+                         "dateOfBirth" : "3000-03-24"
+                       }""".stripMargin
+
   val invalidInvestorJson = """{
                          "investorNINO" : 123456,
                          "firstName" : "Ex first Name",
@@ -60,10 +68,17 @@ class InvestorControllerSpec extends PlaySpec
                        }""".stripMargin
 
   val dobMissing = """{
-                         "investorNINO" : 123456,
+                         "investorNINO" : "AB123456D",
                          "firstName" : "Ex first Name",
                          "lastName" : "Ample"
                        }""".stripMargin
+
+  val dobMissingAndNinoInvalid =  """{
+                         "investorNINO" : 123456,
+                         "firstName" : "Ex first Name",
+                         "lastName" : "Ample"
+                         }""".stripMargin
+
 
   val lisaManager = "Z019283"
 
@@ -107,14 +122,35 @@ class InvestorControllerSpec extends PlaySpec
         val res = SUT.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
           withBody(AnyContentAsJson(Json.parse(dobMissing))))
         status(res) must be(BAD_REQUEST)
-        assert(contentAsJson(res).toString()  contains "MISSING_FIELD")
+        val errorValidation = (contentAsJson(res) \ "errors").as[List[ErrorValidation]]
+        errorValidation.head mustBe ErrorValidation("MISSING_FIELD", "A required field is missing", Some("/dateOfBirth"))
       }
       "Nino is invalid" in {
         val res = SUT.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
-          withBody(AnyContentAsJson(Json.parse(invalidInvestorJson))))
+        withBody(AnyContentAsJson(Json.parse(invalidInvestorJson))))
         status(res) must be(BAD_REQUEST)
-
+        val json = contentAsJson(res)
+        val errorValidation = (contentAsJson(res) \ "errors").as[List[ErrorValidation]]
+        errorValidation.head mustBe ErrorValidation("INVALID_DATA_TYPE", "An invalid data type has been used", Some("/investorNINO"))
       }
+      "dateOfBirth is in the future" in {
+        val res = SUT.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
+        withBody(AnyContentAsJson(Json.parse(invalidDobJson))))
+        status(res) must be(BAD_REQUEST)
+        val json = contentAsJson(res)
+        val errorValidation = (contentAsJson(res) \ "errors").as[List[ErrorValidation]]
+        errorValidation.head mustBe ErrorValidation("INVALID_DATE", "A date is invalid", Some("/dateOfBirth"))
+        assert(json.toString() contains "INVALID_DATE")
+      }
+      "dateOfBirth is missing and Nino is invalid" in {
+        val res = SUT.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
+          withBody(AnyContentAsJson(Json.parse(dobMissingAndNinoInvalid))))
+        status(res) must be(BAD_REQUEST)
+        val errorValidation = (contentAsJson(res) \ "errors").as[List[ErrorValidation]]
+        errorValidation.head mustBe ErrorValidation("MISSING_FIELD", "A required field is missing", Some("/dateOfBirth"))
+        errorValidation.tail.head mustBe ErrorValidation("INVALID_DATA_TYPE", "An invalid data type has been used", Some("/investorNINO"))
+      }
+
     }
 
     "return with status already exists" when {

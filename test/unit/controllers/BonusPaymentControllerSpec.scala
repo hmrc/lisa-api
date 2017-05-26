@@ -17,7 +17,7 @@
 package unit.controllers
 
 import org.mockito.Matchers._
-import org.mockito.Matchers.{eq=>MatcherEquals, _}
+import org.mockito.Matchers.{eq => MatcherEquals, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatest._
@@ -27,7 +27,7 @@ import play.api.mvc.{AnyContentAsJson, Result}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
-import uk.gov.hmrc.lisaapi.controllers.{BonusPaymentController, JsonFormats}
+import uk.gov.hmrc.lisaapi.controllers.{BonusPaymentController, ErrorValidation, JsonFormats}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des.DesFailureResponse
 import uk.gov.hmrc.lisaapi.services.{AuditService, BonusPaymentService}
@@ -112,6 +112,8 @@ class BonusPaymentControllerSpec extends PlaySpec
           status(res) mustBe (BAD_REQUEST)
           (contentAsJson(res) \ "code").as[String] mustBe ("BAD_REQUEST")
           (contentAsJson(res) \ "message").as[String] mustBe ("Bad Request")
+          val errorValidation = (contentAsJson(res) \ "errors").as[List[ErrorValidation]]
+          errorValidation.head mustBe ErrorValidation("INVALID_FORMAT", "An invalid format has been used",Some("/lifeEventId"))
         }
       }
 

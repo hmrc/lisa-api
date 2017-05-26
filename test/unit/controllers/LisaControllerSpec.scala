@@ -26,6 +26,7 @@ import play.api.test._
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.lisaapi.controllers.AccountController
 import uk.gov.hmrc.lisaapi.services.{AccountService, AuditService}
+import uk.gov.hmrc.lisaapi.utils.ErrorConverter
 
 import scala.concurrent.Future
 
@@ -58,9 +59,11 @@ class LisaControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite 
   }
 
   val mockService = mock[AccountService]
+  val mockErrorConverter = mock[ErrorConverter]
 
   val SUT = new AccountController{
     override val service: AccountService = mockService
+    override val errorConverter: ErrorConverter = mockErrorConverter
 
     def testJsonValidator(): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
       withValidJson[TestType] { _ =>
