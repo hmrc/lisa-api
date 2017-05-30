@@ -200,12 +200,6 @@ trait JsonFormats {
   (JsPath \ "bonuses").write[Bonuses]
   ){req: RequestBonusPaymentRequest => (req.lifeEventId, req.periodStartDate, req.periodEndDate, "Bonus", req.htbTransfer, req.inboundPayments, req.bonuses)}
 
-  implicit val errorValidationRead: Reads[ErrorValidation] = (
-    (JsPath \ "code").read[String] and
-      (JsPath \ "message").read[String] and
-      (JsPath \ "path").readNullable[String]
-    )(ErrorValidation.apply _)
-
   private def isoDateReads(allowFutureDates: Boolean = true): Reads[org.joda.time.DateTime] = new Reads[org.joda.time.DateTime] {
 
     val dateFormat = "yyyy-MM-dd"
