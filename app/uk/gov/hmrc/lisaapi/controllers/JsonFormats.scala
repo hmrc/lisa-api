@@ -95,7 +95,7 @@ trait JsonFormats {
     (JsPath \ "transferAccount").read[AccountTransfer]
   )(CreateLisaAccountTransferRequest.apply _)
 
-  implicit val createLisaAccountRequestReads = Reads[CreateLisaAccountRequest] { json =>
+  implicit val createLisaAccountRequestReads: Reads[CreateLisaAccountRequest] = Reads[CreateLisaAccountRequest] { json =>
     (json \ "creationReason").validate[String](Reads.pattern("^(New|Transferred)$".r, "error.formatting.creationReason")).flatMap {
       case "New" => createLisaAccountCreationRequestReads.reads(json)
       case "Transferred" => createLisaAccountTransferRequestReads.reads(json)
@@ -142,20 +142,41 @@ trait JsonFormats {
     (JsPath \ "closureDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd"))
   )(unlift(CloseLisaAccountRequest.unapply))
 
-  implicit val htbFormats = Json.format[HelpToBuyTransfer]
-  implicit val ibpFormats = Json.format[InboundPayments]
+  implicit val htbReads: Reads[HelpToBuyTransfer] = (
+    (JsPath \ "htbTransferInForPeriod").read[Amount](nonNegativeAmountValidator) and
+    (JsPath \ "htbTransferTotalYTD").read[Amount](nonNegativeAmountValidator)
+  )(HelpToBuyTransfer.apply _)
+
+  implicit val htbWrites: Writes[HelpToBuyTransfer] = (
+    (JsPath \ "htbTransferInForPeriod").write[Amount] and
+    (JsPath \ "htbTransferTotalYTD").write[Amount]
+  )(unlift(HelpToBuyTransfer.unapply))
+
+  implicit val ibpReads: Reads[InboundPayments] = (
+    (JsPath \ "newSubsForPeriod").readNullable[Amount](nonNegativeAmountValidator) and
+    (JsPath \ "newSubsYTD").read[Amount](nonNegativeAmountValidator) and
+    (JsPath \ "totalSubsForPeriod").read[Amount](nonNegativeAmountValidator) and
+    (JsPath \ "totalSubsYTD").read[Amount](nonNegativeAmountValidator)
+  )(InboundPayments.apply _)
+
+  implicit val ibpWrites: Writes[InboundPayments] = (
+    (JsPath \ "newSubsForPeriod").writeNullable[Amount] and
+    (JsPath \ "newSubsYTD").write[Amount] and
+    (JsPath \ "totalSubsForPeriod").write[Amount] and
+    (JsPath \ "totalSubsYTD").write[Amount]
+  )(unlift(InboundPayments.unapply))
 
   implicit val bonusesReads: Reads[Bonuses] = (
-    (JsPath \ "bonusDueForPeriod").read[Float] and
-    (JsPath \ "totalBonusDueYTD").read[Float] and
-    (JsPath \ "bonusPaidYTD").readNullable[Float] and
-    (JsPath \ "claimReason").read((Reads.pattern(bonusClaimReasonRegex, "error.formatting.claimReason")))
+    (JsPath \ "bonusDueForPeriod").read[Amount](nonNegativeAmountValidator) and
+    (JsPath \ "totalBonusDueYTD").read[Amount](nonNegativeAmountValidator) and
+    (JsPath \ "bonusPaidYTD").readNullable[Amount](nonNegativeAmountValidator) and
+    (JsPath \ "claimReason").read(Reads.pattern(bonusClaimReasonRegex, "error.formatting.claimReason"))
   )(Bonuses.apply _)
 
   implicit val bonusesWrites: Writes[Bonuses] = (
-    (JsPath \ "bonusDueForPeriod").write[Float] and
-    (JsPath \ "totalBonusDueYTD").write[Float] and
-    (JsPath \ "bonusPaidYTD").writeNullable[Float] and
+    (JsPath \ "bonusDueForPeriod").write[Amount] and
+    (JsPath \ "totalBonusDueYTD").write[Amount] and
+    (JsPath \ "bonusPaidYTD").writeNullable[Amount] and
     (JsPath \ "claimReason").write[String]
   )(unlift(Bonuses.unapply))
 

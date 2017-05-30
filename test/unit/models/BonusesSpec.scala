@@ -59,20 +59,6 @@ class BonusesSpec extends PlaySpec with JsonFormats {
         }
       }
 
-      "sent a valid request with no decimals on floats" in {
-        val res = Json.parse(validBonusJson.replace(".50", "")).validate[Bonuses]
-
-        res match {
-          case JsError(errors) => fail()
-          case JsSuccess(data, path) => {
-            data.bonusDueForPeriod mustBe 1000f
-            data.totalBonusDueYTD mustBe 1000f
-            data.bonusPaidYTD mustBe Some(500f)
-            data.claimReason mustBe "Life Event"
-          }
-        }
-      }
-
     }
 
     "deserialize to json" in {
@@ -81,25 +67,6 @@ class BonusesSpec extends PlaySpec with JsonFormats {
       val json = Json.toJson[Bonuses](request)
 
       json mustBe Json.parse(validBonusJson)
-    }
-
-    "catch invalid floats" in {
-      val req = validBonusJson.replace("1000.50", "\"x\"").replace("500.50", "\"x\"")
-      val res = Json.parse(req).validate[Bonuses]
-
-      res match {
-        case JsError(errors) => {
-          println(errors)
-
-          errors.count {
-            case (path: JsPath, errors: Seq[ValidationError]) => {
-              (path.toString() == "/bonusDueForPeriod" || path.toString() == "/totalBonusDueYTD" ||
-                path.toString() == "/bonusPaidYTD") && errors.contains(ValidationError("error.expected.jsnumber"))
-            }
-          } mustBe 3
-        }
-        case _ => fail()
-      }
     }
 
     "catch an invalid claim reason" in {
