@@ -148,8 +148,8 @@ trait JsonFormats {
   )(HelpToBuyTransfer.apply _)
 
   implicit val htbWrites: Writes[HelpToBuyTransfer] = (
-    (JsPath \ "htbTransferInForPeriod").write[BigDecimal] and
-    (JsPath \ "htbTransferTotalYTD").write[BigDecimal]
+    (JsPath \ "htbTransferInForPeriod").write[Amount] and
+    (JsPath \ "htbTransferTotalYTD").write[Amount]
   )(unlift(HelpToBuyTransfer.unapply))
 
   implicit val ibpReads: Reads[InboundPayments] = (

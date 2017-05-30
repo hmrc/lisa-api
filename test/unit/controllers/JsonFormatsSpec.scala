@@ -85,7 +85,7 @@ class JsonFormatsSpec extends PlaySpec {
     "fail validation" when {
 
       "given a 3dp number" in {
-        val res = createJson("2.005").validate[TestClass]
+        val res = createJson("2.000").validate[TestClass]
 
         res match {
           case JsError(errors) => {
@@ -176,7 +176,7 @@ class JsonFormatsSpec extends PlaySpec {
     s"""{"$monetaryField":$monetaryValue}"""
   }
 
-  case class TestClass(monetaryValue: BigDecimal)
+  case class TestClass(monetaryValue: Amount)
 
   object SUT extends JsonFormats {}
 
