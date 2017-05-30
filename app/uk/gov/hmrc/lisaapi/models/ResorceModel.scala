@@ -96,11 +96,11 @@ case class LisaAccount(investorID:ID,
 
 case class TransferAccount(transferredFromAccountID:AccountId, transferredFromLMRN:ReferenceNumber, transferInDate:ISO8601Date)
 
-case class Bonuses(bonusDueForPeriod: BigDecimal, totalBonusDueYTD: BigDecimal, bonusPaidYTD: Option[BigDecimal], claimReason: String)
+case class Bonuses(bonusDueForPeriod: Amount, totalBonusDueYTD: Amount, bonusPaidYTD: Option[Amount], claimReason: String)
 
-case class HelpToBuyTransfer(htbTransferInForPeriod: BigDecimal, htbTransferTotalYTD: BigDecimal)
+case class HelpToBuyTransfer(htbTransferInForPeriod: Amount, htbTransferTotalYTD: Amount)
 
-case class InboundPayments(newSubsForPeriod: Option[BigDecimal], newSubsYTD: BigDecimal, totalSubsForPeriod: BigDecimal, totalSubsYTD: BigDecimal)
+case class InboundPayments(newSubsForPeriod: Option[Amount], newSubsYTD: Amount, totalSubsForPeriod: Amount, totalSubsYTD: Amount)
 
 case class LifeEvent(accountID: AccountId,
                       lisaManagerReferenceNumber:ReferenceNumber,

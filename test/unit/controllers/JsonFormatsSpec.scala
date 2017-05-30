@@ -21,14 +21,15 @@ import play.api.data.validation.ValidationError
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import uk.gov.hmrc.lisaapi.controllers.JsonFormats
+import uk.gov.hmrc.lisaapi.models._
 
 class JsonFormatsSpec extends PlaySpec {
 
   val monetaryField = "monetaryValue"
-  val invalidError = "error.invalid"
+  val invalidError = "INVALID_DATE"
 
-  implicit val testReads: Reads[TestClass] = (JsPath \ monetaryField).read(SUT.monetaryReads()).map(TestClass.apply)
-  implicit val testWrites: Writes[TestClass] = (JsPath \ monetaryField).write[BigDecimal].contramap[TestClass](_.monetaryValue)
+  implicit val testReads: Reads[TestClass] = (JsPath \ monetaryField).read[Amount](nonNegativeAmountValidator).map(TestClass.apply)
+  implicit val testWrites: Writes[TestClass] = (JsPath \ monetaryField).write[Amount].contramap[TestClass](_.monetaryValue)
 
   "Monetary reads" must {
 
@@ -39,6 +40,24 @@ class JsonFormatsSpec extends PlaySpec {
 
         res match {
           case JsSuccess(data, _) => data.monetaryValue mustBe 0d
+          case _ => fail("failed validation")
+        }
+      }
+
+      "given a whole number" in {
+        val res = createJson("12").validate[TestClass]
+
+        res match {
+          case JsSuccess(data, _) => data.monetaryValue mustBe 12d
+          case _ => fail("failed validation")
+        }
+      }
+
+      "given a 1dp number" in {
+        val res = createJson("100.5").validate[TestClass]
+
+        res match {
+          case JsSuccess(data, _) => data.monetaryValue mustBe 100.5d
           case _ => fail("failed validation")
         }
       }
@@ -64,28 +83,6 @@ class JsonFormatsSpec extends PlaySpec {
     }
 
     "fail validation" when {
-
-      "given a whole number" in {
-        val res = createJson("15").validate[TestClass]
-
-        res match {
-          case JsError(errors) => {
-            errors mustBe Seq((JsPath \ monetaryField, Seq(ValidationError(invalidError))))
-          }
-          case _ => fail("passed validation")
-        }
-      }
-
-      "given a 1dp number" in {
-        val res = createJson("0.0").validate[TestClass]
-
-        res match {
-          case JsError(errors) => {
-            errors mustBe Seq((JsPath \ monetaryField, Seq(ValidationError(invalidError))))
-          }
-          case _ => fail("passed validation")
-        }
-      }
 
       "given a 3dp number" in {
         val res = createJson("2.005").validate[TestClass]
@@ -158,8 +155,10 @@ class JsonFormatsSpec extends PlaySpec {
         res mustBe createJsonString("2.99")
       }
 
+      // doesn't appear possible in play without diving deep into the underlying json library (jackson)
+      // see also: https://github.com/playframework/playframework/issues/5423
       "given a 2dp value with trailing zeros" ignore {
-        val test = TestClass(BigDecimal("0.00"))
+        val test = TestClass(BigDecimal(0.00))
         val res = Json.toJson[TestClass](test).toString()
 
         res mustBe createJsonString("0.00")
