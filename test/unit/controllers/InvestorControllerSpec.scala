@@ -101,7 +101,7 @@ class InvestorControllerSpec extends PlaySpec
         when(mockService.createInvestor(any(), any())(any())).
           thenReturn(Future.successful(CreateLisaInvestorAlreadyExistsResponse("1234567890")))
 
-       val res = SUT.createLisaInvestor(lisaManager).
+        val res = SUT.createLisaInvestor(lisaManager).
           apply(FakeRequest(Helpers.PUT, "/").
             withHeaders(acceptHeader).
             withBody(AnyContentAsJson(Json.parse(investorJson))))
@@ -212,27 +212,6 @@ class InvestorControllerSpec extends PlaySpec
             "reasonNotCreated" -> ErrorInvestorAlreadyExists(investorId).errorCode
           )))(any())
       }
-
-      //      "a error response is returned" in {
-      //        when(mockService.createInvestor(any(), any())(any())).
-      //          thenThrow(new RuntimeException)
-      //
-      //
-      //        await(SUT.createLisaInvestor(lisaManager).
-      //          apply(FakeRequest(Helpers.PUT, "/").
-      //          withHeaders(acceptHeader).
-      //          withBody(AnyContentAsJson(Json.parse(investorJson)))))
-      //
-      //        verify(mockAuditService).audit(
-      //          auditType = matchersEquals("investorNotCreated"),
-      //          path = matchersEquals(s"/manager/$lisaManager/investors"),
-      //          auditData = matchersEquals(Map(
-      //            "lisaManagerReferenceNumber" -> lisaManager,
-      //            "investorNINO" -> "AB123456D",
-      //            "dateOfBirth" -> "1973-03-24",
-      //            "reasonNotCreated" -> ErrorInternalServerError.errorCode
-      //          )))(any())
-      //      }
     }
 
     "audit an investorCreated event" when {

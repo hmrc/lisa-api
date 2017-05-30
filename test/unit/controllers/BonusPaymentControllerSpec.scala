@@ -93,8 +93,8 @@ class BonusPaymentControllerSpec extends PlaySpec
       }
 
       "when account is closed return with INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID code " in {
-          when(mockService.requestBonusPayment(any(), any(),any())(any())).thenReturn(
-            Future.successful(RequestBonusPaymentErrorResponse(403, DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID", "xyz"))))
+        when(mockService.requestBonusPayment(any(), any(),any())(any())).thenReturn(
+          Future.successful(RequestBonusPaymentErrorResponse(403, DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID", "xyz"))))
 
         doRequest(validBonusPaymentJson)  { res =>
           status(res) mustBe (FORBIDDEN)
@@ -205,7 +205,7 @@ class BonusPaymentControllerSpec extends PlaySpec
               "totalBonusDueYTD" -> (bonuses \ "totalBonusDueYTD").as[Amount].toString,
               "claimReason" -> (bonuses \ "claimReason").as[String]
             )
-          ))(any())
+            ))(any())
         }
       }
 
@@ -239,7 +239,7 @@ class BonusPaymentControllerSpec extends PlaySpec
               "claimReason" -> (bonuses \ "claimReason").as[String],
               "reasonNotRequested" -> "LIFE_EVENT_NOT_FOUND"
             )
-          ))(any())
+            ))(any())
         }
       }
 
@@ -277,7 +277,7 @@ class BonusPaymentControllerSpec extends PlaySpec
               "claimReason" -> (bonuses \ "claimReason").as[String],
               "reasonNotRequested" -> "LIFE_EVENT_NOT_PROVIDED"
             )
-          ))(any())
+            ))(any())
         }
       }
 
@@ -308,7 +308,7 @@ class BonusPaymentControllerSpec extends PlaySpec
               "claimReason" -> (bonuses \ "claimReason").as[String],
               "reasonNotRequested" -> "INTERNAL_SERVER_ERROR"
             )
-          ))(any())
+            ))(any())
         }
       }
 

@@ -26,7 +26,11 @@ import play.api.test._
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.lisaapi.controllers.AccountController
 import uk.gov.hmrc.lisaapi.services.{AccountService, AuditService}
-
+import uk.gov.hmrc.lisaapi.utils.ErrorConverter
+import org.mockito.Matchers._
+import org.mockito.Mockito.when
+import org.mockito.Mockito.verify
+import org.mockito.Mockito.times
 import scala.concurrent.Future
 
 class LisaControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
@@ -37,29 +41,27 @@ class LisaControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite 
 
   implicit val testTypeReads: Reads[TestType] = (
     (JsPath \ "prop1").read[Int].map[String](i => throw new RuntimeException("Deliberate Test Exception")) and
-    (JsPath \ "prop2").read[String]
-  )(TestType.apply _)
+      (JsPath \ "prop2").read[String]
+    ) (TestType.apply _)
 
   "The withValidJson method" must {
 
-    "return with an Internal Server Error" when {
+      "return with an Internal Server Error" when {
 
-      "an exception is thrown by one of our Json reads" in {
-        val jsonString = """{"prop1": 123, "prop2": "123"}"""
-        val res = SUT.testJsonValidator().apply(FakeRequest(Helpers.PUT, "/")
-                    .withHeaders(acceptHeader)
-                    .withBody(AnyContentAsJson(Json.parse(jsonString))))
+        "an exception is thrown by one of our Json reads" in {
+          val jsonString = """{"prop1": 123, "prop2": "123"}"""
+          val res = SUT.testJsonValidator().apply(FakeRequest(Helpers.PUT, "/")
+            .withHeaders(acceptHeader)
+            .withBody(AnyContentAsJson(Json.parse(jsonString))))
 
-        status(res) mustBe (INTERNAL_SERVER_ERROR)
+          status(res) mustBe (INTERNAL_SERVER_ERROR)
+        }
       }
-
-    }
-
   }
-
   val mockService = mock[AccountService]
+  val mockErrorConverter = mock[ErrorConverter]
 
-  val SUT = new AccountController{
+  val SUT = new AccountController {
     override val service: AccountService = mockService
 
     def testJsonValidator(): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
@@ -68,5 +70,6 @@ class LisaControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite 
       }
     }
   }
+
 
 }

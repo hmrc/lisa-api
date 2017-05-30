@@ -16,12 +16,19 @@
 
 package uk.gov.hmrc.lisaapi
 
-import play.api.libs.json.{JsValue, Json, Writes}
+import play.api.libs.json.{JsPath, JsValue, Json, Writes}
 
 package object controllers {
-  implicit val errorResponseWrites = new Writes[ErrorResponse] {
-    def writes(e: ErrorResponse): JsValue = Json.obj("code" -> e.errorCode, "message" -> e.message)
+
+  implicit val errorValidationWrite = new Writes[ErrorValidation] {
+    def writes(e: ErrorValidation): JsValue = Json.obj("code" -> e.errorCode, "message" -> e.message, "path" -> e.path)
   }
+
+
+  implicit val errorResponseWrites = new Writes[ErrorResponse] {
+    def writes(e: ErrorResponse): JsValue = Json.obj("code" -> e.errorCode, "message" -> e.message, "errors"-> e.errors)
+  }
+
 
   implicit val errorResponseWithIdWrites = new Writes[ErrorResponseWithId] {
     def writes(e: ErrorResponseWithId): JsValue = Json.obj("code" -> e.errorCode, "message" -> e.message, "id" -> e.id)
