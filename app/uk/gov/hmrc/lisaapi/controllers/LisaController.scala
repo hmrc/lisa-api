@@ -31,7 +31,7 @@ import scala.util.{Failure, Success, Try}
 
 trait LisaController extends BaseController with HeaderValidator with RunMode with JsonFormats {
 
-  val errorConverter: ErrorConverter = ErrorConverter
+  lazy val errorConverter: ErrorConverter = ErrorConverter
 
   protected def withValidJson[T](
                                   success: (T) => Future[Result],

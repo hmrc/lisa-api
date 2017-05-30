@@ -16,10 +16,12 @@
 
 package unit.utils
 
+import org.joda.time.DateTime
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.{JsError, JsSuccess, Json, OFormat}
-import uk.gov.hmrc.lisaapi.controllers.ErrorValidation
+import uk.gov.hmrc.lisaapi.controllers.{ErrorValidation, JsonFormats}
+import uk.gov.hmrc.lisaapi.models.CreateLisaInvestorRequest
 import uk.gov.hmrc.lisaapi.utils.ErrorConverter
 
 
@@ -28,7 +30,8 @@ case class MultipleDataTypes(str: String, num: Int, arr: List[SimpleClass], obj:
 
 class ErrorConverterSpec extends PlaySpec
   with MockitoSugar
-  with OneAppPerSuite {
+  with OneAppPerSuite
+with JsonFormats {
 
   implicit val simpleFormats: OFormat[SimpleClass] = Json.format[SimpleClass]
   implicit val multipleFormats: OFormat[MultipleDataTypes] = Json.format[MultipleDataTypes]
@@ -50,7 +53,29 @@ class ErrorConverterSpec extends PlaySpec
           res must contain(ErrorValidation("INVALID_DATA_TYPE", "An invalid data type has been used", Some("/arr")))
           res must contain(ErrorValidation("MISSING_FIELD", "A required field is missing", Some("/obj/str")))
           res must contain(ErrorValidation("MISSING_FIELD", "A required field is missing", Some("/obj/num")))
+
         }
+      }
+    }
+
+    "catch invalid date" in {
+      val investorJson = """{
+                         "investorNINO" : "AB123456D",
+                         "firstName" : "Ex first Name",
+                         "lastName" : "Ample",
+                         "dateOfBirth" : "1973-13-24"
+                       }""".stripMargin
+
+      val validate = Json.parse(investorJson).validate[CreateLisaInvestorRequest]
+
+
+      validate match {
+        case e: JsError => {
+          val res = SUT.convert(e.errors)
+          res.size mustBe 1
+          res must contain(ErrorValidation("INVALID_DATE", "A date is invalid", Some("/dateOfBirth")))
+        }
+
       }
     }
   }

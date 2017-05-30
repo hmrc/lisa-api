@@ -17,7 +17,7 @@
 package unit.controllers
 
 import org.mockito.Matchers._
-import org.mockito.Matchers.{eq => MatcherEquals, _}
+import org.mockito.Matchers.{eq=>MatcherEquals, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatest._
@@ -27,7 +27,7 @@ import play.api.mvc.{AnyContentAsJson, Result}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
-import uk.gov.hmrc.lisaapi.controllers.{BonusPaymentController, ErrorValidation, JsonFormats}
+import uk.gov.hmrc.lisaapi.controllers.{BonusPaymentController, JsonFormats}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des.DesFailureResponse
 import uk.gov.hmrc.lisaapi.services.{AuditService, BonusPaymentService}
@@ -93,8 +93,8 @@ class BonusPaymentControllerSpec extends PlaySpec
       }
 
       "when account is closed return with INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID code " in {
-          when(mockService.requestBonusPayment(any(), any(),any())(any())).thenReturn(
-            Future.successful(RequestBonusPaymentErrorResponse(403, DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID", "xyz"))))
+        when(mockService.requestBonusPayment(any(), any(),any())(any())).thenReturn(
+          Future.successful(RequestBonusPaymentErrorResponse(403, DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID", "xyz"))))
 
         doRequest(validBonusPaymentJson)  { res =>
           status(res) mustBe (FORBIDDEN)
@@ -112,8 +112,6 @@ class BonusPaymentControllerSpec extends PlaySpec
           status(res) mustBe (BAD_REQUEST)
           (contentAsJson(res) \ "code").as[String] mustBe ("BAD_REQUEST")
           (contentAsJson(res) \ "message").as[String] mustBe ("Bad Request")
-          val errorValidation = (contentAsJson(res) \ "errors").as[List[ErrorValidation]]
-          errorValidation.head mustBe ErrorValidation("INVALID_FORMAT", "An invalid format has been used",Some("/lifeEventId"))
         }
       }
 
@@ -207,7 +205,7 @@ class BonusPaymentControllerSpec extends PlaySpec
               "totalBonusDueYTD" -> (bonuses \ "totalBonusDueYTD").as[Float].toString,
               "claimReason" -> (bonuses \ "claimReason").as[String]
             )
-          ))(any())
+            ))(any())
         }
       }
 
@@ -241,7 +239,7 @@ class BonusPaymentControllerSpec extends PlaySpec
               "claimReason" -> (bonuses \ "claimReason").as[String],
               "reasonNotRequested" -> "LIFE_EVENT_NOT_FOUND"
             )
-          ))(any())
+            ))(any())
         }
       }
 
@@ -279,7 +277,7 @@ class BonusPaymentControllerSpec extends PlaySpec
               "claimReason" -> (bonuses \ "claimReason").as[String],
               "reasonNotRequested" -> "LIFE_EVENT_NOT_PROVIDED"
             )
-          ))(any())
+            ))(any())
         }
       }
 
@@ -310,7 +308,7 @@ class BonusPaymentControllerSpec extends PlaySpec
               "claimReason" -> (bonuses \ "claimReason").as[String],
               "reasonNotRequested" -> "INTERNAL_SERVER_ERROR"
             )
-          ))(any())
+            ))(any())
         }
       }
 
