@@ -146,6 +146,28 @@ class JsonFormatsSpec extends PlaySpec {
 
   "Monetary writes" must {
 
+    "write to a whole number" when {
+
+      "given a 2dp value with 2 trailing zeros" in {
+        val test = TestClass(BigDecimal(0.00))
+        val res = Json.toJson[TestClass](test).toString()
+
+        res mustBe createJsonString("0")
+      }
+
+    }
+
+    "write to 1dp" when {
+
+      "given a 2dp value with 1 trailing zeros" in {
+        val test = TestClass(BigDecimal(1.50))
+        val res = Json.toJson[TestClass](test).toString()
+
+        res mustBe createJsonString("1.5")
+      }
+
+    }
+
     "write to 2dp" when {
 
       "given a 2dp value" in {
@@ -153,15 +175,6 @@ class JsonFormatsSpec extends PlaySpec {
         val res = Json.toJson[TestClass](test).toString()
 
         res mustBe createJsonString("2.99")
-      }
-
-      // doesn't appear possible in play without diving deep into the underlying json library (jackson)
-      // see also: https://github.com/playframework/playframework/issues/5423
-      "given a 2dp value with trailing zeros" ignore {
-        val test = TestClass(BigDecimal(0.00))
-        val res = Json.toJson[TestClass](test).toString()
-
-        res mustBe createJsonString("0.00")
       }
 
     }
