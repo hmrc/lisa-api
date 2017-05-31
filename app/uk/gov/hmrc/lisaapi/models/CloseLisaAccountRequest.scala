@@ -17,5 +17,19 @@
 package uk.gov.hmrc.lisaapi.models
 
 import org.joda.time.DateTime
+import play.api.libs.functional.syntax._
+import play.api.libs.json.{JsPath, Reads, Writes}
 
-case class CloseLisaAccountRequest(accountClosureReason: String, closureDate: DateTime)
+case class CloseLisaAccountRequest(accountClosureReason: AccountClosureReason, closureDate: DateTime)
+
+object CloseLisaAccountRequest {
+  implicit val closeLisaAccountRequestReads: Reads[CloseLisaAccountRequest] = (
+    (JsPath \ "accountClosureReason").read(JsonReads.accountClosureReason) and
+    (JsPath \ "closureDate").read(JsonReads.notFutureDate).map(new DateTime(_))
+  )(CloseLisaAccountRequest.apply _)
+
+  implicit val closeLisaAccountRequestWrites: Writes[CloseLisaAccountRequest] = (
+    (JsPath \ "accountClosureReason").write[String] and
+    (JsPath \ "closureDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd"))
+  )(unlift(CloseLisaAccountRequest.unapply))
+}

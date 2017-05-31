@@ -27,7 +27,7 @@ import play.api.mvc.{AnyContentAsJson, Result}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
-import uk.gov.hmrc.lisaapi.controllers.{BonusPaymentController, JsonFormats}
+import uk.gov.hmrc.lisaapi.controllers.BonusPaymentController
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des.DesFailureResponse
 import uk.gov.hmrc.lisaapi.services.{AuditService, BonusPaymentService}
@@ -41,8 +41,7 @@ case object TestBonusPaymentResponse extends RequestBonusPaymentResponse
 class BonusPaymentControllerSpec extends PlaySpec
   with MockitoSugar
   with OneAppPerSuite
-  with BeforeAndAfterEach
-  with JsonFormats {
+  with BeforeAndAfterEach {
 
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
   val lisaManager = "Z019283"

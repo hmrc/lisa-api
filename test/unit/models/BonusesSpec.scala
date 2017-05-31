@@ -16,14 +16,12 @@
 
 package unit.models
 
-import org.joda.time.DateTime
 import org.scalatestplus.play.PlaySpec
 import play.api.data.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
-import uk.gov.hmrc.lisaapi.controllers.JsonFormats
 import uk.gov.hmrc.lisaapi.models.Bonuses
 
-class BonusesSpec extends PlaySpec with JsonFormats {
+class BonusesSpec extends PlaySpec {
 
   val validBonusJson = """{"bonusDueForPeriod": 1000.50, "totalBonusDueYTD": 1000.50, "bonusPaidYTD": 500.50, "claimReason": "Life Event"}"""
 

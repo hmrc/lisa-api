@@ -29,7 +29,7 @@ import uk.gov.hmrc.play.microservice.controller.BaseController
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 
-trait LisaController extends BaseController with HeaderValidator with RunMode with JsonFormats {
+trait LisaController extends BaseController with HeaderValidator with RunMode {
 
   lazy val errorConverter: ErrorConverter = ErrorConverter
 

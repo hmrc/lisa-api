@@ -19,13 +19,9 @@ package unit.models
 import org.joda.time.DateTime
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsSuccess, Json}
-import uk.gov.hmrc.lisaapi.controllers.JsonFormats
-import uk.gov.hmrc.lisaapi.models.CreateLisaInvestorRequest
 import uk.gov.hmrc.lisaapi.models.ReportLifeEventRequest
-/**
-  * Created by mark on 17/03/17.
-  */
-class ReportLifeEventRequestSpec extends PlaySpec with JsonFormats {
+
+class ReportLifeEventRequestSpec extends PlaySpec {
 
   val validRequestJson = """{"eventType":"LISA Investor Terminal Ill Health", "eventDate":"2017-01-01"}"""
 

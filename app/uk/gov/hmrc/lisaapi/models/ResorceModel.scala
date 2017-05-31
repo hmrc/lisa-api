@@ -16,12 +16,10 @@
 
 package uk.gov.hmrc.lisaapi.models
 
-import play.api.libs.json.Json
-
+import play.api.libs.functional.syntax._
+import play.api.libs.json.{JsPath, Json, Reads, Writes}
 
 case class ID(id:String)
-
-case class AccountId(id:String)
 
 case class ReferenceNumber(ref:String)
 
@@ -96,11 +94,55 @@ case class LisaAccount(investorID:ID,
 
 case class TransferAccount(transferredFromAccountID:AccountId, transferredFromLMRN:ReferenceNumber, transferInDate:ISO8601Date)
 
-case class Bonuses(bonusDueForPeriod: Amount, totalBonusDueYTD: Amount, bonusPaidYTD: Option[Amount], claimReason: String)
+case class Bonuses(bonusDueForPeriod: Amount, totalBonusDueYTD: Amount, bonusPaidYTD: Option[Amount], claimReason: BonusClaimReason)
+
+object Bonuses {
+  implicit val bonusesReads: Reads[Bonuses] = (
+    (JsPath \ "bonusDueForPeriod").read[Amount](JsonReads.nonNegativeAmount) and
+    (JsPath \ "totalBonusDueYTD").read[Amount](JsonReads.nonNegativeAmount) and
+    (JsPath \ "bonusPaidYTD").readNullable[Amount](JsonReads.nonNegativeAmount) and
+    (JsPath \ "claimReason").read(JsonReads.bonusClaimReason)
+  )(Bonuses.apply _)
+
+  implicit val bonusesWrites: Writes[Bonuses] = (
+    (JsPath \ "bonusDueForPeriod").write[Amount] and
+    (JsPath \ "totalBonusDueYTD").write[Amount] and
+    (JsPath \ "bonusPaidYTD").writeNullable[Amount] and
+    (JsPath \ "claimReason").write[String]
+  )(unlift(Bonuses.unapply))
+}
 
 case class HelpToBuyTransfer(htbTransferInForPeriod: Amount, htbTransferTotalYTD: Amount)
 
+object HelpToBuyTransfer {
+  implicit val htbReads: Reads[HelpToBuyTransfer] = (
+    (JsPath \ "htbTransferInForPeriod").read[Amount](JsonReads.nonNegativeAmount) and
+    (JsPath \ "htbTransferTotalYTD").read[Amount](JsonReads.nonNegativeAmount)
+  )(HelpToBuyTransfer.apply _)
+
+  implicit val htbWrites: Writes[HelpToBuyTransfer] = (
+    (JsPath \ "htbTransferInForPeriod").write[Amount] and
+    (JsPath \ "htbTransferTotalYTD").write[Amount]
+  )(unlift(HelpToBuyTransfer.unapply))
+}
+
 case class InboundPayments(newSubsForPeriod: Option[Amount], newSubsYTD: Amount, totalSubsForPeriod: Amount, totalSubsYTD: Amount)
+
+object InboundPayments {
+  implicit val ibpReads: Reads[InboundPayments] = (
+    (JsPath \ "newSubsForPeriod").readNullable[Amount](JsonReads.nonNegativeAmount) and
+    (JsPath \ "newSubsYTD").read[Amount](JsonReads.nonNegativeAmount) and
+    (JsPath \ "totalSubsForPeriod").read[Amount](JsonReads.nonNegativeAmount) and
+    (JsPath \ "totalSubsYTD").read[Amount](JsonReads.nonNegativeAmount)
+  )(InboundPayments.apply _)
+
+  implicit val ibpWrites: Writes[InboundPayments] = (
+    (JsPath \ "newSubsForPeriod").writeNullable[Amount] and
+    (JsPath \ "newSubsYTD").write[Amount] and
+    (JsPath \ "totalSubsForPeriod").write[Amount] and
+    (JsPath \ "totalSubsYTD").write[Amount]
+  )(unlift(InboundPayments.unapply))
+}
 
 case class LifeEvent(accountID: AccountId,
                       lisaManagerReferenceNumber:ReferenceNumber,

@@ -17,12 +17,35 @@
 package uk.gov.hmrc.lisaapi.models
 
 import org.joda.time.DateTime
+import play.api.libs.functional.syntax._
+import play.api.libs.json.{JsPath, Reads, Writes}
 
 case class RequestBonusPaymentRequest(
-                                       lifeEventId: Option[String],
+                                       lifeEventId: Option[LifeEventId],
                                        periodStartDate: DateTime,
                                        periodEndDate: DateTime,
                                        htbTransfer: Option[HelpToBuyTransfer],
                                        inboundPayments: InboundPayments,
                                        bonuses: Bonuses
 )
+
+object RequestBonusPaymentRequest {
+  implicit val requestBonusPaymentReads: Reads[RequestBonusPaymentRequest] = (
+    (JsPath \ "lifeEventId").readNullable(JsonReads.lifeEventId) and
+    (JsPath \ "periodStartDate").read(JsonReads.isoDate).map(new DateTime(_)) and
+    (JsPath \ "periodEndDate").read(JsonReads.isoDate).map(new DateTime(_)) and
+    (JsPath \ "htbTransfer").readNullable[HelpToBuyTransfer] and
+    (JsPath \ "inboundPayments").read[InboundPayments] and
+    (JsPath \ "bonuses").read[Bonuses]
+  )(RequestBonusPaymentRequest.apply _)
+
+  implicit val requestBonusPaymentWrites: Writes[RequestBonusPaymentRequest] = (
+    (JsPath \ "lifeEventId").writeNullable[String] and
+    (JsPath \ "periodStartDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
+    (JsPath \ "periodEndDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
+    (JsPath \ "transactionType").write[String] and
+    (JsPath \ "htbTransfer").writeNullable[HelpToBuyTransfer] and
+    (JsPath \ "inboundPayments").write[InboundPayments] and
+    (JsPath \ "bonuses").write[Bonuses]
+  ){req: RequestBonusPaymentRequest => (req.lifeEventId, req.periodStartDate, req.periodEndDate, "Bonus", req.htbTransfer, req.inboundPayments, req.bonuses)}
+}

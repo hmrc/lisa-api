@@ -17,5 +17,19 @@
 package uk.gov.hmrc.lisaapi.models
 
 import org.joda.time.DateTime
+import play.api.libs.functional.syntax._
+import play.api.libs.json.{JsPath, Reads, Writes}
 
-case class ReportLifeEventRequest(eventType: String,  eventDate: DateTime)
+case class ReportLifeEventRequest(eventType: LifeEventType,  eventDate: DateTime)
+
+object ReportLifeEventRequest {
+  implicit val reportLifeEventRequestReads: Reads[ReportLifeEventRequest] = (
+    (JsPath \ "eventType").read(JsonReads.lifeEventType) and
+    (JsPath \ "eventDate").read(JsonReads.notFutureDate).map(new DateTime(_))
+  )(ReportLifeEventRequest.apply _)
+
+  implicit val reportLifeEventRequestWrites: Writes[ReportLifeEventRequest] = (
+    (JsPath \ "eventType").write[String] and
+    (JsPath \ "eventDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd"))
+  )(unlift(ReportLifeEventRequest.unapply))
+}

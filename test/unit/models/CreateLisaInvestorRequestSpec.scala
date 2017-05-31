@@ -20,10 +20,9 @@ import org.joda.time.DateTime
 import org.scalatestplus.play.PlaySpec
 import play.api.data.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
-import uk.gov.hmrc.lisaapi.controllers.JsonFormats
 import uk.gov.hmrc.lisaapi.models.CreateLisaInvestorRequest
 
-class CreateLisaInvestorRequestSpec extends PlaySpec with JsonFormats {
+class CreateLisaInvestorRequestSpec extends PlaySpec {
 
   val validRequestJson = """{"investorNINO":"AB123456A", "firstName":"A", "lastName":"B", "dateOfBirth":"2000-02-29"}"""
 
@@ -58,11 +57,11 @@ class CreateLisaInvestorRequestSpec extends PlaySpec with JsonFormats {
     }
 
     "catch an invalid firstName" in {
-      hasCorrectValidationError(validRequestJson.replace("A", ""), "/firstName", "error.formatting.firstName")
+      hasCorrectValidationError(validRequestJson.replace("A", ""), "/firstName", "error.formatting.name")
     }
 
     "catch an invalid lastName" in {
-      hasCorrectValidationError(validRequestJson.replace("B", ""), "/lastName", "error.formatting.lastName")
+      hasCorrectValidationError(validRequestJson.replace("B", ""), "/lastName", "error.formatting.name")
     }
 
     "catch an invalid dateOfBirth" when {

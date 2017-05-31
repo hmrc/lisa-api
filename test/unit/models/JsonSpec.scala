@@ -14,21 +14,20 @@
  * limitations under the License.
  */
 
-package unit.controllers
+package unit.models
 
 import org.scalatestplus.play.PlaySpec
 import play.api.data.validation.ValidationError
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
-import uk.gov.hmrc.lisaapi.controllers.JsonFormats
 import uk.gov.hmrc.lisaapi.models._
 
-class JsonFormatsSpec extends PlaySpec {
+class JsonSpec extends PlaySpec {
 
   val monetaryField = "monetaryValue"
-  val invalidError = "INVALID_DATE"
+  val invalidError = "error.formatting.currency"
 
-  implicit val testReads: Reads[TestClass] = (JsPath \ monetaryField).read[Amount](nonNegativeAmountValidator).map(TestClass.apply)
+  implicit val testReads: Reads[TestClass] = (JsPath \ monetaryField).read[Amount](JsonReads.nonNegativeAmount).map(TestClass.apply)
   implicit val testWrites: Writes[TestClass] = (JsPath \ monetaryField).write[Amount].contramap[TestClass](_.monetaryValue)
 
   "Monetary reads" must {
@@ -191,6 +190,6 @@ class JsonFormatsSpec extends PlaySpec {
 
   case class TestClass(monetaryValue: Amount)
 
-  object SUT extends JsonFormats {}
+  object SUT {}
 
 }
