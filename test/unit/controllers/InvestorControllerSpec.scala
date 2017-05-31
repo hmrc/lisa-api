@@ -143,11 +143,7 @@ class InvestorControllerSpec extends PlaySpec
 
         await(res)
 
-        verify(mockService).createInvestor(matchersEquals(lisaManager), matchersEquals(CreateLisaInvestorRequest(
-          investorNINO = "AB123456D",
-          firstName = "RICK",
-          lastName = "SANCHEZ",
-          dateOfBirth = new DateTime("1973-03-24"))
+        verify(mockService).createInvestor(matchersEquals(lisaManager), matchersEquals(CreateLisaInvestorRequest(investorNINO = "AB123456D", firstName = "RICK", lastName = "SANCHEZ", dateOfBirth = new DateTime("1973-03-24"))
         ))(any())
       }
     }

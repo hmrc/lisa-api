@@ -20,10 +20,9 @@ import org.joda.time.DateTime
 import org.scalatestplus.play.PlaySpec
 import play.api.data.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
-import uk.gov.hmrc.lisaapi.controllers.JsonFormats
-import uk.gov.hmrc.lisaapi.models.{CloseLisaAccountRequest, CreateLisaInvestorRequest}
+import uk.gov.hmrc.lisaapi.models.CloseLisaAccountRequest
 
-class CloseLisaAccountSpec extends PlaySpec with JsonFormats {
+class CloseLisaAccountSpec extends PlaySpec {
 
   val validRequestJson = """{"accountClosureReason":"Voided", "closureDate":"2000-01-01"}"""
 

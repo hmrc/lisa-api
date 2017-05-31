@@ -20,10 +20,9 @@ import org.joda.time.DateTime
 import org.scalatestplus.play.PlaySpec
 import play.api.data.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
-import uk.gov.hmrc.lisaapi.controllers.JsonFormats
 import uk.gov.hmrc.lisaapi.models.AccountTransfer
 
-class AccountTransferSpec extends PlaySpec with JsonFormats {
+class AccountTransferSpec extends PlaySpec {
 
   val validAccountTransferJson = """{"transferredFromAccountId":"Z543210", "transferredFromLMRN":"Z543333", "transferInDate":"2015-12-13"}"""
 

@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.lisaapi.models
 
+import play.api.libs.json.{Json, OFormat}
+
 case class ApiResponseData(
   message: String,
   investorId: Option[String] = None,
@@ -23,3 +25,7 @@ case class ApiResponseData(
   lifeEventId: Option[String] = None,
   transactionId: Option[String] = None
 )
+
+object ApiResponseData {
+  implicit val apiResponseDataFormats: OFormat[ApiResponseData] = Json.format[ApiResponseData]
+}

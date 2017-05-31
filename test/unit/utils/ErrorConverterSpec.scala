@@ -16,22 +16,19 @@
 
 package unit.utils
 
-import org.joda.time.DateTime
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.libs.json.{JsError, JsSuccess, Json, OFormat}
-import uk.gov.hmrc.lisaapi.controllers.{ErrorValidation, JsonFormats}
+import play.api.libs.json.{JsError, Json, OFormat}
+import uk.gov.hmrc.lisaapi.controllers.ErrorValidation
 import uk.gov.hmrc.lisaapi.models.CreateLisaInvestorRequest
 import uk.gov.hmrc.lisaapi.utils.ErrorConverter
-
 
 case class SimpleClass(str: String, num: Int)
 case class MultipleDataTypes(str: String, num: Int, arr: List[SimpleClass], obj: SimpleClass)
 
 class ErrorConverterSpec extends PlaySpec
   with MockitoSugar
-  with OneAppPerSuite
-with JsonFormats {
+  with OneAppPerSuite {
 
   implicit val simpleFormats: OFormat[SimpleClass] = Json.format[SimpleClass]
   implicit val multipleFormats: OFormat[MultipleDataTypes] = Json.format[MultipleDataTypes]

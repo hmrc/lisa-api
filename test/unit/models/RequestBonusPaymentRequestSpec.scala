@@ -20,12 +20,11 @@ import org.joda.time.DateTime
 import org.scalatestplus.play.PlaySpec
 import play.api.data.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
-import uk.gov.hmrc.lisaapi.controllers.JsonFormats
 import uk.gov.hmrc.lisaapi.models.{Bonuses, HelpToBuyTransfer, InboundPayments, RequestBonusPaymentRequest}
 
 import scala.io.Source
 
-class RequestBonusPaymentRequestSpec extends PlaySpec with JsonFormats {
+class RequestBonusPaymentRequestSpec extends PlaySpec {
 
   val validBonusPaymentJson = Source.fromInputStream(getClass().getResourceAsStream("/json/request.valid.bonus-payment.json")).mkString
 

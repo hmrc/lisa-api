@@ -18,7 +18,6 @@ package uk.gov.hmrc.lisaapi.connectors
 
 import play.api.Logger
 import uk.gov.hmrc.lisaapi.config.{AppContext, WSHttp}
-import uk.gov.hmrc.lisaapi.controllers.JsonFormats
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des._
 import uk.gov.hmrc.play.config.ServicesConfig
@@ -30,7 +29,7 @@ import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 import play.api.libs.json.Reads
 
-trait DesConnector extends ServicesConfig with JsonFormats {
+trait DesConnector extends ServicesConfig {
 
   val httpPost:HttpPost = WSHttp
   lazy val desUrl = baseUrl("des")
