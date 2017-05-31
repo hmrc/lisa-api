@@ -41,9 +41,21 @@
             </td>
             <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
                 <p class ="code--block"> {<br>
-                                            "code": "BAD_REQUEST",<br>
-                                            "message": "Bad Request"<br>
-                                       }
+  "code": "BAD_REQUEST",<br>
+  "message": "Bad Request",<br>
+  "errors": [<br>
+    {<br>
+      "code": "INVALID_DATE",<br>
+      "message": "Date is invalid",<br>
+      "path": "/closureDate"<br>
+    },<br>
+    {<br>
+      "code": "MISSING_FIELD",<br>
+      "message": "This field is required",<br>
+      "path": "/accountClosureReason"<br>
+    }<br>
+  ]<br>
+}
                 </p>
             </td>
         </tr>

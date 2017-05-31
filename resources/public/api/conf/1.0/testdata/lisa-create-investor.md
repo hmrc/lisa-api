@@ -34,16 +34,38 @@
             <td><p>Request containing invalid and/or missing data</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
             <td><p class ="code--block">{<br>
                                         "investorNINO": "A1234567A",<br>
-                                        "firstName": "",<br>
+                                        "firstName": true,<br>
                                         "dateOfBirth": "25-03-1985"<br>
                                         }</p>
             </td>
             <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
-                                  <p class ="code--block">{<br>
-                                                            "code": "BAD_REQUEST",<br>
-                                                            "message": "Bad Request"<br>
-                                                          }
-                                  </p>
+                  <p class ="code--block">{<br>
+							  "code": "BAD_REQUEST",<br>
+							  "message": "Bad Request",<br>
+							  "errors": [<br>
+							    {<br>
+							      "code": "MISSING_FIELD",<br>
+							      "message": "This field is required",<br>
+							      "path": "/lastName"<br>
+							    },<br>
+							    {<br>
+							      "code": "INVALID_DATE",<br>
+							      "message": "Date is invalid",<br>
+							      "path": "/dateOfBirth"<br>
+							    },<br>
+							    {<br>
+							      "code": "INVALID_FORMAT",<br>
+							      "message": "Invalid format has been used",<br>
+							      "path": "/investorNINO"<br>
+							    },<br>
+							    {<br>
+							      "code": "INVALID_DATA_TYPE",<br>
+							      "message": "Invalid data type has been used",<br>
+							      "path": "/firstName"<br>
+							    }<br>
+							  ]<br>
+							}
+                  </p>
             </td>
         </tr>
         <tr>
