@@ -39,7 +39,7 @@ package object models {
   object JsonReads {
     val nonNegativeAmount: Reads[Amount] = Reads
       .of[Amount]
-      .filter(ValidationError("INVALID_DATE"))(
+      .filter(ValidationError("error.formatting.currency"))(
         amount => amount >= 0 && amount.scale < 3 && amount <= MAX_AMOUNT
       )
 

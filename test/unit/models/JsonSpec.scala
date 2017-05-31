@@ -25,7 +25,7 @@ import uk.gov.hmrc.lisaapi.models._
 class JsonSpec extends PlaySpec {
 
   val monetaryField = "monetaryValue"
-  val invalidError = "INVALID_DATE"
+  val invalidError = "error.formatting.currency"
 
   implicit val testReads: Reads[TestClass] = (JsPath \ monetaryField).read[Amount](JsonReads.nonNegativeAmount).map(TestClass.apply)
   implicit val testWrites: Writes[TestClass] = (JsPath \ monetaryField).write[Amount].contramap[TestClass](_.monetaryValue)
