@@ -45,11 +45,11 @@ class ErrorConverterSpec extends PlaySpec
 
           res.size mustBe 5
 
-          res must contain(ErrorValidation("INVALID_DATA_TYPE", "An invalid data type has been used", Some("/str")))
-          res must contain(ErrorValidation("INVALID_DATA_TYPE", "An invalid data type has been used", Some("/num")))
-          res must contain(ErrorValidation("INVALID_DATA_TYPE", "An invalid data type has been used", Some("/arr")))
-          res must contain(ErrorValidation("MISSING_FIELD", "A required field is missing", Some("/obj/str")))
-          res must contain(ErrorValidation("MISSING_FIELD", "A required field is missing", Some("/obj/num")))
+          res must contain(ErrorValidation("INVALID_DATA_TYPE", "Invalid data type has been used", Some("/str")))
+          res must contain(ErrorValidation("INVALID_DATA_TYPE", "Invalid data type has been used", Some("/num")))
+          res must contain(ErrorValidation("INVALID_DATA_TYPE", "Invalid data type has been used", Some("/arr")))
+          res must contain(ErrorValidation("MISSING_FIELD", "This field is required", Some("/obj/str")))
+          res must contain(ErrorValidation("MISSING_FIELD", "This field is required", Some("/obj/num")))
 
         }
       }
@@ -70,7 +70,7 @@ class ErrorConverterSpec extends PlaySpec
         case e: JsError => {
           val res = SUT.convert(e.errors)
           res.size mustBe 1
-          res must contain(ErrorValidation("INVALID_DATE", "A date is invalid", Some("/dateOfBirth")))
+          res must contain(ErrorValidation("INVALID_DATE", "Date is invalid", Some("/dateOfBirth")))
         }
 
       }
