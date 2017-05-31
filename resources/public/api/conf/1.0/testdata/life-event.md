@@ -35,15 +35,27 @@
             <td><p>Request containing invalid and/or missing data</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br>accountId: 1234567890</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                            "eventType" : "Invalid Event Type"
+                                            "eventType" : "Invalid Event Type"<br>
                                         }
                 </p>
             </td>
             <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
                 <p class ="code--block"> {<br>
-                                            "code": "BAD_REQUEST",<br>
-                                            "message": "Bad Request"<br>
-                                          }
+					  "code": "BAD_REQUEST",<br>
+					  "message": "Bad Request",<br>
+					  "errors": [<br>
+					    {<br>
+					      "code": "MISSING_FIELD",<br>
+					      "message": "This field is required",<br>
+					      "path": "/eventDate"<br>
+					    },<br>
+					    {<br>
+					      "code": "INVALID_FORMAT",<br>
+					      "message": "Invalid format has been used",<br>
+					      "path": "/eventType"<br>
+					    }<br>
+					  ]<br>
+					}
                 </p>
             </td>
         </tr>

@@ -51,19 +51,60 @@
         <tr>
         	 <td><p>Request containing invalid and/or missing data</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br>accountId: 1234567890</p></td>
 	        <td>
-	            <p class ="code--block"> {<br>
-	                                           "periodStartDate": 2017,<br>
-	                                           "periodEndDate": "05-05-2017",<br>
-	                                           "htbTransfer": 0.0,<br>
-	                                           "inboundPayments": []<br>
-	                                         }
+	            <p class ="code--block">{<br>
+	"lifeEventId": true,<br>
+	"periodStartDate": "2017-04-06",<br>
+	"periodEndDate": "05-05-2017",<br>
+	"htbTransfer": {<br>
+		"htbTransferInForPeriod": 5.50,<br>
+		"htbTransferTotalYTD": 5.5001<br>
+	},<br>
+	"inboundPayments": {<br>
+		"newSubsForPeriod": 4000.00,<br>
+		"newSubsYTD": 4000.00,<br>
+		"totalSubsForPeriod": 40000.00,<br>
+		"totalSubsYTD": 40000.00<br>
+	},<br>
+	"bonuses": {<br>
+		"bonusPaidYTD": 0.0,<br>
+		"bonusDueForPeriod": 10000.00,<br>
+		"claimReason": "X"<br>
+	}<br>
+}
 	            </p>
 	        </td>
 	        <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
 	            <p class ="code--block"> {<br>
-	                                        "code": "BAD_REQUEST",<br>
-	                                        "message": "Bad Request"<br>
-	                                      }
+  "code": "BAD_REQUEST",<br>
+  "message": "Bad Request",<br>
+  "errors": [<br>
+    {<br>
+      "code": "INVALID_MONETARY_AMOUNT",<br>
+      "message": "Amount cannot be negative, and can only have up to 2 decimal places",<br>
+      "path": "/htbTransfer/htbTransferTotalYTD"<br>
+    },<br>
+    {<br>
+      "code": "INVALID_DATA_TYPE",<br>
+      "message": "Invalid data type has been used",<br>
+      "path": "/lifeEventId"<br>
+    },<br>
+    {<br>
+      "code": "MISSING_FIELD",<br>
+      "message": "This field is required",<br>
+      "path": "/bonuses/totalBonusDueYTD"<br>
+    },<br>
+    {<br>
+      "code": "INVALID_FORMAT",<br>
+      "message": "Invalid format has been used",<br>
+      "path": "/bonuses/claimReason"<br>
+    },<br>
+    {<br>
+      "code": "INVALID_DATE",<br>
+      "message": "Date is invalid",<br>
+      "path": "/periodEndDate"<br>
+    }<br>
+  ]<br>
+}
 	            </p>
 	        </td>
         </tr>

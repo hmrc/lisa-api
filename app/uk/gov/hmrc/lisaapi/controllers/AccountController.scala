@@ -68,7 +68,7 @@ class AccountController extends LisaController with LisaConstants {
             Future.successful(Forbidden(toJson(ErrorTransferAccountDataNotProvided)))
           }
           else {
-            Future.successful(BadRequest(toJson(ErrorGenericBadRequest)))
+            Future.successful(BadRequest(toJson(ErrorBadRequest(errorConverter.convert(errors)))))
           }
         }
       )
