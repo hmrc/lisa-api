@@ -38,6 +38,7 @@ trait ErrorConverter {
     key match {
       case f: String if f.matches("error\\.expected\\.js.*") => ("INVALID_DATA_TYPE", "An invalid data type has been used")
       case f2: String if f2.matches("error\\.formatting\\.date.*") => ("INVALID_DATE", "A date is invalid")
+      case f2: String if f2.matches("error\\.formatting\\.currency.*") => ("INVALID_MONETARY_AMOUNT", "Must be a non-negative number with up to 2 decimal places")
       case f3: String if f3.matches("error\\.formatting\\..*") => ("INVALID_FORMAT", "An invalid format has been used")
       case "error.path.missing" => ("MISSING_FIELD", "A required field is missing")
       case _ => throw new MatchError("Could not match the JSON Validation error")
