@@ -21,6 +21,12 @@ import play.api.libs.json.Json
 sealed abstract class ErrorResponse(
                                      val httpStatusCode: Int,
                                      val errorCode: String,
+                                     val message: String
+                                   )
+
+sealed abstract class ErrorResponseWithErrors(
+                                     val httpStatusCode: Int,
+                                     val errorCode: String,
                                      val message: String,
                                      val errors: Option[List[ErrorValidation]] = None
                                    )
@@ -38,7 +44,7 @@ case class ErrorValidation(
                              path: Option[String] = None
                            )
 
-case class ErrorBadRequest(errs: List[ErrorValidation]) extends ErrorResponse(400, "BAD_REQUEST", "Bad Request", errors = Some(errs))
+case class ErrorBadRequest(errs: List[ErrorValidation]) extends ErrorResponseWithErrors(400, "BAD_REQUEST", "Bad Request", errors = Some(errs))
 
 case object ErrorNotImplemented extends ErrorResponse(501, "NOT_IMPLEMENTED", "Not implemented")
 

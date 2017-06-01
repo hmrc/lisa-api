@@ -26,7 +26,12 @@ package object controllers {
 
 
   implicit val errorResponseWrites = new Writes[ErrorResponse] {
-    def writes(e: ErrorResponse): JsValue = Json.obj("code" -> e.errorCode, "message" -> e.message, "errors"-> e.errors)
+    def writes(e: ErrorResponse): JsValue = Json.obj("code" -> e.errorCode, "message" -> e.message)
+  }
+
+
+  implicit val errorResponseWithErrorsWrites = new Writes[ErrorResponseWithErrors] {
+    def writes(e: ErrorResponseWithErrors): JsValue = Json.obj("code" -> e.errorCode, "message" -> e.message, "errors" -> e.errors)
   }
 
 
@@ -34,6 +39,7 @@ package object controllers {
     def writes(e: ErrorResponseWithId): JsValue = Json.obj("code" -> e.errorCode, "message" -> e.message, "id" -> e.id)
   }
 }
+
 trait LisaConstants {
-  val ZREF: String =  "lisaManagerReferenceNumber"
+  val ZREF: String = "lisaManagerReferenceNumber"
 }
