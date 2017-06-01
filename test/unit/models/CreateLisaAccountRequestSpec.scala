@@ -167,8 +167,8 @@ class CreateLisaAccountRequestSpec extends PlaySpec {
       }
     }
 
-    "catch an missing creationReason value" in {
-      val req = validAccountTransferRequest.replace("\"creationReason\": \"Transferred\",", "")
+    "catch a missing creationReason value" in {
+      val req = validAccountCreationRequest.replace("\"creationReason\": \"New\",", "")
       val res = Json.parse(req).validate[CreateLisaAccountRequest]
 
       res match {
@@ -185,7 +185,7 @@ class CreateLisaAccountRequestSpec extends PlaySpec {
 
       res match {
         case JsError(errors) => {
-          errors mustBe Seq((JsPath \ "creationReason", Seq(ValidationError("error.path.missing"))))
+          errors mustBe Seq((JsPath \ "transferAccount", Seq(ValidationError("error.path.missing"))))
         }
         case _ => fail()
       }
