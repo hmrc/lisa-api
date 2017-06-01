@@ -133,7 +133,18 @@ class JsonSpec extends PlaySpec {
 
         res match {
           case JsError(errors) => {
-            errors mustBe Seq((JsPath \ monetaryField, Seq(ValidationError("error.expected.numberformatexception"))))
+            errors mustBe Seq((JsPath \ monetaryField, Seq(ValidationError("error.expected.jsnumber"))))
+          }
+          case _ => fail("passed validation")
+        }
+      }
+
+      "given a numeric string" in {
+        val res = createJson(""""5"""").validate[TestClass]
+
+        res match {
+          case JsError(errors) => {
+            errors mustBe Seq((JsPath \ monetaryField, Seq(ValidationError("error.expected.jsnumber"))))
           }
           case _ => fail("passed validation")
         }

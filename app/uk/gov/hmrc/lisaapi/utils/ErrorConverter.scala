@@ -36,7 +36,7 @@ trait ErrorConverter {
 
   private def getErrorDetails(key: String):(String, String) = {
     key match {
-      case f: String if f.matches("error\\.expected\\.js.*") => ("INVALID_DATA_TYPE", "Invalid data type has been used")
+      case f: String if f.matches("error\\.expected\\..*") => ("INVALID_DATA_TYPE", "Invalid data type has been used")
       case f2: String if f2.matches("error\\.formatting\\.date.*") => ("INVALID_DATE", "Date is invalid")
       case f2: String if f2.matches("error\\.formatting\\.currency.*") => ("INVALID_MONETARY_AMOUNT", "Amount cannot be negative, and can only have up to 2 decimal places")
       case f3: String if f3.matches("error\\.formatting\\..*") => ("INVALID_FORMAT", "Invalid format has been used")

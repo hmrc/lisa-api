@@ -38,10 +38,14 @@ package object models {
 
   object JsonReads {
     val nonNegativeAmount: Reads[Amount] = Reads
-      .of[Amount]
+      .of[JsNumber]
       .filter(ValidationError("error.formatting.currency"))(
-        amount => amount >= 0 && amount.scale < 3 && amount <= MAX_AMOUNT
-      )
+        value => {
+          val amount = value.as[BigDecimal]
+
+          amount >= 0 && amount.scale < 3 && amount <= MAX_AMOUNT
+        }
+      ).map((value: JsNumber) => value.as[BigDecimal])
 
     val lmrn: Reads[LisaManagerReferenceNumber] = Reads.pattern("^Z\\d{4,6}$".r, "error.formatting.lmrn")
     val nino: Reads[Nino] = Reads.pattern(
