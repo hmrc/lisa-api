@@ -18,7 +18,7 @@ package uk.gov.hmrc.lisaapi.models
 
 import org.joda.time.DateTime
 import play.api.libs.functional.syntax._
-import play.api.libs.json.{JsPath, Reads, Writes}
+import play.api.libs.json._
 
 sealed trait CreateLisaAccountRequest
 
@@ -40,20 +40,24 @@ object CreateLisaAccountRequest {
   implicit val createLisaAccountCreationRequestReads: Reads[CreateLisaAccountCreationRequest] = (
     (JsPath \ "investorId").read(JsonReads.investorId) and
     (JsPath \ "accountId").read(JsonReads.accountId) and
-    (JsPath \ "firstSubscriptionDate").read(JsonReads.notFutureDate).map(new DateTime(_))
-  )(CreateLisaAccountCreationRequest.apply _)
+    (JsPath \ "firstSubscriptionDate").read(JsonReads.notFutureDate).map(new DateTime(_)) and
+    (JsPath \ "creationReason").read[String](Reads.pattern("New".r, "error.formatting.creationReason"))
+  )((investorId, accountId, firstSubscriptionDate, _) => CreateLisaAccountCreationRequest(investorId, accountId, firstSubscriptionDate))
 
   implicit val createLisaAccountTransferRequestReads: Reads[CreateLisaAccountTransferRequest] = (
     (JsPath \ "investorId").read(JsonReads.investorId) and
     (JsPath \ "accountId").read(JsonReads.accountId) and
     (JsPath \ "firstSubscriptionDate").read(JsonReads.notFutureDate).map(new DateTime(_)) and
-    (JsPath \ "transferAccount").read[AccountTransfer]
-  )(CreateLisaAccountTransferRequest.apply _)
+    (JsPath \ "transferAccount").read[AccountTransfer] and
+    (JsPath \ "creationReason").read[String](Reads.pattern("Transferred".r, "error.formatting.creationReason"))
+  )((investorId, accountId, firstSubscriptionDate, transferAccount, _) => CreateLisaAccountTransferRequest(investorId, accountId, firstSubscriptionDate, transferAccount))
 
   implicit val createLisaAccountRequestReads: Reads[CreateLisaAccountRequest] = Reads[CreateLisaAccountRequest] { json =>
-    (json \ "creationReason").validate[String](Reads.pattern("^(New|Transferred)$".r, "error.formatting.creationReason")).flatMap {
-      case "New" => createLisaAccountCreationRequestReads.reads(json)
-      case "Transferred" => createLisaAccountTransferRequestReads.reads(json)
+    val creationReason = (json \ "creationReason").asOpt[String]
+
+    creationReason match {
+      case Some("Transferred") => createLisaAccountTransferRequestReads.reads(json)
+      case _ => createLisaAccountCreationRequestReads.reads(json)
     }
   }
 
