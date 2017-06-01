@@ -279,7 +279,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request for a pre-existing account</p><p class ="code--block">lisaManagerReferenceNumber: Z123456789</p></td>
+            <td><p>Request for a pre-existing account</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
             <td>
                 <p class ="code--block"> {<br>
                                      	    "investorId": "1234567899",<br>
