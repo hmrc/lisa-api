@@ -151,7 +151,7 @@ class CreateLisaAccountRequestSpec extends PlaySpec {
         case JsError(errors) => {
           errors.count {
             case (path: JsPath, errors: Seq[ValidationError]) => {
-              errors.contains(ValidationError("error.formatting.creationReason"))
+              path.toString() == "/creationReason" && errors.contains(ValidationError("error.formatting.creationReason"))
             }
           } mustBe 1
         }
@@ -167,7 +167,23 @@ class CreateLisaAccountRequestSpec extends PlaySpec {
         case JsError(errors) => {
           errors.count {
             case (path: JsPath, errors: Seq[ValidationError]) => {
-              errors.contains(ValidationError("error.expected.jsstring"))
+              path.toString() == "/creationReason" && errors.contains(ValidationError("error.expected.jsstring"))
+            }
+          } mustBe 1
+        }
+        case _ => fail()
+      }
+    }
+
+    "catch an missing creationReason value" in {
+      val req = validAccountTransferRequest.replace("\"creationReason\": \"Transferred\",", "")
+      val res = Json.parse(req).validate[CreateLisaAccountRequest]
+
+      res match {
+        case JsError(errors) => {
+          errors.count {
+            case (path: JsPath, errors: Seq[ValidationError]) => {
+              path.toString() == "/creationReason" && errors.contains(ValidationError("error.path.missing"))
             }
           } mustBe 1
         }
