@@ -67,7 +67,7 @@ class CreateLisaInvestorRequestSpec extends PlaySpec {
     "catch an invalid dateOfBirth" when {
 
       "the data type is incorrect" in {
-        hasCorrectValidationError(validRequestJson.replace("\"2000-02-29\"", "123456789"), "/dateOfBirth", "error.formatting.date")
+        hasCorrectValidationError(validRequestJson.replace("\"2000-02-29\"", "123456789"), "/dateOfBirth", "error.expected.jsstring")
       }
 
       "the format is incorrect" in {
