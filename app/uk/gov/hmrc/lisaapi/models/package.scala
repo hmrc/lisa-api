@@ -86,7 +86,7 @@ package object models {
           }
           case None => JsError(Seq(JsPath() -> Seq(ValidationError(dateValidationMessage))))
         }
-        case _ => JsError(Seq(JsPath() -> Seq(ValidationError(dateValidationMessage))))
+        case _ => JsError(Seq(JsPath() -> Seq(ValidationError("error.expected.jsstring"))))
       }
 
       private def parseDate(input: String): Option[DateTime] =
