@@ -149,11 +149,7 @@ class CreateLisaAccountRequestSpec extends PlaySpec {
 
       res match {
         case JsError(errors) => {
-          errors.count {
-            case (path: JsPath, errors: Seq[ValidationError]) => {
-              errors.contains(ValidationError("error.formatting.creationReason"))
-            }
-          } mustBe 1
+          errors mustBe Seq((JsPath \ "creationReason", Seq(ValidationError("error.formatting.creationReason"))))
         }
         case _ => fail()
       }
@@ -165,11 +161,19 @@ class CreateLisaAccountRequestSpec extends PlaySpec {
 
       res match {
         case JsError(errors) => {
-          errors.count {
-            case (path: JsPath, errors: Seq[ValidationError]) => {
-              errors.contains(ValidationError("error.expected.jsstring"))
-            }
-          } mustBe 1
+          errors mustBe Seq((JsPath \ "creationReason", Seq(ValidationError("error.expected.jsstring"))))
+        }
+        case _ => fail()
+      }
+    }
+
+    "catch a missing creationReason value" in {
+      val req = validAccountCreationRequest.replace("\"creationReason\": \"New\",", "")
+      val res = Json.parse(req).validate[CreateLisaAccountRequest]
+
+      res match {
+        case JsError(errors) => {
+          errors mustBe Seq((JsPath \ "creationReason", Seq(ValidationError("error.path.missing"))))
         }
         case _ => fail()
       }
@@ -181,11 +185,7 @@ class CreateLisaAccountRequestSpec extends PlaySpec {
 
       res match {
         case JsError(errors) => {
-          errors.count {
-            case (path: JsPath, errors: Seq[ValidationError]) => {
-              path.toString() == "/transferAccount" && errors.contains(ValidationError("error.path.missing"))
-            }
-          } mustBe 1
+          errors mustBe Seq((JsPath \ "transferAccount", Seq(ValidationError("error.path.missing"))))
         }
         case _ => fail()
       }
