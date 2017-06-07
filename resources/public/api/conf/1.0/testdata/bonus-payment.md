@@ -243,7 +243,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request containing an Account ID that doesn't exist</p><p class ="code--block">lisaManagerReferenceNumber: Z123456789<br>accountId: 0000000404</p></td>
+            <td><p>Request containing an Account ID that doesn't exist</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br>accountId: 0000000404</p></td>
             <td>
                 <p class ="code--block"> {<br>
                                                "lifeEventId": "1234567891",<br>
