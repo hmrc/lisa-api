@@ -74,7 +74,7 @@
       },
       "LISAManagerReferenceNumberType": {
         "type": "string",
-        "pattern": "^Z\\d{4,6}$",
+        "pattern": "^Z([0-9]{4}|[0-9]{6})$",
         "example": "Z1234"
       }
     ,

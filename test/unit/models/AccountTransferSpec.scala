@@ -52,7 +52,7 @@ class AccountTransferSpec extends PlaySpec {
     }
 
     "catch an invalid transferredFromLMRN" in {
-      val req = """{"transferredFromAccountId":"Z543210", "transferredFromLMRN":"A123", "transferInDate":"2015-12-13"}"""
+      val req = """{"transferredFromAccountId":"Z543210", "transferredFromLMRN":"A12345", "transferInDate":"2015-12-13"}"""
       val res = Json.parse(req).validate[AccountTransfer]
 
       res match {

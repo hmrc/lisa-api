@@ -47,7 +47,7 @@ package object models {
         }
       ).map((value: JsNumber) => value.as[BigDecimal])
 
-    val lmrn: Reads[LisaManagerReferenceNumber] = Reads.pattern("^Z\\d{4,6}$".r, "error.formatting.lmrn")
+    val lmrn: Reads[LisaManagerReferenceNumber] = Reads.pattern("^Z([0-9]{4}|[0-9]{6})$".r, "error.formatting.lmrn")
     val nino: Reads[Nino] = Reads.pattern(
       "^((?!(BG|GB|KN|NK|NT|TN|ZZ)|(D|F|I|Q|U|V)[A-Z]|[A-Z](D|F|I|O|Q|U|V))[A-Z]{2})[0-9]{6}[A-D]?$".r,
       "error.formatting.nino")
