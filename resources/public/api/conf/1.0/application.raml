@@ -108,11 +108,6 @@ types:
               responses:
                 201:
                   description: The LISA investor resource has been created.
-                  headers:
-                    Location:
-                      description: Relative URI to the created LISAAccount resource.
-                      type: string
-                      example: /investors/0987654321
                   body:
                     application/json:
                       example: !include examples/LISAInvestor.post.response.json
@@ -218,11 +213,6 @@ types:
               example: !include examples/LISAAccount.post.json
           responses:
             201:
-              headers:
-                Location:
-                  description: URI to the created LISA account resource.
-                  type: string
-                  example: /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}
               body:
                 application/json:
                   example: !include examples/LISAAccount.post.response.json
@@ -478,11 +468,6 @@ types:
                       responses:
                         201:
                           description: The LifeEvent resource has been created.
-                          headers:
-                            Location:
-                              description: Relative URI to the created Life Event
-                              type: string
-                              example: /manager/Z654321/accounts/1234567890/events/3333333333
                           body:
                             application/json:
                                 example: !include examples/LifeEvent.post.response.json
@@ -603,11 +588,6 @@ types:
                       responses:
                         201:
                           description: The LISA transaction resource has been created.
-                          headers:
-                            Location:
-                              description: Relative URI to the created LISA transaction resource
-                              type: string
-                              example: /manager/Z654321/accounts/1234567890/transactions/7777777777
                           body:
                             application/json:
                               example: !include examples/LISATransaction.post.response.json
