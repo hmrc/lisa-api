@@ -19,7 +19,7 @@ package uk.gov.hmrc.lisaapi.controllers
 import play.api.Logger
 import play.api.data.validation.ValidationError
 import play.api.libs.json.Json.toJson
-import play.api.libs.json.{JsError, JsPath, JsSuccess, Reads}
+import play.api.libs.json._
 import play.api.mvc.{AnyContent, Request, Result}
 import uk.gov.hmrc.api.controllers.HeaderValidator
 import uk.gov.hmrc.lisaapi.utils.ErrorConverter
@@ -28,11 +28,12 @@ import uk.gov.hmrc.play.microservice.controller.BaseController
 import uk.gov.hmrc.auth.core.Retrievals._
 import uk.gov.hmrc.auth.core.{AuthorisedFunctions, Enrolment}
 import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 
-trait LisaController extends BaseController with HeaderValidator with RunMode  with AuthorisedFunctions {
+trait LisaController extends BaseController with HeaderValidator with RunMode with AuthorisedFunctions {
 
   val authConnector: LisaAuthConnector = LisaAuthConnector
   lazy val errorConverter: ErrorConverter = ErrorConverter
@@ -72,7 +73,14 @@ trait LisaController extends BaseController with HeaderValidator with RunMode  w
         case None => Future.successful(BadRequest(toJson(EmptyJson)))
       }
 
+    } recoverWith {
+      handleFailure
     }
+  }
+
+  def handleFailure(implicit request: Request[_]) = PartialFunction[Throwable, Future[Result]] {
+    // todo: dont assume any controller exception is related to auth - it may be an error in the application code
+    case _ => Future.successful(Unauthorized(Json.toJson(ErrorInvalidLisaManager)))
   }
 }
 
