@@ -29,12 +29,14 @@ import play.api.mvc.AnyContentAsJson
 import play.api.test.Helpers._
 import play.api.test._
 import play.mvc.Http.HeaderNames
+import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
 import uk.gov.hmrc.lisaapi.controllers._
-import uk.gov.hmrc.lisaapi.metrics.{LisaMetrics}
+import uk.gov.hmrc.lisaapi.metrics.LisaMetrics
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des.DesFailureResponse
 import uk.gov.hmrc.lisaapi.services.{AuditService, InvestorService}
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class InvestorControllerSpec extends PlaySpec
@@ -64,6 +66,7 @@ class InvestorControllerSpec extends PlaySpec
   override def beforeEach() {
     reset(mockAuditService)
     reset(mockService)
+    when(mockAuthCon.authorise[Option[String]](any(),any())(any())).thenReturn(Future(Some("1234")))
   }
 
   "The Investor Controller" should {
@@ -235,9 +238,10 @@ class InvestorControllerSpec extends PlaySpec
 
   val mockAuditService: AuditService = mock[AuditService]
   val mockService: InvestorService = mock[InvestorService]
-
+  val mockAuthCon :LisaAuthConnector = mock[LisaAuthConnector]
   val SUT = new InvestorController {
     override val service: InvestorService = mockService
     override val auditService: AuditService = mockAuditService
+    override val authConnector = mockAuthCon
   }
 }

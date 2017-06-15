@@ -16,9 +16,10 @@
 
 package uk.gov.hmrc.lisaapi.config
 
+import uk.gov.hmrc.auth.core.{AuthConnector, PlayAuthConnector}
 import uk.gov.hmrc.play.audit.http.config.LoadAuditingConfig
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.play.auth.microservice.connectors.AuthConnector
+
 import uk.gov.hmrc.play.config.{AppName, RunMode, ServicesConfig}
 import uk.gov.hmrc.play.http.hooks.HttpHook
 import uk.gov.hmrc.play.http.ws._
@@ -31,6 +32,9 @@ object MicroserviceAuditConnector extends AuditConnector with RunMode {
   override lazy val auditingConfig = LoadAuditingConfig(s"auditing")
 }
 
-object MicroserviceAuthConnector extends AuthConnector with ServicesConfig {
-  override val authBaseUrl = baseUrl("auth")
+trait LisaAuthConnector extends PlayAuthConnector with ServicesConfig {
+  lazy val serviceUrl = baseUrl("auth")
+  lazy val http = WSHttp
 }
+
+object LisaAuthConnector extends LisaAuthConnector

@@ -23,15 +23,16 @@ import org.scalatest.BeforeAndAfter
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
-import play.api.mvc.{ AnyContentAsJson, Result}
+import play.api.mvc.{AnyContentAsJson, Result}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
+import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
 import uk.gov.hmrc.lisaapi.controllers.LifeEventController
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, LifeEventService}
 import uk.gov.hmrc.play.http.HeaderCarrier
-
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 case object ReportTest extends ReportLifeEventResponse
@@ -57,6 +58,7 @@ class LifeEventControllerSpec extends PlaySpec
 
   before {
     reset(mockAuditService)
+    when(mockAuthCon.authorise[Option[String]](any(),any())(any())).thenReturn(Future(Some("1234")))
   }
 
   "The Life Event Controller" should {
@@ -232,10 +234,11 @@ class LifeEventControllerSpec extends PlaySpec
 
   val mockService: LifeEventService = mock[LifeEventService]
   val mockAuditService: AuditService = mock[AuditService]
+  val mockAuthCon :LisaAuthConnector = mock[LisaAuthConnector]
   val SUT = new LifeEventController {
     override val service: LifeEventService = mockService
     override val auditService: AuditService = mockAuditService
-
+    override val authConnector = mockAuthCon
 
   }
 }

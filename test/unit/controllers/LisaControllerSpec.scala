@@ -31,6 +31,8 @@ import org.mockito.Matchers._
 import org.mockito.Mockito.when
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.times
+import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class LisaControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
@@ -49,6 +51,7 @@ class LisaControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite 
       "return with an Internal Server Error" when {
 
         "an exception is thrown by one of our Json reads" in {
+          when(mockAuthCon.authorise[Option[String]](any(),any())(any())).thenReturn(Future(Some("1234")))
           val jsonString = """{"prop1": 123, "prop2": "123"}"""
           val res = SUT.testJsonValidator().apply(FakeRequest(Helpers.PUT, "/")
             .withHeaders(acceptHeader)
@@ -60,14 +63,15 @@ class LisaControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite 
   }
   val mockService = mock[AccountService]
   val mockErrorConverter = mock[ErrorConverter]
-
+  val mockAuthCon :LisaAuthConnector = mock[LisaAuthConnector]
   val SUT = new AccountController {
     override val service: AccountService = mockService
-
+    override val authConnector = mockAuthCon
     def testJsonValidator(): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
-      withValidJson[TestType] { _ =>
+      withValidJson[TestType] ( _ =>
         Future.successful(PreconditionFailed) // we don't ever want this to return
-      }
+        ,lisaManager = ""
+      )
     }
   }
 
