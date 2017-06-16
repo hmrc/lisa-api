@@ -40,7 +40,7 @@ class BonusPaymentController extends LisaController with LisaConstants {
       val startTime = System.currentTimeMillis()
       LisaMetrics.startMetrics(startTime,MetricsEnum.BONUS_PAYMENT)
 
-      withValidJson[RequestBonusPaymentRequest] { req =>
+      withValidJson[RequestBonusPaymentRequest] ( req =>
         (req.bonuses.claimReason, req.lifeEventId) match {
           case ("Life Event", None) =>
             handleLifeEventNotProvided(lisaManager, accountId, req)
@@ -60,8 +60,8 @@ class BonusPaymentController extends LisaController with LisaConstants {
                   handleError(lisaManager, accountId, req)
 
            }
-        }
-      }
+        }, lisaManager=lisaManager
+      )
   }
 
   private def handleLifeEventNotProvided(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest)(implicit hc: HeaderCarrier) = {

@@ -17,7 +17,7 @@
 package unit.controllers
 
 import org.mockito.Matchers._
-import org.mockito.Matchers.{eq=>MatcherEquals, _}
+import org.mockito.Matchers.{eq => MatcherEquals, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatest._
@@ -27,12 +27,13 @@ import play.api.mvc.{AnyContentAsJson, Result}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
+import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
 import uk.gov.hmrc.lisaapi.controllers.BonusPaymentController
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des.DesFailureResponse
 import uk.gov.hmrc.lisaapi.services.{AuditService, BonusPaymentService}
 import uk.gov.hmrc.play.http.HeaderCarrier
-
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.io.Source
 
@@ -50,11 +51,15 @@ class BonusPaymentControllerSpec extends PlaySpec
   val validBonusPaymentMinimumFieldsJson = Source.fromInputStream(getClass().getResourceAsStream("/json/request.valid.bonus-payment.min.json")).mkString
   implicit val hc:HeaderCarrier = HeaderCarrier()
 
+
   override def beforeEach() {
     reset(mockAuditService)
+    when(mockAuthCon.authorise[Option[String]](any(),any())(any())).thenReturn(Future(Some("1234")))
   }
 
   "The Life Event Controller" should {
+
+
 
     "return with status 201 created" when {
 
@@ -331,8 +336,10 @@ class BonusPaymentControllerSpec extends PlaySpec
 
   val mockService: BonusPaymentService = mock[BonusPaymentService]
   val mockAuditService: AuditService = mock[AuditService]
+  val mockAuthCon :LisaAuthConnector = mock[LisaAuthConnector]
   val SUT = new BonusPaymentController {
     override val service: BonusPaymentService = mockService
     override val auditService: AuditService = mockAuditService
+    override val authConnector = mockAuthCon
   }
 }

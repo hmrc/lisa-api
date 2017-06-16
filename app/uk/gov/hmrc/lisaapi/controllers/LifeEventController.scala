@@ -37,7 +37,7 @@ class LifeEventController extends LisaController {
       val startTime = System.currentTimeMillis()
       LisaMetrics.startMetrics(startTime,MetricsEnum.LIFE_EVENT)
 
-    withValidJson[ReportLifeEventRequest] { req =>
+    withValidJson[ReportLifeEventRequest] ( req =>
       service.reportLifeEvent(lisaManager, accountId, req) map { res =>
             LisaMetrics.startMetrics(startTime,MetricsEnum.LIFE_EVENT)
         Logger.debug("Entering LifeEvent Controller and the response is " + res.toString)
@@ -85,8 +85,8 @@ class LifeEventController extends LisaController {
             InternalServerError(Json.toJson(ErrorInternalServerError))
           }
         }
-      }
-    }
+      }, lisaManager=lisaManager
+    )
   }
 
   private def doAudit(lisaManager: String, accountId: String, req: ReportLifeEventRequest, auditType: String, extraData: Map[String, String] = Map())(implicit hc: HeaderCarrier) = {

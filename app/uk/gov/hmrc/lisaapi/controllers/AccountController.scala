@@ -71,16 +71,19 @@ class AccountController extends LisaController with LisaConstants {
             Future.successful(BadRequest(toJson(ErrorBadRequest(errorConverter.convert(errors)))))
           }
         }
-      )
+      ), lisaManager = lisaManager
     )
   }
 
   def closeLisaAccount(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
-    withValidJson[CloseLisaAccountRequest] { req =>
-    implicit val startTime = System.currentTimeMillis()
-    LisaMetrics.startMetrics(startTime,MetricsEnum.CLOSE_ACCOUNT)
-      processAccountClosure(lisaManager, accountId, req)
-    }
+    withValidJson[CloseLisaAccountRequest]( closeRequest =>
+      {
+            implicit val startTime = System.currentTimeMillis()
+            LisaMetrics.startMetrics(startTime,MetricsEnum.CLOSE_ACCOUNT)
+          processAccountClosure(lisaManager, accountId, closeRequest)
+      }, lisaManager = lisaManager
+
+    )
   }
 
   private def processAccountCreation(lisaManager: String, creationRequest: CreateLisaAccountCreationRequest)(implicit hc: HeaderCarrier,startTime:Long) = {

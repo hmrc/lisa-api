@@ -17,7 +17,7 @@
 package unit.controllers
 
 import org.mockito.Matchers._
-import org.mockito.Matchers.{eq=>matchersEquals,_}
+import org.mockito.Matchers.{eq => matchersEquals, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.{BeforeAndAfterEach, ShouldMatchers, WordSpec}
@@ -27,10 +27,11 @@ import play.api.mvc.{Action, AnyContent, AnyContentAsJson, Result}
 import play.api.test.Helpers._
 import play.api.test._
 import play.mvc.Http.HeaderNames
+import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
 import uk.gov.hmrc.lisaapi.controllers.AccountController
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AccountService, AuditService}
-
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 
@@ -39,6 +40,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
   val lisaManager = "Z019283"
   val accountId = "ABC12345"
+  val mockAuthCon = mock[LisaAuthConnector]
 
   override def beforeEach() {
     reset(mockAuditService)
@@ -93,6 +95,8 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
   val closeAccountJson = """{"accountClosureReason" : "Voided", "closureDate" : "2000-06-23"}"""
 
   "The Create / Transfer Account endpoint" must {
+
+    when(mockAuthCon.authorise[Option[String]](any(),any())(any())).thenReturn(Future(Some("1234")))
 
     "audit an accountCreated event" when {
       "submitted a valid create account request" in {
@@ -563,7 +567,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
   }
 
   "The Close Account endpoint" must {
-
+    when(mockAuthCon.authorise[Option[String]](any(),any())(any())).thenReturn(Future(Some("1234")))
     "Audit an account closed event" when {
 
       "return with status 200 ok" when {
@@ -736,6 +740,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
   val SUT = new AccountController{
     override val service: AccountService = mockService
     override val auditService: AuditService = mockAuditService
+    override val authConnector = mockAuthCon
   }
 
 }
