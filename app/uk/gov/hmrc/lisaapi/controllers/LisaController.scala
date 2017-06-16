@@ -26,10 +26,10 @@ import uk.gov.hmrc.lisaapi.utils.ErrorConverter
 import uk.gov.hmrc.play.config.RunMode
 import uk.gov.hmrc.play.microservice.controller.BaseController
 import uk.gov.hmrc.auth.core.Retrievals._
-import uk.gov.hmrc.auth.core.{AuthorisedFunctions, Enrolment}
+import uk.gov.hmrc.auth.core.{AuthorisedFunctions, Enrolment, InsufficientEnrolments}
 import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
-import scala.concurrent.ExecutionContext.Implicits.global
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 
@@ -79,8 +79,8 @@ trait LisaController extends BaseController with HeaderValidator with RunMode wi
   }
 
   def handleFailure(implicit request: Request[_]) = PartialFunction[Throwable, Future[Result]] {
-    // todo: dont assume any controller exception is related to auth - it may be an error in the application code
-    case _ => Future.successful(Unauthorized(Json.toJson(ErrorInvalidLisaManager)))
+    case ex: InsufficientEnrolments => Future.successful(Unauthorized(Json.toJson(ErrorInvalidLisaManager)))
+    case _ => Future.successful(InternalServerError(toJson(ErrorInternalServerError)))
   }
 }
 
