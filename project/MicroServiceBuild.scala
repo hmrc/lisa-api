@@ -17,7 +17,6 @@ private object AppDependencies {
   private val microserviceBootstrapVersion = "5.14.0"
   private val playHealthVersion = "2.0.0"
   private val logbackJsonLoggerVersion = "3.1.0"
-  private val playUrlBindersVersion = "2.0.0"
   private val playConfigVersion = "3.0.0"
   private val domainVersion = "4.0.0"
   private val hmrcTestVersion = "2.2.0"
@@ -27,14 +26,11 @@ private object AppDependencies {
   private val metricsGraphiteVersion = "3.0.2"
   private val playGraphiteVersion = "3.1.0"
 
-
   val compile = Seq(
-
     ws,
     "uk.gov.hmrc" %% "microservice-bootstrap" % microserviceBootstrapVersion,
     "uk.gov.hmrc" %% "play-auth" % "1.0.0",
     "uk.gov.hmrc" %% "play-health" % playHealthVersion,
-    "uk.gov.hmrc" %% "play-url-binders" % playUrlBindersVersion,
     "uk.gov.hmrc" %% "play-config" % playConfigVersion,
     "uk.gov.hmrc" %% "logback-json-logger" % logbackJsonLoggerVersion,
     "uk.gov.hmrc" %% "domain" % domainVersion,
@@ -67,9 +63,7 @@ private object AppDependencies {
 
   object IntegrationTest {
     def apply() = new TestDependencies {
-
       override lazy val scope: String = "it"
-
 
       override lazy val test = Seq(
         "uk.gov.hmrc" %% "hmrctest" % hmrcTestVersion % scope,
