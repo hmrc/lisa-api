@@ -35,7 +35,7 @@
           "example": "987654320"
         },
         "transferredFromLMRN": {
-          "description" : "The number issued to the previous LISA provider when they registered with HMRC for LISA.",
+          "description" : "The number given to the LISA provider when they applied for approval from HMRC.",
           "$ref": "#/definitions/LISAManagerReferenceNumberType",
           "example": "Z4567"
         },
