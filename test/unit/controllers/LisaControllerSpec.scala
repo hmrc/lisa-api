@@ -57,10 +57,46 @@ class LisaControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite 
             .withHeaders(acceptHeader)
             .withBody(AnyContentAsJson(Json.parse(jsonString))))
 
-          status(res) mustBe (INTERNAL_SERVER_ERROR)
+          status(res) mustBe INTERNAL_SERVER_ERROR
         }
       }
   }
+
+  "The withValidLMRN method" must {
+
+    "return a Bad Request Error" when {
+
+      "an invalid lmrn is passed in" in {
+        val jsonString = """{"prop1": 123, "prop2": "123"}"""
+        val res = SUT.testLMRNValidator("Z").apply(FakeRequest(Helpers.PUT, "/")
+          .withHeaders(acceptHeader)
+          .withBody(AnyContentAsJson(Json.parse(jsonString))))
+
+        status(res) mustBe BAD_REQUEST
+
+        val json = contentAsJson(res)
+
+        (json \ "code").as[String] mustBe "BAD_REQUEST"
+        (json \ "message").as[String] mustBe "lisaManagerReferenceNumber in the URL is in the wrong format"
+      }
+
+    }
+
+    "pass through to the nested method" when {
+
+      "a valid lmrn is passed in" in {
+        val jsonString = """{"prop1": 123, "prop2": "123"}"""
+        val res = SUT.testLMRNValidator("Z123456").apply(FakeRequest(Helpers.PUT, "/")
+          .withHeaders(acceptHeader)
+          .withBody(AnyContentAsJson(Json.parse(jsonString))))
+
+        status(res) mustBe OK
+      }
+
+    }
+
+  }
+
   val mockService = mock[AccountService]
   val mockErrorConverter = mock[ErrorConverter]
   val mockAuthCon :LisaAuthConnector = mock[LisaAuthConnector]
@@ -72,6 +108,10 @@ class LisaControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite 
         Future.successful(PreconditionFailed) // we don't ever want this to return
         ,lisaManager = ""
       )
+    }
+
+    def testLMRNValidator(lmrn: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
+      withValidLMRN(lmrn){Future.successful(Ok)}
     }
   }
 

@@ -80,6 +80,33 @@ class InvestorControllerSpec extends PlaySpec
       status(res) must be (CREATED)
     }
 
+    "return with status 400 bad request" when {
+
+      "given an invalid json request" in {
+        val res = SUT.createLisaInvestor(lisaManager).
+          apply(FakeRequest(Helpers.PUT, "/").
+            withHeaders(acceptHeader).
+            withBody(AnyContentAsJson(Json.parse(invalidInvestorJson))))
+
+        status(res) mustBe BAD_REQUEST
+      }
+
+      "given an invalid lmrn in the url" in {
+        val res = SUT.createLisaInvestor("Z").
+          apply(FakeRequest(Helpers.PUT, "/").
+            withHeaders(acceptHeader).
+            withBody(AnyContentAsJson(Json.parse(investorJson))))
+
+        status(res) mustBe BAD_REQUEST
+
+        val json = contentAsJson(res)
+
+        (json \ "code").as[String] mustBe ErrorBadRequestLmrn.errorCode
+        (json \ "message").as[String] mustBe ErrorBadRequestLmrn.message
+      }
+
+    }
+
     "return with status 406 not acceptable" when {
       "given an invalid accept header" in {
         when(mockService.createInvestor(any(), any())(any())).thenReturn(Future.successful(CreateLisaInvestorSuccessResponse("AB123456")))
@@ -88,7 +115,7 @@ class InvestorControllerSpec extends PlaySpec
       }
     }
 
-    "return with status 403 FORBIDDEN" when {
+    "return with status 403 forbidden" when {
       "given the Investor details cannot be found" in {
         when(mockService.createInvestor(any(), any())(any())).
           thenReturn(Future.successful(CreateLisaInvestorErrorResponse(403,
@@ -99,7 +126,7 @@ class InvestorControllerSpec extends PlaySpec
       }
     }
 
-    "return with status already exists" when {
+    "return with status 409 conflict" when {
       "given the investor already exists on the system" in {
         when(mockService.createInvestor(any(), any())(any())).
           thenReturn(Future.successful(CreateLisaInvestorAlreadyExistsResponse("1234567890")))
@@ -135,6 +162,7 @@ class InvestorControllerSpec extends PlaySpec
         (contentAsJson(res) \ "code").as[String] mustBe ("INTERNAL_SERVER_ERROR")
       }
     }
+
     "convert names to uppercase" when {
       "given standard a-z characters" in {
         when(mockService.createInvestor(any(), any())(any())).thenReturn(Future.successful(CreateLisaInvestorSuccessResponse("AB123456")))
@@ -234,6 +262,7 @@ class InvestorControllerSpec extends PlaySpec
           ))(any())
       }
     }
+
   }
 
   val mockAuditService: AuditService = mock[AuditService]

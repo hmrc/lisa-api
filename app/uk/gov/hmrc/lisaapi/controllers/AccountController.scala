@@ -40,50 +40,53 @@ class AccountController extends LisaController with LisaConstants {
     implicit val startTime = System.currentTimeMillis()
     LisaMetrics.startMetrics(startTime,MetricsEnum.CREATE_OR_TRANSFER_ACCOUNT)
 
-    withValidJson[CreateLisaAccountRequest](
-      (req) => {
-        req match {
-          case createRequest: CreateLisaAccountCreationRequest => {
-            if (hasAccountTransferData(request.body.asJson.get.as[JsObject])) {
-              Future.successful(Forbidden(toJson(ErrorTransferAccountDataProvided)))
+    withValidLMRN(lisaManager) {
+      withValidJson[CreateLisaAccountRequest](
+        (req) => {
+          req match {
+            case createRequest: CreateLisaAccountCreationRequest => {
+              if (hasAccountTransferData(request.body.asJson.get.as[JsObject])) {
+                Future.successful(Forbidden(toJson(ErrorTransferAccountDataProvided)))
+              }
+              else {
+                processAccountCreation(lisaManager, createRequest)
+              }
+            }
+            case transferRequest: CreateLisaAccountTransferRequest => processAccountTransfer(lisaManager, transferRequest)
+          }
+        },
+        Some(
+          (errors) => {
+            Logger.info("The errors are " + errors.toString())
+
+            val transferAccountDataNotProvided = errors.count {
+              case (path: JsPath, errors: Seq[ValidationError]) => {
+                path.toString().contains("/transferAccount") && errors.contains(ValidationError("error.path.missing"))
+              }
+            }
+
+            if (transferAccountDataNotProvided > 0) {
+              Future.successful(Forbidden(toJson(ErrorTransferAccountDataNotProvided)))
             }
             else {
-              processAccountCreation(lisaManager, createRequest)
+              Future.successful(BadRequest(toJson(ErrorBadRequest(errorConverter.convert(errors)))))
             }
           }
-          case transferRequest: CreateLisaAccountTransferRequest => processAccountTransfer(lisaManager, transferRequest)
-        }
-      },
-      Some(
-        (errors) => {
-          Logger.info("The errors are " + errors.toString())
-
-          val transferAccountDataNotProvided = errors.count {
-            case (path: JsPath, errors: Seq[ValidationError]) => {
-              path.toString().contains("/transferAccount") && errors.contains(ValidationError("error.path.missing"))
-            }
-          }
-
-          if (transferAccountDataNotProvided > 0) {
-            Future.successful(Forbidden(toJson(ErrorTransferAccountDataNotProvided)))
-          }
-          else {
-            Future.successful(BadRequest(toJson(ErrorBadRequest(errorConverter.convert(errors)))))
-          }
-        }
-      ), lisaManager = lisaManager
-    )
+        ), lisaManager = lisaManager
+      )
+    }
   }
 
   def closeLisaAccount(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
-    withValidJson[CloseLisaAccountRequest]( closeRequest =>
-      {
+    withValidLMRN(lisaManager) {
+      withValidJson[CloseLisaAccountRequest]( closeRequest =>
+        {
             implicit val startTime = System.currentTimeMillis()
             LisaMetrics.startMetrics(startTime,MetricsEnum.CLOSE_ACCOUNT)
-          processAccountClosure(lisaManager, accountId, closeRequest)
-      }, lisaManager = lisaManager
-
-    )
+            processAccountClosure(lisaManager, accountId, closeRequest)
+        }, lisaManager = lisaManager
+      )
+    }
   }
 
   private def processAccountCreation(lisaManager: String, creationRequest: CreateLisaAccountCreationRequest)(implicit hc: HeaderCarrier,startTime:Long) = {
@@ -159,7 +162,7 @@ class AccountController extends LisaController with LisaConstants {
         }
       }
     } recover {
-      case e:Exception  =>     Logger.error(s"AccontController : An error occurred due to ${e.getMessage} returning internal server error")
+      case e:Exception => Logger.error(s"AccontController : An error occurred due to ${e.getMessage} returning internal server error")
         InternalServerError(Json.toJson(ErrorInternalServerError))
     }
   }

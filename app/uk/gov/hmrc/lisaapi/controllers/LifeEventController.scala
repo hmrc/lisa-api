@@ -37,56 +37,59 @@ class LifeEventController extends LisaController {
       val startTime = System.currentTimeMillis()
       LisaMetrics.startMetrics(startTime,MetricsEnum.LIFE_EVENT)
 
-    withValidJson[ReportLifeEventRequest] ( req =>
-      service.reportLifeEvent(lisaManager, accountId, req) map { res =>
-            LisaMetrics.startMetrics(startTime,MetricsEnum.LIFE_EVENT)
-        Logger.debug("Entering LifeEvent Controller and the response is " + res.toString)
-        res match {
-          case ReportLifeEventSuccessResponse(lifeEventId) => {
-            Logger.debug("Matched Valid Response ")
+      withValidLMRN(lisaManager) {
+        withValidJson[ReportLifeEventRequest](req =>
+          service.reportLifeEvent(lisaManager, accountId, req) map { res =>
+            LisaMetrics.startMetrics(startTime, MetricsEnum.LIFE_EVENT)
+            Logger.debug("Entering LifeEvent Controller and the response is " + res.toString)
+            res match {
+              case ReportLifeEventSuccessResponse(lifeEventId) => {
+                Logger.debug("Matched Valid Response ")
 
-            doAudit(lisaManager, accountId, req, "lifeEventReported")
+                doAudit(lisaManager, accountId, req, "lifeEventReported")
 
-            val data = ApiResponseData(message = "Life Event Created", lifeEventId = Some(lifeEventId))
+                val data = ApiResponseData(message = "Life Event Created", lifeEventId = Some(lifeEventId))
 
-            Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = 201)))
-          }
-          case ReportLifeEventInappropriateResponse => {
-            Logger.debug("Matched Inappropriate")
+                Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = 201)))
+              }
+              case ReportLifeEventInappropriateResponse => {
+                Logger.debug("Matched Inappropriate")
 
-            doAudit(lisaManager, accountId, req, "lifeEventNotReported", Map("reasonNotReported" -> ErrorLifeEventInappropriate.errorCode))
+                doAudit(lisaManager, accountId, req, "lifeEventNotReported", Map("reasonNotReported" -> ErrorLifeEventInappropriate.errorCode))
 
-            Forbidden(Json.toJson(ErrorLifeEventInappropriate))
-          }
-          case ReportLifeEventAccountClosedResponse => {Logger.error(("Account Closed or VOID"))
-            Forbidden(Json.toJson(ErrorAccountAlreadyClosedOrVoid))
+                Forbidden(Json.toJson(ErrorLifeEventInappropriate))
+              }
+              case ReportLifeEventAccountClosedResponse => {
+                Logger.error(("Account Closed or VOID"))
+                Forbidden(Json.toJson(ErrorAccountAlreadyClosedOrVoid))
+              }
+              case ReportLifeEventAlreadyExistsResponse => {
+                Logger.debug("Matched Already Exists")
+
+                doAudit(lisaManager, accountId, req, "lifeEventNotReported", Map("reasonNotReported" -> ErrorLifeEventAlreadyExists.errorCode))
+
+                Conflict(Json.toJson(ErrorLifeEventAlreadyExists))
+              }
+              case ReportLifeEventAccountNotFoundResponse => {
+                Logger.debug("Matched Not Found")
+
+                doAudit(lisaManager, accountId, req, "lifeEventNotReported", Map("reasonNotReported" -> ErrorAccountNotFound.errorCode))
+
+                NotFound(Json.toJson(ErrorAccountNotFound))
+              }
+              case _ => {
+                Logger.debug("Matched Error")
+
+                doAudit(lisaManager, accountId, req, "lifeEventNotReported", Map("reasonNotReported" -> ErrorInternalServerError.errorCode))
+
+                Logger.error(s"Life Event Not reported : DES unknown case , returning internal server error")
+
+                InternalServerError(Json.toJson(ErrorInternalServerError))
+              }
             }
-          case ReportLifeEventAlreadyExistsResponse => {
-            Logger.debug("Matched Already Exists")
-
-            doAudit(lisaManager, accountId, req, "lifeEventNotReported", Map("reasonNotReported" -> ErrorLifeEventAlreadyExists.errorCode))
-
-            Conflict(Json.toJson(ErrorLifeEventAlreadyExists))
-          }
-          case ReportLifeEventAccountNotFoundResponse => {
-            Logger.debug("Matched Not Found")
-
-            doAudit(lisaManager, accountId, req, "lifeEventNotReported", Map("reasonNotReported" -> ErrorAccountNotFound.errorCode))
-
-            NotFound(Json.toJson(ErrorAccountNotFound))
-          }
-          case _ => {
-            Logger.debug("Matched Error")
-
-            doAudit(lisaManager, accountId, req, "lifeEventNotReported", Map("reasonNotReported" -> ErrorInternalServerError.errorCode))
-
-            Logger.error(s"Life Event Not reported : DES unknown case , returning internal server error")
-
-            InternalServerError(Json.toJson(ErrorInternalServerError))
-          }
-        }
-      }, lisaManager=lisaManager
-    )
+          }, lisaManager = lisaManager
+        )
+      }
   }
 
   private def doAudit(lisaManager: String, accountId: String, req: ReportLifeEventRequest, auditType: String, extraData: Map[String, String] = Map())(implicit hc: HeaderCarrier) = {

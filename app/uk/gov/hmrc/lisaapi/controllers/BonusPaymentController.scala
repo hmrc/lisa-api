@@ -40,28 +40,30 @@ class BonusPaymentController extends LisaController with LisaConstants {
       val startTime = System.currentTimeMillis()
       LisaMetrics.startMetrics(startTime,MetricsEnum.BONUS_PAYMENT)
 
-      withValidJson[RequestBonusPaymentRequest] ( req =>
-        (req.bonuses.claimReason, req.lifeEventId) match {
-          case ("Life Event", None) =>
-            handleLifeEventNotProvided(lisaManager, accountId, req)
-          case _ =>
-            service.requestBonusPayment(lisaManager, accountId, req) map { res =>
-              Logger.debug("Entering Bonus Payment Controller and the response is " + res.toString)
+      withValidLMRN(lisaManager) {
+        withValidJson[RequestBonusPaymentRequest](req =>
+          (req.bonuses.claimReason, req.lifeEventId) match {
+            case ("Life Event", None) =>
+              handleLifeEventNotProvided(lisaManager, accountId, req)
+            case _ =>
+              service.requestBonusPayment(lisaManager, accountId, req) map { res =>
+                Logger.debug("Entering Bonus Payment Controller and the response is " + res.toString)
 
-              LisaMetrics.incrementMetrics(System.currentTimeMillis(),MetricsEnum.BONUS_PAYMENT)
-              res match {
-                case RequestBonusPaymentSuccessResponse(transactionID) =>
-                  handleSuccess(lisaManager, accountId, req, transactionID)
-                case errorResponse: RequestBonusPaymentErrorResponse =>
-                  handleFailure(lisaManager, accountId, req, errorResponse)
-              }
-            } recover {
-                case e:Exception  =>  Logger.error(s"requestBonusPayment : An error occurred due to ${e.getMessage} returning internal server error")
+                LisaMetrics.incrementMetrics(System.currentTimeMillis(), MetricsEnum.BONUS_PAYMENT)
+                res match {
+                  case RequestBonusPaymentSuccessResponse(transactionID) =>
+                    handleSuccess(lisaManager, accountId, req, transactionID)
+                  case errorResponse: RequestBonusPaymentErrorResponse =>
+                    handleFailure(lisaManager, accountId, req, errorResponse)
+                }
+              } recover {
+                case e: Exception => Logger.error(s"requestBonusPayment : An error occurred due to ${e.getMessage} returning internal server error")
                   handleError(lisaManager, accountId, req)
 
-           }
-        }, lisaManager=lisaManager
-      )
+              }
+          }, lisaManager = lisaManager
+        )
+      }
   }
 
   private def handleLifeEventNotProvided(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest)(implicit hc: HeaderCarrier) = {

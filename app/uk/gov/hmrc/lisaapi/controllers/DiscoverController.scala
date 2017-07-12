@@ -26,20 +26,22 @@ class DiscoverController extends LisaController {
 
 
   def discover(lisaManagerReferenceNumber: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
-    val result = s"""{
-      "lisaManagerReferenceNumber" : "${lisaManagerReferenceNumber}",
-      "_links" :
-        {
-          "self" : {"href" : "/lifetime-isa/manager/${lisaManagerReferenceNumber}"},
-          "investors" : {"href" : "/lifetime-isa/manager/${lisaManagerReferenceNumber}/investors"},
-          "create or transfer Account" : {"href" : "/lifetime-isa/manager/${lisaManagerReferenceNumber}/accounts"},
-          "close Account" : {"href" : "/lifetime-isa/manager/${lisaManagerReferenceNumber}/accounts/{accountId}"},
-          "life events" : {"href" : "/lifetime-isa/manager/${lisaManagerReferenceNumber}/accounts/{accountId}/events"},
-          "bonus payments" : {"href" : "/lifetime-isa/manager/${lisaManagerReferenceNumber}/accounts/{accountId}/transactions"}
-        }
-    }"""
+    withValidLMRN(lisaManagerReferenceNumber) {
+      val result = s"""{
+        "lisaManagerReferenceNumber" : "${lisaManagerReferenceNumber}",
+        "_links" :
+          {
+            "self" : {"href" : "/lifetime-isa/manager/${lisaManagerReferenceNumber}"},
+            "investors" : {"href" : "/lifetime-isa/manager/${lisaManagerReferenceNumber}/investors"},
+            "create or transfer Account" : {"href" : "/lifetime-isa/manager/${lisaManagerReferenceNumber}/accounts"},
+            "close Account" : {"href" : "/lifetime-isa/manager/${lisaManagerReferenceNumber}/accounts/{accountId}"},
+            "life events" : {"href" : "/lifetime-isa/manager/${lisaManagerReferenceNumber}/accounts/{accountId}/events"},
+            "bonus payments" : {"href" : "/lifetime-isa/manager/${lisaManagerReferenceNumber}/accounts/{accountId}/transactions"}
+          }
+      }"""
 
-    Future.successful(Ok(Json.parse(result)))
+      Future.successful(Ok(Json.parse(result)))
+    }
   }
 
 }
