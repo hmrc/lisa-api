@@ -28,10 +28,11 @@ import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
-import uk.gov.hmrc.lisaapi.controllers.LifeEventController
+import uk.gov.hmrc.lisaapi.controllers.{ErrorBadRequestLmrn, LifeEventController}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, LifeEventService}
 import uk.gov.hmrc.play.http.HeaderCarrier
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -81,6 +82,7 @@ class LifeEventControllerSpec extends PlaySpec
         }
       }
     }
+
     "audit lifeEventNotReported" when {
       "the request results in a ReportLifeEventInappropriateResponse" in {
         when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventInappropriateResponse))
@@ -166,19 +168,27 @@ class LifeEventControllerSpec extends PlaySpec
       "given an invalid event type" in {
         val invalidJson = reportLifeEventJson.replace("LISA Investor Terminal Ill Health", "Invalid Event Type")
 
-        doReportLifeEventRequest(invalidJson) {
-          res =>
+        doReportLifeEventRequest(invalidJson) { res =>
           status(res) mustBe (BAD_REQUEST)
-          (contentAsJson(res) \ "code").as[String] mustBe ("BAD_REQUEST")
+          (contentAsJson(res) \ "code").as[String] mustBe "BAD_REQUEST"
         }
       }
       "given a future eventDate" in {
         val invalidJson = reportLifeEventJson.replace("2017-01-01", DateTime.now.plusDays(1).toString("yyyy-MM-dd"))
 
-        doReportLifeEventRequest(invalidJson) {
-          res =>
-            status(res) mustBe (BAD_REQUEST)
-            (contentAsJson(res) \ "code").as[String] mustBe ("BAD_REQUEST")
+        doReportLifeEventRequest(invalidJson) { res =>
+          status(res) mustBe (BAD_REQUEST)
+          (contentAsJson(res) \ "code").as[String] mustBe "BAD_REQUEST"
+        }
+      }
+      "given an invalid lmrn in the url" in {
+        doReportLifeEventRequest(reportLifeEventJson, "Z111") { res =>
+          status(res) mustBe BAD_REQUEST
+
+          val json = contentAsJson(res)
+
+          (json \ "code").as[String] mustBe ErrorBadRequestLmrn.errorCode
+          (json \ "message").as[String] mustBe ErrorBadRequestLmrn.message
         }
       }
     }
@@ -224,9 +234,9 @@ class LifeEventControllerSpec extends PlaySpec
 
   }
 
-  def doReportLifeEventRequest(jsonString: String)(callback: (Future[Result]) =>  Unit): Unit = {
+  def doReportLifeEventRequest(jsonString: String, lmrn: String = lisaManager)(callback: (Future[Result]) =>  Unit): Unit = {
     val req = FakeRequest(Helpers.PUT, "/")
-    val res = SUT.reportLisaLifeEvent(lisaManager, accountId).apply(req.withHeaders(acceptHeader).
+    val res = SUT.reportLisaLifeEvent(lmrn, accountId).apply(req.withHeaders(acceptHeader).
       withBody(AnyContentAsJson(Json.parse(jsonString))))
 
     callback(res)

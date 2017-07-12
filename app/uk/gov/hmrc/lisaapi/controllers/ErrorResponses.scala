@@ -46,6 +46,8 @@ case class ErrorValidation(
 
 case class ErrorBadRequest(errs: List[ErrorValidation]) extends ErrorResponseWithErrors(400, "BAD_REQUEST", "Bad Request", errors = Some(errs))
 
+case object ErrorBadRequestLmrn extends ErrorResponse(400, "BAD_REQUEST", "lisaManagerReferenceNumber in the URL is in the wrong format")
+
 case object ErrorNotImplemented extends ErrorResponse(501, "NOT_IMPLEMENTED", "Not implemented")
 
 case object ErrorUnauthorized extends ErrorResponse(401, "UNAUTHORIZED", "Bearer token is missing or not authorized")

@@ -23,7 +23,7 @@ import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.test.Helpers._
 import play.api.test._
 import play.mvc.Http.HeaderNames
-import uk.gov.hmrc.lisaapi.controllers.DiscoverController
+import uk.gov.hmrc.lisaapi.controllers.{DiscoverController, ErrorBadRequestLmrn}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.AuditService
 
@@ -48,6 +48,21 @@ class DiscoverControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSu
 
       status(res) mustBe OK
       (contentAsJson(res) \ "_links" \ "life events" \ "href").as[String] mustBe "/lifetime-isa/manager/Z111111/accounts/{accountId}/events"
+    }
+
+    "return with status 400 bad request" when {
+
+      "given an invalid lmrn in the url" in {
+        val res = SUT.discover("Z0192831").apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
+
+        status(res) mustBe BAD_REQUEST
+
+        val json = contentAsJson(res)
+
+        (json \ "code").as[String] mustBe ErrorBadRequestLmrn.errorCode
+        (json \ "message").as[String] mustBe ErrorBadRequestLmrn.message
+      }
+
     }
 
   }

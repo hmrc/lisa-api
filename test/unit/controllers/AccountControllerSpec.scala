@@ -16,21 +16,21 @@
 
 package unit.controllers
 
-import org.mockito.Matchers._
 import org.mockito.Matchers.{eq => matchersEquals, _}
 import org.mockito.Mockito._
+import org.scalatest.BeforeAndAfterEach
 import org.scalatest.mock.MockitoSugar
-import org.scalatest.{BeforeAndAfterEach, ShouldMatchers, WordSpec}
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent, AnyContentAsJson, Result}
+import play.api.mvc.{AnyContentAsJson, Result}
 import play.api.test.Helpers._
 import play.api.test._
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
-import uk.gov.hmrc.lisaapi.controllers.AccountController
+import uk.gov.hmrc.lisaapi.controllers._
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AccountService, AuditService}
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -388,6 +388,16 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
           (contentAsJson(res) \ "code").as[String] mustBe ("BAD_REQUEST")
         }
       }
+      "invalid lmrn is sent" in {
+        when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountSuccessResponse("AB123456")))
+
+        doCreateOrTransferRequest(createAccountJson, "ZZ1234") { res =>
+          status(res) mustBe (BAD_REQUEST)
+          val json = contentAsJson(res)
+          (json \ "code").as[String] mustBe ErrorBadRequestLmrn.errorCode
+          (json \ "message").as[String] mustBe ErrorBadRequestLmrn.message
+        }
+      }
     }
 
     "return with status 403 forbidden and a code of INVESTOR_NOT_FOUND" when {
@@ -567,8 +577,10 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
   }
 
   "The Close Account endpoint" must {
+
     when(mockAuthCon.authorise[Option[String]](any(),any())(any())).thenReturn(Future(Some("1234")))
-    "Audit an account closed event" when {
+
+    "audit an account closed event" when {
 
       "return with status 200 ok" when {
         "submitted a valid close account request" in {
@@ -589,7 +601,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
       }
     }
 
-    "Audit an accountNotClosed event" when {
+    "audit an accountNotClosed event" when {
       "the data service returns a CloseLisaAccountAlreadyClosedResponse" in {
         when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountAlreadyClosedResponse))
 
@@ -645,6 +657,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
         }
       }
     }
+
     "return with status 200 ok" when {
       "submitted a valid close account request" in {
         when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountSuccessResponse("AB123456")))
@@ -685,6 +698,14 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
           status(res) mustBe (BAD_REQUEST)
         }
       }
+      "submitted an invalid lmrn" in {
+        doCloseRequest(closeAccountJson, "Z12345") { res =>
+          status(res) mustBe (BAD_REQUEST)
+          val json = contentAsJson(res)
+          (json \ "code").as[String] mustBe ErrorBadRequestLmrn.errorCode
+          (json \ "message").as[String] mustBe ErrorBadRequestLmrn.message
+        }
+      }
     }
 
     "return with status 500 internal server error" when {
@@ -707,8 +728,8 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
   }
 
-  def doCreateOrTransferRequest(jsonString: String)(callback: (Future[Result]) => Unit) {
-    val res = SUT.createOrTransferLisaAccount(lisaManager).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
+  def doCreateOrTransferRequest(jsonString: String, lmrn: String = lisaManager)(callback: (Future[Result]) => Unit) {
+    val res = SUT.createOrTransferLisaAccount(lmrn).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
       withBody(AnyContentAsJson(Json.parse(jsonString))))
 
     callback(res)
@@ -721,8 +742,8 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
     callback(res)
   }
 
-  def doCloseRequest(jsonString: String)(callback: (Future[Result]) => Unit) {
-    val res = SUT.closeLisaAccount(lisaManager, accountId).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
+  def doCloseRequest(jsonString: String, lmrn: String = lisaManager)(callback: (Future[Result]) => Unit) {
+    val res = SUT.closeLisaAccount(lmrn, accountId).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
       withBody(AnyContentAsJson(Json.parse(jsonString))))
 
     callback(res)

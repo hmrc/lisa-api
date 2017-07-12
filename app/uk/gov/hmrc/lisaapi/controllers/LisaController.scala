@@ -38,6 +38,15 @@ trait LisaController extends BaseController with HeaderValidator with RunMode wi
   val authConnector: LisaAuthConnector = LisaAuthConnector
   lazy val errorConverter: ErrorConverter = ErrorConverter
 
+  protected def withValidLMRN(lisaManager: String)(success: Future[Result])(implicit request: Request[AnyContent]): Future[Result] = {
+    if (lisaManager.matches("^Z([0-9]{4}|[0-9]{6})$")) {
+      success
+    }
+    else {
+      Future.successful(BadRequest(toJson(ErrorBadRequestLmrn)))
+    }
+  }
+
   protected def withValidJson[T](
                                   success: (T) => Future[Result],
                                   invalid: Option[(Seq[(JsPath, Seq[ValidationError])]) => Future[Result]] = None,

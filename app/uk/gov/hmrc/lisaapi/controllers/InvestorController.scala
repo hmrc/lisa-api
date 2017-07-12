@@ -39,26 +39,28 @@ class InvestorController extends LisaController with LisaConstants  {
       LisaMetrics.startMetrics(startTime,MetricsEnum.LISA_INVESTOR)
       Logger.debug(s"LISA HTTP Request: ${request.uri} and method: ${request.method}")
 
-      withValidJson[CreateLisaInvestorRequest] (
-        createRequest => {
-          service.createInvestor(lisaManager, createRequest).map { res =>
-            LisaMetrics.incrementMetrics(startTime,MetricsEnum.LISA_INVESTOR)
-            res match {
-              case CreateLisaInvestorSuccessResponse(investorId) =>
-                handleCreatedResponse(lisaManager, createRequest, investorId)
-              case CreateLisaInvestorAlreadyExistsResponse(investorId) =>
-                handleExistsResponse(lisaManager, createRequest, investorId)
-              case errorResponse: CreateLisaInvestorErrorResponse =>
-                handleFailureResponse(lisaManager, createRequest, errorResponse)
+      withValidLMRN(lisaManager) {
+        withValidJson[CreateLisaInvestorRequest](
+          createRequest => {
+            service.createInvestor(lisaManager, createRequest).map { res =>
+              LisaMetrics.incrementMetrics(startTime, MetricsEnum.LISA_INVESTOR)
+              res match {
+                case CreateLisaInvestorSuccessResponse(investorId) =>
+                  handleCreatedResponse(lisaManager, createRequest, investorId)
+                case CreateLisaInvestorAlreadyExistsResponse(investorId) =>
+                  handleExistsResponse(lisaManager, createRequest, investorId)
+                case errorResponse: CreateLisaInvestorErrorResponse =>
+                  handleFailureResponse(lisaManager, createRequest, errorResponse)
+              }
+            } recover {
+              case e: Exception =>
+                LisaMetrics.incrementMetrics(startTime, MetricsEnum.LISA_INVESTOR)
+                Logger.error(s"createLisaInvestor: An error occurred due to ${e.getMessage} returning internal server error")
+                handleError(lisaManager, createRequest)
             }
-          } recover {
-            case e:Exception  =>
-                                  LisaMetrics.incrementMetrics(startTime,MetricsEnum.LISA_INVESTOR)
-            Logger.error(s"createLisaInvestor: An error occurred due to ${e.getMessage} returning internal server error")
-            handleError(lisaManager, createRequest)
-          }
-        }, lisaManager=lisaManager
-      )
+          }, lisaManager = lisaManager
+        )
+      }
   }
 
   private def handleCreatedResponse(lisaManager: String, createRequest: CreateLisaInvestorRequest, investorId: String)(implicit hc: HeaderCarrier) = {
