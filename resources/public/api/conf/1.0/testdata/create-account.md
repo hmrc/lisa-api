@@ -62,6 +62,25 @@
             </td>
         </tr>
         <tr>
+            <td><p>Request with a valid payload and an invalid LISA Manager Reference Number</p><p class ="code--block">lisaManagerReferenceNumber: A123456</p></td>
+            <td>
+                <p class ="code--block"> {<br>
+                                     	    "investorId": "9876543210",<br>
+                                     	    "creationReason": "New",<br>
+                                     	    "accountId": "1234567890",<br>
+                                     	    "firstSubscriptionDate": "2011-03-23"<br>
+                                        }
+                </p>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
+                <p class ="code--block"> {<br>
+                    "code": "BAD_REQUEST",<br>
+                    "message": "lisaManagerReferenceNumber in the URL is in the wrong format"<br>
+                  }
+                </p>
+            </td>
+        </tr>
+        <tr>
             <td><p>Request containing invalid and/or missing data</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
             <td>
                 <p class ="code--block"> {<br>

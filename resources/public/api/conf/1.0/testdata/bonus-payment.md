@@ -49,6 +49,40 @@
             </td>
         </tr>
         <tr>
+            <td><p>Request with a valid payload and AccountID, but an invalid LISA Manager Reference Number</p><p class ="code--block">lisaManagerReferenceNumber: 123456<br>accountId: 1234567890</p></td>
+            <td>
+                <p class ="code--block"> {<br>
+                                               "lifeEventId": "1234567891",<br>
+                                               "periodStartDate": "2017-04-06",<br>
+                                               "periodEndDate": "2017-05-05",<br>
+                                               "htbTransfer": {<br>
+                                                  "htbTransferInForPeriod": 0.00,<br>
+                                                  "htbTransferTotalYTD": 0.00<br>
+                                               },<br>
+                                               "inboundPayments": {<br>
+                                                 "newSubsForPeriod": 4000.00,<br>
+                                                 "newSubsYTD": 4000.00,<br>
+                                                 "totalSubsForPeriod": 40000.00,<br>
+                                                 "totalSubsYTD": 40000.00<br>
+                                               },<br>
+                                               "bonuses": {<br>
+                                                 "bonusPaidYTD": 0.0,<br>
+                                                 "bonusDueForPeriod": 10000.00,<br>
+                                                 "totalBonusDueYTD": 10000.00,<br>
+                                                 "claimReason": "Life Event"<br>
+                                               }<br>
+                                             }
+                </p>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
+                <p class ="code--block"> {<br>
+                    "code": "BAD_REQUEST",<br>
+                    "message": "lisaManagerReferenceNumber in the URL is in the wrong format"<br>
+                  }
+                </p>
+            </td>
+        </tr>
+        <tr>
         	 <td><p>Request containing invalid and/or missing data</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br>accountId: 1234567890</p></td>
 	        <td>
 	            <p class ="code--block">{<br>

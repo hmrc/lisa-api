@@ -32,6 +32,23 @@
             </td>
         </tr>
         <tr>
+            <td><p>Request with a valid payload and AccountID, but an invalid LISA Manager Reference Number</p><p class ="code--block">lisaManagerReferenceNumber: 123456<br>accountId: 1234567890</p></td>
+            <td>
+                <p class ="code--block"> {<br>
+                                     	  "accountClosureReason":"All funds withdrawn",<br>
+                                     	  "closureDate": "2017-01-03"<br>
+                                        }
+                </p>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
+                <p class ="code--block"> {<br>
+                    "code": "BAD_REQUEST",<br>
+                    "message": "lisaManagerReferenceNumber in the URL is in the wrong format"<br>
+                  }
+                </p>
+            </td>
+        </tr>
+        <tr>
             <td><p>Request containing invalid and/or missing data</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br>accountId: 1234567890</p></td>
             <td>
                 <p class ="code--block"> {<br>
