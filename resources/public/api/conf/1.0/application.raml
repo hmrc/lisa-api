@@ -49,12 +49,25 @@ types:
                   description: This allows LISA provider to discover all the available endpoints.
                   (annotations.scope): "read:lisa"
                   securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
+                  (annotations.sandboxData): !include testdata/discover-endpoints.md
                   responses:
                     200:
                       body:
                         application/json:
                           type: !include schemas/LISAManager.get.schema.json
                           example: !include examples/LISAManager.get.json
+                    400:
+                      body:
+                        application/json:
+                          type: !include schemas/ErrorCodes.schema.json
+                          examples:
+                            InvalidLmrn:
+                              description: Invalid Lisa Manager Reference Number
+                              value: |
+                                {
+                                  "code" : "BAD_REQUEST",
+                                  "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
+                                }
                     404:
                       body:
                         application/json:
@@ -123,6 +136,13 @@ types:
                             {
                               "code" : "BAD_REQUEST",
                               "message" : "Bad Request"
+                            }
+                        InvalidLmrn:
+                          description: Invalid Lisa Manager Reference Number
+                          value: |
+                            {
+                              "code" : "BAD_REQUEST",
+                              "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
                             }
                 401:
                   body:
@@ -227,6 +247,13 @@ types:
                         {
                           "code" : "BAD_REQUEST",
                           "message" : "Bad Request"
+                        }
+                    InvalidLmrn:
+                      description: Invalid Lisa Manager Reference Number
+                      value: |
+                        {
+                          "code" : "BAD_REQUEST",
+                          "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
                         }
             401:
               body:
@@ -382,6 +409,13 @@ types:
                                       "code" : "BAD_REQUEST",
                                       "message" : "Bad Request"
                                     }
+                                InvalidLmrn:
+                                  description: Invalid Lisa Manager Reference Number
+                                  value: |
+                                    {
+                                      "code" : "BAD_REQUEST",
+                                      "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
+                                    }
                         401:
                           body:
                             application/json:
@@ -482,6 +516,13 @@ types:
                                     {
                                       "code" : "BAD_REQUEST",
                                       "message" : "Bad Request"
+                                    }
+                                InvalidLmrn:
+                                  description: Invalid Lisa Manager Reference Number
+                                  value: |
+                                    {
+                                      "code" : "BAD_REQUEST",
+                                      "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
                                     }
                         401:
                           body:
@@ -603,6 +644,13 @@ types:
                                     {
                                       "code" : "BAD_REQUEST",
                                       "message" : "Bad Request"
+                                    }
+                                InvalidLmrn:
+                                  description: Invalid Lisa Manager Reference Number
+                                  value: |
+                                    {
+                                      "code" : "BAD_REQUEST",
+                                      "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
                                     }
                         401:
                           body:
