@@ -27,7 +27,7 @@ trait MicroService {
   lazy val scoverageSettings = {
     import ScoverageSbtPlugin._
     Seq(
-      ScoverageKeys.coverageExcludedPackages := "<empty>;testOnlyDoNotUseInAppConf.*;uk.gov.hmrc.lisaapi.views.txt;uk.gov.hmrc;prod.*;definition;uk.gov.hmrc.lisaapi.config.*;uk.gov.hmrc.lisaapi.models.*;uk.gov.hmrc.lisaapi.metrics.*;dev.*",
+      ScoverageKeys.coverageExcludedPackages := "<empty>;testOnlyDoNotUseInAppConf.*;release2.routes;uk.gov.hmrc.lisaapi.views.txt;uk.gov.hmrc;prod.*;definition;uk.gov.hmrc.lisaapi.config.*;uk.gov.hmrc.lisaapi.models.*;uk.gov.hmrc.lisaapi.metrics.*;dev.*",
       ScoverageKeys.coverageMinimum := 70,
       ScoverageKeys.coverageFailOnMinimum := false,
       ScoverageKeys.coverageHighlighting := true,
