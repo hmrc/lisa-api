@@ -16,11 +16,14 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
+import java.io
+
 import play.api.Logger
-import play.api.libs.json.Json
+import play.api.data.validation.ValidationError
+import play.api.libs.json.{JsError, JsPath, Json}
 import play.api.mvc.{Action, AnyContent, Result}
 import uk.gov.hmrc.lisaapi.LisaConstants
-import uk.gov.hmrc.lisaapi.metrics.{MetricsEnum, LisaMetrics}
+import uk.gov.hmrc.lisaapi.metrics.{LisaMetrics, MetricsEnum}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, BonusPaymentService, LifeEventService}
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -64,6 +67,29 @@ class BonusPaymentController extends LisaController with LisaConstants {
           }, lisaManager = lisaManager
         )
       }
+  }
+
+  def newSubsOrTransferMustHaveValue(dataAndErrors: (RequestBonusPaymentRequest, Option[(Seq[(JsPath, Seq[ValidationError])])])):
+    (RequestBonusPaymentRequest, Option[Seq[(io.Serializable, Seq[ValidationError])]]) = {
+
+    val data: RequestBonusPaymentRequest = dataAndErrors._1
+    val errors: Option[Seq[(JsPath, Seq[ValidationError])]] = dataAndErrors._2
+    val newSubsForPeriodHasValue: Boolean = !data.inboundPayments.newSubsForPeriod.isEmpty && data.inboundPayments.newSubsForPeriod.get > 0
+    val htbTransferHasValue: Boolean = !data.htbTransfer.isEmpty && data.htbTransfer.get.htbTransferInForPeriod > 0
+
+    if (!newSubsForPeriodHasValue && !htbTransferHasValue) {
+      val newSubsError = ("/inboundPayments/newSubsForPeriod",
+        Seq(ValidationError("newSubsForPeriod and htbTransferForPeriod cannot both be zero")))
+
+      val htbTransferError = ("/htbTransfer/htbTransferInForPeriod",
+        Seq(ValidationError("newSubsForPeriod and htbTransferForPeriod cannot both be zero")))
+
+      (data, Some(Seq(newSubsError, htbTransferError)))
+    }
+    else {
+      (data, errors)
+    }
+
   }
 
   private def handleLifeEventNotProvided(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest)(implicit hc: HeaderCarrier) = {
