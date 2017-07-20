@@ -70,27 +70,27 @@ class BonusPaymentController extends LisaController with LisaConstants {
   }
 
   //scalastyle:off cyclomatic.complexity
-  def newSubsOrTransferMustHaveValue(data: RequestBonusPaymentRequest, errors: Option[(Seq[(JsPath, Seq[ValidationError])])]):
+  def validateNewSubsOrHtbTransferGtZero(data: RequestBonusPaymentRequest, errors: Option[(Seq[(JsPath, Seq[ValidationError])])]):
     (RequestBonusPaymentRequest, Option[Seq[(JsPath, Seq[ValidationError])]]) = {
 
     val subsExists = data.inboundPayments.newSubsForPeriod.isDefined
     val htbExists = data.htbTransfer.isDefined
-    val eitherExists = subsExists || htbExists
 
     val subsGtZero = subsExists && data.inboundPayments.newSubsForPeriod.get > 0
     val htbGtZero = htbExists && data.htbTransfer.get.htbTransferInForPeriod > 0
     val eitherGtZero = subsGtZero || htbGtZero
-
-    val showSubError = !eitherExists || (subsExists && !eitherGtZero)
-    val showHtbError = !eitherExists || (htbExists && !eitherGtZero)
-
-    val errorMessage = "newSubsForPeriod and htbTransferForPeriod cannot both be zero"
 
     if (eitherGtZero) {
       (data, errors)
     }
     else {
       val newErrs = new ListBuffer[(JsPath, Seq[ValidationError])]()
+
+      val eitherExists = subsExists || htbExists
+      val showSubError = !eitherExists || (subsExists && !eitherGtZero)
+      val showHtbError = !eitherExists || (htbExists && !eitherGtZero)
+
+      val errorMessage = "newSubsForPeriod and htbTransferForPeriod cannot both be zero"
 
       if (showSubError) newErrs += ((JsPath \ "inboundPayments" \ "newSubsForPeriod", Seq(ValidationError(errorMessage))))
       if (showHtbError) newErrs += ((JsPath \ "htbTransfer" \ "htbTransferInForPeriod", Seq(ValidationError(errorMessage))))

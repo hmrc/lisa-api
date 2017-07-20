@@ -337,7 +337,7 @@ class BonusPaymentControllerSpec extends PlaySpec
 
         val request = validBonusPayment
 
-        SUT.newSubsOrTransferMustHaveValue(request, None) mustBe (request, None)
+        SUT.validateNewSubsOrHtbTransferGtZero(request, None) mustBe (request, None)
 
       }
 
@@ -351,7 +351,7 @@ class BonusPaymentControllerSpec extends PlaySpec
         val htb = validBonusPayment.htbTransfer.get.copy(htbTransferInForPeriod = 0)
         val request = validBonusPayment.copy(inboundPayments = ibp, htbTransfer = Some(htb))
 
-        val res = SUT.newSubsOrTransferMustHaveValue(request, None)
+        val res = SUT.validateNewSubsOrHtbTransferGtZero(request, None)
         val data = res._1
         val errors = res._2.get
 
@@ -367,7 +367,7 @@ class BonusPaymentControllerSpec extends PlaySpec
         val ibp = validBonusPayment.inboundPayments.copy(newSubsForPeriod = None)
         val request = validBonusPayment.copy(inboundPayments = ibp, htbTransfer = None)
 
-        val res = SUT.newSubsOrTransferMustHaveValue(request, None)
+        val res = SUT.validateNewSubsOrHtbTransferGtZero(request, None)
         val data = res._1
         val errors = res._2.get
 
@@ -387,7 +387,7 @@ class BonusPaymentControllerSpec extends PlaySpec
         val ibp = validBonusPayment.inboundPayments.copy(newSubsForPeriod = Some(0))
         val request = validBonusPayment.copy(inboundPayments = ibp, htbTransfer = None)
 
-        val res = SUT.newSubsOrTransferMustHaveValue(request, None)
+        val res = SUT.validateNewSubsOrHtbTransferGtZero(request, None)
         val data = res._1
         val errors = res._2.get
 
@@ -403,7 +403,7 @@ class BonusPaymentControllerSpec extends PlaySpec
         val htb = validBonusPayment.htbTransfer.get.copy(htbTransferInForPeriod = 0)
         val request = validBonusPayment.copy(inboundPayments = ibp, htbTransfer = Some(htb))
 
-        val res = SUT.newSubsOrTransferMustHaveValue(request, None)
+        val res = SUT.validateNewSubsOrHtbTransferGtZero(request, None)
         val data = res._1
         val errors = res._2.get
 
