@@ -29,6 +29,7 @@ import uk.gov.hmrc.lisaapi.services.{AuditService, BonusPaymentService}
 import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
 import uk.gov.hmrc.play.http.HeaderCarrier
 
+import scala.collection.mutable.ListBuffer
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -68,25 +69,33 @@ class BonusPaymentController extends LisaController with LisaConstants {
       }
   }
 
-  def newSubsOrTransferMustHaveValue(dataAndErrors: (RequestBonusPaymentRequest, Option[(Seq[(JsPath, Seq[ValidationError])])])):
-    (RequestBonusPaymentRequest, Option[Seq[(io.Serializable, Seq[ValidationError])]]) = {
+  //scalastyle:off cyclomatic.complexity
+  def newSubsOrTransferMustHaveValue(data: RequestBonusPaymentRequest, errors: Option[(Seq[(JsPath, Seq[ValidationError])])]):
+    (RequestBonusPaymentRequest, Option[Seq[(JsPath, Seq[ValidationError])]]) = {
 
-    val data: RequestBonusPaymentRequest = dataAndErrors._1
-    val errors: Option[Seq[(JsPath, Seq[ValidationError])]] = dataAndErrors._2
-    val newSubsForPeriodHasValue: Boolean = !data.inboundPayments.newSubsForPeriod.isEmpty && data.inboundPayments.newSubsForPeriod.get > 0
-    val htbTransferHasValue: Boolean = !data.htbTransfer.isEmpty && data.htbTransfer.get.htbTransferInForPeriod > 0
+    val subsExists = data.inboundPayments.newSubsForPeriod.isDefined
+    val htbExists = data.htbTransfer.isDefined
+    val eitherExists = subsExists || htbExists
 
-    if (!newSubsForPeriodHasValue && !htbTransferHasValue) {
-      val newSubsError = ("/inboundPayments/newSubsForPeriod",
-        Seq(ValidationError("newSubsForPeriod and htbTransferForPeriod cannot both be zero")))
+    val subsGtZero = subsExists && data.inboundPayments.newSubsForPeriod.get > 0
+    val htbGtZero = htbExists && data.htbTransfer.get.htbTransferInForPeriod > 0
+    val eitherHasValue = subsGtZero || htbGtZero
 
-      val htbTransferError = ("/htbTransfer/htbTransferInForPeriod",
-        Seq(ValidationError("newSubsForPeriod and htbTransferForPeriod cannot both be zero")))
+    val showSubError = !eitherExists || (subsExists && !eitherHasValue)
+    val showHtbError = !eitherExists || (htbExists && !eitherHasValue)
 
-      (data, Some(Seq(newSubsError, htbTransferError)))
+    val errorMessage = "newSubsForPeriod and htbTransferForPeriod cannot both be zero"
+
+    if (eitherHasValue) {
+      (data, errors)
     }
     else {
-      (data, errors)
+      val newErrs = new ListBuffer[(JsPath, Seq[ValidationError])]()
+
+      if (showSubError) newErrs += ((JsPath \ "inboundPayments" \ "newSubsForPeriod", Seq(ValidationError(errorMessage))))
+      if (showHtbError) newErrs += ((JsPath \ "htbTransfer" \ "htbTransferInForPeriod", Seq(ValidationError(errorMessage))))
+
+      (data, Some(newErrs))
     }
 
   }

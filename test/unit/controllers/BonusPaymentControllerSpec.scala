@@ -357,8 +357,59 @@ class BonusPaymentControllerSpec extends PlaySpec
 
         data mustBe request
         errors.size mustBe 2
-        errors(0)._1 mustBe "/inboundPayments/newSubsForPeriod"
-        errors(1)._1 mustBe "/htbTransfer/htbTransferInForPeriod"
+        errors(0)._1 mustBe JsPath \ "inboundPayments" \ "newSubsForPeriod"
+        errors(1)._1 mustBe JsPath \ "htbTransfer" \ "htbTransferInForPeriod"
+
+      }
+
+      "newSubsForPeriod and htbTransferForPeriod are both none" in {
+
+        val ibp = validBonusPayment.inboundPayments.copy(newSubsForPeriod = None)
+        val request = validBonusPayment.copy(inboundPayments = ibp, htbTransfer = None)
+
+        val res = SUT.newSubsOrTransferMustHaveValue(request, None)
+        val data = res._1
+        val errors = res._2.get
+
+        data mustBe request
+        errors.size mustBe 2
+        errors(0)._1 mustBe JsPath \ "inboundPayments" \ "newSubsForPeriod"
+        errors(1)._1 mustBe JsPath \ "htbTransfer" \ "htbTransferInForPeriod"
+
+      }
+
+    }
+
+    "return one error" when {
+
+      "newSubsForPeriod is 0 and htbTransfer is none" in {
+
+        val ibp = validBonusPayment.inboundPayments.copy(newSubsForPeriod = Some(0))
+        val request = validBonusPayment.copy(inboundPayments = ibp, htbTransfer = None)
+
+        val res = SUT.newSubsOrTransferMustHaveValue(request, None)
+        val data = res._1
+        val errors = res._2.get
+
+        data mustBe request
+        errors.size mustBe 1
+        errors(0)._1 mustBe JsPath \ "inboundPayments" \ "newSubsForPeriod"
+
+      }
+
+      "htbTransfer is 0 and newSubsForPeriod is none" in {
+
+        val ibp = validBonusPayment.inboundPayments.copy(newSubsForPeriod = None)
+        val htb = validBonusPayment.htbTransfer.get.copy(htbTransferInForPeriod = 0)
+        val request = validBonusPayment.copy(inboundPayments = ibp, htbTransfer = Some(htb))
+
+        val res = SUT.newSubsOrTransferMustHaveValue(request, None)
+        val data = res._1
+        val errors = res._2.get
+
+        data mustBe request
+        errors.size mustBe 1
+        errors(0)._1 mustBe JsPath \ "htbTransfer" \ "htbTransferInForPeriod"
 
       }
 
