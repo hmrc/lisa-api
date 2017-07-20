@@ -79,14 +79,14 @@ class BonusPaymentController extends LisaController with LisaConstants {
 
     val subsGtZero = subsExists && data.inboundPayments.newSubsForPeriod.get > 0
     val htbGtZero = htbExists && data.htbTransfer.get.htbTransferInForPeriod > 0
-    val eitherHasValue = subsGtZero || htbGtZero
+    val eitherGtZero = subsGtZero || htbGtZero
 
-    val showSubError = !eitherExists || (subsExists && !eitherHasValue)
-    val showHtbError = !eitherExists || (htbExists && !eitherHasValue)
+    val showSubError = !eitherExists || (subsExists && !eitherGtZero)
+    val showHtbError = !eitherExists || (htbExists && !eitherGtZero)
 
     val errorMessage = "newSubsForPeriod and htbTransferForPeriod cannot both be zero"
 
-    if (eitherHasValue) {
+    if (eitherGtZero) {
       (data, errors)
     }
     else {
