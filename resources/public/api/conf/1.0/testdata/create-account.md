@@ -11,7 +11,7 @@
     </thead>
     <tbody>
         <tr>
-            <td><p>Create Request with a valid payload and LISA Manager Reference Number</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
+            <td><p>Create Request with a valid payload and LISA Manager Reference Number</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile<a></p></td>
             <td>
                 <p class ="code--block"> {<br>
                                      	    "investorId": "9876543210",<br>
@@ -34,7 +34,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Transfer Request with a valid payload and LISA Manager Reference Number</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
+            <td><p>Transfer Request with a valid payload and LISA Manager Reference Number</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile<a></p></td>
             <td>
                 <p class ="code--block"> {<br>
                                               "investorId": "9876543210",<br>
@@ -81,7 +81,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request containing invalid and/or missing data</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
+            <td><p>Request containing invalid and/or missing data</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile<a></p></td>
             <td>
                 <p class ="code--block"> {<br>
                                      	    "investorId": "9876543",<br>
@@ -116,7 +116,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request containing investor details which can't be found</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
+            <td><p>Request containing investor details which can't be found</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile<a></p></td>
             <td>
                 <p class ="code--block"> {<br>
                                      	    "investorId": "1234567890",<br>
@@ -135,7 +135,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request containing an investor who isn't eligible for a LISA account</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
+            <td><p>Request containing an investor who isn't eligible for a LISA account</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile<a></p></td>
             <td>
                 <p class ="code--block"> {<br>
                                      	    "investorId": "1234567891",<br>
@@ -154,7 +154,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request containing an investor who hasn't past the compliance check</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
+            <td><p>Request containing an investor who hasn't past the compliance check</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile<a></p></td>
             <td>
                 <p class ="code--block"> {<br>
                                             "investorId": "1234567892",<br>
@@ -173,7 +173,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Transfer Request containing transfer details which can't be found in HMRC's records</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
+            <td><p>Transfer Request containing transfer details which can't be found in HMRC's records</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile<a></p></td>
             <td>
                 <p class ="code--block"> {<br>
                                               "investorId": "1234567889",<br>
@@ -239,9 +239,8 @@
                 </p>
             </td>
         </tr>
-        
         <tr>
-            <td><p>Request containing a LISA account which has already been closed or voided</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
+            <td><p>Request containing a LISA account which has already been closed or voided</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile<a></p></td>
             <td>
                 <p class ="code--block"> {<br>
                                      	    "investorId": "0000000403",<br>
@@ -260,26 +259,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request containing a LISA Manager Reference Number that doesn't exist</p><p class ="code--block">lisaManagerReferenceNumber: Z123456789</p></td>
-            <td>
-                <p class ="code--block"> {<br>
-                                     	    "investorId": "9876543210",<br>
-                                     	    "creationReason": "New",<br>
-                                     	    "accountId": "1234567890",<br>
-                                     	    "firstSubscriptionDate": "2011-03-23"<br>
-                                        }
-                </p>
-            </td>
-            <td><p>HTTP status: <code class="code--slim">404 (Not Found)</code></p>
-                <p class ="code--block"> {<br>
-                                            "code": "NOT_FOUND",<br>
-                                            "message": "Resource was not found"<br>
-                                          }
-                </p>
-            </td>
-        </tr> 
-        <tr>
-            <td><p>Request with an invalid 'Accept' header</p><p class ="code--block">lisaManagerReferenceNumber: Z123456<br><br>Accept: application/vnd.hmrc.1.0</p></td>
+            <td><p>Request with an invalid 'Accept' header</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile<a><br><br>Accept: application/vnd.hmrc.1.0</p></td>
             <td>
                 <p class ="code--block"> {<br>
                                      	    "investorId": "9876543210",<br>
@@ -298,7 +278,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request for a pre-existing account</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
+            <td><p>Request for a pre-existing account</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile<a></p></td>
             <td>
                 <p class ="code--block"> {<br>
                                      	    "investorId": "1234567899",<br>
@@ -317,7 +297,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request which fails due to an unexpected error</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
+            <td><p>Request which fails due to an unexpected error</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile<a></p></td>
             <td>
                 <p class ="code--block"> {<br>
                                      	    "investorId": "1234567894",<br>
