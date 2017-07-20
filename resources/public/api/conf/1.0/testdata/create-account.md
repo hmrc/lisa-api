@@ -197,7 +197,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Transfer Request without transfer details</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
+            <td><p>Transfer Request without transfer details</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile<a></p></td>
             <td>
                 <p class ="code--block"> {<br>
                                                "investorId":"9876543210",<br>
@@ -216,7 +216,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Create request containing transfer details</p><p class ="code--block">lisaManagerReferenceNumber: Z123456</p></td>
+            <td><p>Create request containing transfer details</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile<a></p></td>
             <td>
                 <p class ="code--block"> {<br>
                                      	     "investorId": "9876543210",<br>
