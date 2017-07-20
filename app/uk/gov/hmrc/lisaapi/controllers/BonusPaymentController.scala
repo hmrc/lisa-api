@@ -20,18 +20,17 @@ import java.io
 
 import play.api.Logger
 import play.api.data.validation.ValidationError
-import play.api.libs.json.{JsError, JsPath, Json}
-import play.api.mvc.{Action, AnyContent, Result}
+import play.api.libs.json.{JsPath, Json}
+import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetrics, MetricsEnum}
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.services.{AuditService, BonusPaymentService, LifeEventService}
+import uk.gov.hmrc.lisaapi.services.{AuditService, BonusPaymentService}
+import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
 import uk.gov.hmrc.play.http.HeaderCarrier
 
-import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
 
 class BonusPaymentController extends LisaController with LisaConstants {
 
