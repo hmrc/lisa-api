@@ -92,18 +92,6 @@ class BonusPaymentController extends LisaController with LisaConstants {
 
   }
 
-  private def handleLifeEventNotProvided(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest)(implicit hc: HeaderCarrier) = {
-    Logger.debug("Life event not provided")
-
-    auditService.audit(
-      auditType = "bonusPaymentNotRequested",
-      path = getEndpointUrl(lisaManager, accountId),
-      auditData = createAuditData(lisaManager, accountId, req) ++ Map("reasonNotRequested" -> ErrorLifeEventNotProvided.errorCode)
-    )
-
-    Future.successful(Forbidden(Json.toJson(ErrorLifeEventNotProvided)))
-  }
-
   private def handleSuccess(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest, transactionID: String)(implicit hc: HeaderCarrier) = {
     Logger.debug("Matched success response")
     val data = ApiResponseData(message = "Bonus transaction created", transactionId = Some(transactionID))
@@ -114,17 +102,14 @@ class BonusPaymentController extends LisaController with LisaConstants {
       auditData = createAuditData(lisaManager, accountId, req)
     )
 
-    Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = 201)))
+    Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
   }
 
-  private def handleFailure(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest, errorResponse: RequestBonusPaymentErrorResponse)(implicit hc: HeaderCarrier) = {
+  private def handleFailure(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest, errorResponse: RequestBonusPaymentErrorResponse)
+                           (implicit hc: HeaderCarrier) = {
     Logger.debug("Matched failure response")
 
-    auditService.audit(
-      auditType = "bonusPaymentNotRequested",
-      path = getEndpointUrl(lisaManager, accountId),
-      auditData = createAuditData(lisaManager, accountId, req) ++ Map("reasonNotRequested" -> errorResponse.data.code)
-    )
+    auditFailure(lisaManager, accountId, req, errorResponse.data.code)
 
     Status(errorResponse.status).apply(Json.toJson(errorResponse.data))
   }
@@ -132,13 +117,25 @@ class BonusPaymentController extends LisaController with LisaConstants {
   private def handleError(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest)(implicit hc: HeaderCarrier) = {
     Logger.debug("An error occurred")
 
+    auditFailure(lisaManager, accountId, req, ErrorInternalServerError.errorCode)
+
+    InternalServerError(Json.toJson(ErrorInternalServerError))
+  }
+
+  private def handleLifeEventNotProvided(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest)(implicit hc: HeaderCarrier) = {
+    Logger.debug("Life event not provided")
+
+    auditFailure(lisaManager, accountId, req, ErrorLifeEventNotProvided.errorCode)
+
+    Future.successful(Forbidden(Json.toJson(ErrorLifeEventNotProvided)))
+  }
+
+  private def auditFailure(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest, failureReason: String)(implicit hc: HeaderCarrier) = {
     auditService.audit(
       auditType = "bonusPaymentNotRequested",
       path = getEndpointUrl(lisaManager, accountId),
-      auditData = createAuditData(lisaManager, accountId, req) ++ Map("reasonNotRequested" -> ErrorInternalServerError.errorCode)
+      auditData = createAuditData(lisaManager, accountId, req) ++ Map("reasonNotRequested" -> failureReason)
     )
-
-    InternalServerError(Json.toJson(ErrorInternalServerError))
   }
 
   private def createAuditData(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest): Map[String, String] = {
