@@ -83,7 +83,7 @@
             </td>
         </tr>
         <tr>
-        	 <td><p>Request containing invalid and/or missing data</p><p class ="code--block">lisaManagerReferenceNumber: : <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile<a><br>accountId: 1234567890</p></td>
+        	 <td><p>Request containing invalid and/or missing data</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile<a><br>accountId: 1234567890</p></td>
 	        <td>
 	            <p class ="code--block">{<br>
 	"lifeEventId": true,<br>
