@@ -37,17 +37,6 @@ object BonusPaymentValidator {
     )).apply(BonusPaymentValidationRequest(data)).errors
   }
 
-  val totalSubsForPeriodGtZero: (BonusPaymentValidationRequest) => BonusPaymentValidationRequest = (req: BonusPaymentValidationRequest) => {
-    if (req.data.inboundPayments.totalSubsForPeriod <= 0) {
-      val newErrors = req.errors :+ ((inboundPayments \ "totalSubsForPeriod", Seq(ValidationError("totalSubsForPeriod must be greater than zero"))))
-
-      req.copy(errors = newErrors)
-    }
-    else {
-      req
-    }
-  }
-
   val newSubsOrHtbTransferGtZero: (BonusPaymentValidationRequest) => BonusPaymentValidationRequest = (req: BonusPaymentValidationRequest) => {
     val subsExists = req.data.inboundPayments.newSubsForPeriod.isDefined
     val htbExists = req.data.htbTransfer.isDefined
@@ -61,31 +50,29 @@ object BonusPaymentValidator {
     req.copy(errors = newErrs)
   }
 
-  val newSubsYTDGtZeroIfnewSubsForPeriodGtZero: (BonusPaymentValidationRequest) => BonusPaymentValidationRequest = (req: BonusPaymentValidationRequest) => {
-    val subsGtZero = req.data.inboundPayments.newSubsForPeriod.isDefined && req.data.inboundPayments.newSubsForPeriod.get > 0
+  val newSubsYTDGtZeroIfnewSubsForPeriodGtZero: PartialFunction[BonusPaymentValidationRequest, BonusPaymentValidationRequest] = {
+    case req: BonusPaymentValidationRequest if (
+      req.data.inboundPayments.newSubsForPeriod.isDefined &&
+      req.data.inboundPayments.newSubsForPeriod.get > 0 &&
+      req.data.inboundPayments.newSubsYTD <= 0) => {
 
-    if (subsGtZero && req.data.inboundPayments.newSubsYTD <= 0) {
-      val newErrors = req.errors :+ ((inboundPayments \ "newSubsYTD", Seq(ValidationError("newSubsYTD must be greater than zero"))))
-
-      req.copy(errors = newErrors)
-    }
-    else {
-      req
+      req.copy(errors = req.errors :+ ((inboundPayments \ "newSubsYTD", Seq(ValidationError("newSubsYTD must be greater than zero")))))
     }
   }
 
-  val htbTransferTotalYTDGtZeroIfhtbTransferInForPeriodGtZero: (BonusPaymentValidationRequest) => BonusPaymentValidationRequest =
-    (req: BonusPaymentValidationRequest) => {
+  val htbTransferTotalYTDGtZeroIfhtbTransferInForPeriodGtZero: PartialFunction[BonusPaymentValidationRequest, BonusPaymentValidationRequest] = {
+    case req: BonusPaymentValidationRequest if (
+      req.data.htbTransfer.isDefined &&
+      req.data.htbTransfer.get.htbTransferInForPeriod > 0 &&
+      req.data.htbTransfer.get.htbTransferTotalYTD <= 0) => {
 
-    val htbGtZero = req.data.htbTransfer.isDefined && req.data.htbTransfer.get.htbTransferInForPeriod > 0
-
-    if (htbGtZero && req.data.htbTransfer.get.htbTransferTotalYTD <= 0) {
-      val newErrors = req.errors :+ ((htbTransfer \ "htbTransferTotalYTD", Seq(ValidationError("htbTransferTotalYTD must be greater than zero"))))
-
-      req.copy(errors = newErrors)
+      req.copy(errors = req.errors :+ ((htbTransfer \ "htbTransferTotalYTD", Seq(ValidationError("htbTransferTotalYTD must be greater than zero")))))
     }
-    else {
-      req
+  }
+
+  val totalSubsForPeriodGtZero: PartialFunction[BonusPaymentValidationRequest, BonusPaymentValidationRequest] = {
+    case req: BonusPaymentValidationRequest if (req.data.inboundPayments.totalSubsForPeriod <= 0) => {
+      req.copy(errors = req.errors :+ ((inboundPayments \ "totalSubsForPeriod", Seq(ValidationError("totalSubsForPeriod must be greater than zero")))))
     }
   }
 
