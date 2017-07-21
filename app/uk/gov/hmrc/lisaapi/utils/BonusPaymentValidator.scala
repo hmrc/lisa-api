@@ -30,11 +30,11 @@ object BonusPaymentValidator {
   val htbTransfer: JsPath = JsPath \ "htbTransfer"
 
   def validate(data: RequestBonusPaymentRequest): Seq[(JsPath, Seq[ValidationError])] = {
-    Function.chain(Seq(
-      newSubsYTDGtZeroIfnewSubsForPeriodGtZero,
-      htbTransferTotalYTDGtZeroIfhtbTransferInForPeriodGtZero,
+    (
+      newSubsYTDGtZeroIfnewSubsForPeriodGtZero andThen
+      htbTransferTotalYTDGtZeroIfhtbTransferInForPeriodGtZero andThen
       totalSubsForPeriodGtZero
-    )).apply(BonusPaymentValidationRequest(data)).errors
+    ).apply(BonusPaymentValidationRequest(data)).errors
   }
 
   val newSubsOrHtbTransferGtZero: (BonusPaymentValidationRequest) => BonusPaymentValidationRequest = (req: BonusPaymentValidationRequest) => {
