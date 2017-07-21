@@ -36,7 +36,7 @@ class BonusPaymentValidatorSpec extends PlaySpec {
 
         val request = BonusPaymentValidationRequest(data = validBonusPayment)
 
-        SUT.validateNewSubsOrHtbTransferGtZero(request) mustBe request
+        SUT.newSubsOrHtbTransferGtZero(request) mustBe request
 
       }
 
@@ -50,7 +50,7 @@ class BonusPaymentValidatorSpec extends PlaySpec {
         val htb = validBonusPayment.htbTransfer.get.copy(htbTransferInForPeriod = 0)
         val request = BonusPaymentValidationRequest(data = validBonusPayment.copy(inboundPayments = ibp, htbTransfer = Some(htb)))
 
-        val res = SUT.validateNewSubsOrHtbTransferGtZero(request)
+        val res = SUT.newSubsOrHtbTransferGtZero(request)
 
         res.data mustBe request.data
         res.errors.size mustBe 2
@@ -64,7 +64,7 @@ class BonusPaymentValidatorSpec extends PlaySpec {
         val ibp = validBonusPayment.inboundPayments.copy(newSubsForPeriod = None)
         val request = BonusPaymentValidationRequest(data = validBonusPayment.copy(inboundPayments = ibp, htbTransfer = None))
 
-        val res = SUT.validateNewSubsOrHtbTransferGtZero(request)
+        val res = SUT.newSubsOrHtbTransferGtZero(request)
 
         res.data mustBe request.data
         res.errors.size mustBe 2
@@ -82,7 +82,7 @@ class BonusPaymentValidatorSpec extends PlaySpec {
         val ibp = validBonusPayment.inboundPayments.copy(newSubsForPeriod = Some(0))
         val request = BonusPaymentValidationRequest(data = validBonusPayment.copy(inboundPayments = ibp, htbTransfer = None))
 
-        val res = SUT.validateNewSubsOrHtbTransferGtZero(request)
+        val res = SUT.newSubsOrHtbTransferGtZero(request)
 
         res.data mustBe request.data
         res.errors.size mustBe 1
@@ -96,7 +96,7 @@ class BonusPaymentValidatorSpec extends PlaySpec {
         val htb = validBonusPayment.htbTransfer.get.copy(htbTransferInForPeriod = 0)
         val request = BonusPaymentValidationRequest(data = validBonusPayment.copy(inboundPayments = ibp, htbTransfer = Some(htb)))
 
-        val res = SUT.validateNewSubsOrHtbTransferGtZero(request)
+        val res = SUT.newSubsOrHtbTransferGtZero(request)
 
         res.data mustBe request.data
         res.errors.size mustBe 1
@@ -106,6 +106,60 @@ class BonusPaymentValidatorSpec extends PlaySpec {
 
     }
 
+  }
+
+  "NewSubsYTD" should {
+
+    "return an error" when {
+
+      "it is zero and newSubsForPeriod is not" in {
+        val ibp = validBonusPayment.inboundPayments.copy(newSubsForPeriod = Some(1), newSubsYTD = 0)
+        val request = BonusPaymentValidationRequest(data = validBonusPayment.copy(inboundPayments = ibp))
+
+        val res = SUT.newSubsYTDGtZeroIfNoNewForPeriod(request)
+
+        res.data mustBe request.data
+        res.errors.size mustBe 1
+        res.errors(0)._1 mustBe JsPath \ "inboundPayments" \ "newSubsYTD"
+      }
+
+    }
+
+  }
+
+  "HtbTransferTotalYTD" should {
+
+    "return an error" when {
+
+      "it is zero and htbTransferInForPeriod is not" in {
+        val htb = validBonusPayment.htbTransfer.get.copy(htbTransferInForPeriod = 1, htbTransferTotalYTD = 0)
+        val request = BonusPaymentValidationRequest(data = validBonusPayment.copy(htbTransfer = Some(htb)))
+
+        val res = SUT.htbTransferTotalYTDGtZeroIfNoTransferForPeriod(request)
+
+        res.data mustBe request.data
+        res.errors.size mustBe 1
+        res.errors(0)._1 mustBe JsPath \ "htbTransfer" \ "htbTransferTotalYTD"
+      }
+
+    }
+
+  }
+
+  "Validate" should {
+    "return both new subs and htb total errors" when {
+      "validation fails for them both" in {
+        val ibp = validBonusPayment.inboundPayments.copy(newSubsForPeriod = Some(1), newSubsYTD = 0)
+        val htb = validBonusPayment.htbTransfer.get.copy(htbTransferInForPeriod = 1, htbTransferTotalYTD = 0)
+        val request = validBonusPayment.copy(inboundPayments = ibp, htbTransfer = Some(htb))
+
+        val res = SUT.validate(request)
+
+        res.size mustBe 2
+        res(0)._1 mustBe JsPath \ "inboundPayments" \ "newSubsYTD"
+        res(1)._1 mustBe JsPath \ "htbTransfer" \ "htbTransferTotalYTD"
+      }
+    }
   }
 
   val SUT = BonusPaymentValidator
