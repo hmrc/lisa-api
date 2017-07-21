@@ -28,13 +28,16 @@ object BonusPaymentValidator {
 
   val inboundPayments: JsPath = JsPath \ "inboundPayments"
   val htbTransfer: JsPath = JsPath \ "htbTransfer"
+  val bonuses: JsPath = JsPath \ "bonuses"
 
   def validate(data: RequestBonusPaymentRequest): Seq[(JsPath, Seq[ValidationError])] = {
     (
       newSubsYTDGtZeroIfNewSubsForPeriodGtZero andThen
       htbTransferTotalYTDGtZeroIfHtbTransferInForPeriodGtZero andThen
       totalSubsForPeriodGtZero andThen
-      totalSubsYTDGteTotalSubsForPeriod
+      totalSubsYTDGteTotalSubsForPeriod andThen
+      bonusDueForPeriodGtZero andThen
+      totalBonusDueYTDGtZero
     ).apply(BonusPaymentValidationRequest(data)).errors
   }
 
@@ -85,6 +88,20 @@ object BonusPaymentValidator {
       req.copy(errors = req.errors :+ (
         (inboundPayments \ "totalSubsYTD", Seq(ValidationError("totalSubsYTD must be greater than or equal to totalSubsForPeriod")))
       ))
+    }
+    case req: BonusPaymentValidationRequest => req
+  }
+
+  val bonusDueForPeriodGtZero: PartialFunction[BonusPaymentValidationRequest, BonusPaymentValidationRequest] = {
+    case req: BonusPaymentValidationRequest if (req.data.bonuses.bonusDueForPeriod <= 0) => {
+      req.copy(errors = req.errors :+ ((bonuses \ "bonusDueForPeriod", Seq(ValidationError("bonusDueForPeriod must be greater than zero")))))
+    }
+    case req: BonusPaymentValidationRequest => req
+  }
+
+  val totalBonusDueYTDGtZero: PartialFunction[BonusPaymentValidationRequest, BonusPaymentValidationRequest] = {
+    case req: BonusPaymentValidationRequest if (req.data.bonuses.totalBonusDueYTD <= 0) => {
+      req.copy(errors = req.errors :+ ((bonuses \ "totalBonusDueYTD", Seq(ValidationError("totalBonusDueYTD must be greater than zero")))))
     }
     case req: BonusPaymentValidationRequest => req
   }

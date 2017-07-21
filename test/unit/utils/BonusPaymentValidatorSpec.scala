@@ -183,6 +183,42 @@ class BonusPaymentValidatorSpec extends PlaySpec {
 
   }
 
+  "bonusDueForPeriod" should {
+
+    "return an error" when {
+
+      "it is zero or less" in {
+        val bon = validBonusPayment.bonuses.copy(bonusDueForPeriod = 0)
+        val request = validBonusPayment.copy(bonuses = bon)
+
+        val res = SUT.validate(request)
+
+        res.size mustBe 1
+        res(0)._1 mustBe JsPath \ "bonuses" \ "bonusDueForPeriod"
+      }
+
+    }
+
+  }
+
+  "totalBonusDueYTD" should {
+
+    "return an error" when {
+
+      "it is zero or less" in {
+        val bon = validBonusPayment.bonuses.copy(totalBonusDueYTD = 0)
+        val request = validBonusPayment.copy(bonuses = bon)
+
+        val res = SUT.validate(request)
+
+        res.size mustBe 1
+        res(0)._1 mustBe JsPath \ "bonuses" \ "totalBonusDueYTD"
+      }
+
+    }
+
+  }
+
   "Validate" should {
     "return no errors" when {
       "everything is valid" in {
