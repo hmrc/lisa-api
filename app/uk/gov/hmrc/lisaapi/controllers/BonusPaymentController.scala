@@ -69,37 +69,6 @@ class BonusPaymentController extends LisaController with LisaConstants {
       }
   }
 
-  //scalastyle:off cyclomatic.complexity
-  def validateNewSubsOrHtbTransferGtZero(data: RequestBonusPaymentRequest, errors: Option[(Seq[(JsPath, Seq[ValidationError])])]):
-    (RequestBonusPaymentRequest, Option[Seq[(JsPath, Seq[ValidationError])]]) = {
-
-    val subsExists = data.inboundPayments.newSubsForPeriod.isDefined
-    val htbExists = data.htbTransfer.isDefined
-
-    val subsGtZero = subsExists && data.inboundPayments.newSubsForPeriod.get > 0
-    val htbGtZero = htbExists && data.htbTransfer.get.htbTransferInForPeriod > 0
-    val eitherGtZero = subsGtZero || htbGtZero
-
-    if (eitherGtZero) {
-      (data, errors)
-    }
-    else {
-      val newErrs = new ListBuffer[(JsPath, Seq[ValidationError])]()
-
-      val eitherExists = subsExists || htbExists
-      val showSubError = !eitherExists || (subsExists && !eitherGtZero)
-      val showHtbError = !eitherExists || (htbExists && !eitherGtZero)
-
-      val errorMessage = "newSubsForPeriod and htbTransferForPeriod cannot both be zero"
-
-      if (showSubError) newErrs += ((JsPath \ "inboundPayments" \ "newSubsForPeriod", Seq(ValidationError(errorMessage))))
-      if (showHtbError) newErrs += ((JsPath \ "htbTransfer" \ "htbTransferInForPeriod", Seq(ValidationError(errorMessage))))
-
-      (data, Some(newErrs))
-    }
-
-  }
-
   private def handleSuccess(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest, transactionID: String)(implicit hc: HeaderCarrier) = {
     Logger.debug("Matched success response")
     val data = ApiResponseData(message = "Bonus transaction created", transactionId = Some(transactionID))

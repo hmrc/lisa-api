@@ -38,21 +38,19 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.io.Source
 
-case object TestBonusPaymentResponse extends RequestBonusPaymentResponse
-
 class BonusPaymentControllerSpec extends PlaySpec
   with MockitoSugar
   with OneAppPerSuite
   with BeforeAndAfterEach {
+
+  case object TestBonusPaymentResponse extends RequestBonusPaymentResponse
 
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
   val lisaManager = "Z019283"
   val accountId = "ABC12345"
   val validBonusPaymentJson = Source.fromInputStream(getClass().getResourceAsStream("/json/request.valid.bonus-payment.json")).mkString
   val validBonusPaymentMinimumFieldsJson = Source.fromInputStream(getClass().getResourceAsStream("/json/request.valid.bonus-payment.min.json")).mkString
-  val validBonusPayment = Json.parse(validBonusPaymentJson).as[RequestBonusPaymentRequest]
   implicit val hc:HeaderCarrier = HeaderCarrier()
-
 
   override def beforeEach() {
     reset(mockAuditService)
@@ -323,94 +321,6 @@ class BonusPaymentControllerSpec extends PlaySpec
             )
             ))(any())
         }
-      }
-
-    }
-
-  }
-
-  "New subs or transfer" should {
-
-    "return no errors" when {
-
-      "everything is good" in {
-
-        val request = validBonusPayment
-
-        SUT.validateNewSubsOrHtbTransferGtZero(request, None) mustBe (request, None)
-
-      }
-
-    }
-
-    "return two errors" when {
-
-      "newSubsForPeriod and htbTransferForPeriod are both 0" in {
-
-        val ibp = validBonusPayment.inboundPayments.copy(newSubsForPeriod = Some(0))
-        val htb = validBonusPayment.htbTransfer.get.copy(htbTransferInForPeriod = 0)
-        val request = validBonusPayment.copy(inboundPayments = ibp, htbTransfer = Some(htb))
-
-        val res = SUT.validateNewSubsOrHtbTransferGtZero(request, None)
-        val data = res._1
-        val errors = res._2.get
-
-        data mustBe request
-        errors.size mustBe 2
-        errors(0)._1 mustBe JsPath \ "inboundPayments" \ "newSubsForPeriod"
-        errors(1)._1 mustBe JsPath \ "htbTransfer" \ "htbTransferInForPeriod"
-
-      }
-
-      "newSubsForPeriod and htbTransferForPeriod are both none" in {
-
-        val ibp = validBonusPayment.inboundPayments.copy(newSubsForPeriod = None)
-        val request = validBonusPayment.copy(inboundPayments = ibp, htbTransfer = None)
-
-        val res = SUT.validateNewSubsOrHtbTransferGtZero(request, None)
-        val data = res._1
-        val errors = res._2.get
-
-        data mustBe request
-        errors.size mustBe 2
-        errors(0)._1 mustBe JsPath \ "inboundPayments" \ "newSubsForPeriod"
-        errors(1)._1 mustBe JsPath \ "htbTransfer" \ "htbTransferInForPeriod"
-
-      }
-
-    }
-
-    "return one error" when {
-
-      "newSubsForPeriod is 0 and htbTransfer is none" in {
-
-        val ibp = validBonusPayment.inboundPayments.copy(newSubsForPeriod = Some(0))
-        val request = validBonusPayment.copy(inboundPayments = ibp, htbTransfer = None)
-
-        val res = SUT.validateNewSubsOrHtbTransferGtZero(request, None)
-        val data = res._1
-        val errors = res._2.get
-
-        data mustBe request
-        errors.size mustBe 1
-        errors(0)._1 mustBe JsPath \ "inboundPayments" \ "newSubsForPeriod"
-
-      }
-
-      "htbTransfer is 0 and newSubsForPeriod is none" in {
-
-        val ibp = validBonusPayment.inboundPayments.copy(newSubsForPeriod = None)
-        val htb = validBonusPayment.htbTransfer.get.copy(htbTransferInForPeriod = 0)
-        val request = validBonusPayment.copy(inboundPayments = ibp, htbTransfer = Some(htb))
-
-        val res = SUT.validateNewSubsOrHtbTransferGtZero(request, None)
-        val data = res._1
-        val errors = res._2.get
-
-        data mustBe request
-        errors.size mustBe 1
-        errors(0)._1 mustBe JsPath \ "htbTransfer" \ "htbTransferInForPeriod"
-
       }
 
     }
