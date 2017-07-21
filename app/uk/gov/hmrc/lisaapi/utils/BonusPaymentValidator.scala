@@ -28,8 +28,8 @@ object BonusPaymentValidator {
 
   def validate(data: RequestBonusPaymentRequest): Seq[(JsPath, Seq[ValidationError])] = {
     Function.chain(Seq(
-      newSubsYTDGtZeroIfNoNewForPeriod,
-      htbTransferTotalYTDGtZeroIfNoTransferForPeriod
+      newSubsYTDGtZeroIfnewSubsForPeriodGtZero,
+      htbTransferTotalYTDGtZeroIfhtbTransferInForPeriodGtZero
     )).apply(BonusPaymentValidationRequest(data)).errors
   }
 
@@ -46,7 +46,7 @@ object BonusPaymentValidator {
     req.copy(errors = newErrs)
   }
 
-  val newSubsYTDGtZeroIfNoNewForPeriod: (BonusPaymentValidationRequest) => BonusPaymentValidationRequest = (req: BonusPaymentValidationRequest) => {
+  val newSubsYTDGtZeroIfnewSubsForPeriodGtZero: (BonusPaymentValidationRequest) => BonusPaymentValidationRequest = (req: BonusPaymentValidationRequest) => {
     val subsGtZero = req.data.inboundPayments.newSubsForPeriod.isDefined && req.data.inboundPayments.newSubsForPeriod.get > 0
 
     if (subsGtZero && req.data.inboundPayments.newSubsYTD <= 0) {
@@ -59,7 +59,7 @@ object BonusPaymentValidator {
     }
   }
 
-  val htbTransferTotalYTDGtZeroIfNoTransferForPeriod: (BonusPaymentValidationRequest) => BonusPaymentValidationRequest =
+  val htbTransferTotalYTDGtZeroIfhtbTransferInForPeriodGtZero: (BonusPaymentValidationRequest) => BonusPaymentValidationRequest =
     (req: BonusPaymentValidationRequest) => {
 
     val htbGtZero = req.data.htbTransfer.isDefined && req.data.htbTransfer.get.htbTransferInForPeriod > 0

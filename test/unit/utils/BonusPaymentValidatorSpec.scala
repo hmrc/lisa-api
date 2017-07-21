@@ -116,7 +116,7 @@ class BonusPaymentValidatorSpec extends PlaySpec {
         val ibp = validBonusPayment.inboundPayments.copy(newSubsForPeriod = Some(1), newSubsYTD = 0)
         val request = BonusPaymentValidationRequest(data = validBonusPayment.copy(inboundPayments = ibp))
 
-        val res = SUT.newSubsYTDGtZeroIfNoNewForPeriod(request)
+        val res = SUT.newSubsYTDGtZeroIfnewSubsForPeriodGtZero(request)
 
         res.data mustBe request.data
         res.errors.size mustBe 1
@@ -135,7 +135,7 @@ class BonusPaymentValidatorSpec extends PlaySpec {
         val htb = validBonusPayment.htbTransfer.get.copy(htbTransferInForPeriod = 1, htbTransferTotalYTD = 0)
         val request = BonusPaymentValidationRequest(data = validBonusPayment.copy(htbTransfer = Some(htb)))
 
-        val res = SUT.htbTransferTotalYTDGtZeroIfNoTransferForPeriod(request)
+        val res = SUT.htbTransferTotalYTDGtZeroIfhtbTransferInForPeriodGtZero(request)
 
         res.data mustBe request.data
         res.errors.size mustBe 1
