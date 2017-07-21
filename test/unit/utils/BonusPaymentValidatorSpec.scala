@@ -33,7 +33,6 @@ class BonusPaymentValidatorSpec extends PlaySpec {
     "return two errors" when {
 
       "newSubsForPeriod and htbTransferForPeriod are both 0" in {
-
         val ibp = validBonusPayment.inboundPayments.copy(newSubsForPeriod = Some(0))
         val htb = validBonusPayment.htbTransfer.get.copy(htbTransferInForPeriod = 0)
         val request = validBonusPayment.copy(inboundPayments = ibp, htbTransfer = Some(htb))
@@ -43,59 +42,45 @@ class BonusPaymentValidatorSpec extends PlaySpec {
         errors.size mustBe 2
         errors(0).path mustBe Some("/inboundPayments/newSubsForPeriod")
         errors(1).path mustBe Some("/htbTransfer/htbTransferInForPeriod")
-
       }
 
-      /*
       "newSubsForPeriod and htbTransferForPeriod are both none" in {
-
         val ibp = validBonusPayment.inboundPayments.copy(newSubsForPeriod = None)
-        val request = BonusPaymentValidationRequest(data = validBonusPayment.copy(inboundPayments = ibp, htbTransfer = None))
+        val request = validBonusPayment.copy(inboundPayments = ibp, htbTransfer = None)
 
-        val res = SUT.newSubsOrHtbTransferGtZero(request)
+        val errors = SUT.validate(request)
 
-        res.data mustBe request.data
-        res.errors.size mustBe 2
-        res.errors(0)._1 mustBe JsPath \ "inboundPayments" \ "newSubsForPeriod"
-        res.errors(1)._1 mustBe JsPath \ "htbTransfer" \ "htbTransferInForPeriod"
-
+        errors.size mustBe 2
+        errors(0).path mustBe Some("/inboundPayments/newSubsForPeriod")
+        errors(1).path mustBe Some("/htbTransfer/htbTransferInForPeriod")
       }
-      */
 
     }
 
-    /*
     "return one error" when {
 
       "newSubsForPeriod is 0 and htbTransfer is none" in {
-
         val ibp = validBonusPayment.inboundPayments.copy(newSubsForPeriod = Some(0))
-        val request = BonusPaymentValidationRequest(data = validBonusPayment.copy(inboundPayments = ibp, htbTransfer = None))
+        val request = validBonusPayment.copy(inboundPayments = ibp, htbTransfer = None)
 
-        val res = SUT.newSubsOrHtbTransferGtZero(request)
+        val errors = SUT.validate(request)
 
-        res.data mustBe request.data
-        res.errors.size mustBe 1
-        res.errors(0)._1 mustBe JsPath \ "inboundPayments" \ "newSubsForPeriod"
-
+        errors.size mustBe 1
+        errors(0).path mustBe Some("/inboundPayments/newSubsForPeriod")
       }
 
       "htbTransfer is 0 and newSubsForPeriod is none" in {
-
         val ibp = validBonusPayment.inboundPayments.copy(newSubsForPeriod = None)
         val htb = validBonusPayment.htbTransfer.get.copy(htbTransferInForPeriod = 0)
-        val request = BonusPaymentValidationRequest(data = validBonusPayment.copy(inboundPayments = ibp, htbTransfer = Some(htb)))
+        val request = validBonusPayment.copy(inboundPayments = ibp, htbTransfer = Some(htb))
 
-        val res = SUT.newSubsOrHtbTransferGtZero(request)
+        val errors = SUT.validate(request)
 
-        res.data mustBe request.data
-        res.errors.size mustBe 1
-        res.errors(0)._1 mustBe JsPath \ "htbTransfer" \ "htbTransferInForPeriod"
-
+        errors.size mustBe 1
+        errors(0).path mustBe Some("/htbTransfer/htbTransferInForPeriod")
       }
 
     }
-    */
 
   }
 

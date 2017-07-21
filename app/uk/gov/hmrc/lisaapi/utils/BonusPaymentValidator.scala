@@ -44,7 +44,7 @@ object BonusPaymentValidator {
     ).apply(BonusPaymentValidationRequest(data)).errors
   }
 
-  val newSubsOrHtbTransferGtZero: (BonusPaymentValidationRequest) => BonusPaymentValidationRequest = (req: BonusPaymentValidationRequest) => {
+  private val newSubsOrHtbTransferGtZero: (BonusPaymentValidationRequest) => BonusPaymentValidationRequest = (req: BonusPaymentValidationRequest) => {
     val subsExists = req.data.inboundPayments.newSubsForPeriod.isDefined
     val htbExists = req.data.htbTransfer.isDefined
 
