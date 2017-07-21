@@ -146,18 +146,38 @@ class BonusPaymentValidatorSpec extends PlaySpec {
 
   }
 
+  "totalSubsForPeriod" should {
+
+    "return an error" when {
+
+      "it is zero" in {
+        val ibp = validBonusPayment.inboundPayments.copy(totalSubsForPeriod = 0)
+        val request = BonusPaymentValidationRequest(data = validBonusPayment.copy(inboundPayments = ibp))
+
+        val res = SUT.totalSubsForPeriodGtZero(request)
+
+        res.data mustBe request.data
+        res.errors.size mustBe 1
+        res.errors(0)._1 mustBe JsPath \ "inboundPayments" \ "totalSubsForPeriod"
+      }
+
+    }
+
+  }
+
   "Validate" should {
-    "return both new subs and htb total errors" when {
-      "validation fails for them both" in {
-        val ibp = validBonusPayment.inboundPayments.copy(newSubsForPeriod = Some(1), newSubsYTD = 0)
+    "return all errors" when {
+      "validation fails multiple conditions" in {
+        val ibp = validBonusPayment.inboundPayments.copy(newSubsForPeriod = Some(1), newSubsYTD = 0, totalSubsForPeriod = 0)
         val htb = validBonusPayment.htbTransfer.get.copy(htbTransferInForPeriod = 1, htbTransferTotalYTD = 0)
         val request = validBonusPayment.copy(inboundPayments = ibp, htbTransfer = Some(htb))
 
         val res = SUT.validate(request)
 
-        res.size mustBe 2
+        res.size mustBe 3
         res(0)._1 mustBe JsPath \ "inboundPayments" \ "newSubsYTD"
         res(1)._1 mustBe JsPath \ "htbTransfer" \ "htbTransferTotalYTD"
+        res(2)._1 mustBe JsPath \ "inboundPayments" \ "totalSubsForPeriod"
       }
     }
   }

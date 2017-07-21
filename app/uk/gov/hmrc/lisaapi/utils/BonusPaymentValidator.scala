@@ -26,11 +26,26 @@ case class BonusPaymentValidationRequest(data: RequestBonusPaymentRequest, error
 
 object BonusPaymentValidator {
 
+  val inboundPayments: JsPath = JsPath \ "inboundPayments"
+  val htbTransfer: JsPath = JsPath \ "htbTransfer"
+
   def validate(data: RequestBonusPaymentRequest): Seq[(JsPath, Seq[ValidationError])] = {
     Function.chain(Seq(
       newSubsYTDGtZeroIfnewSubsForPeriodGtZero,
-      htbTransferTotalYTDGtZeroIfhtbTransferInForPeriodGtZero
+      htbTransferTotalYTDGtZeroIfhtbTransferInForPeriodGtZero,
+      totalSubsForPeriodGtZero
     )).apply(BonusPaymentValidationRequest(data)).errors
+  }
+
+  val totalSubsForPeriodGtZero: (BonusPaymentValidationRequest) => BonusPaymentValidationRequest = (req: BonusPaymentValidationRequest) => {
+    if (req.data.inboundPayments.totalSubsForPeriod <= 0) {
+      val newErrors = req.errors :+ ((inboundPayments \ "totalSubsForPeriod", Seq(ValidationError("totalSubsForPeriod must be greater than zero"))))
+
+      req.copy(errors = newErrors)
+    }
+    else {
+      req
+    }
   }
 
   val newSubsOrHtbTransferGtZero: (BonusPaymentValidationRequest) => BonusPaymentValidationRequest = (req: BonusPaymentValidationRequest) => {
@@ -50,7 +65,7 @@ object BonusPaymentValidator {
     val subsGtZero = req.data.inboundPayments.newSubsForPeriod.isDefined && req.data.inboundPayments.newSubsForPeriod.get > 0
 
     if (subsGtZero && req.data.inboundPayments.newSubsYTD <= 0) {
-      val newErrors = req.errors :+ ((JsPath \ "inboundPayments" \ "newSubsYTD", Seq(ValidationError("newSubsYTD must be greater than zero"))))
+      val newErrors = req.errors :+ ((inboundPayments \ "newSubsYTD", Seq(ValidationError("newSubsYTD must be greater than zero"))))
 
       req.copy(errors = newErrors)
     }
@@ -65,7 +80,7 @@ object BonusPaymentValidator {
     val htbGtZero = req.data.htbTransfer.isDefined && req.data.htbTransfer.get.htbTransferInForPeriod > 0
 
     if (htbGtZero && req.data.htbTransfer.get.htbTransferTotalYTD <= 0) {
-      val newErrors = req.errors :+ ((JsPath \ "htbTransfer" \ "htbTransferTotalYTD", Seq(ValidationError("htbTransferTotalYTD must be greater than zero"))))
+      val newErrors = req.errors :+ ((htbTransfer \ "htbTransferTotalYTD", Seq(ValidationError("htbTransferTotalYTD must be greater than zero"))))
 
       req.copy(errors = newErrors)
     }
@@ -82,8 +97,8 @@ object BonusPaymentValidator {
 
     val errorMessage = "newSubsForPeriod and htbTransferForPeriod cannot both be zero"
 
-    if (showSubError) newErrs += ((JsPath \ "inboundPayments" \ "newSubsForPeriod", Seq(ValidationError(errorMessage))))
-    if (showHtbError) newErrs += ((JsPath \ "htbTransfer" \ "htbTransferInForPeriod", Seq(ValidationError(errorMessage))))
+    if (showSubError) newErrs += ((inboundPayments \ "newSubsForPeriod", Seq(ValidationError(errorMessage))))
+    if (showHtbError) newErrs += ((htbTransfer \ "htbTransferInForPeriod", Seq(ValidationError(errorMessage))))
 
     newErrs
   }
