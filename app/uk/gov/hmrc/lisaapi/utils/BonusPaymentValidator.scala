@@ -16,8 +16,6 @@
 
 package uk.gov.hmrc.lisaapi.utils
 
-import play.api.data.validation.ValidationError
-import play.api.libs.json.JsPath
 import uk.gov.hmrc.lisaapi.controllers.ErrorValidation
 import uk.gov.hmrc.lisaapi.models.RequestBonusPaymentRequest
 
@@ -25,7 +23,7 @@ import scala.collection.mutable.ListBuffer
 
 case class BonusPaymentValidationRequest(data: RequestBonusPaymentRequest, errors: Seq[ErrorValidation] = Nil)
 
-object BonusPaymentValidator {
+trait BonusPaymentValidator {
 
   val inboundPayments: String = "/inboundPayments"
   val htbTransfer: String = "/htbTransfer"
@@ -124,3 +122,5 @@ object BonusPaymentValidator {
   }
 
 }
+
+object BonusPaymentValidator extends BonusPaymentValidator

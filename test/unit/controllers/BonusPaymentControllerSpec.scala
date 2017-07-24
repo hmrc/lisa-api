@@ -22,13 +22,14 @@ import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatest._
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.libs.json._
+import play.api.data.validation.ValidationError
+import play.api.libs.json.{Json, _}
 import play.api.mvc.{AnyContentAsJson, Result}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
-import uk.gov.hmrc.lisaapi.controllers.{BonusPaymentController, ErrorBadRequestLmrn}
+import uk.gov.hmrc.lisaapi.controllers.{BonusPaymentController, ErrorBadRequestLmrn, ErrorForbidden, ErrorValidation}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des.DesFailureResponse
 import uk.gov.hmrc.lisaapi.services.{AuditService, BonusPaymentService}
@@ -57,7 +58,7 @@ class BonusPaymentControllerSpec extends PlaySpec
     when(mockAuthCon.authorise[Option[String]](any(),any())(any())).thenReturn(Future(Some("1234")))
   }
 
-  "The Life Event Controller" should {
+  "The Bonus Payment Controller" should {
 
     "return with status 201 created" when {
 
@@ -103,6 +104,29 @@ class BonusPaymentControllerSpec extends PlaySpec
           (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID")
         }
 
+      }
+
+      "when the json request fails business validation" in {
+        val validBonusPayment = Json.parse(validBonusPaymentJson).as[RequestBonusPaymentRequest]
+
+        val ibp = validBonusPayment.inboundPayments.copy(newSubsForPeriod = Some(1), newSubsYTD = 0, totalSubsForPeriod = 0)
+        val htb = validBonusPayment.htbTransfer.get.copy(htbTransferInForPeriod = 1, htbTransferTotalYTD = 0)
+        val request = validBonusPayment.copy(inboundPayments = ibp, htbTransfer = Some(htb))
+
+        doRequest(Json.toJson(request).toString()) { res =>
+          status(res) mustBe FORBIDDEN
+
+          val json = contentAsJson(res)
+
+          (json \ "code").as[String] mustBe "FORBIDDEN"
+
+          val errors = (json \ "errors").as[List[Map[String, String]]]
+
+          errors.size mustBe 3
+          errors(0)("path") mustBe "/inboundPayments/newSubsYTD"
+          errors(1)("path") mustBe "/htbTransfer/htbTransferTotalYTD"
+          errors(2)("path") mustBe "/inboundPayments/totalSubsForPeriod"
+        }
       }
 
     }
@@ -209,6 +233,7 @@ class BonusPaymentControllerSpec extends PlaySpec
               "accountId" -> accountId,
               "periodStartDate" -> (json \ "periodStartDate").as[String],
               "periodEndDate" -> (json \ "periodEndDate").as[String],
+              "newSubsForPeriod" -> (inboundPayments \ "newSubsForPeriod").as[Amount].toString,
               "newSubsYTD" -> (inboundPayments \ "newSubsYTD").as[Amount].toString,
               "totalSubsForPeriod" -> (inboundPayments \ "totalSubsForPeriod").as[Amount].toString,
               "totalSubsYTD" -> (inboundPayments \ "totalSubsYTD").as[Amount].toString,
@@ -242,6 +267,7 @@ class BonusPaymentControllerSpec extends PlaySpec
               "accountId" -> accountId,
               "periodStartDate" -> (json \ "periodStartDate").as[String],
               "periodEndDate" -> (json \ "periodEndDate").as[String],
+              "newSubsForPeriod" -> (inboundPayments \ "newSubsForPeriod").as[Amount].toString,
               "newSubsYTD" -> (inboundPayments \ "newSubsYTD").as[Amount].toString,
               "totalSubsForPeriod" -> (inboundPayments \ "totalSubsForPeriod").as[Amount].toString,
               "totalSubsYTD" -> (inboundPayments \ "totalSubsYTD").as[Amount].toString,
@@ -292,11 +318,51 @@ class BonusPaymentControllerSpec extends PlaySpec
         }
       }
 
+      "the request fails business rule validation" in {
+        val validBonusPayment = Json.parse(validBonusPaymentJson).as[RequestBonusPaymentRequest]
+
+        val ibp = validBonusPayment.inboundPayments.copy(newSubsForPeriod = Some(1), newSubsYTD = 0, totalSubsForPeriod = 0)
+        val htb = validBonusPayment.htbTransfer.get.copy(htbTransferInForPeriod = 1, htbTransferTotalYTD = 0)
+        val request = validBonusPayment.copy(inboundPayments = ibp, htbTransfer = Some(htb))
+        val json = Json.toJson(request)
+
+        reset(mockService)
+
+        doSyncRequest(json.toString()) { _ =>
+          val inboundPayments = json \ "inboundPayments"
+          val bonuses = json \ "bonuses"
+          val htb = json \ "htbTransfer"
+
+          verify(mockAuditService).audit(
+            auditType = MatcherEquals("bonusPaymentNotRequested"),
+            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions"),
+            auditData = MatcherEquals(Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountId" -> accountId,
+              "lifeEventId" -> (json \ "lifeEventId").as[String],
+              "periodStartDate" -> (json \ "periodStartDate").as[String],
+              "periodEndDate" -> (json \ "periodEndDate").as[String],
+              "htbTransferInForPeriod" -> (htb \ "htbTransferInForPeriod").as[Int].toString,
+              "htbTransferTotalYTD" -> (htb \ "htbTransferTotalYTD").as[Int].toString,
+              "newSubsForPeriod" -> (inboundPayments \ "newSubsForPeriod").as[Int].toString,
+              "newSubsYTD" -> (inboundPayments \ "newSubsYTD").as[Int].toString,
+              "totalSubsForPeriod" -> (inboundPayments \ "totalSubsForPeriod").as[Int].toString,
+              "totalSubsYTD" -> (inboundPayments \ "totalSubsYTD").as[Int].toString,
+              "bonusDueForPeriod" -> (bonuses \ "bonusDueForPeriod").as[Int].toString,
+              "bonusPaidYTD" -> (bonuses \ "bonusPaidYTD").as[Int].toString,
+              "totalBonusDueYTD" -> (bonuses \ "totalBonusDueYTD").as[Int].toString,
+              "claimReason" -> (bonuses \ "claimReason").as[String],
+              "reasonNotRequested" -> "FORBIDDEN"
+            ))
+          )(any())
+        }
+      }
+
       "an error occurs" in {
         when(mockService.requestBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.failed(new RuntimeException("Test")))
 
-        doSyncRequest(validBonusPaymentMinimumFieldsJson) { res =>
+        doSyncRequest(validBonusPaymentMinimumFieldsJson) { _ =>
           reset(mockService) // removes the thenThrow
 
           val json = Json.parse(validBonusPaymentMinimumFieldsJson)
@@ -311,6 +377,7 @@ class BonusPaymentControllerSpec extends PlaySpec
               "accountId" -> accountId,
               "periodStartDate" -> (json \ "periodStartDate").as[String],
               "periodEndDate" -> (json \ "periodEndDate").as[String],
+              "newSubsForPeriod" -> (inboundPayments \ "newSubsForPeriod").as[Amount].toString,
               "newSubsYTD" -> (inboundPayments \ "newSubsYTD").as[Amount].toString,
               "totalSubsForPeriod" -> (inboundPayments \ "totalSubsForPeriod").as[Amount].toString,
               "totalSubsYTD" -> (inboundPayments \ "totalSubsYTD").as[Amount].toString,
