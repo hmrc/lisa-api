@@ -16,20 +16,18 @@
 
 package unit.controllers
 
-import org.mockito.Matchers._
 import org.mockito.Matchers.{eq => MatcherEquals, _}
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
 import org.scalatest._
+import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.data.validation.ValidationError
-import play.api.libs.json.{Json, _}
+import play.api.libs.json.Json
 import play.api.mvc.{AnyContentAsJson, Result}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
-import uk.gov.hmrc.lisaapi.controllers.{BonusPaymentController, ErrorBadRequestLmrn, ErrorForbidden, ErrorValidation}
+import uk.gov.hmrc.lisaapi.controllers.{BonusPaymentController, ErrorBadRequestLmrn}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des.DesFailureResponse
 import uk.gov.hmrc.lisaapi.services.{AuditService, BonusPaymentService}
