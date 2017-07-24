@@ -57,7 +57,7 @@ object BonusPaymentValidator {
     req.copy(errors = newErrs)
   }
 
-  val newSubsYTDGtZeroIfNewSubsForPeriodGtZero: PartialFunction[BonusPaymentValidationRequest, BonusPaymentValidationRequest] = {
+  private val newSubsYTDGtZeroIfNewSubsForPeriodGtZero: PartialFunction[BonusPaymentValidationRequest, BonusPaymentValidationRequest] = {
     case req: BonusPaymentValidationRequest if (
       req.data.inboundPayments.newSubsForPeriod.isDefined &&
       req.data.inboundPayments.newSubsForPeriod.get > 0 &&
@@ -68,7 +68,7 @@ object BonusPaymentValidator {
     case req: BonusPaymentValidationRequest => req
   }
 
-  val htbTransferTotalYTDGtZeroIfHtbTransferInForPeriodGtZero: PartialFunction[BonusPaymentValidationRequest, BonusPaymentValidationRequest] = {
+  private val htbTransferTotalYTDGtZeroIfHtbTransferInForPeriodGtZero: PartialFunction[BonusPaymentValidationRequest, BonusPaymentValidationRequest] = {
     case req: BonusPaymentValidationRequest if (
       req.data.htbTransfer.isDefined &&
       req.data.htbTransfer.get.htbTransferInForPeriod > 0 &&
@@ -79,7 +79,7 @@ object BonusPaymentValidator {
     case req: BonusPaymentValidationRequest => req
   }
 
-  val totalSubsForPeriodGtZero: PartialFunction[BonusPaymentValidationRequest, BonusPaymentValidationRequest] = {
+  private val totalSubsForPeriodGtZero: PartialFunction[BonusPaymentValidationRequest, BonusPaymentValidationRequest] = {
     case req: BonusPaymentValidationRequest if (req.data.inboundPayments.totalSubsForPeriod <= 0) => {
       req.copy(errors = req.errors :+ ErrorValidation(errorCode, "totalSubsForPeriod must be greater than zero", Some(s"$inboundPayments/totalSubsForPeriod")))
     }
@@ -95,14 +95,14 @@ object BonusPaymentValidator {
     case req: BonusPaymentValidationRequest => req
   }
 
-  val bonusDueForPeriodGtZero: PartialFunction[BonusPaymentValidationRequest, BonusPaymentValidationRequest] = {
+  private val bonusDueForPeriodGtZero: PartialFunction[BonusPaymentValidationRequest, BonusPaymentValidationRequest] = {
     case req: BonusPaymentValidationRequest if (req.data.bonuses.bonusDueForPeriod <= 0) => {
       req.copy(errors = req.errors :+ ErrorValidation(errorCode, "bonusDueForPeriod must be greater than zero", Some(s"$bonuses/bonusDueForPeriod")))
     }
     case req: BonusPaymentValidationRequest => req
   }
 
-  val totalBonusDueYTDGtZero: PartialFunction[BonusPaymentValidationRequest, BonusPaymentValidationRequest] = {
+  private val totalBonusDueYTDGtZero: PartialFunction[BonusPaymentValidationRequest, BonusPaymentValidationRequest] = {
     case req: BonusPaymentValidationRequest if (req.data.bonuses.totalBonusDueYTD <= 0) => {
       req.copy(errors = req.errors :+ ErrorValidation(errorCode, "totalBonusDueYTD must be greater than zero", Some(s"$bonuses/totalBonusDueYTD")))
     }
