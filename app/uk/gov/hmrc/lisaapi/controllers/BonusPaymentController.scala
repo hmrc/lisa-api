@@ -17,23 +17,25 @@
 package uk.gov.hmrc.lisaapi.controllers
 
 import play.api.Logger
+import play.api.data.validation.ValidationError
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, Result}
 import uk.gov.hmrc.lisaapi.LisaConstants
-import uk.gov.hmrc.lisaapi.metrics.{MetricsEnum, LisaMetrics}
+import uk.gov.hmrc.lisaapi.metrics.{LisaMetrics, MetricsEnum}
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.services.{AuditService, BonusPaymentService, LifeEventService}
+import uk.gov.hmrc.lisaapi.services.{AuditService, BonusPaymentService}
+import uk.gov.hmrc.lisaapi.utils.BonusPaymentValidator
+import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
 import uk.gov.hmrc.play.http.HeaderCarrier
 
-import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
 
 class BonusPaymentController extends LisaController with LisaConstants {
 
   val service: BonusPaymentService = BonusPaymentService
   val auditService: AuditService = AuditService
+  val validator: BonusPaymentValidator = BonusPaymentValidator
 
   def requestBonusPayment(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async {
     implicit request =>
@@ -46,36 +48,42 @@ class BonusPaymentController extends LisaController with LisaConstants {
             case ("Life Event", None) =>
               handleLifeEventNotProvided(lisaManager, accountId, req)
             case _ =>
-              service.requestBonusPayment(lisaManager, accountId, req) map { res =>
-                Logger.debug("Entering Bonus Payment Controller and the response is " + res.toString)
+              withValidData(req)(lisaManager, accountId) { () =>
+                service.requestBonusPayment(lisaManager, accountId, req) map { res =>
+                  Logger.debug("Entering Bonus Payment Controller and the response is " + res.toString)
 
-                LisaMetrics.incrementMetrics(System.currentTimeMillis(), MetricsEnum.BONUS_PAYMENT)
-                res match {
-                  case RequestBonusPaymentSuccessResponse(transactionID) =>
-                    handleSuccess(lisaManager, accountId, req, transactionID)
-                  case errorResponse: RequestBonusPaymentErrorResponse =>
-                    handleFailure(lisaManager, accountId, req, errorResponse)
+                  LisaMetrics.incrementMetrics(System.currentTimeMillis(), MetricsEnum.BONUS_PAYMENT)
+                  res match {
+                    case RequestBonusPaymentSuccessResponse(transactionID) =>
+                      handleSuccess(lisaManager, accountId, req, transactionID)
+                    case errorResponse: RequestBonusPaymentErrorResponse =>
+                      handleFailure(lisaManager, accountId, req, errorResponse)
+                  }
+                } recover {
+                  case e: Exception => Logger.error(s"requestBonusPayment : An error occurred due to ${e.getMessage} returning internal server error")
+                    handleError(lisaManager, accountId, req)
+
                 }
-              } recover {
-                case e: Exception => Logger.error(s"requestBonusPayment : An error occurred due to ${e.getMessage} returning internal server error")
-                  handleError(lisaManager, accountId, req)
-
               }
           }, lisaManager = lisaManager
         )
       }
   }
 
-  private def handleLifeEventNotProvided(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest)(implicit hc: HeaderCarrier) = {
-    Logger.debug("Life event not provided")
+  private def withValidData(data: RequestBonusPaymentRequest)
+                           (lisaManager: String, accountId: String)
+                           (callback: () => Future[Result])
+                           (implicit hc: HeaderCarrier) = {
+    val errors = validator.validate(data)
 
-    auditService.audit(
-      auditType = "bonusPaymentNotRequested",
-      path = getEndpointUrl(lisaManager, accountId),
-      auditData = createAuditData(lisaManager, accountId, req) ++ Map("reasonNotRequested" -> ErrorLifeEventNotProvided.errorCode)
-    )
+    if (errors.isEmpty) {
+      callback()
+    }
+    else {
+      auditFailure(lisaManager, accountId, data, "FORBIDDEN")
 
-    Future.successful(Forbidden(Json.toJson(ErrorLifeEventNotProvided)))
+      Future.successful(Forbidden(Json.toJson(ErrorForbidden(errors.toList))))
+    }
   }
 
   private def handleSuccess(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest, transactionID: String)(implicit hc: HeaderCarrier) = {
@@ -88,17 +96,14 @@ class BonusPaymentController extends LisaController with LisaConstants {
       auditData = createAuditData(lisaManager, accountId, req)
     )
 
-    Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = 201)))
+    Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
   }
 
-  private def handleFailure(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest, errorResponse: RequestBonusPaymentErrorResponse)(implicit hc: HeaderCarrier) = {
+  private def handleFailure(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest, errorResponse: RequestBonusPaymentErrorResponse)
+                           (implicit hc: HeaderCarrier) = {
     Logger.debug("Matched failure response")
 
-    auditService.audit(
-      auditType = "bonusPaymentNotRequested",
-      path = getEndpointUrl(lisaManager, accountId),
-      auditData = createAuditData(lisaManager, accountId, req) ++ Map("reasonNotRequested" -> errorResponse.data.code)
-    )
+    auditFailure(lisaManager, accountId, req, errorResponse.data.code)
 
     Status(errorResponse.status).apply(Json.toJson(errorResponse.data))
   }
@@ -106,13 +111,25 @@ class BonusPaymentController extends LisaController with LisaConstants {
   private def handleError(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest)(implicit hc: HeaderCarrier) = {
     Logger.debug("An error occurred")
 
+    auditFailure(lisaManager, accountId, req, ErrorInternalServerError.errorCode)
+
+    InternalServerError(Json.toJson(ErrorInternalServerError))
+  }
+
+  private def handleLifeEventNotProvided(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest)(implicit hc: HeaderCarrier) = {
+    Logger.debug("Life event not provided")
+
+    auditFailure(lisaManager, accountId, req, ErrorLifeEventNotProvided.errorCode)
+
+    Future.successful(Forbidden(Json.toJson(ErrorLifeEventNotProvided)))
+  }
+
+  private def auditFailure(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest, failureReason: String)(implicit hc: HeaderCarrier) = {
     auditService.audit(
       auditType = "bonusPaymentNotRequested",
       path = getEndpointUrl(lisaManager, accountId),
-      auditData = createAuditData(lisaManager, accountId, req) ++ Map("reasonNotRequested" -> ErrorInternalServerError.errorCode)
+      auditData = createAuditData(lisaManager, accountId, req) ++ Map("reasonNotRequested" -> failureReason)
     )
-
-    InternalServerError(Json.toJson(ErrorInternalServerError))
   }
 
   private def createAuditData(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest): Map[String, String] = {
