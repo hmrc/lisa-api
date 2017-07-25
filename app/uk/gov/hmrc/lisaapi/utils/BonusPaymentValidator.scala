@@ -113,7 +113,7 @@ trait BonusPaymentValidator {
     val showSubError = !subsExists && !htbExists || subsExists && !eitherGtZero
     val showHtbError = !subsExists && !htbExists || htbExists && !eitherGtZero
 
-    val errorMessage = "newSubsForPeriod and htbTransferForPeriod cannot both be zero"
+    val errorMessage = "newSubsForPeriod and htbTransferInForPeriod cannot both be zero"
 
     if (showSubError) newErrs += ErrorValidation(errorCode, errorMessage, Some(s"$inboundPayments/newSubsForPeriod"))
     if (showHtbError) newErrs += ErrorValidation(errorCode, errorMessage, Some(s"$htbTransfer/htbTransferInForPeriod"))
