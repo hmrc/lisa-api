@@ -16,14 +16,27 @@
 
 package unit.utils
 
+import org.mockito.Mockito._
+import org.joda.time.DateTime
+import org.scalatest.BeforeAndAfter
+import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
+import uk.gov.hmrc.lisaapi.controllers.ErrorValidation
 import uk.gov.hmrc.lisaapi.models.RequestBonusPaymentRequest
+import uk.gov.hmrc.lisaapi.services.CurrentDateService
 import uk.gov.hmrc.lisaapi.utils.BonusPaymentValidator
 
 import scala.io.Source
 
-class BonusPaymentValidatorSpec extends PlaySpec {
+class BonusPaymentValidatorSpec extends PlaySpec
+  with MockitoSugar
+  with BeforeAndAfter {
+
+  before {
+    reset(mockDateService)
+    when(mockDateService.now()).thenReturn(DateTime.now)
+  }
 
   val validBonusPaymentJson = Source.fromInputStream(getClass().getResourceAsStream("/json/request.valid.bonus-payment.json")).mkString
   val validBonusPayment = Json.parse(validBonusPaymentJson).as[RequestBonusPaymentRequest]
@@ -192,6 +205,130 @@ class BonusPaymentValidatorSpec extends PlaySpec {
 
   }
 
+  "periodStartDate" should {
+
+    "validate correctly" when {
+
+      "the current date is the sixth and they're submitting for today" in {
+        val today = new DateTime("2017-04-06")
+        val periodEndDate = new DateTime("2017-05-05")
+
+        reset(mockDateService)
+        when(mockDateService.now()).thenReturn(today)
+
+        val request = validBonusPayment.copy(periodStartDate = today, periodEndDate = periodEndDate)
+
+        val errors = SUT.validate(request)
+
+        errors mustBe List()
+      }
+
+    }
+
+    "return an error" when {
+
+      "it is not the 6th day of the month" in {
+        val request = validBonusPayment.copy(periodStartDate = new DateTime("2017-04-01"))
+
+        val errors = SUT.validate(request)
+
+        errors mustBe List(
+          ErrorValidation(
+            errorCode = "INVALID_DATE",
+            message = "The periodStartDate must equal the 6th day of the month",
+            path = Some("/periodStartDate")
+          )
+        )
+      }
+
+      "the supplied date is in the future" in {
+        val nextMonth = DateTime.now.plusMonths(1).withDayOfMonth(6)
+        val periodEndDate = nextMonth.plusMonths(1).withDayOfMonth(5)
+        val request = validBonusPayment.copy(periodStartDate = nextMonth, periodEndDate = periodEndDate)
+
+        val errors = SUT.validate(request)
+
+        errors mustBe List(
+          ErrorValidation(
+            errorCode = "INVALID_DATE",
+            message = "The periodStartDate may not be a future date",
+            path = Some("/periodStartDate")
+          )
+        )
+      }
+
+    }
+
+  }
+
+  "periodEndDate" should {
+
+    "validate correctly" when {
+
+      "the end date crosses into another year" in {
+        val periodStartDate = new DateTime("2016-12-06")
+        val periodEndDate = new DateTime("2017-01-05")
+        val request = validBonusPayment.copy(periodStartDate = periodStartDate, periodEndDate = periodEndDate)
+
+        val errors = SUT.validate(request)
+
+        errors mustBe List()
+      }
+
+    }
+
+    "return an error" when {
+
+      "it is not the 5th day of the month" in {
+        val request = validBonusPayment.copy(periodEndDate = new DateTime("2017-05-01"))
+
+        val errors = SUT.validate(request)
+
+        errors mustBe List(
+          ErrorValidation(
+            errorCode = "INVALID_DATE",
+            message = "The periodEndDate must equal the 5th day of the month after the periodStartDate",
+            path = Some("/periodEndDate")
+          )
+        )
+      }
+
+      "it is two months after the periodStartDate" in {
+        val periodStartDate = new DateTime("2016-12-06")
+        val periodEndDate = new DateTime("2017-02-05")
+        val request = validBonusPayment.copy(periodStartDate = periodStartDate, periodEndDate = periodEndDate)
+
+        val errors = SUT.validate(request)
+
+        errors mustBe List(
+          ErrorValidation(
+            errorCode = "INVALID_DATE",
+            message = "The periodEndDate must equal the 5th day of the month after the periodStartDate",
+            path = Some("/periodEndDate")
+          )
+        )
+      }
+
+      "it is before the periodStartDate" in {
+        val periodStartDate = new DateTime("2017-01-06")
+        val periodEndDate = new DateTime("2016-02-05")
+        val request = validBonusPayment.copy(periodStartDate = periodStartDate, periodEndDate = periodEndDate)
+
+        val errors = SUT.validate(request)
+
+        errors mustBe List(
+          ErrorValidation(
+            errorCode = "INVALID_DATE",
+            message = "The periodEndDate must equal the 5th day of the month after the periodStartDate",
+            path = Some("/periodEndDate")
+          )
+        )
+      }
+
+    }
+
+  }
+
   "the validate method" should {
 
     "return no errors" when {
@@ -219,6 +356,10 @@ class BonusPaymentValidatorSpec extends PlaySpec {
 
   }
 
-  val SUT = BonusPaymentValidator
+  val mockDateService: CurrentDateService = mock[CurrentDateService]
+
+  object SUT extends BonusPaymentValidator {
+    override val currentDateService: CurrentDateService = mockDateService
+  }
 
 }
