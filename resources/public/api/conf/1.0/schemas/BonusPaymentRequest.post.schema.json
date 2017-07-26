@@ -7,10 +7,10 @@
           "description": "The reference number you get when you report a life event.",
           "$ref": "#/definitions/IDType"},
 		"periodStartDate" : {
-          "description": "The first date in the claim period.",
+          "description": "The first date in the claim period. The periodStartDate must be the 6th day of the month. You can’t enter a date in the future for periodStartDate.",
           "$ref": "#/definitions/ISO8601-Date"},
 	    "periodEndDate" : {
-          "description": "The end date of the claim period.",
+          "description": "The end date of the claim period. The periodEndDate must be the 5th day of the month. It has to be the month after the periodStartDate.",
           "$ref": "#/definitions/ISO8601-Date"},
 
 		"htbTransfer" :
