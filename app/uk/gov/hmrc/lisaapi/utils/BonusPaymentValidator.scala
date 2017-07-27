@@ -115,7 +115,7 @@ trait BonusPaymentValidator {
   }
 
   private val periodStartDateIsSixth: PartialFunction[BonusPaymentValidationRequest, BonusPaymentValidationRequest] = {
-    case req: BonusPaymentValidationRequest if req.data.periodStartDate.dayOfMonth().get() != 6 => {
+    case req: BonusPaymentValidationRequest if req.data.periodStartDate.getDayOfMonth() != 6 => {
       req.copy(errors = req.errors :+ ErrorValidation(dateErrorCode, "The periodStartDate must equal the 6th day of the month", Some(s"/periodStartDate")))
     }
     case req: BonusPaymentValidationRequest => req
