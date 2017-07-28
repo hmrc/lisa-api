@@ -670,6 +670,13 @@ types:
                             application/json:
                               type: !include schemas/ErrorCodes.schema.json
                               examples:
+                                forbidden:
+                                  description: Request data does not meet business rules.
+                                  value: |
+                                    {
+                                      "code" : "FORBIDDEN",
+                                      "message" : "Forbidden"
+                                    }
                                 lifeEventNotProvided:
                                   description: lifeEventId is required when the claimReason is "Life Event".
                                   value: |
