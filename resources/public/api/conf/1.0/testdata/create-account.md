@@ -296,24 +296,5 @@
                 </p>
             </td>
         </tr>
-        <tr>
-            <td><p>Request which fails due to an unexpected error</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile<a></p></td>
-            <td>
-                <p class ="code--block"> {<br>
-                                     	    "investorId": "1234567894",<br>
-                                     	    "creationReason": "New",<br>
-                                     	    "accountId": "1234567890",<br>
-                                     	    "firstSubscriptionDate": "2011-03-23"<br>
-                                        }
-                </p>
-            </td>
-            <td><p>HTTP status: <code class="code--slim">500 (Internal Server Error)</code></p>
-                <p class ="code--block"> {<br>
-                                            "code": "INTERNAL_SERVER_ERROR",<br>
-                                            "message": "Internal server error"<br>
-                                          }
-                </p>
-            </td>
-        </tr>
     </tbody>
 </table>

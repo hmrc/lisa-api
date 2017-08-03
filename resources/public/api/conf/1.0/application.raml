@@ -68,18 +68,6 @@ types:
                                   "code" : "BAD_REQUEST",
                                   "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
                                 }
-                    404:
-                      body:
-                        application/json:
-                          type: !include schemas/ErrorCodes.schema.json
-                          examples:
-                            ResourceNotFound:
-                              description: Resource Not Found
-                              value: |
-                                {
-                                  "code" : "NOT_FOUND",
-                                  "message" : "Resource Not Found"
-                                }
                     406:
                       body:
                         application/json:
@@ -92,20 +80,6 @@ types:
                                   "code" : "ACCEPT_HEADER_INVALID",
                                   "message" : "Accept header invalid"
                                 }
-                    500:
-                      body:
-                        application/json:
-                          type: !include schemas/ErrorCodes.schema.json
-                          examples:
-                           internalServerError :
-                              description: Internal Server Error
-                              value: |
-                                {
-                                  "code" : "INTERNAL_SERVER_ERROR",
-                                  "message" : "Internal Server Error"
-                                }
-
-
       /investors:
             post:
               is: [headers.acceptHeader, headers.contentHeader]
@@ -166,18 +140,6 @@ types:
                           "code": "INVESTOR_NOT_FOUND",
                           "message": "The investor details given do not match with HMRC’s records."
                         }
-                404:
-                  body:
-                    application/json:
-                      type: !include schemas/ErrorCodes.schema.json
-                      examples:
-                        ResourceNotFound:
-                          description: Resource Not Found
-                          value: |
-                            {
-                              "code" : "NOT_FOUND",
-                              "message" : "Resource Not Found"
-                            }
                 406:
                   body:
                     application/json:
@@ -204,20 +166,6 @@ types:
                               "code" : "INVESTOR_ALREADY_EXISTS",
                               "message" : "The investor already has a record with HMRC."
                             }
-                500:
-                  body:
-                    application/json:
-                      type: !include schemas/ErrorCodes.schema.json
-                      examples:
-                       internalServerError :
-                          description: Internal Server Error
-                          value: |
-                            {
-                              "code" : "INTERNAL_SERVER_ERROR",
-                              "message" : "Internal Server Error"
-                            }
-
-
       /accounts:
         description: !include documentation/LISAAccount
         post:
@@ -321,19 +269,6 @@ types:
                           "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID",
                           "message": "The LISA account has already been closed or voided."
                         }
-
-            404:
-              body:
-                application/json:
-                  type: !include schemas/ErrorCodes.schema.json
-                  examples:
-                    ResourceNotFound:
-                      description: Resource Not Found
-                      value: |
-                        {
-                          "code" : "NOT_FOUND",
-                          "message" : "Resource Not Found"
-                        }
             406:
               body:
                 application/json:
@@ -346,7 +281,6 @@ types:
                           "code" : "ACCEPT_HEADER_INVALID",
                           "message" : "Accept header invalid"
                         }
-
             409:
               body:
                 application/json:
@@ -357,19 +291,6 @@ types:
                       "code": "INVESTOR_ACCOUNT_ALREADY_EXISTS",
                       "message": "Investor Account Already Exists"
                     }
-            500:
-              body:
-                application/json:
-                  type: !include schemas/ErrorCodes.schema.json
-                  examples:
-                   internalServerError :
-                      description: Internal Server Error
-                      value: |
-                        {
-                          "code" : "INTERNAL_SERVER_ERROR",
-                          "message" : "Internal Server Error"
-                        }
-
         /{accountId}:
               uriParameters:
                 accountId:
@@ -385,7 +306,6 @@ types:
                       (annotations.scope): "write:lisa"
                       securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
                       (annotations.sandboxData): !include testdata/close-account.md
-
                       body:
                         application/json:
                           type: !include schemas/LISAAccount.close.post.schema.json
@@ -396,7 +316,6 @@ types:
                           body:
                             application/json:
                               example: !include examples/LISAAccount.put.response.json
-
                         400:
                           body:
                             application/json:
@@ -428,7 +347,6 @@ types:
                                       "code" : "UNAUTHORIZED",
                                       "message" : "lisaManagerReferenceNumber is not authorised"
                                     }
-
                         403:
                           body:
                             application/json:
@@ -440,26 +358,6 @@ types:
                                     {
                                       "code" : "INVESTOR_ACCOUNT_ALREADY_CLOSED",
                                       "message" : "The Investor Account is already closed"
-                                    }
-
-                        404:
-                          body:
-                            application/json:
-                              type: !include schemas/ErrorCodes.schema.json
-                              examples:
-                                accountIdNOTFound:
-                                  description: The accountId given does not match with HMRC’s records.
-                                  value: |
-                                    {
-                                      "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
-                                      "message": "The accountId given does not match with HMRC’s records."
-                                    }
-                                resourceNotFound:
-                                  description: Resource Not Found
-                                  value: |
-                                    {
-                                      "code" : "NOT_FOUND",
-                                      "message" : "Resource Not Found"
                                     }
                         406:
                           body:
@@ -473,19 +371,6 @@ types:
                                       "code" : "ACCEPT_HEADER_INVALID",
                                       "message" : "Accept header invalid"
                                     }
-                        500:
-                          body:
-                            application/json:
-                              type: !include schemas/ErrorCodes.schema.json
-                              examples:
-                               internalServerError :
-                                  description: Internal Server Error
-                                  value: |
-                                    {
-                                      "code" : "INTERNAL_SERVER_ERROR",
-                                      "message" : "Internal Server Error"
-                                    }
-
               /events:
                     description: !include documentation/LifeEvent
                     post:
@@ -536,7 +421,6 @@ types:
                                       "code" : "UNAUTHORIZED",
                                       "message" : "lisaManagerReferenceNumber is not authorised"
                                     }
-
                         403:
                           description: Matches already existing resource.
                             Response contains a location header with link to the existing resource.
@@ -558,7 +442,6 @@ types:
                                       "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID",
                                       "message": "The LISA account has already been closed or voided."
                                     }
-
                         404:
                           body:
                             application/json:
@@ -570,13 +453,6 @@ types:
                                     {
                                       "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
                                       "message": "The accountId given does not match with HMRC’s records."
-                                    }
-                                resourceNotFound:
-                                  description: Resource Not Found
-                                  value: |
-                                    {
-                                      "code" : "NOT_FOUND",
-                                      "message" : "Resource Not Found"
                                     }
                         406:
                           body:
@@ -600,19 +476,6 @@ types:
                                       "code" : "LIFE_EVENT_ALREADY_EXISTS",
                                       "message" : "The investor’s life event has already been reported."
                                 }
-                        500:
-                          body:
-                            application/json:
-                              type: !include schemas/ErrorCodes.schema.json
-                              examples:
-                               internalServerError :
-                                  description: Internal Server Error
-                                  value: |
-                                    {
-                                      "code" : "INTERNAL_SERVER_ERROR",
-                                      "message" : "Internal Server Error"
-                                    }
-
               /transactions:
                     description: !include documentation/LISATransaction
                     post:
@@ -632,7 +495,6 @@ types:
                           body:
                             application/json:
                               example: !include examples/LISATransaction.post.response.json
-
                         400:
                           body:
                             application/json:
@@ -697,7 +559,6 @@ types:
                                       "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID",
                                       "message": "The LISA account has already been closed or voided."
                                     }
-
                         404:
                           body:
                             application/json:
@@ -717,13 +578,6 @@ types:
                                       "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
                                       "message": "The accountId given does not match with HMRC’s records."
                                     }
-                                resourceNotFound:
-                                  description: Resource Not Found
-                                  value: |
-                                    {
-                                      "code" : "NOT_FOUND",
-                                      "message" : "Resource Not Found"
-                                    }
                         406:
                           body:
                             application/json:
@@ -735,16 +589,4 @@ types:
                                     {
                                       "code" : "ACCEPT_HEADER_INVALID",
                                       "message" : "Accept header invalid"
-                                    }
-                        500:
-                          body:
-                            application/json:
-                              type: !include schemas/ErrorCodes.schema.json
-                              examples:
-                               internalServerError :
-                                  description: Internal Server Error
-                                  value: |
-                                    {
-                                      "code" : "INTERNAL_SERVER_ERROR",
-                                      "message" : "Internal Server Error"
                                     }
