@@ -136,7 +136,7 @@ trait DesConnector extends ServicesConfig {
   def requestBonusPayment(lisaManager: String, accountId: String, request: RequestBonusPaymentRequest)
                      (implicit hc: HeaderCarrier): Future[(Int, DesResponse)] = {
 
-    val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId/transactions"
+    val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId/bonus-claim"
     Logger.debug("Posting Bonus Payment request to des: " + uri)
     val result = httpPost.POST[RequestBonusPaymentRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc))
 
