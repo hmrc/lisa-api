@@ -434,13 +434,13 @@ class DesConnectorSpec extends PlaySpec
             Future.successful(
               HttpResponse(
                 responseStatus = CREATED,
-                responseJson = Some(Json.parse(s"""{"transactionID": "87654321"}"""))
+                responseJson = Some(Json.parse(s"""{"transactionID": "87654321","message": "On Time"}"""))
               )
             )
           )
 
         doRequestBonusPaymentRequest { response =>
-          response must be((CREATED, DesTransactionResponse("87654321")))
+          response must be((CREATED, DesTransactionResponse("87654321","On Time")))
         }
       }
     }

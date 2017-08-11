@@ -23,8 +23,8 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models.{RequestBonusPaymentResponse, _}
-import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesLifeEventResponse, DesTransactionResponse}
-import uk.gov.hmrc.lisaapi.services.{BonusPaymentService, LifeEventService}
+import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesTransactionResponse}
+import uk.gov.hmrc.lisaapi.services.{BonusPaymentService}
 import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.duration.Duration
@@ -35,15 +35,25 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
   "BonusPaymentService" must {
 
     "return a Success Response" when {
-      "given a success response from the DES connector" in {
+      "given a success On Time response from the DES connector" in {
         when(mockDesConnector.requestBonusPayment(any(), any(),any())(any())).
-          thenReturn(Future.successful((201, DesTransactionResponse("AB123456"))))
+          thenReturn(Future.successful((201, DesTransactionResponse("AB123456","On Time"))))
 
         doRequest{response =>
-          response mustBe RequestBonusPaymentSuccessResponse("AB123456")
+          response mustBe RequestBonusPaymentSuccessResponse("AB123456","Bonus transaction created")
         }
       }
     }
+
+      "given a successful late notification response from the DES connector" in {
+        when(mockDesConnector.requestBonusPayment(any(), any(),any())(any())).
+          thenReturn(Future.successful((201, DesTransactionResponse("AB123456","Late"))))
+
+        doRequest{response =>
+          response mustBe RequestBonusPaymentSuccessResponse("AB123456","Bonus transaction created - Late Notification")
+        }
+      }
+
 
     "return an Error Response" when {
       "given an error response from the DES connector" in {

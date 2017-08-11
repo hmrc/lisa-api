@@ -62,7 +62,7 @@ class BonusPaymentControllerSpec extends PlaySpec
 
       "given a Success Response from the service layer" in {
         when(mockService.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(RequestBonusPaymentSuccessResponse("1928374")))
+          thenReturn(Future.successful(RequestBonusPaymentSuccessResponse("1928374","On Time")))
 
         doRequest(validBonusPaymentJson) { res =>
           status(res) mustBe (CREATED)
@@ -180,7 +180,7 @@ class BonusPaymentControllerSpec extends PlaySpec
 
       "given a success response from the service layer and all optional fields" in {
         when(mockService.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(RequestBonusPaymentSuccessResponse("1928374")))
+          thenReturn(Future.successful(RequestBonusPaymentSuccessResponse("1928374","On Time")))
 
         doSyncRequest(validBonusPaymentJson) { res =>
 
@@ -215,7 +215,7 @@ class BonusPaymentControllerSpec extends PlaySpec
 
       "given a success response from the service layer and no optional fields" in {
         when(mockService.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(RequestBonusPaymentSuccessResponse("1928374")))
+          thenReturn(Future.successful(RequestBonusPaymentSuccessResponse("1928374", "On Time")))
 
         doSyncRequest(validBonusPaymentMinimumFieldsJson) { res =>
 
