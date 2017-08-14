@@ -54,8 +54,8 @@ class BonusPaymentController extends LisaController with LisaConstants {
 
                   LisaMetrics.incrementMetrics(System.currentTimeMillis(), MetricsEnum.BONUS_PAYMENT)
                   res match {
-                    case RequestBonusPaymentSuccessResponse(transactionID) =>
-                      handleSuccess(lisaManager, accountId, req, transactionID)
+                    case successResponse:RequestBonusPaymentSuccessResponse =>
+                      handleSuccess(lisaManager, accountId, req, successResponse)
                     case errorResponse: RequestBonusPaymentErrorResponse =>
                       handleFailure(lisaManager, accountId, req, errorResponse)
                   }
@@ -86,9 +86,9 @@ class BonusPaymentController extends LisaController with LisaConstants {
     }
   }
 
-  private def handleSuccess(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest, transactionID: String)(implicit hc: HeaderCarrier) = {
+  private def handleSuccess(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest, resp: RequestBonusPaymentSuccessResponse)(implicit hc: HeaderCarrier) = {
     Logger.debug("Matched success response")
-    val data = ApiResponseData(message = "Bonus transaction created", transactionId = Some(transactionID))
+    val data = ApiResponseData(message = resp.message, transactionId = Some(resp.transactionId))
 
     auditService.audit(
       auditType = "bonusPaymentRequested",
