@@ -42,4 +42,6 @@ package object controllers {
 
 trait LisaConstants {
   val ZREF: String = "lisaManagerReferenceNumber"
+  val NOTIFICATION:String  = "lateNotification"
+  val NOTIFICATION_MSG:String = "Bonus transaction created - Late Notification"
 }
