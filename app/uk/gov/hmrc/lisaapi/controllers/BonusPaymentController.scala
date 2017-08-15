@@ -93,7 +93,7 @@ class BonusPaymentController extends LisaController with LisaConstants {
     auditService.audit(
       auditType = "bonusPaymentRequested",
       path = getEndpointUrl(lisaManager, accountId),
-      auditData = createAuditData(lisaManager, accountId, req)
+      auditData = (createAuditData(lisaManager, accountId, req) + (NOTIFICATION -> (if(resp.message == NOTIFICATION_MSG) "yes" else "no")))
     )
 
     Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
