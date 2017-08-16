@@ -24,7 +24,7 @@ import uk.gov.hmrc.lisaapi.models.CloseLisaAccountRequest
 
 class CloseLisaAccountSpec extends PlaySpec {
 
-  val validRequestJson = """{"accountClosureReason":"Voided", "closureDate":"2000-01-01"}"""
+  val validRequestJson = """{"accountClosureReason":"All funds withdrawn", "closureDate":"2000-01-01"}"""
 
   "CloseLisaAccountRequest" must {
 
@@ -34,7 +34,7 @@ class CloseLisaAccountSpec extends PlaySpec {
       res match {
         case JsError(errors) => fail()
         case JsSuccess(data, path) => {
-          data.accountClosureReason mustBe "Voided"
+          data.accountClosureReason mustBe "All funds withdrawn"
           data.closureDate.getYear mustBe 2000
           data.closureDate.getMonthOfYear mustBe 1
           data.closureDate.getDayOfMonth mustBe 1
@@ -43,7 +43,7 @@ class CloseLisaAccountSpec extends PlaySpec {
     }
 
     "deserialize to json" in {
-      val request = CloseLisaAccountRequest("Voided", new DateTime("2000-01-01"))
+      val request = CloseLisaAccountRequest("All funds withdrawn", new DateTime("2000-01-01"))
 
       val json = Json.toJson[CloseLisaAccountRequest](request)
 
@@ -68,7 +68,7 @@ class CloseLisaAccountSpec extends PlaySpec {
       }
 
       "given an invalid reason for closure" in {
-        val req = validRequestJson.replace("Voided", "X")
+        val req = validRequestJson.replace("All funds withdrawn", "X")
 
         validateRequest(req) { errors =>
           errors.count {
