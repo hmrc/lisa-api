@@ -291,7 +291,7 @@ class AccountServiceSpec extends PlaySpec
   }
 
   private def doCloseRequest(callback: (CloseLisaAccountResponse) => Unit) = {
-    val request = CloseLisaAccountRequest("Voided", testDate)
+    val request = CloseLisaAccountRequest("All funds withdrawn", testDate)
     val response = Await.result(SUT.closeAccount(testLMRN, "A123456", request)(HeaderCarrier()), Duration.Inf)
 
     callback(response)
