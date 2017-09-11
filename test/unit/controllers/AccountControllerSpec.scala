@@ -92,7 +92,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
                                         |  "firstSubscriptionDate" : "2011-03-23"
                                         |}""".stripMargin
 
-  val closeAccountJson = """{"accountClosureReason" : "Voided", "closureDate" : "2000-06-23"}"""
+  val closeAccountJson = """{"accountClosureReason" : "All funds withdrawn", "closureDate" : "2000-06-23"}"""
 
   "The Create / Transfer Account endpoint" must {
 
@@ -592,7 +592,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               path=matchersEquals(s"/manager/$lisaManager/accounts/AB123456/close-account"),
               auditData = matchersEquals(Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
-                "accountClosureReason" -> "Voided",
+                "accountClosureReason" -> "All funds withdrawn",
                 "closureDate" -> "2000-06-23",
                 "accountId" -> "AB123456"
                )))(any())
@@ -611,7 +611,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
             path=matchersEquals(s"/manager/$lisaManager/accounts/ABC12345/close-account"),
             auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
-              "accountClosureReason" -> "Voided",
+              "accountClosureReason" -> "All funds withdrawn",
               "closureDate" -> "2000-06-23",
               "accountId" -> "ABC12345",
               "reasonNotClosed" -> "INVESTOR_ACCOUNT_ALREADY_CLOSED"
@@ -628,7 +628,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
             path=matchersEquals(s"/manager/$lisaManager/accounts/ABC12345/close-account"),
             auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
-              "accountClosureReason" -> "Voided",
+              "accountClosureReason" -> "All funds withdrawn",
               "closureDate" -> "2000-06-23",
               "accountId" -> "ABC12345",
               "reasonNotClosed" -> "INVESTOR_ACCOUNTID_NOT_FOUND"
@@ -647,7 +647,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               path=matchersEquals(s"/manager/$lisaManager/accounts/ABC12345/close-account"),
               auditData = matchersEquals(Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
-                "accountClosureReason" -> "Voided",
+                "accountClosureReason" -> "All funds withdrawn",
                 "closureDate" -> "2000-06-23",
                 "accountId" -> "ABC12345",
                 "reasonNotClosed" -> "INTERNAL_SERVER_ERROR"
@@ -694,7 +694,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
     "return with status 400 bad request" when {
       "submitted an invalid close account request" in {
-        doCloseRequest(closeAccountJson.replace("Voided", "X")) { res =>
+        doCloseRequest(closeAccountJson.replace("All funds withdrawn", "X")) { res =>
           status(res) mustBe (BAD_REQUEST)
         }
       }

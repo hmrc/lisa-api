@@ -62,7 +62,7 @@ class BonusPaymentControllerSpec extends PlaySpec
 
       "given a Success Response from the service layer" in {
         when(mockService.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(RequestBonusPaymentSuccessResponse("1928374")))
+          thenReturn(Future.successful(RequestBonusPaymentSuccessResponse("1928374","On Time")))
 
         doRequest(validBonusPaymentJson) { res =>
           status(res) mustBe (CREATED)
@@ -180,7 +180,7 @@ class BonusPaymentControllerSpec extends PlaySpec
 
       "given a success response from the service layer and all optional fields" in {
         when(mockService.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(RequestBonusPaymentSuccessResponse("1928374")))
+          thenReturn(Future.successful(RequestBonusPaymentSuccessResponse("1928374","Bonus transaction created")))
 
         doSyncRequest(validBonusPaymentJson) { res =>
 
@@ -195,6 +195,7 @@ class BonusPaymentControllerSpec extends PlaySpec
             auditData = MatcherEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountId" -> accountId,
+              "lateNotification" -> "no",
               "lifeEventId" -> (json \ "lifeEventId").as[String],
               "periodStartDate" -> (json \ "periodStartDate").as[String],
               "periodEndDate" -> (json \ "periodEndDate").as[String],
@@ -215,7 +216,7 @@ class BonusPaymentControllerSpec extends PlaySpec
 
       "given a success response from the service layer and no optional fields" in {
         when(mockService.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(RequestBonusPaymentSuccessResponse("1928374")))
+          thenReturn(Future.successful(RequestBonusPaymentSuccessResponse("1928374", "Bonus transaction created - Late Notification")))
 
         doSyncRequest(validBonusPaymentMinimumFieldsJson) { res =>
 
@@ -229,6 +230,7 @@ class BonusPaymentControllerSpec extends PlaySpec
             auditData = MatcherEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountId" -> accountId,
+              "lateNotification" -> "yes",
               "periodStartDate" -> (json \ "periodStartDate").as[String],
               "periodEndDate" -> (json \ "periodEndDate").as[String],
               "newSubsForPeriod" -> (inboundPayments \ "newSubsForPeriod").as[Amount].toString,

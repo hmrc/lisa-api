@@ -43,7 +43,7 @@ object Constants {
     EVENT_TYPE.toString -> List("LISA Investor Terminal Ill Health", "LISA Investor Death", "House Purchase"),
     CREATION_REASON.toString -> List("New", "Transferred"),
     CLAIM_REASON.toString -> List("Life Event", "Regular Bonus"),
-    CLOSURE_REASON.toString -> List("Transferred out", "All funds withdrawn" , "Voided")  )
+    CLOSURE_REASON.toString -> List("All funds withdrawn")  )
 
 
     def apply (key: Constants.EnumKey, code:String) =

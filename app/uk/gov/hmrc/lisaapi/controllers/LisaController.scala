@@ -26,7 +26,7 @@ import uk.gov.hmrc.lisaapi.utils.ErrorConverter
 import uk.gov.hmrc.play.config.RunMode
 import uk.gov.hmrc.play.microservice.controller.BaseController
 import uk.gov.hmrc.auth.core.Retrievals._
-import uk.gov.hmrc.auth.core.{AuthorisedFunctions, Enrolment, InsufficientEnrolments}
+import uk.gov.hmrc.auth.core.{AuthorisationException, AuthorisedFunctions, Enrolment, InsufficientEnrolments}
 import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetrics, MetricsEnum}
 
@@ -90,8 +90,9 @@ trait LisaController extends BaseController with HeaderValidator with RunMode wi
     }
   }
 
-  def handleFailure(implicit request: Request[_]) = PartialFunction[Throwable, Future[Result]] {
-    case ex: InsufficientEnrolments => Future.successful(Unauthorized(Json.toJson(ErrorInvalidLisaManager)))
+  def handleFailure(implicit request: Request[_]): PartialFunction[Throwable, Future[Result]] = PartialFunction[Throwable, Future[Result]] {
+    case _: InsufficientEnrolments => Future.successful(Unauthorized(Json.toJson(ErrorInvalidLisaManager)))
+    case _: AuthorisationException => Future.successful(Unauthorized(Json.toJson(ErrorUnauthorized)))
     case _ => Future.successful(InternalServerError(toJson(ErrorInternalServerError)))
   }
 }

@@ -20,7 +20,7 @@ import play.api.Logger
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetrics, MetricsEnum}
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.models.des.{DesCreateInvestorResponse, DesFailureResponse, DesLifeEventResponse, DesTransactionResponse}
+import uk.gov.hmrc.lisaapi.models.des.{DesCreateInvestorResponse, DesFailureResponse}
 import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future

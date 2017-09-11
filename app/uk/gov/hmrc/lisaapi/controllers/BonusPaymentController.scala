@@ -52,10 +52,10 @@ class BonusPaymentController extends LisaController with LisaConstants {
                 service.requestBonusPayment(lisaManager, accountId, req) map { res =>
                   Logger.debug("Entering Bonus Payment Controller and the response is " + res.toString)
 
+                  LisaMetrics.incrementMetrics(System.currentTimeMillis(), MetricsEnum.BONUS_PAYMENT)
                   res match {
-                    case RequestBonusPaymentSuccessResponse(transactionID) =>
-                      LisaMetrics.incrementMetrics(startTime, MetricsEnum.BONUS_PAYMENT)
-                      handleSuccess(lisaManager, accountId, req, transactionID)
+                    case successResponse:RequestBonusPaymentSuccessResponse =>
+                      handleSuccess(lisaManager, accountId, req, successResponse)
                     case errorResponse: RequestBonusPaymentErrorResponse =>
                       handleFailure(lisaManager, accountId, req, errorResponse)
                   }
@@ -86,14 +86,14 @@ class BonusPaymentController extends LisaController with LisaConstants {
     }
   }
 
-  private def handleSuccess(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest, transactionID: String)(implicit hc: HeaderCarrier) = {
+  private def handleSuccess(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest, resp: RequestBonusPaymentSuccessResponse)(implicit hc: HeaderCarrier) = {
     Logger.debug("Matched success response")
-    val data = ApiResponseData(message = "Bonus transaction created", transactionId = Some(transactionID))
+    val data = ApiResponseData(message = resp.message, transactionId = Some(resp.transactionId))
 
     auditService.audit(
       auditType = "bonusPaymentRequested",
       path = getEndpointUrl(lisaManager, accountId),
-      auditData = createAuditData(lisaManager, accountId, req)
+      auditData = (createAuditData(lisaManager, accountId, req) + (NOTIFICATION -> (if(resp.message == NOTIFICATION_MSG) "yes" else "no")))
     )
 
     Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
@@ -104,8 +104,6 @@ class BonusPaymentController extends LisaController with LisaConstants {
     Logger.debug("Matched failure response")
 
     auditFailure(lisaManager, accountId, req, errorResponse.data.code)
-    LisaMetrics.incrementMetrics(System.currentTimeMillis(),
-      MetricsEnum.lisaError(errorResponse.status,MetricsEnum.BONUS_PAYMENT))
 
     Status(errorResponse.status).apply(Json.toJson(errorResponse.data))
   }
@@ -114,8 +112,6 @@ class BonusPaymentController extends LisaController with LisaConstants {
     Logger.debug("An error occurred")
 
     auditFailure(lisaManager, accountId, req, ErrorInternalServerError.errorCode)
-    LisaMetrics.startMetrics(System.currentTimeMillis(),
-      MetricsEnum.lisaError(INTERNAL_SERVER_ERROR,MetricsEnum.BONUS_PAYMENT))
 
     InternalServerError(Json.toJson(ErrorInternalServerError))
   }
@@ -124,8 +120,6 @@ class BonusPaymentController extends LisaController with LisaConstants {
     Logger.debug("Life event not provided")
 
     auditFailure(lisaManager, accountId, req, ErrorLifeEventNotProvided.errorCode)
-    LisaMetrics.startMetrics(System.currentTimeMillis(),
-      MetricsEnum.lisaError(FORBIDDEN,MetricsEnum.BONUS_PAYMENT))
 
     Future.successful(Forbidden(Json.toJson(ErrorLifeEventNotProvided)))
   }

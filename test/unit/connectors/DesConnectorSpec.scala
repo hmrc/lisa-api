@@ -434,13 +434,13 @@ class DesConnectorSpec extends PlaySpec
             Future.successful(
               HttpResponse(
                 responseStatus = CREATED,
-                responseJson = Some(Json.parse(s"""{"transactionID": "87654321"}"""))
+                responseJson = Some(Json.parse(s"""{"transactionID": "87654321","message": "On Time"}"""))
               )
             )
           )
 
         doRequestBonusPaymentRequest { response =>
-          response must be((CREATED, DesTransactionResponse("87654321")))
+          response must be((CREATED, DesTransactionResponse("87654321","On Time")))
         }
       }
     }
@@ -524,7 +524,7 @@ class DesConnectorSpec extends PlaySpec
   }
 
   private def doCloseAccountRequest(callback: (DesResponse) => Unit) = {
-    val request = CloseLisaAccountRequest("Voided", new DateTime("2000-01-01"))
+    val request = CloseLisaAccountRequest("All funds withdrawn", new DateTime("2000-01-01"))
     val response = Await.result(SUT.closeAccount("Z123456", "ABC12345", request), Duration.Inf)
 
     callback(response)
