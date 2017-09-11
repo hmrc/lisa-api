@@ -18,6 +18,7 @@ package uk.gov.hmrc.lisaapi.services
 
 import play.api.Logger
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
+import uk.gov.hmrc.lisaapi.metrics.{LisaMetrics, MetricsEnum}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des.{DesCreateInvestorResponse, DesFailureResponse, DesLifeEventResponse, DesTransactionResponse}
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -35,8 +36,10 @@ trait InvestorService  {
     response map {
       case (409, existsResponse: DesCreateInvestorResponse) => CreateLisaInvestorAlreadyExistsResponse(existsResponse.investorID)
       case (_, successResponse: DesCreateInvestorResponse) => CreateLisaInvestorSuccessResponse(successResponse.investorID)
-      case (status: Int, errorResponse: DesFailureResponse) => CreateLisaInvestorErrorResponse(status, errorResponse)
-    }
+      case (status: Int, errorResponse: DesFailureResponse) => LisaMetrics.startMetrics(System.currentTimeMillis(),
+                                                                  MetricsEnum.lisaError(status,MetricsEnum.LISA_INVESTOR))
+                                                              CreateLisaInvestorErrorResponse(status, errorResponse)
+                                                          }
   }
 
 }

@@ -48,5 +48,8 @@ object MetricsEnum extends Enumeration {
  val  CLOSE_ACCOUNT = Value
   val LIFE_EVENT = Value
   val BONUS_PAYMENT = Value
+  def lisaError(status:Int, name:Value):Value =  Value(status,s"${name}_${status}")
+  val LISA_400 = Value
+
 
 }

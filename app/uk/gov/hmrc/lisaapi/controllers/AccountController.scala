@@ -46,6 +46,9 @@ class AccountController extends LisaController with LisaConstants {
           req match {
             case createRequest: CreateLisaAccountCreationRequest => {
               if (hasAccountTransferData(request.body.asJson.get.as[JsObject])) {
+                LisaMetrics.startMetrics(System.currentTimeMillis(),
+                  MetricsEnum.lisaError(FORBIDDEN,MetricsEnum.CREATE_OR_TRANSFER_ACCOUNT))
+
                 Future.successful(Forbidden(toJson(ErrorTransferAccountDataProvided)))
               }
               else {
@@ -66,9 +69,15 @@ class AccountController extends LisaController with LisaConstants {
             }
 
             if (transferAccountDataNotProvided > 0) {
+              LisaMetrics.incrementMetrics(startTime,
+                MetricsEnum.lisaError(FORBIDDEN,MetricsEnum.CREATE_OR_TRANSFER_ACCOUNT))
+
               Future.successful(Forbidden(toJson(ErrorTransferAccountDataNotProvided)))
             }
             else {
+              LisaMetrics.incrementMetrics(startTime,
+                MetricsEnum.lisaError(BAD_REQUEST,MetricsEnum.CREATE_OR_TRANSFER_ACCOUNT))
+
               Future.successful(BadRequest(toJson(ErrorBadRequest(errorConverter.convert(errors)))))
             }
           }
@@ -91,7 +100,6 @@ class AccountController extends LisaController with LisaConstants {
 
   private def processAccountCreation(lisaManager: String, creationRequest: CreateLisaAccountCreationRequest)(implicit hc: HeaderCarrier,startTime:Long) = {
     service.createAccount(lisaManager, creationRequest).map { result =>
-      LisaMetrics.incrementMetrics(startTime,MetricsEnum.CREATE_OR_TRANSFER_ACCOUNT)
 
       result match {
         case CreateLisaAccountSuccessResponse(accountId) => {
@@ -101,6 +109,7 @@ class AccountController extends LisaController with LisaConstants {
             auditData = creationRequest.toStringMap + (ZREF -> lisaManager)
           )
           val data = ApiResponseData(message = "Account Created.", accountId = Some(accountId))
+          LisaMetrics.incrementMetrics(startTime,MetricsEnum.CREATE_OR_TRANSFER_ACCOUNT)
 
           Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = 201)))
         }
@@ -111,6 +120,8 @@ class AccountController extends LisaController with LisaConstants {
             auditData = creationRequest.toStringMap ++ Map(ZREF -> lisaManager,
               "reasonNotCreated" -> ErrorInvestorNotFound.errorCode)
           )
+          LisaMetrics.incrementMetrics(System.currentTimeMillis(),
+            MetricsEnum.lisaError(FORBIDDEN,MetricsEnum.CREATE_OR_TRANSFER_ACCOUNT))
 
           Forbidden(Json.toJson(ErrorInvestorNotFound))
         }
@@ -121,6 +132,9 @@ class AccountController extends LisaController with LisaConstants {
             auditData = creationRequest.toStringMap ++ Map(ZREF -> lisaManager,
               "reasonNotCreated" -> ErrorInvestorNotEligible.errorCode)
           )
+          LisaMetrics.incrementMetrics(System.currentTimeMillis(),
+            MetricsEnum.lisaError(FORBIDDEN,MetricsEnum.CREATE_OR_TRANSFER_ACCOUNT))
+
           Forbidden(Json.toJson(ErrorInvestorNotEligible))
         }
         case CreateLisaAccountInvestorComplianceCheckFailedResponse => {
@@ -130,6 +144,9 @@ class AccountController extends LisaController with LisaConstants {
             auditData = creationRequest.toStringMap ++ Map(ZREF -> lisaManager,
               "reasonNotCreated" -> ErrorInvestorComplianceCheckFailed.errorCode)
           )
+          LisaMetrics.incrementMetrics(System.currentTimeMillis(),
+            MetricsEnum.lisaError(FORBIDDEN,MetricsEnum.CREATE_OR_TRANSFER_ACCOUNT))
+
           Forbidden(Json.toJson(ErrorInvestorComplianceCheckFailed))
         }
         case CreateLisaAccountInvestorAccountAlreadyClosedOrVoidedResponse => {
@@ -139,6 +156,9 @@ class AccountController extends LisaController with LisaConstants {
             auditData = creationRequest.toStringMap ++ Map(ZREF -> lisaManager,
               "reasonNotCreated" -> ErrorAccountAlreadyClosedOrVoid.errorCode)
           )
+          LisaMetrics.incrementMetrics(System.currentTimeMillis(),
+            MetricsEnum.lisaError(FORBIDDEN,MetricsEnum.CREATE_OR_TRANSFER_ACCOUNT))
+
           Forbidden(Json.toJson(ErrorAccountAlreadyClosedOrVoid))
         }
         case CreateLisaAccountAlreadyExistsResponse => {
@@ -148,6 +168,9 @@ class AccountController extends LisaController with LisaConstants {
             auditData = creationRequest.toStringMap ++ Map(ZREF -> lisaManager,
               "reasonNotCreated" -> ErrorAccountAlreadyExists.errorCode)
           )
+          LisaMetrics.startMetrics(System.currentTimeMillis(),
+            MetricsEnum.lisaError(CONFLICT,MetricsEnum.CREATE_OR_TRANSFER_ACCOUNT))
+
           Conflict(Json.toJson(ErrorAccountAlreadyExists))
         }
         case _ => {
@@ -157,19 +180,25 @@ class AccountController extends LisaController with LisaConstants {
             auditData = creationRequest.toStringMap ++ Map(ZREF -> lisaManager,
               "reasonNotCreated" -> ErrorInternalServerError.errorCode)
           )
+          LisaMetrics.incrementMetrics(System.currentTimeMillis(),
+            MetricsEnum.lisaError(INTERNAL_SERVER_ERROR,MetricsEnum.CREATE_OR_TRANSFER_ACCOUNT))
+
           Logger.error(s"AccontController :createAccount unknown case from DES returning internal server error" )
           InternalServerError(Json.toJson(ErrorInternalServerError))
         }
       }
     } recover {
-      case e:Exception => Logger.error(s"AccontController : An error occurred due to ${e.getMessage} returning internal server error")
+      case e:Exception =>
+        Logger.error(s"AccontController : An error occurred due to ${e.getMessage} returning internal server error")
+        LisaMetrics.startMetrics(System.currentTimeMillis(),
+          MetricsEnum.lisaError(INTERNAL_SERVER_ERROR,MetricsEnum.CREATE_OR_TRANSFER_ACCOUNT))
+
         InternalServerError(Json.toJson(ErrorInternalServerError))
     }
   }
 
   private def processAccountTransfer(lisaManager: String, transferRequest: CreateLisaAccountTransferRequest)(implicit hc: HeaderCarrier,startTime:Long) = {
     service.transferAccount(lisaManager, transferRequest).map { result =>
-      LisaMetrics.incrementMetrics(startTime, MetricsEnum.CREATE_OR_TRANSFER_ACCOUNT)
 
       result match {
         case CreateLisaAccountSuccessResponse(accountId) => {
@@ -179,6 +208,7 @@ class AccountController extends LisaController with LisaConstants {
             auditData = transferRequest.toStringMap + (ZREF -> lisaManager)
           )
           val data = ApiResponseData(message = "Account Transferred.", accountId = Some(accountId))
+          LisaMetrics.incrementMetrics(startTime, MetricsEnum.CREATE_OR_TRANSFER_ACCOUNT)
 
           Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = 201)))
         }
@@ -189,6 +219,9 @@ class AccountController extends LisaController with LisaConstants {
             auditData = transferRequest.toStringMap ++ Map(ZREF -> lisaManager,
               "reasonNotCreated" -> ErrorInvestorNotFound.errorCode)
           )
+          LisaMetrics.incrementMetrics(System.currentTimeMillis(),
+            MetricsEnum.lisaError(FORBIDDEN,MetricsEnum.CREATE_OR_TRANSFER_ACCOUNT))
+
           Forbidden(Json.toJson(ErrorInvestorNotFound))
         }
         case CreateLisaAccountInvestorComplianceCheckFailedResponse => {
@@ -198,6 +231,9 @@ class AccountController extends LisaController with LisaConstants {
             auditData = transferRequest.toStringMap ++ Map(ZREF -> lisaManager,
               "reasonNotCreated" -> ErrorInvestorComplianceCheckFailed.errorCode)
           )
+          LisaMetrics.incrementMetrics(System.currentTimeMillis(),
+            MetricsEnum.lisaError(FORBIDDEN,MetricsEnum.CREATE_OR_TRANSFER_ACCOUNT))
+
           Forbidden(Json.toJson(ErrorInvestorComplianceCheckFailed))
         }
         case CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse => {
@@ -207,6 +243,9 @@ class AccountController extends LisaController with LisaConstants {
             auditData = transferRequest.toStringMap ++ Map(ZREF -> lisaManager,
               "reasonNotCreated" -> ErrorPreviousAccountDoesNotExist.errorCode)
           )
+          LisaMetrics.incrementMetrics(System.currentTimeMillis(),
+            MetricsEnum.lisaError(FORBIDDEN,MetricsEnum.CREATE_OR_TRANSFER_ACCOUNT))
+
           Forbidden(Json.toJson(ErrorPreviousAccountDoesNotExist))
         }
         case CreateLisaAccountInvestorAccountAlreadyClosedOrVoidedResponse => {
@@ -216,6 +255,9 @@ class AccountController extends LisaController with LisaConstants {
             auditData = transferRequest.toStringMap ++ Map(ZREF -> lisaManager,
               "reasonNotCreated" -> ErrorAccountAlreadyClosedOrVoid.errorCode)
           )
+          LisaMetrics.incrementMetrics(System.currentTimeMillis(),
+            MetricsEnum.lisaError(FORBIDDEN,MetricsEnum.CREATE_OR_TRANSFER_ACCOUNT))
+
           Forbidden(Json.toJson(ErrorAccountAlreadyClosedOrVoid))
         }
         case CreateLisaAccountAlreadyExistsResponse => {
@@ -225,6 +267,9 @@ class AccountController extends LisaController with LisaConstants {
             auditData = transferRequest.toStringMap ++ Map(ZREF -> lisaManager,
               "reasonNotCreated" -> ErrorAccountAlreadyExists.errorCode)
           )
+          LisaMetrics.incrementMetrics(System.currentTimeMillis(),
+            MetricsEnum.lisaError(CONFLICT,MetricsEnum.CREATE_OR_TRANSFER_ACCOUNT))
+
           Conflict(Json.toJson(ErrorAccountAlreadyExists))
         }
         case _ => {
@@ -235,11 +280,17 @@ class AccountController extends LisaController with LisaConstants {
               "reasonNotCreated" -> ErrorInternalServerError.errorCode)
           )
           Logger.error(s"AccontController : transferAccount unknown case from DES returning internal server error" )
+          LisaMetrics.incrementMetrics(System.currentTimeMillis(),
+            MetricsEnum.lisaError(INTERNAL_SERVER_ERROR,MetricsEnum.CREATE_OR_TRANSFER_ACCOUNT))
+
           InternalServerError(Json.toJson(ErrorInternalServerError))
         }
       }
     } recover {
       case e:Exception  =>     Logger.error(s"AccontController : An error occurred in due to ${e.getMessage} returning internal server error")
+        LisaMetrics.incrementMetrics(System.currentTimeMillis(),
+          MetricsEnum.lisaError(INTERNAL_SERVER_ERROR,MetricsEnum.CREATE_OR_TRANSFER_ACCOUNT))
+
         InternalServerError(Json.toJson(ErrorInternalServerError))
     }
   }
@@ -269,6 +320,9 @@ class AccountController extends LisaController with LisaConstants {
               "accountId" -> accountId,
               "reasonNotClosed" -> ErrorAccountAlreadyClosed.errorCode)
           )
+          LisaMetrics.incrementMetrics(startTime,
+            MetricsEnum.lisaError(FORBIDDEN,MetricsEnum.CLOSE_ACCOUNT))
+
           Forbidden(Json.toJson(ErrorAccountAlreadyClosed))
         }
         case CloseLisaAccountNotFoundResponse => {
@@ -279,6 +333,9 @@ class AccountController extends LisaController with LisaConstants {
               "accountId" -> accountId,
               "reasonNotClosed" -> ErrorAccountNotFound.errorCode)
           )
+          LisaMetrics.incrementMetrics(startTime,
+            MetricsEnum.lisaError(NOT_FOUND,MetricsEnum.CLOSE_ACCOUNT))
+
           NotFound(Json.toJson(ErrorAccountNotFound))
         }
         case _ => {
@@ -290,12 +347,17 @@ class AccountController extends LisaController with LisaConstants {
               "reasonNotClosed" -> ErrorInternalServerError.errorCode)
           )
           Logger.error(s"AccountController: closeAccount unknown case from DES returning internal server error" )
+          LisaMetrics.incrementMetrics(startTime,
+            MetricsEnum.lisaError(INTERNAL_SERVER_ERROR,MetricsEnum.CLOSE_ACCOUNT))
+
           InternalServerError(Json.toJson(ErrorInternalServerError))
         }
       }
     } recover {
         case e:Exception  =>     Logger.error(s"AccountController: closeAccount: An error occurred due to ${e.getMessage} returning internal server error")
-                                  InternalServerError(Json.toJson(ErrorInternalServerError))
+                              LisaMetrics.incrementMetrics(startTime,
+                                MetricsEnum.lisaError(INTERNAL_SERVER_ERROR,MetricsEnum.CLOSE_ACCOUNT))
+                              InternalServerError(Json.toJson(ErrorInternalServerError))
        }
   }
 

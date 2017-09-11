@@ -43,18 +43,20 @@ class InvestorController extends LisaController with LisaConstants  {
         withValidJson[CreateLisaInvestorRequest](
           createRequest => {
             service.createInvestor(lisaManager, createRequest).map { res =>
-              LisaMetrics.incrementMetrics(startTime, MetricsEnum.LISA_INVESTOR)
               res match {
                 case CreateLisaInvestorSuccessResponse(investorId) =>
+                  LisaMetrics.incrementMetrics(startTime, MetricsEnum.LISA_INVESTOR)
                   handleCreatedResponse(lisaManager, createRequest, investorId)
                 case CreateLisaInvestorAlreadyExistsResponse(investorId) =>
+                  LisaMetrics.incrementMetrics(startTime, MetricsEnum.lisaError(CONFLICT,MetricsEnum.LISA_INVESTOR))
                   handleExistsResponse(lisaManager, createRequest, investorId)
                 case errorResponse: CreateLisaInvestorErrorResponse =>
                   handleFailureResponse(lisaManager, createRequest, errorResponse)
               }
             } recover {
               case e: Exception =>
-                LisaMetrics.incrementMetrics(startTime, MetricsEnum.LISA_INVESTOR)
+                LisaMetrics.incrementMetrics(startTime,
+                  MetricsEnum.lisaError(INTERNAL_SERVER_ERROR,MetricsEnum.LISA_INVESTOR))
                 Logger.error(s"createLisaInvestor: An error occurred due to ${e.getMessage} returning internal server error")
                 handleError(lisaManager, createRequest)
             }
@@ -94,6 +96,8 @@ class InvestorController extends LisaController with LisaConstants  {
         "reasonNotCreated" -> result.errorCode
       )
     )
+    LisaMetrics.incrementMetrics(System.currentTimeMillis(),
+      MetricsEnum.lisaError(CONFLICT,MetricsEnum.LISA_INVESTOR))
 
     Conflict(Json.toJson(result))
   }
@@ -110,6 +114,8 @@ class InvestorController extends LisaController with LisaConstants  {
         "reasonNotCreated" -> errorResponse.data.code
       )
     )
+    LisaMetrics.incrementMetrics(System.currentTimeMillis(),
+      MetricsEnum.lisaError(errorResponse.status,MetricsEnum.LISA_INVESTOR))
 
     Status(errorResponse.status).apply(Json.toJson(errorResponse.data))
   }

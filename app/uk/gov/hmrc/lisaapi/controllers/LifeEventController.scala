@@ -40,7 +40,6 @@ class LifeEventController extends LisaController {
       withValidLMRN(lisaManager) {
         withValidJson[ReportLifeEventRequest](req =>
           service.reportLifeEvent(lisaManager, accountId, req) map { res =>
-            LisaMetrics.startMetrics(startTime, MetricsEnum.LIFE_EVENT)
             Logger.debug("Entering LifeEvent Controller and the response is " + res.toString)
             res match {
               case ReportLifeEventSuccessResponse(lifeEventId) => {
@@ -50,23 +49,32 @@ class LifeEventController extends LisaController {
 
                 val data = ApiResponseData(message = "Life Event Created", lifeEventId = Some(lifeEventId))
 
+                LisaMetrics.incrementMetrics(startTime, MetricsEnum.LIFE_EVENT)
+
                 Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = 201)))
               }
               case ReportLifeEventInappropriateResponse => {
                 Logger.debug("Matched Inappropriate")
 
                 doAudit(lisaManager, accountId, req, "lifeEventNotReported", Map("reasonNotReported" -> ErrorLifeEventInappropriate.errorCode))
+                LisaMetrics.incrementMetrics(startTime,
+                  MetricsEnum.lisaError(FORBIDDEN,MetricsEnum.LISA_INVESTOR))
 
                 Forbidden(Json.toJson(ErrorLifeEventInappropriate))
               }
               case ReportLifeEventAccountClosedResponse => {
                 Logger.error(("Account Closed or VOID"))
+                LisaMetrics.incrementMetrics(startTime,
+                  MetricsEnum.lisaError(FORBIDDEN,MetricsEnum.LISA_INVESTOR))
+
                 Forbidden(Json.toJson(ErrorAccountAlreadyClosedOrVoid))
               }
               case ReportLifeEventAlreadyExistsResponse => {
                 Logger.debug("Matched Already Exists")
 
                 doAudit(lisaManager, accountId, req, "lifeEventNotReported", Map("reasonNotReported" -> ErrorLifeEventAlreadyExists.errorCode))
+                LisaMetrics.incrementMetrics(startTime,
+                  MetricsEnum.lisaError(FORBIDDEN,MetricsEnum.LISA_INVESTOR))
 
                 Conflict(Json.toJson(ErrorLifeEventAlreadyExists))
               }
@@ -74,6 +82,8 @@ class LifeEventController extends LisaController {
                 Logger.debug("Matched Not Found")
 
                 doAudit(lisaManager, accountId, req, "lifeEventNotReported", Map("reasonNotReported" -> ErrorAccountNotFound.errorCode))
+                LisaMetrics.incrementMetrics(startTime,
+                  MetricsEnum.lisaError(NOT_FOUND,MetricsEnum.LISA_INVESTOR))
 
                 NotFound(Json.toJson(ErrorAccountNotFound))
               }
@@ -83,6 +93,8 @@ class LifeEventController extends LisaController {
                 doAudit(lisaManager, accountId, req, "lifeEventNotReported", Map("reasonNotReported" -> ErrorInternalServerError.errorCode))
 
                 Logger.error(s"Life Event Not reported : DES unknown case , returning internal server error")
+                LisaMetrics.incrementMetrics(startTime,
+                  MetricsEnum.lisaError(INTERNAL_SERVER_ERROR,MetricsEnum.LISA_INVESTOR))
 
                 InternalServerError(Json.toJson(ErrorInternalServerError))
               }
