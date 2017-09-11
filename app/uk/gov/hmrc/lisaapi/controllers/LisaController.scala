@@ -44,6 +44,8 @@ trait LisaController extends BaseController with HeaderValidator with RunMode wi
       success
     }
     else {
+      LisaMetrics.incrementMetrics(System.currentTimeMillis(),MetricsEnum.LISA_400)
+
       Future.successful(BadRequest(toJson(ErrorBadRequestLmrn)))
     }
   }
@@ -73,7 +75,7 @@ trait LisaController extends BaseController with HeaderValidator with RunMode wi
               invalid match {
                 case Some(invalidCallback) => invalidCallback(errors)
                 case None => {
-                  LisaMetrics.startMetrics(startTime,MetricsEnum.LISA_400)
+                  LisaMetrics.incrementMetrics(startTime,MetricsEnum.LISA_400)
                   Logger.error(s"The errors are ${errors.toString()}")
                   Future.successful(BadRequest(toJson(ErrorBadRequest(errorConverter.convert(errors)))))
                 }
