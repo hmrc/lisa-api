@@ -96,9 +96,6 @@ class InvestorController extends LisaController with LisaConstants  {
         "reasonNotCreated" -> result.errorCode
       )
     )
-    LisaMetrics.incrementMetrics(System.currentTimeMillis(),
-      MetricsEnum.lisaError(CONFLICT,MetricsEnum.LISA_INVESTOR))
-
     Conflict(Json.toJson(result))
   }
 
