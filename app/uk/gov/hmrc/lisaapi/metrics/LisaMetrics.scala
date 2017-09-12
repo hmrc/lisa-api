@@ -17,11 +17,9 @@
 package uk.gov.hmrc.lisaapi.metrics
 
 import java.util.concurrent.TimeUnit
+
 import com.codahale.metrics.MetricRegistry
-import uk.gov.hmrc.lisaapi.metrics.MetricsEnum.MetricsEnum
-
 import uk.gov.hmrc.play.graphite.MicroserviceMetrics
-
 
 trait LisaMetrics {
   def timer (diff: Long, unit: TimeUnit, metricType: String) : Unit
@@ -33,23 +31,22 @@ object LisaMetrics extends LisaMetrics with MicroserviceMetrics {
 
   override def timer(diff: Long, unit: TimeUnit, metricType: String) =   registry.timer(s"${metricType}").update(diff, unit)
 
-  def startMetrics(startTime: Long, api: MetricsEnum): Unit =  LisaMetrics.timer(startTime, TimeUnit.MILLISECONDS, api.toString)
+  def startMetrics(startTime: Long, api: String): Unit =  LisaMetrics.timer(startTime, TimeUnit.MILLISECONDS, api.toString)
 
-  def incrementMetrics(startTime: Long, api: MetricsEnum): Unit = {
+  def incrementMetrics(startTime: Long, api: String): Unit = {
     LisaMetrics.timer(System.currentTimeMillis() - startTime, TimeUnit.MILLISECONDS, api.toString)
   }
 
 }
 
-object MetricsEnum extends Enumeration {
-  type MetricsEnum = Value
-  val LISA_INVESTOR = Value
-  val CREATE_OR_TRANSFER_ACCOUNT = Value
- val  CLOSE_ACCOUNT = Value
-  val LIFE_EVENT = Value
-  val BONUS_PAYMENT = Value
-  def lisaError(status:Int, name:Value):Value =  Value(status,s"${name}_${status}")
-  val LISA_400 = Value
+trait LisaMetricKeys  {
+  val INVESTOR = "LISA_INVESTOR"
+  val ACCOUNT = "CREATE_OR_TRANSFER_ACCOUNT"
+ val  CLOSE = "CLOSE_ACCOUNT"
+  val EVENT = "LIFE_EVENT"
+  val BONUS_PAYMENT = "BONUS_PAYMENT"
 
-
+  def lisaError(status:Int, name:String):String =  s"${name}_${status}"
+  val BAD_REQUEST = "LISA_400"
 }
+object LisaMetricKeys extends LisaMetricKeys

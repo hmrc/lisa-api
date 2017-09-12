@@ -21,7 +21,7 @@ import play.api.data.validation.ValidationError
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, Result}
 import uk.gov.hmrc.lisaapi.LisaConstants
-import uk.gov.hmrc.lisaapi.metrics.{LisaMetrics, MetricsEnum}
+import uk.gov.hmrc.lisaapi.metrics.{LisaMetrics, LisaMetricKeys}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, BonusPaymentService}
 import uk.gov.hmrc.lisaapi.utils.BonusPaymentValidator
@@ -40,7 +40,7 @@ class BonusPaymentController extends LisaController with LisaConstants {
   def requestBonusPayment(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async {
     implicit request =>
       val startTime = System.currentTimeMillis()
-      LisaMetrics.startMetrics(startTime,MetricsEnum.BONUS_PAYMENT)
+      LisaMetrics.startMetrics(startTime,LisaMetricKeys.BONUS_PAYMENT)
 
       withValidLMRN(lisaManager) {
         withValidJson[RequestBonusPaymentRequest](req =>
@@ -52,7 +52,7 @@ class BonusPaymentController extends LisaController with LisaConstants {
                 service.requestBonusPayment(lisaManager, accountId, req) map { res =>
                   Logger.debug("Entering Bonus Payment Controller and the response is " + res.toString)
 
-                  LisaMetrics.incrementMetrics(System.currentTimeMillis(), MetricsEnum.BONUS_PAYMENT)
+                  LisaMetrics.incrementMetrics(System.currentTimeMillis(), LisaMetricKeys.BONUS_PAYMENT)
                   res match {
                     case successResponse:RequestBonusPaymentSuccessResponse =>
                       handleSuccess(lisaManager, accountId, req, successResponse)
