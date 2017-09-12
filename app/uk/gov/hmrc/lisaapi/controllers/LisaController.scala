@@ -28,6 +28,7 @@ import uk.gov.hmrc.play.microservice.controller.BaseController
 import uk.gov.hmrc.auth.core.Retrievals._
 import uk.gov.hmrc.auth.core.{AuthorisationException, AuthorisedFunctions, Enrolment, InsufficientEnrolments}
 import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
+import uk.gov.hmrc.lisaapi.metrics.{LisaMetrics, LisaMetricKeys}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -43,6 +44,8 @@ trait LisaController extends BaseController with HeaderValidator with RunMode wi
       success
     }
     else {
+      LisaMetrics.incrementMetrics(System.currentTimeMillis(),LisaMetricKeys.BAD_REQUEST)
+
       Future.successful(BadRequest(toJson(ErrorBadRequestLmrn)))
     }
   }
@@ -52,6 +55,7 @@ trait LisaController extends BaseController with HeaderValidator with RunMode wi
                                   invalid: Option[(Seq[(JsPath, Seq[ValidationError])]) => Future[Result]] = None,
                                   lisaManager: String
                                 )(implicit request: Request[AnyContent], reads: Reads[T]): Future[Result] = {
+    val startTime = System.currentTimeMillis()
     authorised((Enrolment("HMRC-LISA-ORG")).withIdentifier("ZREF", lisaManager)).retrieve(internalId) { id =>
 
       request.body.asJson match {
@@ -71,6 +75,7 @@ trait LisaController extends BaseController with HeaderValidator with RunMode wi
               invalid match {
                 case Some(invalidCallback) => invalidCallback(errors)
                 case None => {
+                  LisaMetrics.incrementMetrics(startTime,LisaMetricKeys.BAD_REQUEST)
                   Logger.error(s"The errors are ${errors.toString()}")
                   Future.successful(BadRequest(toJson(ErrorBadRequest(errorConverter.convert(errors)))))
                 }

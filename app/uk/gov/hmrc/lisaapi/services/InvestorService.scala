@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.lisaapi.services
 
-import play.api.Logger
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des.{DesCreateInvestorResponse, DesFailureResponse}
@@ -36,7 +35,7 @@ trait InvestorService  {
       case (409, existsResponse: DesCreateInvestorResponse) => CreateLisaInvestorAlreadyExistsResponse(existsResponse.investorID)
       case (_, successResponse: DesCreateInvestorResponse) => CreateLisaInvestorSuccessResponse(successResponse.investorID)
       case (status: Int, errorResponse: DesFailureResponse) => CreateLisaInvestorErrorResponse(status, errorResponse)
-    }
+                                                          }
   }
 
 }

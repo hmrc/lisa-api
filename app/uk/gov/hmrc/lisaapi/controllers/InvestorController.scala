@@ -22,7 +22,7 @@ import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.lisaapi.LisaConstants
-import uk.gov.hmrc.lisaapi.metrics.{MetricsEnum, LisaMetrics}
+import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, InvestorService}
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -36,25 +36,27 @@ class InvestorController extends LisaController with LisaConstants  {
   def createLisaInvestor(lisaManager: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async {
     implicit request =>
       val startTime = System.currentTimeMillis()
-      LisaMetrics.startMetrics(startTime,MetricsEnum.LISA_INVESTOR)
+      LisaMetrics.startMetrics(startTime,LisaMetricKeys.INVESTOR)
       Logger.debug(s"LISA HTTP Request: ${request.uri} and method: ${request.method}")
 
       withValidLMRN(lisaManager) {
         withValidJson[CreateLisaInvestorRequest](
           createRequest => {
             service.createInvestor(lisaManager, createRequest).map { res =>
-              LisaMetrics.incrementMetrics(startTime, MetricsEnum.LISA_INVESTOR)
               res match {
                 case CreateLisaInvestorSuccessResponse(investorId) =>
+                  LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.INVESTOR)
                   handleCreatedResponse(lisaManager, createRequest, investorId)
                 case CreateLisaInvestorAlreadyExistsResponse(investorId) =>
+                  LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaError(CONFLICT,LisaMetricKeys.INVESTOR))
                   handleExistsResponse(lisaManager, createRequest, investorId)
                 case errorResponse: CreateLisaInvestorErrorResponse =>
                   handleFailureResponse(lisaManager, createRequest, errorResponse)
               }
             } recover {
               case e: Exception =>
-                LisaMetrics.incrementMetrics(startTime, MetricsEnum.LISA_INVESTOR)
+                LisaMetrics.incrementMetrics(startTime,
+                  LisaMetricKeys.lisaError(INTERNAL_SERVER_ERROR,LisaMetricKeys.INVESTOR))
                 Logger.error(s"createLisaInvestor: An error occurred due to ${e.getMessage} returning internal server error")
                 handleError(lisaManager, createRequest)
             }
@@ -94,7 +96,6 @@ class InvestorController extends LisaController with LisaConstants  {
         "reasonNotCreated" -> result.errorCode
       )
     )
-
     Conflict(Json.toJson(result))
   }
 
@@ -110,6 +111,8 @@ class InvestorController extends LisaController with LisaConstants  {
         "reasonNotCreated" -> errorResponse.data.code
       )
     )
+    LisaMetrics.incrementMetrics(System.currentTimeMillis(),
+      LisaMetricKeys.lisaError(errorResponse.status,LisaMetricKeys.INVESTOR))
 
     Status(errorResponse.status).apply(Json.toJson(errorResponse.data))
   }

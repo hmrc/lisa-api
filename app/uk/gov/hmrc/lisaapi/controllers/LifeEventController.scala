@@ -19,7 +19,7 @@ package uk.gov.hmrc.lisaapi.controllers
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
-import uk.gov.hmrc.lisaapi.metrics.{MetricsEnum, LisaMetrics}
+import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, LifeEventService}
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -35,12 +35,11 @@ class LifeEventController extends LisaController {
   def reportLisaLifeEvent(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async {
     implicit request =>
       val startTime = System.currentTimeMillis()
-      LisaMetrics.startMetrics(startTime,MetricsEnum.LIFE_EVENT)
+      LisaMetrics.startMetrics(startTime,LisaMetricKeys.EVENT)
 
       withValidLMRN(lisaManager) {
         withValidJson[ReportLifeEventRequest](req =>
           service.reportLifeEvent(lisaManager, accountId, req) map { res =>
-            LisaMetrics.startMetrics(startTime, MetricsEnum.LIFE_EVENT)
             Logger.debug("Entering LifeEvent Controller and the response is " + res.toString)
             res match {
               case ReportLifeEventSuccessResponse(lifeEventId) => {
@@ -50,23 +49,32 @@ class LifeEventController extends LisaController {
 
                 val data = ApiResponseData(message = "Life Event Created", lifeEventId = Some(lifeEventId))
 
+                LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.EVENT)
+
                 Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = 201)))
               }
               case ReportLifeEventInappropriateResponse => {
                 Logger.debug("Matched Inappropriate")
 
                 doAudit(lisaManager, accountId, req, "lifeEventNotReported", Map("reasonNotReported" -> ErrorLifeEventInappropriate.errorCode))
+                LisaMetrics.incrementMetrics(startTime,
+                  LisaMetricKeys.lisaError(FORBIDDEN,LisaMetricKeys.INVESTOR))
 
                 Forbidden(Json.toJson(ErrorLifeEventInappropriate))
               }
               case ReportLifeEventAccountClosedResponse => {
                 Logger.error(("Account Closed or VOID"))
+                LisaMetrics.incrementMetrics(startTime,
+                  LisaMetricKeys.lisaError(FORBIDDEN,LisaMetricKeys.INVESTOR))
+
                 Forbidden(Json.toJson(ErrorAccountAlreadyClosedOrVoid))
               }
               case ReportLifeEventAlreadyExistsResponse => {
                 Logger.debug("Matched Already Exists")
 
                 doAudit(lisaManager, accountId, req, "lifeEventNotReported", Map("reasonNotReported" -> ErrorLifeEventAlreadyExists.errorCode))
+                LisaMetrics.incrementMetrics(startTime,
+                  LisaMetricKeys.lisaError(FORBIDDEN,LisaMetricKeys.INVESTOR))
 
                 Conflict(Json.toJson(ErrorLifeEventAlreadyExists))
               }
@@ -74,6 +82,8 @@ class LifeEventController extends LisaController {
                 Logger.debug("Matched Not Found")
 
                 doAudit(lisaManager, accountId, req, "lifeEventNotReported", Map("reasonNotReported" -> ErrorAccountNotFound.errorCode))
+                LisaMetrics.incrementMetrics(startTime,
+                  LisaMetricKeys.lisaError(NOT_FOUND,LisaMetricKeys.INVESTOR))
 
                 NotFound(Json.toJson(ErrorAccountNotFound))
               }
@@ -83,6 +93,8 @@ class LifeEventController extends LisaController {
                 doAudit(lisaManager, accountId, req, "lifeEventNotReported", Map("reasonNotReported" -> ErrorInternalServerError.errorCode))
 
                 Logger.error(s"Life Event Not reported : DES unknown case , returning internal server error")
+                LisaMetrics.incrementMetrics(startTime,
+                  LisaMetricKeys.lisaError(INTERNAL_SERVER_ERROR,LisaMetricKeys.INVESTOR))
 
                 InternalServerError(Json.toJson(ErrorInternalServerError))
               }
