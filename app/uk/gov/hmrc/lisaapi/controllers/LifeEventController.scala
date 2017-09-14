@@ -58,14 +58,14 @@ class LifeEventController extends LisaController {
 
                 doAudit(lisaManager, accountId, req, "lifeEventNotReported", Map("reasonNotReported" -> ErrorLifeEventInappropriate.errorCode))
                 LisaMetrics.incrementMetrics(startTime,
-                  LisaMetricKeys.lisaError(FORBIDDEN,LisaMetricKeys.EVENT))
+                  LisaMetricKeys.lisaError(FORBIDDEN,request.uri))
 
                 Forbidden(Json.toJson(ErrorLifeEventInappropriate))
               }
               case ReportLifeEventAccountClosedResponse => {
                 Logger.error(("Account Closed or VOID"))
                 LisaMetrics.incrementMetrics(startTime,
-                  LisaMetricKeys.lisaError(FORBIDDEN,LisaMetricKeys.EVENT))
+                  LisaMetricKeys.lisaError(FORBIDDEN,request.uri))
 
                 Forbidden(Json.toJson(ErrorAccountAlreadyClosedOrVoid))
               }
@@ -74,7 +74,7 @@ class LifeEventController extends LisaController {
 
                 doAudit(lisaManager, accountId, req, "lifeEventNotReported", Map("reasonNotReported" -> ErrorLifeEventAlreadyExists.errorCode))
                 LisaMetrics.incrementMetrics(startTime,
-                  LisaMetricKeys.lisaError(FORBIDDEN,LisaMetricKeys.EVENT))
+                  LisaMetricKeys.getErrorKey(CONFLICT,request.uri))
 
                 Conflict(Json.toJson(ErrorLifeEventAlreadyExists))
               }
@@ -83,7 +83,7 @@ class LifeEventController extends LisaController {
 
                 doAudit(lisaManager, accountId, req, "lifeEventNotReported", Map("reasonNotReported" -> ErrorAccountNotFound.errorCode))
                 LisaMetrics.incrementMetrics(startTime,
-                  LisaMetricKeys.lisaError(NOT_FOUND,LisaMetricKeys.EVENT))
+                  LisaMetricKeys.getErrorKey(NOT_FOUND,request.uri))
 
                 NotFound(Json.toJson(ErrorAccountNotFound))
               }
@@ -94,7 +94,7 @@ class LifeEventController extends LisaController {
 
                 Logger.error(s"Life Event Not reported : DES unknown case , returning internal server error")
                 LisaMetrics.incrementMetrics(startTime,
-                  LisaMetricKeys.lisaError(INTERNAL_SERVER_ERROR,LisaMetricKeys.EVENT))
+                  LisaMetricKeys.getErrorKey(INTERNAL_SERVER_ERROR,request.uri))
 
                 InternalServerError(Json.toJson(ErrorInternalServerError))
               }
