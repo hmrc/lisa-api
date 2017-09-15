@@ -21,6 +21,8 @@ import java.util.concurrent.TimeUnit
 import com.codahale.metrics.MetricRegistry
 import uk.gov.hmrc.play.graphite.MicroserviceMetrics
 
+import scala.util.Try
+
 trait LisaMetrics {
   def timer (diff: Long, unit: TimeUnit, metricType: String) : Unit
 }
@@ -29,7 +31,7 @@ object LisaMetrics extends LisaMetrics with MicroserviceMetrics {
 
   val registry: MetricRegistry = metrics.defaultRegistry
 
-  override def timer(diff: Long, unit: TimeUnit, metricType: String) =   registry.timer(s"${metricType}").update(diff, unit)
+  override def timer(diff: Long, unit: TimeUnit, metricType: String):Unit =   registry.timer(s"${metricType}").update(diff, unit)
 
   def startMetrics(startTime: Long, api: String): Unit =  LisaMetrics.timer(startTime, TimeUnit.MILLISECONDS, api.toString)
 
@@ -46,7 +48,12 @@ trait LisaMetricKeys  {
   val EVENT = "LIFE_EVENT"
   val BONUS_PAYMENT = "BONUS_PAYMENT"
 
+
+  val keys = Map("investors"->INVESTOR,"accounts"-> ACCOUNT,"close-account"->CLOSE,"transactions"->BONUS_PAYMENT, "discover"-> "DISCOVER")
+
   def lisaError(status:Int, name:String):String =  s"${name}_${status}"
-  val BAD_REQUEST = "LISA_400"
+
+  def getErrorKey(status:Int, url:String):String = lisaError(status, keys.getOrElse(Try(url.split("/").last).getOrElse("discover"),"UNKNOWN"))
+
 }
 object LisaMetricKeys extends LisaMetricKeys
