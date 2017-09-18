@@ -585,7 +585,11 @@ types:
                           description: The ID for the transaction.
                           example: 1234567890
                       get:
-                        description: Get a transaction
+                        displayName: Retrieve a bonus payment
+                        description: Retrieve a bonus payment by ID
+                        is: [headers.acceptHeader, headers.contentHeader]
+                        (annotations.scope): "read:lisa"
+                        securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
                         responses:
                           200:
                             body:
@@ -634,12 +638,12 @@ types:
                               application/json:
                                 type: !include schemas/ErrorCodes.schema.json
                                 examples:
-                                  noLifeEvent:
-                                    description: The lifeEventId does not match with HMRC’s records.
+                                  noTransaction:
+                                    description: The transactionId does not match with HMRC’s records.
                                     value: |
                                       {
-                                        "code" : "LIFE_EVENT_NOT_FOUND",
-                                        "message" : "The lifeEventId does not match with HMRC’s records."
+                                        "code" : "TRANSACTION_NOT_FOUND",
+                                        "message" : "The transactionId does not match with HMRC’s records."
                                       }
                                   accountIdNOTFound:
                                     description: The accountId given does not match with HMRC’s records.
