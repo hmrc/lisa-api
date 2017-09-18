@@ -49,7 +49,7 @@ trait LisaMetricKeys  {
   val BONUS_PAYMENT = "BONUS_PAYMENT"
 
 
-  val keys = Map("investors"->INVESTOR,"accounts"-> ACCOUNT,"close-account"->CLOSE,"transactions"->BONUS_PAYMENT, "discover"-> "DISCOVER")
+  val keys = Map("investors"->INVESTOR,"accounts"-> ACCOUNT,"close-account"->CLOSE,"transactions"->BONUS_PAYMENT, "events"-> "LIFE_EVENT", "discover"-> "DISCOVER")
 
   def lisaError(status:Int, name:String):String =  s"${name}_${status}"
 
