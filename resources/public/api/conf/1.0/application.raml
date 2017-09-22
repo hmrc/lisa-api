@@ -578,15 +578,76 @@ types:
                                       "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
                                       "message": "The accountId given does not match with HMRC’s records."
                                     }
-                        406:
-                          body:
-                            application/json:
-                              type: !include schemas/ErrorCodes.schema.json
-                              examples:
-                                headerInvalid:
-                                  description: Accept header invalid
-                                  value: |
+                    /{transactionId}:
+                      uriParameters:
+                        transactionId:
+                          type: integer
+                          description: The ID for the transaction.
+                          example: 1234567890
+                      get:
+                        displayName: Retrieve a bonus payment
+                        description: Retrieve a bonus payment by ID
+                        is: [headers.acceptHeader, headers.contentHeader]
+                        (annotations.scope): "read:lisa"
+                        securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
+                        responses:
+                          200:
+                            body:
+                              application/json:
+                                example: |
+                                  {
+                                    "lifeEventId" : "1234567891",
+                                    "periodStartDate" : "2017-04-06",
+                                    "periodEndDate" : "2017-05-05",
+
+                                    "htbTransfer" : {
+                                      "htbTransferInForPeriod" : 0.00,
+                                      "htbTransferTotalYTD" : 0.00
+                                    },
+
+                                    "inboundPayments"   :
                                     {
-                                      "code" : "ACCEPT_HEADER_INVALID",
-                                      "message" : "Accept header invalid"
+                                      "newSubsForPeriod" : 4000.00,
+                                      "newSubsYTD" : 4000.00,
+                                      "totalSubsForPeriod" : 4000.00,
+                                      "totalSubsYTD" : 4000.00
+                                    },
+
+                                    "bonuses"   :
+                                    {
+                                      "bonusDueForPeriod" : 1000.00,
+                                      "totalBonusDueYTD" : 1000.00,
+                                      "claimReason" : "Life Event"
                                     }
+                                  }
+                          401:
+                            body:
+                              application/json:
+                                type: !include schemas/ErrorCodes.schema.json
+                                examples:
+                                  notOpenStatus:
+                                    description: The lisaManagerReferenceNumber path parameter you've used doesn't match with an authorised LISA provider in HMRC's records.
+                                    value: |
+                                      {
+                                        "code" : "UNAUTHORIZED",
+                                        "message" : "lisaManagerReferenceNumber is not authorised"
+                                      }
+                          404:
+                            body:
+                              application/json:
+                                type: !include schemas/ErrorCodes.schema.json
+                                examples:
+                                  noTransaction:
+                                    description: The transactionId does not match with HMRC’s records.
+                                    value: |
+                                      {
+                                        "code" : "TRANSACTION_NOT_FOUND",
+                                        "message" : "The transactionId does not match with HMRC’s records."
+                                      }
+                                  accountIdNOTFound:
+                                    description: The accountId given does not match with HMRC’s records.
+                                    value: |
+                                      {
+                                        "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
+                                        "message": "The accountId given does not match with HMRC’s records."
+                                      }
