@@ -476,6 +476,126 @@ types:
                                       "code" : "LIFE_EVENT_ALREADY_EXISTS",
                                       "message" : "The investor’s life event has already been reported."
                                 }
+                    get:
+                      is: [headers.acceptHeader, headers.contentHeader]
+                      displayName: Retrieve all life events for an account
+                      (annotations.scope): "read:lisa"
+                      securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
+                      responses:
+                        200:
+                            body:
+                              application/json:
+                                example: !include examples/LifeEvent.get.array.json
+                        401:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                notOpenStatus:
+                                  description: The lisaManagerReferenceNumber path parameter you've used doesn't match with an authorised LISA provider in HMRC's records.
+                                  value: |
+                                    {
+                                      "code" : "UNAUTHORIZED",
+                                      "message" : "lisaManagerReferenceNumber is not authorised"
+                                    }
+                        403:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                accountClosedOrVoided:
+                                  description: The LISA account has already been closed or voided.
+                                  value: |
+                                    {
+                                      "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID",
+                                      "message": "The LISA account has already been closed or voided."
+                                    }
+                        404:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                accountIdNOTFound:
+                                  description: The accountId given does not match with HMRC’s records.
+                                  value: |
+                                    {
+                                      "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
+                                      "message": "The accountId given does not match with HMRC’s records."
+                                    }
+                        406:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                headerInvalid:
+                                  description: Accept header invalid
+                                  value: |
+                                    {
+                                      "code" : "ACCEPT_HEADER_INVALID",
+                                      "message" : "Accept header invalid"
+                                    }
+                    /{lifeEventId}:
+                      uriParameters:
+                        lifeEventId:
+                          type: IDtype
+                          description: The ID for the life event
+                          example: "1234567890"
+                      get:
+                        is: [headers.acceptHeader, headers.contentHeader]
+                        displayName: Retrieve a life event
+                        responses:
+                          200:
+                            body:
+                              application/json:
+                                example: !include examples/LifeEvent.post.json
+                          401:
+                            body:
+                              application/json:
+                                type: !include schemas/ErrorCodes.schema.json
+                                examples:
+                                  notOpenStatus:
+                                    description: The lisaManagerReferenceNumber path parameter you've used doesn't match with an authorised LISA provider in HMRC's records.
+                                    value: |
+                                      {
+                                        "code" : "UNAUTHORIZED",
+                                        "message" : "lisaManagerReferenceNumber is not authorised"
+                                      }
+                          403:
+                            body:
+                              application/json:
+                                type: !include schemas/ErrorCodes.schema.json
+                                examples:
+                                  accountClosedOrVoided:
+                                    description: The LISA account has already been closed or voided.
+                                    value: |
+                                      {
+                                        "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID",
+                                        "message": "The LISA account has already been closed or voided."
+                                      }
+                          404:
+                            body:
+                              application/json:
+                                type: !include schemas/ErrorCodes.schema.json
+                                examples:
+                                  accountIdNOTFound:
+                                    description: The accountId given does not match with HMRC’s records.
+                                    value: |
+                                      {
+                                        "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
+                                        "message": "The accountId given does not match with HMRC’s records."
+                                      }
+                          406:
+                            body:
+                              application/json:
+                                type: !include schemas/ErrorCodes.schema.json
+                                examples:
+                                  headerInvalid:
+                                    description: Accept header invalid
+                                    value: |
+                                      {
+                                        "code" : "ACCEPT_HEADER_INVALID",
+                                        "message" : "Accept header invalid"
+                                      }
               /transactions:
                     description: !include documentation/LISATransaction
                     post:
