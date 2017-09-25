@@ -483,7 +483,33 @@ types:
                       securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
                       responses:
                         200:
-                          description: Successful
+                            body:
+                              application/json:
+                                example: !include examples/LifeEvent.get.array.json
+                        404:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                accountIdNOTFound:
+                                  description: The accountId given does not match with HMRC’s records.
+                                  value: |
+                                    {
+                                      "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
+                                      "message": "The accountId given does not match with HMRC’s records."
+                                    }
+                        406:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                headerInvalid:
+                                  description: Accept header invalid
+                                  value: |
+                                    {
+                                      "code" : "ACCEPT_HEADER_INVALID",
+                                      "message" : "Accept header invalid"
+                                    }
                     /{lifeEventId}:
                       uriParameters:
                         lifeEventId:
