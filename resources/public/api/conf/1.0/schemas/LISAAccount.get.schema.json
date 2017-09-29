@@ -29,10 +29,20 @@
       "description": "Status of the account that has been created.",
       "type": "string",
       "enum": [
-        "ACTIVE",
-        "VOID"
+        "OPEN",
+        "VOID",
+        "CLOSED"
       ]
     },
+    "accountClosureReason": {
+      "description": "The reason the account was closed.",
+      "type": "string"
+     },
+    "closureDate": {
+      "description": "The date the account was closed. This can't be in the future.",
+      "$ref": "#/definitions/ISO8601-Date"
+    },
+
     "transferAccount": {
       "type": "object",
       "description" : "If the creationReason is ‘Transferred’, then this is required.",

@@ -3,7 +3,7 @@
   "accountId" :"acc654321",
   "creationReason" : "Transferred",
   "firstSubscriptionDate" : "2011-03-23",
-  "accountStatus" : "ACTIVE",
+  "accountStatus" : "OPEN",
   "transferAccount": {
     "transferredFromAccountId": "98123459898",
     "transferredFromLMRN": "Z543333",
