@@ -2,11 +2,14 @@
   "lisaManagerReferenceNumber" : "Z543210",
   "_links" :
   {
-    "self" : {"href" : "/lifetime-isa/manager/{LISAManagerReferenceNumber}"},
-    "investors" : {"href" : "/lifetime-isa/manager/{lisaManagerReferenceNumber}/investors"},
-    "create or transfer Account" : {"href" : "/lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts"},
-    "close Account" : {"href" : " /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}"},
-    "life events" : {"href" : " /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/events"},
-    "bonus payments" : {"href" : " /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/transactions"}
+    "self" : {"href" : "/lifetime-isa/manager/{LISAManagerReferenceNumber}", "methods": ["GET"]},
+    "investors" : {"href" : "/lifetime-isa/manager/{lisaManagerReferenceNumber}/investors", "methods": ["POST"]},
+    "create or transfer Account" :[ {"href" : "/lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts" , "methods": ["POST"]},
+                                  {"href" : "/lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}" , "methods": ["GET"]}],
+    "close Account" : {"href" : " /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/close-account", "methods": ["POST"]},
+    "life events" :[ {"href" : " /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/events", "methods": ["POST", "GET"]},
+              {"href" : " /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/events/{lifeEventId}", "methods": [ "GET"]}],
+    "bonus payments" : [{"href" : " /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/transactions", "methods": ["POST"]},
+      {"href" : " /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/transactions/{transactionId}", "methods": ["GET"]}]
   }
 }

@@ -68,18 +68,6 @@ types:
                                   "code" : "BAD_REQUEST",
                                   "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
                                 }
-                    406:
-                      body:
-                        application/json:
-                          type: !include schemas/ErrorCodes.schema.json
-                          examples:
-                            headerInvalid:
-                              description: Accept header invalid
-                              value: |
-                                {
-                                  "code" : "ACCEPT_HEADER_INVALID",
-                                  "message" : "Accept header invalid"
-                                }
       /investors:
             post:
               is: [headers.acceptHeader, headers.contentHeader]
@@ -140,18 +128,6 @@ types:
                           "code": "INVESTOR_NOT_FOUND",
                           "message": "The investor details given do not match with HMRC’s records."
                         }
-                406:
-                  body:
-                    application/json:
-                      type: !include schemas/ErrorCodes.schema.json
-                      examples:
-                        headerInvalid:
-                          description: Accept header invalid
-                          value: |
-                            {
-                              "code" : "ACCEPT_HEADER_INVALID",
-                              "message" : "Accept header invalid"
-                            }
                 409:
                   description: Matches already existing resource.
                     Response contains a location header with link to the existing resource.
@@ -185,7 +161,7 @@ types:
                 Location:
                   description: relative URI to the created LISA Account resource
                   type: string
-                  example: /manager/Z876543/accounts/acc654321
+                  example: /lifetime-isa/manager/Z876543/accounts/acc654321
               body:
                 application/json:
                   example: !include examples/LISAAccount.post.response.json
@@ -274,18 +250,6 @@ types:
                           "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID",
                           "message": "The LISA account has already been closed or voided."
                         }
-            406:
-              body:
-                application/json:
-                  type: !include schemas/ErrorCodes.schema.json
-                  examples:
-                    notOpenStatus:
-                      description: Accept header invalid
-                      value: |
-                        {
-                          "code" : "ACCEPT_HEADER_INVALID",
-                          "message" : "Accept header invalid"
-                        }
             409:
               body:
                 application/json:
@@ -315,6 +279,18 @@ types:
                         application/json:
                           example: !include examples/LISAAccount.get.json
                           type: !include schemas/LISAAccount.get.schema.json
+                    400:
+                      body:
+                        application/json:
+                          type: !include schemas/ErrorCodes.schema.json
+                          examples:
+                            InvalidLmrn:
+                              description: Invalid Lisa Manager Reference Number
+                              value: |
+                                {
+                                  "code" : "BAD_REQUEST",
+                                  "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
+                                }
                     401:
                       body:
                         application/json:
@@ -401,18 +377,6 @@ types:
                                       "code" : "INVESTOR_ACCOUNT_ALREADY_CLOSED",
                                       "message" : "The Investor Account is already closed"
                                     }
-                        406:
-                          body:
-                            application/json:
-                              type: !include schemas/ErrorCodes.schema.json
-                              examples:
-                                headerInvalid:
-                                  description: Accept header invalid
-                                  value: |
-                                    {
-                                      "code" : "ACCEPT_HEADER_INVALID",
-                                      "message" : "Accept header invalid"
-                                    }
               /events:
                     description: !include documentation/LifeEvent
                     post:
@@ -433,7 +397,7 @@ types:
                             Location:
                               description: relative URI to the created LISA event created.
                               type: string
-                              example: /manager/Z876543/accounts/acc654321/events/1234567890
+                              example: /lifetime-isa/manager/Z876543/accounts/acc654321/events/1234567890
 
                           body:
                             application/json:
@@ -502,18 +466,6 @@ types:
                                       "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
                                       "message": "The accountId given does not match with HMRC’s records."
                                     }
-                        406:
-                          body:
-                            application/json:
-                              type: !include schemas/ErrorCodes.schema.json
-                              examples:
-                                headerInvalid:
-                                  description: Accept header invalid
-                                  value: |
-                                    {
-                                      "code" : "ACCEPT_HEADER_INVALID",
-                                      "message" : "Accept header invalid"
-                                    }
                         409:
                           body:
                             application/json:
@@ -534,6 +486,19 @@ types:
                             body:
                               application/json:
                                 example: !include examples/LifeEvent.get.array.json
+                        400:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                InvalidLmrn:
+                                  description: Invalid Lisa Manager Reference Number
+                                  value: |
+                                    {
+                                      "code" : "BAD_REQUEST",
+                                      "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
+                                    }
+
                         401:
                           body:
                             application/json:
@@ -546,18 +511,6 @@ types:
                                       "code" : "UNAUTHORIZED",
                                       "message" : "lisaManagerReferenceNumber is not authorised"
                                     }
-                        403:
-                          body:
-                            application/json:
-                              type: !include schemas/ErrorCodes.schema.json
-                              examples:
-                                accountClosedOrVoided:
-                                  description: The LISA account has already been closed or voided.
-                                  value: |
-                                    {
-                                      "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID",
-                                      "message": "The LISA account has already been closed or voided."
-                                    }
                         404:
                           body:
                             application/json:
@@ -569,18 +522,6 @@ types:
                                     {
                                       "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
                                       "message": "The accountId given does not match with HMRC’s records."
-                                    }
-                        406:
-                          body:
-                            application/json:
-                              type: !include schemas/ErrorCodes.schema.json
-                              examples:
-                                headerInvalid:
-                                  description: Accept header invalid
-                                  value: |
-                                    {
-                                      "code" : "ACCEPT_HEADER_INVALID",
-                                      "message" : "Accept header invalid"
                                     }
                     /{lifeEventId}:
                       uriParameters:
@@ -596,6 +537,19 @@ types:
                             body:
                               application/json:
                                 example: !include examples/LifeEvent.post.json
+                          400:
+                            body:
+                              application/json:
+                                type: !include schemas/ErrorCodes.schema.json
+                                examples:
+                                  InvalidLmrn:
+                                    description: Invalid Lisa Manager Reference Number
+                                    value: |
+                                      {
+                                        "code" : "BAD_REQUEST",
+                                        "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
+                                      }
+
                           401:
                             body:
                               application/json:
@@ -608,18 +562,6 @@ types:
                                         "code" : "UNAUTHORIZED",
                                         "message" : "lisaManagerReferenceNumber is not authorised"
                                       }
-                          403:
-                            body:
-                              application/json:
-                                type: !include schemas/ErrorCodes.schema.json
-                                examples:
-                                  accountClosedOrVoided:
-                                    description: The LISA account has already been closed or voided.
-                                    value: |
-                                      {
-                                        "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID",
-                                        "message": "The LISA account has already been closed or voided."
-                                      }
                           404:
                             body:
                               application/json:
@@ -631,18 +573,6 @@ types:
                                       {
                                         "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
                                         "message": "The accountId given does not match with HMRC’s records."
-                                      }
-                          406:
-                            body:
-                              application/json:
-                                type: !include schemas/ErrorCodes.schema.json
-                                examples:
-                                  headerInvalid:
-                                    description: Accept header invalid
-                                    value: |
-                                      {
-                                        "code" : "ACCEPT_HEADER_INVALID",
-                                        "message" : "Accept header invalid"
                                       }
               /transactions:
                     description: !include documentation/LISATransaction
@@ -664,7 +594,7 @@ types:
                             Location:
                               description: relative URI to the created Bonus Payment resource
                               type: string
-                              example: /manager/Z876543/accounts/acc654321/transactions/1234567890
+                              example: /lifetime-isa/manager/Z876543/accounts/acc654321/transactions/7777777777
                           body:
                             application/json:
                               example: !include examples/LISATransaction.post.response.json
@@ -758,8 +688,8 @@ types:
                           description: The ID for the transaction.
                           example: 1234567890
                       get:
-                        displayName: Retrieve a bonus payment
-                        description: Retrieve a bonus payment by ID
+                        displayName: Retrieve request of a bonus payment resource
+                        description: Retrieve request of a bonus payment resource by transactionID
                         is: [headers.acceptHeader, headers.contentHeader]
                         (annotations.scope): "read:lisa"
                         securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
@@ -793,6 +723,19 @@ types:
                                       "claimReason" : "Life Event"
                                     }
                                   }
+                          400:
+                            body:
+                              application/json:
+                                type: !include schemas/ErrorCodes.schema.json
+                                examples:
+                                  InvalidLmrn:
+                                    description: Invalid Lisa Manager Reference Number
+                                    value: |
+                                      {
+                                        "code" : "BAD_REQUEST",
+                                        "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
+                                      }
+
                           401:
                             body:
                               application/json:
