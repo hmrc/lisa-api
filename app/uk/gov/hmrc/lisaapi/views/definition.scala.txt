@@ -1,4 +1,7 @@
-@(context : String, status: String)
+@import uk.gov.hmrc.lisaapi.domain.APIAccess
+@import play.api.libs.json.Json
+
+@(context : String, status: String, access: APIAccess)
 {
   "scopes": [
     {
@@ -19,7 +22,8 @@
     "versions": [
       {
         "version": "1.0",
-        "status": "@status"
+        "status": "@status",
+        "access": @Json.toJson(access)
       }
     ]
   }

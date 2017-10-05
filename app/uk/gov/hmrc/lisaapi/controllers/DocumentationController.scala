@@ -20,6 +20,8 @@ import play.api.http.{HttpErrorHandler, LazyHttpErrorHandler}
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.api.controllers.DocumentationController
 import uk.gov.hmrc.lisaapi.config.AppContext
+import uk.gov.hmrc.lisaapi.config.APIAccessConfig
+import uk.gov.hmrc.lisaapi.domain.APIAccess
 import uk.gov.hmrc.lisaapi.views._
 
 class  Documentation(httpErrorHandler: HttpErrorHandler) extends DocumentationController(httpErrorHandler) {
@@ -29,11 +31,16 @@ class  Documentation(httpErrorHandler: HttpErrorHandler) extends DocumentationCo
   }
 
   override def definition(): Action[AnyContent] = Action {
-    Ok(txt.definition(AppContext.apiContext,AppContext.apiStatus))
+    Ok(txt.definition(AppContext.apiContext,AppContext.apiStatus, buildAccess()))
   }
 
   def raml(version: String, file: String): Action[AnyContent] = {
     super.at(s"/public/api/conf/$version", file)
+  }
+
+  private def buildAccess() = {
+    val access = APIAccessConfig(AppContext.access)
+    APIAccess(access.accessType, access.whiteListedApplicationIds)
   }
 }
 
