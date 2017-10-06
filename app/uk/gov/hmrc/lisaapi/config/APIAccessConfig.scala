@@ -24,9 +24,7 @@ case class APIAccessConfig(value: Option[Configuration]) {
 
   def accessType = {
     value match {
-      case Some(config) => {
-        config.getString("type").getOrElse(PRIVATE)
-      }
+      case Some(config) => config.getString("type").getOrElse(PRIVATE)
       case None => PRIVATE
     }
   }
