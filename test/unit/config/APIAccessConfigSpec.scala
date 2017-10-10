@@ -31,7 +31,7 @@ class APIAccessConfigSpec extends PlaySpec with MockitoSugar {
 
     "APIAccessConfig created with no Configuration" should {
     "return private for type" in {
-      apiAccessConfigNone.accessType must be ("PRIVATE")
+      apiAccessConfigNone.accessType must be ("PUBLIC")
     }
     "return an empty sequence for the whitelist ids" in {
       apiAccessConfigNone.whiteListedApplicationIds must be (Some(Seq()))
@@ -39,7 +39,7 @@ class APIAccessConfigSpec extends PlaySpec with MockitoSugar {
   }
 
   "APIAccessConfig created with valid configuration" should {
-    "return public for the access type" in {
+    "return private for the access type" in {
       when(mockConfiguration.getString(any(),any())).thenReturn(Some("PRIVATE"))
       apiAccessConfigMocked.accessType must be ("PRIVATE")
     }

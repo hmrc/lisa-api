@@ -20,12 +20,12 @@ import play.api.Configuration
 
 case class APIAccessConfig(value: Option[Configuration]) {
 
-  val PRIVATE = "PRIVATE"
+  val PUBLIC = "PUBLIC"
 
   def accessType = {
     value match {
-      case Some(config) => config.getString("type").getOrElse(PRIVATE)
-      case None => PRIVATE
+      case Some(config) => config.getString("type").getOrElse(PUBLIC)
+      case None => PUBLIC
     }
   }
 
