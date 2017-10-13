@@ -16,12 +16,17 @@
 
 package uk.gov.hmrc.lisaapi.models.des
 
+import java.util.Optional
+
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 
 trait DesResponse
 
 case class DesAccountResponse(accountID: String) extends DesResponse
+case class DesGetAccountResponse(accountId: String, investorId: String, creationReason: String, firstSubscriptionDate:String,
+                                     accountStatus:String, accountClosureReason:Option[String], closureDate:Option[String],
+                                     transferredFromAccountId:Option[String], transferredFromLMRN:Option[String], transferInDate:Option[String]) extends DesResponse
 case class DesLifeEventResponse(lifeEventID: String) extends DesResponse
 case class DesCreateInvestorResponse(investorID: String) extends DesResponse
 case class DesTransactionResponse(transactionID: String, message: String) extends DesResponse
@@ -30,6 +35,7 @@ case object DesEmptySuccessResponse extends DesResponse
 
 object DesResponse {
   implicit val desCreateAccountResponseFormats: OFormat[DesAccountResponse] = Json.format[DesAccountResponse]
+  implicit val desGetOpenAccountResponseFormats: OFormat[DesGetAccountResponse] = Json.format[DesGetAccountResponse]
   implicit val desCreateInvestorResponseFormats: OFormat[DesCreateInvestorResponse] = Json.format[DesCreateInvestorResponse]
   implicit val desLifeEventResponseFormats: OFormat[DesLifeEventResponse] = Json.format[DesLifeEventResponse]
   implicit val desTransactionResponseFormats: OFormat[DesTransactionResponse] = Json.format[DesTransactionResponse]

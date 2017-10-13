@@ -22,7 +22,7 @@ import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des._
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.http.logging.Authorization
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpReads, HttpResponse}
+import uk.gov.hmrc.play.http._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -31,6 +31,7 @@ import play.api.libs.json.Reads
 
 trait DesConnector extends ServicesConfig {
 
+  val httpGet: HttpGet = WSHttp
   val httpPost:HttpPost = WSHttp
   lazy val desUrl = baseUrl("des")
   lazy val lisaServiceUrl = s"$desUrl/lifetime-isa/manager"
@@ -75,6 +76,25 @@ trait DesConnector extends ServicesConfig {
       }
     })
   }
+
+  /**
+    * Attempts to get the details for LISA account
+    */
+
+
+  def getAccountInformation(lisaManager: String, accountId: String)(implicit hc: HeaderCarrier): Future[DesResponse] = {
+    val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId"
+    Logger.debug("Getting the Account details from des: " + uri)
+
+    val result: Future[HttpResponse] = httpGet.GET(uri)(implicitly[HttpReads[HttpResponse]], hc = updateHeaderCarrier(hc))
+
+    result.map(res => {
+      Logger.debug("Get Account request returned status: " + res.status)
+      parseDesResponse[DesGetAccountResponse](res)._2
+    })
+  }
+
+
 
   /**
     * Attempts to transfer an existing LISA account
