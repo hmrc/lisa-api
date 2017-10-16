@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.lisaapi.models
 
+import org.joda.time.DateTime
+
 trait ReportLifeEventResponse
 
 case class ReportLifeEventSuccessResponse(lifeEventId: String) extends ReportLifeEventResponse
@@ -24,3 +26,5 @@ case object ReportLifeEventInappropriateResponse extends ReportLifeEventResponse
 case object ReportLifeEventAlreadyExistsResponse extends ReportLifeEventResponse
 case object ReportLifeEventAccountNotFoundResponse extends ReportLifeEventResponse
 case object ReportLifeEventAccountClosedResponse extends ReportLifeEventResponse
+
+case class RequestLifeEventSuccessResponse(lifeEventId: String, eventType: LifeEventType, eventDate: DateTime) extends ReportLifeEventResponse

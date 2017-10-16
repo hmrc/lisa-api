@@ -19,7 +19,7 @@ package uk.gov.hmrc.lisaapi.services
 import play.api.Logger
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesLifeEventResponse}
+import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesLifeEventResponse, DesLifeEventRetrievalResponse, DesResponse}
 import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -32,25 +32,44 @@ trait LifeEventService {
   def reportLifeEvent(lisaManager: String, accountId: String, request: ReportLifeEventRequest)(implicit hc: HeaderCarrier): Future[ReportLifeEventResponse] = {
     val response = desConnector.reportLifeEvent(lisaManager, accountId, request)
 
-    response map { result =>
-      result match {
-        case successResponse: DesLifeEventResponse => {
-          Logger.debug("Matched DesLifeEventResponse")
+    response map {
+      case successResponse: DesLifeEventResponse => {
+        Logger.debug("Matched DesLifeEventResponse")
 
-          ReportLifeEventSuccessResponse(successResponse.lifeEventID)
+        ReportLifeEventSuccessResponse(successResponse.lifeEventID)
+      }
+      case failureResponse: DesFailureResponse => {
+        Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
+
+        failureResponse.code match {
+          case "LIFE_EVENT_INAPPROPRIATE" => ReportLifeEventInappropriateResponse
+          case "LIFE_EVENT_ALREADY_EXISTS" => ReportLifeEventAlreadyExistsResponse
+          case "INVESTOR_ACCOUNTID_NOT_FOUND" => ReportLifeEventAccountNotFoundResponse
+          case "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID" => ReportLifeEventAccountClosedResponse
+          case _ => {
+            ReportLifeEventErrorResponse
+          }
         }
-        case failureResponse: DesFailureResponse => {
-          Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
+      }
+    }
+  }
 
-          failureResponse.code match {
-            case "LIFE_EVENT_INAPPROPRIATE" => ReportLifeEventInappropriateResponse
-            case "LIFE_EVENT_ALREADY_EXISTS" => ReportLifeEventAlreadyExistsResponse
-            case "INVESTOR_ACCOUNTID_NOT_FOUND" => ReportLifeEventAccountNotFoundResponse
-            case "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID" => ReportLifeEventAccountClosedResponse
-            case "INTERNAL_SERVER_ERROR" => ReportLifeEventErrorResponse
-            case _ => {
-              ReportLifeEventErrorResponse
-            }
+  def getLifeEvent(lisaManager: String, accountId: String, eventId: String)(implicit hc: HeaderCarrier): Future[ReportLifeEventResponse] = {
+    val response = desConnector.getLifeEvent(lisaManager, accountId, eventId)
+
+    response map {
+      case successResponse: DesLifeEventRetrievalResponse => {
+        Logger.debug("Matched DesLifeEventRetrievalResponse")
+
+        RequestLifeEventSuccessResponse(successResponse.lifeEventId, successResponse.eventType, successResponse.eventDate)
+      }
+      case failureResponse: DesFailureResponse => {
+        Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
+
+        failureResponse.code match {
+          case "INVESTOR_ACCOUNTID_NOT_FOUND" => ReportLifeEventAccountNotFoundResponse
+          case _ => {
+            ReportLifeEventErrorResponse
           }
         }
       }
