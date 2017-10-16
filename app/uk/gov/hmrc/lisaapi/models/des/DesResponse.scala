@@ -23,6 +23,7 @@ trait DesResponse
 
 case class DesAccountResponse(accountID: String) extends DesResponse
 case class DesLifeEventResponse(lifeEventID: String) extends DesResponse
+case class DesLifeEventRetrievalResponse(lifeEventId: String, eventType: String, eventDate: String) extends DesResponse
 case class DesCreateInvestorResponse(investorID: String) extends DesResponse
 case class DesTransactionResponse(transactionID: String, message: String) extends DesResponse
 case class DesFailureResponse(code: String = "INTERNAL_SERVER_ERROR", reason: String = "Internal Server Error") extends DesResponse
@@ -32,6 +33,7 @@ object DesResponse {
   implicit val desCreateAccountResponseFormats: OFormat[DesAccountResponse] = Json.format[DesAccountResponse]
   implicit val desCreateInvestorResponseFormats: OFormat[DesCreateInvestorResponse] = Json.format[DesCreateInvestorResponse]
   implicit val desLifeEventResponseFormats: OFormat[DesLifeEventResponse] = Json.format[DesLifeEventResponse]
+  implicit val desLifeEventRetrievalResponseFormats: OFormat[DesLifeEventRetrievalResponse] = Json.format[DesLifeEventRetrievalResponse]
   implicit val desTransactionResponseFormats: OFormat[DesTransactionResponse] = Json.format[DesTransactionResponse]
 
   implicit val desFailureReads: Reads[DesFailureResponse] = (
