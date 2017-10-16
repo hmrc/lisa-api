@@ -544,7 +544,13 @@ class DesConnectorSpec extends PlaySpec
             Future.successful(
               HttpResponse(
                 responseStatus = OK,
-                responseJson = Some(Json.parse("{}"))
+                responseJson = Some(Json.parse(
+                  """
+                    |{
+                    |  "lifeEventId" : "1234567890",
+                    |  "eventType" : "UNKNOWN"
+                    |}
+                  """.stripMargin))
               )
             )
           )
@@ -575,7 +581,7 @@ class DesConnectorSpec extends PlaySpec
           )
 
         doRetrieveLifeEventRequest { response =>
-          response must be(DesLifeEventRetrievalResponse("1234567890", "LISA Investor Terminal Ill Health", "2017-04-06"))
+          response must be(DesLifeEventRetrievalResponse("1234567890", "LISA Investor Terminal Ill Health", new DateTime("2017-04-06")))
         }
       }
     }
