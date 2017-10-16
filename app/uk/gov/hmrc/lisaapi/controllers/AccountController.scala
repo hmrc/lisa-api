@@ -116,23 +116,14 @@ class AccountController extends LisaController with LisaConstants {
     service.getAccount(lisaManager, accountId).map { result =>
       result match {
         case response: GetLisaAccountSuccessResponse => {
-          auditService.audit(
-            auditType = "getAccountDetails",
-            path = getEndpointUrl(lisaManager),
-            auditData = (response.investorId, lisaManager).toStringMap
-          )
+
           LisaMetrics.incrementMetrics(startTime,LisaMetricKeys.ACCOUNT)
 
           Ok(Json.toJson(response))
         }
 
         case _ => {
-          auditService.audit(
-            auditType = "accountDetailsNotFound",
-            path = getEndpointUrl(lisaManager),
-            auditData = (accountId, lisaManager).toStringMap ++ Map(ZREF -> lisaManager,
-              "detailsNotFound" -> ErrorAccountNotFound.errorCode)
-          )
+
           LisaMetrics.incrementMetrics(System.currentTimeMillis(),
             LisaMetricKeys.lisaError(FORBIDDEN, LisaMetricKeys.ACCOUNT))
 
@@ -367,7 +358,7 @@ class AccountController extends LisaController with LisaConstants {
           LisaMetrics.incrementMetrics(startTime,
             LisaMetricKeys.lisaError(FORBIDDEN,LisaMetricKeys.CLOSE))
 
-          Forbidden(Json.toJson(ErrorAccountAlreadyClosedOrVoid))
+          Forbidden(Json.toJson(ErrorAccountAlreadyClosed))
         }
         case CloseLisaAccountNotFoundResponse => {
           auditService.audit(
@@ -411,6 +402,10 @@ class AccountController extends LisaController with LisaConstants {
 
   private def getEndpointUrl(lisaManagerReferenceNumber: String): String = {
     s"/manager/$lisaManagerReferenceNumber/accounts"
+  }
+
+  private def getAccountDetailsEndpointUrl(lisaManagerReferenceNumber: String, accountId: String): String = {
+    s"/manager/$lisaManagerReferenceNumber/accounts/$accountId"
   }
 
   private def getCloseEndpointUrl(lisaManagerReferenceNumber: String, accountID: String): String = {
