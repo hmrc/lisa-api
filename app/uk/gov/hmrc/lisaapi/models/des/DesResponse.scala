@@ -25,7 +25,7 @@ trait DesResponse
 
 case class DesAccountResponse(accountID: String) extends DesResponse
 case class DesLifeEventResponse(lifeEventID: String) extends DesResponse
-case class DesLifeEventRetrievalResponse(lifeEventId: LifeEventId, eventType: LifeEventType, eventDate: DateTime) extends DesResponse
+case class DesLifeEventRetrievalResponse(lifeEventID: LifeEventId, eventType: LifeEventType, eventDate: DateTime) extends DesResponse
 case class DesCreateInvestorResponse(investorID: String) extends DesResponse
 case class DesTransactionResponse(transactionID: String, message: String) extends DesResponse
 case class DesFailureResponse(code: String = "INTERNAL_SERVER_ERROR", reason: String = "Internal Server Error") extends DesResponse
@@ -48,14 +48,8 @@ object DesResponse {
   )(unlift(DesFailureResponse.unapply))
 
   implicit val requestLifeEventResponseReads: Reads[DesLifeEventRetrievalResponse] = (
-    (JsPath \ "lifeEventId").read(JsonReads.lifeEventId) and
+    (JsPath \ "lifeEventID").read(JsonReads.lifeEventId) and
     (JsPath \ "eventType").read(JsonReads.lifeEventType) and
     (JsPath \ "eventDate").read(JsonReads.notFutureDate).map(new DateTime(_))
   )(DesLifeEventRetrievalResponse.apply _)
-
-  implicit val requestLifeEventResponseWrites: Writes[DesLifeEventRetrievalResponse] = (
-    (JsPath \ "lifeEventId").write[String] and
-    (JsPath \ "eventType").write[String] and
-    (JsPath \ "eventDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd"))
-  )(unlift(DesLifeEventRetrievalResponse.unapply))
 }

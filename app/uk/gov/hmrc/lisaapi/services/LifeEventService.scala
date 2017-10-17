@@ -61,7 +61,7 @@ trait LifeEventService {
       case successResponse: DesLifeEventRetrievalResponse => {
         Logger.debug("Matched DesLifeEventRetrievalResponse")
 
-        RequestLifeEventSuccessResponse(successResponse.lifeEventId, successResponse.eventType, successResponse.eventDate)
+        RequestLifeEventSuccessResponse(successResponse.lifeEventID, successResponse.eventType, successResponse.eventDate)
       }
       case failureResponse: DesFailureResponse => {
         Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)

@@ -111,7 +111,7 @@ class LifeEventController extends LisaController {
 
       withValidLMRN(lisaManager) {
         service.getLifeEvent(lisaManager, accountId, eventId) map { res =>
-          Logger.debug("Entering LifeEvent Controller and the response is " + res.toString)
+          Logger.debug("Entering LifeEvent Controller GET and the response is " + res.toString)
           res match {
             case success: RequestLifeEventSuccessResponse => {
               Logger.debug("Matched Valid Response ")
@@ -129,7 +129,7 @@ class LifeEventController extends LisaController {
             }
             case _ => {
               Logger.debug("Matched Error")
-              Logger.error("Life Event Not reported : DES unknown case , returning internal server error")
+              Logger.error("Life Event Not returned : DES unknown case , returning internal server error")
 
               LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getErrorKey(INTERNAL_SERVER_ERROR, request.uri))
 
