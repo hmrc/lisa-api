@@ -35,7 +35,7 @@ class LifeEventController extends LisaController {
   def reportLisaLifeEvent(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async {
     implicit request =>
       val startTime = System.currentTimeMillis()
-      LisaMetrics.startMetrics(startTime,LisaMetricKeys.EVENT)
+      LisaMetrics.startMetrics(startTime, LisaMetricKeys.EVENT)
 
       withValidLMRN(lisaManager) {
         withValidJson[ReportLifeEventRequest](req =>
@@ -103,6 +103,42 @@ class LifeEventController extends LisaController {
         )
       }
   }
+
+  def getLifeEvent(lisaManager: String, accountId: String, eventId: String): Action[AnyContent] =
+    validateAccept(acceptHeaderValidationRules).async { implicit request =>
+      val startTime = System.currentTimeMillis()
+      LisaMetrics.startMetrics(startTime, LisaMetricKeys.EVENT)
+
+      withValidLMRN(lisaManager) {
+        service.getLifeEvent(lisaManager, accountId, eventId) map { res =>
+          Logger.debug("Entering LifeEvent Controller and the response is " + res.toString)
+          res match {
+            case success: RequestLifeEventSuccessResponse => {
+              Logger.debug("Matched Valid Response ")
+
+              LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.EVENT)
+
+              Ok(Json.toJson(success))
+            }
+            case ReportLifeEventAccountNotFoundResponse => {
+              Logger.debug("Matched Not Found")
+
+              LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getErrorKey(NOT_FOUND, request.uri))
+
+              NotFound(Json.toJson(ErrorAccountNotFound))
+            }
+            case _ => {
+              Logger.debug("Matched Error")
+              Logger.error("Life Event Not reported : DES unknown case , returning internal server error")
+
+              LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getErrorKey(INTERNAL_SERVER_ERROR, request.uri))
+
+              InternalServerError(Json.toJson(ErrorInternalServerError))
+            }
+          }
+        }
+      }
+    }
 
   private def doAudit(lisaManager: String, accountId: String, req: ReportLifeEventRequest, auditType: String, extraData: Map[String, String] = Map())(implicit hc: HeaderCarrier) = {
     auditService.audit(
