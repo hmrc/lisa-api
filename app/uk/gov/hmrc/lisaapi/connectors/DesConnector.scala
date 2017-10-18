@@ -86,7 +86,7 @@ trait DesConnector extends ServicesConfig {
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId"
     Logger.debug("Getting the Account details from des: " + uri)
 
-    val result: Future[HttpResponse] = httpGet.GET(uri)(implicitly[HttpReads[HttpResponse]], hc = updateHeaderCarrier(hc))
+    val result: Future[HttpResponse] = httpGet.GET(uri)(httpReads, hc = updateHeaderCarrier(hc))
 
     result.map(res => {
       Logger.debug("Get Account request returned status: " + res.status)

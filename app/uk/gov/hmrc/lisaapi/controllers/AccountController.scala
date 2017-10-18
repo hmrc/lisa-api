@@ -115,19 +115,16 @@ class AccountController extends LisaController with LisaConstants {
   private def processGetAccountDetails(lisaManager:String, accountId:String)(implicit hc: HeaderCarrier,startTime:Long) = {
     service.getAccount(lisaManager, accountId).map { result =>
       result match {
-        case response: GetLisaAccountSuccessResponse => {
-
+        case response : GetLisaAccountSuccessResponse  => {
           LisaMetrics.incrementMetrics(startTime,LisaMetricKeys.ACCOUNT)
-
           Ok(Json.toJson(response))
         }
 
-        case _ => {
 
+        case _ => {
           LisaMetrics.incrementMetrics(System.currentTimeMillis(),
             LisaMetricKeys.lisaError(FORBIDDEN, LisaMetricKeys.ACCOUNT))
-
-          Forbidden(Json.toJson(ErrorAccountNotFound))
+          NotFound(Json.toJson(ErrorAccountNotFound))
         }
       }
     }
