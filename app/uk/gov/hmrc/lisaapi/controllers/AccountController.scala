@@ -355,7 +355,7 @@ class AccountController extends LisaController with LisaConstants {
           LisaMetrics.incrementMetrics(startTime,
             LisaMetricKeys.lisaError(FORBIDDEN,LisaMetricKeys.CLOSE))
 
-          Forbidden(Json.toJson(ErrorAccountAlreadyClosed))
+          Forbidden(Json.toJson(ErrorAccountAlreadyClosedOrVoid))
         }
         case CloseLisaAccountNotFoundResponse => {
           auditService.audit(

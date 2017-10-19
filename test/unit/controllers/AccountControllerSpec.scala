@@ -727,15 +727,13 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
       }
     }
 
-    /* TODO: 403 & WRONG_LISA_MANAGER */
-
-    "return with status 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_CLOSED" when {
+    "return with status 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID" when {
       "the data service returns a CloseLisaAccountAlreadyClosedResponse" in {
         when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountAlreadyClosedResponse))
 
         doCloseRequest(closeAccountJson) { res =>
           status(res) mustBe (FORBIDDEN)
-          (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ACCOUNT_ALREADY_CLOSED")
+          (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID")
         }
       }
     }
