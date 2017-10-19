@@ -476,53 +476,6 @@ types:
                                       "code" : "LIFE_EVENT_ALREADY_EXISTS",
                                       "message" : "The investor’s life event has already been reported."
                                 }
-                    get:
-                      is: [headers.acceptHeader, headers.contentHeader]
-                      displayName: Retrieve all life events for an account
-                      (annotations.scope): "read:lisa"
-                      securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
-                      responses:
-                        200:
-                            body:
-                              application/json:
-                                example: !include examples/LifeEvent.get.array.json
-                        400:
-                          body:
-                            application/json:
-                              type: !include schemas/ErrorCodes.schema.json
-                              examples:
-                                InvalidLmrn:
-                                  description: Invalid Lisa Manager Reference Number
-                                  value: |
-                                    {
-                                      "code" : "BAD_REQUEST",
-                                      "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
-                                    }
-
-                        401:
-                          body:
-                            application/json:
-                              type: !include schemas/ErrorCodes.schema.json
-                              examples:
-                                notOpenStatus:
-                                  description: The lisaManagerReferenceNumber path parameter you've used doesn't match with an authorised LISA provider in HMRC's records.
-                                  value: |
-                                    {
-                                      "code" : "UNAUTHORIZED",
-                                      "message" : "lisaManagerReferenceNumber is not authorised"
-                                    }
-                        404:
-                          body:
-                            application/json:
-                              type: !include schemas/ErrorCodes.schema.json
-                              examples:
-                                accountIdNOTFound:
-                                  description: The accountId given does not match with HMRC’s records.
-                                  value: |
-                                    {
-                                      "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
-                                      "message": "The accountId given does not match with HMRC’s records."
-                                    }
                     /{lifeEventId}:
                       uriParameters:
                         lifeEventId:
@@ -532,6 +485,7 @@ types:
                       get:
                         is: [headers.acceptHeader, headers.contentHeader]
                         displayName: Retrieve a life event
+                        (annotations.sandboxData): !include testdata/life-event-get.md
                         responses:
                           200:
                             body:
