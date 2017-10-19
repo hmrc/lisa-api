@@ -46,6 +46,7 @@ class LifeEventControllerSpec extends PlaySpec
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
   val lisaManager = "Z019283"
   val accountId = "ABC12345"
+  val eventId = "1234567890"
 
   implicit val hc:HeaderCarrier = HeaderCarrier()
 
@@ -62,7 +63,7 @@ class LifeEventControllerSpec extends PlaySpec
     when(mockAuthCon.authorise[Option[String]](any(),any())(any())).thenReturn(Future(Some("1234")))
   }
 
-  "The Life Event Controller" should {
+  "Report Life Event" should {
 
     "audit lifeEventReported" when {
       "the request has been successful" in {
@@ -156,7 +157,7 @@ class LifeEventControllerSpec extends PlaySpec
       }
     }
 
-    "return with status 201 created" in {
+    "return with 201 created" in {
       when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful((ReportLifeEventSuccessResponse("1928374"))))
       doReportLifeEventRequest(reportLifeEventJson){res =>
         status(res) mustBe (CREATED)
@@ -164,7 +165,7 @@ class LifeEventControllerSpec extends PlaySpec
       }
     }
 
-    "return with status 400 bad request and a code of BAD_REQUEST" when {
+    "return with 400 bad request and a code of BAD_REQUEST" when {
       "given an invalid event type" in {
         val invalidJson = reportLifeEventJson.replace("LISA Investor Terminal Ill Health", "Invalid Event Type")
 
@@ -200,6 +201,7 @@ class LifeEventControllerSpec extends PlaySpec
         (contentAsJson(res) \"code").as[String] mustBe ("LIFE_EVENT_INAPPROPRIATE")
       }
     }
+
     "return with 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID" in {
       when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful((ReportLifeEventAccountClosedResponse)))
       doReportLifeEventRequest(reportLifeEventJson){res =>
@@ -209,7 +211,7 @@ class LifeEventControllerSpec extends PlaySpec
       }
     }
 
-    "return with 404 Notfound and a code of INVESTOR_ACCOUNTID_NOT_FOUND" in {
+    "return with 404 not found and a code of INVESTOR_ACCOUNTID_NOT_FOUND" in {
       when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful((ReportLifeEventAccountNotFoundResponse)))
       doReportLifeEventRequest(reportLifeEventJson){res =>
         status(res) mustBe (NOT_FOUND)
@@ -217,7 +219,7 @@ class LifeEventControllerSpec extends PlaySpec
       }
     }
 
-    "return with 409 Conflict and a code of LIFE_EVENT_ALREADY_EXISTS" in {
+    "return with 409 conflict and a code of LIFE_EVENT_ALREADY_EXISTS" in {
       when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful((ReportLifeEventAlreadyExistsResponse)))
       doReportLifeEventRequest(reportLifeEventJson){res =>
         status(res) mustBe (CONFLICT)
@@ -225,10 +227,44 @@ class LifeEventControllerSpec extends PlaySpec
       }
     }
 
-    "return with InternalServer Error when the Wrong event is returned" in {
-      when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful((ReportTest)))
+    "return with 500 internal server error when the wrong event is returned" in {
+      when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportTest))
       doReportLifeEventRequest(reportLifeEventJson){res =>
-        status(res) mustBe (INTERNAL_SERVER_ERROR)
+        status(res) mustBe INTERNAL_SERVER_ERROR
+        (contentAsJson(res) \ "code").as[String] mustBe "INTERNAL_SERVER_ERROR"
+      }
+    }
+
+  }
+
+  "Get Life Event" should {
+
+    "return with 200 ok" in {
+      val successResponse = RequestLifeEventSuccessResponse(eventId, "LISA Investor Terminal Ill Health", new DateTime("2000-01-01"))
+      when(mockService.getLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(successResponse))
+      doGetLifeEventRequest{ res =>
+        status(res) mustBe OK
+        val json = contentAsJson(res)
+
+        (json \ "lifeEventId").as[String] mustBe eventId
+        (json \ "eventType").as[String] mustBe "LISA Investor Terminal Ill Health"
+        (json \ "eventDate").as[String] mustBe "2000-01-01"
+      }
+    }
+
+    "return with 404 not found and a code of INVESTOR_ACCOUNTID_NOT_FOUND" in {
+      when(mockService.getLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventAccountNotFoundResponse))
+      doGetLifeEventRequest{ res =>
+        status(res) mustBe NOT_FOUND
+        (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNTID_NOT_FOUND"
+      }
+    }
+
+    "return with 500 internal server error when the wrong event is returned" in {
+      when(mockService.getLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportTest))
+      doGetLifeEventRequest{ res =>
+        status(res) mustBe INTERNAL_SERVER_ERROR
+        (contentAsJson(res) \ "code").as[String] mustBe "INTERNAL_SERVER_ERROR"
       }
     }
 
@@ -242,13 +278,20 @@ class LifeEventControllerSpec extends PlaySpec
     callback(res)
   }
 
+  def doGetLifeEventRequest(callback: (Future[Result]) => Unit): Unit = {
+    val res = SUT.getLifeEvent(lisaManager, accountId, eventId).apply(FakeRequest().withHeaders(acceptHeader))
+
+    callback(res)
+  }
+
   val mockService: LifeEventService = mock[LifeEventService]
   val mockAuditService: AuditService = mock[AuditService]
   val mockAuthCon :LisaAuthConnector = mock[LisaAuthConnector]
+
   val SUT = new LifeEventController {
     override val service: LifeEventService = mockService
     override val auditService: AuditService = mockAuditService
     override val authConnector = mockAuthCon
-
   }
+
 }
