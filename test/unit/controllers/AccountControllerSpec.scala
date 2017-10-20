@@ -575,6 +575,14 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
           status(res) mustBe (INTERNAL_SERVER_ERROR)
         }
       }
+
+      "the data service returns a GetLisaAccountErrorResponse for a getAccount details request" in {
+        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountErrorResponse))
+
+        doSyncGetAccountDetailsRequest { res =>
+          status(res) mustBe (INTERNAL_SERVER_ERROR)
+        }
+      }
     }
 
   }
