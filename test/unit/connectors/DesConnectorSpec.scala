@@ -571,7 +571,7 @@ class DesConnectorSpec extends PlaySpec
                 responseJson = Some(Json.parse(
                   """
                     |{
-                    |  "lifeEventId" : "1234567890",
+                    |  "lifeEventID" : "1234567890",
                     |  "eventType" : "LISA Investor Terminal Ill Health",
                     |  "eventDate" : "2017-04-06"
                     |}
