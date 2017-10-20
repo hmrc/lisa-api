@@ -16,6 +16,10 @@
 
 package uk.gov.hmrc.lisaapi.models
 
+import org.joda.time.DateTime
+import play.api.libs.functional.syntax._
+import play.api.libs.json._
+
 trait ReportLifeEventResponse
 
 case class ReportLifeEventSuccessResponse(lifeEventId: String) extends ReportLifeEventResponse
@@ -24,3 +28,13 @@ case object ReportLifeEventInappropriateResponse extends ReportLifeEventResponse
 case object ReportLifeEventAlreadyExistsResponse extends ReportLifeEventResponse
 case object ReportLifeEventAccountNotFoundResponse extends ReportLifeEventResponse
 case object ReportLifeEventAccountClosedResponse extends ReportLifeEventResponse
+
+case class RequestLifeEventSuccessResponse(lifeEventId: String, eventType: LifeEventType, eventDate: DateTime) extends ReportLifeEventResponse
+
+object RequestLifeEventSuccessResponse {
+  implicit val writes: Writes[RequestLifeEventSuccessResponse] = (
+    (JsPath \ "lifeEventId").write[String] and
+    (JsPath \ "eventType").write[String] and
+    (JsPath \ "eventDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd"))
+  )(unlift(RequestLifeEventSuccessResponse.unapply))
+}

@@ -94,6 +94,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
   val closeAccountJson = """{"accountClosureReason" : "All funds withdrawn", "closureDate" : "2000-06-23"}"""
 
+
   "The Create / Transfer Account endpoint" must {
 
     when(mockAuthCon.authorise[Option[String]](any(),any())(any())).thenReturn(Future(Some("1234")))
@@ -114,6 +115,8 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
         }
       }
     }
+
+
 
     "audit an accountNotCreated event" when {
       "the data service returns a CreateLisaAccountInvestorNotFoundResponse for a create request" in {
@@ -572,6 +575,70 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
           status(res) mustBe (INTERNAL_SERVER_ERROR)
         }
       }
+
+      "the data service returns a GetLisaAccountErrorResponse for a getAccount details request" in {
+        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountErrorResponse))
+
+        doSyncGetAccountDetailsRequest { res =>
+          status(res) mustBe (INTERNAL_SERVER_ERROR)
+        }
+      }
+    }
+
+  }
+
+  "The Get Account Details endpoint" must {
+
+    when(mockAuthCon.authorise[Option[String]](any(), any())(any())).thenReturn(Future(Some("1234")))
+
+    "audit an getAccountDetails event" when {
+      "submitted a valid open account request" in {
+        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", "2011-03-23", "OPEN", None, None, None, None, None)))
+        doSyncGetAccountDetailsRequest(res => {
+          status(res) mustBe OK
+          contentAsJson(res) mustBe Json.toJson (GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", "2011-03-23", "OPEN", None, None, None, None, None))
+        })
+      }
+    }
+
+
+    "audit an getAccountDetails event" when {
+      "submitted a valid close account request" in {
+        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", "2011-03-23", "CLOSED", Some("All funds withdrawn"), Some("2017-01-03"), None, None, None)))
+        doSyncGetAccountDetailsRequest(res => {
+          status(res) mustBe OK
+          contentAsJson(res) mustBe Json.toJson (GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", "2011-03-23",  "CLOSED", Some("All funds withdrawn"), Some("2017-01-03"), None, None, None))
+        })
+      }
+    }
+
+    "audit an getAccountDetails event" when {
+      "submitted a valid transfer account request" in {
+        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountSuccessResponse("9876543210", "8765432100", "Transferred", "2011-03-23", "OPEN", None, None, Some("8765432102"), Some ("Z543333"), Some("2015-12-13"))))
+        doSyncGetAccountDetailsRequest(res => {
+          status(res) mustBe OK
+          contentAsJson(res) mustBe Json.toJson (GetLisaAccountSuccessResponse("9876543210", "8765432100", "Transferred", "2011-03-23", "OPEN", None, None, Some("8765432102"), Some ("Z543333"), Some("2015-12-13")))
+        })
+      }
+    }
+
+    "audit an getAccountDetails event" when {
+      "submitted a valid void account request" in {
+        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", "2011-03-23", "VOID", None, None, None, None, None)))
+        doSyncGetAccountDetailsRequest(res => {
+          status(res) mustBe OK
+          contentAsJson(res) mustBe Json.toJson (GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", "2011-03-23", "VOID", None, None, None, None, None))
+        })
+      }
+    }
+
+    "audit an getAccountDetails event" when {
+      "submitted a invalid account request" in {
+        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountDoesNotExistResponse))
+        doSyncGetAccountDetailsRequest(res => {
+          (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNTID_NOT_FOUND"
+        })
+      }
     }
 
   }
@@ -614,7 +681,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               "accountClosureReason" -> "All funds withdrawn",
               "closureDate" -> "2000-06-23",
               "accountId" -> "ABC12345",
-              "reasonNotClosed" -> "INVESTOR_ACCOUNT_ALREADY_CLOSED"
+              "reasonNotClosed" -> "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID"
             )))(any())
         }
       }
@@ -668,15 +735,13 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
       }
     }
 
-    /* TODO: 403 & WRONG_LISA_MANAGER */
-
-    "return with status 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_CLOSED" when {
+    "return with status 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID" when {
       "the data service returns a CloseLisaAccountAlreadyClosedResponse" in {
         when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountAlreadyClosedResponse))
 
         doCloseRequest(closeAccountJson) { res =>
           status(res) mustBe (FORBIDDEN)
-          (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ACCOUNT_ALREADY_CLOSED")
+          (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID")
         }
       }
     }
@@ -741,6 +806,12 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
     callback(res)
   }
+
+  def doSyncGetAccountDetailsRequest(callback: (Future[Result]) => Unit) {
+    val res = SUT.getAccountDetails(lisaManager, accountId).apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
+    callback(res)
+  }
+
 
   def doCloseRequest(jsonString: String, lmrn: String = lisaManager)(callback: (Future[Result]) => Unit) {
     val res = SUT.closeLisaAccount(lmrn, accountId).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).

@@ -19,8 +19,8 @@ package uk.gov.hmrc.lisaapi.services
 import play.api.Logger
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.models.des.{DesAccountResponse, DesEmptySuccessResponse, DesFailureResponse}
-import uk.gov.hmrc.play.http.HeaderCarrier
+import uk.gov.hmrc.lisaapi.models.des._
+import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -52,49 +52,77 @@ trait AccountService {
     }
   }
 
-  def transferAccount(lisaManager: String, request: CreateLisaAccountTransferRequest)(implicit hc: HeaderCarrier): Future[CreateLisaAccountResponse] = {
-    val response = desConnector.transferAccount(lisaManager, request)
+  def getAccount(lisaManager: String, accountId: String)(implicit hc: HeaderCarrier): Future[GetLisaAccountResponse] = {
+    val response: Future[DesResponse] = desConnector.getAccountInformation(lisaManager, accountId)
 
     response map {
-      case successResponse: DesAccountResponse => {
+      case successResponse: DesGetAccountResponse => {
         Logger.debug("Matched DesAccountResponse")
-
-        CreateLisaAccountSuccessResponse(successResponse.accountID)
+        GetLisaAccountSuccessResponse(successResponse.accountId, successResponse.investorId, successResponse.creationReason, successResponse.firstSubscriptionDate,
+          successResponse.accountStatus, successResponse.accountClosureReason, successResponse.closureDate,
+          successResponse.transferredFromAccountId, successResponse.transferredFromLMRN, successResponse.transferInDate)
       }
+
       case failureResponse: DesFailureResponse => {
         Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
 
         failureResponse.code match {
-          case "INVESTOR_NOT_FOUND" => CreateLisaAccountInvestorNotFoundResponse
-          case "INVESTOR_COMPLIANCE_CHECK_FAILED" => CreateLisaAccountInvestorComplianceCheckFailedResponse
-          case "PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST" => CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse
-          case "INVESTOR_ACCOUNT_ALREADY_EXISTS" => CreateLisaAccountAlreadyExistsResponse
-          case "INVESTOR_ACCOUNT_ALREADY_CLOSED" => CreateLisaAccountInvestorAccountAlreadyClosedOrVoidedResponse
-          case _ => CreateLisaAccountErrorResponse
+          case "INVESTOR_ACCOUNTID_NOT_FOUND" => GetLisaAccountDoesNotExistResponse
+          case _ => GetLisaAccountErrorResponse
         }
       }
     }
   }
 
-  def closeAccount(lisaManager: String, accountId: String, request: CloseLisaAccountRequest)(implicit hc: HeaderCarrier): Future[CloseLisaAccountResponse] = {
+    def transferAccount(lisaManager: String, request: CreateLisaAccountTransferRequest)(implicit hc: HeaderCarrier): Future[CreateLisaAccountResponse] = {
+      val response = desConnector.transferAccount(lisaManager, request)
 
-    val response = desConnector.closeAccount(lisaManager, accountId, request)
+      response map {
+        case successResponse: DesAccountResponse => {
+          Logger.debug("Matched DesAccountResponse")
 
-    response map {
-      case DesEmptySuccessResponse => {
-        CloseLisaAccountSuccessResponse(accountId)
+          CreateLisaAccountSuccessResponse(successResponse.accountID)
+        }
+        case failureResponse: DesFailureResponse => {
+          Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
+
+          failureResponse.code match {
+            case "INVESTOR_NOT_FOUND" => CreateLisaAccountInvestorNotFoundResponse
+            case "INVESTOR_COMPLIANCE_CHECK_FAILED" => CreateLisaAccountInvestorComplianceCheckFailedResponse
+            case "PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST" => CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse
+            case "INVESTOR_ACCOUNT_ALREADY_EXISTS" => CreateLisaAccountAlreadyExistsResponse
+            case "INVESTOR_ACCOUNT_ALREADY_CLOSED" => CreateLisaAccountInvestorAccountAlreadyClosedOrVoidedResponse
+            case _ => CreateLisaAccountErrorResponse
+          }
+        }
       }
-      case failureResponse: DesFailureResponse => {
-        failureResponse.code match {
-          case "INVESTOR_ACCOUNT_ALREADY_CLOSED" => CloseLisaAccountAlreadyClosedResponse
-          case "INVESTOR_ACCOUNTID_NOT_FOUND" => CloseLisaAccountNotFoundResponse
-          case _ => CloseLisaAccountErrorResponse
+    }
+
+    def closeAccount(lisaManager: String, accountId: String, request: CloseLisaAccountRequest)(implicit hc: HeaderCarrier): Future[CloseLisaAccountResponse] = {
+
+      val response = desConnector.closeAccount(lisaManager, accountId, request)
+
+      response map {
+        case DesEmptySuccessResponse => {
+          CloseLisaAccountSuccessResponse(accountId)
+        }
+        case failureResponse: DesFailureResponse => {
+          failureResponse.code match {
+            case "INVESTOR_ACCOUNT_ALREADY_CLOSED" => CloseLisaAccountAlreadyClosedResponse
+            case "INVESTOR_ACCOUNTID_NOT_FOUND" => CloseLisaAccountNotFoundResponse
+            case _ => CloseLisaAccountErrorResponse
+          }
         }
       }
     }
   }
-}
 
-object AccountService extends AccountService {
-  override val desConnector: DesConnector = DesConnector
-}
+
+  object AccountService extends AccountService {
+    override val desConnector: DesConnector = DesConnector
+  }
+
+
+
+
+

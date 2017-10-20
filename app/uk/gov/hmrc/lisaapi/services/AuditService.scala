@@ -43,6 +43,8 @@ trait AuditService extends AppName {
 
 }
 
+
+
 object AuditService extends AuditService {
   override val connector: AuditConnector = MicroserviceAuditConnector
 }

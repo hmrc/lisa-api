@@ -28,7 +28,8 @@ import uk.gov.hmrc.play.microservice.controller.BaseController
 import uk.gov.hmrc.auth.core.Retrievals.internalId
 import uk.gov.hmrc.auth.core.{AuthorisationException, AuthorisedFunctions, Enrolment, InsufficientEnrolments}
 import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
-import uk.gov.hmrc.lisaapi.metrics.{LisaMetrics, LisaMetricKeys}
+import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
+import uk.gov.hmrc.lisaapi.models.AccountId
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -46,6 +47,16 @@ trait LisaController extends BaseController with HeaderValidator with RunMode wi
     else {
       LisaMetrics.incrementMetrics(System.currentTimeMillis,LisaMetricKeys.getErrorKey(BAD_REQUEST,request.uri))
       Future.successful(BadRequest(toJson(ErrorBadRequestLmrn)))
+    }
+  }
+
+  protected def withValidAccountId(accountId: String)(success: Future[Result])(implicit request: Request[AnyContent]): Future[Result] = {
+    if (accountId.matches("^[a-zA-Z0-9 :\\-]{1,20}$")) {
+      success
+    }
+    else {
+      LisaMetrics.incrementMetrics(System.currentTimeMillis,LisaMetricKeys.getErrorKey(NOT_FOUND,request.uri))
+      Future.successful(NotFound(toJson(ErrorAccountNotFound)))
     }
   }
 
