@@ -31,7 +31,7 @@ import play.api.libs.json.Reads
 
 trait DesConnector extends ServicesConfig {
 
-  val httpGet: HttpGet = WSHttp
+
   val httpPost:HttpPost = WSHttp
   val httpGet:HttpGet = WSHttp
   lazy val desUrl = baseUrl("des")
