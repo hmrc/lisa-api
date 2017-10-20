@@ -352,12 +352,12 @@ types:
                             application/json:
                               type: !include schemas/ErrorCodes.schema.json
                               examples:
-                                accountClosed:
-                                  description: The LISA account is already closed.
+                                accountClosedOrVoided:
+                                  description: The LISA account has already been closed or voided.
                                   value: |
                                     {
-                                      "code" : "INVESTOR_ACCOUNT_ALREADY_CLOSED",
-                                      "message" : "The Investor Account is already closed"
+                                      "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID",
+                                      "message": "The LISA account has already been closed or voided."
                                     }
                         406:
                           body:

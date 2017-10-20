@@ -31,6 +31,7 @@ import play.api.libs.json.Reads
 
 trait DesConnector extends ServicesConfig {
 
+
   val httpPost:HttpPost = WSHttp
   val httpGet:HttpGet = WSHttp
   lazy val desUrl = baseUrl("des")
@@ -76,6 +77,25 @@ trait DesConnector extends ServicesConfig {
       }
     })
   }
+
+  /**
+    * Attempts to get the details for LISA account
+    */
+
+
+  def getAccountInformation(lisaManager: String, accountId: String)(implicit hc: HeaderCarrier): Future[DesResponse] = {
+    val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId"
+    Logger.debug("Getting the Account details from des: " + uri)
+
+    val result: Future[HttpResponse] = httpGet.GET(uri)(httpReads, hc = updateHeaderCarrier(hc))
+
+    result.map(res => {
+      Logger.debug("Get Account request returned status: " + res.status)
+      parseDesResponse[DesGetAccountResponse](res)._2
+    })
+  }
+
+
 
   /**
     * Attempts to transfer an existing LISA account

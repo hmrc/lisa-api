@@ -23,7 +23,7 @@ import play.api.libs.json.Json.toJson
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
-import uk.gov.hmrc.lisaapi.models._
+import uk.gov.hmrc.lisaapi.models.{GetLisaAccountDoesNotExistResponse, _}
 import uk.gov.hmrc.lisaapi.services.{AccountService, AuditService}
 import uk.gov.hmrc.play.http.HeaderCarrier
 
@@ -86,6 +86,20 @@ class AccountController extends LisaController with LisaConstants {
     }
   }
 
+
+  def getAccountDetails (lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
+    implicit val startTime = System.currentTimeMillis()
+    LisaMetrics.startMetrics(startTime, LisaMetricKeys.ACCOUNT)
+
+    withValidLMRN(lisaManager) {
+      withValidAccountId(accountId) {
+        processGetAccountDetails(lisaManager, accountId)
+      }
+    }
+  }
+
+
+
   def closeLisaAccount(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
     withValidLMRN(lisaManager) {
       withValidJson[CloseLisaAccountRequest]( closeRequest =>
@@ -95,6 +109,29 @@ class AccountController extends LisaController with LisaConstants {
             processAccountClosure(lisaManager, accountId, closeRequest)
         }, lisaManager = lisaManager
       )
+    }
+  }
+
+  private def processGetAccountDetails(lisaManager:String, accountId:String)(implicit hc: HeaderCarrier,startTime:Long) = {
+    service.getAccount(lisaManager, accountId).map { result =>
+      result match {
+        case response : GetLisaAccountSuccessResponse  => {
+          LisaMetrics.incrementMetrics(startTime,LisaMetricKeys.ACCOUNT)
+          Ok(Json.toJson(response))
+        }
+
+        case GetLisaAccountDoesNotExistResponse => {
+          LisaMetrics.incrementMetrics(System.currentTimeMillis(),
+            LisaMetricKeys.lisaError(FORBIDDEN, LisaMetricKeys.ACCOUNT))
+          NotFound(Json.toJson(ErrorAccountNotFound))
+        }
+
+        case _ => {
+          LisaMetrics.incrementMetrics(System.currentTimeMillis(),
+            LisaMetricKeys.lisaError(FORBIDDEN, LisaMetricKeys.ACCOUNT))
+          InternalServerError(Json.toJson(ErrorInternalServerError))
+        }
+      }
     }
   }
 
@@ -318,12 +355,12 @@ class AccountController extends LisaController with LisaConstants {
             path = getCloseEndpointUrl(lisaManager, accountId),
             auditData = closeLisaAccountRequest.toStringMap ++ Map(ZREF -> lisaManager,
               "accountId" -> accountId,
-              "reasonNotClosed" -> ErrorAccountAlreadyClosed.errorCode)
+              "reasonNotClosed" -> ErrorAccountAlreadyClosedOrVoid.errorCode)
           )
           LisaMetrics.incrementMetrics(startTime,
             LisaMetricKeys.lisaError(FORBIDDEN,LisaMetricKeys.CLOSE))
 
-          Forbidden(Json.toJson(ErrorAccountAlreadyClosed))
+          Forbidden(Json.toJson(ErrorAccountAlreadyClosedOrVoid))
         }
         case CloseLisaAccountNotFoundResponse => {
           auditService.audit(
@@ -367,6 +404,10 @@ class AccountController extends LisaController with LisaConstants {
 
   private def getEndpointUrl(lisaManagerReferenceNumber: String): String = {
     s"/manager/$lisaManagerReferenceNumber/accounts"
+  }
+
+  private def getAccountDetailsEndpointUrl(lisaManagerReferenceNumber: String, accountId: String): String = {
+    s"/manager/$lisaManagerReferenceNumber/accounts/$accountId"
   }
 
   private def getCloseEndpointUrl(lisaManagerReferenceNumber: String, accountID: String): String = {
