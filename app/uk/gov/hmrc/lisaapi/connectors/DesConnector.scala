@@ -33,6 +33,7 @@ trait DesConnector extends ServicesConfig {
 
   val httpGet: HttpGet = WSHttp
   val httpPost:HttpPost = WSHttp
+  val httpGet:HttpGet = WSHttp
   lazy val desUrl = baseUrl("des")
   lazy val lisaServiceUrl = s"$desUrl/lifetime-isa/manager"
 
@@ -145,6 +146,22 @@ trait DesConnector extends ServicesConfig {
     result.map(res => {
       Logger.debug("Life Event request returned status: " + res.status)
       parseDesResponse[DesLifeEventResponse](res)._2
+    })
+  }
+
+  /**
+    * Attempts to get a LISA Life Event
+    */
+  def getLifeEvent(lisaManager: String, accountId: String, eventId: String)
+                     (implicit hc: HeaderCarrier): Future[DesResponse] = {
+
+    val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId/life-event/$eventId"
+    Logger.debug("Posting Life Event request to des: " + uri)
+    val result = httpGet.GET(uri)(httpReads, updateHeaderCarrier(hc))
+
+    result.map(res => {
+      Logger.debug("Get Life Event request returned status: " + res.status)
+      parseDesResponse[DesLifeEventRetrievalResponse](res)._2
     })
   }
 

@@ -25,7 +25,7 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des._
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpResponse}
+import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet, HttpPost, HttpResponse}
 import play.api.test.Helpers._
 
 import scala.concurrent.{Await, Future}
@@ -501,6 +501,93 @@ class DesConnectorSpec extends PlaySpec
 
   }
 
+  "Retrieve Life Event endpoint" must {
+
+    "return a failure response" when {
+      "the DES response is a failure response" in {
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = OK,
+                responseJson = Some(Json.parse(
+                  """{
+                    | "code": "ERROR_CODE",
+                    | "reason" : "ERROR MESSAGE"
+                  }""".stripMargin))
+              )
+            )
+          )
+
+        doRetrieveLifeEventRequest { response =>
+          response must be(DesFailureResponse("ERROR_CODE", "ERROR MESSAGE"))
+        }
+      }
+      "the DES response has no json body" in {
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = SERVICE_UNAVAILABLE,
+                responseJson = None
+              )
+            )
+          )
+
+        doRetrieveLifeEventRequest { response =>
+          response must be(DesFailureResponse())
+        }
+      }
+      "the DES response is invalid" in {
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = OK,
+                responseJson = Some(Json.parse(
+                  """
+                    |{
+                    |  "lifeEventId" : "1234567890",
+                    |  "eventType" : "UNKNOWN"
+                    |}
+                  """.stripMargin))
+              )
+            )
+          )
+
+        doRetrieveLifeEventRequest { response =>
+          response must be(DesFailureResponse())
+        }
+      }
+    }
+
+    "return a success response" when {
+      "the DES response is a life event" in {
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = OK,
+                responseJson = Some(Json.parse(
+                  """
+                    |{
+                    |  "lifeEventId" : "1234567890",
+                    |  "eventType" : "LISA Investor Terminal Ill Health",
+                    |  "eventDate" : "2017-04-06"
+                    |}
+                  """.stripMargin))
+              )
+            )
+          )
+
+        doRetrieveLifeEventRequest { response =>
+          response must be(DesLifeEventRetrievalResponse("1234567890", "LISA Investor Terminal Ill Health", new DateTime("2017-04-06")))
+        }
+      }
+    }
+
+  }
+
   private def doCreateInvestorRequest(callback: ((Int,DesResponse)) => Unit) = {
     val request = CreateLisaInvestorRequest("AB123456A", "A", "B", new DateTime("2000-01-01"))
     val response = Await.result(SUT.createInvestor("Z019283", request), Duration.Inf)
@@ -537,6 +624,12 @@ class DesConnectorSpec extends PlaySpec
     callback(response)
   }
 
+  private def doRetrieveLifeEventRequest(callback: (DesResponse) => Unit) = {
+    val response = Await.result(SUT.getLifeEvent("Z123456", "ABC12345", "123456"), Duration.Inf)
+
+    callback(response)
+  }
+
   private def doRequestBonusPaymentRequest(callback: ((Int, DesResponse)) => Unit) = {
     val request = RequestBonusPaymentRequest(
       lifeEventId = Some("1234567891"),
@@ -553,10 +646,12 @@ class DesConnectorSpec extends PlaySpec
   }
 
   val mockHttpPost = mock[HttpPost]
+  val mockHttpGet = mock[HttpGet]
 
   implicit val hc = HeaderCarrier()
 
   object SUT extends DesConnector {
     override val httpPost = mockHttpPost
+    override val httpGet = mockHttpGet
   }
 }

@@ -18,8 +18,10 @@ package uk.gov.hmrc.lisaapi.models.des
 
 import java.util.Optional
 
+import org.joda.time.DateTime
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
+import uk.gov.hmrc.lisaapi.models.{JsonReads, LifeEventId, LifeEventType}
 
 trait DesResponse
 
@@ -28,6 +30,7 @@ case class DesGetAccountResponse(accountId: String, investorId: String, creation
                                      accountStatus:String, accountClosureReason:Option[String], closureDate:Option[String],
                                      transferredFromAccountId:Option[String], transferredFromLMRN:Option[String], transferInDate:Option[String]) extends DesResponse
 case class DesLifeEventResponse(lifeEventID: String) extends DesResponse
+case class DesLifeEventRetrievalResponse(lifeEventID: LifeEventId, eventType: LifeEventType, eventDate: DateTime) extends DesResponse
 case class DesCreateInvestorResponse(investorID: String) extends DesResponse
 case class DesTransactionResponse(transactionID: String, message: String) extends DesResponse
 case class DesFailureResponse(code: String = "INTERNAL_SERVER_ERROR", reason: String = "Internal Server Error") extends DesResponse
@@ -49,4 +52,10 @@ object DesResponse {
     (JsPath \ "code").write[String] and
     (JsPath \ "message").write[String]
   )(unlift(DesFailureResponse.unapply))
+
+  implicit val requestLifeEventResponseReads: Reads[DesLifeEventRetrievalResponse] = (
+    (JsPath \ "lifeEventID").read(JsonReads.lifeEventId) and
+    (JsPath \ "eventType").read(JsonReads.lifeEventType) and
+    (JsPath \ "eventDate").read(JsonReads.notFutureDate).map(new DateTime(_))
+  )(DesLifeEventRetrievalResponse.apply _)
 }
