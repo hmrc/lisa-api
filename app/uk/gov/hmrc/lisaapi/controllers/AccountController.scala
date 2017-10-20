@@ -23,7 +23,7 @@ import play.api.libs.json.Json.toJson
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
-import uk.gov.hmrc.lisaapi.models._
+import uk.gov.hmrc.lisaapi.models.{GetLisaAccountDoesNotExistResponse, _}
 import uk.gov.hmrc.lisaapi.services.{AccountService, AuditService}
 import uk.gov.hmrc.play.http.HeaderCarrier
 
@@ -120,11 +120,16 @@ class AccountController extends LisaController with LisaConstants {
           Ok(Json.toJson(response))
         }
 
+        case response : GetLisaAccountDoesNotExistResponse => {
+          LisaMetrics.incrementMetrics(System.currentTimeMillis(),
+            LisaMetricKeys.lisaError(FORBIDDEN, LisaMetricKeys.ACCOUNT))
+          NotFound(Json.toJson(ErrorAccountNotFound))
+        }
 
         case _ => {
           LisaMetrics.incrementMetrics(System.currentTimeMillis(),
             LisaMetricKeys.lisaError(FORBIDDEN, LisaMetricKeys.ACCOUNT))
-          NotFound(Json.toJson(ErrorAccountNotFound))
+          InternalServerError(Json.toJson(ErrorInternalServerError))
         }
       }
     }

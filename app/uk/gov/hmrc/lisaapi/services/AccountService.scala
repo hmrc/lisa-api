@@ -62,6 +62,7 @@ trait AccountService {
           successResponse.accountStatus, successResponse.accountClosureReason, successResponse.closureDate,
           successResponse.transferredFromAccountId, successResponse.transferredFromLMRN, successResponse.transferInDate)
       }
+
       case failureResponse: DesFailureResponse => {
         Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
 
