@@ -1,0 +1,8 @@
+{
+  "data": {
+    "accountId": "8765432100",
+    "message": "LISA Account reinstated."
+  },
+  "success": true,
+  "status": 200
+}

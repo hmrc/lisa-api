@@ -2,22 +2,13 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "properties": {
-    "accountClosureReason": {
-      "description": "The reason the account was closed.",
-      "type": "string",
-      "enum": [
-        "All funds withdrawn",
-        "Cancellation"
-      ]
-    },
-    "closureDate": {
-      "description": "The date the account was closed. This can't be in the future.",
+    "firstSubscriptionDate": {
+      "description":"The date of the first deposit into the account - if this is a transfer, use the date of deposit into the account managed by the previous organisation. This can't be in the future.",
       "$ref": "#/definitions/ISO8601-Date"
     }
   },
     "required": [
-	  "accountClosureReason",
-	  "closureDate"
+	  "firstSubscriptionDate"
 	],
 	"additionalProperties": false,
 	"definitions": {
@@ -28,5 +19,4 @@
         "example": "2017-05-05"
 	  }
 	}
-
 }

@@ -155,8 +155,9 @@
             <td><p>HTTP status: <code class="code--slim">409 (Conflict)</code></p>
                 <p class ="code--block"> {<br>
                                             "code": "LIFE_EVENT_ALREADY_EXISTS",<br>
-                                            "message": "The investor’s life event has already been reported"<br>
-                                          }
+                                            "message": "The investor’s life event has already been reported",<br>
+                                             "id": "9876543210"<br>
+                                             }
                 </p>
             </td>
         </tr>

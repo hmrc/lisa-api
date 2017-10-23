@@ -1,0 +1,8 @@
+{
+  "transactionID": "7777777777",
+  "creationDate": "2017-05-05",
+  "paymentDate": "2017-07-05",
+  "paymentStatus": "Paid",
+  "paymentReference": "12345",
+  "paymentAmount": "1000.00"
+}

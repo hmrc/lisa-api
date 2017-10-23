@@ -37,7 +37,8 @@
 				"ACCEPT_HEADER_INVALID",
         "NOT_FOUND",
         "BAD_REQUEST",
-        "FORBIDDEN"
+        "FORBIDDEN",
+        "INVESTOR_ACCOUNT_CANNOT_BE_REINSTATED"
       ]
     }
   }

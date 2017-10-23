@@ -1,0 +1,62 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "transactionID" : {
+      "description": "The transactionID for which the payment details have been requested",
+      "type" : "string",
+      "example": "7777777777"
+    },
+    "creationDate": {
+      "description":"The  date the transaction has been created.",
+      "$ref": "#/definitions/ISO8601-Date"
+    },
+    "paymentDate": {
+      "description":"The date payment has been made.",
+      "$ref": "#/definitions/ISO8601-Date"
+    },
+    "paymentDueDate": {
+      "description":"The date the payment is due.",
+      "$ref": "#/definitions/ISO8601-Date"
+    },
+    "paymentStatus" : {
+      "description": "The status of the payment for a transaction",
+      "type" : "string",
+      "enum": [
+        "Paid",
+        "Pending"
+      ],
+      "example": "complete"
+    },
+    "paymentReference" : {
+      "description": "The reference of the payment made",
+      "type" : "string",
+      "example": "complete"
+    },
+    "paymentAmount" : {
+      "description": "The amount paid for the transaction",
+      "type" : "string",
+      "example": "complete"
+    },
+    "bonusDueForPeriod": {
+      "description": "Payment due for the period",
+      "type" : "string",
+      "example": "complete"
+    }
+
+  },
+    "required": [
+      "transactionID",
+	  "creationDate",
+      "paymentStatus"
+    ],
+	"additionalProperties": false,
+	"definitions": {
+	  "ISO8601-Date": {
+        "id": "full-date",
+		"type": "string",
+		"pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+        "example": "2017-05-05"
+	  }
+	}
+}
