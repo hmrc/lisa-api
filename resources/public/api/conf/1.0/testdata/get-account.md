@@ -12,7 +12,7 @@
   <tbody>
     <tr>
       <td>
-        <p>Request with a valid LISA Manager Reference Number and Account ID</p>
+        <p>Request with a valid LISA Manager Reference Number and Account ID (open account)</p>
         <p class ="code--block">
           lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
           accountId: 1234567890
@@ -101,29 +101,6 @@
     </tr>
     <tr>
       <td>
-        <p>Request with a valid LISA Manager Reference Number and Account ID (closed acount)</p>
-        <p class ="code--block">
-          lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
-          accountId: 2000000200
-        </p>
-      </td>
-      <td></td>
-      <td>
-        <p>HTTP status: <code class="code--slim">200 (OK)</code></p>
-        <p class ="code--block"> {<br>
-            "investorId": "0000000403",<br>
-            "accountId": "A1234561",<br>
-            "creationReason": "New",<br>
-            "firstSubscriptionDate": "2011-03-23",<br>
-            "accountStatus": "CLOSED",<br>
-            "accountClosureReason": "All funds withdrawn",<br>
-            "closureDate": "2017-01-03"<br>
-          }
-        </p>
-      </td>
-    </tr>
-    <tr>
-      <td>
         <p>Request with a valid Account ID, but an invalid LISA Manager Reference Number</p>
         <p class ="code--block">
           lisaManagerReferenceNumber: 123456<br>
@@ -139,6 +116,23 @@
           }
         </p>
       </td>
+    </tr>
+    <tr>
+        <td>
+            <p>Request containing an Account ID that does not exist</p>
+            <p class ="code--block">
+                lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+                accountId: 0000000404
+            </p>
+        </td>
+        <td></td>
+        <td><p>HTTP status: <code class="code--slim">404 (Not found)</code></p>
+            <p class ="code--block"> {<br>
+              "code": "INVESTOR_ACCOUNTID_NOT_FOUND",<br>
+              "message": "The accountId given does not match with HMRC’s records"<br>
+            }
+            </p>
+        </td>
     </tr>
     <tr>
       <td>
