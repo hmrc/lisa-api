@@ -26,22 +26,22 @@
         "Paid",
         "Pending"
       ],
-      "example": "complete"
+      "example": "Paid"
     },
     "paymentReference" : {
       "description": "The reference of the payment made",
       "type" : "string",
-      "example": "complete"
+      "example": "12345"
     },
     "paymentAmount" : {
       "description": "The amount paid for the transaction",
       "type" : "string",
-      "example": "complete"
+      "example": "1000.00"
     },
     "bonusDueForPeriod": {
       "description": "Payment due for the period",
       "type" : "string",
-      "example": "complete"
+      "example": "700.00"
     }
 
   },
