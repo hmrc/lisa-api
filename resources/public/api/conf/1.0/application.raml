@@ -837,6 +837,18 @@ types:
                                         "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
                                         "message": "The accountId given does not match with HMRC’s records."
                                       }
+                          409:
+                              body:
+                                application/json:
+                                  type: !include schemas/ErrorCodes.schema.json
+                                  examples:
+                                    noLifeEvent:
+                                      description: A transaction already exists with similar data.
+                                      value: |
+                                        {
+                                          "code" : "TRANSACTION_ALREADY_EXISTS",
+                                          "message" : "A transaction already exists with similar data."
+                                        }
                       /{transactionId}:
                         uriParameters:
                           transactionId:
