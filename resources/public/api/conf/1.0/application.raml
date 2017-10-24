@@ -503,7 +503,7 @@ types:
                                     "code": "INVESTOR_ACCOUNT_CANNOT_BE_REINSTATED",
                                     "message": "Account transfer or the account is already open"
                                   }
-                /update-subscrition:
+                /update-subscription:
                       post:
                         is: [headers.acceptHeader, headers.contentHeader]
                         displayName: Modify date of first subscription of a LISA account.
@@ -753,7 +753,9 @@ types:
                                 example: /lifetime-isa/manager/Z876543/accounts/acc654321/transactions/7777777777
                             body:
                               application/json:
-                                example: !include examples/LISATransaction.post.response.json
+                                examples:
+                                  example-1: !include examples/LISATransaction.post.response.json
+                                  example-2: !include examples/LISATransaction.post.response.1.json
                           400:
                             body:
                               application/json:
@@ -865,32 +867,8 @@ types:
                             200:
                               body:
                                 application/json:
-                                  example: |
-                                    {
-                                      "lifeEventId" : "1234567891",
-                                      "periodStartDate" : "2017-04-06",
-                                      "periodEndDate" : "2017-05-05",
+                                 example: !include examples/LISATransaction.get.response.json
 
-                                      "htbTransfer" : {
-                                        "htbTransferInForPeriod" : 0.00,
-                                        "htbTransferTotalYTD" : 0.00
-                                      },
-
-                                      "inboundPayments"   :
-                                      {
-                                        "newSubsForPeriod" : 4000.00,
-                                        "newSubsYTD" : 4000.00,
-                                        "totalSubsForPeriod" : 4000.00,
-                                        "totalSubsYTD" : 4000.00
-                                      },
-
-                                      "bonuses"   :
-                                      {
-                                        "bonusDueForPeriod" : 1000.00,
-                                        "totalBonusDueYTD" : 1000.00,
-                                        "claimReason" : "Life Event"
-                                      }
-                                    }
                             400:
                               body:
                                 application/json:

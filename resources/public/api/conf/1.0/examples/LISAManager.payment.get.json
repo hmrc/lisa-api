@@ -1,7 +1,7 @@
 {
   "lisaManagerReferenceNumber" : "Z543210",
   "paymentReference": "32456",
-  "paymentType" : "",
-  "paymentAmount": "",
+  "paymentType" : "VISA Debt.",
+  "paymentAmount": "10000.00",
   "paymentDate" : "2017-05-05"
 }
