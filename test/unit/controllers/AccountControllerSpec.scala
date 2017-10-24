@@ -16,6 +16,7 @@
 
 package unit.controllers
 
+import org.joda.time.DateTime
 import org.mockito.Matchers.{eq => matchersEquals, _}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
@@ -591,52 +592,52 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
     when(mockAuthCon.authorise[Option[String]](any(), any())(any())).thenReturn(Future(Some("1234")))
 
-    "audit an getAccountDetails event" when {
-      "submitted a valid open account request" in {
-        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", "2011-03-23", "OPEN", None, None, None, None, None)))
+    "return the correct json" when {
+      "returning a valid open account response" in {
+        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", "2011-03-23", "OPEN", None, None, None)))
         doSyncGetAccountDetailsRequest(res => {
           status(res) mustBe OK
-          contentAsJson(res) mustBe Json.toJson (GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", "2011-03-23", "OPEN", None, None, None, None, None))
+          contentAsJson(res) mustBe Json.toJson (GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", "2011-03-23", "OPEN", None, None, None))
         })
       }
-    }
 
-
-    "audit an getAccountDetails event" when {
-      "submitted a valid close account request" in {
-        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", "2011-03-23", "CLOSED", Some("All funds withdrawn"), Some("2017-01-03"), None, None, None)))
+      "returning a valid close account response" in {
+        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", "2011-03-23", "CLOSED", Some("All funds withdrawn"), Some("2017-01-03"), None)))
         doSyncGetAccountDetailsRequest(res => {
           status(res) mustBe OK
-          contentAsJson(res) mustBe Json.toJson (GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", "2011-03-23",  "CLOSED", Some("All funds withdrawn"), Some("2017-01-03"), None, None, None))
+          contentAsJson(res) mustBe Json.toJson (GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", "2011-03-23",  "CLOSED", Some("All funds withdrawn"), Some("2017-01-03"), None))
         })
       }
-    }
 
-    "audit an getAccountDetails event" when {
-      "submitted a valid transfer account request" in {
-        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountSuccessResponse("9876543210", "8765432100", "Transferred", "2011-03-23", "OPEN", None, None, Some("8765432102"), Some ("Z543333"), Some("2015-12-13"))))
+      "returning a valid transfer account response" in {
+        when(mockService.getAccount(any(), any())(any())).
+          thenReturn(Future.successful(GetLisaAccountSuccessResponse("9876543210", "8765432100", "Transferred", "2011-03-23", "OPEN", None, None, Some(GetLisaAccountTransferAccount("8765432102", "Z543333", new DateTime("2015-12-13"))))))
+
         doSyncGetAccountDetailsRequest(res => {
           status(res) mustBe OK
-          contentAsJson(res) mustBe Json.toJson (GetLisaAccountSuccessResponse("9876543210", "8765432100", "Transferred", "2011-03-23", "OPEN", None, None, Some("8765432102"), Some ("Z543333"), Some("2015-12-13")))
+          contentAsJson(res) mustBe Json.toJson (GetLisaAccountSuccessResponse("9876543210", "8765432100", "Transferred", "2011-03-23", "OPEN", None, None, Some(GetLisaAccountTransferAccount("8765432102", "Z543333", new DateTime("2015-12-13")))))
         })
       }
-    }
 
-    "audit an getAccountDetails event" when {
-      "submitted a valid void account request" in {
-        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", "2011-03-23", "VOID", None, None, None, None, None)))
+      "returning a valid void account response" in {
+        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", "2011-03-23", "VOID", None, None, None)))
         doSyncGetAccountDetailsRequest(res => {
           status(res) mustBe OK
-          contentAsJson(res) mustBe Json.toJson (GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", "2011-03-23", "VOID", None, None, None, None, None))
+          contentAsJson(res) mustBe Json.toJson (GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", "2011-03-23", "VOID", None, None, None))
         })
       }
-    }
 
-    "audit an getAccountDetails event" when {
-      "submitted a invalid account request" in {
+      "returning a account not found response" in {
         when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountDoesNotExistResponse))
         doSyncGetAccountDetailsRequest(res => {
           (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNTID_NOT_FOUND"
+        })
+      }
+
+      "returning a internal server error response" in {
+        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountErrorResponse))
+        doSyncGetAccountDetailsRequest(res => {
+          (contentAsJson(res) \ "code").as[String] mustBe "INTERNAL_SERVER_ERROR"
         })
       }
     }

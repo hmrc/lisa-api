@@ -56,11 +56,23 @@ trait AccountService {
     val response: Future[DesResponse] = desConnector.getAccountInformation(lisaManager, accountId)
 
     response map {
-      case successResponse: DesGetAccountResponse => {
+      case res: DesGetAccountResponse => {
         Logger.debug("Matched DesAccountResponse")
-        GetLisaAccountSuccessResponse(successResponse.accountId, successResponse.investorId, successResponse.creationReason, successResponse.firstSubscriptionDate,
-          successResponse.accountStatus, successResponse.accountClosureReason, successResponse.closureDate,
-          successResponse.transferredFromAccountId, successResponse.transferredFromLMRN, successResponse.transferInDate)
+
+        val transferAccount = res.transferAccount.map {data =>
+          GetLisaAccountTransferAccount(data.transferredFromAccountId, data.transferredFromLMRN, data.transferInDate)
+        }
+
+        GetLisaAccountSuccessResponse(
+          res.accountId,
+          res.investorId,
+          res.creationReason,
+          res.firstSubscriptionDate,
+          res.accountStatus,
+          res.accountClosureReason,
+          res.closureDate,
+          transferAccount
+        )
       }
 
       case failureResponse: DesFailureResponse => {
