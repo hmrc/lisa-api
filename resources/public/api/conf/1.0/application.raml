@@ -636,6 +636,18 @@ types:
                                       "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
                                       "message": "The accountId given does not match with HMRC’s records."
                                     }
+                        409:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                duplicateBonusPayment:
+                                  description: The investor's bonus payment has already been requested.
+                                  value: |
+                                    {
+                                      "code" : "BONUS_CLAIM_ALREADY_EXISTS",
+                                      "message" : "The investor's bonus payment has already been requested."
+                                    }
                     /{transactionId}:
                       uriParameters:
                         transactionId:
