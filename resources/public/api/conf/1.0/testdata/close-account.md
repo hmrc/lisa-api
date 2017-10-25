@@ -87,8 +87,8 @@
             </td>
             <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
                 <p class ="code--block"> {<br>
-                                            "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED",<br>
-                                            "message": "The LISA account is already closed"<br>
+                                            "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID",<br>
+                                            "message": "The LISA account has already been closed or voided."<br>
                                        }
                 </p>
             </td>

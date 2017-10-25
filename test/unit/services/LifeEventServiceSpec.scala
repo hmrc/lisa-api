@@ -23,21 +23,18 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesLifeEventResponse}
+import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesLifeEventResponse, DesLifeEventRetrievalResponse}
 import uk.gov.hmrc.lisaapi.services.LifeEventService
 import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
-/**
-  * Created by mark on 21/03/17.
-  */
 class LifeEventServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
 
-  "LifeEventService" must {
+  "Report life event" must {
 
-    "return a Success Reponse" when {
+    "return a Success response" when {
       "given a success response from the DES connector" in {
         when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(DesLifeEventResponse("AB123456")))
 
@@ -45,28 +42,28 @@ class LifeEventServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuit
       }
     }
 
-    "return a Inappropriate Life Event" when {
+    "return a Inappropriate Life Event response" when {
       "given DesFailureResponse and status 403" in {
         when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("LIFE_EVENT_INAPPROPRIATE","The life Event was inappropriate")))
         doRequest(response => response mustBe ReportLifeEventInappropriateResponse)
       }
     }
 
-    "return a Already Exists error" when {
+    "return a Already Exists response" when {
       "given DesFailureResponse and status 409" in {
         when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("LIFE_EVENT_ALREADY_EXISTS","The life Event Already Exists")))
         doRequest(response => response mustBe ReportLifeEventAlreadyExistsResponse)
       }
     }
 
-    "Return Not Found response" when {
+    "return a Not Found response" when {
       "given DesFailureReponse and status 404" in {
         when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNTID_NOT_FOUND","The accountID given does not match with HMRC’s records")))
         doRequest(response => response mustBe ReportLifeEventAccountNotFoundResponse)
       }
     }
 
-    "Return Internal Server Error" when {
+    "return a Internal Server Error response" when {
       "When INTERNAL_SERVER_ERROR sent" in {
         when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("INTERNAL_SERVER_ERROR","Internal Error")))
         doRequest(response => response mustBe ReportLifeEventErrorResponse)
@@ -77,11 +74,57 @@ class LifeEventServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuit
         doRequest(response => response mustBe ReportLifeEventErrorResponse)
       }
     }
+
   }
 
-  private def doRequest(callback: (ReportLifeEventResponse) => Unit) = {
+  "Retrieve life event" must {
+
+    "return a Success response" when {
+      "given a success response from the DES connector" in {
+        when(mockDesConnector.getLifeEvent(any(), any(), any())(any())).
+          thenReturn(Future.successful(DesLifeEventRetrievalResponse("AB123456", "X", new DateTime("2000-01-01"))))
+
+        doRetrieval{ _ mustBe RequestLifeEventSuccessResponse("AB123456", "X", new DateTime("2000-01-01")) }
+      }
+    }
+
+    "return a Not Found response" when {
+      "given DesFailureReponse and status 404" in {
+        when(mockDesConnector.getLifeEvent(any(), any(), any())(any())).
+          thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNTID_NOT_FOUND", "The accountID given does not match with HMRC’s records")))
+
+        doRetrieval{ _ mustBe ReportLifeEventAccountNotFoundResponse }
+      }
+    }
+
+    "return a Internal Server Error response" when {
+      "When INTERNAL_SERVER_ERROR sent" in {
+        when(mockDesConnector.getLifeEvent(any(), any(), any())(any())).
+          thenReturn(Future.successful(DesFailureResponse("INTERNAL_SERVER_ERROR", "Internal Error")))
+
+        doRetrieval{ _ mustBe ReportLifeEventErrorResponse }
+      }
+
+      "When Invalid Code Sent" in {
+        when(mockDesConnector.getLifeEvent(any(), any(), any())(any())).
+          thenReturn(Future.successful(DesFailureResponse("INVALID", "Invalid Code")))
+
+        doRetrieval{ _ mustBe ReportLifeEventErrorResponse }
+      }
+    }
+
+
+  }
+
+  private def doRequest(callback: (ReportLifeEventResponse) => Unit): Unit = {
     val request = ReportLifeEventRequest("LISA Investor Terminal Ill Health", new DateTime("2017-04-06"))
     val response = Await.result(SUT.reportLifeEvent("Z019283", "192837", request)(HeaderCarrier()), Duration.Inf)
+
+    callback(response)
+  }
+
+  private def doRetrieval(callback: (ReportLifeEventResponse) => Unit): Unit = {
+    val response = Await.result(SUT.getLifeEvent("Z019283", "192837", "1234567890")(HeaderCarrier()), Duration.Inf)
 
     callback(response)
   }

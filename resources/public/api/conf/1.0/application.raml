@@ -334,6 +334,7 @@ types:
                     is: [headers.acceptHeader, headers.contentHeader]
                     (annotations.scope): "read:lisa"
                     securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
+                    (annotations.sandboxData): !include testdata/get-account.md
                     responses:
                       200:
                         body:
@@ -432,12 +433,12 @@ types:
                               application/json:
                                 type: !include schemas/ErrorCodes.schema.json
                                 examples:
-                                  accountClosed:
-                                    description: The LISA account is already closed.
+                                  accountClosedOrVoided:
+                                    description: The LISA account has already been closed or voided.
                                     value: |
                                       {
-                                        "code" : "INVESTOR_ACCOUNT_ALREADY_CLOSED",
-                                        "message" : "The Investor Account is already closed"
+                                        "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID",
+                                        "message": "The LISA account has already been closed or voided."
                                       }
                 /reinstate-account:
                       post:
@@ -688,6 +689,7 @@ types:
                         get:
                           is: [headers.acceptHeader, headers.contentHeader]
                           displayName: Retrieve a life event
+                          (annotations.sandboxData): !include testdata/life-event-get.md
                           responses:
                             200:
                               body:
