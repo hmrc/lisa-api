@@ -870,6 +870,171 @@ types:
                               body:
                                 application/json:
                                  example: !include examples/LISATransaction.get.response.json
+                          401:
+                            body:
+                              application/json:
+                                type: !include schemas/ErrorCodes.schema.json
+                                examples:
+                                  notOpenStatus:
+                                    description: The lisaManagerReferenceNumber path parameter you've used doesn't match with an authorised LISA provider in HMRC's records.
+                                    value: |
+                                      {
+                                        "code" : "UNAUTHORIZED",
+                                        "message" : "lisaManagerReferenceNumber is not authorised"
+                                      }
+                          404:
+                            body:
+                              application/json:
+                                type: !include schemas/ErrorCodes.schema.json
+                                examples:
+                                  accountIdNOTFound:
+                                    description: The accountId given does not match with HMRC’s records.
+                                    value: |
+                                      {
+                                        "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
+                                        "message": "The accountId given does not match with HMRC’s records."
+                                      }
+              /transactions:
+                    description: !include documentation/LISATransaction
+                    post:
+                      is: [headers.acceptHeader, headers.contentHeader]
+                      displayName: Request a bonus payment
+                      description: Request a bonus payment from HMRC and provide a reason for the request.
+                      (annotations.scope): "write:lisa"
+                      securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
+                      (annotations.sandboxData): !include testdata/bonus-payment.md
+                      body:
+                        application/json:
+                          type: !include schemas/BonusPaymentRequest.post.schema.json
+                          example: !include examples/BonusPaymentRequest.post.json
+                      responses:
+                        201:
+                          description: The LISA transaction resource has been created.
+                          headers:
+                            Location:
+                              description: relative URI to the created Bonus Payment resource
+                              type: string
+                              example: /lifetime-isa/manager/Z876543/accounts/acc654321/transactions/7777777777
+                          body:
+                            application/json:
+                              example: !include examples/LISATransaction.post.response.json
+                        400:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                badRequest:
+                                  description: Bad Request
+                                  value: |
+                                    {
+                                      "code" : "BAD_REQUEST",
+                                      "message" : "Bad Request"
+                                    }
+                                InvalidLmrn:
+                                  description: Invalid Lisa Manager Reference Number
+                                  value: |
+                                    {
+                                      "code" : "BAD_REQUEST",
+                                      "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
+                                    }
+                        401:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                notOpenStatus:
+                                  description: The lisaManagerReferenceNumber path parameter you've used doesn't match with an authorised LISA provider in HMRC's records.
+                                  value: |
+                                    {
+                                      "code" : "UNAUTHORIZED",
+                                      "message" : "lisaManagerReferenceNumber is not authorised"
+                                    }
+                        403:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                forbidden:
+                                  description: Request data does not meet business rules.
+                                  value: |
+                                    {
+                                      "code" : "FORBIDDEN",
+                                      "message" : "Forbidden"
+                                    }
+                                lifeEventNotProvided:
+                                  description: lifeEventId is required when the claimReason is "Life Event".
+                                  value: |
+                                    {
+                                      "code" : "LIFE_EVENT_NOT_PROVIDED",
+                                      "message" : "lifeEventId is required when the claimReason is \"Life Event\"."
+                                    }
+                                bonusWrong:
+                                  description: The bonus information given exceeds the maximum annual amount, the qualifying deposits exceed the maximum annual amount, or the bonus claim doesn't equal the correct percentage of stated qualifying funds.
+                                  value: |
+                                    {
+                                      "code" : "BONUS_CLAIM_ERROR",
+                                      "message" : "Bonus Claim Error"
+                                    }
+                                accountClosedOrVoided:
+                                  description: The LISA account has already been closed or voided.
+                                  value: |
+                                    {
+                                      "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID",
+                                      "message": "The LISA account has already been closed or voided."
+                                    }
+                        404:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                noLifeEvent:
+                                  description: The lifeEventId does not match with HMRC’s records.
+                                  value: |
+                                    {
+                                      "code" : "LIFE_EVENT_NOT_FOUND",
+                                      "message" : "The lifeEventId does not match with HMRC’s records."
+                                    }
+                                accountIdNOTFound:
+                                  description: The accountId given does not match with HMRC’s records.
+                                  value: |
+                                    {
+                                      "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
+                                      "message": "The accountId given does not match with HMRC’s records."
+                                    }
+                        409:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                duplicateBonusPayment:
+                                  description: The investor's bonus payment has already been requested.
+                                  value: |
+                                    {
+                                      "code" : "BONUS_CLAIM_ALREADY_EXISTS",
+                                      "message" : "The investor's bonus payment has already been requested."
+                                    }
+                    /{transactionId}:
+                      uriParameters:
+                        transactionId:
+                          type: integer
+                          description: The ID for the transaction.
+                          example: 1234567890
+                      get:
+                        displayName: Retrieve request of a bonus payment resource
+                        description: Retrieve request of a bonus payment resource by transactionID
+                        is: [headers.acceptHeader, headers.contentHeader]
+                        (annotations.scope): "read:lisa"
+                        securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
+                        (annotations.sandboxData): !include testdata/bonus-payment-get.md
+                        responses:
+                          200:
+                            body:
+                              application/json:
+                                example: |
+                                  {
+                                    "lifeEventId" : "1234567891",
+                                    "periodStartDate" : "2017-04-06",
+                                    "periodEndDate" : "2017-05-05",
 
                             400:
                               body:
