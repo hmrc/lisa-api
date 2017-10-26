@@ -38,6 +38,11 @@ package object controllers {
   implicit val errorResponseWithIdWrites = new Writes[ErrorResponseWithId] {
     def writes(e: ErrorResponseWithId): JsValue = Json.obj("code" -> e.errorCode, "message" -> e.message, "id" -> e.id)
   }
+
+
+  implicit val errorResponseWithLifeEventIdWrites = new Writes[ErrorResponseWithLifeEventId] {
+    def writes(e: ErrorResponseWithLifeEventId): JsValue = Json.obj("code" -> e.errorCode, "message" -> e.message, "lifeEventID" -> e.lifeEventID)
+  }
 }
 
 trait LisaConstants {

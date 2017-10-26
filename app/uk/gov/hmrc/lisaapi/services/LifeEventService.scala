@@ -19,7 +19,7 @@ package uk.gov.hmrc.lisaapi.services
 import play.api.Logger
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesLifeEventResponse, DesLifeEventRetrievalResponse, DesResponse}
+import uk.gov.hmrc.lisaapi.models.des._
 import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -38,12 +38,16 @@ trait LifeEventService {
 
         ReportLifeEventSuccessResponse(successResponse.lifeEventID)
       }
+
+      case existsResponse: DesLifeEventExistResponse => {
+        Logger.debug("*******************Matched DesLifeEventAlreadyExistResponse")
+        ReportLifeEventAlreadyExistsResponse(existsResponse.lifeEventID)
+      }
       case failureResponse: DesFailureResponse => {
         Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
 
         failureResponse.code match {
           case "LIFE_EVENT_INAPPROPRIATE" => ReportLifeEventInappropriateResponse
-          case "LIFE_EVENT_ALREADY_EXISTS" => ReportLifeEventAlreadyExistsResponse
           case "INVESTOR_ACCOUNTID_NOT_FOUND" => ReportLifeEventAccountNotFoundResponse
           case "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID" => ReportLifeEventAccountClosedResponse
           case _ => {
