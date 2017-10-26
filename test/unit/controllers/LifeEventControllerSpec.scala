@@ -102,23 +102,23 @@ class LifeEventControllerSpec extends PlaySpec
           )(any())
         }
       }
-//      "the request results in a ReportLifeEventAlreadyExistsResponse" in {
-//        when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventAlreadyExistsResponse))
-//        doReportLifeEventRequest(reportLifeEventJson){res =>
-//          await(res)
-//          verify(mockAuditService).audit(
-//            auditType = matchersEquals("lifeEventNotReported"),
-//            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events"),
-//            auditData = matchersEquals(Map(
-//              "lisaManagerReferenceNumber" -> lisaManager,
-//              "accountID" -> accountId,
-//              "eventType" -> "LISA Investor Terminal Ill Health",
-//              "eventDate" -> "2017-01-01",
-//              "reasonNotReported" -> "LIFE_EVENT_ALREADY_EXISTS"
-//            ))
-//          )(any())
-//        }
-//      }
+      "the request results in a ReportLifeEventAlreadyExistsResponse" in {
+        when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventAlreadyExistsResponse("1234567890")))
+        doReportLifeEventRequest(reportLifeEventJson){res =>
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = matchersEquals("lifeEventNotReported"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events"),
+            auditData = matchersEquals(Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountID" -> accountId,
+              "eventType" -> "LISA Investor Terminal Ill Health",
+              "eventDate" -> "2017-01-01",
+              "reasonNotReported" -> "LIFE_EVENT_ALREADY_EXISTS"
+            ))
+          )(any())
+        }
+      }
       "the request results in a ReportLifeEventAccountNotFoundResponse" in {
         when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventAccountNotFoundResponse))
         doReportLifeEventRequest(reportLifeEventJson){res =>
@@ -219,13 +219,14 @@ class LifeEventControllerSpec extends PlaySpec
       }
     }
 
-//    "return with 409 conflict and a code of LIFE_EVENT_ALREADY_EXISTS" in {
-//      when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful((ReportLifeEventAlreadyExistsResponse)))
-//      doReportLifeEventRequest(reportLifeEventJson){res =>
-//        status(res) mustBe (CONFLICT)
-//        (contentAsJson(res) \"code").as[String] mustBe ("LIFE_EVENT_ALREADY_EXISTS")
-//      }
-//    }
+    "return with 409 conflict and a code of LIFE_EVENT_ALREADY_EXISTS" in {
+      when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventAlreadyExistsResponse("1234567890")))
+      doReportLifeEventRequest(reportLifeEventJson){res =>
+        status(res) mustBe (CONFLICT)
+        (contentAsJson(res) \"code").as[String] mustBe ("LIFE_EVENT_ALREADY_EXISTS")
+        (contentAsJson(res) \"lifeEventId").as[String] mustBe ("1234567890")
+      }
+    }
 
     "return with 500 internal server error when the wrong event is returned" in {
       when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportTest))

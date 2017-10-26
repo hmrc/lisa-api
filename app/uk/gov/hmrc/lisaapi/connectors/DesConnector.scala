@@ -147,7 +147,6 @@ trait DesConnector extends ServicesConfig {
       Logger.debug("Life Event request returned status: " + res.status)
       res.status match {
         case 409 => {
-          Logger.debug("Inside the DesLifeEventExistResponse ")
           parseDesResponse[DesLifeEventExistResponse](res)._2
         }
         case _ => parseDesResponse[DesLifeEventResponse](res)._2

@@ -40,7 +40,7 @@ trait LifeEventService {
       }
 
       case existsResponse: DesLifeEventExistResponse => {
-        Logger.debug("*******************Matched DesLifeEventAlreadyExistResponse")
+        Logger.debug("Matched DesLifeEventAlreadyExistResponse")
         ReportLifeEventAlreadyExistsResponse(existsResponse.lifeEventID)
       }
       case failureResponse: DesFailureResponse => {
