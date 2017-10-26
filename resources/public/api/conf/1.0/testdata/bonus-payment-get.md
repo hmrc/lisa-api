@@ -100,7 +100,7 @@
 				<p class ="code--block">
 					{<br>
 						"code": "BONUS_PAYMENT_TRANSACTION_NOT_FOUND",<br>
-						"message": "The bonusPaymentTransactionId does not match with HMRC’s records."<br>					}
+						"message": "The bonusPaymentTransactionId does not match with HMRC’s records"<br>					}
 				</p>
 			</td>
 		</tr>
