@@ -405,6 +405,24 @@ class DesConnectorSpec extends PlaySpec
       }
     }
 
+    "Return a populated DesLifeEventExistResponse" when {
+      "A LIFE_EVENT_ALREADY_EXISTS failure is returned" in {
+        when(mockHttpPost.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = CONFLICT,
+                responseJson = Some(Json.parse(s"""{"code": "LIFE_EVENT_ALREADY_EXISTS", "reason": "The investor’s life event has already been reported.", "lifeEventID": "1234567891"}"""))
+              )
+            )
+          )
+
+        doReportLifeEventRequest { response =>
+          response must be(DesLifeEventExistResponse("LIFE_EVENT_ALREADY_EXISTS", "The investor’s life event has already been reported.", "1234567891"))
+        }
+      }
+    }
+
     "Return a populated DesFailureResponse" when {
       "A LIFE_EVENT_INAPPROPRIATE failure is returned" in {
         when(mockHttpPost.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any()))

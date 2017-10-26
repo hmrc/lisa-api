@@ -38,6 +38,14 @@ case class ErrorResponseWithId(
                                 id: String
                               )
 
+case class ErrorResponseWithLifeEventId(
+                                         httpStatusCode: Int,
+                                         errorCode: String,
+                                         message: String,
+                                         lifeEventID: String
+                                       )
+
+
 case class ErrorValidation(
                              errorCode: String,
                              message: String,
@@ -90,8 +98,6 @@ case object ErrorTransferAccountDataProvided extends ErrorResponse(403, "TRANSFE
 
 case object ErrorLifeEventInappropriate extends ErrorResponse(403, "LIFE_EVENT_INAPPROPRIATE","The life event conflicts with previous life event reported")
 
-case object ErrorLifeEventAlreadyExists extends ErrorResponse(409,"LIFE_EVENT_ALREADY_EXISTS","The investor’s life event has already been reported")
-
 case object ErrorInvalidLisaManager extends ErrorResponse(401,"UNAUTHORIZED","The lisaManagerReferenceNumber path parameter you've used doesn't match with an authorised LISA provider in HMRC's records.")
 
 object ErrorInvestorAlreadyExists {
@@ -102,4 +108,13 @@ object ErrorInvestorAlreadyExists {
 
 }
 
+object ErrorLifeEventAlreadyExists {
+
+  def apply(lifeEventID: String) = {
+    ErrorResponseWithLifeEventId(409,"LIFE_EVENT_ALREADY_EXISTS","The investor’s life event has already been reported", lifeEventID)
+  }
+
+}
+
 case object ErrorLifeEventNotProvided extends ErrorResponse(403,"LIFE_EVENT_NOT_PROVIDED","lifeEventId is required when the claimReason is \"Life Event\"")
+

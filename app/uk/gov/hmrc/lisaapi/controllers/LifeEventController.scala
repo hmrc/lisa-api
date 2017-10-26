@@ -69,14 +69,15 @@ class LifeEventController extends LisaController {
 
                 Forbidden(Json.toJson(ErrorAccountAlreadyClosedOrVoid))
               }
-              case ReportLifeEventAlreadyExistsResponse => {
+              case ReportLifeEventAlreadyExistsResponse(lifeEventId)=> {
+                val result = ErrorLifeEventAlreadyExists (lifeEventId)
                 Logger.debug("Matched Already Exists")
 
-                doAudit(lisaManager, accountId, req, "lifeEventNotReported", Map("reasonNotReported" -> ErrorLifeEventAlreadyExists.errorCode))
+                doAudit(lisaManager, accountId, req, "lifeEventNotReported", Map("reasonNotReported" -> result.errorCode))
                 LisaMetrics.incrementMetrics(startTime,
                   LisaMetricKeys.getErrorKey(CONFLICT,request.uri))
 
-                Conflict(Json.toJson(ErrorLifeEventAlreadyExists))
+                Conflict(Json.toJson(result))
               }
               case ReportLifeEventAccountNotFoundResponse => {
                 Logger.debug("Matched Not Found")

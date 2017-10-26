@@ -47,6 +47,7 @@ case class DesLifeEventRetrievalResponse(lifeEventID: LifeEventId, eventType: Li
 case class DesCreateInvestorResponse(investorID: String) extends DesResponse
 case class DesTransactionResponse(transactionID: String, message: String) extends DesResponse
 case class DesFailureResponse(code: String = "INTERNAL_SERVER_ERROR", reason: String = "Internal Server Error") extends DesResponse
+case class DesLifeEventExistResponse(code: String, reason: String, lifeEventID: String) extends DesResponse
 case object DesEmptySuccessResponse extends DesResponse
 
 object DesResponse {
@@ -84,4 +85,6 @@ object DesResponse {
     (JsPath \ "eventType").read(JsonReads.lifeEventType) and
     (JsPath \ "eventDate").read(JsonReads.notFutureDate).map(new DateTime(_))
   )(DesLifeEventRetrievalResponse.apply _)
+
+  implicit val requestLifeEventAlreadyExistResponseFormats: OFormat[DesLifeEventExistResponse] = Json.format[DesLifeEventExistResponse]
 }
