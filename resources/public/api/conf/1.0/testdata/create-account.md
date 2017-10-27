@@ -291,7 +291,8 @@
             <td><p>HTTP status: <code class="code--slim">409 (Conflict)</code></p>
                 <p class ="code--block"> {<br>
                                             "code": "INVESTOR_ACCOUNT_ALREADY_EXISTS",<br>
-                                            "message": "The LISA account already exists"<br>
+                                            "message": "The LISA account already exists",<br>
+                                            "accountId": "1234567890"<br>
                                           }
                 </p>
             </td>
