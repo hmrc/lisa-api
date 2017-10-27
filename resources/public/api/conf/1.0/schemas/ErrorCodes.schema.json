@@ -4,7 +4,8 @@
   "properties":
   {
     "code" : {"$ref": "#/definitions/error-codeType"},
-    "message" : {"type" : "string"}
+    "message" : {"type" : "string"},
+    "accountId" : {"type" : "string"}
   },
 	"required" : ["code", "message"],
   "definitions":
