@@ -45,6 +45,12 @@ case class ErrorResponseWithLifeEventId(
                                          lifeEventID: String
                                        )
 
+case class ErrorResponseWithAccountId(
+                                         httpStatusCode: Int,
+                                         errorCode: String,
+                                         message: String,
+                                         accountId: String
+                                       )
 
 case class ErrorValidation(
                              errorCode: String,
@@ -86,8 +92,6 @@ case object ErrorInvestorComplianceCheckFailed extends ErrorResponse(403, "INVES
 
 case object ErrorPreviousAccountDoesNotExist extends ErrorResponse(403, "PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST", "The transferredFromAccountId and transferredFromLMRN given don’t match with an account on HMRC’s records")
 
-case object ErrorAccountAlreadyExists extends ErrorResponse(409, "INVESTOR_ACCOUNT_ALREADY_EXISTS", "The LISA account already exists")
-
 case object ErrorAccountAlreadyClosedOrVoid extends ErrorResponse(403, "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID", "The LISA account has already been closed or voided.")
 
 case object ErrorAccountNotFound extends ErrorResponse(404, "INVESTOR_ACCOUNTID_NOT_FOUND", "The accountId given does not match with HMRC’s records")
@@ -112,6 +116,14 @@ object ErrorLifeEventAlreadyExists {
 
   def apply(lifeEventID: String) = {
     ErrorResponseWithLifeEventId(409,"LIFE_EVENT_ALREADY_EXISTS","The investor’s life event has already been reported", lifeEventID)
+  }
+
+}
+
+object ErrorAccountAlreadyExists {
+
+  def apply(accountId: String) = {
+    ErrorResponseWithAccountId(409,"INVESTOR_ACCOUNT_ALREADY_EXISTS","The LISA account already exists", accountId)
   }
 
 }
