@@ -539,5 +539,40 @@
                 </p>
             </td>
         </tr>
+        <tr>
+            <td><p>Request with a valid payload, LISA Manager Reference Number and Account ID</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890</p></td>
+            <td>
+                <p class ="code--block"> {<br>
+                                               "lifeEventId": "1234567891",<br>
+                                               "periodStartDate": "2017-04-06",<br>
+                                               "periodEndDate": "2017-05-05",<br>
+                                               "htbTransfer": {<br>
+                                                  "htbTransferInForPeriod": 0.00,<br>
+                                                  "htbTransferTotalYTD": 0.00<br>
+                                               },<br>
+                                               "inboundPayments": {<br>
+                                                 "newSubsForPeriod": 4000.00,<br>
+                                                 "newSubsYTD": 4000.00,<br>
+                                                 "totalSubsForPeriod": 40000.00,<br>
+                                                 "totalSubsYTD": 40000.00<br>
+                                               },<br>
+                                               "bonuses": {<br>
+                                                 "bonusPaidYTD": 0.0,<br>
+                                                 "bonusDueForPeriod": 10000.00,<br>
+                                                 "totalBonusDueYTD": 10000.00,<br>
+                                                 "claimReason": "Life Event"<br>
+                                               }<br>
+                                             }
+                </p>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">409 (Conflict)</code></p>
+                <p class ="code--block"> {<br>
+                                            "code": "TRANSACTION_ALREADY_EXISTS",<br>
+                                            "message": "A transaction already exists with similar data. ",<br>
+                                            "id": "7777777777"<br>
+                                          }
+                </p>
+            </td>
+        </tr>
 	</tbody>
 </table>

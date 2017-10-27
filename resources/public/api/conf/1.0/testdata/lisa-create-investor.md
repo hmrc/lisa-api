@@ -11,7 +11,7 @@
     </thead>
     <tbody>
         <tr>
-            <td><p>Request with a valid payload and LISA Manager Reference Number</p> <p class="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile<a></p></td>
+            <td><p>Request with a valid payload and LISA Manager Reference Number</p> <p class="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a></p></td>
             <td><p class ="code--block">
                     {<br>
                      "investorNINO": "AA123456A",<br>
@@ -49,7 +49,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request containing invalid and/or missing data</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile<a></p></td>
+            <td><p>Request containing invalid and/or missing data</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a></p></td>
             <td><p class ="code--block">{<br>
                                         "investorNINO": "A1234567A",<br>
                                         "firstName": true,<br>
@@ -87,7 +87,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request containing investor details which don't match HMRC's records</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile<a></p></td>
+            <td><p>Request containing investor details which don't match HMRC's records</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a></p></td>
             <td><p class ="code--block">{<br>
                                         "investorNINO": "AA111111A",<br>
                                         "firstName": "First Name",<br>
@@ -104,7 +104,7 @@
              </td>
         </tr>
         <tr>
-           <td><p>Request with an invalid 'Accept' header</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile<a><br><br>Accept: application/vnd.hmrc.1.0</p></td>
+           <td><p>Request with an invalid 'Accept' header</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br><br>Accept: application/vnd.hmrc.1.0</p></td>
            <td><p class ="code--block">{<br>
                      "investorNINO": "AA123456A",<br>
                      "firstName": "First Name",<br>
@@ -121,7 +121,7 @@
            </td>
         </tr>
         <tr>
-            <td><p>Request containing a pre-existing investor's details</p> <p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile<a></p></td>
+            <td><p>Request containing a pre-existing investor's details</p> <p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a></p></td>
             <td><p class ="code--block">{<br>
                                         "investorNINO": "AA222222A",<br>
                                         "firstName": "First Name",<br>
