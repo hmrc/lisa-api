@@ -868,12 +868,9 @@ types:
                                        200:
                                          body:
                                            application/json:
-                                             example: |
-                                               {
-                                                 "lifeEventId" : "1234567891",
-                                                 "periodStartDate" : "2017-04-06",
-                                                 "periodEndDate" : "2017-05-05",
-                                               }
+                                             examples:
+                                               example-1: !include examples/LISATransaction.get.response.json
+                                               example-2: !include examples/LISATransaction.get.response.1.json
                                        400:
                                          body:
                                            application/json:

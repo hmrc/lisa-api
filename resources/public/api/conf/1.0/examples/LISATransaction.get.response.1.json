@@ -1,0 +1,19 @@
+{
+  "lifeEventId" : "1234567891",
+  "periodStartDate" : "2017-04-06",
+  "periodEndDate" : "2017-05-05",
+  "inboundPayments"   :
+  {
+    "newSubsForPeriod" : 4000.00,
+    "newSubsYTD" : 4000.00,
+    "totalSubsForPeriod" : 4000.00,
+    "totalSubsYTD" : 4000.00
+  },
+
+  "bonuses"   :
+  {
+    "bonusDueForPeriod" : 1000.00,
+    "totalBonusDueYTD" : 1000.00,
+    "claimReason" : "Life Event"
+  }
+}
