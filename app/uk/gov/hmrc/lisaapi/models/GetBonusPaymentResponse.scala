@@ -32,7 +32,7 @@ case class GetBonusPaymentSuccessResponse(
                                            lifeEventId: LifeEventId,
                                            periodStartDate: DateTime,
                                            periodEndDate: DateTime,
-                                           htbTransfer: HelpToBuyTransfer,
+                                           htbTransfer: Option[HelpToBuyTransfer],
                                            inboundPayments: InboundPayments,
                                            bonuses: Bonuses) extends GetBonusPaymentResponse
 

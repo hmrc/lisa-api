@@ -13,4 +13,4 @@ POST      /manager/:id/accounts/:accountId/close-account                    @uk.
 POST      /manager/:id/accounts/:accountId/events                           @uk.gov.hmrc.lisaapi.controllers.LifeEventController.reportLisaLifeEvent(id: String, accountId: String)
 GET       /manager/:id/accounts/:accountId/events/:eventId                  @uk.gov.hmrc.lisaapi.controllers.LifeEventController.getLifeEvent(id: String, accountId: String, eventId: String)
 POST      /manager/:id/accounts/:accountId/transactions                     @uk.gov.hmrc.lisaapi.controllers.BonusPaymentController.requestBonusPayment(id: String, accountId: String)
-GET       /manager/:id/accounts/:accountId/transactions/:transactionId      @uk.gov.hmrc.lisaapi.controllers.BonusPaymentController.getBonusPayment(id: String, accountId: String, transactionId: Int)
+GET       /manager/:id/accounts/:accountId/transactions/:transactionId      @uk.gov.hmrc.lisaapi.controllers.BonusPaymentController.getBonusPayment(id: String, accountId: String, transactionId: String)

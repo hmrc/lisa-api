@@ -72,7 +72,7 @@ class BonusPaymentController extends LisaController with LisaConstants {
       }
   }
 
-  def getBonusPayment(lisaManager: String, accountId: String, transactionId: Int): Action[AnyContent] =
+  def getBonusPayment(lisaManager: String, accountId: String, transactionId: String): Action[AnyContent] =
     validateAccept(acceptHeaderValidationRules).async { implicit request =>
       withValidLMRN(lisaManager) {
         withValidAccountId(accountId) {
@@ -81,7 +81,7 @@ class BonusPaymentController extends LisaController with LisaConstants {
       }
     }
 
-  private def processGetBonusPayment(lisaManager:String, accountId:String, transactionId: Int)(implicit hc: HeaderCarrier) = {
+  private def processGetBonusPayment(lisaManager:String, accountId:String, transactionId: String)(implicit hc: HeaderCarrier) = {
     service.getBonusPayment(lisaManager, accountId, transactionId).map { result =>
       result match {
         case response : GetBonusPaymentSuccessResponse => {

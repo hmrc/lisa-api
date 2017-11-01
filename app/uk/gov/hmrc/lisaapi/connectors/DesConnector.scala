@@ -191,15 +191,15 @@ trait DesConnector extends ServicesConfig {
 
 
 
-  def getBonusPayment(lisaManager: String, accountId: String, transactionId: Int)(implicit hc: HeaderCarrier): Future[DesResponse] = {
+  def getBonusPayment(lisaManager: String, accountId: String, transactionId: String)(implicit hc: HeaderCarrier): Future[DesResponse] = {
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId/transaction/$transactionId"
     Logger.debug("Getting the Bonus Payment transaction details from des: " + uri)
 
     val result: Future[HttpResponse] = httpGet.GET(uri)(httpReads, hc = updateHeaderCarrier(hc))
-  //TODO: edw kanw handle mono des failure response. prepei na valw kai add successful scenario
+
     result.map(res => {
       Logger.debug("Get Bonus Payment transaction details returned status: " + res.status)
-      parseDesResponse[DesFailureResponse](res)._2
+      parseDesResponse[DesGetBonusPaymentResponse](res)._2
     })
   }
 

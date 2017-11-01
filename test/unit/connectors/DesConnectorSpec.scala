@@ -30,6 +30,7 @@ import play.api.test.Helpers._
 
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
+import scala.io.Source
 
 class DesConnectorSpec extends PlaySpec
   with MockitoSugar
@@ -647,7 +648,40 @@ class DesConnectorSpec extends PlaySpec
       }
 
     }
+
+
+    "return a success response" when {
+
+      "DES returns successfully" in {
+
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = OK,
+                responseJson = Some(Json.parse(validBonusPaymentJson))
+              )
+            )
+          )
+
+        doRetrieveBonusPaymentRequest { response =>
+          response mustBe DesGetBonusPaymentResponse(
+            lifeEventId = "1234567891",
+            periodStartDate = new DateTime("2017-04-06"),
+            periodEndDate = new DateTime("2017-05-05"),
+            htbTransfer = Some(HelpToBuyTransfer(0f, 10f)),
+            inboundPayments = InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
+            bonuses = Bonuses(1000f, 1000f, Some(1000f), "Life Event")
+          )
+        }
+
+      }
+
+    }
+
   }
+
+  val validBonusPaymentJson = Source.fromInputStream(getClass().getResourceAsStream("/json/request.valid.bonus-payment.json")).mkString
 
   private def doCreateInvestorRequest(callback: ((Int,DesResponse)) => Unit) = {
     val request = CreateLisaInvestorRequest("AB123456A", "A", "B", new DateTime("2000-01-01"))
@@ -707,7 +741,7 @@ class DesConnectorSpec extends PlaySpec
   }
 
   private def doRetrieveBonusPaymentRequest(callback: (DesResponse) => Unit) = {
-    val response = Await.result(SUT.getBonusPayment("Z123456", "ABC12345", 123456), Duration.Inf)
+    val response = Await.result(SUT.getBonusPayment("Z123456", "ABC12345", "123456"), Duration.Inf)
 
     callback(response)
   }

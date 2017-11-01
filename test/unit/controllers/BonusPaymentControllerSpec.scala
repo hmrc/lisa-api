@@ -16,6 +16,7 @@
 
 package unit.controllers
 
+import org.joda.time.DateTime
 import org.mockito.Matchers.{eq => MatcherEquals, _}
 import org.mockito.Mockito._
 import org.scalatest._
@@ -47,7 +48,7 @@ class BonusPaymentControllerSpec extends PlaySpec
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
   val lisaManager = "Z019283"
   val accountId = "ABC12345"
-  val transactionId = 1234567890
+  val transactionId = "1234567890"
   val validBonusPaymentJson = Source.fromInputStream(getClass().getResourceAsStream("/json/request.valid.bonus-payment.json")).mkString
   val validBonusPaymentMinimumFieldsJson = Source.fromInputStream(getClass().getResourceAsStream("/json/request.valid.bonus-payment.min.json")).mkString
   implicit val hc:HeaderCarrier = HeaderCarrier()
@@ -57,7 +58,7 @@ class BonusPaymentControllerSpec extends PlaySpec
     when(mockAuthCon.authorise[Option[String]](any(),any())(any())).thenReturn(Future(Some("1234")))
   }
 
-  "The Bonus Payment Controller" should {
+  "the POST bonus payment endpoint" must {
 
     "return with status 201 created" when {
 
@@ -395,12 +396,25 @@ class BonusPaymentControllerSpec extends PlaySpec
 
   }
 
-  "the GET Request bonus payment endpoint" must {
-    "return success status 200 response" in {
-      when(mockService.getBonusPayment(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusPaymentSuccessResponse("1234567890", "1234567890", 1234567890)))
+  "the GET bonus payment endpoint" must {
+
+    // add in the test for 200 ok
+    "return 200 success response" in {
+      when(mockService.getBonusPayment(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusPaymentSuccessResponse("1234567891",
+        new DateTime("2017-04-06"),
+        new DateTime("2017-05-05"),
+        Some(HelpToBuyTransfer(0f, 10f)),
+        InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
+        Bonuses(1000f, 1000f, Some(1000f), "Life Event"))))
+
       doGetBonusPaymentTransactionRequest(res => {
         status(res) mustBe OK
-        contentAsJson(res) mustBe Json.toJson (GetBonusPaymentSuccessResponse("1234567890", "1234567890", 1234567890))
+        contentAsJson(res) mustBe Json.toJson (GetBonusPaymentSuccessResponse("1234567891",
+          new DateTime("2017-04-06"),
+          new DateTime("2017-05-05"),
+          Some(HelpToBuyTransfer(0f, 10f)),
+          InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
+          Bonuses(1000f, 1000f, Some(1000f), "Life Event")))
       })
     }
 

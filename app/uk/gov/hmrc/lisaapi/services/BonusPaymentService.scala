@@ -18,7 +18,7 @@ package uk.gov.hmrc.lisaapi.services
 
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesGetAccountResponse, DesResponse, DesTransactionResponse}
+import uk.gov.hmrc.lisaapi.models.des._
 import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -41,23 +41,25 @@ trait BonusPaymentService {
     }
   }
 
-  def getBonusPayment(lisaManager: String, accountId: String, transactionId: Int)
+  def getBonusPayment(lisaManager: String, accountId: String, transactionId: String)
                      (implicit hc: HeaderCarrier): Future[GetBonusPaymentResponse] = {
 
 
     val response: Future[DesResponse] = desConnector.getBonusPayment(lisaManager, accountId, transactionId)
 
     response map {
-      case successResponse: GetBonusPaymentResponse => {
+      case successResponse: DesGetBonusPaymentResponse => {
         Logger.debug("Matched DesAccountResponse")
 
-        GetBonusPaymentSuccessResponse(lifeEventId, periodStartDate, periodEndDate, htbTransfer, inboundPayments, bonuses)
+        GetBonusPaymentSuccessResponse(successResponse.lifeEventId, successResponse.periodStartDate, successResponse.periodEndDate, successResponse.htbTransfer, successResponse.inboundPayments, successResponse.bonuses)
       }
 
       case failureResponse: DesFailureResponse => {
         Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
 
         failureResponse.code match {
+          case "BONUS_PAYMENT_TRANSACTION_NOT_FOUND" => GetBonusPaymentTransactionNotFoundResponse
+          case "BAD_REQUEST" => GetBonusPaymentLmrnDoesNotExistResponse
           case "INVESTOR_ACCOUNTID_NOT_FOUND" => GetBonusPaymentInvestorNotFoundResponse
           case _ => GetBonusPaymentErrorResponse
         }
