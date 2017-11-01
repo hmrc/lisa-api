@@ -23,8 +23,8 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models.{RequestBonusPaymentResponse, _}
-import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesTransactionResponse}
-import uk.gov.hmrc.lisaapi.services.{BonusPaymentService}
+import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesGetAccountResponse, DesTransactionResponse}
+import uk.gov.hmrc.lisaapi.services.BonusPaymentService
 import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.duration.Duration
@@ -65,6 +65,19 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
         }
       }
     }
+
+    "return the type-appropriate response" when {
+      "an invalid lisa account (investor id not found) response comes from DES" in {
+        when(mockDesConnector.getBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesFailureResponse(code = "INVESTOR_ACCOUNTID_NOT_FOUND")))
+
+        dogetBonusPaymentRequest { response =>
+          response mustBe GetBonusPaymentInvestorNotFoundResponse
+        }
+      }
+
+    }
+
   }
 
   private def doRequest(callback: (RequestBonusPaymentResponse) => Unit) = {
@@ -81,6 +94,19 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
 
     callback(response)
   }
+
+  private def dogetBonusPaymentRequest(callback: (GetBonusPaymentResponse) => Unit) = {
+    val request = GetBonusPaymentSuccessResponse("1234567890",  "9876543210", 1234)
+    val response = Await.result(SUT.getBonusPayment(Some("1234567891"), new DateTime("2017-04-06"), new DateTime("2017-05-05"),(HelpToBuyTransfer(0f, 0f)),
+     InboundPayments(Some(4000f), 4000f, 4000f, 4000f), Bonuses(1000f, 1000f, None, "Life Event"))(HeaderCarrier()), Duration.Inf)
+
+    callback(response)
+  }
+
+
+
+
+
 
   val mockDesConnector = mock[DesConnector]
   object SUT extends BonusPaymentService {

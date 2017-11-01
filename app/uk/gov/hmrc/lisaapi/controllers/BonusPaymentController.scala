@@ -21,8 +21,10 @@ import play.api.data.validation.ValidationError
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, Result}
 import uk.gov.hmrc.lisaapi.LisaConstants
-import uk.gov.hmrc.lisaapi.metrics.{LisaMetrics, LisaMetricKeys}
+import uk.gov.hmrc.lisaapi.connectors.DesConnector
+import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models._
+import uk.gov.hmrc.lisaapi.models.des.DesResponse
 import uk.gov.hmrc.lisaapi.services.{AuditService, BonusPaymentService}
 import uk.gov.hmrc.lisaapi.utils.BonusPaymentValidator
 import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
@@ -68,6 +70,41 @@ class BonusPaymentController extends LisaController with LisaConstants {
           }, lisaManager = lisaManager
         )
       }
+  }
+
+  def getBonusPayment(lisaManager: String, accountId: String, transactionId: Int): Action[AnyContent] =
+    validateAccept(acceptHeaderValidationRules).async { implicit request =>
+      withValidLMRN(lisaManager) {
+        withValidAccountId(accountId) {
+          processGetBonusPayment(lisaManager, accountId, transactionId)
+        }
+      }
+    }
+
+  private def processGetBonusPayment(lisaManager:String, accountId:String, transactionId: Int)(implicit hc: HeaderCarrier) = {
+    service.getBonusPayment(lisaManager, accountId, transactionId).map { result =>
+      result match {
+        case response : GetBonusPaymentSuccessResponse => {
+          Ok(Json.toJson(response))
+        }
+
+        case GetBonusPaymentLmrnDoesNotExistResponse => {
+          BadRequest(Json.toJson(ErrorBadRequestLmrn))
+        }
+
+        case GetBonusPaymentTransactionNotFoundResponse => {
+          NotFound(Json.toJson(ErrorTransactionNotFound))
+        }
+
+        case GetBonusPaymentInvestorNotFoundResponse => {
+          NotFound(Json.toJson(ErrorAccountNotFound))
+        }
+
+        case _ => {
+          InternalServerError(Json.toJson(ErrorInternalServerError))
+        }
+      }
+    }
   }
 
   private def withValidData(data: RequestBonusPaymentRequest)
@@ -149,4 +186,7 @@ class BonusPaymentController extends LisaController with LisaConstants {
     s"/manager/$lisaManager/accounts/$accountId/transactions"
   }
 
+  private def getBomusPaymentEndPointUrl(lisaManager: String, accountId: String, transactionId: Int): String = {
+    s"/manager/$lisaManager/accounts/$accountId/transactions/$transactionId"
+  }
 }

@@ -606,6 +606,49 @@ class DesConnectorSpec extends PlaySpec
 
   }
 
+  "Retrieve Bonus Payment endpoint" must {
+
+    "return a specific DesFailureResponse" when {
+
+      "a specific failure is returned" in {
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = CONFLICT,
+                responseJson = Some(Json.parse(
+                  """{
+                    | "code": "ERROR_CODE",
+                    | "reason" : "ERROR MESSAGE"
+                  }""".stripMargin))
+              )
+            )
+          )
+
+        doRetrieveBonusPaymentRequest { response =>
+          response mustBe DesFailureResponse("ERROR_CODE", "ERROR MESSAGE")
+        }
+      }
+
+      "the response has no json body" in {
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = INTERNAL_SERVER_ERROR,
+                responseJson = None
+              )
+            )
+          )
+
+        doRetrieveBonusPaymentRequest { response =>
+          response mustBe DesFailureResponse()
+        }
+      }
+
+    }
+  }
+
   private def doCreateInvestorRequest(callback: ((Int,DesResponse)) => Unit) = {
     val request = CreateLisaInvestorRequest("AB123456A", "A", "B", new DateTime("2000-01-01"))
     val response = Await.result(SUT.createInvestor("Z019283", request), Duration.Inf)
@@ -659,6 +702,12 @@ class DesConnectorSpec extends PlaySpec
     )
 
     val response = Await.result(SUT.requestBonusPayment("Z123456", "ABC12345", request), Duration.Inf)
+
+    callback(response)
+  }
+
+  private def doRetrieveBonusPaymentRequest(callback: (DesResponse) => Unit) = {
+    val response = Await.result(SUT.getBonusPayment("Z123456", "ABC12345", 123456), Duration.Inf)
 
     callback(response)
   }
