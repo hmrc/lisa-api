@@ -74,6 +74,8 @@ class BonusPaymentController extends LisaController with LisaConstants {
 
   def getBonusPayment(lisaManager: String, accountId: String, transactionId: String): Action[AnyContent] =
     validateAccept(acceptHeaderValidationRules).async { implicit request =>
+      implicit val startTime = System.currentTimeMillis()
+      LisaMetrics.startMetrics(startTime, LisaMetricKeys.BONUS_PAYMENT)
       withValidLMRN(lisaManager) {
         withValidAccountId(accountId) {
           processGetBonusPayment(lisaManager, accountId, transactionId)
@@ -81,26 +83,35 @@ class BonusPaymentController extends LisaController with LisaConstants {
       }
     }
 
-  private def processGetBonusPayment(lisaManager:String, accountId:String, transactionId: String)(implicit hc: HeaderCarrier) = {
-    service.getBonusPayment(lisaManager, accountId, transactionId).map { result =>
-      result match {
+  private def processGetBonusPayment(lisaManager:String, accountId:String, transactionId: String)(implicit hc: HeaderCarrier, startTime:Long) = {
+      service.getBonusPayment(lisaManager, accountId, transactionId).map { result =>
+        result match {
         case response : GetBonusPaymentSuccessResponse => {
+          LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.BONUS_PAYMENT)
           Ok(Json.toJson(response))
         }
 
         case GetBonusPaymentLmrnDoesNotExistResponse => {
+          LisaMetrics.incrementMetrics(System.currentTimeMillis(),
+          LisaMetricKeys.lisaError(FORBIDDEN, LisaMetricKeys.BONUS_PAYMENT))
           BadRequest(Json.toJson(ErrorBadRequestLmrn))
         }
 
         case GetBonusPaymentTransactionNotFoundResponse => {
+          LisaMetrics.incrementMetrics(System.currentTimeMillis(),
+            LisaMetricKeys.lisaError(FORBIDDEN, LisaMetricKeys.BONUS_PAYMENT))
           NotFound(Json.toJson(ErrorTransactionNotFound))
         }
 
         case GetBonusPaymentInvestorNotFoundResponse => {
+          LisaMetrics.incrementMetrics(System.currentTimeMillis(),
+          LisaMetricKeys.lisaError(FORBIDDEN, LisaMetricKeys.BONUS_PAYMENT))
           NotFound(Json.toJson(ErrorAccountNotFound))
         }
 
         case _ => {
+          LisaMetrics.incrementMetrics(System.currentTimeMillis(),
+          LisaMetricKeys.lisaError(FORBIDDEN, LisaMetricKeys.BONUS_PAYMENT))
           InternalServerError(Json.toJson(ErrorInternalServerError))
         }
       }
