@@ -197,7 +197,7 @@ class BonusPaymentController extends LisaController with LisaConstants {
     s"/manager/$lisaManager/accounts/$accountId/transactions"
   }
 
-  private def getBomusPaymentEndPointUrl(lisaManager: String, accountId: String, transactionId: Int): String = {
+  private def getBonusPaymentEndPointUrl(lisaManager: String, accountId: String, transactionId: Int): String = {
     s"/manager/$lisaManager/accounts/$accountId/transactions/$transactionId"
   }
 }

@@ -398,7 +398,6 @@ class BonusPaymentControllerSpec extends PlaySpec
 
   "the GET bonus payment endpoint" must {
 
-    // add in the test for 200 ok
     "return 200 success response" in {
       when(mockService.getBonusPayment(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusPaymentSuccessResponse("1234567891",
         new DateTime("2017-04-06"),

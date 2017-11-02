@@ -69,7 +69,6 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
 
   "GET bonus payment" must {
 
-    // success
     "return success" when {
       "a valid response comes from DES" in {
         val successResponse = DesGetBonusPaymentResponse(
@@ -124,9 +123,6 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
         }
       }
     }
-
-    // unknown error
-
   }
 
 
@@ -150,11 +146,6 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
 
     callback(response)
   }
-
-
-
-
-
 
   val mockDesConnector = mock[DesConnector]
   object SUT extends BonusPaymentService {
