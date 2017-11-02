@@ -59,7 +59,7 @@ package object models {
     val lifeEventId: Reads[LifeEventId] = Reads.pattern("^\\d{10}$".r, "error.formatting.lifeEventId")
     val lifeEventType: Reads[LifeEventType] = Reads.pattern("^(LISA Investor Terminal Ill Health|LISA Investor Death)$".r, "error.formatting.lifeEventType")
     val accountClosureReason: Reads[AccountClosureReason] = Reads.pattern(
-      "^(All funds withdrawn)$".r,
+      "^(All funds withdrawn|Cancellation)$".r,
       "error.formatting.accountClosureReason")
     val bonusClaimReason: Reads[BonusClaimReason] = Reads.pattern(
       "^(Life Event|Regular Bonus)$".r,
