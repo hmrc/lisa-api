@@ -261,6 +261,46 @@ class AccountServiceSpec extends PlaySpec
         }
       }
 
+      "given failureResponse for a Account Cancellation Period Exceeded" in {
+        when(mockDesConnector.closeAccount(any(), any(), any())(any()))
+          .thenReturn(
+            Future.successful(
+              DesFailureResponse("CANCELLATION_PERIOD_EXCEEDED")
+            )
+          )
+
+        doCloseRequest { response =>
+          response mustBe CloseLisaAccountCancellationPeriodExceeded
+        }
+      }
+
+      "given failureResponse for a Account Within Cancellation Period" in {
+        when(mockDesConnector.closeAccount(any(), any(), any())(any()))
+          .thenReturn(
+            Future.successful(
+              DesFailureResponse("ACCOUNT_WITHIN_CANCELLATION_PERIOD")
+            )
+          )
+
+        doCloseRequest { response =>
+          response mustBe CloseLisaAccountWithinCancellationPeriod
+        }
+      }
+
+      "given failureResponse for a Account Bonus Payment Required" in {
+        when(mockDesConnector.closeAccount(any(), any(), any())(any()))
+          .thenReturn(
+            Future.successful(
+              DesFailureResponse("BONUS_REPAYMENT_REQUIRED")
+            )
+          )
+
+        doCloseRequest { response =>
+          response mustBe CloseLisaAccountBonusPaymentRequired
+        }
+      }
+
+
       "given failureResponse for a Account Not Found Response" in {
         when(mockDesConnector.closeAccount(any(), any(), any())(any()))
           .thenReturn(

@@ -90,6 +90,12 @@ case object ErrorInvestorNotEligible extends ErrorResponse(403, "INVESTOR_ELIGIB
 
 case object ErrorInvestorComplianceCheckFailed extends ErrorResponse(403, "INVESTOR_COMPLIANCE_CHECK_FAILED", "The investor has failed a compliance check - they may have breached ISA guidelines or regulations")
 
+case object ErrorAccountCancellationPeriodExceeded extends ErrorResponse(403, "CANCELLATION_PERIOD_EXCEEDED", "The LISA account cancellation period exceeded")
+
+case object ErrorAccountWithinCancellationPeriod extends ErrorResponse(403, "ACCOUNT_WITHIN_CANCELLATION_PERIOD", "The LISA account within cancellation period")
+
+case object ErrorAccountBonusPaymentRequired extends ErrorResponse(403, "BONUS_REPAYMENT_REQUIRED", "The LISA account bonus payment required")
+
 case object ErrorPreviousAccountDoesNotExist extends ErrorResponse(403, "PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST", "The transferredFromAccountId and transferredFromLMRN given don’t match with an account on HMRC’s records")
 
 case object ErrorAccountAlreadyClosedOrVoid extends ErrorResponse(403, "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID", "The LISA account has already been closed or voided.")

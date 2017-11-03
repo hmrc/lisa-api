@@ -364,6 +364,49 @@ class AccountController extends LisaController with LisaConstants {
 
           Forbidden(Json.toJson(ErrorAccountAlreadyClosedOrVoid))
         }
+
+        case CloseLisaAccountCancellationPeriodExceeded => {
+          auditService.audit(
+            auditType = "accountNotClosed",
+            path = getCloseEndpointUrl(lisaManager, accountId),
+            auditData = closeLisaAccountRequest.toStringMap ++ Map(ZREF -> lisaManager,
+              "accountId" -> accountId,
+              "reasonNotClosed" -> ErrorAccountCancellationPeriodExceeded.errorCode)
+          )
+          LisaMetrics.incrementMetrics(startTime,
+            LisaMetricKeys.lisaError(FORBIDDEN,LisaMetricKeys.CLOSE))
+
+          Forbidden(Json.toJson(ErrorAccountCancellationPeriodExceeded))
+        }
+
+        case CloseLisaAccountWithinCancellationPeriod => {
+          auditService.audit(
+            auditType = "accountNotClosed",
+            path = getCloseEndpointUrl(lisaManager, accountId),
+            auditData = closeLisaAccountRequest.toStringMap ++ Map(ZREF -> lisaManager,
+              "accountId" -> accountId,
+              "reasonNotClosed" -> ErrorAccountWithinCancellationPeriod.errorCode)
+          )
+          LisaMetrics.incrementMetrics(startTime,
+            LisaMetricKeys.lisaError(FORBIDDEN,LisaMetricKeys.CLOSE))
+
+          Forbidden(Json.toJson(ErrorAccountWithinCancellationPeriod))
+        }
+
+        case CloseLisaAccountBonusPaymentRequired => {
+          auditService.audit(
+            auditType = "accountNotClosed",
+            path = getCloseEndpointUrl(lisaManager, accountId),
+            auditData = closeLisaAccountRequest.toStringMap ++ Map(ZREF -> lisaManager,
+              "accountId" -> accountId,
+              "reasonNotClosed" -> ErrorAccountBonusPaymentRequired.errorCode)
+          )
+          LisaMetrics.incrementMetrics(startTime,
+            LisaMetricKeys.lisaError(FORBIDDEN,LisaMetricKeys.CLOSE))
+
+          Forbidden(Json.toJson(ErrorAccountBonusPaymentRequired))
+        }
+
         case CloseLisaAccountNotFoundResponse => {
           auditService.audit(
             auditType = "accountNotClosed",
