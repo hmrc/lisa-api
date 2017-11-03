@@ -87,7 +87,7 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
         }
       }
 
-      "an invalid lisa account (investor id not found) response comes from DES" in {
+      "an invalid lisa account (investor id not found) (404) response comes from DES" in {
         when(mockDesConnector.getBonusPayment(any(), any(), any())(any()))
           .thenReturn(Future.successful(DesFailureResponse(code = "INVESTOR_ACCOUNTID_NOT_FOUND")))
 
@@ -96,7 +96,7 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
         }
       }
 
-      "an invalid payment transaction response comes from DES" in {
+      "an invalid payment transaction (404) response comes from DES" in {
         when(mockDesConnector.getBonusPayment(any(), any(), any())(any()))
           .thenReturn(Future.successful(DesFailureResponse(code = "BONUS_PAYMENT_TRANSACTION_NOT_FOUND")))
 
