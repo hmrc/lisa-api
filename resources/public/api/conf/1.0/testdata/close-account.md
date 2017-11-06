@@ -114,6 +114,58 @@
                 </p>
             </td>
         </tr>
+         <tr>
+            <td><p>Request for a close account with a closure reason of 'Cancellation' and the cancellation period has been exceeded</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: A1234568</p></td>
+            <td>
+                <p class ="code--block"> {<br>
+                                          "accountClosureReason": "Cancellation",<br>
+                                          "closureDate": "2017-01-03"<br>
+                                        }
+                </p>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
+                <p class ="code--block"> {<br>
+                                            "code": "CANCELLATION_PERIOD_EXCEEDED",<br>
+                                            "message": "The account cannot be closed with a closure reason of 'Cancellation' as the cancellation period has been exceeded"<br>
+                                       }
+                </p>
+            </td>
+        </tr>
+        </tr>
+         <tr>
+            <td><p>Request for a close account with a closure reason of 'All funds withdrawn' and is still within the cancellation period</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: A1234569</p></td>
+            <td>
+                <p class ="code--block"> {<br>
+                                          "accountClosureReason": "All funds withdrawn",<br>
+                                          "closureDate": "2017-01-03"<br>
+                                        }
+                </p>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
+                <p class ="code--block"> {<br>
+                                            "code": "ACCOUNT_WITHIN_CANCELLATION_PERIOD",<br>
+                                            "message": "The account cannot be closed with a closure reason of 'All funds withdrawn' as this  is still within the cancellation period"<br>
+                                       }
+                </p>
+            </td>
+        </tr>
+         <tr>
+            <td><p>Request for a close account with a closure reason of 'Cancellation' as a bonus payment needs to be repaid</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: A1234570</p></td>
+            <td>
+                <p class ="code--block"> {<br>
+                                          "accountClosureReason": "Cancellation",<br>
+                                          "closureDate": "2017-01-03"<br>
+                                        }
+                </p>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
+                <p class ="code--block"> {<br>
+                                            "code": "BONUS_REPAYMENT_REQUIRED",<br>
+                                            "message": "The account cannot be closed with a closure reason of 'Cancellation' as a bonus payment needs to be repaid"<br>
+                                       }
+                </p>
+            </td>
+        </tr>
         <tr>
             <td><p>Request containing an Account ID that does not exist</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: A1234562</p></td>
             <td>
