@@ -122,6 +122,9 @@ trait AccountService {
           failureResponse.code match {
             case "INVESTOR_ACCOUNT_ALREADY_CLOSED" => CloseLisaAccountAlreadyClosedResponse
             case "INVESTOR_ACCOUNTID_NOT_FOUND" => CloseLisaAccountNotFoundResponse
+            case "CANCELLATION_PERIOD_EXCEEDED" => CloseLisaAccountCancellationPeriodExceeded
+            case "ACCOUNT_WITHIN_CANCELLATION_PERIOD" => CloseLisaAccountWithinCancellationPeriod
+            case "BONUS_REPAYMENT_REQUIRED" => CloseLisaAccountBonusPaymentRequired
             case _ => CloseLisaAccountErrorResponse
           }
         }

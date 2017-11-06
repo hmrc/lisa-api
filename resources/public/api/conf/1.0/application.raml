@@ -440,6 +440,42 @@ types:
                                                 "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID",
                                                 "message": "The LISA account has already been closed or voided."
                                               }
+                                   403:
+                                    body:
+                                      application/json:
+                                        type: !include schemas/ErrorCodes.schema.json
+                                        examples:
+                                          accountCancellationPeriodExceeded:
+                                            description: The account cannot be closed with a closure reason of 'Cancellation' as the cancellation period has been exceeded
+                                            value: |
+                                              {
+                                                "code": "CANCELLATION_PERIOD_EXCEEDED",
+                                                "message": "The account cannot be closed with a closure reason of 'Cancellation' as the cancellation period has been exceeded"
+                                              }
+                                   403:
+                                    body:
+                                      application/json:
+                                        type: !include schemas/ErrorCodes.schema.json
+                                        examples:
+                                          accountWithinCancellationPeriod:
+                                            description: The account cannot be closed with a closure reason of 'All funds withdrawn' as this  is still within the cancellation period
+                                            value: |
+                                              {
+                                                "code": "ACCOUNT_WITHIN_CANCELLATION_PERIOD",
+                                                "message": "The account cannot be closed with a closure reason of 'All funds withdrawn' as this  is still within the cancellation period"
+                                              }
+                                   403:
+                                    body:
+                                      application/json:
+                                        type: !include schemas/ErrorCodes.schema.json
+                                        examples:
+                                          accountBonusPaymentRequired:
+                                            description: The account cannot be closed with a closure reason of 'Cancellation' as a bonus payment needs to be repaid
+                                            value: |
+                                              {
+                                                "code": "BONUS_REPAYMENT_REQUIRED",
+                                                "message": "The account cannot be closed with a closure reason of 'Cancellation' as a bonus payment needs to be repaid"
+                                              }
                             /reinstate-account:
                               post:
                                 is: [headers.acceptHeader, headers.contentHeader]

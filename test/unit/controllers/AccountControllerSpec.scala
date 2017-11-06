@@ -687,6 +687,59 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
         }
       }
 
+
+        "the data service returns a CloseLisaAccountCancellationPeriodExceeded" in {
+          when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountCancellationPeriodExceeded))
+
+          doSyncCloseRequest(closeAccountJson) { res =>
+            verify(mockAuditService).audit(
+              auditType = matchersEquals("accountNotClosed"),
+              path = matchersEquals(s"/manager/$lisaManager/accounts/ABC12345/close-account"),
+              auditData = matchersEquals(Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "accountClosureReason" -> "All funds withdrawn",
+                "closureDate" -> "2000-06-23",
+                "accountId" -> "ABC12345",
+                "reasonNotClosed" -> "CANCELLATION_PERIOD_EXCEEDED"
+              )))(any())
+          }
+        }
+
+      "the data service returns a CloseLisaAccountWithinCancellationPeriod" in {
+        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountWithinCancellationPeriod))
+
+        doSyncCloseRequest(closeAccountJson) { res =>
+          verify(mockAuditService).audit(
+            auditType = matchersEquals("accountNotClosed"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts/ABC12345/close-account"),
+            auditData = matchersEquals(Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountClosureReason" -> "All funds withdrawn",
+              "closureDate" -> "2000-06-23",
+              "accountId" -> "ABC12345",
+              "reasonNotClosed" -> "ACCOUNT_WITHIN_CANCELLATION_PERIOD"
+            )))(any())
+        }
+      }
+
+      "the data service returns a CloseLisaAccountBonusPaymentRequired" in {
+        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountBonusPaymentRequired))
+
+        doSyncCloseRequest(closeAccountJson) { res =>
+          verify(mockAuditService).audit(
+            auditType = matchersEquals("accountNotClosed"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts/ABC12345/close-account"),
+            auditData = matchersEquals(Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountClosureReason" -> "All funds withdrawn",
+              "closureDate" -> "2000-06-23",
+              "accountId" -> "ABC12345",
+              "reasonNotClosed" -> "BONUS_REPAYMENT_REQUIRED"
+            )))(any())
+        }
+      }
+
+
       "the data service returns a CloseLisaAccountNotFoundResponse" in {
         when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountNotFoundResponse))
 
@@ -746,6 +799,40 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
         }
       }
     }
+
+    "return with status 403 forbidden and a code of CANCELLATION_PERIOD_EXCEEDED" when {
+      "the data service returns a CloseLisaAccountAlreadyClosedResponse" in {
+        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountCancellationPeriodExceeded))
+
+        doCloseRequest(closeAccountJson) { res =>
+          status(res) mustBe (FORBIDDEN)
+          (contentAsJson(res) \ "code").as[String] mustBe ("CANCELLATION_PERIOD_EXCEEDED")
+        }
+      }
+    }
+
+    "return with status 403 forbidden and a code of ACCOUNT_WITHIN_CANCELLATION_PERIOD" when {
+      "the data service returns a CloseLisaAccountAlreadyClosedResponse" in {
+        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountWithinCancellationPeriod))
+
+        doCloseRequest(closeAccountJson) { res =>
+          status(res) mustBe (FORBIDDEN)
+          (contentAsJson(res) \ "code").as[String] mustBe ("ACCOUNT_WITHIN_CANCELLATION_PERIOD")
+        }
+      }
+    }
+
+    "return with status 403 forbidden and a code of BONUS_REPAYMENT_REQUIRED" when {
+      "the data service returns a CloseLisaAccountAlreadyClosedResponse" in {
+        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountBonusPaymentRequired))
+
+        doCloseRequest(closeAccountJson) { res =>
+          status(res) mustBe (FORBIDDEN)
+          (contentAsJson(res) \ "code").as[String] mustBe ("BONUS_REPAYMENT_REQUIRED")
+        }
+      }
+    }
+
 
     "return with status 404 forbidden and a code of INVESTOR_ACCOUNTID_NOT_FOUND" when {
       "the data service returns a CloseLisaAccountNotFoundResponse" in {

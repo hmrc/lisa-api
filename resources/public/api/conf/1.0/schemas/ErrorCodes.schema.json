@@ -23,6 +23,9 @@
         "INVESTOR_ALREADY_EXISTS",
         "INVESTOR_ACCOUNT_ALREADY_EXISTS",
         "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID",
+        "CANCELLATION_PERIOD_EXCEEDED",
+        "ACCOUNT_WITHIN_CANCELLATION_PERIOD",
+        "BONUS_REPAYMENT_REQUIRED",
         "PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST",
         "Investor-Account-Created-Late-Notification",
         "INVESTOR_ACCOUNTID_NOT_FOUND",
@@ -41,6 +44,7 @@
         "NOT_FOUND",
         "BAD_REQUEST",
         "FORBIDDEN"
+
       ]
     }
   }
