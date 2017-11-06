@@ -54,6 +54,7 @@ trait BonusPaymentService {
         GetBonusPaymentSuccessResponse(successResponse.lifeEventId,
                                        successResponse.periodStartDate,
                                        successResponse.periodEndDate,
+                                       successResponse.transactionType,
                                        successResponse.htbTransfer,
                                        successResponse.inboundPayments,
                                        successResponse.bonuses)

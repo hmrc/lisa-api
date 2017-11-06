@@ -666,9 +666,10 @@ class DesConnectorSpec extends PlaySpec
 
         doRetrieveBonusPaymentRequest { response =>
           response mustBe DesGetBonusPaymentResponse(
-            lifeEventId = "1234567891",
+            lifeEventId = Some("1234567891"),
             periodStartDate = new DateTime("2017-04-06"),
             periodEndDate = new DateTime("2017-05-05"),
+            transactionType = "Bonus",
             htbTransfer = Some(HelpToBuyTransfer(0f, 10f)),
             inboundPayments = InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
             bonuses = Bonuses(1000f, 1000f, Some(1000f), "Life Event")

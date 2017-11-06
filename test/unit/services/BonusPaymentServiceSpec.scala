@@ -72,9 +72,10 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
     "return success" when {
       "a valid response comes from DES" in {
         val successResponse = DesGetBonusPaymentResponse(
-          "1234567891",
+          Some("1234567891"),
           new DateTime("2017-04-06"),
           new DateTime("2017-05-05"),
+          transactionType = "Bonus",
           Some(HelpToBuyTransfer(0f, 10f)),
           InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
           Bonuses(1000f, 1000f, Some(1000f), "Life Event"))
@@ -83,7 +84,7 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
           .thenReturn(Future.successful(successResponse))
 
         dogetBonusPaymentRequest { response =>
-          response mustBe GetBonusPaymentSuccessResponse(successResponse.lifeEventId, successResponse.periodStartDate, successResponse.periodEndDate, successResponse.htbTransfer, successResponse.inboundPayments, successResponse.bonuses)
+          response mustBe GetBonusPaymentSuccessResponse(successResponse.lifeEventId, successResponse.periodStartDate, successResponse.periodEndDate, successResponse.transactionType, successResponse.htbTransfer, successResponse.inboundPayments, successResponse.bonuses)
         }
       }
 
