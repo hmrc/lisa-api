@@ -402,7 +402,6 @@ class BonusPaymentControllerSpec extends PlaySpec
       when(mockService.getBonusPayment(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusPaymentSuccessResponse(Some("1234567891"),
         new DateTime("2017-04-06"),
         new DateTime("2017-05-05"),
-        transactionType = "Bonus",
         Some(HelpToBuyTransfer(0f, 10f)),
         InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
         Bonuses(1000f, 1000f, Some(1000f), "Life Event"))))
@@ -412,7 +411,6 @@ class BonusPaymentControllerSpec extends PlaySpec
         contentAsJson(res) mustBe Json.toJson (GetBonusPaymentSuccessResponse(Some("1234567891"),
           new DateTime("2017-04-06"),
           new DateTime("2017-05-05"),
-          transactionType = "Bonus",
           Some(HelpToBuyTransfer(0f, 10f)),
           InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
           Bonuses(1000f, 1000f, Some(1000f), "Life Event")))
