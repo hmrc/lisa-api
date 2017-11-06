@@ -50,8 +50,8 @@ case class DesFailureResponse(code: String = "INTERNAL_SERVER_ERROR", reason: St
 case class DesLifeEventExistResponse(code: String, reason: String, lifeEventID: String) extends DesResponse
 case object DesEmptySuccessResponse extends DesResponse
 case class DesGetBonusPaymentResponse(lifeEventId: Option[LifeEventId],
-                                      periodStartDate: DateTime,
-                                      periodEndDate: DateTime,
+                                      periodStartDate: String,
+                                      periodEndDate: String,
                                       htbTransfer: Option[HelpToBuyTransfer],
                                       inboundPayments: InboundPayments,
                                       bonuses: Bonuses) extends DesResponse
@@ -96,8 +96,8 @@ object DesResponse {
 
   implicit val desGetBonusPaymentResponse: Reads[DesGetBonusPaymentResponse] = (
     (JsPath \ "lifeEventId").readNullable(JsonReads.lifeEventId) and
-    (JsPath \ "periodStartDate").read(JsonReads.isoDate).map(new DateTime(_)) and
-    (JsPath \ "periodEndDate").read(JsonReads.isoDate).map(new DateTime(_)) and
+    (JsPath \ "periodStartDate").read[String] and
+    (JsPath \ "periodEndDate").read[String] and
     (JsPath \ "htbTransfer").readNullable[HelpToBuyTransfer] and
     (JsPath \ "inboundPayments").read[InboundPayments] and
     (JsPath \ "bonuses").read[Bonuses]

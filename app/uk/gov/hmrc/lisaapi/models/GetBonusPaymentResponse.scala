@@ -30,8 +30,8 @@ case object GetBonusPaymentErrorResponse extends GetBonusPaymentResponse
 
 case class GetBonusPaymentSuccessResponse(
                                            lifeEventId: Option[LifeEventId],
-                                           periodStartDate: DateTime,
-                                           periodEndDate: DateTime,
+                                           periodStartDate: String,
+                                           periodEndDate: String,
                                            htbTransfer: Option[HelpToBuyTransfer],
                                            inboundPayments: InboundPayments,
                                            bonuses: Bonuses) extends GetBonusPaymentResponse
