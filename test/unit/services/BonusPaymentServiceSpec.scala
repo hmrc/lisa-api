@@ -75,7 +75,6 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
           Some("1234567891"),
           new DateTime("2017-04-06"),
           new DateTime("2017-05-05"),
-          transactionType = "Bonus",
           Some(HelpToBuyTransfer(0f, 10f)),
           InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
           Bonuses(1000f, 1000f, Some(1000f), "Life Event"))
