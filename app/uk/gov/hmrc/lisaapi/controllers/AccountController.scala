@@ -90,7 +90,6 @@ class AccountController extends LisaController with LisaConstants {
   def getAccountDetails (lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
     implicit val startTime = System.currentTimeMillis()
     LisaMetrics.startMetrics(startTime, LisaMetricKeys.ACCOUNT)
-
     withValidLMRN(lisaManager) {
       withValidAccountId(accountId) {
         processGetAccountDetails(lisaManager, accountId)

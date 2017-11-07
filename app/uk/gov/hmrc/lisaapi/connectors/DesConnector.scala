@@ -189,6 +189,20 @@ trait DesConnector extends ServicesConfig {
     })
   }
 
+
+
+  def getBonusPayment(lisaManager: String, accountId: String, transactionId: String)(implicit hc: HeaderCarrier): Future[DesResponse] = {
+    val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId/transactions/$transactionId"
+    Logger.debug("Getting the Bonus Payment transaction details from des: " + uri)
+
+    val result: Future[HttpResponse] = httpGet.GET(uri)(httpReads, hc = updateHeaderCarrier(hc))
+
+    result.map(res => {
+      Logger.debug("Get Bonus Payment transaction details returned status: " + res.status)
+      parseDesResponse[DesGetBonusPaymentResponse](res)._2
+    })
+  }
+
   // scalastyle:off magic.number
   def parseDesResponse[A <: DesResponse](res: HttpResponse)(implicit reads:Reads[A]): (Int, DesResponse) = {
     Try(res.json.as[A]) match {

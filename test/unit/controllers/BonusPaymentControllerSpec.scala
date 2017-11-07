@@ -16,6 +16,7 @@
 
 package unit.controllers
 
+import org.joda.time.DateTime
 import org.mockito.Matchers.{eq => MatcherEquals, _}
 import org.mockito.Mockito._
 import org.scalatest._
@@ -27,11 +28,11 @@ import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
-import uk.gov.hmrc.lisaapi.controllers.{BonusPaymentController, ErrorBadRequestLmrn}
+import uk.gov.hmrc.lisaapi.controllers.{BonusPaymentController, ErrorAccountNotFound, ErrorBadRequestLmrn, ErrorTransactionNotFound}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des.DesFailureResponse
 import uk.gov.hmrc.lisaapi.services.{AuditService, BonusPaymentService}
-import uk.gov.hmrc.play.http.HeaderCarrier
+import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -47,6 +48,7 @@ class BonusPaymentControllerSpec extends PlaySpec
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
   val lisaManager = "Z019283"
   val accountId = "ABC12345"
+  val transactionId = "1234567890"
   val validBonusPaymentJson = Source.fromInputStream(getClass().getResourceAsStream("/json/request.valid.bonus-payment.json")).mkString
   val validBonusPaymentMinimumFieldsJson = Source.fromInputStream(getClass().getResourceAsStream("/json/request.valid.bonus-payment.min.json")).mkString
   implicit val hc:HeaderCarrier = HeaderCarrier()
@@ -56,7 +58,7 @@ class BonusPaymentControllerSpec extends PlaySpec
     when(mockAuthCon.authorise[Option[String]](any(),any())(any())).thenReturn(Future(Some("1234")))
   }
 
-  "The Bonus Payment Controller" should {
+  "the POST bonus payment endpoint" must {
 
     "return with status 201 created" when {
 
@@ -394,6 +396,64 @@ class BonusPaymentControllerSpec extends PlaySpec
 
   }
 
+  "the GET bonus payment endpoint" must {
+
+    "return 200 success response" in {
+      when(mockService.getBonusPayment(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusPaymentSuccessResponse(Some("1234567891"),
+        new DateTime("2017-04-06"),
+        new DateTime("2017-05-05"),
+        Some(HelpToBuyTransfer(0f, 10f)),
+        InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
+        Bonuses(1000f, 1000f, Some(1000f), "Life Event"))))
+
+      doGetBonusPaymentTransactionRequest(res => {
+        status(res) mustBe OK
+        contentAsJson(res) mustBe Json.toJson (GetBonusPaymentSuccessResponse(Some("1234567891"),
+          new DateTime("2017-04-06"),
+          new DateTime("2017-05-05"),
+          Some(HelpToBuyTransfer(0f, 10f)),
+          InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
+          Bonuses(1000f, 1000f, Some(1000f), "Life Event")))
+      })
+    }
+
+    "return 400 when an invalid lmrn is being sent" in {
+      when(mockService.getBonusPayment(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusPaymentLmrnDoesNotExistResponse))
+
+      doGetBonusPaymentTransactionRequest { res =>
+        status(res) mustBe (BAD_REQUEST)
+        val json = contentAsJson(res)
+        (json \ "code").as[String] mustBe ErrorBadRequestLmrn.errorCode
+        (json \ "message").as[String] mustBe ErrorBadRequestLmrn.message
+      }
+    }
+    "return 404 status invalid lisa account (investor id not found)" in {
+      when(mockService.getBonusPayment(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusPaymentInvestorNotFoundResponse))
+      doGetBonusPaymentTransactionRequest(res => {
+        status(res) mustBe (NOT_FOUND)
+        val json = contentAsJson(res)
+        (json \ "code").as[String] mustBe ErrorAccountNotFound.errorCode
+        (json \ "message").as[String] mustBe ErrorAccountNotFound.message
+      })
+    }
+
+    "return 404 transcation not found" in {
+      when(mockService.getBonusPayment(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusPaymentTransactionNotFoundResponse))
+      doGetBonusPaymentTransactionRequest(res => {
+        status(res) mustBe (NOT_FOUND)
+        val json = contentAsJson(res)
+        (json \ "code").as[String] mustBe ErrorTransactionNotFound.errorCode
+        (json \ "message").as[String] mustBe ErrorTransactionNotFound.message
+      })
+    }
+    "return an internal server error response" in {
+      when(mockService.getBonusPayment(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusPaymentErrorResponse))
+      doGetBonusPaymentTransactionRequest(res => {
+        (contentAsJson(res) \ "code").as[String] mustBe "INTERNAL_SERVER_ERROR"
+      })
+    }
+  }
+
   def doRequest(jsonString: String, lmrn: String = lisaManager)(callback: (Future[Result]) =>  Unit): Unit = {
     val res = SUT.requestBonusPayment(lmrn, accountId).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
       withBody(AnyContentAsJson(Json.parse(jsonString))))
@@ -405,6 +465,12 @@ class BonusPaymentControllerSpec extends PlaySpec
     val res = await(SUT.requestBonusPayment(lisaManager, accountId).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
       withBody(AnyContentAsJson(Json.parse(jsonString)))))
 
+    callback(res)
+  }
+
+
+  def doGetBonusPaymentTransactionRequest(callback: (Future[Result]) => Unit) {
+    val res = SUT.getBonusPayment(lisaManager, accountId, transactionId).apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
     callback(res)
   }
 

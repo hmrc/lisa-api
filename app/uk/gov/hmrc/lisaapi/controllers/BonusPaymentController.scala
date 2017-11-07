@@ -21,8 +21,10 @@ import play.api.data.validation.ValidationError
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, Result}
 import uk.gov.hmrc.lisaapi.LisaConstants
-import uk.gov.hmrc.lisaapi.metrics.{LisaMetrics, LisaMetricKeys}
+import uk.gov.hmrc.lisaapi.connectors.DesConnector
+import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models._
+import uk.gov.hmrc.lisaapi.models.des.DesResponse
 import uk.gov.hmrc.lisaapi.services.{AuditService, BonusPaymentService}
 import uk.gov.hmrc.lisaapi.utils.BonusPaymentValidator
 import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
@@ -68,6 +70,52 @@ class BonusPaymentController extends LisaController with LisaConstants {
           }, lisaManager = lisaManager
         )
       }
+  }
+
+  def getBonusPayment(lisaManager: String, accountId: String, transactionId: String): Action[AnyContent] =
+    validateAccept(acceptHeaderValidationRules).async { implicit request =>
+      implicit val startTime = System.currentTimeMillis()
+      LisaMetrics.startMetrics(startTime, LisaMetricKeys.BONUS_PAYMENT)
+      withValidLMRN(lisaManager) {
+        withValidAccountId(accountId) {
+          processGetBonusPayment(lisaManager, accountId, transactionId)
+        }
+      }
+    }
+
+  private def processGetBonusPayment(lisaManager:String, accountId:String, transactionId: String)(implicit hc: HeaderCarrier, startTime:Long) = {
+      service.getBonusPayment(lisaManager, accountId, transactionId).map { result =>
+        result match {
+        case response : GetBonusPaymentSuccessResponse => {
+          LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.BONUS_PAYMENT)
+          Ok(Json.toJson(response))
+        }
+
+        case GetBonusPaymentLmrnDoesNotExistResponse => {
+          LisaMetrics.incrementMetrics(System.currentTimeMillis(),
+          LisaMetricKeys.lisaError(FORBIDDEN, LisaMetricKeys.BONUS_PAYMENT))
+          BadRequest(Json.toJson(ErrorBadRequestLmrn))
+        }
+
+        case GetBonusPaymentTransactionNotFoundResponse => {
+          LisaMetrics.incrementMetrics(System.currentTimeMillis(),
+            LisaMetricKeys.lisaError(FORBIDDEN, LisaMetricKeys.BONUS_PAYMENT))
+          NotFound(Json.toJson(ErrorTransactionNotFound))
+        }
+
+        case GetBonusPaymentInvestorNotFoundResponse => {
+          LisaMetrics.incrementMetrics(System.currentTimeMillis(),
+          LisaMetricKeys.lisaError(FORBIDDEN, LisaMetricKeys.BONUS_PAYMENT))
+          NotFound(Json.toJson(ErrorAccountNotFound))
+        }
+
+        case _ => {
+          LisaMetrics.incrementMetrics(System.currentTimeMillis(),
+          LisaMetricKeys.lisaError(FORBIDDEN, LisaMetricKeys.BONUS_PAYMENT))
+          InternalServerError(Json.toJson(ErrorInternalServerError))
+        }
+      }
+    }
   }
 
   private def withValidData(data: RequestBonusPaymentRequest)
@@ -149,4 +197,7 @@ class BonusPaymentController extends LisaController with LisaConstants {
     s"/manager/$lisaManager/accounts/$accountId/transactions"
   }
 
+  private def getBonusPaymentEndPointUrl(lisaManager: String, accountId: String, transactionId: Int): String = {
+    s"/manager/$lisaManager/accounts/$accountId/transactions/$transactionId"
+  }
 }
