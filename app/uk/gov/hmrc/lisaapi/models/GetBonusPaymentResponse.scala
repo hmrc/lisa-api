@@ -17,7 +17,8 @@
 package uk.gov.hmrc.lisaapi.models
 
 import org.joda.time.DateTime
-import play.api.libs.json.Json
+import play.api.libs.functional.syntax._
+import play.api.libs.json.{JsPath, Reads, Writes}
 
 sealed trait GetBonusPaymentResponse
 
@@ -37,5 +38,22 @@ case class GetBonusPaymentSuccessResponse(
                                            bonuses: Bonuses) extends GetBonusPaymentResponse
 
 object GetBonusPaymentSuccessResponse {
-  implicit val format = Json.format[GetBonusPaymentSuccessResponse]
+    implicit val getBonusPaymentReads: Reads[GetBonusPaymentSuccessResponse] = (
+    (JsPath \ "lifeEventId").readNullable(JsonReads.lifeEventId) and
+    (JsPath \ "periodStartDate").read(JsonReads.isoDate).map(new DateTime(_)) and
+    (JsPath \ "periodEndDate").read(JsonReads.isoDate).map(new DateTime(_)) and
+    (JsPath \ "htbTransfer").readNullable[HelpToBuyTransfer] and
+    (JsPath \ "inboundPayments").read[InboundPayments] and
+    (JsPath \ "bonuses").read[Bonuses]
+    )(GetBonusPaymentSuccessResponse.apply _)
+
+  implicit val getBonusPaymentWrites: Writes[GetBonusPaymentSuccessResponse] = (
+    (JsPath \ "lifeEventId").writeNullable[String] and
+    (JsPath \ "periodStartDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
+    (JsPath \ "periodEndDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
+    (JsPath \ "htbTransfer").writeNullable[HelpToBuyTransfer] and
+    (JsPath \ "inboundPayments").write[InboundPayments] and
+    (JsPath \ "bonuses").write[Bonuses]
+    ){req: GetBonusPaymentSuccessResponse => (req.lifeEventId, req.periodStartDate, req.periodEndDate, req.htbTransfer, req.inboundPayments, req.bonuses)}
 }
+
