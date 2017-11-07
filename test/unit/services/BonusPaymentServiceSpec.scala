@@ -83,7 +83,12 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
           .thenReturn(Future.successful(successResponse))
 
         dogetBonusPaymentRequest { response =>
-          response mustBe GetBonusPaymentSuccessResponse(successResponse.lifeEventId, successResponse.periodStartDate, successResponse.periodEndDate, successResponse.htbTransfer, successResponse.inboundPayments, successResponse.bonuses)
+          response mustBe GetBonusPaymentSuccessResponse(successResponse.lifeEventId,
+                                                         successResponse.periodStartDate,
+                                                         successResponse.periodEndDate,
+                                                         successResponse.htbTransfer,
+                                                         successResponse.inboundPayments,
+                                                         successResponse.bonuses)
         }
       }
 
