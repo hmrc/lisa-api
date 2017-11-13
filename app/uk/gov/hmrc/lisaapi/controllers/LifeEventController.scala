@@ -22,10 +22,10 @@ import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, LifeEventService}
-import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import uk.gov.hmrc.http.HeaderCarrier
 
 class LifeEventController extends LisaController {
 

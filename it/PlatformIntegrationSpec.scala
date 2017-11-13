@@ -28,7 +28,7 @@ import play.api.test.FakeRequest
 import play.api.{Application, Mode}
 import uk.gov.hmrc.lisaapi.controllers.Documentation
 import uk.gov.hmrc.lisaapi.domain.Registration
-import uk.gov.hmrc.play.filters.MicroserviceFilterSupport
+import uk.gov.hmrc.play.microservice.filters.MicroserviceFilterSupport
 import uk.gov.hmrc.play.test.UnitSpec
 
 

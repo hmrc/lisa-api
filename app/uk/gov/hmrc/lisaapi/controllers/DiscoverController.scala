@@ -18,7 +18,6 @@ package uk.gov.hmrc.lisaapi.controllers
 
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
-import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
 

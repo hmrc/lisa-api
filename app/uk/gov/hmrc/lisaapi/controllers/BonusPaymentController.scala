@@ -28,10 +28,10 @@ import uk.gov.hmrc.lisaapi.models.des.DesResponse
 import uk.gov.hmrc.lisaapi.services.{AuditService, BonusPaymentService}
 import uk.gov.hmrc.lisaapi.utils.BonusPaymentValidator
 import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
-import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import uk.gov.hmrc.http.HeaderCarrier
 
 class BonusPaymentController extends LisaController with LisaConstants {
 

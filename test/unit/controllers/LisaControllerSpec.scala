@@ -51,7 +51,7 @@ class LisaControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite 
       "return with an Internal Server Error" when {
 
         "an exception is thrown by one of our Json reads" in {
-          when(mockAuthCon.authorise[Option[String]](any(),any())(any())).thenReturn(Future(Some("1234")))
+          when(mockAuthCon.authorise[Option[String]](any(),any())(any(),any())).thenReturn(Future(Some("1234")))
           val jsonString = """{"prop1": 123, "prop2": "123"}"""
           val res = SUT.testJsonValidator().apply(FakeRequest(Helpers.PUT, "/")
             .withHeaders(acceptHeader)

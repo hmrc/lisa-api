@@ -25,10 +25,10 @@ import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesLifeEventExistResponse, DesLifeEventResponse, DesLifeEventRetrievalResponse}
 import uk.gov.hmrc.lisaapi.services.LifeEventService
-import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
+import uk.gov.hmrc.http.HeaderCarrier
 
 class LifeEventServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
 

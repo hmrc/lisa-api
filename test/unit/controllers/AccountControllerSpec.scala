@@ -98,7 +98,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
   "The Create / Transfer Account endpoint" must {
 
-    when(mockAuthCon.authorise[Option[String]](any(),any())(any())).thenReturn(Future(Some("1234")))
+    when(mockAuthCon.authorise[Option[String]](any(),any())(any(), any())).thenReturn(Future(Some("1234")))
 
     "audit an accountCreated event" when {
       "submitted a valid create account request" in {
@@ -590,7 +590,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
   "The Get Account Details endpoint" must {
 
-    when(mockAuthCon.authorise[Option[String]](any(), any())(any())).thenReturn(Future(Some("1234")))
+    when(mockAuthCon.authorise[Option[String]](any(), any())(any(), any())).thenReturn(Future(Some("1234")))
 
     "return the correct json" when {
       "returning a valid open account response" in {
@@ -646,7 +646,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
   "The Close Account endpoint" must {
 
-    when(mockAuthCon.authorise[Option[String]](any(),any())(any())).thenReturn(Future(Some("1234")))
+    when(mockAuthCon.authorise[Option[String]](any(),any())(any(), any())).thenReturn(Future(Some("1234")))
 
     "audit an account closed event" when {
 

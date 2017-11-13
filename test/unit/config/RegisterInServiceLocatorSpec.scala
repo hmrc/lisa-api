@@ -22,11 +22,11 @@ import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import uk.gov.hmrc.lisaapi.config.ServiceLocatorRegistration
 import uk.gov.hmrc.lisaapi.connectors.ServiceLocatorConnector
-import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.test.UnitSpec
 import org.mockito.Mockito._
 import org.mockito.Matchers._
 import scala.concurrent.Future
+import uk.gov.hmrc.http.HeaderCarrier
 
 class RegisterInServiceLocatorSpec extends UnitSpec with MockitoSugar with OneAppPerSuite {
 
