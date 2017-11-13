@@ -659,7 +659,7 @@ class DesConnectorSpec extends PlaySpec
             Future.successful(
               HttpResponse(
                 responseStatus = OK,
-                responseJson = Some(Json.parse(validBonusPaymentJson))
+                responseJson = Some(Json.parse(validBonusPaymentResponseJson))
               )
             )
           )
@@ -671,7 +671,9 @@ class DesConnectorSpec extends PlaySpec
             periodEndDate = new DateTime("2017-05-05"),
             htbTransfer = Some(HelpToBuyTransfer(0f, 10f)),
             inboundPayments = InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
-            bonuses = Bonuses(1000f, 1000f, Some(1000f), "Life Event")
+            bonuses = Bonuses(1000f, 1000f, Some(1000f), "Life Event"),
+            creationDate = new DateTime("2017-05-05"),
+            status = "Paid"
           )
         }
 
@@ -681,7 +683,7 @@ class DesConnectorSpec extends PlaySpec
 
   }
 
-  val validBonusPaymentJson = Source.fromInputStream(getClass().getResourceAsStream("/json/request.valid.bonus-payment.json")).mkString
+  val validBonusPaymentResponseJson = Source.fromInputStream(getClass().getResourceAsStream("/json/request.valid.bonus-payment-response.json")).mkString
 
   private def doCreateInvestorRequest(callback: ((Int,DesResponse)) => Unit) = {
     val request = CreateLisaInvestorRequest("AB123456A", "A", "B", new DateTime("2000-01-01"))
