@@ -50,7 +50,8 @@ trait DesConnector extends ServicesConfig {
     *
     * @return A tuple of the http status code and an (optional) data response
     */
-  def createInvestor(lisaManager: String, request: CreateLisaInvestorRequest)(implicit hc: HeaderCarrier): Future[(Int, DesResponse)] = {
+  def createInvestor(lisaManager: String, request: CreateLisaInvestorRequest)
+                    (implicit hc: HeaderCarrier): Future[(Int, DesResponse)] = {
     val uri = s"$lisaServiceUrl/$lisaManager/investors"
     Logger.debug("Posting Create Investor request to des: " + uri)
     val result = httpPost.POST[CreateLisaInvestorRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc))
@@ -64,7 +65,8 @@ trait DesConnector extends ServicesConfig {
   /**
     * Attempts to create a new LISA account
     */
-  def createAccount(lisaManager: String, request: CreateLisaAccountCreationRequest)(implicit hc: HeaderCarrier): Future[DesResponse] = {
+  def createAccount(lisaManager: String, request: CreateLisaAccountCreationRequest)
+                   (implicit hc: HeaderCarrier): Future[DesResponse] = {
     val uri = s"$lisaServiceUrl/$lisaManager/accounts"
     Logger.debug("Posting Create Account request to des: " + uri)
     val result = httpPost.POST[CreateLisaAccountCreationRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc))
@@ -81,9 +83,8 @@ trait DesConnector extends ServicesConfig {
   /**
     * Attempts to get the details for LISA account
     */
-
-
-  def getAccountInformation(lisaManager: String, accountId: String)(implicit hc: HeaderCarrier): Future[DesResponse] = {
+  def getAccountInformation(lisaManager: String, accountId: String)
+                           (implicit hc: HeaderCarrier): Future[DesResponse] = {
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId"
     Logger.debug("Getting the Account details from des: " + uri)
 
@@ -95,12 +96,11 @@ trait DesConnector extends ServicesConfig {
     })
   }
 
-
-
   /**
     * Attempts to transfer an existing LISA account
     */
-  def transferAccount(lisaManager: String, request: CreateLisaAccountTransferRequest)(implicit hc: HeaderCarrier): Future[DesResponse] = {
+  def transferAccount(lisaManager: String, request: CreateLisaAccountTransferRequest)
+                     (implicit hc: HeaderCarrier): Future[DesResponse] = {
     val uri = s"$lisaServiceUrl/$lisaManager/accounts"
     Logger.debug("Posting Create Transfer request to des: " + uri)
     val result = httpPost.POST[CreateLisaAccountTransferRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc))
@@ -119,7 +119,8 @@ trait DesConnector extends ServicesConfig {
     *
     * @return A tuple of the http status code and an (optional) data response
     */
-  def closeAccount(lisaManager: String, accountId: String, request: CloseLisaAccountRequest)(implicit hc: HeaderCarrier): Future[DesResponse] = {
+  def closeAccount(lisaManager: String, accountId: String, request: CloseLisaAccountRequest)
+                  (implicit hc: HeaderCarrier): Future[DesResponse] = {
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId/close-account"
     Logger.debug("Posting Close Account request to des: " + uri)
     val result = httpPost.POST[CloseLisaAccountRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc))
@@ -159,7 +160,7 @@ trait DesConnector extends ServicesConfig {
     * Attempts to get a LISA Life Event
     */
   def getLifeEvent(lisaManager: String, accountId: String, eventId: String)
-                     (implicit hc: HeaderCarrier): Future[DesResponse] = {
+                  (implicit hc: HeaderCarrier): Future[DesResponse] = {
 
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId/life-event/$eventId"
     Logger.debug("Posting Life Event request to des: " + uri)
@@ -177,7 +178,7 @@ trait DesConnector extends ServicesConfig {
     * @return A tuple of the http status code and a des response
     */
   def requestBonusPayment(lisaManager: String, accountId: String, request: RequestBonusPaymentRequest)
-                     (implicit hc: HeaderCarrier): Future[(Int, DesResponse)] = {
+                         (implicit hc: HeaderCarrier): Future[(Int, DesResponse)] = {
 
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId/bonus-claim"
     Logger.debug("Posting Bonus Payment request to des: " + uri)
@@ -189,9 +190,8 @@ trait DesConnector extends ServicesConfig {
     })
   }
 
-
-
-  def getBonusPayment(lisaManager: String, accountId: String, transactionId: String)(implicit hc: HeaderCarrier): Future[DesResponse] = {
+  def getBonusPayment(lisaManager: String, accountId: String, transactionId: String)
+                     (implicit hc: HeaderCarrier): Future[DesResponse] = {
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId/transactions/$transactionId"
     Logger.debug("Getting the Bonus Payment transaction details from des: " + uri)
 
@@ -204,7 +204,8 @@ trait DesConnector extends ServicesConfig {
   }
 
   // scalastyle:off magic.number
-  def parseDesResponse[A <: DesResponse](res: HttpResponse)(implicit reads:Reads[A]): (Int, DesResponse) = {
+  def parseDesResponse[A <: DesResponse](res: HttpResponse)
+                                        (implicit reads:Reads[A]): (Int, DesResponse) = {
     Try(res.json.as[A]) match {
       case Success(data) =>
         (res.status, data)
@@ -221,7 +222,4 @@ trait DesConnector extends ServicesConfig {
 
 }
 
-
-object DesConnector extends DesConnector {
-
-}
+object DesConnector extends DesConnector
