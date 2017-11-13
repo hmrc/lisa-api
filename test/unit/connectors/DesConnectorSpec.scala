@@ -649,7 +649,6 @@ class DesConnectorSpec extends PlaySpec
 
     }
 
-
     "return a success response" when {
 
       "DES returns successfully" in {
@@ -679,6 +678,152 @@ class DesConnectorSpec extends PlaySpec
 
       }
 
+    }
+
+  }
+
+  "Retrieve Transaction endpoint" must {
+
+    "return a failure response" when {
+      "the DES response is a failure response" in {
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = OK,
+                responseJson = Some(Json.parse(
+                  """{
+                    | "code": "ERROR_CODE",
+                    | "reason" : "ERROR MESSAGE"
+                  }""".stripMargin))
+              )
+            )
+          )
+
+        doRetrieveTransactionRequest { response =>
+          response mustBe DesFailureResponse("ERROR_CODE", "ERROR MESSAGE")
+        }
+      }
+      "the DES response has no json body" in {
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = OK,
+                responseJson = None
+              )
+            )
+          )
+
+        doRetrieveTransactionRequest { response =>
+          response mustBe DesFailureResponse()
+        }
+      }
+      "the DES response is invalid" in {
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = OK,
+                responseJson = Some(Json.parse(
+                  """{
+                    | "status": "Due"
+                  }""".stripMargin))
+              )
+            )
+          )
+
+        doRetrieveTransactionRequest { response =>
+          response mustBe DesFailureResponse()
+        }
+      }
+    }
+
+    "return a success response" when {
+      "the DES response is a valid Pending transaction" in {
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = OK,
+                responseJson = Some(Json.parse("""{
+                                                 |    "status": "Pending",
+                                                 |    "paymentDueDate": "2000-01-01",
+                                                 |    "paymentAmount": 1.00
+                                                 |}""".stripMargin))
+              )
+            )
+          )
+
+        doRetrieveTransactionRequest { response =>
+          response mustBe DesGetTransactionPending(
+            paymentDueDate = new DateTime("2000-01-01"),
+            paymentAmount = 1.0
+          )
+        }
+      }
+      "the DES response is a valid Cancelled transaction" in {
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = OK,
+                responseJson = Some(Json.parse("""{
+                                                 |    "status": "Cancelled"
+                                                 |}""".stripMargin))
+              )
+            )
+          )
+
+        doRetrieveTransactionRequest { response =>
+          response mustBe DesGetTransactionCancelled
+        }
+      }
+      "the DES response is a valid Paid transaction" in {
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = OK,
+                responseJson = Some(Json.parse("""{
+                                                 |    "status": "Paid",
+                                                 |    "paymentDate": "2000-01-01",
+                                                 |    "paymentReference": "002630000993",
+                                                 |    "paymentAmount": 1.00
+                                                 |}""".stripMargin))
+              )
+            )
+          )
+
+        doRetrieveTransactionRequest { response =>
+          response mustBe DesGetTransactionPaid(
+            paymentDate = new DateTime("2000-01-01"),
+            paymentReference = "002630000993",
+            paymentAmount = 1.0
+          )
+        }
+      }
+      "the DES response is a valid Charge transaction" in {
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = OK,
+                responseJson = Some(Json.parse("""{
+                                                 |    "status": "Due",
+                                                 |    "chargeReference": "XM00261010895"
+                                                 |}""".stripMargin))
+              )
+            )
+          )
+
+        doRetrieveTransactionRequest { response =>
+          response mustBe DesGetTransactionCharge(
+            status = "Due",
+            chargeReference = "XM00261010895"
+          )
+        }
+      }
     }
 
   }
@@ -744,6 +889,12 @@ class DesConnectorSpec extends PlaySpec
 
   private def doRetrieveBonusPaymentRequest(callback: (DesResponse) => Unit) = {
     val response = Await.result(SUT.getBonusPayment("Z123456", "ABC12345", "123456"), Duration.Inf)
+
+    callback(response)
+  }
+
+  private def doRetrieveTransactionRequest(callback: (DesResponse) => Unit) = {
+    val response = Await.result(SUT.getTransaction("Z123456", "ABC12345", "123456"), Duration.Inf)
 
     callback(response)
   }
