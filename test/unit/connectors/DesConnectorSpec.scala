@@ -331,7 +331,69 @@ class DesConnectorSpec extends PlaySpec
     }
   }
 
-  "Report Life Event endpoint" must {
+  "Update First Subscription date endpoint" must {
+
+    "Return a populated DesUpdateSubscriptionSuccessResponse" when {
+
+      "The DES response has a json body that is in the correct format" in {
+        when(mockHttpPost.POST[UpdateSubscriptionRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = OK,
+                responseJson = Some(Json.parse(s"""{"code": "UPDATED_AND_ACCOUNT_VOIDED", "message": "LISA Account firstSubscriptionDate has been updated successfully"}"""))
+              )
+            )
+          )
+
+        updateFirstSubscriptionDateRequest { response =>
+          response must be((
+            DesUpdateSubscriptionSuccessResponse("UPDATED_AND_ACCOUNT_VOIDED", "LISA Account firstSubscriptionDate has been updated successfully" )
+          ))
+        }
+      }
+    }
+
+    "Return an failure response" when {
+      "The DES response has no json body" in {
+        when(mockHttpPost.POST[UpdateSubscriptionRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = SERVICE_UNAVAILABLE,
+                responseJson = None
+              )
+            )
+          )
+
+        updateFirstSubscriptionDateRequest { response =>
+          response must be(DesFailureResponse())
+        }
+      }
+    }
+
+    "Return a DesFailureResponse" when {
+      "Status is 201 and Json is invalid" in {
+        when(mockHttpPost.POST[UpdateSubscriptionRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = CREATED,
+                responseJson = Some(Json.parse(s"""{"code": "UPDATED_AND_ACCOUNT_VOIDED", "message": "LISA Account firstSubscriptionDate has been updated successfully"}"""))
+              )
+            )
+          )
+
+        updateFirstSubscriptionDateRequest { response =>
+          response must be(DesFailureResponse("INTERNAL_SERVER_ERROR","Internal Server Error"))
+        }
+
+      }
+    }
+
+  }
+
+    "Report Life Event endpoint" must {
 
     "Return an failure response" when {
       "The DES response has no json body" in {
@@ -708,6 +770,14 @@ class DesConnectorSpec extends PlaySpec
   private def doCloseAccountRequest(callback: (DesResponse) => Unit) = {
     val request = CloseLisaAccountRequest("All funds withdrawn", new DateTime("2000-01-01"))
     val response = Await.result(SUT.closeAccount("Z123456", "ABC12345", request), Duration.Inf)
+
+    callback(response)
+  }
+
+
+  private def updateFirstSubscriptionDateRequest(callback: (DesResponse) => Unit) = {
+    val request = UpdateSubscriptionRequest(new DateTime("2000-01-01"))
+    val response = Await.result(SUT.updateFirstSubDate("Z019283", "123456789", request), Duration.Inf)
 
     callback(response)
   }

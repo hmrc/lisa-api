@@ -70,7 +70,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request for an account that has already been closed</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 8765432100</p></td>
+            <td><p>Request for an account that has already been closed</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 0000000901</p></td>
             <td>
                 <p class ="code--block"> {<br>
                                      	  "firstSubscriptionDate": "2017-01-03"<br>
@@ -86,7 +86,23 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request containing an Account ID that does not exist</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: A1234562</p></td>
+            <td><p>Request for an account that has already been voided</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 0000000902</p></td>
+            <td>
+                <p class ="code--block"> {<br>
+                                          "firstSubscriptionDate": "2017-01-03"<br>
+                                        }
+                </p>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
+                <p class ="code--block"> {<br>
+                                            "code": "INVESTOR_ACCOUNT_ALREADY_VOID",<br>
+                                            "message": "The LISA account is already voided"<br>
+                                       }
+                </p>
+            </td>
+        </tr>
+        <tr>
+            <td><p>Request containing an Account ID that does not exist</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 0000000404</p></td>
             <td>
                 <p class ="code--block"> {<br>
                                      	  "firstSubscriptionDate": "2017-01-03"<br>
