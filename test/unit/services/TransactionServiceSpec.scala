@@ -39,7 +39,6 @@ class TransactionServiceSpec extends PlaySpec
   "Get Transaction" must {
 
     "return a Pending transaction" when {
-
       "ITMP returns a Pending status" in {
         when(mockDesConnector.getBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(DesGetBonusPaymentResponse(
@@ -61,7 +60,6 @@ class TransactionServiceSpec extends PlaySpec
           status = "Pending"
         )
       }
-
       "ITMP returns a Paid status and ETMP returns a Pending status" in {
         when(mockDesConnector.getBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(DesGetBonusPaymentResponse(
@@ -90,11 +88,9 @@ class TransactionServiceSpec extends PlaySpec
           paymentAmount = Some(1.0)
         )
       }
-
     }
 
     "return a Cancelled transaction" when {
-
       "ITMP returns a Cancelled status" in {
         when(mockDesConnector.getBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(DesGetBonusPaymentResponse(
@@ -116,7 +112,6 @@ class TransactionServiceSpec extends PlaySpec
           status = "Cancelled"
         )
       }
-
       "ITMP returns a Paid status and ETMP returns a Cancelled status" in {
         when(mockDesConnector.getBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(DesGetBonusPaymentResponse(
@@ -141,11 +136,9 @@ class TransactionServiceSpec extends PlaySpec
           status = "Cancelled"
         )
       }
-
     }
 
     "return a Superceded transaction" when {
-
       "ITMP returns a Superceded status" in {
         when(mockDesConnector.getBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(DesGetBonusPaymentResponse(
@@ -167,11 +160,9 @@ class TransactionServiceSpec extends PlaySpec
           status = "Superceded"
         )
       }
-
     }
 
     "return a Paid transaction" when {
-
       "ITMP returns a Paid status and ETMP returns a Paid status" in {
         when(mockDesConnector.getBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(DesGetBonusPaymentResponse(
@@ -202,11 +193,9 @@ class TransactionServiceSpec extends PlaySpec
           paymentAmount = Some(1.0)
         )
       }
-
     }
 
     "return a Charge transaction" when {
-
       "ITMP returns a Paid status and ETMP returns a charge" in {
         when(mockDesConnector.getBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(DesGetBonusPaymentResponse(
@@ -231,11 +220,9 @@ class TransactionServiceSpec extends PlaySpec
           chargeReference = Some("XM002610108957")
         )
       }
-
     }
 
     "return a Transaction Not Found error" when {
-
       "ITMP returns a Transaction Not Found error" in {
         when(mockDesConnector.getBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(DesFailureResponse("TRANSACTION_NOT_FOUND")))
@@ -244,7 +231,6 @@ class TransactionServiceSpec extends PlaySpec
 
         result mustBe GetTransactionTransactionNotFoundResponse
       }
-
       "ITMP returns a Paid status and ETMP returns a Transaction Not Found error" in {
         when(mockDesConnector.getBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(DesGetBonusPaymentResponse(
@@ -264,11 +250,9 @@ class TransactionServiceSpec extends PlaySpec
 
         result mustBe GetTransactionTransactionNotFoundResponse
       }
-
     }
 
     "return a Account Not Found error" when {
-
       "ITMP returns a Account Not Found error" in {
         when(mockDesConnector.getBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNTID_NOT_FOUND")))
@@ -277,7 +261,6 @@ class TransactionServiceSpec extends PlaySpec
 
         result mustBe GetTransactionAccountNotFoundResponse
       }
-
       "ITMP returns a Paid status and ETMP returns a Account Not Found error" in {
         when(mockDesConnector.getBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(DesGetBonusPaymentResponse(
@@ -297,11 +280,9 @@ class TransactionServiceSpec extends PlaySpec
 
         result mustBe GetTransactionAccountNotFoundResponse
       }
-
     }
 
     "return a Generic error" when {
-
       "ITMP returns a status other than Pending, Paid, Cancelled and Superceded" in {
         when(mockDesConnector.getBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(DesGetBonusPaymentResponse(
@@ -318,7 +299,6 @@ class TransactionServiceSpec extends PlaySpec
 
         result mustBe GetTransactionErrorResponse
       }
-
     }
 
   }
