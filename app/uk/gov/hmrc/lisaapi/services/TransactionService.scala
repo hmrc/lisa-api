@@ -17,30 +17,82 @@
 package uk.gov.hmrc.lisaapi.services
 
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
-import uk.gov.hmrc.lisaapi.models.{GetTransactionErrorResponse, GetTransactionResponse}
 import uk.gov.hmrc.lisaapi.models.des._
+import uk.gov.hmrc.lisaapi.models.{GetTransactionResponse, GetTransactionSuccessResponse}
 import uk.gov.hmrc.play.http.HeaderCarrier
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 trait TransactionService {
   val desConnector: DesConnector
 
   def getTransaction(lisaManager: String, accountId: String, transactionId: String)
                      (implicit hc: HeaderCarrier): Future[GetTransactionResponse] = {
+
     val bonus: Future[DesResponse] = desConnector.getBonusPayment(lisaManager, accountId, transactionId)
-    val transaction: Future[DesResponse] = desConnector.getTransaction(lisaManager, accountId, transactionId)
 
-    transaction map {
-      case paid: DesGetTransactionPaid => paid
-      case pending: DesGetTransactionPending => pending
-      case charge: DesGetTransactionCharge => charge
-      case DesGetTransactionCancelled => DesGetTransactionCancelled
+    bonus flatMap {
+      case bp: DesGetBonusPaymentResponse => {
+
+        bp.status match {
+          case "Paid" => {
+            val transaction: Future[DesResponse] = desConnector.getTransaction(lisaManager, accountId, transactionId)
+
+            transaction map {
+              case paid: DesGetTransactionPaid => {
+                GetTransactionSuccessResponse(
+                  transactionId = transactionId,
+                  creationDate = bp.creationDate,
+                  bonusDueForPeriod = Some(bp.bonuses.bonusDueForPeriod),
+                  status = "Paid",
+                  paymentDate = Some(paid.paymentDate),
+                  paymentAmount = Some(paid.paymentAmount),
+                  paymentReference = Some(paid.paymentReference)
+                )
+              }
+              case pending: DesGetTransactionPending => {
+                GetTransactionSuccessResponse(
+                  transactionId = transactionId,
+                  creationDate = bp.creationDate,
+                  bonusDueForPeriod = Some(bp.bonuses.bonusDueForPeriod),
+                  status = "Pending",
+                  paymentDueDate = Some(pending.paymentDueDate),
+                  paymentAmount = Some(pending.paymentAmount)
+                )
+              }
+              case charge: DesGetTransactionCharge => {
+                GetTransactionSuccessResponse(
+                  transactionId = transactionId,
+                  creationDate = bp.creationDate,
+                  status = charge.status,
+                  chargeReference = Some(charge.chargeReference)
+                )
+              }
+              case DesGetTransactionCancelled => {
+                GetTransactionSuccessResponse(
+                  transactionId = transactionId,
+                  creationDate = bp.creationDate,
+                  bonusDueForPeriod = Some(bp.bonuses.bonusDueForPeriod),
+                  status = "Cancelled"
+                )
+              }
+            }
+
+          }
+          case "Pending" | "Cancelled" | "Superceded" => {
+            Future.successful(GetTransactionSuccessResponse(
+              transactionId = transactionId,
+              creationDate = bp.creationDate,
+              bonusDueForPeriod = Some(bp.bonuses.bonusDueForPeriod),
+              status = bp.status
+            ))
+          }
+        }
+      }
     }
-
-    Future.successful(GetTransactionErrorResponse)
   }
+
 }
 
 object TransactionService extends TransactionService {

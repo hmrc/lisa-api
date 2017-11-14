@@ -26,12 +26,13 @@ case object GetTransactionErrorResponse extends GetTransactionResponse
 
 case class GetTransactionSuccessResponse(transactionId: String,
                                          creationDate: DateTime,
-                                         bonusDueForPeriod: Amount,
                                          status: String,
-                                         paymentDate: Option[DateTime],
-                                         paymentDueDate: Option[DateTime],
-                                         paymentAmount: Option[Amount],
-                                         chargeReference: Option[String]) extends GetTransactionResponse
+                                         bonusDueForPeriod: Option[Amount] = None,
+                                         paymentDate: Option[DateTime] = None,
+                                         paymentDueDate: Option[DateTime] = None,
+                                         paymentAmount: Option[Amount] = None,
+                                         paymentReference: Option[String] = None,
+                                         chargeReference: Option[String] = None) extends GetTransactionResponse
 
 object GetTransactionResponse {
   val dateFormat = "yyyy-MM-dd"
@@ -39,11 +40,12 @@ object GetTransactionResponse {
   implicit val successWrites: Writes[GetTransactionSuccessResponse] = (
     (JsPath \ "transactionId").write[String] and
     (JsPath \ "creationDate").write[String].contramap[DateTime](d => d.toString(dateFormat)) and
-    (JsPath \ "bonusDueForPeriod").write[Amount] and
     (JsPath \ "status").write[String] and
+    (JsPath \ "bonusDueForPeriod").writeNullable[Amount] and
     (JsPath \ "paymentDate").writeNullable[String].contramap[Option[DateTime]](d => d.map(v => v.toString(dateFormat))) and
     (JsPath \ "paymentDueDate").writeNullable[String].contramap[Option[DateTime]](d => d.map(v => v.toString(dateFormat))) and
     (JsPath \ "paymentAmount").writeNullable[Amount] and
+    (JsPath \ "paymentReference").writeNullable[String] and
     (JsPath \ "chargeReference").writeNullable[String]
   )(unlift(GetTransactionSuccessResponse.unapply))
 }
