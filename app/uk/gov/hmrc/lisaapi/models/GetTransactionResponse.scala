@@ -23,6 +23,8 @@ import play.api.libs.json.{JsPath, Writes}
 trait GetTransactionResponse
 
 case object GetTransactionErrorResponse extends GetTransactionResponse
+case object GetTransactionTransactionNotFoundResponse extends GetTransactionResponse
+case object GetTransactionAccountNotFoundResponse extends GetTransactionResponse
 
 case class GetTransactionSuccessResponse(transactionId: String,
                                          creationDate: DateTime,
