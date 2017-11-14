@@ -157,6 +157,26 @@ trait DesConnector extends ServicesConfig {
   }
 
   /**
+    * Attempts to update the first subscription date
+    */
+  def updateFirstSubDate(lisaManager: String, accountId: String, request: UpdateSubscriptionRequest)
+                     (implicit hc: HeaderCarrier): Future[DesResponse] = {
+
+    val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId/update-subscription"
+    Logger.debug("Posting update subscription request to des: " + uri)
+    val result = httpPost.POST[UpdateSubscriptionRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc))
+
+    result.map(res => {
+      Logger.debug("Update first subscription date request returned status: " + res.status)
+      res.status match {
+        case 200 => parseDesResponse[DesUpdateSubscriptionSuccessResponse](res)._2
+        case _ => parseDesResponse[DesFailureResponse](res)._2
+      }
+
+    })
+  }
+
+  /**
     * Attempts to get a LISA Life Event
     */
   def getLifeEvent(lisaManager: String, accountId: String, eventId: String)
