@@ -1,8 +1,8 @@
 {
-   "transactionId": "12345",
-   "creationDate": "2000-01-01",
-   "bonusDueForPeriod": 1.00,
-   "status": "Pending",
-   "paymentDueDate": "2000-01-01",
-   "paymentAmount": 1.00
+  "transactionId": "12345",
+  "creationDate": "2000-01-01",
+  "bonusDueForPeriod": 1.00,
+  "status": "Pending",
+  "paymentDueDate": "2000-01-01",
+  "paymentAmount": 1.00
 }

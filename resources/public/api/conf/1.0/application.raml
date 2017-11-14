@@ -945,8 +945,8 @@ types:
                                                    }
                                    /payments:
                                      get:
-                                        displayName: Retrieve payment details for an investor transactionID
-                                        description: Retrieve payment details for an investor transactionID
+                                        displayName: Retrieve payment details for an investor transactionId
+                                        description: Retrieve payment details for an investor transactionId
                                         is: [headers.acceptHeader, headers.contentHeader]
                                         (annotations.scope): "read:lisa"
                                         securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
@@ -956,8 +956,8 @@ types:
                                               application/json:
                                                 type: !include schemas/InvestorPayment.get.response.schema.json
                                                 examples:
-                                                  example-1: !include examples/InvestorPayment.get.response.json
-                                                  example-2: !include examples/InvestorPayment.get.response.1.json
+                                                  paid: !include examples/InvestorPayment.get.response.json
+                                                  charge: !include examples/InvestorPayment.get.response.1.json
                                           401:
                                             body:
                                               application/json:
