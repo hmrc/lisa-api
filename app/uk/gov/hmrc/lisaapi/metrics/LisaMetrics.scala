@@ -42,14 +42,23 @@ object LisaMetrics extends LisaMetrics with MicroserviceMetrics {
 }
 
 trait LisaMetricKeys  {
+  val DISCOVER = "DISCOVER"
   val INVESTOR = "LISA_INVESTOR"
   val ACCOUNT = "CREATE_OR_TRANSFER_ACCOUNT"
- val  CLOSE = "CLOSE_ACCOUNT"
+  val CLOSE = "CLOSE_ACCOUNT"
   val EVENT = "LIFE_EVENT"
   val BONUS_PAYMENT = "BONUS_PAYMENT"
+  val TRANSACTION = "TRANSACTION"
 
-
-  val keys = Map("investors"->INVESTOR,"accounts"-> ACCOUNT,"close-account"->CLOSE,"transactions"->BONUS_PAYMENT, "events"-> "LIFE_EVENT", "discover"-> "DISCOVER")
+  val keys = Map(
+    "investors" -> INVESTOR,
+    "accounts" -> ACCOUNT,
+    "close-account" -> CLOSE,
+    "transactions" -> BONUS_PAYMENT,
+    "events" -> EVENT,
+    "discover" -> DISCOVER,
+    "payments" -> TRANSACTION
+  )
 
   def lisaError(status:Int, name:String):String =  s"${name}_${status}"
 

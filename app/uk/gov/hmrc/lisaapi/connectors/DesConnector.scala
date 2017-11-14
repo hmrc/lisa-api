@@ -211,7 +211,7 @@ trait DesConnector extends ServicesConfig {
     */
   def getTransaction(lisaManager: String, accountId: String, transactionId: String)
                     (implicit hc:HeaderCarrier): Future[DesResponse] = {
-    val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId/transactions/$transactionId/details"
+    val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId/transactions/$transactionId/payments"
     Logger.debug("Getting the Transaction details from des: " + uri)
 
     val result: Future[HttpResponse] = httpGet.GET(uri)(httpReads, hc = updateHeaderCarrier(hc))
