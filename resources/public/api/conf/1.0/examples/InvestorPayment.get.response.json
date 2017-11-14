@@ -1,8 +1,8 @@
 {
-  "transactionID": "7777777777",
-  "creationDate": "2017-05-05",
-  "paymentDate": "2017-07-05",
-  "paymentStatus": "Paid",
-  "paymentReference": "12345",
-  "paymentAmount": "1000.00"
+   "transactionId": "12345",
+   "creationDate": "2000-01-01",
+   "bonusDueForPeriod": 1.00,
+   "status": "Pending",
+   "paymentDueDate": "2000-01-01",
+   "paymentAmount": 1.00
 }
