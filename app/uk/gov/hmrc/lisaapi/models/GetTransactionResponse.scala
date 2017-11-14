@@ -18,7 +18,7 @@ package uk.gov.hmrc.lisaapi.models
 
 import org.joda.time.DateTime
 import play.api.libs.functional.syntax._
-import play.api.libs.json.{JsPath, Json}
+import play.api.libs.json.{JsPath, Writes}
 
 trait GetTransactionResponse
 
@@ -36,7 +36,7 @@ case class GetTransactionSuccessResponse(transactionId: String,
 object GetTransactionResponse {
   val dateFormat = "yyyy-MM-dd"
 
-  implicit val successWrites = Json.writes[GetTransactionSuccessResponse] = (
+  implicit val successWrites: Writes[GetTransactionSuccessResponse] = (
     (JsPath \ "transactionId").write[String] and
     (JsPath \ "creationDate").write[String].contramap[DateTime](d => d.toString(dateFormat)) and
     (JsPath \ "bonusDueForPeriod").write[Amount] and

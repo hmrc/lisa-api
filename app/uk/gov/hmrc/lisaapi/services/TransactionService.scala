@@ -22,6 +22,7 @@ import uk.gov.hmrc.lisaapi.models.des._
 import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 trait TransactionService {
   val desConnector: DesConnector
