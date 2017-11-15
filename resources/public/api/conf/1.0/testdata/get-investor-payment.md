@@ -27,11 +27,11 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request for a pending transaction</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 000000200</p></td>
+            <td><p>Request for a pending transaction</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 0000000200</p></td>
             <td></td>
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
                 <p class ="code--block">{<br>
-						     "transactionId": "000000200",<br>
+						     "transactionId": "0000000200",<br>
 						     "creationDate": "2017-05-05",<br>
 						     "bonusDueForPeriod": 1000,<br>
 						     "status": "Pending"<br>
@@ -40,11 +40,11 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request for a pending transaction that has a due date</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 300000200</p></td>
+            <td><p>Request for a pending transaction that has a due date</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 3000000200</p></td>
             <td></td>
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
                 <p class ="code--block">{<br>
-						    "transactionId": "300000200",<br>
+						    "transactionId": "3000000200",<br>
 						    "creationDate": "2017-05-05",<br>
 						    "bonusDueForPeriod": 1000,<br>
 						    "status": "Pending",<br>
@@ -55,11 +55,11 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request for a cancelled transaction</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 100000200</p></td>
+            <td><p>Request for a cancelled transaction</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 1000000200</p></td>
             <td></td>
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
                 <p class ="code--block">{<br>
-						    "transactionId": "100000200",<br>
+						    "transactionId": "1000000200",<br>
 						    "creationDate": "2017-05-05",<br>
 						    "bonusDueForPeriod": 1000,<br>
 						    "status": "Cancelled",<br>						}
@@ -67,11 +67,11 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request for a superceded transaction</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 200000200</p></td>
+            <td><p>Request for a superceded transaction</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 2000000200</p></td>
             <td></td>
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
                 <p class ="code--block">{<br>
-						    "transactionId": "200000200",<br>
+						    "transactionId": "2000000200",<br>
 						    "creationDate": "2017-05-05",<br>
 						    "bonusDueForPeriod": 1000,<br>
 						    "status": "Superceded",<br>						}
@@ -79,11 +79,11 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request for a transaction where a charge is owed</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 500000200</p></td>
+            <td><p>Request for a transaction where a charge is owed</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 5000000200</p></td>
             <td></td>
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
                 <p class ="code--block">{<br>
-					     "transactionId": "500000200",<br>
+					     "transactionId": "5000000200",<br>
 					     "creationDate": "2017-05-05",<br>
 					     "status": "Due",<br>
 					     "chargeReference": "XM002610108957"<br>
