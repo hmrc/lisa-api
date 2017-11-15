@@ -166,7 +166,7 @@ trait DesConnector extends ServicesConfig {
 
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId/update-subscription"
     Logger.debug("Posting update subscription request to des: " + uri)
-    val result = httpPost.POST[UpdateSubscriptionRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc))
+    val result = httpPost.POST[UpdateSubscriptionRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
 
     result.map(res => {
       Logger.debug("Update first subscription date request returned status: " + res.status)
@@ -236,7 +236,7 @@ trait DesConnector extends ServicesConfig {
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId/transactions/$transactionId/payments"
     Logger.debug("Getting the Transaction details from des: " + uri)
 
-    val result: Future[HttpResponse] = httpGet.GET(uri)(httpReads, hc = updateHeaderCarrier(hc))
+    val result: Future[HttpResponse] = httpGet.GET(uri)(httpReads, hc = updateHeaderCarrier(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
 
     result.map(res => {
       Logger.debug("Get Transaction details returned status: " + res.status)
