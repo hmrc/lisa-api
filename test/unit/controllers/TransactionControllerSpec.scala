@@ -27,7 +27,7 @@ import play.api.test.Helpers._
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.api.controllers.ErrorAcceptHeaderInvalid
 import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
-import uk.gov.hmrc.lisaapi.controllers.{ErrorBadRequestLmrn, TransactionController}
+import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountNotFound, ErrorBadRequestLmrn, TransactionController}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.TransactionService
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -105,6 +105,15 @@ class TransactionControllerSpec extends PlaySpec
         status(res) mustBe NOT_FOUND
 
         (contentAsJson(res) \ "code").as[String] mustBe "TRANSACTION_NOT_FOUND"
+      }
+      "the accountId in the URL is in an incorrect format" in {
+        when(mockService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionErrorResponse))
+
+        val res = SUT.getTransaction(lmrn, "!!!", transactionId).apply(FakeRequest().withHeaders(acceptHeader))
+
+        status(res) mustBe NOT_FOUND
+
+        (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNTID_NOT_FOUND"
       }
     }
 

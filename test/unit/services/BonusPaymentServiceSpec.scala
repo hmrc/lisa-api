@@ -105,7 +105,7 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
 
       "an invalid payment transaction (404) response comes from DES" in {
         when(mockDesConnector.getBonusPayment(any(), any(), any())(any()))
-          .thenReturn(Future.successful(DesFailureResponse(code = "BONUS_PAYMENT_TRANSACTION_NOT_FOUND")))
+          .thenReturn(Future.successful(DesFailureResponse(code = "TRANSACTION_NOT_FOUND")))
 
         dogetBonusPaymentRequest { response =>
           response mustBe GetBonusPaymentTransactionNotFoundResponse

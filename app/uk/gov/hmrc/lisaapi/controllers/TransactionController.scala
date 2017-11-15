@@ -36,34 +36,36 @@ class TransactionController extends LisaController with LisaConstants {
       LisaMetrics.startMetrics(startTime, LisaMetricKeys.TRANSACTION)
 
       withValidLMRN(lisaManager) {
-        service.getTransaction(lisaManager, accountId, transactionId) map {
-          case success: GetTransactionSuccessResponse => {
-            Logger.debug("Matched Valid Response")
+        withValidAccountId(accountId) {
+          service.getTransaction(lisaManager, accountId, transactionId) map {
+            case success: GetTransactionSuccessResponse => {
+              Logger.debug("Matched Valid Response")
 
-            LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.TRANSACTION)
+              LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.TRANSACTION)
 
-            Ok(Json.toJson(success))
-          }
-          case GetTransactionAccountNotFoundResponse => {
-            Logger.debug("Matched Not Found Response")
+              Ok(Json.toJson(success))
+            }
+            case GetTransactionAccountNotFoundResponse => {
+              Logger.debug("Matched Not Found Response")
 
-            LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getErrorKey(NOT_FOUND, request.uri))
+              LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getErrorKey(NOT_FOUND, request.uri))
 
-            NotFound(Json.toJson(ErrorAccountNotFound))
-          }
-          case GetTransactionTransactionNotFoundResponse => {
-            Logger.debug("Matched Not Found Response")
+              NotFound(Json.toJson(ErrorAccountNotFound))
+            }
+            case GetTransactionTransactionNotFoundResponse => {
+              Logger.debug("Matched Not Found Response")
 
-            LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getErrorKey(NOT_FOUND, request.uri))
+              LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getErrorKey(NOT_FOUND, request.uri))
 
-            NotFound(Json.toJson(ErrorTransactionNotFound))
-          }
-          case GetTransactionErrorResponse => {
-            Logger.debug("Matched an error")
+              NotFound(Json.toJson(ErrorTransactionNotFound))
+            }
+            case GetTransactionErrorResponse => {
+              Logger.debug("Matched an error")
 
-            LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getErrorKey(INTERNAL_SERVER_ERROR, request.uri))
+              LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getErrorKey(INTERNAL_SERVER_ERROR, request.uri))
 
-            InternalServerError(Json.toJson(ErrorInternalServerError))
+              InternalServerError(Json.toJson(ErrorInternalServerError))
+            }
           }
         }
       }
