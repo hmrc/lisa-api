@@ -15,7 +15,7 @@
             <td></td>
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
                 <p class ="code--block">{<br>
-					     "transactionId": "12345",<br>
+					     "transactionId": "1234567890",<br>
 					     "creationDate": "2000-01-01",<br>
 					     "bonusDueForPeriod": 1,<br>
 					     "status": "Paid",<br>
@@ -31,7 +31,7 @@
             <td></td>
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
                 <p class ="code--block">{<br>
-						     "transactionId": "12345",<br>
+						     "transactionId": "000000200",<br>
 						     "creationDate": "2000-01-01",<br>
 						     "bonusDueForPeriod": 1,<br>
 						     "status": "Pending"<br>
@@ -44,7 +44,7 @@
             <td></td>
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
                 <p class ="code--block">{<br>
-						    "transactionId": "12345",<br>
+						    "transactionId": "300000200",<br>
 						    "creationDate": "2000-01-01",<br>
 						    "bonusDueForPeriod": 1,<br>
 						    "status": "Pending",<br>
@@ -59,7 +59,7 @@
             <td></td>
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
                 <p class ="code--block">{<br>
-						    "transactionId": "12345",<br>
+						    "transactionId": "100000200",<br>
 						    "creationDate": "2000-01-01",<br>
 						    "bonusDueForPeriod": 1,<br>
 						    "status": "Cancelled",<br>						}
@@ -71,7 +71,7 @@
             <td></td>
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
                 <p class ="code--block">{<br>
-						    "transactionId": "12345",<br>
+						    "transactionId": "200000200",<br>
 						    "creationDate": "2000-01-01",<br>
 						    "bonusDueForPeriod": 1,<br>
 						    "status": "Superceded",<br>						}
@@ -83,7 +83,7 @@
             <td></td>
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
                 <p class ="code--block">{<br>
-					     "transactionId": "12345",<br>
+					     "transactionId": "500000200",<br>
 					     "creationDate": "2000-01-01",<br>
 					     "status": "Due",<br>
 					     "chargeReference": "XM002610108957"<br>
@@ -92,7 +92,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request with a valid Account ID and Transaction ID, but an invalid LISA Manager Reference Number</p><p class ="code--block">lisaManagerReferenceNumber: 123456<br>accountId: 1234567890<br>lifeEventId: 1234567890</p></td>
+            <td><p>Request with a valid Account ID and Transaction ID, but an invalid LISA Manager Reference Number</p><p class ="code--block">lisaManagerReferenceNumber: 123456<br>accountId: 1234567890<br>transactionId: 1234567890</p></td>
                         <td></td>
             <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
                 <p class ="code--block"> {<br>
