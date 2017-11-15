@@ -950,6 +950,7 @@ types:
                                         is: [headers.acceptHeader, headers.contentHeader]
                                         (annotations.scope): "read:lisa"
                                         securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
+                                        (annotations.sandboxData): !include testdata/get-investor-payment.md
                                         responses:
                                           200:
                                             body:
