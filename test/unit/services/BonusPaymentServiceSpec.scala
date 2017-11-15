@@ -77,7 +77,9 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
           new DateTime("2017-05-05"),
           Some(HelpToBuyTransfer(0f, 10f)),
           InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
-          Bonuses(1000f, 1000f, Some(1000f), "Life Event"))
+          Bonuses(1000f, 1000f, Some(1000f), "Life Event"),
+          new DateTime("2017-05-05"),
+          "Paid")
 
         when(mockDesConnector.getBonusPayment(any(), any(), any())(any()))
           .thenReturn(Future.successful(successResponse))
@@ -103,7 +105,7 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
 
       "an invalid payment transaction (404) response comes from DES" in {
         when(mockDesConnector.getBonusPayment(any(), any(), any())(any()))
-          .thenReturn(Future.successful(DesFailureResponse(code = "BONUS_PAYMENT_TRANSACTION_NOT_FOUND")))
+          .thenReturn(Future.successful(DesFailureResponse(code = "TRANSACTION_NOT_FOUND")))
 
         dogetBonusPaymentRequest { response =>
           response mustBe GetBonusPaymentTransactionNotFoundResponse

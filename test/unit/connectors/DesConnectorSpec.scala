@@ -331,7 +331,69 @@ class DesConnectorSpec extends PlaySpec
     }
   }
 
-  "Report Life Event endpoint" must {
+  "Update First Subscription date endpoint" must {
+
+    "Return a populated DesUpdateSubscriptionSuccessResponse" when {
+
+      "The DES response has a json body that is in the correct format" in {
+        when(mockHttpPost.POST[UpdateSubscriptionRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = OK,
+                responseJson = Some(Json.parse(s"""{"code": "UPDATED_AND_ACCOUNT_VOIDED", "message": "LISA Account firstSubscriptionDate has been updated successfully"}"""))
+              )
+            )
+          )
+
+        updateFirstSubscriptionDateRequest { response =>
+          response must be((
+            DesUpdateSubscriptionSuccessResponse("UPDATED_AND_ACCOUNT_VOIDED", "LISA Account firstSubscriptionDate has been updated successfully" )
+          ))
+        }
+      }
+    }
+
+    "Return an failure response" when {
+      "The DES response has no json body" in {
+        when(mockHttpPost.POST[UpdateSubscriptionRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = SERVICE_UNAVAILABLE,
+                responseJson = None
+              )
+            )
+          )
+
+        updateFirstSubscriptionDateRequest { response =>
+          response must be(DesFailureResponse())
+        }
+      }
+    }
+
+    "Return a DesFailureResponse" when {
+      "Status is 201 and Json is invalid" in {
+        when(mockHttpPost.POST[UpdateSubscriptionRequest, HttpResponse](any(), any(), any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = CREATED,
+                responseJson = Some(Json.parse(s"""{"code": "UPDATED_AND_ACCOUNT_VOIDED", "message": "LISA Account firstSubscriptionDate has been updated successfully"}"""))
+              )
+            )
+          )
+
+        updateFirstSubscriptionDateRequest { response =>
+          response must be(DesFailureResponse("INTERNAL_SERVER_ERROR","Internal Server Error"))
+        }
+
+      }
+    }
+
+  }
+
+    "Report Life Event endpoint" must {
 
     "Return an failure response" when {
       "The DES response has no json body" in {
@@ -649,7 +711,6 @@ class DesConnectorSpec extends PlaySpec
 
     }
 
-
     "return a success response" when {
 
       "DES returns successfully" in {
@@ -659,7 +720,7 @@ class DesConnectorSpec extends PlaySpec
             Future.successful(
               HttpResponse(
                 responseStatus = OK,
-                responseJson = Some(Json.parse(validBonusPaymentJson))
+                responseJson = Some(Json.parse(validBonusPaymentResponseJson))
               )
             )
           )
@@ -671,7 +732,9 @@ class DesConnectorSpec extends PlaySpec
             periodEndDate = new DateTime("2017-05-05"),
             htbTransfer = Some(HelpToBuyTransfer(0f, 10f)),
             inboundPayments = InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
-            bonuses = Bonuses(1000f, 1000f, Some(1000f), "Life Event")
+            bonuses = Bonuses(1000f, 1000f, Some(1000f), "Life Event"),
+            creationDate = new DateTime("2017-05-05"),
+            status = "Paid"
           )
         }
 
@@ -681,7 +744,153 @@ class DesConnectorSpec extends PlaySpec
 
   }
 
-  val validBonusPaymentJson = Source.fromInputStream(getClass().getResourceAsStream("/json/request.valid.bonus-payment.json")).mkString
+  "Retrieve Transaction endpoint" must {
+
+    "return a failure response" when {
+      "the DES response is a failure response" in {
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = OK,
+                responseJson = Some(Json.parse(
+                  """{
+                    | "code": "ERROR_CODE",
+                    | "reason" : "ERROR MESSAGE"
+                  }""".stripMargin))
+              )
+            )
+          )
+
+        doRetrieveTransactionRequest { response =>
+          response mustBe DesFailureResponse("ERROR_CODE", "ERROR MESSAGE")
+        }
+      }
+      "the DES response has no json body" in {
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = OK,
+                responseJson = None
+              )
+            )
+          )
+
+        doRetrieveTransactionRequest { response =>
+          response mustBe DesFailureResponse()
+        }
+      }
+      "the DES response is invalid" in {
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = OK,
+                responseJson = Some(Json.parse(
+                  """{
+                    | "status": "Due"
+                  }""".stripMargin))
+              )
+            )
+          )
+
+        doRetrieveTransactionRequest { response =>
+          response mustBe DesFailureResponse()
+        }
+      }
+    }
+
+    "return a success response" when {
+      "the DES response is a valid Pending transaction" in {
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = OK,
+                responseJson = Some(Json.parse("""{
+                                                 |    "status": "Pending",
+                                                 |    "paymentDueDate": "2000-01-01",
+                                                 |    "paymentAmount": 1.00
+                                                 |}""".stripMargin))
+              )
+            )
+          )
+
+        doRetrieveTransactionRequest { response =>
+          response mustBe DesGetTransactionPending(
+            paymentDueDate = new DateTime("2000-01-01"),
+            paymentAmount = 1.0
+          )
+        }
+      }
+      "the DES response is a valid Cancelled transaction" in {
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = OK,
+                responseJson = Some(Json.parse("""{
+                                                 |    "status": "Cancelled"
+                                                 |}""".stripMargin))
+              )
+            )
+          )
+
+        doRetrieveTransactionRequest { response =>
+          response mustBe DesGetTransactionCancelled
+        }
+      }
+      "the DES response is a valid Paid transaction" in {
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = OK,
+                responseJson = Some(Json.parse("""{
+                                                 |    "status": "Paid",
+                                                 |    "paymentDate": "2000-01-01",
+                                                 |    "paymentReference": "002630000993",
+                                                 |    "paymentAmount": 1.00
+                                                 |}""".stripMargin))
+              )
+            )
+          )
+
+        doRetrieveTransactionRequest { response =>
+          response mustBe DesGetTransactionPaid(
+            paymentDate = new DateTime("2000-01-01"),
+            paymentReference = "002630000993",
+            paymentAmount = 1.0
+          )
+        }
+      }
+      "the DES response is a valid Charge transaction" in {
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = OK,
+                responseJson = Some(Json.parse("""{
+                                                 |    "status": "Due",
+                                                 |    "chargeReference": "XM00261010895"
+                                                 |}""".stripMargin))
+              )
+            )
+          )
+
+        doRetrieveTransactionRequest { response =>
+          response mustBe DesGetTransactionCharge(
+            status = "Due",
+            chargeReference = "XM00261010895"
+          )
+        }
+      }
+    }
+
+  }
+
+  val validBonusPaymentResponseJson = Source.fromInputStream(getClass().getResourceAsStream("/json/request.valid.bonus-payment-response.json")).mkString
 
   private def doCreateInvestorRequest(callback: ((Int,DesResponse)) => Unit) = {
     val request = CreateLisaInvestorRequest("AB123456A", "A", "B", new DateTime("2000-01-01"))
@@ -708,6 +917,14 @@ class DesConnectorSpec extends PlaySpec
   private def doCloseAccountRequest(callback: (DesResponse) => Unit) = {
     val request = CloseLisaAccountRequest("All funds withdrawn", new DateTime("2000-01-01"))
     val response = Await.result(SUT.closeAccount("Z123456", "ABC12345", request), Duration.Inf)
+
+    callback(response)
+  }
+
+
+  private def updateFirstSubscriptionDateRequest(callback: (DesResponse) => Unit) = {
+    val request = UpdateSubscriptionRequest(new DateTime("2000-01-01"))
+    val response = Await.result(SUT.updateFirstSubDate("Z019283", "123456789", request), Duration.Inf)
 
     callback(response)
   }
@@ -742,6 +959,12 @@ class DesConnectorSpec extends PlaySpec
 
   private def doRetrieveBonusPaymentRequest(callback: (DesResponse) => Unit) = {
     val response = Await.result(SUT.getBonusPayment("Z123456", "ABC12345", "123456"), Duration.Inf)
+
+    callback(response)
+  }
+
+  private def doRetrieveTransactionRequest(callback: (DesResponse) => Unit) = {
+    val response = Await.result(SUT.getTransaction("Z123456", "ABC12345", "123456"), Duration.Inf)
 
     callback(response)
   }

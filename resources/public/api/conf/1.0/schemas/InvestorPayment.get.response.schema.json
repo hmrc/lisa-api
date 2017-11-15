@@ -2,13 +2,13 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "properties": {
-    "transactionID" : {
-      "description": "The transactionID for which the payment details have been requested",
+    "transactionId" : {
+      "description": "The transactionId for which the payment details have been requested",
       "type" : "string",
       "example": "7777777777"
     },
     "creationDate": {
-      "description":"The  date the transaction has been created.",
+      "description":"The date the transaction has been created.",
       "$ref": "#/definitions/ISO8601-Date"
     },
     "paymentDate": {
@@ -19,12 +19,16 @@
       "description":"The date the payment is due.",
       "$ref": "#/definitions/ISO8601-Date"
     },
-    "paymentStatus" : {
+    "status" : {
       "description": "The status of the payment for a transaction",
       "type" : "string",
       "enum": [
         "Paid",
-        "Pending"
+        "Pending",
+        "Cancelled",
+        "Superceded",
+        "Due",
+        "Overdue"
       ],
       "example": "Paid"
     },
@@ -33,23 +37,28 @@
       "type" : "string",
       "example": "12345"
     },
+    "chargeReference" : {
+      "description": "The reference for a charge due",
+      "type" : "string",
+      "example": "12345"
+    },
     "paymentAmount" : {
       "description": "The amount paid for the transaction",
-      "type" : "string",
+      "type" : "number",
       "example": "1000.00"
     },
     "bonusDueForPeriod": {
       "description": "Payment due for the period",
-      "type" : "string",
+      "type" : "number",
       "example": "700.00"
     }
 
   },
-    "required": [
-      "transactionID",
-	  "creationDate",
-      "paymentStatus"
-    ],
+  "required": [
+     "transactionId",
+     "creationDate",
+     "status"
+  ],
 	"additionalProperties": false,
 	"definitions": {
 	  "ISO8601-Date": {

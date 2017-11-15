@@ -100,6 +100,10 @@ case object ErrorPreviousAccountDoesNotExist extends ErrorResponse(403, "PREVIOU
 
 case object ErrorAccountAlreadyClosedOrVoid extends ErrorResponse(403, "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID", "The LISA account has already been closed or voided.")
 
+case object ErrorAccountAlreadyVoided extends ErrorResponse(403, "INVESTOR_ACCOUNT_ALREADY_VOID", "The LISA account is already voided")
+
+case object ErrorAccountAlreadyClosed extends ErrorResponse(403, "INVESTOR_ACCOUNT_ALREADY_CLOSED", "The LISA account is already closed")
+
 case object ErrorAccountNotFound extends ErrorResponse(404, "INVESTOR_ACCOUNTID_NOT_FOUND", "The accountId given does not match with HMRC’s records")
 
 case object ErrorTransferAccountDataNotProvided extends ErrorResponse(403, "TRANSFER_ACCOUNT_DATA_NOT_PROVIDED", "The transferredFromAccountId, transferredFromLMRN and transferInDate are not provided and are required for transfer of an account.")
@@ -110,7 +114,7 @@ case object ErrorLifeEventInappropriate extends ErrorResponse(403, "LIFE_EVENT_I
 
 case object ErrorInvalidLisaManager extends ErrorResponse(401,"UNAUTHORIZED","The lisaManagerReferenceNumber path parameter you've used doesn't match with an authorised LISA provider in HMRC's records.")
 
-case object ErrorTransactionNotFound extends ErrorResponse(404, "BONUS_PAYMENT_TRANSACTION_NOT_FOUND", "The bonusPaymentTransactionId does not match with HMRC’s records")
+case object ErrorTransactionNotFound extends ErrorResponse(404, "TRANSACTION_NOT_FOUND", "The transactionId does not match with HMRC’s records.")
 
 object ErrorInvestorAlreadyExists {
 

@@ -16,17 +16,10 @@
 
 package uk.gov.hmrc.lisaapi.models
 
-import play.api.libs.json.{Json, OFormat}
+trait UpdateSubscriptionResponse
 
-case class ApiResponseData(
-  message: String,
-  investorId: Option[String] = None,
-  code: Option[String] = None,
-  accountId: Option[String] = None,
-  lifeEventId: Option[String] = None,
-  transactionId: Option[String] = None
-)
-
-object ApiResponseData {
-  implicit val apiResponseDataFormats: OFormat[ApiResponseData] = Json.format[ApiResponseData]
-}
+case class UpdateSubscriptionSuccessResponse (code: String, message: String) extends UpdateSubscriptionResponse
+case object UpdateSubscriptionErrorResponse extends UpdateSubscriptionResponse
+case object UpdateSubscriptionAccountNotFoundResponse extends UpdateSubscriptionResponse
+case object UpdateSubscriptionAccountClosedResponse extends UpdateSubscriptionResponse
+case object UpdateSubscriptionAccountVoidedResponse extends UpdateSubscriptionResponse

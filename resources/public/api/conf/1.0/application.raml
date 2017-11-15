@@ -588,6 +588,13 @@ types:
                                                 "code" : "INVESTOR_ACCOUNT_ALREADY_CLOSED",
                                                 "message" : "The Investor Account is already closed"
                                               }
+                                          accountVoided:
+                                            description: The LISA account is already voided.
+                                            value: |
+                                              {
+                                                "code" : "INVESTOR_ACCOUNT_ALREADY_VOID",
+                                                "message" : "The Investor Account is already voided"
+                                              }
                                   404:
                                     body:
                                       application/json:
@@ -938,19 +945,20 @@ types:
                                                    }
                                    /payments:
                                      get:
-                                        displayName: Retrieve payment details for an investor transactionID
-                                        description: Retrieve payment details for an investor transactionID
+                                        displayName: Retrieve payment details for an investor transactionId
+                                        description: Retrieve payment details for an investor transactionId
                                         is: [headers.acceptHeader, headers.contentHeader]
                                         (annotations.scope): "read:lisa"
                                         securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
+                                        (annotations.sandboxData): !include testdata/get-investor-payment.md
                                         responses:
                                           200:
                                             body:
                                               application/json:
                                                 type: !include schemas/InvestorPayment.get.response.schema.json
                                                 examples:
-                                                  example-1: !include examples/InvestorPayment.get.response.json
-                                                  example-2: !include examples/InvestorPayment.get.response.1.json
+                                                  paid: !include examples/InvestorPayment.get.response.json
+                                                  charge: !include examples/InvestorPayment.get.response.1.json
                                           401:
                                             body:
                                               application/json:
