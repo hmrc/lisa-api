@@ -11,7 +11,7 @@
     </thead>
     <tbody>
         <tr>
-            <td><p>Request for a paid payment</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 1234567890</p></td>
+            <td><p>Request for a paid transaction</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 1234567890</p></td>
             <td></td>
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
                 <p class ="code--block">{<br>
@@ -79,7 +79,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request for a payment where a charge is owed</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 500000200</p></td>
+            <td><p>Request for a transaction where a charge is owed</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 500000200</p></td>
             <td></td>
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
                 <p class ="code--block">{<br>
