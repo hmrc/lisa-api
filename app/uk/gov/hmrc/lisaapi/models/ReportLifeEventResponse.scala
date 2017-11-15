@@ -37,9 +37,7 @@ case class RequestLifeEventSuccessResponse(lifeEventId: String, eventType: LifeE
 object RequestLifeEventSuccessResponse {
   implicit val writes: Writes[RequestLifeEventSuccessResponse] = (
     (JsPath \ "lifeEventId").write[String] and
-      (JsPath \ "eventType").write[String] and
-      (JsPath \ "eventDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd"))
-    ) (unlift(RequestLifeEventSuccessResponse.unapply))
-
-
+    (JsPath \ "eventType").write[String] and
+    (JsPath \ "eventDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd"))
+  ) (unlift(RequestLifeEventSuccessResponse.unapply))
 }

@@ -55,7 +55,9 @@ case class DesGetBonusPaymentResponse(lifeEventId: Option[LifeEventId],
                                       periodEndDate: DateTime,
                                       htbTransfer: Option[HelpToBuyTransfer],
                                       inboundPayments: InboundPayments,
-                                      bonuses: Bonuses) extends DesResponse
+                                      bonuses: Bonuses,
+                                      creationDate: DateTime,
+                                      status: String) extends DesResponse
 
 object DesResponse {
   implicit val desCreateAccountResponseFormats: OFormat[DesAccountResponse] = Json.format[DesAccountResponse]
@@ -102,6 +104,8 @@ object DesResponse {
     (JsPath \ "periodEndDate").read(JsonReads.isoDate).map(new DateTime(_)) and
     (JsPath \ "htbTransfer").readNullable[HelpToBuyTransfer] and
     (JsPath \ "inboundPayments").read[InboundPayments] and
-    (JsPath \ "bonuses").read[Bonuses]
+    (JsPath \ "bonuses").read[Bonuses] and
+    (JsPath \ "creationDate").read(JsonReads.isoDate).map(new DateTime(_)) and
+    (JsPath \ "status").read[String]
   )(DesGetBonusPaymentResponse.apply _)
 }
