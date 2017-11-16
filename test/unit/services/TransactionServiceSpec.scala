@@ -22,11 +22,11 @@ import org.mockito.Mockito.when
 import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des._
 import uk.gov.hmrc.lisaapi.services.TransactionService
-import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration

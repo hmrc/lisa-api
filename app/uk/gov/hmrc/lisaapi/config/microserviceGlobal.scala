@@ -23,16 +23,14 @@ import play.api.libs.json.Json
 import play.api.mvc.Results.{NotFound, Status}
 import play.api.mvc.{RequestHeader, Result}
 import uk.gov.hmrc.lisaapi.connectors.ServiceLocatorConnector
-import uk.gov.hmrc.play.audit.filters.AuditFilter
 import uk.gov.hmrc.play.config.{AppName, ControllerConfig, RunMode}
-import uk.gov.hmrc.play.filters.MicroserviceFilterSupport
-import uk.gov.hmrc.play.http.HeaderCarrier
-import uk.gov.hmrc.play.http.logging.filters.LoggingFilter
 import uk.gov.hmrc.play.microservice.bootstrap.DefaultMicroserviceGlobal
 import uk.gov.hmrc.lisaapi.controllers._
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.microservice.filters.{ AuditFilter, LoggingFilter, MicroserviceFilterSupport }
 
 trait ServiceLocatorRegistration extends GlobalSettings with RunMode {
 

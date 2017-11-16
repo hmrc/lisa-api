@@ -25,7 +25,8 @@ import uk.gov.hmrc.api.controllers.HeaderValidator
 import uk.gov.hmrc.lisaapi.utils.ErrorConverter
 import uk.gov.hmrc.play.config.RunMode
 import uk.gov.hmrc.play.microservice.controller.BaseController
-import uk.gov.hmrc.auth.core.Retrievals.internalId
+import uk.gov.hmrc.auth.core.retrieve.Retrievals.internalId
+
 import uk.gov.hmrc.auth.core.{AuthorisationException, AuthorisedFunctions, Enrolment, InsufficientEnrolments}
 import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}

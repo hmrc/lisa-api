@@ -32,11 +32,11 @@ import uk.gov.hmrc.lisaapi.controllers.{BonusPaymentController, ErrorAccountNotF
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des.DesFailureResponse
 import uk.gov.hmrc.lisaapi.services.{AuditService, BonusPaymentService}
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.io.Source
+import uk.gov.hmrc.http.HeaderCarrier
 
 class BonusPaymentControllerSpec extends PlaySpec
   with MockitoSugar
@@ -55,7 +55,7 @@ class BonusPaymentControllerSpec extends PlaySpec
 
   override def beforeEach() {
     reset(mockAuditService)
-    when(mockAuthCon.authorise[Option[String]](any(),any())(any())).thenReturn(Future(Some("1234")))
+    when(mockAuthCon.authorise[Option[String]](any(),any())(any(), any())).thenReturn(Future(Some("1234")))
   }
 
   "the POST bonus payment endpoint" must {

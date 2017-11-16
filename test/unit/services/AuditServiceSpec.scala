@@ -27,9 +27,9 @@ import uk.gov.hmrc.lisaapi.models.{Bonuses, HelpToBuyTransfer, InboundPayments, 
 import uk.gov.hmrc.lisaapi.services.AuditService
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.DataEvent
-import uk.gov.hmrc.play.http.HeaderCarrier
 
 import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
+import uk.gov.hmrc.http.HeaderCarrier
 
 class AuditServiceSpec extends PlaySpec
   with MockitoSugar

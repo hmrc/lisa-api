@@ -14,29 +14,22 @@ private object AppDependencies {
   import play.sbt.PlayImport._
   import play.core.PlayVersion
 
-  private val microserviceBootstrapVersion = "5.14.0"
-  private val playHealthVersion = "2.0.0"
-  private val logbackJsonLoggerVersion = "3.1.0"
-  private val playConfigVersion = "3.0.0"
-  private val domainVersion = "4.0.0"
+  private val microserviceBootstrapVersion = "6.13.0"
+  private val domainVersion = "5.0.0"
+  private val authclientVersion = "2.3.0"
   private val hmrcTestVersion = "2.2.0"
   private val scalaTestVersion = "2.2.6"
   private val pegdownVersion = "1.6.0"
   private val apiPlatformlibVersion = "1.3.0"
   private val metricsGraphiteVersion = "3.0.2"
-  private val playGraphiteVersion = "3.1.0"
 
   val compile = Seq(
     ws,
     "uk.gov.hmrc" %% "microservice-bootstrap" % microserviceBootstrapVersion,
-    "uk.gov.hmrc" %% "play-auth" % "1.0.0",
-    "uk.gov.hmrc" %% "play-health" % playHealthVersion,
-    "uk.gov.hmrc" %% "play-config" % playConfigVersion,
-    "uk.gov.hmrc" %% "logback-json-logger" % logbackJsonLoggerVersion,
+    "uk.gov.hmrc" %% "auth-client" % authclientVersion,
     "uk.gov.hmrc" %% "domain" % domainVersion,
     "uk.gov.hmrc" %% "play-hmrc-api" % apiPlatformlibVersion,
-    "com.codahale.metrics" % "metrics-graphite" % metricsGraphiteVersion,
-    "uk.gov.hmrc" %% "play-graphite" % playGraphiteVersion
+    "com.codahale.metrics" % "metrics-graphite" % metricsGraphiteVersion
   )
 
   trait TestDependencies {
