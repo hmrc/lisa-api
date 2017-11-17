@@ -21,7 +21,8 @@
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
                 <p class ="code--block"> {<br>
                                          "data": {<br>
-                                           "LISA Account firstSubscriptionDate has been updated successfully",<br>
+                                           "message": "LISA Account firstSubscriptionDate has been updated successfully",<br>
+                                           "code": "UPDATED",<br>
                                            "accountId": "1234567890"<br>
                                          }<br>
                                          "success": true,<br>
@@ -30,6 +31,48 @@
                 </p>
             </td>
         </tr>
+        <tr>
+            <td><p>Request with a valid payload, LISA Manager Reference Number and Account ID</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567891</p></td>
+            <td>
+                <p class ="code--block"> {<br>
+                                     	  "firstSubscriptionDate" : "2017-05-05"<br>
+                                          }
+                </p>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
+                <p class ="code--block"> {<br>
+                                         "data": {<br>
+                                           "message": "LISA account dateOffirstSubscription has been successfully updated",<br>
+                                           "code": "UPDATED_AND_ACCOUNT_OPENED",<br>
+                                           "accountId": "1234567890"<br>
+                                         }<br>
+                                         "success": true,<br>
+                                         "status": 200<br>
+                                       }
+                </p>
+            </td>
+        </tr> 
+        <tr>
+            <td><p>Request with a valid payload, LISA Manager Reference Number and Account ID</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567892</p></td>
+            <td>
+                <p class ="code--block"> {<br>
+                                     	  "firstSubscriptionDate" : "2017-05-05"<br>
+                                          }
+                </p>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
+                <p class ="code--block"> {<br>
+                                         "data": {<br>
+                                           "message": "LISA account dateOffirstSubscription has been successfully updated. The account status has been changed to 'Void' as the Investor has another account with a more recent firstSubscriptionDate",<br>
+                                           "code": "UPDATED_AND_ACCOUNT_VOIDED",<br>
+                                           "accountId": "1234567890"<br>
+                                         }<br>
+                                         "success": true,<br>
+                                         "status": 200<br>
+                                       }
+                </p>
+            </td>
+        </tr>                
         <tr>
             <td><p>Request with a valid payload and AccountID, but an invalid LISA Manager Reference Number</p><p class ="code--block">lisaManagerReferenceNumber: A12345<br>accountId: 1234567890</p></td>
             <td>

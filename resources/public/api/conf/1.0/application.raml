@@ -544,7 +544,10 @@ types:
                                     description: The first Subscription is updated successfully.
                                     body:
                                       application/json:
-                                          example: !include examples/LISAAccount.subscription.response.json
+                                        examples:
+                                          example-1: !include examples/LISAAccount.subscription.response.json
+                                          example-2: !include examples/LISAAccount.update.opened.subscription.response.json
+                                          example-3: !include examples/LISAAccount.update.voided.subscription.response.json
                                   400:
                                     body:
                                       application/json:
