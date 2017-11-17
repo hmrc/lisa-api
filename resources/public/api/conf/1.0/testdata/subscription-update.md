@@ -44,7 +44,7 @@
                                          "data": {<br>
                                            "message": "LISA account dateOffirstSubscription has been successfully updated",<br>
                                            "code": "UPDATED_AND_ACCOUNT_OPENED",<br>
-                                           "accountId": "1234567890"<br>
+                                           "accountId": "1234567891"<br>
                                          }<br>
                                          "success": true,<br>
                                          "status": 200<br>
@@ -65,7 +65,7 @@
                                          "data": {<br>
                                            "message": "LISA account dateOffirstSubscription has been successfully updated. The account status has been changed to 'Void' as the Investor has another account with a more recent firstSubscriptionDate",<br>
                                            "code": "UPDATED_AND_ACCOUNT_VOIDED",<br>
-                                           "accountId": "1234567890"<br>
+                                           "accountId": "1234567892"<br>
                                          }<br>
                                          "success": true,<br>
                                          "status": 200<br>
@@ -105,7 +105,7 @@
                                                 {<br>
                                                   "code": "INVALID_DATE",<br>
                                                   "message": "Date is invalid",<br>
-                                                  "path": "/closureDate"<br>
+                                                  "path": "/firstSubscriptionDate"<br>
                                                 }<br>
                                               ]<br>
 }
