@@ -21,7 +21,7 @@
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
                 <p class ="code--block"> {<br>
                                          "data": {<br>
-                                           "message": "LISA Account firstSubscriptionDate has been updated successfully",<br>
+                                           "message": "LISA account dateOffirstSubscription has been successfully updated",<br>
                                            "code": "UPDATED",<br>
                                            "accountId": "1234567890"<br>
                                          }<br>
@@ -42,7 +42,7 @@
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
                 <p class ="code--block"> {<br>
                                          "data": {<br>
-                                           "message": "LISA account dateOffirstSubscription has been successfully updated",<br>
+                                           "message": "LISA account dateOffirstSubscription has been successfully updated and the account status has been changed to Open",<br>
                                            "code": "UPDATED_AND_ACCOUNT_OPENED",<br>
                                            "accountId": "1234567891"<br>
                                          }<br>
