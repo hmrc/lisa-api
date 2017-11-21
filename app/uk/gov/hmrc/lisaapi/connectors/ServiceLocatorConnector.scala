@@ -17,9 +17,9 @@
 package uk.gov.hmrc.lisaapi.connectors
 
 import play.api.Logger
+import uk.gov.hmrc.http.{HeaderCarrier, HttpPost}
 import uk.gov.hmrc.lisaapi.config.{AppContext, WSHttp}
 import uk.gov.hmrc.lisaapi.domain.Registration
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
