@@ -1,0 +1,1 @@
+When you report or get information from the API, you will get a unique reference number. You must save all reference numbers for GET requests.
