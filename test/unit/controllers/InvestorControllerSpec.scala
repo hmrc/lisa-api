@@ -66,7 +66,7 @@ class InvestorControllerSpec extends PlaySpec
   override def beforeEach() {
     reset(mockAuditService)
     reset(mockService)
-    when(mockAuthCon.authorise[Option[String]](any(),any())(any())).thenReturn(Future(Some("1234")))
+    when(mockAuthCon.authorise[Option[String]](any(),any())(any(), any())).thenReturn(Future(Some("1234")))
   }
 
   "The Investor Controller" should {

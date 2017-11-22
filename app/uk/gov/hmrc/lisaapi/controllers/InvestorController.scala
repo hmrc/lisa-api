@@ -25,8 +25,7 @@ import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, InvestorService}
-import uk.gov.hmrc.play.http.HeaderCarrier
-
+import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class InvestorController extends LisaController with LisaConstants  {
