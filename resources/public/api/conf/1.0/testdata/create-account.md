@@ -234,7 +234,7 @@
             <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
                 <p class ="code--block"> {<br>
                                          "code": "TRANSFER_ACCOUNT_DATA_PROVIDED",<br>
-                                         "message": "transferredFromAccountId, transferedFromLMRN, and transferInDate fields should only be completed when the creationReason is \"Transferred\"."<br>
+                                         "message": "transferredFromAccountId, transferredFromLMRN, and transferInDate fields should only be completed when the creationReason is \"Transferred\"."<br>
                                        }
                 </p>
             </td>
@@ -291,7 +291,7 @@
             <td><p>HTTP status: <code class="code--slim">409 (Conflict)</code></p>
                 <p class ="code--block"> {<br>
                                             "code": "INVESTOR_ACCOUNT_ALREADY_EXISTS",<br>
-                                            "message": "The LISA account already exists",<br>
+                                            "message": "This investor already has a LISA account.",<br>
                                             "accountId": "1234567890"<br>
                                           }
                 </p>

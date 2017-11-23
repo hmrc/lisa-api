@@ -76,11 +76,11 @@ types:
                        startDate:
                         type : ISO8601Date
                         description: The start date of the date range for the payment request.
-                        example: "2017-05-05"
+                        example: "2017-05-20"
                        endDate:
                         type : ISO8601Date
                         description: The end date of the date range for the payment request.
-                        example: "2017-05-05"
+                        example: "2017-05-20"
                       get:
                           is: [headers.acceptHeader]
                           displayName: Retrieve Payment details
@@ -292,14 +292,14 @@ types:
                                             "message" : "Previous Investor Account Doesn’t Exist"
                                           }
                                       noTransferAccntData:
-                                        description: transferredFromAccountId, transferedFromLMRN and transferInDate are required fields when the creationReason is "Transferred".
+                                        description: transferredFromAccountId, transferredFromLMRN and transferInDate are required when the creationReason is "Transferred".
                                         value: |
                                           {
                                             "code" : "TRANSFER_ACCOUNT_DATA_NOT_PROVIDED",
                                             "message" : "transfer account data not provided"
                                           }
                                       transferAccntDataProvided:
-                                        description: transferredFromAccountId, transferedFromLMRN, and transferInDate fields should only be completed when the creationReason is "Transferred".
+                                        description: transferredFromAccountId, transferredFromLMRN, and transferInDate should only be completed when the creationReason is "Transferred".
                                         value: |
                                           {
                                             "code" : "TRANSFER_ACCOUNT_DATA_PROVIDED",
@@ -315,12 +315,12 @@ types:
                               409:
                                 body:
                                   application/json:
-                                    description: The LISA account already exists
+                                    description: This investor already has a LISA account.
                                     type: !include schemas/ErrorCodes.schema.json
                                     example: |
                                       {
                                         "code": "INVESTOR_ACCOUNT_ALREADY_EXISTS",
-                                        "message": "The LISA account already exists",
+                                        "message": "This investor already has a LISA account.",
                                         "accountId": "1234567890"
                                       }
                       /{accountId}:
@@ -373,11 +373,11 @@ types:
                                         type: !include schemas/ErrorCodes.schema.json
                                         examples:
                                           accountIdNOTFound:
-                                            description: The accountId given does not match with HMRC’s records.
+                                            description: The accountId does not match HMRC’s records.
                                             value: |
                                               {
                                                 "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
-                                                "message": "The accountId given does not match with HMRC’s records."
+                                                "message": "The accountId does not match HMRC’s records."
                                               }
                             /close-account:
                               post:
@@ -443,11 +443,11 @@ types:
                                                 "message": "The LISA account has already been closed or voided."
                                               }
                                           accountCancellationPeriodExceeded:
-                                            description: The account cannot be closed with a closure reason of 'Cancellation' as the cancellation period has been exceeded
+                                            description: You cannot close the account with cancellation as the reason because the cancellation period is over
                                             value: |
                                               {
                                                 "code": "CANCELLATION_PERIOD_EXCEEDED",
-                                                "message": "The account cannot be closed with a closure reason of 'Cancellation' as the cancellation period has been exceeded"
+                                                "message": "You cannot close the account with cancellation as the reason because the cancellation period is over"
                                               }
                                           accountWithinCancellationPeriod:
                                             description: The account cannot be closed with a closure reason of 'All funds withdrawn' as this  is still within the cancellation period
@@ -457,11 +457,23 @@ types:
                                                 "message": "The account cannot be closed with a closure reason of 'All funds withdrawn' as this  is still within the cancellation period"
                                               }
                                           accountBonusPaymentRequired:
-                                            description: The account cannot be closed with a closure reason of 'Cancellation' as a bonus payment needs to be repaid
+                                            description: You cannot close the account with cancellation as the reason because you need to repay a bonus payment
                                             value: |
                                               {
                                                 "code": "BONUS_REPAYMENT_REQUIRED",
-                                                "message": "The account cannot be closed with a closure reason of 'Cancellation' as a bonus payment needs to be repaid"
+                                                "message": "You cannot close the account with cancellation as the reason because you need to repay a bonus payment"
+                                              }
+                                  404:
+                                    body:
+                                      application/json:
+                                        type: !include schemas/ErrorCodes.schema.json
+                                        examples:
+                                          accountIdNOTFound:
+                                            description: The accountId does not match HMRC’s records.
+                                            value: |
+                                              {
+                                                "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
+                                                "message": "The accountId does not match HMRC’s records."
                                               }
                             /reinstate-account:
                               post:
@@ -510,17 +522,17 @@ types:
                                         type: !include schemas/ErrorCodes.schema.json
                                         examples:
                                           accountIdNOTFound:
-                                            description: The accountId given does not match with HMRC’s records.
+                                            description: The accountId does not match HMRC’s records.
                                             value: |
                                               {
                                                 "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
-                                                "message": "The accountId given does not match with HMRC’s records."
+                                                "message": "The accountId does not match HMRC’s records."
                                               }
 
                                   403:
                                     body:
                                       application/json:
-                                        description:  Investor Account may have been transferred or is active.
+                                        description:  Investor account may have been transferred or is active.
                                         type: !include schemas/ErrorCodes.schema.json
                                         example: |
                                           {
@@ -594,11 +606,11 @@ types:
                                                 "message" : "The Investor Account is already closed"
                                               }
                                           accountVoided:
-                                            description: The LISA account is already voided.
+                                            description: The LISA account is already void.
                                             value: |
                                               {
                                                 "code" : "INVESTOR_ACCOUNT_ALREADY_VOID",
-                                                "message" : "The Investor Account is already voided"
+                                                "message" : "The Investor Account is already void"
                                               }
                                   404:
                                     body:
@@ -606,11 +618,11 @@ types:
                                         type: !include schemas/ErrorCodes.schema.json
                                         examples:
                                           accountIdNOTFound:
-                                            description: The accountId given does not match with HMRC’s records.
+                                            description: The accountId does not match HMRC’s records.
                                             value: |
                                               {
                                                 "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
-                                                "message": "The accountId given does not match with HMRC’s records."
+                                                "message": "The accountId does not match HMRC’s records."
                                               }
                             /events:
                               description: !include documentation/LifeEvent
@@ -695,11 +707,11 @@ types:
                                         type: !include schemas/ErrorCodes.schema.json
                                         examples:
                                           accountIdNOTFound:
-                                            description: The accountId given does not match with HMRC’s records.
+                                            description: The accountId does not match HMRC’s records.
                                             value: |
                                               {
                                                 "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
-                                                "message": "The accountId given does not match with HMRC’s records."
+                                                "message": "The accountId does not match HMRC’s records."
                                               }
                                   409:
                                     body:
@@ -758,11 +770,11 @@ types:
                                           type: !include schemas/ErrorCodes.schema.json
                                           examples:
                                             accountIdNOTFound:
-                                              description: The accountId given does not match with HMRC’s records.
+                                              description: The accountId does not match HMRC’s records.
                                               value: |
                                                 {
                                                   "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
-                                                  "message": "The accountId given does not match with HMRC’s records."
+                                                  "message": "The accountId does not match HMRC’s records."
                                                 }
                             /transactions:
                               description: !include documentation/LISATransaction
@@ -867,11 +879,11 @@ types:
                                                 "message" : "The lifeEventId does not match with HMRC’s records."
                                               }
                                           accountIdNOTFound:
-                                            description: The accountId given does not match with HMRC’s records.
+                                            description: The accountId does not match HMRC’s records.
                                             value: |
                                               {
                                                 "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
-                                                "message": "The accountId given does not match with HMRC’s records."
+                                                "message": "The accountId does not match HMRC’s records."
                                               }
                                   409:
                                       body:
@@ -882,8 +894,8 @@ types:
                                               description: The investor's bonus payment has already been requested.
                                               value: |
                                                 {
-                                                  "code" : "BONUS_CLAIM_ALREADY_EXISTS",
-                                                  "message" : "The investor's bonus payment has already been requested."
+                                                  "code" : "TRANSACTION_ALREADY_EXISTS",
+                                                  "message" : "A transaction already exists with similar data"
                                                 }
                               /{transactionId}:
                                    uriParameters:
@@ -935,18 +947,18 @@ types:
                                              type: !include schemas/ErrorCodes.schema.json
                                              examples:
                                                noTransaction:
-                                                 description: The transactionId does not match with HMRC’s records.
+                                                 description: The transactionId does not match HMRC’s records.
                                                  value: |
                                                    {
                                                      "code" : "TRANSACTION_NOT_FOUND",
-                                                     "message" : "The transactionId does not match with HMRC’s records."
+                                                     "message" : "The transactionId does not match HMRC’s records"
                                                    }
                                                accountIdNOTFound:
-                                                 description: The accountId given does not match with HMRC’s records.
+                                                 description: The accountId does not match HMRC’s records.
                                                  value: |
                                                    {
                                                      "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
-                                                     "message": "The accountId given does not match with HMRC’s records."
+                                                     "message": "The accountId does not match HMRC’s records."
                                                    }
                                    /payments:
                                      get:
@@ -982,16 +994,16 @@ types:
                                                 type: !include schemas/ErrorCodes.schema.json
                                                 examples:
                                                   noTransaction:
-                                                    description: The transactionId does not match with HMRC’s records.
+                                                    description: The transactionId does not match HMRC’s records.
                                                     value: |
                                                       {
                                                         "code" : "TRANSACTION_NOT_FOUND",
-                                                        "message" : "The transactionId does not match with HMRC’s records."
+                                                        "message" : "The transactionId does not match HMRC’s records."
                                                       }
                                                   accountIdNOTFound:
-                                                    description: The accountId given does not match with HMRC’s records.
+                                                    description: The accountId does not match HMRC’s records.
                                                     value: |
                                                       {
                                                         "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
-                                                        "message": "The accountId given does not match with HMRC’s records."
+                                                        "message": "The accountId does not match HMRC’s records."
                                                       }
