@@ -9,8 +9,8 @@
     "dateSubmitted" : "2017-10-22T11:33Z",
     "financialPeriod" :
     {
-       "startDate" : "2017-04-05",
-      "endDate" : "2017-04-06"
+       "startDate" : "2017-04-06",
+      "endDate" : "2017-04-05"
     },
     "amount" : 123.45,
 
@@ -82,8 +82,8 @@
     "dateSubmitted" : "2017-10-22T11:33Z",
     "financialPeriod" :
     {
-       "startDate" : "2017-04-05",
-      "endDate" : "2017-04-06"
+       "startDate" : "2017-04-06",
+      "endDate" : "2017-04-05"
     },
     "amount" : 123.45,
 

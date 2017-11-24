@@ -15,7 +15,7 @@
             <td>
                 <p class ="code--block"> {<br>
                                      	  "accountClosureReason":"All funds withdrawn",<br>
-                                     	  "closureDate": "2017-01-03"<br>
+                                     	  "closureDate": "2017-01-20"<br>
                                         }
                 </p>
             </td>
@@ -36,7 +36,7 @@
             <td>
                 <p class ="code--block"> {<br>
                                           "accountClosureReason":"Cancellation",<br>
-                                          "closureDate": "2017-01-03"<br>
+                                          "closureDate": "2017-01-20"<br>
                                         }
                 </p>
             </td>
@@ -57,7 +57,7 @@
             <td>
                 <p class ="code--block"> {<br>
                                      	  "accountClosureReason":"All funds withdrawn",<br>
-                                     	  "closureDate": "2017-01-03"<br>
+                                     	  "closureDate": "2017-01-20"<br>
                                         }
                 </p>
             </td>
@@ -102,7 +102,7 @@
             <td>
                 <p class ="code--block"> {<br>
                                      	  "accountClosureReason": "All funds withdrawn",<br>
-                                     	  "closureDate": "2017-01-03"<br>
+                                     	  "closureDate": "2017-01-20"<br>
                                         }
                 </p>
             </td>
@@ -119,14 +119,14 @@
             <td>
                 <p class ="code--block"> {<br>
                                           "accountClosureReason": "Cancellation",<br>
-                                          "closureDate": "2017-01-03"<br>
+                                          "closureDate": "2017-01-20"<br>
                                         }
                 </p>
             </td>
             <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
                 <p class ="code--block"> {<br>
                                             "code": "CANCELLATION_PERIOD_EXCEEDED",<br>
-                                            "message": "The account cannot be closed with a closure reason of 'Cancellation' as the cancellation period has been exceeded"<br>
+                                            "message": "You cannot close the account with cancellation as the reason because the cancellation period is over"<br>
                                        }
                 </p>
             </td>
@@ -137,7 +137,7 @@
             <td>
                 <p class ="code--block"> {<br>
                                           "accountClosureReason": "All funds withdrawn",<br>
-                                          "closureDate": "2017-01-03"<br>
+                                          "closureDate": "2017-01-20"<br>
                                         }
                 </p>
             </td>
@@ -154,14 +154,14 @@
             <td>
                 <p class ="code--block"> {<br>
                                           "accountClosureReason": "Cancellation",<br>
-                                          "closureDate": "2017-01-03"<br>
+                                          "closureDate": "2017-01-20"<br>
                                         }
                 </p>
             </td>
             <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
                 <p class ="code--block"> {<br>
                                             "code": "BONUS_REPAYMENT_REQUIRED",<br>
-                                            "message": "The account cannot be closed with a closure reason of 'Cancellation' as a bonus payment needs to be repaid"<br>
+                                            "message": "You cannot close the account with cancellation as the reason because you need to repay a bonus payment"<br>
                                        }
                 </p>
             </td>
@@ -171,14 +171,14 @@
             <td>
                 <p class ="code--block"> {<br>
                                      	  "accountClosureReason": "All funds withdrawn",<br>
-                                     	  "closureDate": "2017-01-03"<br>
+                                     	  "closureDate": "2017-01-20"<br>
                                         }
                 </p>
             </td>
             <td><p>HTTP status: <code class="code--slim">404 (Not Found)</code></p>
                 <p class ="code--block"> {<br>
                                             "code": "INVESTOR_ACCOUNTID_NOT_FOUND",<br>
-                                            "message": "The accountId given does not match with HMRC’s records"<br>
+                                            "message": "The accountId does not match HMRC’s records."<br>
                                        }
                 </p>
             </td>
@@ -188,7 +188,7 @@
             <td>
                 <p class ="code--block"> {<br>
                                           "accountClosureReason": "All funds withdrawn",<br>
-                                          "closureDate": "2017-01-03"<br>
+                                          "closureDate": "2017-01-20"<br>
                                         }
                 </p>
             </td>

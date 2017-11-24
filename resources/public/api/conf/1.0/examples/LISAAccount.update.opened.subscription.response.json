@@ -1,6 +1,6 @@
 {
   "data": {
-    "message": "LISA account dateOffirstSubscription has been successfully updated and the account status has been changed to Open",
+    "message": "Successfully updated the firstSubscriptionDate for the LISA account and changed the account status to Open",
     "code": "UPDATED_AND_ACCOUNT_OPENED",
     "accountId": "1234567891"
   },

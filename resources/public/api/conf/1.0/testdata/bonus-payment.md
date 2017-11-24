@@ -457,7 +457,7 @@
             <td><p>HTTP status: <code class="code--slim">404 (Not Found)</code></p>
                 <p class ="code--block"> {<br>
                                             "code": "INVESTOR_ACCOUNTID_NOT_FOUND",<br>
-                                            "message": "The accountId given does not match with HMRC’s records."<br>
+                                            "message": "The accountId does not match HMRC’s records"<br>
                                           }
                 </p>
             </td>
@@ -568,7 +568,7 @@
             <td><p>HTTP status: <code class="code--slim">409 (Conflict)</code></p>
                 <p class ="code--block"> {<br>
                                             "code": "TRANSACTION_ALREADY_EXISTS",<br>
-                                            "message": "A transaction already exists with similar data. ",<br>
+                                            "message": "A transaction already exists with similar data",<br>
                                             "id": "7777777777"<br>
                                           }
                 </p>

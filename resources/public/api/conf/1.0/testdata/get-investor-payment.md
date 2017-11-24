@@ -16,10 +16,10 @@
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
                 <p class ="code--block">{<br>
 					     "transactionId": "1234567890",<br>
-					     "creationDate": "2017-05-05",<br>
+					     "creationDate": "2017-05-20",<br>
 					     "bonusDueForPeriod": 1000,<br>
 					     "status": "Paid",<br>
-					     "paymentDate": "2017-05-05",<br>
+					     "paymentDate": "2017-05-20",<br>
 					     "paymentReference": "002630000993",<br>
 					     "paymentAmount": 1000<br>
 						}
@@ -32,7 +32,7 @@
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
                 <p class ="code--block">{<br>
 						     "transactionId": "0000000200",<br>
-						     "creationDate": "2017-05-05",<br>
+						     "creationDate": "2017-05-20",<br>
 						     "bonusDueForPeriod": 1000,<br>
 						     "status": "Pending"<br>
 						}
@@ -45,10 +45,10 @@
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
                 <p class ="code--block">{<br>
 						    "transactionId": "3000000200",<br>
-						    "creationDate": "2017-05-05",<br>
+						    "creationDate": "2017-05-20",<br>
 						    "bonusDueForPeriod": 1000,<br>
 						    "status": "Pending",<br>
-						    "paymentDueDate": "2017-06-05",<br>
+						    "paymentDueDate": "2017-06-20",<br>
 						    "paymentAmount": 1000<br>
 						}
                 </p>
@@ -60,7 +60,7 @@
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
                 <p class ="code--block">{<br>
 						    "transactionId": "1000000200",<br>
-						    "creationDate": "2017-05-05",<br>
+						    "creationDate": "2017-05-20",<br>
 						    "bonusDueForPeriod": 1000,<br>
 						    "status": "Cancelled",<br>						}
                 </p>
@@ -72,7 +72,7 @@
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
                 <p class ="code--block">{<br>
 						    "transactionId": "2000000200",<br>
-						    "creationDate": "2017-05-05",<br>
+						    "creationDate": "2017-05-20",<br>
 						    "bonusDueForPeriod": 1000,<br>
 						    "status": "Superceded",<br>						}
                 </p>
@@ -84,7 +84,7 @@
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
                 <p class ="code--block">{<br>
 					     "transactionId": "5000000200",<br>
-					     "creationDate": "2017-05-05",<br>
+					     "creationDate": "2017-05-20",<br>
 					     "status": "Due",<br>
 					     "chargeReference": "XM002610108957"<br>
 						}
@@ -108,7 +108,7 @@
             <td><p>HTTP status: <code class="code--slim">404 (Not found)</code></p>
                 <p class ="code--block"> {<br>
                                             "code": "TRANSACTION_NOT_FOUND",<br>
-                                            "message": "The transactionId does not match with HMRC’s records."<br>
+                                            "message": "The transactionId does not match HMRC’s records."<br>
                                           }
                 </p>
             </td>
@@ -119,7 +119,7 @@
             <td><p>HTTP status: <code class="code--slim">404 (Not found)</code></p>
                 <p class ="code--block"> {<br>
                                             "code": "INVESTOR_ACCOUNTID_NOT_FOUND",<br>
-                                            "message": "The accountId given does not match with HMRC’s records"<br>
+                                            "message": "The accountId does not match HMRC’s records."<br>
                                           }
                 </p>
             </td>

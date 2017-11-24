@@ -81,7 +81,7 @@
 				<p class ="code--block">
 					{<br>
 						"code": "INVESTOR_ACCOUNTID_NOT_FOUND",<br>
-						"message": "The accountId given does not match with HMRC’s records"<br>					}
+						"message": "The accountId does not match HMRC’s records."<br>					}
 				</p>
 			</td>
 		</tr>
@@ -99,8 +99,8 @@
 				<p>HTTP status: <code class="code--slim">404 (Not Found)</code></p>
 				<p class ="code--block">
 					{<br>
-						"code": "BONUS_PAYMENT_TRANSACTION_NOT_FOUND",<br>
-						"message": "The bonusPaymentTransactionId does not match with HMRC’s records"<br>					}
+						"code": "TRANSACTION_NOT_FOUND",<br>
+						"message": "The transactionId does not match HMRC’s records."<br>					}
 				</p>
 			</td>
 		</tr>

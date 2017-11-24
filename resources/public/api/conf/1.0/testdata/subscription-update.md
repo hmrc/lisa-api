@@ -14,7 +14,7 @@
             <td><p>Request with a valid payload, LISA Manager Reference Number and Account ID</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                     	  "firstSubscriptionDate" : "2017-05-05"<br>
+                                     	  "firstSubscriptionDate" : "2017-05-20"<br>
                                           }
                 </p>
             </td>
@@ -35,7 +35,7 @@
             <td><p>Request with a valid payload, LISA Manager Reference Number and Account ID</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567891</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                     	  "firstSubscriptionDate" : "2017-05-05"<br>
+                                     	  "firstSubscriptionDate" : "2017-05-20"<br>
                                           }
                 </p>
             </td>
@@ -56,7 +56,7 @@
             <td><p>Request with a valid payload, LISA Manager Reference Number and Account ID</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567892</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                     	  "firstSubscriptionDate" : "2017-05-05"<br>
+                                     	  "firstSubscriptionDate" : "2017-05-20"<br>
                                           }
                 </p>
             </td>
@@ -77,7 +77,7 @@
             <td><p>Request with a valid payload and AccountID, but an invalid LISA Manager Reference Number</p><p class ="code--block">lisaManagerReferenceNumber: A12345<br>accountId: 1234567890</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                             "firstSubscriptionDate" : "2017-05-05"<br>
+                                             "firstSubscriptionDate" : "2017-05-20"<br>
                                 }
                 </p>
             </td>
@@ -116,7 +116,7 @@
             <td><p>Request for an account that has already been closed</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 0000000901</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                     	  "firstSubscriptionDate": "2017-01-03"<br>
+                                     	  "firstSubscriptionDate": "2017-01-20"<br>
                                         }
                 </p>
             </td>
@@ -132,14 +132,14 @@
             <td><p>Request for an account that has already been voided</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 0000000902</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                          "firstSubscriptionDate": "2017-01-03"<br>
+                                          "firstSubscriptionDate": "2017-01-20"<br>
                                         }
                 </p>
             </td>
             <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
                 <p class ="code--block"> {<br>
                                             "code": "INVESTOR_ACCOUNT_ALREADY_VOID",<br>
-                                            "message": "The LISA account is already voided"<br>
+                                            "message": "The LISA account is already void"<br>
                                        }
                 </p>
             </td>
@@ -148,14 +148,14 @@
             <td><p>Request containing an Account ID that does not exist</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 0000000404</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                     	  "firstSubscriptionDate": "2017-01-03"<br>
+                                     	  "firstSubscriptionDate": "2017-01-20"<br>
                                         }
                 </p>
             </td>
             <td><p>HTTP status: <code class="code--slim">404 (Not Found)</code></p>
                 <p class ="code--block"> {<br>
                                             "code": "INVESTOR_ACCOUNTID_NOT_FOUND",<br>
-                                            "message": "The accountId given does not match with HMRC’s records"<br>
+                                            "message": "The accountId does not match HMRC’s records."<br>
                                        }
                 </p>
             </td>
@@ -164,7 +164,7 @@
             <td><p>Request with an invalid 'Accept' header</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890<br><br>Accept: application/vnd.hmrc.1.0</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                          "firstSubscriptionDate": "2017-01-03"<br>
+                                          "firstSubscriptionDate": "2017-01-20"<br>
                                         }
                 </p>
             </td>
