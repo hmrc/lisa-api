@@ -19,7 +19,7 @@
                                          "status": 200,<br>
                                          "success": true,<br>
                                          "data": {<br>
-                                           "message": "LISA ccount reinstated",<br>
+                                           "message": "LISA account reinstated",<br>
                                            "accountId": "8765432100"<br>
                                          }<br>
                                        }
