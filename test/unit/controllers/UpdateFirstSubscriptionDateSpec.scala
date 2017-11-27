@@ -96,9 +96,9 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
     }
 
 
-    "audit an firstSubscriptionDateUpdate event with response as UPDATED_AND_ACCOUNT_VOIDED" when {
+    "audit an firstSubscriptionDateUpdate event with response as UPDATED_AND_ACCOUNT_VOID" when {
       "submitted a valid first subscription update request" in {
-        when(mockService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionSuccessResponse("UPDATED_AND_ACCOUNT_VOIDED", "message")))
+        when(mockService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionSuccessResponse("UPDATED_AND_ACCOUNT_VOID", "message")))
         doUpdateSubsDate(updateFirstSubscriptionDate) { result =>
           await(result)
 
@@ -207,8 +207,8 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
   }
 
   "return with status 200 created and an account Id" when {
-    "submitted a valid update subscription request request and response UPDATED_AND_ACCOUNT_VOIDED" in {
-      when(mockService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionSuccessResponse("UPDATED_AND_ACCOUNT_VOIDED", "message")))
+    "submitted a valid update subscription request request and response UPDATED_AND_ACCOUNT_VOID" in {
+      when(mockService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionSuccessResponse("UPDATED_AND_ACCOUNT_VOID", "message")))
       doUpdateSubsDate(updateFirstSubscriptionDate) { res =>
         status(res) mustBe (OK)
       }

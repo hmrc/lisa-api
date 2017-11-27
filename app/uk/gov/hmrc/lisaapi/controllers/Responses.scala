@@ -154,7 +154,7 @@ object AccountFirstSubscriptionUpdated {
     code match {
       case "UPDATED" => ResponseWithAccountId(200, "UPDATED", "Successfully updated the firstSubscriptionDate for the LISA account", accountId)
       case "UPDATED_AND_ACCOUNT_OPENED" => ResponseWithAccountId(200, "UPDATED_AND_ACCOUNT_OPENED", "Successfully updated the firstSubscriptionDate for the LISA account and changed the account status to Open", accountId)
-      case "UPDATED_AND_ACCOUNT_VOIDED" => ResponseWithAccountId(200, "UPDATED_AND_ACCOUNT_VOIDED", "Successfully updated the firstSubscriptionDate for the LISA account. Changed the account status to 'Void' as the Investor has another account with a more recent firstSubscriptionDate", accountId)
+      case "UPDATED_AND_ACCOUNT_VOID" => ResponseWithAccountId(200, "UPDATED_AND_ACCOUNT_VOID", "Successfully updated the firstSubscriptionDate for the LISA account. Changed the account status to 'Void' as the Investor has another account with a more recent firstSubscriptionDate", accountId)
     }
   }
 }
