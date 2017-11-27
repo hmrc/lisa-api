@@ -44,11 +44,10 @@ class UpdateSubscriptionController extends LisaController with LisaConstants {
             Logger.debug("Entering Updated subscription Controller and the response is " + result.toString)
             result match {
               case success: UpdateSubscriptionSuccessResponse => {
-                val resultRes = AccountFirstSubscriptionUpdated(accountId, success.code)
                 Logger.debug("First Subscription date updated")
                 doAudit(lisaManager, accountId, updateSubsRequest, "firstSubscriptionDateUpdated")
 
-                val data = ApiResponseData(message = resultRes.message, code = Some(resultRes.code), accountId = Some(accountId))
+                val data = ApiResponseData(message = success.message, code = Some(success.code) ,accountId = Some(accountId))
                 LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.UPDATE_SUBSCRIPTION)
                 Ok(Json.toJson(ApiResponse(data = Some(data), success = true, status = 200)))
               }
