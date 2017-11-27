@@ -77,7 +77,9 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
     }
 
 
-      "the data service returns a UpdateFirstSubscriptionDateAccountAlreadyVoidedResponse for a create request" in {
+
+
+    "the data service returns a UpdateFirstSubscriptionDateAccountAlreadyVoidedResponse for a create request" in {
         when(mockService.updateSubscription(any(), any(),any())(any())).thenReturn(Future.successful(UpdateSubscriptionAccountVoidedResponse))
 
         doUpdateSubsDate(updateFirstSubscriptionDate) {result =>
@@ -149,13 +151,14 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
     }
 
     "return with status 200 created and an account Id" when {
-      "submitted a valid create account request" in {
-        when(mockService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionSuccessResponse("code", "message")))
+      "submitted a valid update subscription request request and response UPDATED" in {
+        when(mockService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionSuccessResponse("UPDATED", "message")))
         doUpdateSubsDate(updateFirstSubscriptionDate) { res =>
           status(res) mustBe (OK)
         }
       }
     }
+
 
     "return with status 400 bad request and a code of BAD_REQUEST" when {
       "invalid json is sent" in {

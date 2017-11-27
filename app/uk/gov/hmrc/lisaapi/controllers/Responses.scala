@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
+import play.api.Logger
 import play.api.libs.json.Json
 
 sealed abstract class ErrorResponse(
@@ -51,6 +52,7 @@ case class ErrorResponseWithAccountId(
                                          message: String,
                                          accountId: String
                                        )
+
 
 case class ErrorValidation(
                              errorCode: String,
@@ -90,11 +92,11 @@ case object ErrorInvestorNotEligible extends ErrorResponse(403, "INVESTOR_ELIGIB
 
 case object ErrorInvestorComplianceCheckFailed extends ErrorResponse(403, "INVESTOR_COMPLIANCE_CHECK_FAILED", "The investor has failed a compliance check - they may have breached ISA guidelines or regulations")
 
-case object ErrorAccountCancellationPeriodExceeded extends ErrorResponse(403, "CANCELLATION_PERIOD_EXCEEDED", "The account cannot be closed with a closure reason of 'Cancellation' as the cancellation period has been exceeded")
+case object ErrorAccountCancellationPeriodExceeded extends ErrorResponse(403, "CANCELLATION_PERIOD_EXCEEDED", "You cannot close the account with cancellation as the reason because the cancellation period is over")
 
-case object ErrorAccountWithinCancellationPeriod extends ErrorResponse(403, "ACCOUNT_WITHIN_CANCELLATION_PERIOD", "The account cannot be closed with a closure reason of 'All funds withdrawn' as this  is still within the cancellation period")
+case object ErrorAccountWithinCancellationPeriod extends ErrorResponse(403, "ACCOUNT_WITHIN_CANCELLATION_PERIOD", "You cannot close the account with all funds withdrawn as the reason because it is within the cancellation period")
 
-case object ErrorAccountBonusPaymentRequired extends ErrorResponse(403, "BONUS_REPAYMENT_REQUIRED", "The account cannot be closed with a closure reason of 'Cancellation' as a bonus payment needs to be repaid")
+case object ErrorAccountBonusPaymentRequired extends ErrorResponse(403, "BONUS_REPAYMENT_REQUIRED", "You cannot close the account with cancellation as the reason because you need to repay a bonus payment")
 
 case object ErrorPreviousAccountDoesNotExist extends ErrorResponse(403, "PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST", "The transferredFromAccountId and transferredFromLMRN given don’t match with an account on HMRC’s records")
 
@@ -104,7 +106,7 @@ case object ErrorAccountAlreadyVoided extends ErrorResponse(403, "INVESTOR_ACCOU
 
 case object ErrorAccountAlreadyClosed extends ErrorResponse(403, "INVESTOR_ACCOUNT_ALREADY_CLOSED", "The LISA account is already closed")
 
-case object ErrorAccountNotFound extends ErrorResponse(404, "INVESTOR_ACCOUNTID_NOT_FOUND", "The accountId given does not match with HMRC’s records")
+case object ErrorAccountNotFound extends ErrorResponse(404, "INVESTOR_ACCOUNTID_NOT_FOUND", "The accountId does not match HMRC’s records")
 
 case object ErrorTransferAccountDataNotProvided extends ErrorResponse(403, "TRANSFER_ACCOUNT_DATA_NOT_PROVIDED", "The transferredFromAccountId, transferredFromLMRN and transferInDate are not provided and are required for transfer of an account.")
 
@@ -114,7 +116,7 @@ case object ErrorLifeEventInappropriate extends ErrorResponse(403, "LIFE_EVENT_I
 
 case object ErrorInvalidLisaManager extends ErrorResponse(401,"UNAUTHORIZED","The lisaManagerReferenceNumber path parameter you've used doesn't match with an authorised LISA provider in HMRC's records.")
 
-case object ErrorTransactionNotFound extends ErrorResponse(404, "TRANSACTION_NOT_FOUND", "The transactionId does not match with HMRC’s records.")
+case object ErrorTransactionNotFound extends ErrorResponse(404, "TRANSACTION_NOT_FOUND", "The transactionId does not match HMRC’s records.")
 
 object ErrorInvestorAlreadyExists {
 
@@ -135,10 +137,14 @@ object ErrorLifeEventAlreadyExists {
 object ErrorAccountAlreadyExists {
 
   def apply(accountId: String) = {
-    ErrorResponseWithAccountId(409,"INVESTOR_ACCOUNT_ALREADY_EXISTS","The LISA account already exists", accountId)
+    ErrorResponseWithAccountId(409,"INVESTOR_ACCOUNT_ALREADY_EXISTS","This investor already has a LISA account.", accountId)
   }
 
 }
 
+
 case object ErrorLifeEventNotProvided extends ErrorResponse(403,"LIFE_EVENT_NOT_PROVIDED","lifeEventId is required when the claimReason is \"Life Event\"")
+
+
+
 

@@ -21,7 +21,7 @@
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
                 <p class ="code--block"> {<br>
                                          "data": {<br>
-                                           "message": "LISA account dateOffirstSubscription has been successfully updated",<br>
+                                           "message": "Successfully updated the firstSubscriptionDate for the LISA account",<br>
                                            "code": "UPDATED",<br>
                                            "accountId": "1234567890"<br>
                                          }<br>
@@ -42,7 +42,7 @@
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
                 <p class ="code--block"> {<br>
                                          "data": {<br>
-                                           "message": "LISA account dateOffirstSubscription has been successfully updated and the account status has been changed to Open",<br>
+                                           "message": "Successfully updated the firstSubscriptionDate for the LISA account and changed the account status to open",<br>
                                            "code": "UPDATED_AND_ACCOUNT_OPENED",<br>
                                            "accountId": "1234567891"<br>
                                          }<br>
@@ -63,8 +63,8 @@
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
                 <p class ="code--block"> {<br>
                                          "data": {<br>
-                                           "message": "LISA account dateOffirstSubscription has been successfully updated. The account status has been changed to 'Void' as the Investor has another account with a more recent firstSubscriptionDate",<br>
-                                           "code": "UPDATED_AND_ACCOUNT_VOIDED",<br>
+                                           "message": "Successfully updated the firstSubscriptionDate for the LISA account. Changed the account status to void as the investor has another account with a more recent firstSubscriptionDate",<br>
+                                           "code": "UPDATED_AND_ACCOUNT_VOID",<br>
                                            "accountId": "1234567892"<br>
                                          }<br>
                                          "success": true,<br>
@@ -129,7 +129,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request for an account that has already been voided</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 0000000902</p></td>
+            <td><p>Request for an account that has already been void</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 0000000902</p></td>
             <td>
                 <p class ="code--block"> {<br>
                                           "firstSubscriptionDate": "2017-01-20"<br>

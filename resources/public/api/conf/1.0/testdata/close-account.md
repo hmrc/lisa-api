@@ -144,7 +144,7 @@
             <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
                 <p class ="code--block"> {<br>
                                             "code": "ACCOUNT_WITHIN_CANCELLATION_PERIOD",<br>
-                                            "message": "The account cannot be closed with a closure reason of 'All funds withdrawn' as this  is still within the cancellation period"<br>
+                                            "message": "You cannot close the account with all funds withdrawn as the reason because it is within the cancellation period"<br>
                                        }
                 </p>
             </td>
