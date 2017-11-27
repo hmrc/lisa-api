@@ -567,8 +567,8 @@
             </td>
             <td><p>HTTP status: <code class="code--slim">409 (Conflict)</code></p>
                 <p class ="code--block"> {<br>
-                                            "code": "TRANSACTION_ALREADY_EXISTS",<br>
-                                            "message": "A transaction already exists with similar data",<br>
+                                            "code": "BONUS_CLAIM_ALREADY_EXISTS",<br>
+                                            "message": "A bonus claim already exists with similar data",<br>
                                             "id": "7777777777"<br>
                                           }
                 </p>

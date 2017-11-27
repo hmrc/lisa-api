@@ -57,9 +57,28 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
 
 
   "The update first subscription date endpoint" must {
-    "audit an firstSubscriptionDateUpdate event" when {
+    "audit an firstSubscriptionDateUpdate event with response as UPDATED" when {
       "submitted a valid first subscription update request" in {
-        when(mockService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionSuccessResponse("code", "message")))
+        when(mockService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionSuccessResponse("UPDATED", "message")))
+        doUpdateSubsDate(updateFirstSubscriptionDate) { result =>
+          await(result)
+
+          verify(mockAuditService).audit(
+            auditType = matchersEquals("firstSubscriptionDateUpdated"),
+            path= matchersEquals(s"/manager/$lisaManager/accounts/$accountId/update-subscription"),
+            auditData = matchersEquals(Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountID" -> accountId,
+              "firstSubscriptionDate" -> "2017-05-05"
+            ))
+          )(any())
+        }
+      }
+    }
+
+    "audit an firstSubscriptionDateUpdate event with response as UPDATED_AND_ACCOUNT_OPENED" when {
+      "submitted a valid first subscription update request" in {
+        when(mockService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionSuccessResponse("UPDATED_AND_ACCOUNT_OPENED", "message")))
         doUpdateSubsDate(updateFirstSubscriptionDate) { result =>
           await(result)
 
@@ -77,7 +96,28 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
     }
 
 
-      "the data service returns a UpdateFirstSubscriptionDateAccountAlreadyVoidedResponse for a create request" in {
+    "audit an firstSubscriptionDateUpdate event with response as UPDATED_AND_ACCOUNT_VOIDED" when {
+      "submitted a valid first subscription update request" in {
+        when(mockService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionSuccessResponse("UPDATED_AND_ACCOUNT_VOIDED", "message")))
+        doUpdateSubsDate(updateFirstSubscriptionDate) { result =>
+          await(result)
+
+          verify(mockAuditService).audit(
+            auditType = matchersEquals("firstSubscriptionDateUpdated"),
+            path= matchersEquals(s"/manager/$lisaManager/accounts/$accountId/update-subscription"),
+            auditData = matchersEquals(Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountID" -> accountId,
+              "firstSubscriptionDate" -> "2017-05-05"
+            ))
+          )(any())
+        }
+      }
+    }
+
+
+
+    "the data service returns a UpdateFirstSubscriptionDateAccountAlreadyVoidedResponse for a create request" in {
         when(mockService.updateSubscription(any(), any(),any())(any())).thenReturn(Future.successful(UpdateSubscriptionAccountVoidedResponse))
 
         doUpdateSubsDate(updateFirstSubscriptionDate) {result =>
@@ -149,13 +189,31 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
     }
 
     "return with status 200 created and an account Id" when {
-      "submitted a valid create account request" in {
-        when(mockService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionSuccessResponse("code", "message")))
+      "submitted a valid update subscription request request and response UPDATED" in {
+        when(mockService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionSuccessResponse("UPDATED", "message")))
         doUpdateSubsDate(updateFirstSubscriptionDate) { res =>
           status(res) mustBe (OK)
         }
       }
     }
+
+  "return with status 200 created and an account Id" when {
+    "submitted a valid update subscription request request and response UPDATED_AND_ACCOUNT_OPENED" in {
+      when(mockService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionSuccessResponse("UPDATED_AND_ACCOUNT_OPENED", "message")))
+      doUpdateSubsDate(updateFirstSubscriptionDate) { res =>
+        status(res) mustBe (OK)
+      }
+    }
+  }
+
+  "return with status 200 created and an account Id" when {
+    "submitted a valid update subscription request request and response UPDATED_AND_ACCOUNT_VOIDED" in {
+      when(mockService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionSuccessResponse("UPDATED_AND_ACCOUNT_VOIDED", "message")))
+      doUpdateSubsDate(updateFirstSubscriptionDate) { res =>
+        status(res) mustBe (OK)
+      }
+    }
+  }
 
     "return with status 400 bad request and a code of BAD_REQUEST" when {
       "invalid json is sent" in {

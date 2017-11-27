@@ -454,7 +454,7 @@ types:
                                             value: |
                                               {
                                                 "code": "ACCOUNT_WITHIN_CANCELLATION_PERIOD",
-                                                "message": "The account cannot be closed with a closure reason of 'All funds withdrawn' as this  is still within the cancellation period"
+                                                "message": "You cannot close the account with all funds withdrawn as the reason because it is within the cancellation period"
                                               }
                                           accountBonusPaymentRequired:
                                             description: You cannot close the account with cancellation as the reason because you need to repay a bonus payment
@@ -894,8 +894,8 @@ types:
                                               description: The investor's bonus payment has already been requested.
                                               value: |
                                                 {
-                                                  "code" : "TRANSACTION_ALREADY_EXISTS",
-                                                  "message" : "A transaction already exists with similar data"
+                                                  "code" : "BONUS_CLAIM_ALREADY_EXISTS",
+                                                  "message" : "A bonus claim already exists with similar data"
                                                 }
                               /{transactionId}:
                                    uriParameters:

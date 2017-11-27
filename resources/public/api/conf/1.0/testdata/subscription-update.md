@@ -21,7 +21,7 @@
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
                 <p class ="code--block"> {<br>
                                          "data": {<br>
-                                           "message": "LISA account dateOffirstSubscription has been successfully updated",<br>
+                                           "message": "Successfully updated the firstSubscriptionDate for the LISA account",<br>
                                            "code": "UPDATED",<br>
                                            "accountId": "1234567890"<br>
                                          }<br>
@@ -42,7 +42,7 @@
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
                 <p class ="code--block"> {<br>
                                          "data": {<br>
-                                           "message": "LISA account dateOffirstSubscription has been successfully updated and the account status has been changed to Open",<br>
+                                           "message": "Successfully updated the firstSubscriptionDate for the LISA account and changed the account status to Open",<br>
                                            "code": "UPDATED_AND_ACCOUNT_OPENED",<br>
                                            "accountId": "1234567891"<br>
                                          }<br>
@@ -63,7 +63,7 @@
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
                 <p class ="code--block"> {<br>
                                          "data": {<br>
-                                           "message": "LISA account dateOffirstSubscription has been successfully updated. The account status has been changed to 'Void' as the Investor has another account with a more recent firstSubscriptionDate",<br>
+                                           "message": "Successfully updated the firstSubscriptionDate for the LISA account. Changed the account status to 'Void' as the Investor has another account with a more recent firstSubscriptionDate",<br>
                                            "code": "UPDATED_AND_ACCOUNT_VOIDED",<br>
                                            "accountId": "1234567892"<br>
                                          }<br>
