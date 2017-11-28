@@ -16,15 +16,15 @@
 
 package unit.controllers
 
-import org.scalatest.Matchers
+import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 import uk.gov.hmrc.lisaapi.controllers.ErrorAcceptHeaderInvalid
-import uk.gov.hmrc.play.test.UnitSpec
 
-class ErrorResponseSpec extends UnitSpec with Matchers{
+class ErrorResponseSpec extends PlaySpec {
+
   "errorResponse" should {
     "be translated to error Json with only the required fields" in {
-      Json.toJson(ErrorAcceptHeaderInvalid).toString() shouldBe
+      Json.toJson(ErrorAcceptHeaderInvalid).toString() mustBe
         """{"code":"ACCEPT_HEADER_INVALID","message":"The accept header is missing or invalid"}"""
     }
   }

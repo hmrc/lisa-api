@@ -16,24 +16,21 @@
 
 package uk.gov.hmrc.models
 
+import org.scalatestplus.play.PlaySpec
 import uk.gov.hmrc.lisaapi.models.CreationReason
-import uk.gov.hmrc.play.test.UnitSpec
 
 import scala.util.Try
 
+class ModelSpec extends PlaySpec {
 
-class ModelSpec extends UnitSpec{
   "CreationReason" should {
     "allow only New and Transferred" in {
-      Try(CreationReason("New")).isSuccess shouldBe true
+      Try(CreationReason("New")).isSuccess mustBe true
 
-      CreationReason("Transferred").creationCode shouldBe "Transferred"
+      CreationReason("Transferred").creationCode mustBe "Transferred"
 
-      Try(CreationReason("Transfer")).isFailure shouldBe true
-
-
+      Try(CreationReason("Transfer")).isFailure mustBe true
     }
   }
-
 
 }

@@ -16,18 +16,18 @@
 
 package unit.connectors
 
-import org.scalatest.concurrent.ScalaFutures
 import org.mockito.Mockito._
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
+import org.scalatestplus.play.PlaySpec
+import uk.gov.hmrc.http.{HeaderCarrier, HttpPost, HttpResponse}
 import uk.gov.hmrc.lisaapi.connectors.ServiceLocatorConnector
 import uk.gov.hmrc.lisaapi.domain.Registration
-import uk.gov.hmrc.play.test.UnitSpec
+
 import scala.concurrent.ExecutionContext.Implicits.global
-
 import scala.concurrent.Future
-import uk.gov.hmrc.http.{ HeaderCarrier, HttpPost, HttpResponse }
 
-class ServiceLocatorConnectorSpec extends UnitSpec with MockitoSugar with ScalaFutures {
+class ServiceLocatorConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
 
   trait Setup {
     implicit val hc = HeaderCarrier()
@@ -51,7 +51,7 @@ class ServiceLocatorConnectorSpec extends UnitSpec with MockitoSugar with ScalaF
 
       when(connector.http.POST(s"${connector.serviceUrl}/registration", registration, Seq("Content-Type"-> "application/json"))).thenReturn(Future.successful(HttpResponse(200)))
 
-      connector.register.futureValue shouldBe true
+      connector.register.futureValue mustBe true
       verify(connector.http).POST("https://SERVICE_LOCATOR/registration", registration, Seq("Content-Type"-> "application/json"))
       verify(connector.handlerOK).apply()
       verify(connector.handlerError, never).apply(serviceLocatorException)
@@ -63,7 +63,7 @@ class ServiceLocatorConnectorSpec extends UnitSpec with MockitoSugar with ScalaF
       val registration = Registration(serviceName = "api-microservice", serviceUrl = "http://api-microservice.service", metadata = Some(Map("third-party-api" -> "true")))
       when(connector.http.POST(s"${connector.serviceUrl}/registration", registration, Seq("Content-Type"-> "application/json"))).thenReturn(Future.failed(serviceLocatorException))
 
-      connector.register.futureValue shouldBe false
+      connector.register.futureValue mustBe false
       verify(connector.http).POST("https://SERVICE_LOCATOR/registration", registration, Seq("Content-Type"-> "application/json"))
       verify(connector.handlerOK, never).apply()
       verify(connector.handlerError).apply(serviceLocatorException)
