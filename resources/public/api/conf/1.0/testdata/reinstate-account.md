@@ -11,7 +11,7 @@
     </thead>
     <tbody>
         <tr>
-            <td><p>Request with a valid payload, LISA Manager Reference Number and Account ID</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 8765432100</p></td>
+            <td><p>Request with a valid payload, LISA manager reference number and account ID</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 8765432100</p></td>
             <td><p> empty payload </p>
             </td>
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
@@ -27,7 +27,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request with a valid payload and AccountID, but an invalid LISA Manager Reference Number</p><p class ="code--block">lisaManagerReferenceNumber: A12345<br>accountId: 1234567890</p></td>
+            <td><p>Request with a valid payload and account ID, but an invalid LISA manager reference number</p><p class ="code--block">lisaManagerReferenceNumber: A12345<br>accountId: 1234567890</p></td>
             <td><p> empty payload </p>
             <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
                 <p class ="code--block"> {<br>
@@ -44,13 +44,13 @@
                 <p class ="code--block"> 
                     {<br>
                         "code": "INVESTOR_ACCOUNT_CANNOT_BE_REINSTATED",<br>
-                        "message": "Investor account may have been transferred or is active."<br>
+                        "message": "Investor account may have been transferred or is active"<br>
                    }
                 </p>
             </td>
         </tr>
         <tr>
-            <td><p>Request containing an Account ID that does not exist</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: A1234562</p></td>
+            <td><p>Request containing an account ID that does not exist</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: A1234562</p></td>
                 <td><p> empty payload </p>
             <td><p>HTTP status: <code class="code--slim">404 (Not Found)</code></p>
                 <p class ="code--block"> {<br>

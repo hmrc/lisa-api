@@ -12,7 +12,7 @@
 	<tbody>
 	    <tr>
 		    <td>
-		    	<p>Retrieve a bonus payment details associated with LISA account</p>
+		    	<p>Retrieve details for a bonus payment associated with a LISA account</p>
 		    	<p class ="code--block">
 		    		lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
 		    		accountId: 1234567890<br>
@@ -99,8 +99,8 @@
 				<p>HTTP status: <code class="code--slim">404 (Not Found)</code></p>
 				<p class ="code--block">
 					{<br>
-						"code": "TRANSACTION_NOT_FOUND",<br>
-						"message": "The transactionId does not match HMRC’s records."<br>					}
+						"code": "BONUS_PAYMENT_TRANSACTION_NOT_FOUND",<br>
+						"message": "bonusPaymentTransactionId does not match HMRC’s records"<br>					}
 				</p>
 			</td>
 		</tr>

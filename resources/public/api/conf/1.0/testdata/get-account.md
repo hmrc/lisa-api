@@ -12,7 +12,7 @@
   <tbody>
     <tr>
       <td>
-        <p>Request with a valid LISA Manager Reference Number and Account ID (open account)</p>
+        <p>Request with a valid LISA manager reference number and account ID (open account)</p>
         <p class ="code--block">
           lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
           accountId: 1234567890
@@ -33,7 +33,7 @@
     </tr>
     <tr>
       <td>
-        <p>Request with a valid LISA Manager Reference Number and Account ID (transferred acount)</p>
+        <p>Request with a valid LISA manager reference number and account ID (transferred acount)</p>
         <p class ="code--block">
           lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
           accountId: 0000000200
@@ -59,7 +59,7 @@
     </tr>
     <tr>
       <td>
-        <p>Request with a valid LISA Manager Reference Number and Account ID (voided acount)</p>
+        <p>Request with a valid LISA manager reference number and account ID (voided acount)</p>
         <p class ="code--block">
           lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
           accountId: 1000000200
@@ -80,7 +80,7 @@
     </tr>
     <tr>
       <td>
-        <p>Request with a valid LISA Manager Reference Number and Account ID (closed acount)</p>
+        <p>Request with a valid LISA manager reference number and account ID (closed acount)</p>
         <p class ="code--block">
           lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
           accountId: 2000000200
@@ -103,7 +103,7 @@
     </tr>
     <tr>
       <td>
-        <p>Request with a valid Account ID, but an invalid LISA Manager Reference Number</p>
+        <p>Request with a valid account ID, but an invalid LISA manager reference number</p>
         <p class ="code--block">
           lisaManagerReferenceNumber: 123456<br>
           accountId: 1234567890
@@ -121,7 +121,7 @@
     </tr>
     <tr>
         <td>
-            <p>Request containing an Account ID that does not exist</p>
+            <p>Request containing an account ID that does not exist</p>
             <p class ="code--block">
                 lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
                 accountId: 0000000404

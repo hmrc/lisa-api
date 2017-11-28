@@ -13,17 +13,17 @@
           "example": "32456"
       },
       "paymentType" : {
-        "description": "the type of payment.",
+        "description": "Method of payment to the LISA provider.",
         "type" : "string",
-        "example": "VISA Debt"
+        "example": "VISA debit"
       },
       "paymentAmount" : {
-        "description": "Amount paid to the LISA Manager",
+        "description": "Amount paid to the LISA provider.",
         "type" : "string",
         "example": "23456.00"
       },
       "paymentDate": {
-        "description": "The date the payment has been made",
+        "description": "Date the payment has been made.",
         "$ref": "#/definitions/ISO8601-Date"}
 
     },
@@ -41,7 +41,8 @@
 		"LISAManagerReferenceNumberType" :
 		{
 			"type" : "string",
-			"pattern": "^Z([0-9]{4}|[0-9]{6})$"
+			"pattern": "^Z([0-9]{4}|[0-9]{6})$",
+            "example": "Z1234"
 		},
       "IDType": {
         "type": "string",

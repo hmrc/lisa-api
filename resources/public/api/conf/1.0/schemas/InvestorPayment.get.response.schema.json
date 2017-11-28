@@ -3,7 +3,7 @@
   "type": "object",
   "properties": {
     "transactionId" : {
-      "description": "The transactionId for which the payment details have been requested",
+      "description": "The transactionId for which the payment details have been requested.",
       "type" : "string",
       "example": "7777777777"
     },
@@ -20,7 +20,7 @@
       "$ref": "#/definitions/ISO8601-Date"
     },
     "status" : {
-      "description": "The status of the payment for a transaction",
+      "description": "The status of the payment for a transaction.",
       "type" : "string",
       "enum": [
         "Paid",
