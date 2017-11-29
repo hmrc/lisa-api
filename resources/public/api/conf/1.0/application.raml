@@ -65,7 +65,7 @@ types:
                                     type: !include schemas/ErrorCodes.schema.json
                                     examples:
                                       InvalidLmrn:
-                                        description: Invalid Lisa Manager Reference Number
+                                        description: Invalid LISA Manager reference number
                                         value: |
                                           {
                                             "code" : "BAD_REQUEST",
@@ -108,7 +108,7 @@ types:
                                             "message" : "Bad Request"
                                           }
                                       InvalidLmrn:
-                                        description: Invalid Lisa Manager Reference Number
+                                        description: Invalid LISA Manager reference number
                                         value: |
                                           {
                                             "code" : "BAD_REQUEST",
@@ -158,7 +158,7 @@ types:
                                           "message" : "Bad Request"
                                         }
                                     InvalidLmrn:
-                                      description: Invalid Lisa Manager Reference Number
+                                      description: Invalid LISA Manager reference number
                                       value: |
                                         {
                                           "code" : "BAD_REQUEST",
@@ -219,7 +219,7 @@ types:
                               201:
                                 headers:
                                   Location:
-                                    description: Relative URI to the created LISA Account resource
+                                    description: Relative URI to the created LISA account resource
                                     type: string
                                     example: /lifetime-isa/manager/Z876543/accounts/acc654321
                                 body:
@@ -240,7 +240,7 @@ types:
                                             "message" : "Bad Request"
                                           }
                                       InvalidLmrn:
-                                        description: Invalid Lisa Manager Reference Number
+                                        description: Invalid LISA Manager reference number
                                         value: |
                                           {
                                             "code" : "BAD_REQUEST",
@@ -349,7 +349,7 @@ types:
                                         type: !include schemas/ErrorCodes.schema.json
                                         examples:
                                           InvalidLmrn:
-                                            description: Invalid Lisa Manager Reference Number
+                                            description: Invalid LISA Manager reference number
                                             value: |
                                               {
                                                 "code" : "BAD_REQUEST",
@@ -412,7 +412,7 @@ types:
                                                 "message" : "Bad Request"
                                               }
                                           InvalidLmrn:
-                                            description: Invalid Lisa Manager Reference Number
+                                            description: Invalid LISA Manager reference number
                                             value: |
                                               {
                                                 "code" : "BAD_REQUEST",
@@ -498,7 +498,7 @@ types:
                                         type: !include schemas/ErrorCodes.schema.json
                                         examples:
                                           InvalidLmrn:
-                                            description: Invalid Lisa Manager Reference Number
+                                            description: Invalid LISA Manager reference number
                                             value: |
                                               {
                                                 "code" : "BAD_REQUEST",
@@ -575,7 +575,7 @@ types:
                                                 "message" : "Bad Request"
                                               }
                                           InvalidLmrn:
-                                            description: Invalid Lisa Manager Reference Number
+                                            description: Invalid LISA Manager reference number
                                             value: |
                                               {
                                                 "code" : "BAD_REQUEST",
@@ -662,7 +662,7 @@ types:
                                                 "message" : "Bad Request"
                                               }
                                           InvalidLmrn:
-                                            description: Invalid Lisa Manager Reference Number
+                                            description: Invalid LISA Manager reference number
                                             value: |
                                               {
                                                 "code" : "BAD_REQUEST",
@@ -745,7 +745,7 @@ types:
                                           type: !include schemas/ErrorCodes.schema.json
                                           examples:
                                             InvalidLmrn:
-                                              description: Invalid Lisa Manager Reference Number
+                                              description: Invalid LISA Manager reference number
                                               value: |
                                                 {
                                                   "code" : "BAD_REQUEST",
@@ -815,7 +815,7 @@ types:
                                                 "message" : "Bad Request"
                                               }
                                           InvalidLmrn:
-                                            description: Invalid Lisa Manager Reference Number
+                                            description: Invalid LISA Manager reference number
                                             value: |
                                               {
                                                 "code" : "BAD_REQUEST",
@@ -923,7 +923,7 @@ types:
                                              type: !include schemas/ErrorCodes.schema.json
                                              examples:
                                                InvalidLmrn:
-                                                 description: Invalid Lisa Manager Reference Number
+                                                 description: Invalid LISA Manager reference number
                                                  value: |
                                                    {
                                                      "code" : "BAD_REQUEST",
@@ -950,8 +950,8 @@ types:
                                                  description: The transactionId does not match HMRC’s records.
                                                  value: |
                                                    {
-                                                     "code" : "TRANSACTION_NOT_FOUND",
-                                                     "message" : "The transactionId does not match HMRC’s records"
+                                                     "code" : "BONUS_PAYMENT_TRANSACTION_NOT_FOUND",
+                                                     "message" : "bonusPaymentTransactionId does not match HMRC’s records"
                                                    }
                                                accountIdNOTFound:
                                                  description: The accountId does not match HMRC’s records.
@@ -997,8 +997,8 @@ types:
                                                     description: The transactionId does not match HMRC’s records.
                                                     value: |
                                                       {
-                                                        "code" : "TRANSACTION_NOT_FOUND",
-                                                        "message" : "The transactionId does not match HMRC’s records."
+                                                        "code" : "BONUS_PAYMENT_TRANSACTION_NOT_FOUND",
+                                                        "message" : "bonusPaymentTransactionId does not match HMRC’s records"
                                                       }
                                                   accountIdNOTFound:
                                                     description: The accountId does not match HMRC’s records.

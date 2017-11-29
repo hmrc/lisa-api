@@ -8,7 +8,7 @@
       "example": "9876543210"
     },
     "accountId": {
-      "description": "The financial organisation’s own unique reference number for the investor’s LISA account.",
+      "description": "The provider’s own unique reference number for the investor’s LISA account.",
       "$ref": "#/definitions/accountIdType",
       "example": "AB76543210"
     },
@@ -48,12 +48,12 @@
       "description" : "If the creationReason is ‘Transferred’, then this is required.",
       "properties": {
         "transferredFromAccountId": {
-          "description" : "The previous provider financial organisation’s own unique reference number for the investor’s LISA account.",
+          "description" : "The previous provider's own unique reference number for the investor’s LISA account.",
           "$ref": "#/definitions/accountIdType",
           "example": "987654320"
         },
         "transferredFromLMRN": {
-          "description" : "The number given to the LISA provider when they applied for approval from HMRC.",
+          "description" : "The reference given to the LISA provider when they applied for approval from HMRC.",
           "$ref": "#/definitions/LISAManagerReferenceNumberType",
           "example": "Z4567"
         },

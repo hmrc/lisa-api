@@ -92,7 +92,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request with a valid account ID and Transaction ID, but an invalid LISA manager reference number</p><p class ="code--block">lisaManagerReferenceNumber: 123456<br>accountId: 1234567890<br>transactionId: 1234567890</p></td>
+            <td><p>Request with a valid account ID and Transaction ID, but an invalid LISA Manager reference number</p><p class ="code--block">lisaManagerReferenceNumber: 123456<br>accountId: 1234567890<br>transactionId: 1234567890</p></td>
                         <td></td>
             <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
                 <p class ="code--block"> {<br>

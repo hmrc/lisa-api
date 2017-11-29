@@ -48,7 +48,7 @@
 		</tr>
 	   <tr>
 		    <td>
-		    	<p>Request with an invalid LISA manager reference number</p>
+		    	<p>Request with an invalid LISA Manager reference number</p>
 		    	<p class ="code--block">
 		    		lisaManagerReferenceNumber: 123456
 		    		accountId: 1234567890<br>

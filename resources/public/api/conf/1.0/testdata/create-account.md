@@ -11,7 +11,7 @@
     </thead>
     <tbody>
         <tr>
-            <td><p>Create Request with a valid payload and LISA manager reference number</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a></p></td>
+            <td><p>Create request with a valid payload and LISA Manager reference number</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a></p></td>
             <td>
                 <p class ="code--block"> {<br>
                                      	    "investorId": "9876543210",<br>
@@ -34,7 +34,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Transfer request with a valid payload and LISA manager reference number</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a></p></td>
+            <td><p>Transfer request with a valid payload and LISA Manager reference number</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a></p></td>
             <td>
                 <p class ="code--block"> {<br>
                                               "investorId": "9876543210",<br>
@@ -62,7 +62,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request with a valid payload and an invalid LISA manager reference number</p><p class ="code--block">lisaManagerReferenceNumber: A123456</p></td>
+            <td><p>Request with a valid payload and an invalid LISA Manager reference number</p><p class ="code--block">lisaManagerReferenceNumber: A123456</p></td>
             <td>
                 <p class ="code--block"> {<br>
                                      	    "investorId": "9876543210",<br>

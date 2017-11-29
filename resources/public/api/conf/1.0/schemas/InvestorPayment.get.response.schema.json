@@ -33,22 +33,22 @@
       "example": "Paid"
     },
     "paymentReference" : {
-      "description": "The reference of the payment made",
+      "description": "The reference of the payment made.",
       "type" : "string",
       "example": "12345"
     },
     "chargeReference" : {
-      "description": "The reference for a charge due",
+      "description": "The reference for a charge due.",
       "type" : "string",
       "example": "12345"
     },
     "paymentAmount" : {
-      "description": "The amount paid for the transaction",
+      "description": "The amount paid for the transaction.",
       "type" : "number",
       "example": "1000.00"
     },
     "bonusDueForPeriod": {
-      "description": "Payment due for the period",
+      "description": "Payment due for the period.",
       "type" : "number",
       "example": "700.00"
     }

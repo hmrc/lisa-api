@@ -11,7 +11,7 @@
     </thead>
     <tbody>
         <tr>
-            <td><p>Request with a valid LISA manager reference number, account ID and life event ID</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890<br>lifeEventId: 1234567890</p></td>
+            <td><p>Request with a valid LISA Manager reference number, account ID and life event ID</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890<br>lifeEventId: 1234567890</p></td>
             <td></td>
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
                 <p class ="code--block"> {<br>
@@ -23,7 +23,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request with a valid account ID and life event ID, but an invalid LISA manager reference number</p><p class ="code--block">lisaManagerReferenceNumber: 123456<br>accountId: 1234567890<br>lifeEventId: 1234567890</p></td>
+            <td><p>Request with a valid account ID and life event ID, but an invalid LISA Manager reference number</p><p class ="code--block">lisaManagerReferenceNumber: 123456<br>accountId: 1234567890<br>lifeEventId: 1234567890</p></td>
                         <td></td>
             <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
                 <p class ="code--block"> {<br>

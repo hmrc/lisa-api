@@ -11,7 +11,7 @@
     </thead>
     <tbody>
         <tr>
-            <td><p>Request with a valid payload, LISA manager reference number and account ID</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890</p></td>
+            <td><p>Request with a valid payload, LISA Manager reference number and account ID</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890</p></td>
             <td>
                 <p class ="code--block"> {<br>
                                      	  "accountClosureReason":"All funds withdrawn",<br>
@@ -32,7 +32,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request with a valid payload, LISA manager reference number and account ID</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890</p></td>
+            <td><p>Request with a valid payload, LISA Manager reference number and account ID</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890</p></td>
             <td>
                 <p class ="code--block"> {<br>
                                           "accountClosureReason":"Cancellation",<br>
@@ -53,7 +53,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request with a valid payload and account ID, but an invalid LISA manager reference number</p><p class ="code--block">lisaManagerReferenceNumber: A12345<br>accountId: 1234567890</p></td>
+            <td><p>Request with a valid payload and account ID, but an invalid LISA Manager reference number</p><p class ="code--block">lisaManagerReferenceNumber: A12345<br>accountId: 1234567890</p></td>
             <td>
                 <p class ="code--block"> {<br>
                                      	  "accountClosureReason":"All funds withdrawn",<br>
@@ -115,7 +115,7 @@
             </td>
         </tr>
          <tr>
-            <td><p>Request to close an account with cancellation as the reason and you cannot use this reason because the cancellation period is over</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: A1234568</p></td>
+            <td><p>Request to close an account with cancellation as the reason when the cancellation period is over</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: A1234568</p></td>
             <td>
                 <p class ="code--block"> {<br>
                                           "accountClosureReason": "Cancellation",<br>
