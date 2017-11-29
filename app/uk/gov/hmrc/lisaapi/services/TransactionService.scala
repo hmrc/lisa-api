@@ -116,7 +116,7 @@ trait TransactionService {
 
   private def handleError(code: String): GetTransactionResponse = {
     code match {
-      case "TRANSACTION_NOT_FOUND" => GetTransactionTransactionNotFoundResponse
+      case "BONUS_PAYMENT_TRANSACTION_NOT_FOUND" => GetTransactionTransactionNotFoundResponse
       case "INVESTOR_ACCOUNTID_NOT_FOUND" => GetTransactionAccountNotFoundResponse
       case _ => GetTransactionErrorResponse
     }

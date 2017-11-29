@@ -2,7 +2,7 @@
   "lisaManagerReferenceNumber" : "Z543210",
   "_links" :
   {
-    "self" : {"href" : "/lifetime-isa/manager/{LISAManagerReferenceNumber}", "methods": ["GET"]},
+    "self" : {"href" : "/lifetime-isa/manager/{lisaManagerReferenceNumber}", "methods": ["GET"]},
     "investors" : {"href" : "/lifetime-isa/manager/{lisaManagerReferenceNumber}/investors", "methods": ["POST"]},
     "create or transfer Account" :[ {"href" : "/lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts" , "methods": ["POST"]},
                                   {"href" : "/lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}" , "methods": ["GET"]}],

@@ -11,11 +11,11 @@
           "$ref": "#/definitions/ISO8601-Date"},
 	    "periodEndDate" : {
           "description": "The end date of the claim period. The periodEndDate must be the 5th day of the month. It has to be the month after the periodStartDate.",
-          "$ref": "#/definitions/ISO8601-Date"},
+          "$ref": "#/definitions/ISO8601-Date1"},
 
 		"htbTransfer" :
 		{
-          "description": "Details about Help-To-Buy funds.",
+          "description": "Details about Help to Buy funds.",
 			"type" : "object",
 			"properties":
 			{
@@ -39,8 +39,8 @@
 			"type" : "object",
 			"properties":
 			{
-			  "newSubsForPeriod" :{"description": "The total value of new qualifying deposits paid into to the account during the claim period. You can include an amount up to 2 decimal places. You must enter a number greater than 0 in either newSubsForPeriod or htbTransferInForPeriod. Both fields can’t be 0. If there is a number in newSubsForPeriod, then the number in newSubsYTD must be greater than 0.", "type" : "number"},
-			  "newSubsYTD" :{"description": "The total value of new qualifying deposits paid into the account during the tax year to date. You can include an amount up to 2 decimal places. If there is a number in newSubsForPeriod, then the number in newSubsYTD must be greater than 0.", "type" : "number"},
+			  "newSubsForPeriod" :{"description": "The total value of new qualifying deposits paid in to the account during the claim period. You can include an amount up to 2 decimal places. You must enter a number greater than 0 in either newSubsForPeriod or htbTransferInForPeriod. Both fields can’t be 0. If there is a number in newSubsForPeriod, then the number in newSubsYTD must be greater than 0.", "type" : "number"},
+			  "newSubsYTD" :{"description": "The total value of new qualifying deposits paid in to the account during the tax year to date. You can include an amount up to 2 decimal places. If there is a number in newSubsForPeriod, then the number in newSubsYTD must be greater than 0.", "type" : "number"},
 			  "totalSubsForPeriod" :{"description": "The total amount in the account during the claim period that qualifies for a bonus payment. You can include an amount up to 2 decimal places. The totalSubsForPeriod must always be greater than 0.", "type" : "number"},
 			  "totalSubsYTD" :{"description": "The total amount in the account during the tax year to date that qualifies for a bonus payment. You can include an amount up to 2 decimal places. The totalSubsYTD must be the same as or more than totalSubsForPeriod.", "type" : "number"}
 			},
@@ -85,7 +85,13 @@
         "id": "full-date",
         "type": "string",
         "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
-        "example": "2017-05-20"
+        "example": "2017-05-06"
+      },
+      "ISO8601-Date1": {
+        "id": "full-date",
+        "type": "string",
+        "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+        "example": "2017-06-05"
       },
 		"IDType": {
 			"type": "string",

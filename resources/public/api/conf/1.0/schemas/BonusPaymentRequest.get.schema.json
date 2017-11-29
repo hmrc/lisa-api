@@ -11,7 +11,7 @@
           "$ref": "#/definitions/ISO8601-Date"},
 	    "periodEndDate" : {
           "description": "The end date of the claim period. The periodEndDate must be the 5th day of the month. It has to be the month after the periodStartDate.",
-          "$ref": "#/definitions/ISO8601-Date"},
+          "$ref": "#/definitions/ISO8601-Date1"},
 
 		"htbTransfer" :
 		{
@@ -85,7 +85,13 @@
         "id": "full-date",
         "type": "string",
         "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
-        "example": "2017-05-20"
+        "example": "2017-05-06"
+      },
+      "ISO8601-Date1": {
+        "id": "full-date",
+        "type": "string",
+        "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+        "example": "2017-05-05"
       },
 		"IDType": {
 			"type": "string",

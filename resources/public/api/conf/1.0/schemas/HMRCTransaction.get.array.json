@@ -37,7 +37,7 @@
   		"LISAManagerReferenceNumber",
   		"paymentReference",
   		"amount",
-			"paymentForTransaction",
+		"paymentForTransaction",
   		"transactionType",
       "applicablePeriod"
   	],

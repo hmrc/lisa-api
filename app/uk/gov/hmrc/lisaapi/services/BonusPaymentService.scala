@@ -63,7 +63,7 @@ trait BonusPaymentService {
         Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
 
         failureResponse.code match {
-          case "TRANSACTION_NOT_FOUND" => GetBonusPaymentTransactionNotFoundResponse
+          case "BONUS_PAYMENT_TRANSACTION_NOT_FOUND" => GetBonusPaymentTransactionNotFoundResponse
           case "BAD_REQUEST" => GetBonusPaymentLmrnDoesNotExistResponse
           case "INVESTOR_ACCOUNTID_NOT_FOUND" => GetBonusPaymentInvestorNotFoundResponse
           case _ => GetBonusPaymentErrorResponse

@@ -4,7 +4,7 @@
 	"properties":
 	{
 	  "lisaManagerReferenceNumber": {
-		"description": "The number given to the LISA provider when they applied for approval from HMRC.",
+		"description": "The reference given to the LISA provider when they applied for approval from HMRC.",
 		"$ref": "#/definitions/LISAManagerReferenceNumberType"
 	  },
 		"_links" : {"type" : "object"}
@@ -19,7 +19,8 @@
 		"LISAManagerReferenceNumberType" :
 		{
 			"type" : "string",
-			"pattern": "^Z([0-9]{4}|[0-9]{6})$"
+			"pattern": "^Z([0-9]{4}|[0-9]{6})$",
+			"example": "Z1234"
 		}
 	}
 }

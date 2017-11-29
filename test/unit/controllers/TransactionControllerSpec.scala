@@ -104,7 +104,7 @@ class TransactionControllerSpec extends PlaySpec
 
         status(res) mustBe NOT_FOUND
 
-        (contentAsJson(res) \ "code").as[String] mustBe "TRANSACTION_NOT_FOUND"
+        (contentAsJson(res) \ "code").as[String] mustBe "BONUS_PAYMENT_TRANSACTION_NOT_FOUND"
       }
       "the accountId in the URL is in an incorrect format" in {
         when(mockService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionErrorResponse))

@@ -92,7 +92,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request with a valid Account ID and Transaction ID, but an invalid LISA Manager Reference Number</p><p class ="code--block">lisaManagerReferenceNumber: 123456<br>accountId: 1234567890<br>transactionId: 1234567890</p></td>
+            <td><p>Request with a valid account ID and Transaction ID, but an invalid LISA Manager reference number</p><p class ="code--block">lisaManagerReferenceNumber: 123456<br>accountId: 1234567890<br>transactionId: 1234567890</p></td>
                         <td></td>
             <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
                 <p class ="code--block"> {<br>
@@ -107,8 +107,8 @@
             <td></td>
             <td><p>HTTP status: <code class="code--slim">404 (Not found)</code></p>
                 <p class ="code--block"> {<br>
-                                            "code": "TRANSACTION_NOT_FOUND",<br>
-                                            "message": "The transactionId does not match HMRC’s records."<br>
+                                            "code": "BONUS_PAYMENT_TRANSACTION_NOT_FOUND",<br>
+                                            "message": "transactionId does not match HMRC’s records"<br>
                                           }
                 </p>
             </td>
