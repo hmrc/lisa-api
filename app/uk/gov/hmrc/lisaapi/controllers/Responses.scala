@@ -116,7 +116,7 @@ case object ErrorLifeEventInappropriate extends ErrorResponse(403, "LIFE_EVENT_I
 
 case object ErrorInvalidLisaManager extends ErrorResponse(401,"UNAUTHORIZED","The lisaManagerReferenceNumber path parameter you've used doesn't match with an authorised LISA provider in HMRC's records.")
 
-case object ErrorTransactionNotFound extends ErrorResponse(404, "BONUS_PAYMENT_TRANSACTION_NOT_FOUND", "bonusPaymentTransactionId does not match HMRC’s records")
+case object ErrorTransactionNotFound extends ErrorResponse(404, "BONUS_PAYMENT_TRANSACTION_NOT_FOUND", "transactionId does not match HMRC’s records")
 
 object ErrorInvestorAlreadyExists {
 
