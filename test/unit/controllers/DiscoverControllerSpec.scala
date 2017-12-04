@@ -40,14 +40,14 @@ class DiscoverControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSu
       val res = SUT.discover("Z019283").apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
 
       status(res) mustBe OK
-      (contentAsJson(res) \ "_links" \ "life events" \ "href").as[String] mustBe "/lifetime-isa/manager/Z019283/accounts/{accountId}/events"
+      (contentAsJson(res) \ "_links" \ "close account" \ "href").as[String] mustBe "/lifetime-isa/manager/Z019283/accounts/{accountId}/close-account"
     }
 
     "return the lisa manager reference number provided" in {
       val res = SUT.discover("Z111111").apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
 
       status(res) mustBe OK
-      (contentAsJson(res) \ "_links" \ "life events" \ "href").as[String] mustBe "/lifetime-isa/manager/Z111111/accounts/{accountId}/events"
+      (contentAsJson(res) \ "_links" \ "close account" \ "href").as[String] mustBe "/lifetime-isa/manager/Z111111/accounts/{accountId}/close-account"
     }
 
     "return with status 400 bad request" when {

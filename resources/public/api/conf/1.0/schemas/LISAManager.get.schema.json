@@ -7,8 +7,8 @@
 		"description": "The reference given to the LISA provider when they applied for approval from HMRC.",
 		"$ref": "#/definitions/LISAManagerReferenceNumberType"
 	  },
-		"_links" : {"type" : "object"}
-},
+	  "_links" : {"type" : "object"}
+	},
 	"required" :
 	[
 		"lisaManagerReferenceNumber"
