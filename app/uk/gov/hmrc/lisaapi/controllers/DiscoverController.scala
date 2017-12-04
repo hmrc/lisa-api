@@ -32,8 +32,8 @@ class DiscoverController extends LisaController {
           {
             "self" : {"href" : "/lifetime-isa/manager/${lisaManagerReferenceNumber}"},
             "investors" : {"href" : "/lifetime-isa/manager/${lisaManagerReferenceNumber}/investors"},
-            "create or transfer Account" : {"href" : "/lifetime-isa/manager/${lisaManagerReferenceNumber}/accounts"},
-            "close Account" : {"href" : "/lifetime-isa/manager/${lisaManagerReferenceNumber}/accounts/{accountId}"},
+            "create or transfer account" : {"href" : "/lifetime-isa/manager/${lisaManagerReferenceNumber}/accounts"},
+            "close account" : {"href" : "/lifetime-isa/manager/${lisaManagerReferenceNumber}/accounts/{accountId}"},
             "life events" : {"href" : "/lifetime-isa/manager/${lisaManagerReferenceNumber}/accounts/{accountId}/events"},
             "bonus payments" : {"href" : "/lifetime-isa/manager/${lisaManagerReferenceNumber}/accounts/{accountId}/transactions"}
           }
