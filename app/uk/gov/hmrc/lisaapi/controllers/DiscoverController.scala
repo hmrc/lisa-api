@@ -39,7 +39,7 @@ class DiscoverController extends LisaController {
 //            ],
 //            "close account": {"href": "/lifetime-isa/manager/${lisaManagerReferenceNumber}/accounts/{accountId}/close-account", "methods": ["POST"]},
 //            "life events": [
-//              {"href": "/lifetime-isa/manager/${lisaManagerReferenceNumber}/accounts/{accountId}/events", "methods": ["POST", "GET"]},
+//              {"href": "/lifetime-isa/manager/${lisaManagerReferenceNumber}/accounts/{accountId}/events", "methods": ["POST"},
 //              {"href": "/lifetime-isa/manager/${lisaManagerReferenceNumber}/accounts/{accountId}/events/{lifeEventId}", "methods": [ "GET"]}
 //            ],
 //            "bonus payments": [
@@ -65,7 +65,7 @@ class DiscoverController extends LisaController {
                             ],
                             "close account": {"href": "/lifetime-isa/manager/${lisaManagerReferenceNumber}/accounts/{accountId}/close-account", "methods": ["POST"]},
                             "life events": [
-                              {"href": "/lifetime-isa/manager/${lisaManagerReferenceNumber}/accounts/{accountId}/events", "methods": ["POST", "GET"]}
+                              {"href": "/lifetime-isa/manager/${lisaManagerReferenceNumber}/accounts/{accountId}/events", "methods": ["POST"]}
                             ],
                             "bonus payments": [
                               {"href": "/lifetime-isa/manager/${lisaManagerReferenceNumber}/accounts/{accountId}/transactions", "methods": ["POST"]}
