@@ -331,6 +331,38 @@ class DesConnectorSpec extends PlaySpec
     }
   }
 
+  "Reinstate Lisa Account endpoint" must {
+
+    "Return a status code of 200" when {
+      "Given a 200 response from DES" in {
+        when(mockHttpPost.POSTEmpty[HttpResponse](any())(any(), any(), any()))
+          .thenReturn(Future.successful(HttpResponse(responseStatus = OK, responseJson = None)))
+
+        doReinstateAccountRequest { response =>
+          response must be(DesEmptySuccessResponse)
+        }
+      }
+    }
+
+    "Return no DesAccountResponse" when {
+      "The DES response has no json body" in {
+        when(mockHttpPost.POSTEmpty[HttpResponse](any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = SERVICE_UNAVAILABLE,
+                responseJson = None
+              )
+            )
+          )
+
+        doReinstateAccountRequest { response =>
+          response must be(DesFailureResponse())
+        }
+      }
+    }
+  }
+
   "Update First Subscription date endpoint" must {
 
     "Return a populated DesUpdateSubscriptionSuccessResponse" when {
@@ -921,6 +953,12 @@ class DesConnectorSpec extends PlaySpec
     callback(response)
   }
 
+
+  private def doReinstateAccountRequest(callback: (DesResponse) => Unit) = {
+    val response = Await.result(SUT.reinstateAccount("Z123456", "ABC12345"), Duration.Inf)
+
+    callback(response)
+  }
 
   private def updateFirstSubscriptionDateRequest(callback: (DesResponse) => Unit) = {
     val request = UpdateSubscriptionRequest(new DateTime("2000-01-01"))
