@@ -19,9 +19,9 @@ package uk.gov.hmrc.lisaapi.models
 import play.api.libs.json.{Json, OFormat}
 
 case class ApiResponseData(
+  code: Option[String] = None,
   message: String,
   investorId: Option[String] = None,
-  code: Option[String] = None,
   accountId: Option[String] = None,
   lifeEventId: Option[String] = None,
   transactionId: Option[String] = None

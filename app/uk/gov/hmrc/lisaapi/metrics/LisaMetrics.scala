@@ -46,6 +46,7 @@ trait LisaMetricKeys  {
   val INVESTOR = "LISA_INVESTOR"
   val ACCOUNT = "CREATE_OR_TRANSFER_ACCOUNT"
   val CLOSE = "CLOSE_ACCOUNT"
+  val REINSTATE = "REINSTATE_ACCOUNT"
   val EVENT = "LIFE_EVENT"
   val BONUS_PAYMENT = "BONUS_PAYMENT"
   val UPDATE_SUBSCRIPTION = "UPDATE_SUBSCRIPTION"
@@ -68,3 +69,7 @@ trait LisaMetricKeys  {
 
 }
 object LisaMetricKeys extends LisaMetricKeys
+
+
+
+

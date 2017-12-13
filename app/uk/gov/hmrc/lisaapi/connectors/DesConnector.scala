@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.lisaapi.connectors
 
+import com.fasterxml.jackson.databind.JsonSerializer.None
 import play.api.Logger
 import uk.gov.hmrc.lisaapi.config.{AppContext, WSHttp}
 import uk.gov.hmrc.lisaapi.models._
@@ -27,6 +28,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 import play.api.libs.json.Reads
+import play.mvc.BodyParser.AnyContent
 import uk.gov.hmrc.http.{HeaderCarrier, HttpGet, HttpPost, HttpReads, HttpResponse}
 import uk.gov.hmrc.http.logging.Authorization
 import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext
@@ -95,6 +97,24 @@ trait DesConnector extends ServicesConfig {
     result.map(res => {
       Logger.debug("Get Account request returned status: " + res.status)
       parseDesResponse[DesGetAccountResponse](res)._2
+    })
+  }
+
+  /**
+    * Attempts to reinstate a LISA account
+    */
+  def reinstateAccount (lisaManager: String, accountId: String)
+                           (implicit hc: HeaderCarrier): Future[DesResponse] = {
+    val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId/reinstate-account"
+    Logger.debug("Reinstate Account request returned status: " + uri)
+
+    val result = httpPost.POSTEmpty[HttpResponse](uri)(httpReads, updateHeaderCarrier(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
+    result.map(r => {
+      Logger.debug("Reinstate Account request returned status: " + r.status)
+      r.status match {
+        case 200 => DesEmptySuccessResponse
+        case _ => parseDesResponse[DesFailureResponse](r)._2
+      }
     })
   }
 
