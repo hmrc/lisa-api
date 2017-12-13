@@ -44,7 +44,7 @@
                 <p class ="code--block"> 
                     {<br>
                         "code": "INVESTOR_ACCOUNT_ALREADY_OPEN",<br>
-                        "message": "The account already has a ststus of Open"<br>
+                        "message": "The account already has a status of Open"<br>
                    }
                 </p>
             </td>
