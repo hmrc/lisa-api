@@ -26,6 +26,7 @@ case class ReportLifeEventSuccessResponse(lifeEventId: String) extends ReportLif
 case object ReportLifeEventErrorResponse extends ReportLifeEventResponse
 case object ReportLifeEventInappropriateResponse extends ReportLifeEventResponse
 case object ReportLifeEventAccountNotFoundResponse extends ReportLifeEventResponse
+case object ReportLifeEventIdNotFoundResponse extends ReportLifeEventResponse
 case object ReportLifeEventAccountClosedResponse extends ReportLifeEventResponse
 
 case class ReportLifeEventAlreadyExistsResponse (lifeEventID: String) extends ReportLifeEventResponse

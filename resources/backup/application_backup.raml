@@ -776,6 +776,13 @@ types:
                                                   "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
                                                   "message": "The accountId does not match HMRC’s records."
                                                 }
+                                            lifeEventIdNOTFound:
+                                              description: The lifeEventId does not match HMRC’s records.
+                                              value: |
+                                                {
+                                                  "code": "LIFE_EVENT_NOT_FOUND",
+                                                  "message": "The lifeEventId does not match HMRC's records."
+                                                }
                             /transactions:
                               description: !include documentation/LISATransaction
                               post:

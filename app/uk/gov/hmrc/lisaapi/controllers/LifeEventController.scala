@@ -128,6 +128,13 @@ class LifeEventController extends LisaController {
 
               NotFound(Json.toJson(ErrorAccountNotFound))
             }
+            case ReportLifeEventIdNotFoundResponse => {
+              Logger.debug("Matched Not Found")
+
+              LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getErrorKey(NOT_FOUND, request.uri))
+
+              NotFound(Json.toJson(ErrorLifeEventIdNotFound))
+            }
             case _ => {
               Logger.debug("Matched Error")
               Logger.error("Life Event Not returned : DES unknown case , returning internal server error")
