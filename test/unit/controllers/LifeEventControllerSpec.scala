@@ -261,6 +261,14 @@ class LifeEventControllerSpec extends PlaySpec
       }
     }
 
+    "return with 404 not found and a code of LIFE_EVENT_NOT_FOUND" in {
+      when(mockService.getLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventIdNotFoundResponse))
+      doGetLifeEventRequest{ res =>
+        status(res) mustBe NOT_FOUND
+        (contentAsJson(res) \ "code").as[String] mustBe "LIFE_EVENT_NOT_FOUND"
+      }
+    }
+
     "return with 500 internal server error when the wrong event is returned" in {
       when(mockService.getLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportTest))
       doGetLifeEventRequest{ res =>

@@ -45,6 +45,17 @@
             </td>
         </tr>
         <tr>
+            <td><p>Request containing an account ID that does not exist</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1000000404<br>lifeEventId: 1234567890</p></td>
+            <td></td>
+            <td><p>HTTP status: <code class="code--slim">404 (Not found)</code></p>
+                <p class ="code--block"> {<br>
+                                            "code": "LIFE_EVENT_NOT_FOUND",<br>
+                                            "message": "The lifeEventId does not match HMRC's records."<br>
+                                          }
+                </p>
+            </td>
+        </tr>        
+        <tr>
             <td><p>Request with an invalid 'Accept' header</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890<br>lifeEventId: 1234567890<br><br>Accept: application/vnd.hmrc.1.0</p></td>
             <td></td>
             <td><p>HTTP status: <code class="code--slim">406 (Not Acceptable)</code></p>

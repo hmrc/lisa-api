@@ -97,6 +97,16 @@ class LifeEventServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuit
       }
     }
 
+    "return a life event Not Found response" when {
+      "given DesFailureReponse and status 404" in {
+        when(mockDesConnector.getLifeEvent(any(), any(), any())(any())).
+          thenReturn(Future.successful(DesFailureResponse("LIFE_EVENT_NOT_FOUND", "The lifeEventId given does not match with HMRC’s records")))
+
+        doRetrieval{ _ mustBe ReportLifeEventIdNotFoundResponse }
+      }
+    }
+
+
     "return a Internal Server Error response" when {
       "When INTERNAL_SERVER_ERROR sent" in {
         when(mockDesConnector.getLifeEvent(any(), any(), any())(any())).

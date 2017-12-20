@@ -72,6 +72,7 @@ trait LifeEventService {
 
         failureResponse.code match {
           case "INVESTOR_ACCOUNTID_NOT_FOUND" => ReportLifeEventAccountNotFoundResponse
+          case "LIFE_EVENT_NOT_FOUND" => ReportLifeEventIdNotFoundResponse
           case _ => {
             ReportLifeEventErrorResponse
           }
