@@ -374,7 +374,7 @@ types:
                 /reinstate-account:
                   post:
                     is: [headers.acceptHeader, headers.contentHeader]
-                    displayName: Re-open a LISA account that has been closed
+                    displayName: Reinstate a LISA account
                     description: Re-open a LISA account that has been closed
                     (annotations.scope): "write:lisa"
                     securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
