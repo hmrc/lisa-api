@@ -375,7 +375,7 @@ types:
                   post:
                     is: [headers.acceptHeader, headers.contentHeader]
                     displayName: Reinstate a LISA account
-                    description: Re-open a LISA account that has been closed
+                    description: Re-open a LISA account that has been closed.
                     (annotations.scope): "write:lisa"
                     securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
                     (annotations.sandboxData): !include testdata/reinstate-account.md
