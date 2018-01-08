@@ -227,41 +227,41 @@
             <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
                 <p class ="code--block"> {<br>
                                               "code": "FORBIDDEN",<br>
-                                              "message": "Forbidden",<br>
+                                              "message": "There is a problem with the request data",<br>
                                               "errors": [<br>
                                                   {<br>
                                                       "code": "INVALID_MONETARY_AMOUNT",<br>
-                                                      "message": "newSubsForPeriod and htbTransferInForPeriod cannot both be zero",<br>
+                                                      "message": "newSubsForPeriod and htbTransferInForPeriod cannot both be 0",<br>
                                                       "path": "/inboundPayments/newSubsForPeriod"<br>
                                                   },<br>
                                                   {<br>
                                                       "code": "INVALID_MONETARY_AMOUNT",<br>
-                                                      "message": "newSubsForPeriod and htbTransferInForPeriod cannot both be zero",<br>
+                                                      "message": "newSubsForPeriod and htbTransferInForPeriod cannot both be 0",<br>
                                                       "path": "/htbTransfer/htbTransferInForPeriod"<br>
                                                   },<br>
                                                   {<br>
                                                       "code": "INVALID_MONETARY_AMOUNT",<br>
-                                                      "message": "totalSubsForPeriod must be greater than zero",<br>
+                                                      "message": "totalSubsForPeriod must be more than 0",<br>
                                                       "path": "/inboundPayments/totalSubsForPeriod"<br>
                                                   },<br>
                                                   {<br>
                                                       "code": "INVALID_MONETARY_AMOUNT",<br>
-                                                      "message": "bonusDueForPeriod must be greater than zero",<br>
+                                                      "message": "bonusDueForPeriod must be more than 0",<br>
                                                       "path": "/bonuses/bonusDueForPeriod"<br>
                                                   },<br>
                                                   {<br>
                                                       "code": "INVALID_MONETARY_AMOUNT",<br>
-                                                      "message": "totalBonusDueYTD must be greater than zero",<br>
+                                                      "message": "totalBonusDueYTD must be more than 0",<br>
                                                       "path": "/bonuses/totalBonusDueYTD"<br>
                                                   },<br>
                                                   {<br>
                                                       "code": "INVALID_DATE",<br>
-                                                      "message": "The periodStartDate must equal the 6th day of the month",<br>
+                                                      "message": "The periodStartDate must be the 6th day of the month",<br>
                                                       "path": "/periodStartDate"<br>
                                                   },<br>
                                                   {<br>
                                                       "code": "INVALID_DATE",<br>
-                                                      "message": "The periodEndDate must equal the 5th day of the month after the periodStartDate",<br>
+                                                      "message": "The periodEndDate must be the 5th day of the month which occurs after the periodStartDate",<br>
                                                       "path": "/periodEndDate"<br>
                                                   },<br>
                                                   {<br>
@@ -306,7 +306,7 @@
 	        <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
 	            <p class ="code--block"> {<br>
 	                                        "code": "LIFE_EVENT_NOT_PROVIDED",<br>
-	                                        "message": "lifeEventId is required when the claimReason is \"Life Event\""<br>
+	                                        "message": "lifeEventId is required when the claimReason is a life event"<br>
 	                                      }
 	            </p>
 	        </td>
@@ -381,7 +381,7 @@
             </td>
             <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
                 <p class ="code--block"> {<br>"code": "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID",<br>
-                                            "message": "The LISA account has already been closed or voided."<br>
+                                            "message": "This LISA account has already been closed or been made void by HMRC"<br>
                                           }
                 </p>
             </td>
@@ -419,7 +419,7 @@
             <td><p>HTTP status: <code class="code--slim">404 (Not Found)</code></p>
                 <p class ="code--block"> {<br>
                                            "code": "LIFE_EVENT_NOT_FOUND",<br>
-                                           "message": "The lifeEventId does not match with HMRC’s records."<br>
+                                           "message": "The lifeEventId does not match with HMRC’s records"<br>
                                        }
                 </p>
             </td>
