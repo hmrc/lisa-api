@@ -1,7 +1,7 @@
 {
   "data": {
     "accountId": "87654321",
-    "message": "Investor Account Created."
+    "message": "Account created"
   },
   "success": true,
   "status": 201

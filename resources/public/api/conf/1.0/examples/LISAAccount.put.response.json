@@ -1,7 +1,7 @@
 {
   "data": {
     "accountId": "8765432100",
-    "message": "LISA Account Closed."
+    "message": "LISA account closed"
   },
   "success": true,
   "status": 200
