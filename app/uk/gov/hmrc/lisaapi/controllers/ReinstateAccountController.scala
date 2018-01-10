@@ -34,15 +34,17 @@ class ReinstateAccountController extends LisaController with LisaConstants {
 
 
 
-  def reinstateAccount (lisaManager: String, accountId: String): Action[AnyContent] = Action.async{ implicit request =>
+  def reinstateAccount (lisaManager: String): Action[AnyContent] = Action.async{ implicit request =>
     implicit val startTime = System.currentTimeMillis()
     LisaMetrics.startMetrics(startTime, LisaMetricKeys.REINSTATE)
     withValidLMRN(lisaManager) {
-      withValidAccountId(accountId) {
-        processReinstateAccount(lisaManager, accountId)
-      }
+      withValidJson[ReinstateLisaAccountRequest] (req => {
+        processReinstateAccount(lisaManager, req.accountId.toString)
+      }, lisaManager = lisaManager)
     }
+
   }
+
 
 
 
