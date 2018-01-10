@@ -26,7 +26,7 @@
                      "success": true,<br>
                      "data": {<br>
                                 "investorId": "9876543210",<br>
-                                "message": "Investor Created."<br>
+                                "message": "Investor created"<br>
                      }<br>
                    }</p></td>
         </tr>

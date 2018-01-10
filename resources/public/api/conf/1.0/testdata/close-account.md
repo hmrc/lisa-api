@@ -24,7 +24,7 @@
                                          "status": 200,<br>
                                          "success": true,<br>
                                          "data": {<br>
-                                           "message": "LISA Account Closed",<br>
+                                           "message": "LISA account closed",<br>
                                            "accountId": "1234567890"<br>
                                          }<br>
                                        }

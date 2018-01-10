@@ -26,7 +26,7 @@
                                          "status": 201,<br>
                                          "success": true,<br>
                                          "data": {<br>
-                                           "message": "Account Created.",<br>
+                                           "message": "Account created",<br>
                                            "accountId": "1234567890"<br>
                                          }<br>
                                        }
@@ -54,7 +54,7 @@
                                          "status": 201,<br>
                                           "success": true,<br>
                                           "data": {<br>
-                                            "message": "Account Transferred.",<br>
+                                            "message": "Account transferred",<br>
                                             "accountId": "1234567890"<br>
                                           }<br>
                                        }

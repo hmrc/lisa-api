@@ -87,7 +87,7 @@
                                            "status": 201,<br>
                                            "success": true,<br>
                                            "data": {<br>
-                                             "message": "Bonus transaction created - Late Notification",<br>
+                                             "message": "Bonus transaction created - late notification",<br>
                                              "transactionId": "8888888888"<br>
                                            }<br>
                                        }

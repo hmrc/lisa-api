@@ -24,7 +24,7 @@
                                             "status": 201,<br>
                                               "success": true,<br>
                                               "data": {<br>
-                                                "message": "Life Event Created",<br>
+                                                "message": "Life event created",<br>
                                                 "lifeEventId": "9876543210"<br>
                                               }<br>
                                        }

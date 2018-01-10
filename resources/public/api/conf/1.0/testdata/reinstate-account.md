@@ -19,7 +19,7 @@ You cannot reinstate this account because it is already open<table>
                                          "status": 200,<br>
                                          "success": true,<br>
                                          "data": {<br>
-                                           "message": "The account has been re-instated to a status of open",<br>
+                                           "message": "This account has been reinstated",<br>
                                            "accountId": "8765432100"<br>
                                          }<br>
                                        }
