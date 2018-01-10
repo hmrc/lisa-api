@@ -34,8 +34,8 @@ trait BonusPaymentService {
 
     response map {
       case (_, successResponse: DesTransactionResponse) => successResponse.message match {
-        case ("Late") => RequestBonusPaymentSuccessResponse(successResponse.transactionID,"Bonus transaction created - Late Notification")
-        case _ => RequestBonusPaymentSuccessResponse(successResponse.transactionID,"Bonus transaction created")
+        case ("Late") => RequestBonusPaymentSuccessResponse(successResponse.transactionID, "Bonus transaction created - late notification")
+        case _ => RequestBonusPaymentSuccessResponse(successResponse.transactionID, "Bonus transaction created")
       }
       case (status: Int, errorResponse: DesFailureResponse) => RequestBonusPaymentErrorResponse(status, errorResponse)
     }

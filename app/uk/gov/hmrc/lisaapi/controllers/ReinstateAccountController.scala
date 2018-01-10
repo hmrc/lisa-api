@@ -58,7 +58,7 @@ class ReinstateAccountController extends LisaController with LisaConstants {
             auditData = Map(ZREF -> lisaManager, "accountId" -> accountId)
           )
 
-          val data = ApiResponseData(message = "The account has been re-instated to a status of open", accountId = Some(accountId))
+          val data = ApiResponseData(message = "This account has been reinstated", accountId = Some(accountId))
 
           Ok(Json.toJson(ApiResponse(data = Some(data), success = true, status = 200)))
         }

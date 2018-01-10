@@ -77,7 +77,7 @@ class InvestorController extends LisaController with LisaConstants  {
       )
     )
 
-    val data = ApiResponseData(message = "Investor Created.", investorId = Some(investorId))
+    val data = ApiResponseData(message = "Investor created", investorId = Some(investorId))
 
     Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = 201)))
   }
