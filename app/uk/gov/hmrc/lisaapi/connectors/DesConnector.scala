@@ -27,9 +27,9 @@ import uk.gov.hmrc.play.http._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
-import play.api.libs.json.Reads
+import play.api.libs.json.{JsValue, Json, Reads}
 import play.mvc.BodyParser.AnyContent
-import uk.gov.hmrc.http.{HeaderCarrier, HttpGet, HttpPost, HttpReads, HttpResponse}
+import uk.gov.hmrc.http._
 import uk.gov.hmrc.http.logging.Authorization
 import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext
 
@@ -37,6 +37,7 @@ trait DesConnector extends ServicesConfig {
 
 
   val httpPost:HttpPost = WSHttp
+  val httpPut:HttpPut = WSHttp
   val httpGet:HttpGet = WSHttp
   lazy val desUrl = baseUrl("des")
   lazy val lisaServiceUrl = s"$desUrl/lifetime-isa/manager"
@@ -108,7 +109,7 @@ trait DesConnector extends ServicesConfig {
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId/reinstate-account"
     Logger.debug("Reinstate Account request returned status: " + uri)
 
-    val result = httpPost.POSTEmpty[HttpResponse](uri)(httpReads, updateHeaderCarrier(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
+    val result = httpPut.PUT[JsValue,HttpResponse](uri,Json.toJson(""))(implicitly,httpReads, updateHeaderCarrier(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
     result.map(r => {
       Logger.debug("Reinstate Account request returned status: " + r.status)
       r.status match {
