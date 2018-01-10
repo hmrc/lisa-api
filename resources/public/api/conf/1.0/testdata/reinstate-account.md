@@ -1,4 +1,4 @@
-You cannot reinstate this account because it is already open<table>
+<table>
     <col width="25%">
     <col width="35%">
     <col width="40%">
