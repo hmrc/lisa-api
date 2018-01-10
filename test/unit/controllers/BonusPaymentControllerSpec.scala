@@ -91,7 +91,7 @@ class BonusPaymentControllerSpec extends PlaySpec
         doRequest(validBonusPaymentJson.replace(""""lifeEventId": "1234567891",""", "")) { res =>
           status(res) mustBe (FORBIDDEN)
           (contentAsJson(res) \ "code").as[String] mustBe ("LIFE_EVENT_NOT_PROVIDED")
-          (contentAsJson(res) \ "message").as[String] mustBe ("lifeEventId is required when the claimReason is \"Life Event\"")
+          (contentAsJson(res) \ "message").as[String] mustBe ("lifeEventId is required when the claimReason is a life event")
         }
       }
 

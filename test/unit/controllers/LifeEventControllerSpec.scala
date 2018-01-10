@@ -207,7 +207,7 @@ class LifeEventControllerSpec extends PlaySpec
       doReportLifeEventRequest(reportLifeEventJson){res =>
         status(res) mustBe (FORBIDDEN)
         (contentAsJson(res) \"code").as[String] mustBe ("INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID")
-        (contentAsJson(res) \"message").as[String] mustBe ("The LISA account has already been closed or voided.")
+        (contentAsJson(res) \"message").as[String] mustBe ("This LISA account has already been closed or been made void by HMRC")
       }
     }
 
