@@ -71,7 +71,7 @@ class ReinstateAccountController extends LisaController with LisaConstants {
           )
           LisaMetrics.incrementMetrics(startTime,
             LisaMetricKeys.lisaError(FORBIDDEN,LisaMetricKeys.REINSTATE))
-          val data = ApiResponseData( code = Some(ErrorAccountAlreadyClosed.errorCode), message = "The account has a status of closed with a closure reason of transferred out")
+          val data = ApiResponseData( code = Some(ErrorAccountAlreadyClosed.errorCode), message = "You cannot reinstate this account because it was closed with a closure reason of transferred out")
           Forbidden(Json.toJson(Some(data)))
         }
 
@@ -84,7 +84,7 @@ class ReinstateAccountController extends LisaController with LisaConstants {
           )
           LisaMetrics.incrementMetrics(startTime,
             LisaMetricKeys.lisaError(FORBIDDEN,LisaMetricKeys.REINSTATE))
-          val data = ApiResponseData( code = Some(ErrorAccountAlreadyClosed.errorCode), message = "The account has a status of closed with a closure reason of cancelled")
+          val data = ApiResponseData( code = Some(ErrorAccountAlreadyClosed.errorCode), message = "You cannot reinstate this account because it was closed with a closure reason of cancellation")
           Forbidden(Json.toJson(Some(data)))
         }
 
@@ -106,12 +106,12 @@ class ReinstateAccountController extends LisaController with LisaConstants {
             auditType = "accountNotReinstated",
             path = getReinstateEndpointUrl(lisaManager, accountId),
             auditData = Map(ZREF -> lisaManager, "accountId" -> accountId,
-              "reasonNotReinstated" -> ErrorInvestorComplianceCheckFailed.errorCode)
+              "reasonNotReinstated" -> ErrorInvestorComplianceCheckFailedReinstate.errorCode)
           )
           LisaMetrics.incrementMetrics(startTime,
             LisaMetricKeys.lisaError(FORBIDDEN,LisaMetricKeys.REINSTATE))
 
-          Forbidden(Json.toJson(ErrorInvestorComplianceCheckFailed))
+          Forbidden(Json.toJson(ErrorInvestorComplianceCheckFailedReinstate))
         }
 
         case ReinstateLisaAccountNotFoundResponse => {

@@ -178,12 +178,12 @@ class AccountController extends LisaController with LisaConstants {
             auditType = "accountNotCreated",
             path = getEndpointUrl(lisaManager),
             auditData = creationRequest.toStringMap ++ Map(ZREF -> lisaManager,
-              "reasonNotCreated" -> ErrorInvestorComplianceCheckFailed.errorCode)
+              "reasonNotCreated" -> ErrorInvestorComplianceCheckFailedCreateTransfer.errorCode)
           )
           LisaMetrics.incrementMetrics(System.currentTimeMillis(),
             LisaMetricKeys.lisaError(FORBIDDEN,LisaMetricKeys.ACCOUNT))
 
-          Forbidden(Json.toJson(ErrorInvestorComplianceCheckFailed))
+          Forbidden(Json.toJson(ErrorInvestorComplianceCheckFailedCreateTransfer))
         }
         case CreateLisaAccountInvestorAccountAlreadyClosedOrVoidedResponse => {
           auditService.audit(
@@ -266,12 +266,12 @@ class AccountController extends LisaController with LisaConstants {
             auditType = "accountNotTransferred",
             path = getEndpointUrl(lisaManager),
             auditData = transferRequest.toStringMap ++ Map(ZREF -> lisaManager,
-              "reasonNotCreated" -> ErrorInvestorComplianceCheckFailed.errorCode)
+              "reasonNotCreated" -> ErrorInvestorComplianceCheckFailedCreateTransfer.errorCode)
           )
           LisaMetrics.incrementMetrics(System.currentTimeMillis(),
             LisaMetricKeys.lisaError(FORBIDDEN,LisaMetricKeys.ACCOUNT))
 
-          Forbidden(Json.toJson(ErrorInvestorComplianceCheckFailed))
+          Forbidden(Json.toJson(ErrorInvestorComplianceCheckFailedCreateTransfer))
         }
         case CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse => {
           auditService.audit(
