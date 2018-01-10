@@ -167,7 +167,7 @@
             <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
                 <p class ="code--block"> {<br>
                                          "code": "INVESTOR_COMPLIANCE_CHECK_FAILED",<br>
-                                         "message": "The investor has failed a compliance check - they may have breached ISA guidelines or regulations"<br>
+                                         "message": "You cannot create or transfer a LISA account because the investor has failed a compliance check"<br>
                                        }
                 </p>
             </td>
@@ -191,7 +191,7 @@
             <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
                 <p class ="code--block"> {<br>
                                          "code": "PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST",<br>
-                                          "message": "The transferredFromAccountId and transferredFromLMRN given don’t match with an account on HMRC’s records"<br>
+                                          "message": "The transferredFromAccountId and transferredFromLMRN given do not match an account on HMRC’s records"<br>
                                        }
                 </p>
             </td>
@@ -210,7 +210,7 @@
             <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
                 <p class ="code--block"> {<br>
                                          "code": "TRANSFER_ACCOUNT_DATA_NOT_PROVIDED",<br>
-                                          "message": "The transferredFromAccountId, transferredFromLMRN and transferInDate are not provided and are required for transfer of an account."<br>
+                                          "message": "You must give a transferredFromAccountId, transferredFromLMRN and transferInDate when the creationReason is transferred"<br>
                                        }
                 </p>
             </td>
@@ -234,7 +234,7 @@
             <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
                 <p class ="code--block"> {<br>
                                          "code": "TRANSFER_ACCOUNT_DATA_PROVIDED",<br>
-                                         "message": "transferredFromAccountId, transferredFromLMRN, and transferInDate fields should only be completed when the creationReason is \"Transferred\"."<br>
+                                         "message": "You must only give a transferredFromAccountId, transferredFromLMRN, and transferInDate when the creationReason is transferred"<br>
                                        }
                 </p>
             </td>
@@ -253,7 +253,7 @@
             <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
                 <p class ="code--block"> {<br>
                                          "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID",<br>
-                                         "message": "The LISA account has already been closed or voided."<br>
+                                         "message": "This LISA account has already been closed or been made void by HMRC"<br>
                                        }
                 </p>
             </td>
@@ -291,7 +291,7 @@
             <td><p>HTTP status: <code class="code--slim">409 (Conflict)</code></p>
                 <p class ="code--block"> {<br>
                                             "code": "INVESTOR_ACCOUNT_ALREADY_EXISTS",<br>
-                                            "message": "This investor already has a LISA account.",<br>
+                                            "message": "This investor already has a LISA account",<br>
                                             "accountId": "1234567890"<br>
                                           }
                 </p>

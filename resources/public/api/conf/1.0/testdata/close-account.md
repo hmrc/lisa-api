@@ -109,7 +109,7 @@
             <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
                 <p class ="code--block"> {<br>
                                             "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID",<br>
-                                            "message": "The LISA account has already been closed or voided."<br>
+                                            "message": "This LISA account has already been closed or been made void by HMRC"<br>
                                        }
                 </p>
             </td>
@@ -178,7 +178,7 @@
             <td><p>HTTP status: <code class="code--slim">404 (Not Found)</code></p>
                 <p class ="code--block"> {<br>
                                             "code": "INVESTOR_ACCOUNTID_NOT_FOUND",<br>
-                                            "message": "The accountId does not match HMRC’s records."<br>
+                                            "message": "The accountId does not match HMRC’s records"<br>
                                        }
                 </p>
             </td>
