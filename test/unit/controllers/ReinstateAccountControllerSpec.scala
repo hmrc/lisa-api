@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 HM Revenue & Customs
+ * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import play.api.libs.json.Json
 import play.api.mvc.{AnyContentAsJson, Result}
 import play.api.test.Helpers._
 import play.api.test._
@@ -46,7 +47,7 @@ class ReinstateAccountControllerSpec extends PlaySpec with MockitoSugar with One
   }
 
 
-  val closeAccountJson = """{"accountClosureReason" : "All funds withdrawn", "closureDate" : "2000-06-23"}"""
+  val reinstateAccountValidJson = """{"accountId" :"ABC12345"}"""
 
 
 
@@ -60,7 +61,7 @@ class ReinstateAccountControllerSpec extends PlaySpec with MockitoSugar with One
         "submitted a valid reinstate account request" in {
           when(mockService.reinstateAccountService(any(), any())(any())).thenReturn(Future.successful(ReinstateLisaAccountSuccessResponse))
 
-          doSyncReinstateAccount { res =>
+          doSyncReinstateAccount (reinstateAccountValidJson){ res =>
             verify(mockAuditService).audit(
               auditType = matchersEquals("accountReinstated"),
               path=matchersEquals(s"/manager/$lisaManager/accounts/ABC12345/reinstate-account"),
@@ -77,7 +78,7 @@ class ReinstateAccountControllerSpec extends PlaySpec with MockitoSugar with One
       "the data service returns a ReinstateLisaAccountAlreadyClosedResponse" in {
         when(mockService.reinstateAccountService(any(), any())(any())).thenReturn(Future.successful(ReinstateLisaAccountAlreadyClosedResponse))
 
-        doSyncReinstateAccount { res =>
+        doSyncReinstateAccount (reinstateAccountValidJson) { res =>
           verify(mockAuditService).audit(
             auditType = matchersEquals("accountNotReinstated"),
             path = matchersEquals(s"/manager/$lisaManager/accounts/ABC12345/reinstate-account"),
@@ -92,7 +93,7 @@ class ReinstateAccountControllerSpec extends PlaySpec with MockitoSugar with One
        "the data service returns a ReinstateLisaAccountAlreadyCancelledResponse" in {
           when(mockService.reinstateAccountService(any(), any())(any())).thenReturn(Future.successful(ReinstateLisaAccountAlreadyCancelledResponse))
 
-         doSyncReinstateAccount { res =>
+         doSyncReinstateAccount (reinstateAccountValidJson){ res =>
            verify(mockAuditService).audit(
              auditType = matchersEquals("accountNotReinstated"),
              path = matchersEquals(s"/manager/$lisaManager/accounts/ABC12345/reinstate-account"),
@@ -107,7 +108,7 @@ class ReinstateAccountControllerSpec extends PlaySpec with MockitoSugar with One
       "the data service returns a ReinstateLisaAccountAlreadyOpenResponse" in {
         when(mockService.reinstateAccountService(any(), any())(any())).thenReturn(Future.successful(ReinstateLisaAccountAlreadyOpenResponse))
 
-        doSyncReinstateAccount { res =>
+        doSyncReinstateAccount (reinstateAccountValidJson){ res =>
           verify(mockAuditService).audit(
             auditType = matchersEquals("accountNotReinstated"),
             path = matchersEquals(s"/manager/$lisaManager/accounts/ABC12345/reinstate-account"),
@@ -122,7 +123,7 @@ class ReinstateAccountControllerSpec extends PlaySpec with MockitoSugar with One
       "the data service returns a ReinstateLisaAccountInvestorComplianceCheckFailedResponse" in {
         when(mockService.reinstateAccountService(any(), any())(any())).thenReturn(Future.successful(ReinstateLisaAccountInvestorComplianceCheckFailedResponse))
 
-        doSyncReinstateAccount { res =>
+        doSyncReinstateAccount (reinstateAccountValidJson){ res =>
           verify(mockAuditService).audit(
             auditType = matchersEquals("accountNotReinstated"),
             path = matchersEquals(s"/manager/$lisaManager/accounts/ABC12345/reinstate-account"),
@@ -138,7 +139,7 @@ class ReinstateAccountControllerSpec extends PlaySpec with MockitoSugar with One
       "the data service returns a ReinstateLisaAccountNotFoundResponse" in {
         when(mockService.reinstateAccountService(any(), any())(any())).thenReturn(Future.successful(ReinstateLisaAccountNotFoundResponse))
 
-        doSyncReinstateAccount { res =>
+        doSyncReinstateAccount (reinstateAccountValidJson){ res =>
           verify(mockAuditService).audit(
             auditType = matchersEquals("accountNotReinstated"),
             path = matchersEquals(s"/manager/$lisaManager/accounts/ABC12345/reinstate-account"),
@@ -155,7 +156,7 @@ class ReinstateAccountControllerSpec extends PlaySpec with MockitoSugar with One
         "the data service returns an error" in {
           when(mockService.reinstateAccountService(any(), any())(any())).thenReturn(Future.successful(ReinstateLisaAccountErrorResponse))
 
-          doSyncReinstateAccount { res =>
+          doSyncReinstateAccount (reinstateAccountValidJson){ res =>
             verify(mockAuditService).audit(
               auditType = matchersEquals("accountNotReinstated"),
               path=matchersEquals(s"/manager/$lisaManager/accounts/ABC12345/reinstate-account"),
@@ -174,7 +175,7 @@ class ReinstateAccountControllerSpec extends PlaySpec with MockitoSugar with One
       "submitted a valid reinstate account request" in {
         when(mockService.reinstateAccountService(any(), any())(any())).thenReturn(Future.successful(ReinstateLisaAccountSuccessResponse))
 
-        doReinstateRequest(lisaManager) { res =>
+        doReinstateRequest(reinstateAccountValidJson, lisaManager) { res =>
           status(res) mustBe (OK)
         }
       }
@@ -184,7 +185,7 @@ class ReinstateAccountControllerSpec extends PlaySpec with MockitoSugar with One
       "the data service returns a ReinstateLisaAccountAlreadyClosedResponse" in {
         when(mockService.reinstateAccountService(any(), any())(any())).thenReturn(Future.successful(ReinstateLisaAccountAlreadyClosedResponse))
 
-        doReinstateRequest (lisaManager) { res =>
+        doReinstateRequest (reinstateAccountValidJson, lisaManager) { res =>
           status(res) mustBe (FORBIDDEN)
           (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ACCOUNT_ALREADY_CLOSED")
         }
@@ -195,7 +196,7 @@ class ReinstateAccountControllerSpec extends PlaySpec with MockitoSugar with One
       "the data service returns a ReinstateLisaAccountAlreadyCancelledResponse" in {
         when(mockService.reinstateAccountService(any(), any())(any())).thenReturn(Future.successful(ReinstateLisaAccountAlreadyCancelledResponse))
 
-        doReinstateRequest (lisaManager) { res =>
+        doReinstateRequest (reinstateAccountValidJson, lisaManager) { res =>
           status(res) mustBe (FORBIDDEN)
           (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ACCOUNT_ALREADY_CLOSED")
         }
@@ -206,7 +207,7 @@ class ReinstateAccountControllerSpec extends PlaySpec with MockitoSugar with One
       "the data service returns a ReinstateLisaAccountAlreadyOpenResponse" in {
         when(mockService.reinstateAccountService(any(), any())(any())).thenReturn(Future.successful(ReinstateLisaAccountAlreadyOpenResponse))
 
-        doReinstateRequest(lisaManager) { res =>
+        doReinstateRequest(reinstateAccountValidJson, lisaManager) { res =>
           status(res) mustBe (FORBIDDEN)
           (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ACCOUNT_ALREADY_OPEN")
         }
@@ -217,7 +218,7 @@ class ReinstateAccountControllerSpec extends PlaySpec with MockitoSugar with One
       "the data service returns a ReinstateLisaAccountInvestorComplianceCheckFailedResponse" in {
         when(mockService.reinstateAccountService(any(), any())(any())).thenReturn(Future.successful(ReinstateLisaAccountInvestorComplianceCheckFailedResponse))
 
-        doReinstateRequest(lisaManager) { res =>
+        doReinstateRequest(reinstateAccountValidJson, lisaManager) { res =>
           status(res) mustBe (FORBIDDEN)
           (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_COMPLIANCE_CHECK_FAILED")
         }
@@ -229,7 +230,7 @@ class ReinstateAccountControllerSpec extends PlaySpec with MockitoSugar with One
       "the data service returns a ReinstateLisaAccountNotFoundResponse" in {
         when(mockService.reinstateAccountService(any(), any())(any())).thenReturn(Future.successful(ReinstateLisaAccountNotFoundResponse))
 
-        doReinstateRequest(lisaManager) { res =>
+        doReinstateRequest(reinstateAccountValidJson, lisaManager) { res =>
           status(res) mustBe (NOT_FOUND)
           (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ACCOUNTID_NOT_FOUND")
         }
@@ -238,7 +239,7 @@ class ReinstateAccountControllerSpec extends PlaySpec with MockitoSugar with One
 
     "return with status 400 bad request" when {
       "submitted an invalid lmrn" in {
-        doReinstateRequest("Z12345") { res =>
+        doReinstateRequest(reinstateAccountValidJson, "Z12345") { res =>
           status(res) mustBe (BAD_REQUEST)
           val json = contentAsJson(res)
           (json \ "code").as[String] mustBe ErrorBadRequestLmrn.errorCode
@@ -251,7 +252,7 @@ class ReinstateAccountControllerSpec extends PlaySpec with MockitoSugar with One
       "the data service returns an error" in {
         when(mockService.reinstateAccountService(any(), any())(any())).thenReturn(Future.successful(ReinstateLisaAccountErrorResponse))
 
-        doReinstateRequest() { res =>
+        doReinstateRequest(reinstateAccountValidJson) { res =>
           status(res) mustBe (INTERNAL_SERVER_ERROR)
         }
       }
@@ -262,17 +263,21 @@ class ReinstateAccountControllerSpec extends PlaySpec with MockitoSugar with One
 
 
 
-  def doReinstateRequest(lmrn: String = lisaManager)(callback: (Future[Result]) => Unit) {
-    val res = SUT.reinstateAccount(lmrn, accountId).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader))
+  def doReinstateRequest(jsonString: String, lmrn: String = lisaManager)(callback: (Future[Result]) => Unit) {
+    val res = SUT.reinstateAccount(lmrn).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
+      withBody(AnyContentAsJson(Json.parse(jsonString))))
 
     callback(res)
   }
 
 
-  def doSyncReinstateAccount(callback: Result => Unit) {
-    val res = await(SUT.reinstateAccount(lisaManager, accountId).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader)))
+  def doSyncReinstateAccount(jsonString: String)(callback: (Result) => Unit) {
+    val res = await(SUT.reinstateAccount(lisaManager).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
+      withBody(AnyContentAsJson(Json.parse(jsonString)))))
+
     callback(res)
   }
+
 
 
 

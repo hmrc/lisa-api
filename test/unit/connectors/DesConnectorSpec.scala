@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 HM Revenue & Customs
+ * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import org.mockito.Matchers._
 import org.mockito.Mockito.when
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des._
@@ -30,7 +30,7 @@ import play.api.test.Helpers._
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
 import scala.io.Source
-import uk.gov.hmrc.http.{ HeaderCarrier, HttpGet, HttpPost, HttpResponse }
+import uk.gov.hmrc.http._
 
 class DesConnectorSpec extends PlaySpec
   with MockitoSugar
@@ -335,7 +335,7 @@ class DesConnectorSpec extends PlaySpec
 
     "Return a status code of 200" when {
       "Given a 200 response from DES" in {
-        when(mockHttpPost.POSTEmpty[HttpResponse](any())(any(), any(), any()))
+        when(mockHttpPut.PUT[JsValue, HttpResponse](any(), any())(any(),any(), any(), any()))
           .thenReturn(Future.successful(HttpResponse(responseStatus = OK, responseJson = None)))
 
         doReinstateAccountRequest { response =>
@@ -346,7 +346,7 @@ class DesConnectorSpec extends PlaySpec
 
     "Return no DesAccountResponse" when {
       "The DES response has no json body" in {
-        when(mockHttpPost.POSTEmpty[HttpResponse](any())(any(), any(), any()))
+        when(mockHttpPut.PUT[JsValue,HttpResponse](any(),any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1009,11 +1009,13 @@ class DesConnectorSpec extends PlaySpec
 
   val mockHttpPost = mock[HttpPost]
   val mockHttpGet = mock[HttpGet]
+  val mockHttpPut = mock[HttpPut]
 
   implicit val hc = HeaderCarrier()
 
   object SUT extends DesConnector {
     override val httpPost = mockHttpPost
     override val httpGet = mockHttpGet
+    override val httpPut = mockHttpPut
   }
 }
