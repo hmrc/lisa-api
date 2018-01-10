@@ -115,7 +115,7 @@ types:
                           type: !include schemas/ErrorCodes.schema.json
                           examples:
                             notOpenStatus:
-                              description: The lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC's records
+                              description: The lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
                               value: |
                                 {
                                   "code" : "UNAUTHORIZED",
@@ -197,7 +197,7 @@ types:
                             type: !include schemas/ErrorCodes.schema.json
                             examples:
                               notOpenStatus:
-                                description: The lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC's records
+                                description: The lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
                                 value: |
                                   {
                                     "code" : "UNAUTHORIZED",
@@ -220,7 +220,7 @@ types:
                                 value: |
                                   {
                                     "code" : "INVESTOR_ELIGIBILITY_CHECK_FAILED",
-                                    "message" : "Can't open a LISA if investor is older than 40 or younger than 18"
+                                    "message" : "Can’t open a LISA if investor is older than 40 or younger than 18"
                                    }
                               complianceFail:
                                 description: You cannot create or transfer a LISA account because the investor has failed a compliance check
@@ -320,7 +320,7 @@ types:
                             type: !include schemas/ErrorCodes.schema.json
                             examples:
                               notOpenStatus:
-                                description: The lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC's records
+                                description: The lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
                                 value: |
                                   {
                                     "code" : "UNAUTHORIZED",
@@ -406,7 +406,7 @@ types:
                             type: !include schemas/ErrorCodes.schema.json
                             examples:
                               notOpenStatus:
-                                description: The lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC's records
+                                description: The lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
                                 value: |
                                   {
                                     "code" : "UNAUTHORIZED",
@@ -507,7 +507,7 @@ types:
                             type: !include schemas/ErrorCodes.schema.json
                             examples:
                               notOpenStatus:
-                                description: The lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC's records
+                                description: The lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
                                 value: |
                                   {
                                     "code" : "UNAUTHORIZED",
@@ -594,7 +594,7 @@ types:
                             type: !include schemas/ErrorCodes.schema.json
                             examples:
                               notOpenStatus:
-                                description: The lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC's records
+                                description: The lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
                                 value: |
                                   {
                                     "code" : "UNAUTHORIZED",
@@ -694,7 +694,7 @@ types:
                             type: !include schemas/ErrorCodes.schema.json
                             examples:
                               notOpenStatus:
-                                description: The lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC's records
+                                description: The lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
                                 value: |
                                   {
                                     "code" : "UNAUTHORIZED",
@@ -720,7 +720,7 @@ types:
                                     "message" : "lifeEventId is required when the claimReason is a life event"
                                   }
                               bonusWrong:
-                                description: The bonus information given exceeds the maximum annual amount, the qualifying deposits exceed the maximum annual amount, or the bonus claim doesn't equal the correct percentage of stated qualifying funds.
+                                description: The bonus information given exceeds the maximum annual amount, the qualifying deposits exceed the maximum annual amount, or the bonus claim doesn’t equal the correct percentage of stated qualifying funds.
                                 value: |
                                   {
                                     "code" : "BONUS_CLAIM_ERROR",
@@ -758,9 +758,9 @@ types:
                               type: !include schemas/ErrorCodes.schema.json
                               examples:
                                 noLifeEvent:
-                                  description: The investor's bonus payment has already been requested.
+                                  description: The investor’s bonus payment has already been requested.
                                   value: |
                                     {
                                       "code" : "BONUS_CLAIM_ALREADY_EXISTS",
-                                      "message" : "The investor's bonus payment has already been requested"
+                                      "message" : "The investor’s bonus payment has already been requested"
                                     }
