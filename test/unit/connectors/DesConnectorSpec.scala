@@ -336,10 +336,11 @@ class DesConnectorSpec extends PlaySpec
     "Return a status code of 200" when {
       "Given a 200 response from DES" in {
         when(mockHttpPut.PUT[JsValue, HttpResponse](any(), any())(any(),any(), any(), any()))
-          .thenReturn(Future.successful(HttpResponse(responseStatus = OK, responseJson = None)))
+          .thenReturn (Future.successful(HttpResponse(responseStatus = OK,
+            responseJson =  Some(Json.parse(s"""{"code": "SUCCESS", "reason": "Account successfully reinstated"}""")))))
 
         doReinstateAccountRequest { response =>
-          response must be(DesEmptySuccessResponse)
+          response must be(DesReinstateAccountSuccessResponse("SUCCESS", "Account successfully reinstated"))
         }
       }
     }

@@ -59,12 +59,12 @@ class ReinstateAccountControllerSpec extends PlaySpec with MockitoSugar with One
 
       "return with status 200 ok" when {
         "submitted a valid reinstate account request" in {
-          when(mockService.reinstateAccountService(any(), any())(any())).thenReturn(Future.successful(ReinstateLisaAccountSuccessResponse))
+          when(mockService.reinstateAccountService(any(), any())(any())).thenReturn(Future.successful(ReinstateLisaAccountSuccessResponse("code", "reason")))
 
           doSyncReinstateAccount (reinstateAccountValidJson){ res =>
             verify(mockAuditService).audit(
               auditType = matchersEquals("accountReinstated"),
-              path=matchersEquals(s"/manager/$lisaManager/accounts/ABC12345/reinstate-account"),
+              path=matchersEquals(s"/manager/$lisaManager/accounts/ABC12345/reinstate"),
               auditData = matchersEquals(Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountId" -> "ABC12345"
@@ -81,7 +81,7 @@ class ReinstateAccountControllerSpec extends PlaySpec with MockitoSugar with One
         doSyncReinstateAccount (reinstateAccountValidJson) { res =>
           verify(mockAuditService).audit(
             auditType = matchersEquals("accountNotReinstated"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/ABC12345/reinstate-account"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts/ABC12345/reinstate"),
             auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountId" -> "ABC12345",
@@ -96,7 +96,7 @@ class ReinstateAccountControllerSpec extends PlaySpec with MockitoSugar with One
          doSyncReinstateAccount (reinstateAccountValidJson){ res =>
            verify(mockAuditService).audit(
              auditType = matchersEquals("accountNotReinstated"),
-             path = matchersEquals(s"/manager/$lisaManager/accounts/ABC12345/reinstate-account"),
+             path = matchersEquals(s"/manager/$lisaManager/accounts/ABC12345/reinstate"),
              auditData = matchersEquals(Map(
                "lisaManagerReferenceNumber" -> lisaManager,
                "accountId" -> "ABC12345",
@@ -111,7 +111,7 @@ class ReinstateAccountControllerSpec extends PlaySpec with MockitoSugar with One
         doSyncReinstateAccount (reinstateAccountValidJson){ res =>
           verify(mockAuditService).audit(
             auditType = matchersEquals("accountNotReinstated"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/ABC12345/reinstate-account"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts/ABC12345/reinstate"),
             auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountId" -> "ABC12345",
@@ -126,7 +126,7 @@ class ReinstateAccountControllerSpec extends PlaySpec with MockitoSugar with One
         doSyncReinstateAccount (reinstateAccountValidJson){ res =>
           verify(mockAuditService).audit(
             auditType = matchersEquals("accountNotReinstated"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/ABC12345/reinstate-account"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts/ABC12345/reinstate"),
             auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountId" -> "ABC12345",
@@ -142,7 +142,7 @@ class ReinstateAccountControllerSpec extends PlaySpec with MockitoSugar with One
         doSyncReinstateAccount (reinstateAccountValidJson){ res =>
           verify(mockAuditService).audit(
             auditType = matchersEquals("accountNotReinstated"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/ABC12345/reinstate-account"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts/ABC12345/reinstate"),
             auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountId" -> "ABC12345",
@@ -159,7 +159,7 @@ class ReinstateAccountControllerSpec extends PlaySpec with MockitoSugar with One
           doSyncReinstateAccount (reinstateAccountValidJson){ res =>
             verify(mockAuditService).audit(
               auditType = matchersEquals("accountNotReinstated"),
-              path=matchersEquals(s"/manager/$lisaManager/accounts/ABC12345/reinstate-account"),
+              path=matchersEquals(s"/manager/$lisaManager/accounts/ABC12345/reinstate"),
               auditData = matchersEquals(Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountId" -> "ABC12345",
@@ -173,7 +173,7 @@ class ReinstateAccountControllerSpec extends PlaySpec with MockitoSugar with One
 
     "return with status 200 ok" when {
       "submitted a valid reinstate account request" in {
-        when(mockService.reinstateAccountService(any(), any())(any())).thenReturn(Future.successful(ReinstateLisaAccountSuccessResponse))
+        when(mockService.reinstateAccountService(any(), any())(any())).thenReturn(Future.successful(ReinstateLisaAccountSuccessResponse("code", "reason")))
 
         doReinstateRequest(reinstateAccountValidJson, lisaManager) { res =>
           status(res) mustBe (OK)

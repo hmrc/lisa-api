@@ -51,8 +51,8 @@ class ReinstateAccountController extends LisaController with LisaConstants {
   private def processReinstateAccount(lisaManager: String, accountId: String)(implicit hc: HeaderCarrier, startTime:Long) = {
     service.reinstateAccountService(lisaManager, accountId).map { result =>
       result match {
-        case ReinstateLisaAccountSuccessResponse => {
-          LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.REINSTATE)
+        case success: ReinstateLisaAccountSuccessResponse => {
+           LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.REINSTATE)
 
           auditService.audit(
             auditType = "accountReinstated",
@@ -151,7 +151,7 @@ class ReinstateAccountController extends LisaController with LisaConstants {
   }
 
   private def getReinstateEndpointUrl(lisaManagerReferenceNumber: String, accountID: String): String = {
-    s"/manager/$lisaManagerReferenceNumber/accounts/$accountID/reinstate-account"
+    s"/manager/$lisaManagerReferenceNumber/accounts/$accountID/reinstate"
   }
 }
 
