@@ -106,14 +106,14 @@ trait DesConnector extends ServicesConfig {
     */
   def reinstateAccount (lisaManager: String, accountId: String)
                            (implicit hc: HeaderCarrier): Future[DesResponse] = {
-    val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId/reinstate-account"
+    val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId/reinstate"
     Logger.debug("Reinstate Account request returned status: " + uri)
 
     val result = httpPut.PUT[JsValue,HttpResponse](uri,Json.toJson(""))(implicitly,httpReads, updateHeaderCarrier(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
     result.map(r => {
       Logger.debug("Reinstate Account request returned status: " + r.status)
       r.status match {
-        case 200 => DesEmptySuccessResponse
+        case 200 => parseDesResponse[DesReinstateAccountSuccessResponse](r)._2
         case _ => parseDesResponse[DesFailureResponse](r)._2
       }
     })

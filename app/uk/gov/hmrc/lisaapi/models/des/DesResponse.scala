@@ -50,6 +50,7 @@ case class DesFailureResponse(code: String = "INTERNAL_SERVER_ERROR", reason: St
 case class DesLifeEventExistResponse(code: String, reason: String, lifeEventID: String) extends DesResponse
 case object DesEmptySuccessResponse extends DesResponse
 case class DesUpdateSubscriptionSuccessResponse (code: String, message: String)extends DesResponse
+case class DesReinstateAccountSuccessResponse (code: String, reason: String)extends DesResponse
 case class DesGetBonusPaymentResponse(lifeEventId: Option[LifeEventId],
                                       periodStartDate: DateTime,
                                       periodEndDate: DateTime,
@@ -79,6 +80,7 @@ object DesResponse {
   implicit val desLifeEventResponseFormats: OFormat[DesLifeEventResponse] = Json.format[DesLifeEventResponse]
   implicit val desTransactionResponseFormats: OFormat[DesTransactionResponse] = Json.format[DesTransactionResponse]
   implicit val desUpdateSubscriptionResponseFormats: OFormat[DesUpdateSubscriptionSuccessResponse] = Json.format[DesUpdateSubscriptionSuccessResponse]
+  implicit val desReinstateAccountResponseFormats: OFormat[DesReinstateAccountSuccessResponse] = Json.format[DesReinstateAccountSuccessResponse]
 
   implicit val desFailureReads: Reads[DesFailureResponse] = (
     (JsPath \ "code").read[String] and
