@@ -344,7 +344,7 @@
             <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
                 <p class ="code--block"> {<br>
                                            "code": "BONUS_CLAIM_ERROR",<br>
-                                           "message": "The bonus information given exceeds the maximum annual amount, the qualifying deposits exceed the maximum annual amount, or the bonus claim doesn't equal the correct percentage of stated qualifying funds."<br>
+                                           "message": "The bonus information given exceeds the maximum annual amount, the qualifying deposits exceed the maximum annual amount, or the bonus claim doesn't equal the correct percentage of stated qualifying funds"<br>
                                        }
                 </p>
             </td>
