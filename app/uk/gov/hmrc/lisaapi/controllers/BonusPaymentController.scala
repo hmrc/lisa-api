@@ -140,17 +140,30 @@ class BonusPaymentController extends LisaController with LisaConstants {
                            (implicit hc: HeaderCarrier) = {
     Logger.debug("Matched success response")
 
-    //val data = ApiResponseData(message = resp.message, transactionId = Some(resp.transactionId))
-    val data = ApiResponseData(message = NOTIFICATION_MSG, transactionId = Some(resp.transactionId))
-    val lateNotification: Boolean = resp match { case _: RequestBonusPaymentLateResponse => true; case _ => false }
+    resp match {
+      case _:RequestBonusPaymentOnTimeResponse => {
+        val data = ApiResponseData(message = "Bonus transaction created", transactionId = Some(resp.transactionId))
 
-    auditService.audit(
-      auditType = "bonusPaymentRequested",
-      path = getEndpointUrl(lisaManager, accountId),
-      auditData = (createAuditData(lisaManager, accountId, req) + (NOTIFICATION -> (if(lateNotification) "yes" else "no")))
-    )
+        auditService.audit(
+          auditType = "bonusPaymentRequested",
+          path = getEndpointUrl(lisaManager, accountId),
+          auditData = (createAuditData(lisaManager, accountId, req) + (NOTIFICATION -> "no"))
+        )
 
-    Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
+        Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
+      }
+      case _:RequestBonusPaymentLateResponse => {
+        val data = ApiResponseData(message = "Bonus transaction created - late notification", transactionId = Some(resp.transactionId))
+
+        auditService.audit(
+          auditType = "bonusPaymentRequested",
+          path = getEndpointUrl(lisaManager, accountId),
+          auditData = (createAuditData(lisaManager, accountId, req) + (NOTIFICATION -> "yes"))
+        )
+
+        Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
+      }
+    }
   }
 
   private def handleFailure(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest, errorResponse: RequestBonusPaymentErrorResponse)
