@@ -62,13 +62,25 @@ class BonusPaymentControllerSpec extends PlaySpec
 
     "return with status 201 created" when {
 
-      "given a Success Response from the service layer" in {
+      "given a RequestBonusPaymentOnTimeResponse from the service layer" in {
         when(mockService.requestBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(RequestBonusPaymentOnTimeResponse("1928374")))
 
         doRequest(validBonusPaymentJson) { res =>
           status(res) mustBe (CREATED)
-          (contentAsJson(res) \ "data" \ "transactionId").as[String] mustBe ("1928374")
+          (contentAsJson(res) \ "data" \ "transactionId").as[String] mustBe "1928374"
+          (contentAsJson(res) \ "data" \ "message").as[String] mustBe "Bonus transaction created"
+        }
+      }
+
+      "given a RequestBonusPaymentLateResponse from the service layer" in {
+        when(mockService.requestBonusPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(RequestBonusPaymentLateResponse("1928374")))
+
+        doRequest(validBonusPaymentJson) { res =>
+          status(res) mustBe (CREATED)
+          (contentAsJson(res) \ "data" \ "transactionId").as[String] mustBe "1928374"
+          (contentAsJson(res) \ "data" \ "message").as[String] mustBe "Bonus transaction created - late notification"
         }
       }
 
