@@ -235,7 +235,7 @@ class BonusPaymentValidatorSpec extends PlaySpec
         errors mustBe List(
           ErrorValidation(
             errorCode = "INVALID_DATE",
-            message = "The periodStartDate must equal the 6th day of the month",
+            message = "The periodStartDate must be the 6th day of the month",
             path = Some("/periodStartDate")
           )
         )
@@ -287,7 +287,7 @@ class BonusPaymentValidatorSpec extends PlaySpec
         errors mustBe List(
           ErrorValidation(
             errorCode = "INVALID_DATE",
-            message = "The periodEndDate must equal the 5th day of the month after the periodStartDate",
+            message = "The periodEndDate must be the 5th day of the month which occurs after the periodStartDate",
             path = Some("/periodEndDate")
           )
         )
@@ -303,7 +303,7 @@ class BonusPaymentValidatorSpec extends PlaySpec
         errors mustBe List(
           ErrorValidation(
             errorCode = "INVALID_DATE",
-            message = "The periodEndDate must equal the 5th day of the month after the periodStartDate",
+            message = "The periodEndDate must be the 5th day of the month which occurs after the periodStartDate",
             path = Some("/periodEndDate")
           )
         )
@@ -319,7 +319,7 @@ class BonusPaymentValidatorSpec extends PlaySpec
         errors mustBe List(
           ErrorValidation(
             errorCode = "INVALID_DATE",
-            message = "The periodEndDate must equal the 5th day of the month after the periodStartDate",
+            message = "The periodEndDate must be the 5th day of the month which occurs after the periodStartDate",
             path = Some("/periodEndDate")
           )
         )

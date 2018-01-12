@@ -33,11 +33,26 @@ trait BonusPaymentService {
     val response = desConnector.requestBonusPayment(lisaManager, accountId, request)
 
     response map {
-      case (_, successResponse: DesTransactionResponse) => successResponse.message match {
-        case ("Late") => RequestBonusPaymentSuccessResponse(successResponse.transactionID,"Bonus transaction created - Late Notification")
-        case _ => RequestBonusPaymentSuccessResponse(successResponse.transactionID,"Bonus transaction created")
+      case successResponse: DesTransactionResponse => {
+        Logger.debug("Matched RequestBonusPaymentSuccessResponse and the message is " + successResponse.message)
+
+        successResponse.message match {
+          case "Late" => RequestBonusPaymentLateResponse(successResponse.transactionID)
+          case _ => RequestBonusPaymentOnTimeResponse(successResponse.transactionID)
+        }
       }
-      case (status: Int, errorResponse: DesFailureResponse) => RequestBonusPaymentErrorResponse(status, errorResponse)
+      case failureResponse: DesFailureResponse => {
+        Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
+
+        failureResponse.code match {
+          case "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID" => RequestBonusPaymentAccountClosed
+          case "LIFE_EVENT_NOT_FOUND" => RequestBonusPaymentLifeEventNotFound
+          case "BONUS_CLAIM_ERROR" => RequestBonusPaymentBonusClaimError
+          case "INVESTOR_ACCOUNTID_NOT_FOUND" => RequestBonusPaymentAccountNotFound
+          case "BONUS_CLAIM_ALREADY_EXISTS" => RequestBonusPaymentClaimAlreadyExists
+          case _ => RequestBonusPaymentError
+        }
+      }
     }
   }
 
@@ -49,7 +64,7 @@ trait BonusPaymentService {
 
     response map {
       case successResponse: DesGetBonusPaymentResponse => {
-        Logger.debug("Matched DesAccountResponse")
+        Logger.debug("Matched DesGetBonusPaymentResponse")
 
         GetBonusPaymentSuccessResponse(successResponse.lifeEventId,
                                        successResponse.periodStartDate,

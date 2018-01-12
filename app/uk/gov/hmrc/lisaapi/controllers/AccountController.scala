@@ -144,7 +144,7 @@ class AccountController extends LisaController with LisaConstants {
             path = getEndpointUrl(lisaManager),
             auditData = creationRequest.toStringMap + (ZREF -> lisaManager)
           )
-          val data = ApiResponseData(message = "Account Created.", accountId = Some(accountId))
+          val data = ApiResponseData(message = "Account created", accountId = Some(accountId))
           LisaMetrics.incrementMetrics(startTime,LisaMetricKeys.ACCOUNT)
 
           Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = 201)))
@@ -178,12 +178,12 @@ class AccountController extends LisaController with LisaConstants {
             auditType = "accountNotCreated",
             path = getEndpointUrl(lisaManager),
             auditData = creationRequest.toStringMap ++ Map(ZREF -> lisaManager,
-              "reasonNotCreated" -> ErrorInvestorComplianceCheckFailed.errorCode)
+              "reasonNotCreated" -> ErrorInvestorComplianceCheckFailedCreateTransfer.errorCode)
           )
           LisaMetrics.incrementMetrics(System.currentTimeMillis(),
             LisaMetricKeys.lisaError(FORBIDDEN,LisaMetricKeys.ACCOUNT))
 
-          Forbidden(Json.toJson(ErrorInvestorComplianceCheckFailed))
+          Forbidden(Json.toJson(ErrorInvestorComplianceCheckFailedCreateTransfer))
         }
         case CreateLisaAccountInvestorAccountAlreadyClosedOrVoidedResponse => {
           auditService.audit(
@@ -220,13 +220,13 @@ class AccountController extends LisaController with LisaConstants {
           LisaMetrics.incrementMetrics(System.currentTimeMillis(),
             LisaMetricKeys.lisaError(INTERNAL_SERVER_ERROR,LisaMetricKeys.ACCOUNT))
 
-          Logger.error(s"AccontController :createAccount unknown case from DES returning internal server error" )
+          Logger.error(s"AccontController: createAccount unknown case from DES returning internal server error" )
           InternalServerError(Json.toJson(ErrorInternalServerError))
         }
       }
     } recover {
       case e:Exception =>
-        Logger.error(s"AccontController : An error occurred due to ${e.getMessage} returning internal server error")
+        Logger.error(s"AccontController: An error occurred due to ${e.getMessage} returning internal server error")
         LisaMetrics.startMetrics(System.currentTimeMillis(),
           LisaMetricKeys.lisaError(INTERNAL_SERVER_ERROR,LisaMetricKeys.ACCOUNT))
 
@@ -244,7 +244,7 @@ class AccountController extends LisaController with LisaConstants {
             path = getEndpointUrl(lisaManager),
             auditData = transferRequest.toStringMap + (ZREF -> lisaManager)
           )
-          val data = ApiResponseData(message = "Account Transferred.", accountId = Some(accountId))
+          val data = ApiResponseData(message = "Account transferred", accountId = Some(accountId))
           LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.ACCOUNT)
 
           Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = 201)))
@@ -266,12 +266,12 @@ class AccountController extends LisaController with LisaConstants {
             auditType = "accountNotTransferred",
             path = getEndpointUrl(lisaManager),
             auditData = transferRequest.toStringMap ++ Map(ZREF -> lisaManager,
-              "reasonNotCreated" -> ErrorInvestorComplianceCheckFailed.errorCode)
+              "reasonNotCreated" -> ErrorInvestorComplianceCheckFailedCreateTransfer.errorCode)
           )
           LisaMetrics.incrementMetrics(System.currentTimeMillis(),
             LisaMetricKeys.lisaError(FORBIDDEN,LisaMetricKeys.ACCOUNT))
 
-          Forbidden(Json.toJson(ErrorInvestorComplianceCheckFailed))
+          Forbidden(Json.toJson(ErrorInvestorComplianceCheckFailedCreateTransfer))
         }
         case CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse => {
           auditService.audit(
@@ -317,7 +317,7 @@ class AccountController extends LisaController with LisaConstants {
             auditData = transferRequest.toStringMap ++ Map(ZREF -> lisaManager,
               "reasonNotCreated" -> ErrorInternalServerError.errorCode)
           )
-          Logger.error(s"AccontController : transferAccount unknown case from DES returning internal server error" )
+          Logger.error(s"AccontController: transferAccount unknown case from DES returning internal server error" )
           LisaMetrics.incrementMetrics(System.currentTimeMillis(),
             LisaMetricKeys.lisaError(INTERNAL_SERVER_ERROR,LisaMetricKeys.ACCOUNT))
 
@@ -325,7 +325,7 @@ class AccountController extends LisaController with LisaConstants {
         }
       }
     } recover {
-      case e:Exception  =>     Logger.error(s"AccontController : An error occurred in due to ${e.getMessage} returning internal server error")
+      case e:Exception  =>     Logger.error(s"AccontController: An error occurred in due to ${e.getMessage} returning internal server error")
         LisaMetrics.incrementMetrics(System.currentTimeMillis(),
           LisaMetricKeys.lisaError(INTERNAL_SERVER_ERROR,LisaMetricKeys.ACCOUNT))
 
@@ -346,7 +346,7 @@ class AccountController extends LisaController with LisaConstants {
               "accountId" -> accountId)
           )
 
-          val data = ApiResponseData(message = "LISA Account Closed", accountId = Some(accountId))
+          val data = ApiResponseData(message = "LISA account closed", accountId = Some(accountId))
 
           Ok(Json.toJson(ApiResponse(data = Some(data), success = true, status = 200)))
         }

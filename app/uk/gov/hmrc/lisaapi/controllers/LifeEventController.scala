@@ -47,7 +47,7 @@ class LifeEventController extends LisaController {
 
                 doAudit(lisaManager, accountId, req, "lifeEventReported")
 
-                val data = ApiResponseData(message = "Life Event Created", lifeEventId = Some(lifeEventId))
+                val data = ApiResponseData(message = "Life event created", lifeEventId = Some(lifeEventId))
 
                 LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.EVENT)
 

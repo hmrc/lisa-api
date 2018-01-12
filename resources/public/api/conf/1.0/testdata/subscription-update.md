@@ -51,7 +51,7 @@
                                        }
                 </p>
             </td>
-        </tr> 
+        </tr>
         <tr>
             <td><p>Request with a valid payload, LISA Manager reference number and account ID</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567892</p></td>
             <td>
@@ -63,7 +63,7 @@
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
                 <p class ="code--block"> {<br>
                                          "data": {<br>
-                                           "message": "Successfully updated the firstSubscriptionDate for the LISA account. Changed the account status to void as the investor has another account with a more recent firstSubscriptionDate",<br>
+                                           "message": "Successfully updated the firstSubscriptionDate for the LISA account and changed the account status to void because the investor has another account with a more recent firstSubscriptionDate",<br>
                                            "code": "UPDATED_AND_ACCOUNT_VOID",<br>
                                            "accountId": "1234567892"<br>
                                          }<br>
@@ -72,7 +72,7 @@
                                        }
                 </p>
             </td>
-        </tr>                
+        </tr>
         <tr>
             <td><p>Request with a valid payload and account ID, but an invalid LISA Manager reference number</p><p class ="code--block">lisaManagerReferenceNumber: A12345<br>accountId: 1234567890</p></td>
             <td>
@@ -155,7 +155,7 @@
             <td><p>HTTP status: <code class="code--slim">404 (Not Found)</code></p>
                 <p class ="code--block"> {<br>
                                             "code": "INVESTOR_ACCOUNTID_NOT_FOUND",<br>
-                                            "message": "The accountId does not match HMRC’s records."<br>
+                                            "message": "The accountId does not match HMRC’s records"<br>
                                        }
                 </p>
             </td>

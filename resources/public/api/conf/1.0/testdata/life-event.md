@@ -24,7 +24,7 @@
                                             "status": 201,<br>
                                               "success": true,<br>
                                               "data": {<br>
-                                                "message": "Life Event Created",<br>
+                                                "message": "Life event created",<br>
                                                 "lifeEventId": "9876543210"<br>
                                               }<br>
                                        }
@@ -88,7 +88,7 @@
             <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
                 <p class ="code--block"> {<br>
                                             "code": "LIFE_EVENT_INAPPROPRIATE",<br>
-                                            "message": "The life event conflicts with previous life event reported"<br>
+                                            "message": "The life event conflicts with a previous life event reported"<br>
                                           }
                 </p>
             </td>
@@ -104,7 +104,7 @@
             </td>
             <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
                 <p class ="code--block"> {<br>"code": "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID",<br>
-                                            "message": "The LISA account has already been closed or voided."<br>
+                                            "message": "This LISA account has already been closed or been made void by HMRC"<br>
                                           }
                 </p>
             </td>
@@ -121,7 +121,7 @@
             <td><p>HTTP status: <code class="code--slim">404 (Not found)</code></p>
                 <p class ="code--block"> {<br>
                                             "code": "INVESTOR_ACCOUNTID_NOT_FOUND",<br>
-                                            "message": "The accountId does not match HMRC’s records."<br>
+                                            "message": "The accountId does not match HMRC’s records"<br>
                                           }
                 </p>
             </td>

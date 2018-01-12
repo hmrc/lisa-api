@@ -62,7 +62,7 @@ case class ErrorValidation(
 
 case class ErrorBadRequest(errs: List[ErrorValidation]) extends ErrorResponseWithErrors(400, "BAD_REQUEST", "Bad Request", errors = Some(errs))
 
-case class ErrorForbidden(errs: List[ErrorValidation]) extends ErrorResponseWithErrors(403, "FORBIDDEN", "Forbidden", errors = Some(errs))
+case class ErrorForbidden(errs: List[ErrorValidation]) extends ErrorResponseWithErrors(403, "FORBIDDEN", "There is a problem with the request data", errors = Some(errs))
 
 case object ErrorBadRequestLmrn extends ErrorResponse(400, "BAD_REQUEST", "lisaManagerReferenceNumber in the URL is in the wrong format")
 
@@ -88,11 +88,12 @@ case object EmptyJson extends ErrorResponse(400, "BAD_REQUEST", "Can't parse emp
 
 case object ErrorInvestorNotFound extends ErrorResponse(403, "INVESTOR_NOT_FOUND", "The investor details given do not match with HMRC’s records")
 
-case object ErrorLifeEventIdNotFound extends ErrorResponse(403, "LIFE_EVENT_NOT_FOUND", "The lifeEventId does not match HMRC's records.")
+case object ErrorLifeEventIdNotFound extends ErrorResponse(403, "LIFE_EVENT_NOT_FOUND", "The lifeEventId does not match with HMRC’s records")
 
 case object ErrorInvestorNotEligible extends ErrorResponse(403, "INVESTOR_ELIGIBILITY_CHECK_FAILED", "The investor is not eligible for a LISA account")
 
-case object ErrorInvestorComplianceCheckFailed extends ErrorResponse(403, "INVESTOR_COMPLIANCE_CHECK_FAILED", "The investor has failed a compliance check - they may have breached ISA guidelines or regulations")
+case object ErrorInvestorComplianceCheckFailedCreateTransfer extends ErrorResponse(403, "INVESTOR_COMPLIANCE_CHECK_FAILED", "You cannot create or transfer a LISA account because the investor has failed a compliance check")
+case object ErrorInvestorComplianceCheckFailedReinstate extends ErrorResponse(403, "INVESTOR_COMPLIANCE_CHECK_FAILED", "You cannot reinstate this account because the investor has failed a compliance check")
 
 case object ErrorAccountCancellationPeriodExceeded extends ErrorResponse(403, "CANCELLATION_PERIOD_EXCEEDED", "You cannot close the account with cancellation as the reason because the cancellation period is over")
 
@@ -100,27 +101,31 @@ case object ErrorAccountWithinCancellationPeriod extends ErrorResponse(403, "ACC
 
 case object ErrorAccountBonusPaymentRequired extends ErrorResponse(403, "BONUS_REPAYMENT_REQUIRED", "You cannot close the account with cancellation as the reason because you need to repay a bonus payment")
 
-case object ErrorPreviousAccountDoesNotExist extends ErrorResponse(403, "PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST", "The transferredFromAccountId and transferredFromLMRN given don’t match with an account on HMRC’s records")
+case object ErrorPreviousAccountDoesNotExist extends ErrorResponse(403, "PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST", "The transferredFromAccountId and transferredFromLMRN given do not match an account on HMRC’s records")
 
-case object ErrorAccountAlreadyClosedOrVoid extends ErrorResponse(403, "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID", "The LISA account has already been closed or voided.")
+case object ErrorAccountAlreadyClosedOrVoid extends ErrorResponse(403, "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID", "This LISA account has already been closed or been made void by HMRC")
 
-case object ErrorAccountAlreadyVoided extends ErrorResponse(403, "INVESTOR_ACCOUNT_ALREADY_VOID", "The LISA account is already voided")
+case object ErrorAccountAlreadyVoided extends ErrorResponse(403, "INVESTOR_ACCOUNT_ALREADY_VOID", "The LISA account is already void")
 
 case object ErrorAccountAlreadyClosed extends ErrorResponse(403, "INVESTOR_ACCOUNT_ALREADY_CLOSED", "The LISA account is already closed")
 
-case object ErrorAccountAlreadyOpen extends ErrorResponse(403, "INVESTOR_ACCOUNT_ALREADY_OPEN", "The account already has a status of Open")
+case object ErrorAccountAlreadyOpen extends ErrorResponse(403, "INVESTOR_ACCOUNT_ALREADY_OPEN", "You cannot reinstate this account because it is already open")
 
 case object ErrorAccountNotFound extends ErrorResponse(404, "INVESTOR_ACCOUNTID_NOT_FOUND", "The accountId does not match HMRC’s records")
 
-case object ErrorTransferAccountDataNotProvided extends ErrorResponse(403, "TRANSFER_ACCOUNT_DATA_NOT_PROVIDED", "The transferredFromAccountId, transferredFromLMRN and transferInDate are not provided and are required for transfer of an account.")
+case object ErrorTransferAccountDataNotProvided extends ErrorResponse(403, "TRANSFER_ACCOUNT_DATA_NOT_PROVIDED", "You must give a transferredFromAccountId, transferredFromLMRN and transferInDate when the creationReason is transferred")
 
-case object ErrorTransferAccountDataProvided extends ErrorResponse(403, "TRANSFER_ACCOUNT_DATA_PROVIDED", "transferredFromAccountId, transferedFromLMRN, and transferInDate fields should only be completed when the creationReason is \"Transferred\".")
+case object ErrorTransferAccountDataProvided extends ErrorResponse(403, "TRANSFER_ACCOUNT_DATA_PROVIDED", "You must only give a transferredFromAccountId, transferredFromLMRN, and transferInDate when the creationReason is transferred")
 
-case object ErrorLifeEventInappropriate extends ErrorResponse(403, "LIFE_EVENT_INAPPROPRIATE","The life event conflicts with previous life event reported")
+case object ErrorLifeEventInappropriate extends ErrorResponse(403, "LIFE_EVENT_INAPPROPRIATE", "The life event conflicts with a previous life event reported")
 
-case object ErrorInvalidLisaManager extends ErrorResponse(401,"UNAUTHORIZED","The lisaManagerReferenceNumber path parameter you've used doesn't match with an authorised LISA provider in HMRC's records.")
+case object ErrorInvalidLisaManager extends ErrorResponse(401,"UNAUTHORIZED", "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records")
 
 case object ErrorTransactionNotFound extends ErrorResponse(404, "BONUS_PAYMENT_TRANSACTION_NOT_FOUND", "transactionId does not match HMRC’s records")
+
+case object ErrorBonusClaimError extends ErrorResponse(403, "BONUS_CLAIM_ERROR", "The bonus information given exceeds the maximum annual amount, the qualifying deposits exceed the maximum annual amount, or the bonus claim doesn’t equal the correct percentage of stated qualifying funds")
+
+case object ErrorBonusClaimAlreadyExists extends ErrorResponse(409, "BONUS_CLAIM_ALREADY_EXISTS", "The investor’s bonus payment has already been requested")
 
 object ErrorInvestorAlreadyExists {
 
@@ -133,7 +138,7 @@ object ErrorInvestorAlreadyExists {
 object ErrorLifeEventAlreadyExists {
 
   def apply(lifeEventID: String) = {
-    ErrorResponseWithLifeEventId(409,"LIFE_EVENT_ALREADY_EXISTS","The investor’s life event has already been reported", lifeEventID)
+    ErrorResponseWithLifeEventId(409, "LIFE_EVENT_ALREADY_EXISTS", "The investor’s life event has already been reported", lifeEventID)
   }
 
 }
@@ -141,13 +146,13 @@ object ErrorLifeEventAlreadyExists {
 object ErrorAccountAlreadyExists {
 
   def apply(accountId: String) = {
-    ErrorResponseWithAccountId(409,"INVESTOR_ACCOUNT_ALREADY_EXISTS","This investor already has a LISA account.", accountId)
+    ErrorResponseWithAccountId(409, "INVESTOR_ACCOUNT_ALREADY_EXISTS", "This investor already has a LISA account", accountId)
   }
 
 }
 
 
-case object ErrorLifeEventNotProvided extends ErrorResponse(403,"LIFE_EVENT_NOT_PROVIDED","lifeEventId is required when the claimReason is \"Life Event\"")
+case object ErrorLifeEventNotProvided extends ErrorResponse(403, "LIFE_EVENT_NOT_PROVIDED", "lifeEventId is required when the claimReason is a life event")
 
 
 

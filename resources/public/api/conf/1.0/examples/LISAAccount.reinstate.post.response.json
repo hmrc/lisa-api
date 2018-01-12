@@ -1,7 +1,7 @@
 {
   "data": {
     "accountId": "8765432100",
-    "message": "The account has been re-instated to a status of open"
+    "message": "This account has been reinstated"
   },
   "success": true,
   "status": 200

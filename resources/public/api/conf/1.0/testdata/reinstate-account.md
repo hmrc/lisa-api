@@ -24,7 +24,7 @@
                                          "status": 200,<br>
                                          "success": true,<br>
                                          "data": {<br>
-                                           "message": "The account has been re-instated to a status of open",<br>
+                                           "message": "This account has been reinstated",<br>
                                            "accountId": "8765432100"<br>
                                          }<br>
                                        }
@@ -56,7 +56,7 @@
                 </p>              
             </td>
             <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
-                <p class ="code--block"> 
+                <p class ="code--block">
                     {<br>
                         "code": "INVESTOR_ACCOUNT_ALREADY_OPEN",<br>
                         "message": "The account already has a status of Open"<br>
@@ -73,10 +73,10 @@
                 </p>   
             </td>
             <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
-                <p class ="code--block"> 
+                <p class ="code--block">
                     {<br>
                         "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED",<br>
-                        "message": "The account has a status of closed with a closure reason of transferred out"<br>
+                        "message": "You cannot reinstate this account because it was closed with a closure reason of transferred out"<br>
                    }
                 </p>
             </td>
@@ -90,10 +90,10 @@
                 </p>               
             </td>
             <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
-                <p class ="code--block"> 
+                <p class ="code--block">
                     {<br>
                         "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED",<br>
-                        "message": "The account has a status of closed with a closure reason of cancelled"<br>
+                        "message": "You cannot reinstate this account because it was closed with a closure reason of cancellation"<br>
                    }
                 </p>
             </td>
@@ -107,14 +107,14 @@
                 </p>   
             </td>
             <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
-                <p class ="code--block"> 
+                <p class ="code--block">
                     {<br>
                         "code": "INVESTOR_COMPLIANCE_CHECK_FAILED",<br>
-                        "message": "The investor has failed a compliance check - they may have breached ISA guidelines or regulations."<br>
+                        "message": "You cannot reinstate this account because the investor has failed a compliance check"<br>
                    }
                 </p>
             </td>
-        </tr>        
+        </tr>
         <tr>
             <td><p>Request containing an account ID that does not exist</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 0000000404</p></td>
             <td>
@@ -126,7 +126,7 @@
             <td><p>HTTP status: <code class="code--slim">404 (Not Found)</code></p>
                 <p class ="code--block"> {<br>
                                             "code": "INVESTOR_ACCOUNTID_NOT_FOUND",<br>
-                                            "message": "The accountId does not match HMRC’s records."<br>
+                                            "message": "The accountId does not match HMRC’s records"<br>
                                        }
                 </p>
             </td>

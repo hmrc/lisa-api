@@ -34,37 +34,94 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
 
   "POST bonus payment" must {
 
-    "return a Success Response" when {
-      "given a success On Time response from the DES connector" in {
-        when(mockDesConnector.requestBonusPayment(any(), any(),any())(any())).
-          thenReturn(Future.successful((201, DesTransactionResponse("AB123456","On Time"))))
+    "return a success response" when {
 
-        doRequest{response =>
-          response mustBe RequestBonusPaymentSuccessResponse("AB123456","Bonus transaction created")
+      "given a successful on time response from the DES connector" in {
+        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(DesTransactionResponse("AB123456", "On Time")))
+
+        doRequest { response =>
+          response mustBe RequestBonusPaymentOnTimeResponse("AB123456")
         }
       }
-    }
 
       "given a successful late notification response from the DES connector" in {
-        when(mockDesConnector.requestBonusPayment(any(), any(),any())(any())).
-          thenReturn(Future.successful((201, DesTransactionResponse("AB123456","Late"))))
+        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(DesTransactionResponse("AB123456", "Late")))
 
-        doRequest{response =>
-          response mustBe RequestBonusPaymentSuccessResponse("AB123456","Bonus transaction created - Late Notification")
+        doRequest { response =>
+          response mustBe RequestBonusPaymentLateResponse("AB123456")
         }
       }
 
+    }
 
-    "return an Error Response" when {
-      "given an error response from the DES connector" in {
-        when(mockDesConnector.requestBonusPayment(any(), any(),any())(any())).
-          thenReturn(Future.successful((500, DesFailureResponse("code1", "reason1"))))
+    "return a account closed response" when {
+      "given the code INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID from the DES connector" in {
+        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID", "x")))
 
-        doRequest{response =>
-          response mustBe RequestBonusPaymentErrorResponse(500, DesFailureResponse("code1", "reason1"))
+        doRequest { response =>
+          response mustBe RequestBonusPaymentAccountClosed
         }
       }
     }
+
+    "return a life event not found response" when {
+      "given the code LIFE_EVENT_NOT_FOUND from the DES connector" in {
+        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(DesFailureResponse("LIFE_EVENT_NOT_FOUND", "xx")))
+
+        doRequest { response =>
+          response mustBe RequestBonusPaymentLifeEventNotFound
+        }
+      }
+    }
+
+    "return a bonus claim error response" when {
+      "given the code BONUS_CLAIM_ERROR from the DES connector" in {
+        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(DesFailureResponse("BONUS_CLAIM_ERROR", "xxx")))
+
+        doRequest { response =>
+          response mustBe RequestBonusPaymentBonusClaimError
+        }
+      }
+    }
+
+    "return a account not found response" when {
+      "given the code INVESTOR_ACCOUNTID_NOT_FOUND from the DES connector" in {
+        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNTID_NOT_FOUND", "xxxx")))
+
+        doRequest { response =>
+          response mustBe RequestBonusPaymentAccountNotFound
+        }
+      }
+    }
+
+    "return a bonus claim already exists response" when {
+      "given the code BONUS_CLAIM_ALREADY_EXISTS from the DES connector" in {
+        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(DesFailureResponse("BONUS_CLAIM_ALREADY_EXISTS", "xxxxx")))
+
+        doRequest { response =>
+          response mustBe RequestBonusPaymentClaimAlreadyExists
+        }
+      }
+    }
+
+    "return a generic error response" when {
+      "given any other error code from the DES connector" in {
+        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(DesFailureResponse("SOMETHING_ELSE", "xxxxx")))
+
+        doRequest { response =>
+          response mustBe RequestBonusPaymentError
+        }
+      }
+    }
+
   }
 
   "GET bonus payment" must {

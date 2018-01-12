@@ -68,7 +68,7 @@ trait BonusPaymentValidator {
       req.data.inboundPayments.newSubsForPeriod.get > 0 &&
       req.data.inboundPayments.newSubsYTD <= 0) => {
 
-      req.copy(errors = req.errors :+ ErrorValidation(monetaryErrorCode, "newSubsYTD must be greater than zero", Some(s"$inboundPayments/newSubsYTD")))
+      req.copy(errors = req.errors :+ ErrorValidation(monetaryErrorCode, "newSubsYTD must be more than 0", Some(s"$inboundPayments/newSubsYTD")))
     }
     case req: BonusPaymentValidationRequest => req
   }
@@ -79,14 +79,14 @@ trait BonusPaymentValidator {
       req.data.htbTransfer.get.htbTransferInForPeriod > 0 &&
       req.data.htbTransfer.get.htbTransferTotalYTD <= 0) => {
 
-      req.copy(errors = req.errors :+ ErrorValidation(monetaryErrorCode, "htbTransferTotalYTD must be greater than zero", Some(s"$htbTransfer/htbTransferTotalYTD")))
+      req.copy(errors = req.errors :+ ErrorValidation(monetaryErrorCode, "htbTransferTotalYTD must be more than 0", Some(s"$htbTransfer/htbTransferTotalYTD")))
     }
     case req: BonusPaymentValidationRequest => req
   }
 
   private val totalSubsForPeriodGtZero: PartialFunction[BonusPaymentValidationRequest, BonusPaymentValidationRequest] = {
     case req: BonusPaymentValidationRequest if (req.data.inboundPayments.totalSubsForPeriod <= 0) => {
-      req.copy(errors = req.errors :+ ErrorValidation(monetaryErrorCode, "totalSubsForPeriod must be greater than zero", Some(s"$inboundPayments/totalSubsForPeriod")))
+      req.copy(errors = req.errors :+ ErrorValidation(monetaryErrorCode, "totalSubsForPeriod must be more than 0", Some(s"$inboundPayments/totalSubsForPeriod")))
     }
     case req: BonusPaymentValidationRequest => req
   }
@@ -94,7 +94,7 @@ trait BonusPaymentValidator {
   private val totalSubsYTDGteTotalSubsForPeriod: PartialFunction[BonusPaymentValidationRequest, BonusPaymentValidationRequest] = {
     case req: BonusPaymentValidationRequest if (req.data.inboundPayments.totalSubsYTD < req.data.inboundPayments.totalSubsForPeriod) => {
       req.copy(errors = req.errors :+
-        ErrorValidation(monetaryErrorCode, "totalSubsYTD must be greater than or equal to totalSubsForPeriod", Some(s"$inboundPayments/totalSubsYTD"))
+        ErrorValidation(monetaryErrorCode, "totalSubsYTD must be more than or equal to totalSubsForPeriod", Some(s"$inboundPayments/totalSubsYTD"))
       )
     }
     case req: BonusPaymentValidationRequest => req
@@ -102,21 +102,21 @@ trait BonusPaymentValidator {
 
   private val bonusDueForPeriodGtZero: PartialFunction[BonusPaymentValidationRequest, BonusPaymentValidationRequest] = {
     case req: BonusPaymentValidationRequest if (req.data.bonuses.bonusDueForPeriod <= 0) => {
-      req.copy(errors = req.errors :+ ErrorValidation(monetaryErrorCode, "bonusDueForPeriod must be greater than zero", Some(s"$bonuses/bonusDueForPeriod")))
+      req.copy(errors = req.errors :+ ErrorValidation(monetaryErrorCode, "bonusDueForPeriod must be more than 0", Some(s"$bonuses/bonusDueForPeriod")))
     }
     case req: BonusPaymentValidationRequest => req
   }
 
   private val totalBonusDueYTDGtZero: PartialFunction[BonusPaymentValidationRequest, BonusPaymentValidationRequest] = {
     case req: BonusPaymentValidationRequest if (req.data.bonuses.totalBonusDueYTD <= 0) => {
-      req.copy(errors = req.errors :+ ErrorValidation(monetaryErrorCode, "totalBonusDueYTD must be greater than zero", Some(s"$bonuses/totalBonusDueYTD")))
+      req.copy(errors = req.errors :+ ErrorValidation(monetaryErrorCode, "totalBonusDueYTD must be more than 0", Some(s"$bonuses/totalBonusDueYTD")))
     }
     case req: BonusPaymentValidationRequest => req
   }
 
   private val periodStartDateIsSixth: PartialFunction[BonusPaymentValidationRequest, BonusPaymentValidationRequest] = {
     case req: BonusPaymentValidationRequest if req.data.periodStartDate.getDayOfMonth() != 6 => {
-      req.copy(errors = req.errors :+ ErrorValidation(dateErrorCode, "The periodStartDate must equal the 6th day of the month", Some(s"/periodStartDate")))
+      req.copy(errors = req.errors :+ ErrorValidation(dateErrorCode, "The periodStartDate must be the 6th day of the month", Some(s"/periodStartDate")))
     }
     case req: BonusPaymentValidationRequest => req
   }
@@ -141,7 +141,7 @@ trait BonusPaymentValidator {
     else {
       req.copy(errors = req.errors :+ ErrorValidation(
         errorCode = dateErrorCode,
-        message = "The periodEndDate must equal the 5th day of the month after the periodStartDate",
+        message = "The periodEndDate must be the 5th day of the month which occurs after the periodStartDate",
         path = Some(s"/periodEndDate")
       ))
     }
@@ -153,7 +153,7 @@ trait BonusPaymentValidator {
     val showSubError = !subsExists && !htbExists || subsExists && !eitherGtZero
     val showHtbError = !subsExists && !htbExists || htbExists && !eitherGtZero
 
-    val errorMessage = "newSubsForPeriod and htbTransferInForPeriod cannot both be zero"
+    val errorMessage = "newSubsForPeriod and htbTransferInForPeriod cannot both be 0"
 
     if (showSubError) newErrs += ErrorValidation(monetaryErrorCode, errorMessage, Some(s"$inboundPayments/newSubsForPeriod"))
     if (showHtbError) newErrs += ErrorValidation(monetaryErrorCode, errorMessage, Some(s"$htbTransfer/htbTransferInForPeriod"))
