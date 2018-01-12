@@ -50,6 +50,11 @@ trait DesConnector extends ServicesConfig {
     headerCarrier.copy(extraHeaders = Seq(("Environment" -> AppContext.desUrlHeaderEnv)),
           authorization = Some(Authorization(s"Bearer ${AppContext.desAuthToken}")))
 
+
+  private def updateHeaderCarrierWithAllDesHeaders(headerCarrier: HeaderCarrier) =
+    headerCarrier.copy(extraHeaders = Seq(("Environment" -> AppContext.desUrlHeaderEnv), ("OriginatorId" -> "DA2_LISA")),
+      authorization = Some(Authorization(s"Bearer ${AppContext.desAuthToken}")))
+
   /**
     * Attempts to create a new LISA investor
     *
@@ -106,14 +111,14 @@ trait DesConnector extends ServicesConfig {
     */
   def reinstateAccount (lisaManager: String, accountId: String)
                            (implicit hc: HeaderCarrier): Future[DesResponse] = {
-    val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId/reinstate-account"
+    val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId/reinstate"
     Logger.debug("Reinstate Account request returned status: " + uri)
 
-    val result = httpPut.PUT[JsValue,HttpResponse](uri,Json.toJson(""))(implicitly,httpReads, updateHeaderCarrier(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
+    val result = httpPut.PUT[JsValue,HttpResponse](uri,Json.toJson(""))(implicitly,httpReads, updateHeaderCarrierWithAllDesHeaders(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
     result.map(r => {
       Logger.debug("Reinstate Account request returned status: " + r.status)
       r.status match {
-        case 200 => DesEmptySuccessResponse
+        case 200 => parseDesResponse[DesReinstateAccountSuccessResponse](r)._2
         case _ => parseDesResponse[DesFailureResponse](r)._2
       }
     })

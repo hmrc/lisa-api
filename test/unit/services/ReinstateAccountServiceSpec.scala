@@ -24,7 +24,7 @@ import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.models.des.{DesAccountResponse, DesEmptySuccessResponse, DesFailureResponse}
+import uk.gov.hmrc.lisaapi.models.des.{DesAccountResponse, DesEmptySuccessResponse, DesFailureResponse, DesReinstateAccountSuccessResponse}
 import uk.gov.hmrc.lisaapi.services.{AccountService, ReinstateAccountService}
 
 import scala.concurrent.duration.Duration
@@ -44,12 +44,12 @@ class ReinstateAccountServiceSpec extends PlaySpec
         when(mockDesConnector.reinstateAccount(any(), any())(any()))
           .thenReturn(
             Future.successful((
-             DesEmptySuccessResponse
+              DesReinstateAccountSuccessResponse("code", "reason")
             ))
           )
 
         doReinstateRequest { response =>
-          response mustBe ReinstateLisaAccountSuccessResponse
+          response mustBe ReinstateLisaAccountSuccessResponse ("code", "reason")
         }
       }
 

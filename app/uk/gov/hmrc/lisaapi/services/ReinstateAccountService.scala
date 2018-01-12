@@ -32,9 +32,11 @@ trait ReinstateAccountService {
     val response = desConnector.reinstateAccount(lisaManager, accountId)
 
     response map {
-      case DesEmptySuccessResponse => {
-        ReinstateLisaAccountSuccessResponse
+      case successResponse: DesReinstateAccountSuccessResponse => {
+        Logger.debug("Reinstate account success response")
+        ReinstateLisaAccountSuccessResponse(successResponse.code, successResponse.reason)
       }
+
       case failureResponse: DesFailureResponse => {
         failureResponse.code match {
           case "INVESTOR_ACCOUNT_ALREADY_CLOSED" => ReinstateLisaAccountAlreadyClosedResponse
