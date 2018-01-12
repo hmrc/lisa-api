@@ -29,22 +29,26 @@ import scala.concurrent.Future
 trait UpdateSubscriptionService {
   val desConnector: DesConnector
 
+
   def updateSubscription(lisaManager: String, accountId: String, request: UpdateSubscriptionRequest)(implicit hc: HeaderCarrier): Future[UpdateSubscriptionResponse] = {
     val response = desConnector.updateFirstSubDate(lisaManager, accountId, request)
 
     response map {
       case successResponse: DesUpdateSubscriptionSuccessResponse => {
         Logger.debug("Update subscription success response")
-        UpdateSubscriptionSuccessResponse(successResponse.code, successResponse.message)
+        successResponse.code == Constants.successCode match{
+          case true => UpdateSubscriptionSuccessResponse(Constants.updateCode,Constants.updateMsg)
+          case _ => UpdateSubscriptionSuccessResponse(Constants.voidCode,  Constants.voidMsg)
+        }
       }
-
       case failureResponse: DesFailureResponse => {
         Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
 
         failureResponse.code match {
-          case "INVESTOR_ACCOUNTID_NOT_FOUND" => UpdateSubscriptionAccountNotFoundResponse
-          case "INVESTOR_ACCOUNT_ALREADY_CLOSED" => UpdateSubscriptionAccountClosedResponse
-          case "INVESTOR_ACCOUNT_ALREADY_VOID" => UpdateSubscriptionAccountVoidedResponse
+          case Constants.accNotFound => UpdateSubscriptionAccountNotFoundResponse
+          case Constants.accClosed => UpdateSubscriptionAccountClosedResponse
+          case Constants.accCancelled => UpdateSubscriptionAccountClosedResponse
+          case Constants.accVoid => UpdateSubscriptionAccountVoidedResponse
           case _ => {
             UpdateSubscriptionErrorResponse
           }
@@ -57,5 +61,18 @@ trait UpdateSubscriptionService {
 
 object UpdateSubscriptionService extends UpdateSubscriptionService {
   override val desConnector: DesConnector = DesConnector
+}
+
+object Constants {
+  val successCode = "SUCCESS"
+  val updateCode = "UPDATED"
+  val voidCode = "UPDATED_AND_ACCOUNT_VOIDED"
+  val updateMsg = "LISA account firstSubscriptionDate has been successfully updated"
+  val voidMsg = "LISA account firstSubscriptionDate has been successfully updated. " +
+    "The account status has been changed to 'Void' as the Investor has another account with a more recent firstSubscriptionDate"
+  val accNotFound = "INVESTOR_ACCOUNTID_NOT_FOUND"
+  val accClosed = "INVESTOR_ACCOUNT_ALREADY_CLOSED"
+  val accCancelled = "INVESTOR_ACCOUNT_ALREADY_CANCELLED"
+  val accVoid = "INVESTOR_ACCOUNT_ALREADY_VOID"
 }
 

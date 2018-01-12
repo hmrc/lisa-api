@@ -21,11 +21,11 @@ import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des._
-import uk.gov.hmrc.lisaapi.services.{LifeEventService, UpdateSubscriptionService}
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.lisaapi.services.UpdateSubscriptionService
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
@@ -35,10 +35,16 @@ class UpdateSubscriptionServiceSpec extends PlaySpec with MockitoSugar with OneA
   "Update subscription event" must {
 
     "return a Success response" when {
-      "given a success response from the DES connector" in {
-        when(mockDesConnector.updateFirstSubDate(any(), any(),any())(any())).thenReturn(Future.successful(DesUpdateSubscriptionSuccessResponse("code","message")))
+      "given a success response with code SUCCESS from the DES connector" in {
+        when(mockDesConnector.updateFirstSubDate(any(), any(),any())(any())).thenReturn(Future.successful(DesUpdateSubscriptionSuccessResponse("SUCCESS","message")))
 
-        doRequest{response => response mustBe UpdateSubscriptionSuccessResponse("code", "message")}
+        doRequest{response => response mustBe UpdateSubscriptionSuccessResponse("UPDATED", "LISA account firstSubscriptionDate has been successfully updated")}
+      }
+      "given a success response with code INVESTOR_ACCOUNT_NOW_VOID from the DES connector" in {
+        when(mockDesConnector.updateFirstSubDate(any(), any(),any())(any())).thenReturn(Future.successful(DesUpdateSubscriptionSuccessResponse("INVESTOR_ACCOUNT_NOW_VOID","message")))
+
+        doRequest{response => response mustBe UpdateSubscriptionSuccessResponse("UPDATED_AND_ACCOUNT_VOIDED",
+          "LISA account firstSubscriptionDate has been successfully updated. The account status has been changed to 'Void' as the Investor has another account with a more recent firstSubscriptionDate")}
       }
     }
 
@@ -56,7 +62,12 @@ class UpdateSubscriptionServiceSpec extends PlaySpec with MockitoSugar with OneA
         doRequest(response => response mustBe UpdateSubscriptionAccountClosedResponse)
       }
     }
-
+    "return a Forbidden account closed response" when {
+      "given DesFailureReponse and status 403 for cancelled account" in {
+        when(mockDesConnector.updateFirstSubDate(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_CANCELLED","The LISA account is already cancelled")))
+        doRequest(response => response mustBe UpdateSubscriptionAccountClosedResponse)
+      }
+    }
     "return a Forbidden account voided response" when {
       "given DesFailureReponse and status 403" in {
         when(mockDesConnector.updateFirstSubDate(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_VOID","The LISA account is already voided")))

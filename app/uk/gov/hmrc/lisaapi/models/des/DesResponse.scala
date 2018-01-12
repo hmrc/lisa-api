@@ -49,7 +49,7 @@ case class DesTransactionResponse(transactionID: String, message: String) extend
 case class DesFailureResponse(code: String = "INTERNAL_SERVER_ERROR", reason: String = "Internal Server Error") extends DesResponse
 case class DesLifeEventExistResponse(code: String, reason: String, lifeEventID: String) extends DesResponse
 case object DesEmptySuccessResponse extends DesResponse
-case class DesUpdateSubscriptionSuccessResponse (code: String, message: String)extends DesResponse
+case class DesUpdateSubscriptionSuccessResponse (code: String, reason: String)extends DesResponse
 case class DesReinstateAccountSuccessResponse (code: String, reason: String)extends DesResponse
 case class DesGetBonusPaymentResponse(lifeEventId: Option[LifeEventId],
                                       periodStartDate: DateTime,

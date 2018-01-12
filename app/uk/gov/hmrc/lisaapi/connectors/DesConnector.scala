@@ -16,22 +16,19 @@
 
 package uk.gov.hmrc.lisaapi.connectors
 
-import com.fasterxml.jackson.databind.JsonSerializer.None
 import play.api.Logger
+import play.api.libs.json.{JsValue, Json, Reads}
+import uk.gov.hmrc.http._
+import uk.gov.hmrc.http.logging.Authorization
 import uk.gov.hmrc.lisaapi.config.{AppContext, WSHttp}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des._
 import uk.gov.hmrc.play.config.ServicesConfig
-import uk.gov.hmrc.play.http._
+import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
-import play.api.libs.json.{JsValue, Json, Reads}
-import play.mvc.BodyParser.AnyContent
-import uk.gov.hmrc.http._
-import uk.gov.hmrc.http.logging.Authorization
-import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext
 
 trait DesConnector extends ServicesConfig {
 
@@ -190,9 +187,9 @@ trait DesConnector extends ServicesConfig {
   def updateFirstSubDate(lisaManager: String, accountId: String, request: UpdateSubscriptionRequest)
                      (implicit hc: HeaderCarrier): Future[DesResponse] = {
 
-    val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId/update-subscription"
+    val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId"
     Logger.debug("Posting update subscription request to des: " + uri)
-    val result = httpPost.POST[UpdateSubscriptionRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
+    val result = httpPut.PUT[UpdateSubscriptionRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrierWithAllDesHeaders(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
 
     result.map(res => {
       Logger.debug("Update first subscription date request returned status: " + res.status)
