@@ -369,19 +369,19 @@ class DesConnectorSpec extends PlaySpec
     "Return a populated DesUpdateSubscriptionSuccessResponse" when {
 
       "The DES response has a json body that is in the correct format" in {
-        when(mockHttpPost.POST[UpdateSubscriptionRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockHttpPut.PUT[UpdateSubscriptionRequest, HttpResponse](any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
                 responseStatus = OK,
-                responseJson = Some(Json.parse(s"""{"code": "UPDATED_AND_ACCOUNT_VOIDED", "message": "LISA Account firstSubscriptionDate has been updated successfully"}"""))
+                responseJson = Some(Json.parse(s"""{"code": "INVESTOR_ACCOUNT_NOW_VOID", "reason": "Date of first Subscription updated successfully, but as a result of the date change the account has subsequently been voided"}"""))
               )
             )
           )
 
         updateFirstSubscriptionDateRequest { response =>
           response must be((
-            DesUpdateSubscriptionSuccessResponse("UPDATED_AND_ACCOUNT_VOIDED", "LISA Account firstSubscriptionDate has been updated successfully" )
+            DesUpdateSubscriptionSuccessResponse("INVESTOR_ACCOUNT_NOW_VOID", "Date of first Subscription updated successfully, but as a result of the date change the account has subsequently been voided" )
           ))
         }
       }
@@ -389,7 +389,7 @@ class DesConnectorSpec extends PlaySpec
 
     "Return an failure response" when {
       "The DES response has no json body" in {
-        when(mockHttpPost.POST[UpdateSubscriptionRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockHttpPut.PUT[UpdateSubscriptionRequest, HttpResponse](any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
