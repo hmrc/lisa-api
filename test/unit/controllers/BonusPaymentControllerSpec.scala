@@ -74,18 +74,28 @@ class BonusPaymentControllerSpec extends PlaySpec
 
     }
 
-    "return with status 403 forbidden" when {
+    "return with status 400 bad request" when {
 
-      "given a BONUS_CLAIM_ERROR from the service layer" in {
-        when(mockService.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(RequestBonusPaymentBonusClaimError))
-
-        doRequest(validBonusPaymentJson) { res =>
-          status(res) mustBe FORBIDDEN
-          (contentAsJson(res) \ "code").as[String] mustBe "BONUS_CLAIM_ERROR"
-          (contentAsJson(res) \ "message").as[String] mustBe "xyz"
+      "provided an invalid json object" in {
+        doRequest(validBonusPaymentJson.replace("1234567891","X")) { res =>
+          status(res) mustBe (BAD_REQUEST)
+          (contentAsJson(res) \ "code").as[String] mustBe ("BAD_REQUEST")
+          (contentAsJson(res) \ "message").as[String] mustBe ("Bad Request")
         }
       }
+
+      "provided an invalid lmrn" in {
+        doRequest(validBonusPaymentJson, "Z1234567") { res =>
+          status(res) mustBe (BAD_REQUEST)
+          val json = contentAsJson(res)
+          (json \ "code").as[String] mustBe ErrorBadRequestLmrn.errorCode
+          (json \ "message").as[String] mustBe ErrorBadRequestLmrn.message
+        }
+      }
+
+    }
+
+    "return with status 403 forbidden" when {
 
       "the bonus claim reason is life event and no life event id is provided" in {
         doRequest(validBonusPaymentJson.replace(""""lifeEventId": "1234567891",""", "")) { res =>
@@ -95,18 +105,7 @@ class BonusPaymentControllerSpec extends PlaySpec
         }
       }
 
-      "when account is closed return with INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID code " in {
-        when(mockService.requestBonusPayment(any(), any(),any())(any())).thenReturn(
-          Future.successful(RequestBonusPaymentAccountClosed))
-
-        doRequest(validBonusPaymentJson)  { res =>
-          status(res) mustBe FORBIDDEN
-          (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID"
-        }
-
-      }
-
-      "when the json request fails business validation" in {
+      "the json request fails business validation" in {
         val validBonusPayment = Json.parse(validBonusPaymentJson).as[RequestBonusPaymentRequest]
 
         val ibp = validBonusPayment.inboundPayments.copy(newSubsForPeriod = Some(1), newSubsYTD = 0, totalSubsForPeriod = 0)
@@ -129,24 +128,69 @@ class BonusPaymentControllerSpec extends PlaySpec
         }
       }
 
-    }
+      "given a RequestBonusPaymentBonusClaimError response from the service layer" in {
+        when(mockService.requestBonusPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(RequestBonusPaymentBonusClaimError))
 
-    "return with status 400 bad request" when {
-
-      "provided an invalid json object" in {
-        doRequest(validBonusPaymentJson.replace("1234567891","X")) { res =>
-          status(res) mustBe (BAD_REQUEST)
-          (contentAsJson(res) \ "code").as[String] mustBe ("BAD_REQUEST")
-          (contentAsJson(res) \ "message").as[String] mustBe ("Bad Request")
+        doRequest(validBonusPaymentJson) { res =>
+          status(res) mustBe FORBIDDEN
+          (contentAsJson(res) \ "code").as[String] mustBe "BONUS_CLAIM_ERROR"
+          (contentAsJson(res) \ "message").as[String] mustBe "The bonus information given exceeds the maximum annual amount, " +
+          "the qualifying deposits exceed the maximum annual amount, or the bonus claim doesn’t equal the correct percentage of " +
+          "stated qualifying funds."
         }
       }
 
-      "provided an invalid lmrn" in {
-        doRequest(validBonusPaymentJson, "Z1234567") { res =>
-          status(res) mustBe (BAD_REQUEST)
-          val json = contentAsJson(res)
-          (json \ "code").as[String] mustBe ErrorBadRequestLmrn.errorCode
-          (json \ "message").as[String] mustBe ErrorBadRequestLmrn.message
+      "given a RequestBonusPaymentAccountClosed response from the service layer" in {
+        when(mockService.requestBonusPayment(any(), any(),any())(any())).thenReturn(
+          Future.successful(RequestBonusPaymentAccountClosed))
+
+        doRequest(validBonusPaymentJson)  { res =>
+          status(res) mustBe FORBIDDEN
+          (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID"
+          (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID"
+        }
+
+      }
+
+    }
+
+    "return with status 404 not found" when {
+
+      "given a RequestBonusPaymentAccountNotFound response from the service layer" in {
+        when(mockService.requestBonusPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(RequestBonusPaymentAccountNotFound))
+
+        doRequest(validBonusPaymentJson) { res =>
+          status(res) mustBe NOT_FOUND
+          (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNTID_NOT_FOUND"
+          (contentAsJson(res) \ "message").as[String] mustBe "The accountId does not match HMRC’s records"
+        }
+      }
+
+      "given a RequestBonusPaymentLifeEventNotFound response from the service layer" in {
+        when(mockService.requestBonusPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(RequestBonusPaymentLifeEventNotFound))
+
+        doRequest(validBonusPaymentJson) { res =>
+          status(res) mustBe NOT_FOUND
+          (contentAsJson(res) \ "code").as[String] mustBe "LIFE_EVENT_NOT_FOUND"
+          (contentAsJson(res) \ "message").as[String] mustBe "The lifeEventId does not match with HMRC’s records"
+        }
+      }
+
+    }
+
+    "return with status 409 conflict" when {
+
+      "given a RequestBonusPaymentClaimAlreadyExists response from the service layer" in {
+        when(mockService.requestBonusPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(RequestBonusPaymentClaimAlreadyExists))
+
+        doRequest(validBonusPaymentJson) { res =>
+          status(res) mustBe CONFLICT
+          (contentAsJson(res) \ "code").as[String] mustBe "BONUS_CLAIM_ALREADY_EXISTS"
+          (contentAsJson(res) \ "message").as[String] mustBe "The investor’s bonus payment has already been requested"
         }
       }
 
@@ -169,6 +213,16 @@ class BonusPaymentControllerSpec extends PlaySpec
       "an unexpected result comes back from the service" in {
         when(mockService.requestBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(TestBonusPaymentResponse))
+
+        doRequest(validBonusPaymentJson) { res =>
+          status(res) mustBe (INTERNAL_SERVER_ERROR)
+          (contentAsJson(res) \ "code").as[String] mustBe ("INTERNAL_SERVER_ERROR")
+        }
+      }
+
+      "given a RequestBonusPaymentError response from the service layer" in {
+        when(mockService.requestBonusPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(RequestBonusPaymentError))
 
         doRequest(validBonusPaymentJson) { res =>
           status(res) mustBe (INTERNAL_SERVER_ERROR)

@@ -159,22 +159,34 @@ class BonusPaymentController extends LisaController with LisaConstants {
 
     errorResponse match {
       case RequestBonusPaymentBonusClaimError => {
-        auditFailure(lisaManager, accountId, req, "BONUS_CLAIM_ERROR")
+        auditFailure(lisaManager, accountId, req, ErrorBonusClaimError.errorCode)
         LisaMetrics.incrementMetrics(System.currentTimeMillis(), LisaMetricKeys.lisaError(403, LisaMetricKeys.BONUS_PAYMENT))
 
-        Forbidden(Json.parse("""{"code": "BONUS_CLAIM_ERROR", "message": "xyz"}"""))
-      }
-      case RequestBonusPaymentLifeEventNotFound => {
-        auditFailure(lisaManager, accountId, req, "LIFE_EVENT_NOT_FOUND")
-        LisaMetrics.incrementMetrics(System.currentTimeMillis(), LisaMetricKeys.lisaError(404, LisaMetricKeys.BONUS_PAYMENT))
-
-        NotFound(Json.parse("""{"code": "LIFE_EVENT_NOT_FOUND"}"""))
+        Forbidden(Json.toJson(ErrorBonusClaimError))
       }
       case RequestBonusPaymentAccountClosed => {
-        auditFailure(lisaManager, accountId, req, "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID")
+        auditFailure(lisaManager, accountId, req, ErrorAccountAlreadyClosedOrVoid.errorCode)
         LisaMetrics.incrementMetrics(System.currentTimeMillis(), LisaMetricKeys.lisaError(403, LisaMetricKeys.BONUS_PAYMENT))
 
-        Forbidden(Json.parse("""{"code": "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID"}"""))
+        Forbidden(Json.toJson(ErrorAccountAlreadyClosedOrVoid))
+      }
+      case RequestBonusPaymentAccountNotFound => {
+        auditFailure(lisaManager, accountId, req, ErrorAccountNotFound.errorCode)
+        LisaMetrics.incrementMetrics(System.currentTimeMillis(), LisaMetricKeys.lisaError(404, LisaMetricKeys.BONUS_PAYMENT))
+
+        NotFound(Json.toJson(ErrorAccountNotFound))
+      }
+      case RequestBonusPaymentLifeEventNotFound => {
+        auditFailure(lisaManager, accountId, req, ErrorLifeEventIdNotFound.errorCode)
+        LisaMetrics.incrementMetrics(System.currentTimeMillis(), LisaMetricKeys.lisaError(404, LisaMetricKeys.BONUS_PAYMENT))
+
+        NotFound(Json.toJson(ErrorLifeEventIdNotFound))
+      }
+      case RequestBonusPaymentClaimAlreadyExists => {
+        auditFailure(lisaManager, accountId, req, ErrorBonusClaimAlreadyExists.errorCode)
+        LisaMetrics.incrementMetrics(System.currentTimeMillis(), LisaMetricKeys.lisaError(409, LisaMetricKeys.BONUS_PAYMENT))
+
+        Conflict(Json.toJson(ErrorBonusClaimAlreadyExists))
       }
       case _ => {
         InternalServerError(Json.toJson(ErrorInternalServerError))

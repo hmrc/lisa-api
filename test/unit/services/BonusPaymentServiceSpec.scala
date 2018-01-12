@@ -100,6 +100,17 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
       }
     }
 
+    "return a bonus claim already exists response" when {
+      "given the code BONUS_CLAIM_ALREADY_EXISTS from the DES connector" in {
+        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(DesFailureResponse("BONUS_CLAIM_ALREADY_EXISTS", "xxxxx")))
+
+        doRequest { response =>
+          response mustBe RequestBonusPaymentClaimAlreadyExists
+        }
+      }
+    }
+
     "return a generic error response" when {
       "given any other error code from the DES connector" in {
         when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).

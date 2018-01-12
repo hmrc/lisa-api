@@ -49,6 +49,7 @@ trait BonusPaymentService {
           case "LIFE_EVENT_NOT_FOUND" => RequestBonusPaymentLifeEventNotFound
           case "BONUS_CLAIM_ERROR" => RequestBonusPaymentBonusClaimError
           case "INVESTOR_ACCOUNTID_NOT_FOUND" => RequestBonusPaymentAccountNotFound
+          case "BONUS_CLAIM_ALREADY_EXISTS" => RequestBonusPaymentClaimAlreadyExists
           case _ => RequestBonusPaymentError
         }
       }
