@@ -20,6 +20,15 @@ import uk.gov.hmrc.lisaapi.models.des.DesFailureResponse
 
 trait RequestBonusPaymentResponse
 
-case class RequestBonusPaymentSuccessResponse(transactionId: String, message:String) extends RequestBonusPaymentResponse
+trait RequestBonusPaymentSuccessResponse extends RequestBonusPaymentResponse {
+  val transactionId: String
+}
+case class RequestBonusPaymentLateResponse(transactionId: String) extends RequestBonusPaymentSuccessResponse
+case class RequestBonusPaymentOnTimeResponse(transactionId: String) extends RequestBonusPaymentSuccessResponse
 
-case class RequestBonusPaymentErrorResponse(status: Int, data: DesFailureResponse) extends RequestBonusPaymentResponse
+trait RequestBonusPaymentErrorResponse extends RequestBonusPaymentResponse
+case object RequestBonusPaymentAccountClosed extends RequestBonusPaymentErrorResponse
+case object RequestBonusPaymentLifeEventNotFound extends RequestBonusPaymentErrorResponse
+case object RequestBonusPaymentBonusClaimError extends RequestBonusPaymentErrorResponse
+case object RequestBonusPaymentAccountNotFound extends RequestBonusPaymentErrorResponse
+case object RequestBonusPaymentError extends RequestBonusPaymentErrorResponse

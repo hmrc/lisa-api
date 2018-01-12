@@ -64,7 +64,7 @@ class BonusPaymentControllerSpec extends PlaySpec
 
       "given a Success Response from the service layer" in {
         when(mockService.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(RequestBonusPaymentSuccessResponse("1928374","On Time")))
+          thenReturn(Future.successful(RequestBonusPaymentOnTimeResponse("1928374")))
 
         doRequest(validBonusPaymentJson) { res =>
           status(res) mustBe (CREATED)
@@ -78,30 +78,30 @@ class BonusPaymentControllerSpec extends PlaySpec
 
       "given a BONUS_CLAIM_ERROR from the service layer" in {
         when(mockService.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(RequestBonusPaymentErrorResponse(403, DesFailureResponse("BONUS_CLAIM_ERROR", "xyz"))))
+          thenReturn(Future.successful(RequestBonusPaymentBonusClaimError))
 
         doRequest(validBonusPaymentJson) { res =>
-          status(res) mustBe (FORBIDDEN)
-          (contentAsJson(res) \ "code").as[String] mustBe ("BONUS_CLAIM_ERROR")
-          (contentAsJson(res) \ "message").as[String] mustBe ("xyz")
+          status(res) mustBe FORBIDDEN
+          (contentAsJson(res) \ "code").as[String] mustBe "BONUS_CLAIM_ERROR"
+          (contentAsJson(res) \ "message").as[String] mustBe "xyz"
         }
       }
 
       "the bonus claim reason is life event and no life event id is provided" in {
         doRequest(validBonusPaymentJson.replace(""""lifeEventId": "1234567891",""", "")) { res =>
-          status(res) mustBe (FORBIDDEN)
-          (contentAsJson(res) \ "code").as[String] mustBe ("LIFE_EVENT_NOT_PROVIDED")
-          (contentAsJson(res) \ "message").as[String] mustBe ("lifeEventId is required when the claimReason is a life event")
+          status(res) mustBe FORBIDDEN
+          (contentAsJson(res) \ "code").as[String] mustBe "LIFE_EVENT_NOT_PROVIDED"
+          (contentAsJson(res) \ "message").as[String] mustBe "lifeEventId is required when the claimReason is a life event"
         }
       }
 
       "when account is closed return with INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID code " in {
         when(mockService.requestBonusPayment(any(), any(),any())(any())).thenReturn(
-          Future.successful(RequestBonusPaymentErrorResponse(403, DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID", "xyz"))))
+          Future.successful(RequestBonusPaymentAccountClosed))
 
         doRequest(validBonusPaymentJson)  { res =>
-          status(res) mustBe (FORBIDDEN)
-          (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID")
+          status(res) mustBe FORBIDDEN
+          (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID"
         }
 
       }
@@ -182,7 +182,7 @@ class BonusPaymentControllerSpec extends PlaySpec
 
       "given a success response from the service layer and all optional fields" in {
         when(mockService.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(RequestBonusPaymentSuccessResponse("1928374","Bonus transaction created")))
+          thenReturn(Future.successful(RequestBonusPaymentOnTimeResponse("1928374")))
 
         doSyncRequest(validBonusPaymentJson) { res =>
 
@@ -218,7 +218,7 @@ class BonusPaymentControllerSpec extends PlaySpec
 
       "given a success response from the service layer and no optional fields" in {
         when(mockService.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(RequestBonusPaymentSuccessResponse("1928374", "Bonus transaction created - Late Notification")))
+          thenReturn(Future.successful(RequestBonusPaymentLateResponse("1928374")))
 
         doSyncRequest(validBonusPaymentMinimumFieldsJson) { res =>
 
@@ -253,7 +253,7 @@ class BonusPaymentControllerSpec extends PlaySpec
 
       "given an error response from the service layer" in {
         when(mockService.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(RequestBonusPaymentErrorResponse(404, DesFailureResponse("LIFE_EVENT_NOT_FOUND", ""))))
+          thenReturn(Future.successful(RequestBonusPaymentLifeEventNotFound))
 
         doSyncRequest(validBonusPaymentMinimumFieldsJson) { res =>
 
@@ -399,7 +399,8 @@ class BonusPaymentControllerSpec extends PlaySpec
   "the GET bonus payment endpoint" must {
 
     "return 200 success response" in {
-      when(mockService.getBonusPayment(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusPaymentSuccessResponse(Some("1234567891"),
+      when(mockService.getBonusPayment(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusPaymentSuccessResponse(
+        Some("1234567891"),
         new DateTime("2017-04-06"),
         new DateTime("2017-05-05"),
         Some(HelpToBuyTransfer(0f, 10f)),

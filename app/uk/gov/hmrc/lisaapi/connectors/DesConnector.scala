@@ -221,7 +221,7 @@ trait DesConnector extends ServicesConfig {
     * @return A tuple of the http status code and a des response
     */
   def requestBonusPayment(lisaManager: String, accountId: String, request: RequestBonusPaymentRequest)
-                         (implicit hc: HeaderCarrier): Future[(Int, DesResponse)] = {
+                         (implicit hc: HeaderCarrier): Future[DesResponse] = {
 
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId/bonus-claim"
     Logger.debug("Posting Bonus Payment request to des: " + uri)
@@ -229,7 +229,7 @@ trait DesConnector extends ServicesConfig {
 
     result.map(res => {
       Logger.debug("Bonus Payment request returned status: " + res.status)
-      parseDesResponse[DesTransactionResponse](res)
+      parseDesResponse[DesTransactionResponse](res)._2
     })
   }
 
