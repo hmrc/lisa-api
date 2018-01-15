@@ -123,7 +123,7 @@ case object ErrorInvalidLisaManager extends ErrorResponse(401,"UNAUTHORIZED", "l
 
 case object ErrorTransactionNotFound extends ErrorResponse(404, "BONUS_PAYMENT_TRANSACTION_NOT_FOUND", "transactionId does not match HMRC’s records")
 
-case object ErrorBonusClaimError extends ErrorResponse(403, "BONUS_CLAIM_ERROR", "The bonus information given exceeds the maximum annual amount, the qualifying deposits exceed the maximum annual amount, or the bonus claim doesn’t equal the correct percentage of stated qualifying funds")
+case object ErrorBonusClaimError extends ErrorResponse(403, "BONUS_CLAIM_ERROR", "The bonus amount given is above the maximum annual amount, or the qualifying deposits are above the maximum annual amount or the bonus claim does not equal the correct percentage of qualifying funds")
 
 case object ErrorBonusClaimAlreadyExists extends ErrorResponse(409, "BONUS_CLAIM_ALREADY_EXISTS", "The investor’s bonus payment has already been requested")
 
