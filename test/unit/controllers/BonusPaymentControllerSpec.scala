@@ -147,9 +147,9 @@ class BonusPaymentControllerSpec extends PlaySpec
         doRequest(validBonusPaymentJson) { res =>
           status(res) mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "BONUS_CLAIM_ERROR"
-          (contentAsJson(res) \ "message").as[String] mustBe "The bonus information given exceeds the maximum annual amount, " +
-          "the qualifying deposits exceed the maximum annual amount, or the bonus claim doesn’t equal the correct percentage of " +
-          "stated qualifying funds"
+          (contentAsJson(res) \ "message").as[String] mustBe "The bonus amount given is above the maximum annual amount, " +
+          "or the qualifying deposits are above the maximum annual amount or the bonus claim does not equal the correct " +
+          "percentage of qualifying funds"
         }
       }
 
