@@ -32,27 +32,6 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request with a valid payload, LISA Manager reference number and account ID</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567891</p></td>
-            <td>
-                <p class ="code--block"> {<br>
-                                     	  "firstSubscriptionDate" : "2017-05-20"<br>
-                                          }
-                </p>
-            </td>
-            <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
-                <p class ="code--block"> {<br>
-                                         "data": {<br>
-                                           "message": "Successfully updated the firstSubscriptionDate for the LISA account and changed the account status to open",<br>
-                                           "code": "UPDATED_AND_ACCOUNT_OPENED",<br>
-                                           "accountId": "1234567891"<br>
-                                         }<br>
-                                         "success": true,<br>
-                                         "status": 200<br>
-                                       }
-                </p>
-            </td>
-        </tr>
-        <tr>
             <td><p>Request with a valid payload, LISA Manager reference number and account ID</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567892</p></td>
             <td>
                 <p class ="code--block"> {<br>
