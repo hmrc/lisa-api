@@ -66,10 +66,10 @@ object UpdateSubscriptionService extends UpdateSubscriptionService {
 object Constants {
   val successCode = "SUCCESS"
   val updateCode = "UPDATED"
-  val voidCode = "UPDATED_AND_ACCOUNT_VOIDED"
-  val updateMsg = "LISA account firstSubscriptionDate has been successfully updated"
-  val voidMsg = "LISA account firstSubscriptionDate has been successfully updated. " +
-    "The account status has been changed to 'Void' as the Investor has another account with a more recent firstSubscriptionDate"
+  val voidCode = "UPDATED_AND_ACCOUNT_VOID"
+  val updateMsg = "Successfully updated the firstSubscriptionDate for the LISA account"
+  val voidMsg = "Successfully updated the firstSubscriptionDate for the LISA account and " +
+    "changed the account status to void because the investor has another account with a more recent firstSubscriptionDate"
   val accNotFound = "INVESTOR_ACCOUNTID_NOT_FOUND"
   val accClosed = "INVESTOR_ACCOUNT_ALREADY_CLOSED"
   val accCancelled = "INVESTOR_ACCOUNT_ALREADY_CANCELLED"
