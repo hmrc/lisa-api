@@ -98,6 +98,23 @@
             </td>
         </tr>
         <tr>
+            <td><p>Request for an account that has already been voided</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: A1234560</p></td>
+            <td>
+                <p class ="code--block"> {<br>
+                                     	  "accountClosureReason": "All funds withdrawn",<br>
+                                     	  "closureDate": "2017-01-20"<br>
+                                        }
+                </p>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
+                <p class ="code--block"> {<br>
+                                            "code": "INVESTOR_ACCOUNT_ALREADY_VOID",<br>
+                                            "message": "The LISA account is already void"<br>
+                                       }
+                </p>
+            </td>
+        </tr>
+        <tr>
             <td><p>Request for an account that has already been closed</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: A1234561</p></td>
             <td>
                 <p class ="code--block"> {<br>
@@ -108,8 +125,8 @@
             </td>
             <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
                 <p class ="code--block"> {<br>
-                                            "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID",<br>
-                                            "message": "This LISA account has already been closed or been made void by HMRC"<br>
+                                            "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED",<br>
+                                            "message": "The LISA account is already closed"<br>
                                        }
                 </p>
             </td>
