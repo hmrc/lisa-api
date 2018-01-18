@@ -166,23 +166,6 @@
                 </p>
             </td>
         </tr>
-         <tr>
-            <td><p>Request to close an account with cancellation as the reason and they need to repay a bonus payment</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: A1234570</p></td>
-            <td>
-                <p class ="code--block"> {<br>
-                                          "accountClosureReason": "Cancellation",<br>
-                                          "closureDate": "2017-01-20"<br>
-                                        }
-                </p>
-            </td>
-            <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
-                <p class ="code--block"> {<br>
-                                            "code": "BONUS_REPAYMENT_REQUIRED",<br>
-                                            "message": "You cannot close the account with cancellation as the reason because you need to repay a bonus payment"<br>
-                                       }
-                </p>
-            </td>
-        </tr>
         <tr>
             <td><p>Request containing an account ID that does not exist</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: A1234562</p></td>
             <td>
