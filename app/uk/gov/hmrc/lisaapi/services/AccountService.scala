@@ -86,53 +86,54 @@ trait AccountService {
     }
   }
 
-    def transferAccount(lisaManager: String, request: CreateLisaAccountTransferRequest)(implicit hc: HeaderCarrier): Future[CreateLisaAccountResponse] = {
-      val response = desConnector.transferAccount(lisaManager, request)
+  def transferAccount(lisaManager: String, request: CreateLisaAccountTransferRequest)(implicit hc: HeaderCarrier): Future[CreateLisaAccountResponse] = {
+    val response = desConnector.transferAccount(lisaManager, request)
 
-      response map {
-        case successResponse: DesAccountResponse => {
-          Logger.debug("Matched DesAccountResponse")
+    response map {
+      case successResponse: DesAccountResponse => {
+        Logger.debug("Matched DesAccountResponse")
 
-          CreateLisaAccountSuccessResponse(successResponse.accountID)
-        }
-        case failureResponse: DesFailureResponse => {
-          Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
-
-          failureResponse.code match {
-            case "INVESTOR_NOT_FOUND" => CreateLisaAccountInvestorNotFoundResponse
-            case "INVESTOR_COMPLIANCE_CHECK_FAILED" => CreateLisaAccountInvestorComplianceCheckFailedResponse
-            case "PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST" => CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse
-            case "INVESTOR_ACCOUNT_ALREADY_EXISTS" => CreateLisaAccountAlreadyExistsResponse
-            case "INVESTOR_ACCOUNT_ALREADY_CLOSED" => CreateLisaAccountInvestorAccountAlreadyClosedOrVoidedResponse
-            case _ => CreateLisaAccountErrorResponse
-          }
-        }
+        CreateLisaAccountSuccessResponse(successResponse.accountID)
       }
-    }
+      case failureResponse: DesFailureResponse => {
+        Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
 
-    def closeAccount(lisaManager: String, accountId: String, request: CloseLisaAccountRequest)(implicit hc: HeaderCarrier): Future[CloseLisaAccountResponse] = {
-
-      val response = desConnector.closeAccount(lisaManager, accountId, request)
-
-      response map {
-        case DesEmptySuccessResponse => {
-          CloseLisaAccountSuccessResponse(accountId)
-        }
-        case failureResponse: DesFailureResponse => {
-          failureResponse.code match {
-            case "INVESTOR_ACCOUNT_ALREADY_CLOSED" => CloseLisaAccountAlreadyClosedResponse
-            case "INVESTOR_ACCOUNTID_NOT_FOUND" => CloseLisaAccountNotFoundResponse
-            case "CANCELLATION_PERIOD_EXCEEDED" => CloseLisaAccountCancellationPeriodExceeded
-            case "ACCOUNT_WITHIN_CANCELLATION_PERIOD" => CloseLisaAccountWithinCancellationPeriod
-            case "BONUS_REPAYMENT_REQUIRED" => CloseLisaAccountBonusPaymentRequired
-            case _ => CloseLisaAccountErrorResponse
-          }
+        failureResponse.code match {
+          case "INVESTOR_NOT_FOUND" => CreateLisaAccountInvestorNotFoundResponse
+          case "INVESTOR_COMPLIANCE_CHECK_FAILED" => CreateLisaAccountInvestorComplianceCheckFailedResponse
+          case "PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST" => CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse
+          case "INVESTOR_ACCOUNT_ALREADY_EXISTS" => CreateLisaAccountAlreadyExistsResponse
+          case "INVESTOR_ACCOUNT_ALREADY_CLOSED" => CreateLisaAccountInvestorAccountAlreadyClosedOrVoidedResponse
+          case _ => CreateLisaAccountErrorResponse
         }
       }
     }
   }
 
+  def closeAccount(lisaManager: String, accountId: String, request: CloseLisaAccountRequest)(implicit hc: HeaderCarrier): Future[CloseLisaAccountResponse] = {
 
-  object AccountService extends AccountService {
-    override val desConnector: DesConnector = DesConnector
+    val response = desConnector.closeAccount(lisaManager, accountId, request)
+
+    response map {
+      case DesEmptySuccessResponse => {
+        CloseLisaAccountSuccessResponse(accountId)
+      }
+      case failureResponse: DesFailureResponse => {
+        failureResponse.code match {
+          case "INVESTOR_ACCOUNT_ALREADY_VOID" => CloseLisaAccountAlreadyVoidResponse
+          case "INVESTOR_ACCOUNT_ALREADY_CLOSED" => CloseLisaAccountAlreadyClosedResponse
+          case "INVESTOR_ACCOUNTID_NOT_FOUND" => CloseLisaAccountNotFoundResponse
+          case "CANCELLATION_PERIOD_EXCEEDED" => CloseLisaAccountCancellationPeriodExceeded
+          case "ACCOUNT_WITHIN_CANCELLATION_PERIOD" => CloseLisaAccountWithinCancellationPeriod
+          case _ => CloseLisaAccountErrorResponse
+        }
+      }
+    }
   }
+
+}
+
+
+object AccountService extends AccountService {
+  override val desConnector: DesConnector = DesConnector
+}

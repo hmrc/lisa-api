@@ -245,7 +245,6 @@ class AccountServiceSpec extends PlaySpec
 
     }
 
-
     "return the type-appropriate response" when {
 
       "given failureResponse for a Account Already Closed Response" in {
@@ -287,20 +286,6 @@ class AccountServiceSpec extends PlaySpec
         }
       }
 
-      "given failureResponse for a Account Bonus Payment Required" in {
-        when(mockDesConnector.closeAccount(any(), any(), any())(any()))
-          .thenReturn(
-            Future.successful(
-              DesFailureResponse("BONUS_REPAYMENT_REQUIRED")
-            )
-          )
-
-        doCloseRequest { response =>
-          response mustBe CloseLisaAccountBonusPaymentRequired
-        }
-      }
-
-
       "given failureResponse for a Account Not Found Response" in {
         when(mockDesConnector.closeAccount(any(), any(), any())(any()))
           .thenReturn(
@@ -311,6 +296,7 @@ class AccountServiceSpec extends PlaySpec
           response mustBe CloseLisaAccountNotFoundResponse
         }
       }
+
     }
 
   }
