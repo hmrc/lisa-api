@@ -99,8 +99,6 @@ case object ErrorAccountCancellationPeriodExceeded extends ErrorResponse(403, "C
 
 case object ErrorAccountWithinCancellationPeriod extends ErrorResponse(403, "ACCOUNT_WITHIN_CANCELLATION_PERIOD", "You cannot close the account with all funds withdrawn as the reason because it is within the cancellation period")
 
-case object ErrorAccountBonusPaymentRequired extends ErrorResponse(403, "BONUS_REPAYMENT_REQUIRED", "You cannot close the account with cancellation as the reason because you need to repay a bonus payment")
-
 case object ErrorPreviousAccountDoesNotExist extends ErrorResponse(403, "PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST", "The transferredFromAccountId and transferredFromLMRN given do not match an account on HMRC’s records")
 
 case object ErrorAccountAlreadyClosedOrVoid extends ErrorResponse(403, "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID", "This LISA account has already been closed or been made void by HMRC")

@@ -86,7 +86,6 @@ class AccountController extends LisaController with LisaConstants {
     }
   }
 
-
   def getAccountDetails (lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
     implicit val startTime = System.currentTimeMillis()
     LisaMetrics.startMetrics(startTime, LisaMetricKeys.ACCOUNT)
@@ -96,8 +95,6 @@ class AccountController extends LisaController with LisaConstants {
       }
     }
   }
-
-
 
   def closeLisaAccount(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
     withValidLMRN(lisaManager) {
@@ -350,20 +347,32 @@ class AccountController extends LisaController with LisaConstants {
 
           Ok(Json.toJson(ApiResponse(data = Some(data), success = true, status = 200)))
         }
+        case CloseLisaAccountAlreadyVoidResponse => {
+          auditService.audit(
+            auditType = "accountNotClosed",
+            path = getCloseEndpointUrl(lisaManager, accountId),
+            auditData = closeLisaAccountRequest.toStringMap ++ Map(ZREF -> lisaManager,
+              "accountId" -> accountId,
+              "reasonNotClosed" -> ErrorAccountAlreadyVoided.errorCode)
+          )
+          LisaMetrics.incrementMetrics(startTime,
+            LisaMetricKeys.lisaError(FORBIDDEN,LisaMetricKeys.CLOSE))
+
+          Forbidden(Json.toJson(ErrorAccountAlreadyVoided))
+        }
         case CloseLisaAccountAlreadyClosedResponse => {
           auditService.audit(
             auditType = "accountNotClosed",
             path = getCloseEndpointUrl(lisaManager, accountId),
             auditData = closeLisaAccountRequest.toStringMap ++ Map(ZREF -> lisaManager,
               "accountId" -> accountId,
-              "reasonNotClosed" -> ErrorAccountAlreadyClosedOrVoid.errorCode)
+              "reasonNotClosed" -> ErrorAccountAlreadyClosed.errorCode)
           )
           LisaMetrics.incrementMetrics(startTime,
             LisaMetricKeys.lisaError(FORBIDDEN,LisaMetricKeys.CLOSE))
 
-          Forbidden(Json.toJson(ErrorAccountAlreadyClosedOrVoid))
+          Forbidden(Json.toJson(ErrorAccountAlreadyClosed))
         }
-
         case CloseLisaAccountCancellationPeriodExceeded => {
           auditService.audit(
             auditType = "accountNotClosed",
@@ -377,7 +386,6 @@ class AccountController extends LisaController with LisaConstants {
 
           Forbidden(Json.toJson(ErrorAccountCancellationPeriodExceeded))
         }
-
         case CloseLisaAccountWithinCancellationPeriod => {
           auditService.audit(
             auditType = "accountNotClosed",
@@ -391,21 +399,6 @@ class AccountController extends LisaController with LisaConstants {
 
           Forbidden(Json.toJson(ErrorAccountWithinCancellationPeriod))
         }
-
-        case CloseLisaAccountBonusPaymentRequired => {
-          auditService.audit(
-            auditType = "accountNotClosed",
-            path = getCloseEndpointUrl(lisaManager, accountId),
-            auditData = closeLisaAccountRequest.toStringMap ++ Map(ZREF -> lisaManager,
-              "accountId" -> accountId,
-              "reasonNotClosed" -> ErrorAccountBonusPaymentRequired.errorCode)
-          )
-          LisaMetrics.incrementMetrics(startTime,
-            LisaMetricKeys.lisaError(FORBIDDEN,LisaMetricKeys.CLOSE))
-
-          Forbidden(Json.toJson(ErrorAccountBonusPaymentRequired))
-        }
-
         case CloseLisaAccountNotFoundResponse => {
           auditService.audit(
             auditType = "accountNotClosed",
