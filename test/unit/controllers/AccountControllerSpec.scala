@@ -117,8 +117,6 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
       }
     }
 
-
-
     "audit an accountNotCreated event" when {
       "the data service returns a CreateLisaAccountInvestorNotFoundResponse for a create request" in {
         when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorNotFoundResponse))
@@ -171,18 +169,21 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
         }
       }
       "the data service returns a CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse for a create request" in {
-        when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorAccountAlreadyClosedOrVoidedResponse))
+        when(mockService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse))
 
-        doSyncCreateOrTransferRequest(createAccountJson) { _ =>
+        doSyncCreateOrTransferRequest(transferAccountJson) { _ =>
           verify(mockAuditService).audit(
-            auditType = matchersEquals("accountNotCreated"),
+            auditType = matchersEquals("accountNotTransferred"),
             path=matchersEquals(s"/manager/$lisaManager/accounts"),
             auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorId" -> "9876543210",
               "accountId" -> "8765432100",
               "firstSubscriptionDate" -> "2011-03-23",
-              "reasonNotCreated" -> "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID"
+              "transferredFromAccountId" -> "Z543210",
+              "transferredFromLMRN" -> "Z543333",
+              "transferInDate" -> "2015-12-13",
+              "reasonNotCreated" -> "PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST"
             ))
           )(any())
         }
@@ -243,7 +244,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
       }
     }
 
-    "audit and accountNotTransferred event" when {
+    "audit an accountNotTransferred event" when {
       "the data service returns a CreateLisaAccountInvestorNotFoundResponse for a transfer request" in {
         when(mockService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorNotFoundResponse))
 
@@ -263,7 +264,6 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
             )))(any())
         }
       }
-
       "the data service returns a CreateLisaAccountInvestorComplianceCheckFailedResponse for a transfer request" in {
         when(mockService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorComplianceCheckFailedResponse))
 
@@ -283,7 +283,6 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
             )))(any())
         }
       }
-
       "the data service returns a CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse for a transfer request" in {
         when(mockService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse))
 
@@ -303,9 +302,8 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
             )))(any())
         }
       }
-
-      "the data service returns a CreateLisaAccountInvestorAccountAlreadyClosedOrVoidedResponse for a transfer request" in {
-        when(mockService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorAccountAlreadyClosedOrVoidedResponse))
+      "the data service returns a CreateLisaAccountInvestorAccountAlreadyClosed for a transfer request" in {
+        when(mockService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorAccountAlreadyClosedResponse))
 
         doSyncCreateOrTransferRequest(transferAccountJson) { res =>
           verify(mockAuditService).audit(
@@ -319,11 +317,29 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               "transferredFromAccountId" -> "Z543210",
               "transferredFromLMRN" -> "Z543333",
               "transferInDate" -> "2015-12-13",
-              "reasonNotCreated" -> "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID"
+              "reasonNotCreated" -> "INVESTOR_ACCOUNT_ALREADY_CLOSED"
             )))(any())
         }
       }
+      "the data service returns a CreateLisaAccountInvestorAccountAlreadyVoid for a transfer request" in {
+        when(mockService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorAccountAlreadyVoidResponse))
 
+        doSyncCreateOrTransferRequest(transferAccountJson) { res =>
+          verify(mockAuditService).audit(
+            auditType = matchersEquals("accountNotTransferred"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts"),
+            auditData = matchersEquals(Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "investorId" -> "9876543210",
+              "accountId" -> "8765432100",
+              "firstSubscriptionDate" -> "2011-03-23",
+              "transferredFromAccountId" -> "Z543210",
+              "transferredFromLMRN" -> "Z543333",
+              "transferInDate" -> "2015-12-13",
+              "reasonNotCreated" -> "INVESTOR_ACCOUNT_ALREADY_VOID"
+            )))(any())
+        }
+      }
       "the data service returns a CreateLisaAccountAlreadyExistsResponse for a transfer request" in {
         when(mockService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountAlreadyExistsResponse))
 
@@ -343,7 +359,6 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
             )))(any())
         }
       }
-
       "the data service returns an error for a transfer request" in {
         when(mockService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountErrorResponse))
 
@@ -495,21 +510,40 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
       }
     }
 
-    "return with status 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID" when {
-      "the data service returns a CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse for a create request" in {
-        when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorAccountAlreadyClosedOrVoidedResponse))
+    "return with status 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_CLOSED" when {
+      "the data service returns a CreateLisaAccountInvestorAccountAlreadyClosedResponse for a create request" in {
+        when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorAccountAlreadyClosedResponse))
 
         doCreateOrTransferRequest(createAccountJson) { res =>
           status(res) mustBe (FORBIDDEN)
-          (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID")
+          (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ACCOUNT_ALREADY_CLOSED")
         }
       }
-      "the data service returns a CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse for a transfer request" in {
-        when(mockService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorAccountAlreadyClosedOrVoidedResponse))
+      "the data service returns a CreateLisaAccountInvestorAccountAlreadyClosedResponse for a transfer request" in {
+        when(mockService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorAccountAlreadyClosedResponse))
 
         doCreateOrTransferRequest(transferAccountJson) { res =>
           status(res) mustBe (FORBIDDEN)
-          (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID")
+          (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ACCOUNT_ALREADY_CLOSED")
+        }
+      }
+    }
+
+    "return with status 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_VOID" when {
+      "the data service returns a CreateLisaAccountInvestorAccountAlreadyVoidResponse for a create request" in {
+        when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorAccountAlreadyVoidResponse))
+
+        doCreateOrTransferRequest(createAccountJson) { res =>
+          status(res) mustBe (FORBIDDEN)
+          (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ACCOUNT_ALREADY_VOID")
+        }
+      }
+      "the data service returns a CreateLisaAccountInvestorAccountAlreadyVoidResponse for a transfer request" in {
+        when(mockService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorAccountAlreadyVoidResponse))
+
+        doCreateOrTransferRequest(transferAccountJson) { res =>
+          status(res) mustBe (FORBIDDEN)
+          (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ACCOUNT_ALREADY_VOID")
         }
       }
     }

@@ -250,17 +250,24 @@ types:
                                     "code" : "TRANSFER_ACCOUNT_DATA_PROVIDED",
                                     "message" : "transfer account data provided"
                                   }
-                              accountClosedOrVoided:
-                                description: This LISA account has already been closed or been made void by HMRC
+                              accountClosed:
+                                description: The LISA account is already closed
                                 value: |
                                   {
-                                    "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID",
-                                    "message": "This LISA account has already been closed or been made void by HMRC"
+                                    "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED",
+                                    "message": "The LISA account is already closed"
+                                  }
+                              accountVoided:
+                                description: The LISA account is already void
+                                value: |
+                                  {
+                                    "code": "INVESTOR_ACCOUNT_ALREADY_VOID",
+                                    "message": "The LISA account is already void"
                                   }
                       409:
                         body:
                           application/json:
-                            description:
+                            description: This investor already has a LISA account
                             type: !include schemas/ErrorCodes.schema.json
                             example: |
                               {
