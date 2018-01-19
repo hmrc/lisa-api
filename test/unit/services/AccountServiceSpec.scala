@@ -124,7 +124,7 @@ class AccountServiceSpec extends PlaySpec
           .thenReturn(Future.successful(DesFailureResponse(code = "INVESTOR_ACCOUNT_ALREADY_CLOSED")))
 
         doCreateRequest { response =>
-          response mustBe CreateLisaAccountInvestorAccountAlreadyClosedOrVoidedResponse
+          response mustBe CreateLisaAccountInvestorAccountAlreadyClosedResponse
         }
       }
     }
@@ -219,7 +219,7 @@ class AccountServiceSpec extends PlaySpec
           .thenReturn(Future.successful(DesFailureResponse(code = "INVESTOR_ACCOUNT_ALREADY_CLOSED")))
 
         doTransferRequest { response =>
-          response mustBe CreateLisaAccountInvestorAccountAlreadyClosedOrVoidedResponse
+          response mustBe CreateLisaAccountInvestorAccountAlreadyClosedResponse
         }
       }
     }

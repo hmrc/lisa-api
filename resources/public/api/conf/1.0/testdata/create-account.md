@@ -240,7 +240,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request containing a LISA account which has already been closed or voided</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a></p></td>
+            <td><p>Request containing a LISA account which has already been closed</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a></p></td>
             <td>
                 <p class ="code--block"> {<br>
                                      	    "investorId": "0000000403",<br>
@@ -252,8 +252,8 @@
             </td>
             <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
                 <p class ="code--block"> {<br>
-                                         "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID",<br>
-                                         "message": "This LISA account has already been closed or been made void by HMRC"<br>
+                                         "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED",<br>
+                                         "message": "The LISA account is already closed"<br>
                                        }
                 </p>
             </td>
