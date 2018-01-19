@@ -71,6 +71,7 @@ trait AccountService {
           res.creationReason,
           res.firstSubscriptionDate,
           res.accountStatus,
+          res.subscriptionStatus,
           res.accountClosureReason,
           res.closureDate,
           transferAccount
