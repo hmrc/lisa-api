@@ -127,6 +127,22 @@ class AccountServiceSpec extends PlaySpec
           response mustBe CreateLisaAccountInvestorAccountAlreadyClosedResponse
         }
       }
+      "a INVESTOR_ACCOUNT_ALREADY_CANCELLED response comes from DES" in {
+        when(mockDesConnector.createAccount(any(), any())(any()))
+          .thenReturn(Future.successful(DesFailureResponse(code = "INVESTOR_ACCOUNT_ALREADY_CANCELLED")))
+
+        doCreateRequest { response =>
+          response mustBe CreateLisaAccountInvestorAccountAlreadyClosedResponse
+        }
+      }
+      "a INVESTOR_ACCOUNT_ALREADY_VOID response comes from DES" in {
+        when(mockDesConnector.createAccount(any(), any())(any()))
+          .thenReturn(Future.successful(DesFailureResponse(code = "INVESTOR_ACCOUNT_ALREADY_VOID")))
+
+        doCreateRequest { response =>
+          response mustBe CreateLisaAccountInvestorAccountAlreadyVoidResponse
+        }
+      }
     }
 
   }
@@ -220,6 +236,22 @@ class AccountServiceSpec extends PlaySpec
 
         doTransferRequest { response =>
           response mustBe CreateLisaAccountInvestorAccountAlreadyClosedResponse
+        }
+      }
+      "a INVESTOR_ACCOUNT_ALREADY_CANCELLED response comes from DES" in {
+        when(mockDesConnector.transferAccount(any(), any())(any()))
+          .thenReturn(Future.successful(DesFailureResponse(code = "INVESTOR_ACCOUNT_ALREADY_CANCELLED")))
+
+        doTransferRequest { response =>
+          response mustBe CreateLisaAccountInvestorAccountAlreadyClosedResponse
+        }
+      }
+      "a INVESTOR_ACCOUNT_ALREADY_VOID response comes from DES" in {
+        when(mockDesConnector.transferAccount(any(), any())(any()))
+          .thenReturn(Future.successful(DesFailureResponse(code = "INVESTOR_ACCOUNT_ALREADY_VOID")))
+
+        doTransferRequest { response =>
+          response mustBe CreateLisaAccountInvestorAccountAlreadyVoidResponse
         }
       }
     }

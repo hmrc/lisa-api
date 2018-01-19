@@ -194,6 +194,18 @@ class AccountController extends LisaController with LisaConstants {
 
           Forbidden(Json.toJson(ErrorAccountAlreadyClosed))
         }
+        case CreateLisaAccountInvestorAccountAlreadyVoidResponse => {
+          auditService.audit(
+            auditType = "accountNotCreated",
+            path = getEndpointUrl(lisaManager),
+            auditData = creationRequest.toStringMap ++ Map(ZREF -> lisaManager,
+              "reasonNotCreated" -> ErrorAccountAlreadyVoided.errorCode)
+          )
+          LisaMetrics.incrementMetrics(System.currentTimeMillis(),
+            LisaMetricKeys.lisaError(FORBIDDEN,LisaMetricKeys.ACCOUNT))
+
+          Forbidden(Json.toJson(ErrorAccountAlreadyVoided))
+        }
         case CreateLisaAccountAlreadyExistsResponse => {
           val result = ErrorAccountAlreadyExists (creationRequest.accountId)
           auditService.audit(
@@ -295,6 +307,18 @@ class AccountController extends LisaController with LisaConstants {
             LisaMetricKeys.lisaError(FORBIDDEN,LisaMetricKeys.ACCOUNT))
 
           Forbidden(Json.toJson(ErrorAccountAlreadyClosed))
+        }
+        case CreateLisaAccountInvestorAccountAlreadyVoidResponse => {
+          auditService.audit(
+            auditType = "accountNotTransferred",
+            path = getEndpointUrl(lisaManager),
+            auditData = transferRequest.toStringMap ++ Map(ZREF -> lisaManager,
+              "reasonNotCreated" -> ErrorAccountAlreadyVoided.errorCode)
+          )
+          LisaMetrics.incrementMetrics(System.currentTimeMillis(),
+            LisaMetricKeys.lisaError(FORBIDDEN,LisaMetricKeys.ACCOUNT))
+
+          Forbidden(Json.toJson(ErrorAccountAlreadyVoided))
         }
         case CreateLisaAccountAlreadyExistsResponse => {
           val result = ErrorAccountAlreadyExists (transferRequest.accountId)
