@@ -23,7 +23,6 @@
     "firstSubscriptionDate": {
       "description":"The date of the first deposit into the account - if this is a transfer, use the date of deposit into the account managed by the previous provider. This can't be in the future.",
       "$ref": "#/definitions/ISO8601-Date"
-
     },
     "accountStatus": {
       "description": "Status of the account that has been created.",
@@ -32,6 +31,17 @@
         "OPEN",
         "VOID",
         "CLOSED"
+      ]
+    },
+    "subscriptionStatus": {
+      "description": "Status of the account's subscription.",
+      "type": "string",
+      "enum": [
+        "AVAILABLE",
+        "ACTIVE",
+        "LOCKED",
+        "CANCELLED",
+        "VOID"
       ]
     },
     "accountClosureReason": {
