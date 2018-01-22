@@ -125,6 +125,7 @@ trait AccountService {
       case failureResponse: DesFailureResponse => {
         failureResponse.code match {
           case "INVESTOR_ACCOUNT_ALREADY_VOID" => CloseLisaAccountAlreadyVoidResponse
+          case "INVESTOR_ACCOUNT_ALREADY_CANCELLED" => CloseLisaAccountAlreadyClosedResponse
           case "INVESTOR_ACCOUNT_ALREADY_CLOSED" => CloseLisaAccountAlreadyClosedResponse
           case "INVESTOR_ACCOUNTID_NOT_FOUND" => CloseLisaAccountNotFoundResponse
           case "CANCELLATION_PERIOD_EXCEEDED" => CloseLisaAccountCancellationPeriodExceeded

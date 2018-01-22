@@ -292,6 +292,19 @@ class AccountServiceSpec extends PlaySpec
         }
       }
 
+      "given failureResponse for a Account Already Cancelled Response" in {
+        when(mockDesConnector.closeAccount(any(), any(), any())(any()))
+          .thenReturn(
+            Future.successful(
+              DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_CANCELLED")
+            )
+          )
+
+        doCloseRequest { response =>
+          response mustBe CloseLisaAccountAlreadyClosedResponse
+        }
+      }
+
       "given failureResponse for a Account Cancellation Period Exceeded" in {
         when(mockDesConnector.closeAccount(any(), any(), any())(any()))
           .thenReturn(
