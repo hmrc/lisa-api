@@ -55,7 +55,7 @@ package object models {
       "^[a-zA-Z &`\\-\\'^]{1,35}$".r,
       "error.formatting.name")
     val investorId: Reads[InvestorId] = Reads.pattern("^\\d{10}$".r, "error.formatting.investorId")
-    val accountId: Reads[AccountId] = Reads.pattern("^[a-zA-Z0-9 :\\-]{1,20}$".r, "error.formatting.accountId")
+    val accountId: Reads[AccountId] = Reads.pattern("^[a-zA-Z0-9 :/-]{1,20}$".r, "error.formatting.accountId")
     val lifeEventId: Reads[LifeEventId] = Reads.pattern("^\\d{10}$".r, "error.formatting.lifeEventId")
     val lifeEventType: Reads[LifeEventType] = Reads.pattern("^(LISA Investor Terminal Ill Health|LISA Investor Death)$".r, "error.formatting.lifeEventType")
     val accountClosureReason: Reads[AccountClosureReason] = Reads.pattern(
