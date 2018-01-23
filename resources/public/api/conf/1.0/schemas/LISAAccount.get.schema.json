@@ -34,7 +34,7 @@
       ]
     },
     "subscriptionStatus": {
-      "description": "Status of the account's subscription.",
+      "description": "The subscription status for the current financial year.",
       "type": "string",
       "enum": [
         "AVAILABLE",
