@@ -52,7 +52,7 @@ trait LisaController extends BaseController with HeaderValidator with RunMode wi
   }
 
   protected def withValidAccountId(accountId: String)(success: Future[Result])(implicit request: Request[AnyContent]): Future[Result] = {
-    if (accountId.matches("^[a-zA-Z0-9 :\\-]{1,20}$")) {
+    if (accountId.matches("^[a-zA-Z0-9 :/-]{1,20}$")) {
       success
     }
     else {

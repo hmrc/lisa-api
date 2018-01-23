@@ -40,7 +40,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
   val lisaManager = "Z019283"
-  val accountId = "ABC12345"
+  val accountId = "ABC/12345"
   val mockAuthCon = mock[LisaAuthConnector]
 
   override def beforeEach() {
@@ -101,7 +101,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
     "audit an accountCreated event" when {
       "submitted a valid create account request" in {
-        when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountSuccessResponse("AB123456")))
+        when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountSuccessResponse(accountId)))
         doSyncCreateOrTransferRequest(createAccountJson) { _ =>
           verify(mockAuditService).audit(
             auditType = matchersEquals("accountCreated"),
@@ -225,7 +225,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
     "audit an accountTransferred event" when {
       "submitted a valid transfer account request" in {
-        when(mockService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountSuccessResponse("AB123456")))
+        when(mockService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountSuccessResponse(accountId)))
         doSyncCreateOrTransferRequest(transferAccountJson) { res =>
           verify(mockAuditService).audit(
             auditType = matchersEquals("accountTransferred"),
@@ -381,18 +381,18 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
     "return with status 201 created and an account Id" when {
       "submitted a valid create account request" in {
-        when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountSuccessResponse("AB123456")))
+        when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountSuccessResponse(accountId)))
         doCreateOrTransferRequest(createAccountJson) { res =>
           status(res) mustBe (CREATED)
-          (contentAsJson(res) \ "data" \ "accountId").as[String] mustBe ("AB123456")
+          (contentAsJson(res) \ "data" \ "accountId").as[String] mustBe (accountId)
         }
       }
       "submitted a valid transfer account request" in {
-        when(mockService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountSuccessResponse("AB123456")))
+        when(mockService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountSuccessResponse(accountId)))
 
         doCreateOrTransferRequest(transferAccountJson) { res =>
           status(res) mustBe (CREATED)
-          (contentAsJson(res) \ "data" \ "accountId").as[String] mustBe ("AB123456")
+          (contentAsJson(res) \ "data" \ "accountId").as[String] mustBe (accountId)
         }
       }
     }
@@ -407,7 +407,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
         }
       }
       "invalid lmrn is sent" in {
-        when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountSuccessResponse("AB123456")))
+        when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountSuccessResponse(accountId)))
 
         doCreateOrTransferRequest(createAccountJson, "ZZ1234") { res =>
           status(res) mustBe (BAD_REQUEST)
@@ -417,7 +417,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
         }
       }
       "invalid accountId is sent" in {
-        when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountSuccessResponse("AB123456")))
+        when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountSuccessResponse(accountId)))
 
         doCreateOrTransferRequest(transferAccountJson.replace("/", "\\\\")) { res =>
           status(res) mustBe (BAD_REQUEST)
@@ -700,17 +700,17 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
     "audit an account closed event" when {
       "return with status 200 ok" when {
         "submitted a valid close account request" in {
-          when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountSuccessResponse("AB123456")))
+          when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountSuccessResponse(accountId)))
 
           doSyncCloseRequest(closeAccountJson) { res =>
             verify(mockAuditService).audit(
               auditType = matchersEquals("accountClosed"),
-              path=matchersEquals(s"/manager/$lisaManager/accounts/AB123456/close-account"),
+              path=matchersEquals(s"/manager/$lisaManager/accounts/$accountId/close-account"),
               auditData = matchersEquals(Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountClosureReason" -> "All funds withdrawn",
                 "closureDate" -> "2000-06-23",
-                "accountId" -> "AB123456"
+                "accountId" -> accountId
                )))(any())
           }
         }
@@ -724,12 +724,12 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
         doSyncCloseRequest(closeAccountJson) { res =>
           verify(mockAuditService).audit(
             auditType = matchersEquals("accountNotClosed"),
-            path=matchersEquals(s"/manager/$lisaManager/accounts/ABC12345/close-account"),
+            path=matchersEquals(s"/manager/$lisaManager/accounts/$accountId/close-account"),
             auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountClosureReason" -> "All funds withdrawn",
               "closureDate" -> "2000-06-23",
-              "accountId" -> "ABC12345",
+              "accountId" -> accountId,
               "reasonNotClosed" -> "INVESTOR_ACCOUNT_ALREADY_VOID"
             )))(any())
         }
@@ -741,12 +741,12 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
         doSyncCloseRequest(closeAccountJson) { res =>
           verify(mockAuditService).audit(
             auditType = matchersEquals("accountNotClosed"),
-            path=matchersEquals(s"/manager/$lisaManager/accounts/ABC12345/close-account"),
+            path=matchersEquals(s"/manager/$lisaManager/accounts/$accountId/close-account"),
             auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountClosureReason" -> "All funds withdrawn",
               "closureDate" -> "2000-06-23",
-              "accountId" -> "ABC12345",
+              "accountId" -> accountId,
               "reasonNotClosed" -> "INVESTOR_ACCOUNT_ALREADY_CLOSED"
             )))(any())
         }
@@ -758,12 +758,12 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
         doSyncCloseRequest(closeAccountJson) { res =>
           verify(mockAuditService).audit(
             auditType = matchersEquals("accountNotClosed"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/ABC12345/close-account"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/close-account"),
             auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountClosureReason" -> "All funds withdrawn",
               "closureDate" -> "2000-06-23",
-              "accountId" -> "ABC12345",
+              "accountId" -> accountId,
               "reasonNotClosed" -> "CANCELLATION_PERIOD_EXCEEDED"
             )))(any())
         }
@@ -775,12 +775,12 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
         doSyncCloseRequest(closeAccountJson) { res =>
           verify(mockAuditService).audit(
             auditType = matchersEquals("accountNotClosed"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/ABC12345/close-account"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/close-account"),
             auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountClosureReason" -> "All funds withdrawn",
               "closureDate" -> "2000-06-23",
-              "accountId" -> "ABC12345",
+              "accountId" -> accountId,
               "reasonNotClosed" -> "ACCOUNT_WITHIN_CANCELLATION_PERIOD"
             )))(any())
         }
@@ -792,12 +792,12 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
         doSyncCloseRequest(closeAccountJson) { res =>
           verify(mockAuditService).audit(
             auditType = matchersEquals("accountNotClosed"),
-            path=matchersEquals(s"/manager/$lisaManager/accounts/ABC12345/close-account"),
+            path=matchersEquals(s"/manager/$lisaManager/accounts/$accountId/close-account"),
             auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountClosureReason" -> "All funds withdrawn",
               "closureDate" -> "2000-06-23",
-              "accountId" -> "ABC12345",
+              "accountId" -> accountId,
               "reasonNotClosed" -> "INVESTOR_ACCOUNTID_NOT_FOUND"
             )))(any())
 
@@ -811,12 +811,12 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
           doSyncCloseRequest(closeAccountJson) { res =>
             verify(mockAuditService).audit(
               auditType = matchersEquals("accountNotClosed"),
-              path=matchersEquals(s"/manager/$lisaManager/accounts/ABC12345/close-account"),
+              path=matchersEquals(s"/manager/$lisaManager/accounts/$accountId/close-account"),
               auditData = matchersEquals(Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountClosureReason" -> "All funds withdrawn",
                 "closureDate" -> "2000-06-23",
-                "accountId" -> "ABC12345",
+                "accountId" -> accountId,
                 "reasonNotClosed" -> "INTERNAL_SERVER_ERROR"
               )))(any())
 
@@ -827,7 +827,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
     "return with status 200 ok" when {
       "submitted a valid close account request" in {
-        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountSuccessResponse("AB123456")))
+        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountSuccessResponse(accountId)))
 
         doCloseRequest(closeAccountJson) { res =>
           status(res) mustBe (OK)

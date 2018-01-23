@@ -45,7 +45,7 @@ class LifeEventControllerSpec extends PlaySpec
 
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
   val lisaManager = "Z019283"
-  val accountId = "ABC12345"
+  val accountId = "ABC/12345"
   val eventId = "1234567890"
 
   implicit val hc:HeaderCarrier = HeaderCarrier()
