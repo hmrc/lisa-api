@@ -47,7 +47,7 @@ class BonusPaymentControllerSpec extends PlaySpec
 
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
   val lisaManager = "Z019283"
-  val accountId = "ABC12345"
+  val accountId = "ABC/12345"
   val transactionId = "1234567890"
   val validBonusPaymentJson = Source.fromInputStream(getClass().getResourceAsStream("/json/request.valid.bonus-payment.json")).mkString
   val validBonusPaymentMinimumFieldsJson = Source.fromInputStream(getClass().getResourceAsStream("/json/request.valid.bonus-payment.min.json")).mkString

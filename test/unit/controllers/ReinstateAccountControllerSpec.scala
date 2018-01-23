@@ -39,24 +39,20 @@ class ReinstateAccountControllerSpec extends PlaySpec with MockitoSugar with One
 
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
   val lisaManager = "Z019283"
-  val accountId = "ABC12345"
+  val accountId = "ABC/12345"
   val mockAuthCon = mock[LisaAuthConnector]
 
   override def beforeEach() {
     reset(mockAuditService)
   }
 
-
-  val reinstateAccountValidJson = """{"accountId" :"ABC12345"}"""
-
-
+  val reinstateAccountValidJson = s"""{"accountId" :"$accountId"}"""
 
   "The Reinstate Account endpoint" must {
 
     when(mockAuthCon.authorise[Option[String]](any(),any())(any(), any())).thenReturn(Future(Some("1234")))
 
     "audit an account reinstated event" when {
-
       "return with status 200 ok" when {
         "submitted a valid reinstate account request" in {
           when(mockService.reinstateAccountService(any(), any())(any())).thenReturn(Future.successful(ReinstateLisaAccountSuccessResponse("code", "reason")))
@@ -64,10 +60,10 @@ class ReinstateAccountControllerSpec extends PlaySpec with MockitoSugar with One
           doSyncReinstateAccount (reinstateAccountValidJson){ res =>
             verify(mockAuditService).audit(
               auditType = matchersEquals("accountReinstated"),
-              path=matchersEquals(s"/manager/$lisaManager/accounts/ABC12345/reinstate"),
+              path=matchersEquals(s"/manager/$lisaManager/accounts/$accountId/reinstate"),
               auditData = matchersEquals(Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
-                "accountId" -> "ABC12345"
+                "accountId" -> accountId
                )))(any())
           }
         }
@@ -78,95 +74,86 @@ class ReinstateAccountControllerSpec extends PlaySpec with MockitoSugar with One
       "the data service returns a ReinstateLisaAccountAlreadyClosedResponse" in {
         when(mockService.reinstateAccountService(any(), any())(any())).thenReturn(Future.successful(ReinstateLisaAccountAlreadyClosedResponse))
 
-        doSyncReinstateAccount (reinstateAccountValidJson) { res =>
+        doSyncReinstateAccount(reinstateAccountValidJson) { res =>
           verify(mockAuditService).audit(
             auditType = matchersEquals("accountNotReinstated"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/ABC12345/reinstate"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/reinstate"),
             auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
-              "accountId" -> "ABC12345",
+              "accountId" -> accountId,
               "reasonNotReinstated" -> "INVESTOR_ACCOUNT_ALREADY_CLOSED"
             )))(any())
         }
       }
+      "the data service returns a ReinstateLisaAccountAlreadyCancelledResponse" in {
+        when(mockService.reinstateAccountService(any(), any())(any())).thenReturn(Future.successful(ReinstateLisaAccountAlreadyCancelledResponse))
 
-       "the data service returns a ReinstateLisaAccountAlreadyCancelledResponse" in {
-          when(mockService.reinstateAccountService(any(), any())(any())).thenReturn(Future.successful(ReinstateLisaAccountAlreadyCancelledResponse))
-
-         doSyncReinstateAccount (reinstateAccountValidJson){ res =>
-           verify(mockAuditService).audit(
-             auditType = matchersEquals("accountNotReinstated"),
-             path = matchersEquals(s"/manager/$lisaManager/accounts/ABC12345/reinstate"),
-             auditData = matchersEquals(Map(
-               "lisaManagerReferenceNumber" -> lisaManager,
-               "accountId" -> "ABC12345",
-               "reasonNotReinstated" -> "INVESTOR_ACCOUNT_ALREADY_CLOSED"
-             )))(any())
-          }
+        doSyncReinstateAccount(reinstateAccountValidJson) { res =>
+          verify(mockAuditService).audit(
+            auditType = matchersEquals("accountNotReinstated"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/reinstate"),
+            auditData = matchersEquals(Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountId" -> accountId,
+              "reasonNotReinstated" -> "INVESTOR_ACCOUNT_ALREADY_CLOSED"
+            )))(any())
         }
-
+      }
       "the data service returns a ReinstateLisaAccountAlreadyOpenResponse" in {
         when(mockService.reinstateAccountService(any(), any())(any())).thenReturn(Future.successful(ReinstateLisaAccountAlreadyOpenResponse))
 
-        doSyncReinstateAccount (reinstateAccountValidJson){ res =>
+        doSyncReinstateAccount(reinstateAccountValidJson) { res =>
           verify(mockAuditService).audit(
             auditType = matchersEquals("accountNotReinstated"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/ABC12345/reinstate"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/reinstate"),
             auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
-              "accountId" -> "ABC12345",
+              "accountId" -> accountId,
               "reasonNotReinstated" -> "INVESTOR_ACCOUNT_ALREADY_OPEN"
             )))(any())
         }
       }
-
       "the data service returns a ReinstateLisaAccountInvestorComplianceCheckFailedResponse" in {
         when(mockService.reinstateAccountService(any(), any())(any())).thenReturn(Future.successful(ReinstateLisaAccountInvestorComplianceCheckFailedResponse))
 
-        doSyncReinstateAccount (reinstateAccountValidJson){ res =>
+        doSyncReinstateAccount(reinstateAccountValidJson) { res =>
           verify(mockAuditService).audit(
             auditType = matchersEquals("accountNotReinstated"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/ABC12345/reinstate"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/reinstate"),
             auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
-              "accountId" -> "ABC12345",
+              "accountId" -> accountId,
               "reasonNotReinstated" -> "INVESTOR_COMPLIANCE_CHECK_FAILED"
             )))(any())
         }
       }
-
-
       "the data service returns a ReinstateLisaAccountNotFoundResponse" in {
         when(mockService.reinstateAccountService(any(), any())(any())).thenReturn(Future.successful(ReinstateLisaAccountNotFoundResponse))
 
-        doSyncReinstateAccount (reinstateAccountValidJson){ res =>
+        doSyncReinstateAccount(reinstateAccountValidJson) { res =>
           verify(mockAuditService).audit(
             auditType = matchersEquals("accountNotReinstated"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/ABC12345/reinstate"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/reinstate"),
             auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
-              "accountId" -> "ABC12345",
+              "accountId" -> accountId,
               "reasonNotReinstated" -> "INVESTOR_ACCOUNTID_NOT_FOUND"
             )))(any())
 
         }
       }
+      "the data service returns an error" in {
+        when(mockService.reinstateAccountService(any(), any())(any())).thenReturn(Future.successful(ReinstateLisaAccountErrorResponse))
 
-      "return with status 500 internal server error" when {
-        "the data service returns an error" in {
-          when(mockService.reinstateAccountService(any(), any())(any())).thenReturn(Future.successful(ReinstateLisaAccountErrorResponse))
-
-          doSyncReinstateAccount (reinstateAccountValidJson){ res =>
-            verify(mockAuditService).audit(
-              auditType = matchersEquals("accountNotReinstated"),
-              path=matchersEquals(s"/manager/$lisaManager/accounts/ABC12345/reinstate"),
-              auditData = matchersEquals(Map(
-                "lisaManagerReferenceNumber" -> lisaManager,
-                "accountId" -> "ABC12345",
-                "reasonNotReinstated" -> "INTERNAL_SERVER_ERROR"
-              )))(any())
-
-          }
+        doSyncReinstateAccount (reinstateAccountValidJson){ res =>
+          verify(mockAuditService).audit(
+            auditType = matchersEquals("accountNotReinstated"),
+            path=matchersEquals(s"/manager/$lisaManager/accounts/$accountId/reinstate"),
+            auditData = matchersEquals(Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountId" -> accountId,
+              "reasonNotReinstated" -> "INTERNAL_SERVER_ERROR"
+            )))(any())
         }
       }
     }
@@ -225,7 +212,6 @@ class ReinstateAccountControllerSpec extends PlaySpec with MockitoSugar with One
       }
     }
 
-
     "return with status 404 forbidden and a code of INVESTOR_ACCOUNTID_NOT_FOUND" when {
       "the data service returns a ReinstateLisaAccountNotFoundResponse" in {
         when(mockService.reinstateAccountService(any(), any())(any())).thenReturn(Future.successful(ReinstateLisaAccountNotFoundResponse))
@@ -260,9 +246,6 @@ class ReinstateAccountControllerSpec extends PlaySpec with MockitoSugar with One
 
   }
 
-
-
-
   def doReinstateRequest(jsonString: String, lmrn: String = lisaManager)(callback: (Future[Result]) => Unit) {
     val res = SUT.reinstateAccount(lmrn).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
       withBody(AnyContentAsJson(Json.parse(jsonString))))
@@ -270,16 +253,12 @@ class ReinstateAccountControllerSpec extends PlaySpec with MockitoSugar with One
     callback(res)
   }
 
-
   def doSyncReinstateAccount(jsonString: String)(callback: (Result) => Unit) {
     val res = await(SUT.reinstateAccount(lisaManager).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
       withBody(AnyContentAsJson(Json.parse(jsonString)))))
 
     callback(res)
   }
-
-
-
 
   val mockService: ReinstateAccountService = mock[ReinstateAccountService]
   val mockAuditService: AuditService = mock[AuditService]

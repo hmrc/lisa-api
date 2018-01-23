@@ -41,7 +41,7 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
 
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
   val lisaManager = "Z019283"
-  val accountId = "1234567890"
+  val accountId = "1234/567890"
   val mockAuthCon = mock[LisaAuthConnector]
 
   implicit val hc:HeaderCarrier = HeaderCarrier()
@@ -229,7 +229,7 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
 
 
   def doUpdateSubsDate(jsonString: String)(callback: (Future[Result]) => Unit) {
-    val res = SUT.updateSubscription(lisaManager, "1234567890").apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
+    val res = SUT.updateSubscription(lisaManager, accountId).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
       withBody(AnyContentAsJson(Json.parse(jsonString))))
 
     callback(res)
@@ -237,7 +237,7 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
 
 
   def doUpdateSubsDateInvalidLMRN(jsonString: String)(callback: (Future[Result]) => Unit) {
-    val res = SUT.updateSubscription("12345678", "1234567890").apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
+    val res = SUT.updateSubscription("12345678", accountId).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
       withBody(AnyContentAsJson(Json.parse(jsonString))))
 
     callback(res)
