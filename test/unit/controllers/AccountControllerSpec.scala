@@ -643,36 +643,36 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
     "return the correct json" when {
       "returning a valid open account response" in {
-        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", "2011-03-23", "OPEN", None, None, None)))
+        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", "2011-03-23", "OPEN", "ACTIVE", None, None, None)))
         doSyncGetAccountDetailsRequest(res => {
           status(res) mustBe OK
-          contentAsJson(res) mustBe Json.toJson (GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", "2011-03-23", "OPEN", None, None, None))
+          contentAsJson(res) mustBe Json.toJson (GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", "2011-03-23", "OPEN", "ACTIVE", None, None, None))
         })
       }
 
       "returning a valid close account response" in {
-        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", "2011-03-23", "CLOSED", Some("All funds withdrawn"), Some("2017-01-03"), None)))
+        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", "2011-03-23", "CLOSED", "ACTIVE", Some("All funds withdrawn"), Some("2017-01-03"), None)))
         doSyncGetAccountDetailsRequest(res => {
           status(res) mustBe OK
-          contentAsJson(res) mustBe Json.toJson (GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", "2011-03-23",  "CLOSED", Some("All funds withdrawn"), Some("2017-01-03"), None))
+          contentAsJson(res) mustBe Json.toJson (GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", "2011-03-23",  "CLOSED", "ACTIVE", Some("All funds withdrawn"), Some("2017-01-03"), None))
         })
       }
 
       "returning a valid transfer account response" in {
         when(mockService.getAccount(any(), any())(any())).
-          thenReturn(Future.successful(GetLisaAccountSuccessResponse("9876543210", "8765432100", "Transferred", "2011-03-23", "OPEN", None, None, Some(GetLisaAccountTransferAccount("8765432102", "Z543333", new DateTime("2015-12-13"))))))
+          thenReturn(Future.successful(GetLisaAccountSuccessResponse("9876543210", "8765432100", "Transferred", "2011-03-23", "OPEN", "ACTIVE", None, None, Some(GetLisaAccountTransferAccount("8765432102", "Z543333", new DateTime("2015-12-13"))))))
 
         doSyncGetAccountDetailsRequest(res => {
           status(res) mustBe OK
-          contentAsJson(res) mustBe Json.toJson (GetLisaAccountSuccessResponse("9876543210", "8765432100", "Transferred", "2011-03-23", "OPEN", None, None, Some(GetLisaAccountTransferAccount("8765432102", "Z543333", new DateTime("2015-12-13")))))
+          contentAsJson(res) mustBe Json.toJson (GetLisaAccountSuccessResponse("9876543210", "8765432100", "Transferred", "2011-03-23", "OPEN", "ACTIVE", None, None, Some(GetLisaAccountTransferAccount("8765432102", "Z543333", new DateTime("2015-12-13")))))
         })
       }
 
       "returning a valid void account response" in {
-        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", "2011-03-23", "VOID", None, None, None)))
+        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", "2011-03-23", "VOID", "ACTIVE", None, None, None)))
         doSyncGetAccountDetailsRequest(res => {
           status(res) mustBe OK
-          contentAsJson(res) mustBe Json.toJson (GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", "2011-03-23", "VOID", None, None, None))
+          contentAsJson(res) mustBe Json.toJson (GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", "2011-03-23", "VOID", "ACTIVE", None, None, None))
         })
       }
 

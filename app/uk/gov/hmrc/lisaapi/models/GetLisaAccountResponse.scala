@@ -28,6 +28,7 @@ case class GetLisaAccountSuccessResponse(
   creationReason: String,
   firstSubscriptionDate:String,
   accountStatus:String,
+  subscriptionStatus:String,
   accountClosureReason: Option[String],
   closureDate: Option[String],
   transferAccount: Option[GetLisaAccountTransferAccount]

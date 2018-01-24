@@ -26,7 +26,8 @@
           "investorId": "9876543210",<br>
           "creationReason": "New",<br>
           "firstSubscriptionDate": "2011-03-23",<br>
-          "accountStatus": "OPEN"<br>
+          "accountStatus": "OPEN",<br>
+          "subscriptionStatus": "ACTIVE"<br>
         }
         </p>
       </td>
@@ -48,6 +49,7 @@
           "creationReason": "Transferred",<br>
           "firstSubscriptionDate": "2011-03-23",<br>
           "accountStatus": "OPEN",<br>
+          "subscriptionStatus": "ACTIVE",<br>
           "transferAccount": {<br>
             "transferredFromAccountId": "8765432102",<br>
             "transferredFromLMRN": "Z543333",<br>
@@ -73,7 +75,8 @@
           "investorId": "9876543210",<br>
           "creationReason": "New",<br>
           "firstSubscriptionDate": "2011-03-23",<br>
-          "accountStatus": "VOID"<br>
+          "accountStatus": "VOID",<br>
+          "subscriptionStatus": "VOID"<br>
         }
         </p>
       </td>
@@ -95,6 +98,7 @@
           "creationReason": "New",<br>
           "firstSubscriptionDate": "2011-03-23",<br>
           "accountStatus": "CLOSED",<br>
+          "subscriptionStatus": "VOID",<br>
           "accountClosureReason": "All funds withdrawn",<br>
           "closureDate": "2017-01-20"<br>
         }
