@@ -18,6 +18,7 @@ package uk.gov.hmrc.lisaapi.connectors
 
 import play.api.Logger
 import play.api.libs.json.{JsValue, Json, Reads}
+import play.utils.UriEncoding
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.http.logging.Authorization
 import uk.gov.hmrc.lisaapi.config.{AppContext, WSHttp}
@@ -36,6 +37,7 @@ trait DesConnector extends ServicesConfig {
   val httpPost:HttpPost = WSHttp
   val httpPut:HttpPut = WSHttp
   val httpGet:HttpGet = WSHttp
+  val urlEncodingFormat:String = "utf-8"
   lazy val desUrl = baseUrl("des")
   lazy val lisaServiceUrl = s"$desUrl/lifetime-isa/manager"
 
@@ -92,7 +94,7 @@ trait DesConnector extends ServicesConfig {
     */
   def getAccountInformation(lisaManager: String, accountId: String)
                            (implicit hc: HeaderCarrier): Future[DesResponse] = {
-    val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId"
+    val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}"
     Logger.debug("Getting the Account details from des: " + uri)
 
     val result: Future[HttpResponse] = httpGet.GET(uri)(httpReads, hc = updateHeaderCarrier(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
@@ -108,7 +110,7 @@ trait DesConnector extends ServicesConfig {
     */
   def reinstateAccount (lisaManager: String, accountId: String)
                            (implicit hc: HeaderCarrier): Future[DesResponse] = {
-    val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId/reinstate"
+    val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/reinstate"
     Logger.debug("Reinstate Account request returned status: " + uri)
 
     val result = httpPut.PUT[JsValue,HttpResponse](uri,Json.toJson(""))(implicitly,httpReads, updateHeaderCarrierWithAllDesHeaders(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
@@ -146,7 +148,7 @@ trait DesConnector extends ServicesConfig {
     */
   def closeAccount(lisaManager: String, accountId: String, request: CloseLisaAccountRequest)
                   (implicit hc: HeaderCarrier): Future[DesResponse] = {
-    val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId/close-account"
+    val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/close-account"
     Logger.debug("Posting Close Account request to des: " + uri)
     val result = httpPost.POST[CloseLisaAccountRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
 
@@ -165,7 +167,7 @@ trait DesConnector extends ServicesConfig {
   def reportLifeEvent(lisaManager: String, accountId: String, request: ReportLifeEventRequest)
                      (implicit hc: HeaderCarrier): Future[DesResponse] = {
 
-    val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId/life-event"
+    val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/life-event"
     Logger.debug("Posting Life Event request to des: " + uri)
     val result = httpPost.POST[ReportLifeEventRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
 
@@ -187,7 +189,7 @@ trait DesConnector extends ServicesConfig {
   def updateFirstSubDate(lisaManager: String, accountId: String, request: UpdateSubscriptionRequest)
                      (implicit hc: HeaderCarrier): Future[DesResponse] = {
 
-    val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId"
+    val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}"
     Logger.debug("Posting update subscription request to des: " + uri)
     val result = httpPut.PUT[UpdateSubscriptionRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrierWithAllDesHeaders(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
 
@@ -207,7 +209,7 @@ trait DesConnector extends ServicesConfig {
   def getLifeEvent(lisaManager: String, accountId: String, eventId: String)
                   (implicit hc: HeaderCarrier): Future[DesResponse] = {
 
-    val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId/life-event/$eventId"
+    val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/life-event/$eventId"
     Logger.debug("Posting Life Event request to des: " + uri)
     val result = httpGet.GET(uri)(httpReads, updateHeaderCarrier(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
 
@@ -225,7 +227,7 @@ trait DesConnector extends ServicesConfig {
   def requestBonusPayment(lisaManager: String, accountId: String, request: RequestBonusPaymentRequest)
                          (implicit hc: HeaderCarrier): Future[DesResponse] = {
 
-    val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId/bonus-claim"
+    val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/bonus-claim"
     Logger.debug("Posting Bonus Payment request to des: " + uri)
     val result = httpPost.POST[RequestBonusPaymentRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
 
@@ -240,7 +242,7 @@ trait DesConnector extends ServicesConfig {
     */
   def getBonusPayment(lisaManager: String, accountId: String, transactionId: String)
                      (implicit hc: HeaderCarrier): Future[DesResponse] = {
-    val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId/transactions/$transactionId"
+    val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/transactions/$transactionId"
     Logger.debug("Getting the Bonus Payment transaction details from des: " + uri)
 
     val result: Future[HttpResponse] = httpGet.GET(uri)(httpReads, hc = updateHeaderCarrier(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
@@ -256,7 +258,7 @@ trait DesConnector extends ServicesConfig {
     */
   def getTransaction(lisaManager: String, accountId: String, transactionId: String)
                     (implicit hc:HeaderCarrier): Future[DesResponse] = {
-    val uri = s"$lisaServiceUrl/$lisaManager/accounts/$accountId/transactions/$transactionId/payments"
+    val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/transactions/$transactionId/payments"
     Logger.debug("Getting the Transaction details from des: " + uri)
 
     val result: Future[HttpResponse] = httpGet.GET(uri)(httpReads, hc = updateHeaderCarrier(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
