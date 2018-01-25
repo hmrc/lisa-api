@@ -89,10 +89,15 @@ package object models {
         case _ => JsError(Seq(JsPath() -> Seq(ValidationError("error.expected.jsstring"))))
       }
 
-      private def parseDate(input: String): Option[DateTime] =
-        scala.util.control.Exception.allCatch[DateTime] opt (DateTime.parse(input, DateTimeFormat.forPattern(dateFormat)))
+      private def parseDate(input: String): Option[DateTime] = {
+        input.matches("[0-9]{4}-[0-9]{2}-[0-9]{2}") match {
+          case true => scala.util.control.Exception.allCatch[DateTime] opt (DateTime.parse(input, DateTimeFormat.forPattern(dateFormat)))
+          case _ => None
+        }
+      }
 
     }
+    
   }
 
 }

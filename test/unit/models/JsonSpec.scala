@@ -210,6 +210,43 @@ class JsonSpec extends PlaySpec {
 
     }
 
+    "return an bad formatting error response" when {
+
+      "given a random string" in {
+        val res = createJson("\"true\"").validate[TestDateClass]
+
+        res match {
+          case JsError(errors) => {
+            errors mustBe Seq((JsPath \ property, Seq(ValidationError("error.formatting.date"))))
+          }
+          case _ => fail("passed validation")
+        }
+      }
+
+      "given a yy-MM-dd string" in {
+        val res = createJson("\"90-01-20\"").validate[TestDateClass]
+
+        res match {
+          case JsError(errors) => {
+            errors mustBe Seq((JsPath \ property, Seq(ValidationError("error.formatting.date"))))
+          }
+          case _ => fail("passed validation")
+        }
+      }
+
+      "given an invalid date" in {
+        val res = createJson("\"2000-02-30\"").validate[TestDateClass]
+
+        res match {
+          case JsError(errors) => {
+            errors mustBe Seq((JsPath \ property, Seq(ValidationError("error.formatting.date"))))
+          }
+          case _ => fail("passed validation")
+        }
+      }
+
+    }
+
   }
 
   private def createJson(value:String): JsValue = {
