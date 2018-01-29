@@ -160,7 +160,10 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
 
         doUpdateSubsDate(invalidJson) { res =>
           status(res) mustBe (BAD_REQUEST)
-          (contentAsJson(res) \ "code").as[String] mustBe ("BAD_REQUEST")
+          val json = contentAsJson(res)
+          (json \ "code").as[String] mustBe ("BAD_REQUEST")
+          (json \ "errors" \ 0 \ "code").as[String] mustBe ("INVALID_DATE")
+          (json \ "errors" \ 0 \ "path").as[String] mustBe ("/firstSubscriptionDate")
         }
       }
       "an invalid lmrn is sent" in {
@@ -171,6 +174,19 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
           val json = contentAsJson(res)
           (json \ "code").as[String] mustBe ErrorBadRequestLmrn.errorCode
           (json \ "message").as[String] mustBe ErrorBadRequestLmrn.message
+        }
+      }
+    }
+    "return with status 403 forbidden and a code of FORBIDDEN" ignore {
+      "an invalid date is sent" in {
+        val invalidJson = updateFirstSubscriptionDate.replace("2015-05-05", "")
+
+        doUpdateSubsDate(invalidJson) { res =>
+          status(res) mustBe (FORBIDDEN)
+          val json = contentAsJson(res)
+          (json \ "code").as[String] mustBe ("FORBIDDEN")
+          (json \ "errors" \ 0 \ "code").as[String] mustBe ("INVALID_DATE")
+          (json \ "errors" \ 0 \ "path").as[String] mustBe ("/firstSubscriptionDate")
         }
       }
     }
