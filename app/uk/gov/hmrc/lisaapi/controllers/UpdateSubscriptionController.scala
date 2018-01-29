@@ -40,52 +40,40 @@ class UpdateSubscriptionController extends LisaController with LisaConstants {
     withValidLMRN(lisaManager) {
       withValidAccountId(accountId) {
         withValidJson[UpdateSubscriptionRequest]( req => {
-          withValidDates(req) { updateSubsRequest =>
+          withValidDate(req) { updateSubsRequest =>
             service.updateSubscription(lisaManager, accountId, updateSubsRequest) map { result =>
               Logger.debug("Entering Updated subscription Controller and the response is " + result.toString)
               result match {
                 case success: UpdateSubscriptionSuccessResponse => {
                   Logger.debug("First Subscription date updated")
                   doAudit(lisaManager, accountId, updateSubsRequest, "firstSubscriptionDateUpdated")
-
                   val data = ApiResponseData(message = success.message, code = Some(success.code), accountId = Some(accountId))
                   LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.UPDATE_SUBSCRIPTION)
                   Ok(Json.toJson(ApiResponse(data = Some(data), success = true, status = 200)))
                 }
                 case UpdateSubscriptionAccountNotFoundResponse => {
                   Logger.debug("First Subscription date not updated")
-
                   doAudit(lisaManager, accountId, updateSubsRequest, "firstSubscriptionDateNotUpdated", Map("reasonNotUpdated" -> ErrorAccountNotFound.errorCode))
-                  LisaMetrics.incrementMetrics(startTime,
-                    LisaMetricKeys.getErrorKey(NOT_FOUND, request.uri))
-
+                  LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getErrorKey(NOT_FOUND, request.uri))
                   NotFound(Json.toJson(ErrorAccountNotFound))
                 }
                 case UpdateSubscriptionAccountClosedResponse => {
-                  Logger.error(("Account Closed"))
+                  Logger.error("Account Closed")
                   doAudit(lisaManager, accountId, updateSubsRequest, "firstSubscriptionDateNotUpdated", Map("reasonNotUpdated" -> ErrorAccountAlreadyClosed.errorCode))
-                  LisaMetrics.incrementMetrics(startTime,
-                    LisaMetricKeys.lisaError(FORBIDDEN, request.uri))
-
+                  LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaError(FORBIDDEN, request.uri))
                   Forbidden(Json.toJson(ErrorAccountAlreadyClosed))
                 }
                 case UpdateSubscriptionAccountVoidedResponse => {
-                  Logger.error(("Account Voided"))
+                  Logger.error("Account Voided")
                   doAudit(lisaManager, accountId, updateSubsRequest, "firstSubscriptionDateNotUpdated", Map("reasonNotUpdated" -> ErrorAccountAlreadyVoided.errorCode))
-                  LisaMetrics.incrementMetrics(startTime,
-                    LisaMetricKeys.lisaError(FORBIDDEN, request.uri))
-
+                  LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaError(FORBIDDEN, request.uri))
                   Forbidden(Json.toJson(ErrorAccountAlreadyVoided))
                 }
                 case _ => {
                   Logger.debug("Matched Error")
-
                   doAudit(lisaManager, accountId, updateSubsRequest, "firstSubscriptionDateNotUpdated", Map("reasonNotUpdated" -> ErrorInternalServerError.errorCode))
-
                   Logger.error(s"First Subscription date not updated : DES unknown case , returning internal server error")
-                  LisaMetrics.incrementMetrics(startTime,
-                    LisaMetricKeys.getErrorKey(INTERNAL_SERVER_ERROR, request.uri))
-
+                  LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getErrorKey(INTERNAL_SERVER_ERROR, request.uri))
                   InternalServerError(Json.toJson(ErrorInternalServerError))
                 }
               }
@@ -96,7 +84,7 @@ class UpdateSubscriptionController extends LisaController with LisaConstants {
     }
   }
 
-  private def withValidDates(req: UpdateSubscriptionRequest)(success: (UpdateSubscriptionRequest) => Future[Result]) = {
+  private def withValidDate(req: UpdateSubscriptionRequest)(success: (UpdateSubscriptionRequest) => Future[Result]) = {
     if (req.firstSubscriptionDate.isBefore(LISA_START_DATE)) {
       Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
         ErrorValidation("INVALID_DATE", "The firstSubscriptionDate must not be before the 6th of April 2017", Some("/firstSubscriptionDate"))
