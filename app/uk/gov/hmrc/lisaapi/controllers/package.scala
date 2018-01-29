@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.lisaapi
 
+import org.joda.time.DateTime
 import play.api.libs.json.{JsPath, JsValue, Json, Writes}
 
 package object controllers {
@@ -51,4 +52,5 @@ package object controllers {
 trait LisaConstants {
   val ZREF: String = "lisaManagerReferenceNumber"
   val NOTIFICATION:String  = "lateNotification"
+  val LISA_START_DATE = new DateTime(2017, 4, 6, 0, 0)
 }

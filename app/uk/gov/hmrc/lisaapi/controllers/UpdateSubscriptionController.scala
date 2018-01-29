@@ -19,7 +19,7 @@ package uk.gov.hmrc.lisaapi.controllers
 import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent}
+import play.api.mvc.{Action, AnyContent, Result}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
@@ -34,20 +34,13 @@ class UpdateSubscriptionController extends LisaController with LisaConstants {
   val service: UpdateSubscriptionService = UpdateSubscriptionService
   val auditService: AuditService = AuditService
 
-
-
   def updateSubscription (lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
     implicit val startTime = System.currentTimeMillis()
     LisaMetrics.startMetrics(startTime, LisaMetricKeys.UPDATE_SUBSCRIPTION)
     withValidLMRN(lisaManager) {
       withValidAccountId(accountId) {
-        withValidJson[UpdateSubscriptionRequest]( updateSubsRequest => {
-          if (updateSubsRequest.firstSubscriptionDate.isBefore(lisaStartDate)) {
-            Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
-              ErrorValidation("INVALID_DATE", "The firstSubscriptionDate must not be before the 6th of April 2017", Some("/firstSubscriptionDate"))
-            )))))
-          }
-          else {
+        withValidJson[UpdateSubscriptionRequest]( req => {
+          withValidDates(req) { updateSubsRequest =>
             service.updateSubscription(lisaManager, accountId, updateSubsRequest) map { result =>
               Logger.debug("Entering Updated subscription Controller and the response is " + result.toString)
               result match {
@@ -59,7 +52,6 @@ class UpdateSubscriptionController extends LisaController with LisaConstants {
                   LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.UPDATE_SUBSCRIPTION)
                   Ok(Json.toJson(ApiResponse(data = Some(data), success = true, status = 200)))
                 }
-
                 case UpdateSubscriptionAccountNotFoundResponse => {
                   Logger.debug("First Subscription date not updated")
 
@@ -104,17 +96,31 @@ class UpdateSubscriptionController extends LisaController with LisaConstants {
     }
   }
 
-  private val lisaStartDate = new DateTime(2017, 4, 6, 0, 0)
+  private def withValidDates(req: UpdateSubscriptionRequest)(success: (UpdateSubscriptionRequest) => Future[Result]) = {
+    if (req.firstSubscriptionDate.isBefore(LISA_START_DATE)) {
+      Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
+        ErrorValidation("INVALID_DATE", "The firstSubscriptionDate must not be before the 6th of April 2017", Some("/firstSubscriptionDate"))
+      )))))
+    }
+    else {
+      success(req)
+    }
+  }
 
-  private def doAudit(lisaManager: String, accountId: String, updateSubsRequest: UpdateSubscriptionRequest, auditType: String, extraData: Map[String, String] = Map())(implicit hc: HeaderCarrier) = {
+  private def doAudit(lisaManager: String,
+                      accountId: String,
+                      updateSubsRequest: UpdateSubscriptionRequest,
+                      auditType: String,
+                      extraData: Map[String, String] = Map())
+                     (implicit hc: HeaderCarrier) = {
     auditService.audit(
-    auditType = auditType,
-    path = getEndpointUrl(lisaManager, accountId),
-    auditData = Map(
-    "lisaManagerReferenceNumber" -> lisaManager,
-    "accountID" -> accountId,
-    "firstSubscriptionDate" -> updateSubsRequest.firstSubscriptionDate.toString("yyyy-MM-dd")
-    ) ++ extraData
+      auditType = auditType,
+      path = getEndpointUrl(lisaManager, accountId),
+      auditData = Map(
+      "lisaManagerReferenceNumber" -> lisaManager,
+      "accountID" -> accountId,
+      "firstSubscriptionDate" -> updateSubsRequest.firstSubscriptionDate.toString("yyyy-MM-dd")
+      ) ++ extraData
     )
   }
 
