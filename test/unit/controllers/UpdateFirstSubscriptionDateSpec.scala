@@ -145,11 +145,12 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
         }
       }
     }
-    "return with status 200 created and an account Id" when {
-      "submitted a valid update subscription request request and response UPDATED" in {
+    "return with status 200 ok and an account Id" when {
+      "the data service returns a UpdateSubscriptionSuccessResponse" in {
         when(mockService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionSuccessResponse("UPDATED", "message")))
         doUpdateSubsDate(updateFirstSubscriptionDate) { res =>
           status(res) mustBe (OK)
+          (contentAsJson(res) \ "data" \ "accountId").as[String] mustBe accountId
         }
       }
     }
@@ -162,7 +163,7 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
           (contentAsJson(res) \ "code").as[String] mustBe ("BAD_REQUEST")
         }
       }
-      "invalid lmrn is sent" in {
+      "an invalid lmrn is sent" in {
         when(mockService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionSuccessResponse("code", "message")))
 
         doUpdateSubsDateInvalidLMRN(updateFirstSubscriptionDate) { res =>
