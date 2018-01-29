@@ -53,7 +53,7 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
 
   val updateFirstSubscriptionDate =
     """{
-      |  "firstSubscriptionDate" : "2017-05-05"
+      |  "firstSubscriptionDate" : "2017-04-06"
       |}""".stripMargin
 
   "The update first subscription date endpoint" must {
@@ -69,7 +69,7 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
             auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountID" -> accountId,
-              "firstSubscriptionDate" -> "2017-05-05"
+              "firstSubscriptionDate" -> "2017-04-06"
             ))
           )(any())
         }
@@ -87,7 +87,7 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
             auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountID" -> accountId,
-              "firstSubscriptionDate" -> "2017-05-05",
+              "firstSubscriptionDate" -> "2017-04-06",
               "reasonNotUpdated" -> "INVESTOR_ACCOUNT_ALREADY_VOID"
             ))
           )(any())
@@ -104,7 +104,7 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
             auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountID" -> accountId,
-              "firstSubscriptionDate" -> "2017-05-05",
+              "firstSubscriptionDate" -> "2017-04-06",
               "reasonNotUpdated" -> "INVESTOR_ACCOUNT_ALREADY_CLOSED"
             ))
           )(any())
@@ -121,7 +121,7 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
             auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountID" -> accountId,
-              "firstSubscriptionDate" -> "2017-05-05",
+              "firstSubscriptionDate" -> "2017-04-06",
               "reasonNotUpdated" -> "INVESTOR_ACCOUNTID_NOT_FOUND"
             ))
           )(any())
@@ -138,7 +138,7 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
             auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountID" -> accountId,
-              "firstSubscriptionDate" -> "2017-05-05",
+              "firstSubscriptionDate" -> "2017-04-06",
               "reasonNotUpdated" -> "INTERNAL_SERVER_ERROR"
             ))
           )(any())
@@ -156,7 +156,7 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
     }
     "return with status 400 bad request and a code of BAD_REQUEST" when {
       "invalid json is sent" in {
-        val invalidJson = updateFirstSubscriptionDate.replace("2017-05-05", "")
+        val invalidJson = updateFirstSubscriptionDate.replace("2017-04-06", "")
 
         doUpdateSubsDate(invalidJson) { res =>
           status(res) mustBe (BAD_REQUEST)
@@ -177,9 +177,9 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
         }
       }
     }
-    "return with status 403 forbidden and a code of FORBIDDEN" ignore {
+    "return with status 403 forbidden and a code of FORBIDDEN" when {
       "an invalid date is sent" in {
-        val invalidJson = updateFirstSubscriptionDate.replace("2015-05-05", "")
+        val invalidJson = updateFirstSubscriptionDate.replace("2017-04-06", "2017-04-05")
 
         doUpdateSubsDate(invalidJson) { res =>
           status(res) mustBe (FORBIDDEN)
