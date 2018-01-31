@@ -51,18 +51,18 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
                             |  "investorId" : "9876543210",
                             |  "accountId" :"8765/432100",
                             |  "creationReason" : "New",
-                            |  "firstSubscriptionDate" : "2011-03-23"
+                            |  "firstSubscriptionDate" : "2017-04-06"
                             |}""".stripMargin
 
   val createAccountJsonWithTransfer = """{
                                         |  "investorId" : "9876543210",
                                         |  "accountId" :"8765/432100",
                                         |  "creationReason" : "New",
-                                        |  "firstSubscriptionDate" : "2011-03-23",
+                                        |  "firstSubscriptionDate" : "2017-04-06",
                                         |  "transferAccount": {
                                         |    "transferredFromAccountId": "Z54/3210",
                                         |    "transferredFromLMRN": "Z543333",
-                                        |    "transferInDate": "2015-12-13"
+                                        |    "transferInDate": "2017-04-06"
                                         |  }
                                         |}""".stripMargin
 
@@ -70,7 +70,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
                                                |  "investorId" : "9876543210",
                                                |  "accountId" :"8765/432100",
                                                |  "creationReason" : "New",
-                                               |  "firstSubscriptionDate" : "2011-03-23",
+                                               |  "firstSubscriptionDate" : "2017-04-06",
                                                |  "transferAccount": "X"
                                                |}""".stripMargin
 
@@ -78,11 +78,11 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
                               |  "investorId" : "9876543210",
                               |  "accountId" :"8765/432100",
                               |  "creationReason" : "Transferred",
-                              |  "firstSubscriptionDate" : "2011-03-23",
+                              |  "firstSubscriptionDate" : "2017-04-06",
                               |  "transferAccount": {
                               |    "transferredFromAccountId": "Z54/3210",
                               |    "transferredFromLMRN": "Z543333",
-                              |    "transferInDate": "2015-12-13"
+                              |    "transferInDate": "2017-04-06"
                               |  }
                               |}""".stripMargin
 
@@ -90,10 +90,10 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
                                         |  "investorId" : "9876543210",
                                         |  "accountId" :"8765/432100",
                                         |  "creationReason" : "Transferred",
-                                        |  "firstSubscriptionDate" : "2011-03-23"
+                                        |  "firstSubscriptionDate" : "2017-04-06"
                                         |}""".stripMargin
 
-  val closeAccountJson = """{"accountClosureReason" : "All funds withdrawn", "closureDate" : "2000-06-23"}"""
+  val closeAccountJson = """{"accountClosureReason" : "All funds withdrawn", "closureDate" : "2017-04-06"}"""
 
   "The Create / Transfer Account endpoint" must {
 
@@ -110,7 +110,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorId" -> "9876543210",
               "accountId" -> "8765/432100",
-              "firstSubscriptionDate" -> "2011-03-23"
+              "firstSubscriptionDate" -> "2017-04-06"
             )))(any())
         }
       }
@@ -128,7 +128,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorId" -> "9876543210",
               "accountId" -> "8765/432100",
-              "firstSubscriptionDate" -> "2011-03-23",
+              "firstSubscriptionDate" -> "2017-04-06",
               "reasonNotCreated" -> "INVESTOR_NOT_FOUND"
             )))(any())
         }
@@ -144,7 +144,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorId" -> "9876543210",
               "accountId" -> "8765/432100",
-              "firstSubscriptionDate" -> "2011-03-23",
+              "firstSubscriptionDate" -> "2017-04-06",
               "reasonNotCreated" -> "INVESTOR_ELIGIBILITY_CHECK_FAILED"
             ))
           )(any())
@@ -161,7 +161,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorId" -> "9876543210",
               "accountId" -> "8765/432100",
-              "firstSubscriptionDate" -> "2011-03-23",
+              "firstSubscriptionDate" -> "2017-04-06",
               "reasonNotCreated" -> "INVESTOR_COMPLIANCE_CHECK_FAILED"
             ))
           )(any())
@@ -178,10 +178,10 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorId" -> "9876543210",
               "accountId" -> "8765/432100",
-              "firstSubscriptionDate" -> "2011-03-23",
+              "firstSubscriptionDate" -> "2017-04-06",
               "transferredFromAccountId" -> "Z54/3210",
               "transferredFromLMRN" -> "Z543333",
-              "transferInDate" -> "2015-12-13",
+              "transferInDate" -> "2017-04-06",
               "reasonNotCreated" -> "PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST"
             ))
           )(any())
@@ -198,7 +198,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorId" -> "9876543210",
               "accountId" -> "8765/432100",
-              "firstSubscriptionDate" -> "2011-03-23",
+              "firstSubscriptionDate" -> "2017-04-06",
               "reasonNotCreated" -> "INVESTOR_ACCOUNT_ALREADY_EXISTS"
             ))
           )(any())
@@ -215,7 +215,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorId" -> "9876543210",
               "accountId" -> "8765/432100",
-              "firstSubscriptionDate" -> "2011-03-23",
+              "firstSubscriptionDate" -> "2017-04-06",
               "reasonNotCreated" -> "INTERNAL_SERVER_ERROR"
             ))
           )(any())
@@ -234,10 +234,10 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorId" -> "9876543210",
               "accountId" -> "8765/432100",
-              "firstSubscriptionDate" -> "2011-03-23",
+              "firstSubscriptionDate" -> "2017-04-06",
               "transferredFromAccountId" -> "Z54/3210",
               "transferredFromLMRN" -> "Z543333",
-              "transferInDate" -> "2015-12-13"
+              "transferInDate" -> "2017-04-06"
             )))(any())
         }
       }
@@ -255,10 +255,10 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorId" -> "9876543210",
               "accountId" -> "8765/432100",
-              "firstSubscriptionDate" -> "2011-03-23",
+              "firstSubscriptionDate" -> "2017-04-06",
               "transferredFromAccountId" -> "Z54/3210",
               "transferredFromLMRN" -> "Z543333",
-              "transferInDate" -> "2015-12-13",
+              "transferInDate" -> "2017-04-06",
               "reasonNotCreated" -> "INVESTOR_NOT_FOUND"
             )))(any())
         }
@@ -274,10 +274,10 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorId" -> "9876543210",
               "accountId" -> "8765/432100",
-              "firstSubscriptionDate" -> "2011-03-23",
+              "firstSubscriptionDate" -> "2017-04-06",
               "transferredFromAccountId" -> "Z54/3210",
               "transferredFromLMRN" -> "Z543333",
-              "transferInDate" -> "2015-12-13",
+              "transferInDate" -> "2017-04-06",
               "reasonNotCreated" -> "INVESTOR_COMPLIANCE_CHECK_FAILED"
             )))(any())
         }
@@ -293,10 +293,10 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorId" -> "9876543210",
               "accountId" -> "8765/432100",
-              "firstSubscriptionDate" -> "2011-03-23",
+              "firstSubscriptionDate" -> "2017-04-06",
               "transferredFromAccountId" -> "Z54/3210",
               "transferredFromLMRN" -> "Z543333",
-              "transferInDate" -> "2015-12-13",
+              "transferInDate" -> "2017-04-06",
               "reasonNotCreated" -> "PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST"
             )))(any())
         }
@@ -312,10 +312,10 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorId" -> "9876543210",
               "accountId" -> "8765/432100",
-              "firstSubscriptionDate" -> "2011-03-23",
+              "firstSubscriptionDate" -> "2017-04-06",
               "transferredFromAccountId" -> "Z54/3210",
               "transferredFromLMRN" -> "Z543333",
-              "transferInDate" -> "2015-12-13",
+              "transferInDate" -> "2017-04-06",
               "reasonNotCreated" -> "INVESTOR_ACCOUNT_ALREADY_CLOSED"
             )))(any())
         }
@@ -331,10 +331,10 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorId" -> "9876543210",
               "accountId" -> "8765/432100",
-              "firstSubscriptionDate" -> "2011-03-23",
+              "firstSubscriptionDate" -> "2017-04-06",
               "transferredFromAccountId" -> "Z54/3210",
               "transferredFromLMRN" -> "Z543333",
-              "transferInDate" -> "2015-12-13",
+              "transferInDate" -> "2017-04-06",
               "reasonNotCreated" -> "INVESTOR_ACCOUNT_ALREADY_VOID"
             )))(any())
         }
@@ -350,10 +350,10 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorId" -> "9876543210",
               "accountId" -> "8765/432100",
-              "firstSubscriptionDate" -> "2011-03-23",
+              "firstSubscriptionDate" -> "2017-04-06",
               "transferredFromAccountId" -> "Z54/3210",
               "transferredFromLMRN" -> "Z543333",
-              "transferInDate" -> "2015-12-13",
+              "transferInDate" -> "2017-04-06",
               "reasonNotCreated" -> "INVESTOR_ACCOUNT_ALREADY_EXISTS"
             )))(any())
         }
@@ -369,10 +369,10 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorId" -> "9876543210",
               "accountId" -> "8765/432100",
-              "firstSubscriptionDate" -> "2011-03-23",
+              "firstSubscriptionDate" -> "2017-04-06",
               "transferredFromAccountId" -> "Z54/3210",
               "transferredFromLMRN" -> "Z543333",
-              "transferInDate" -> "2015-12-13",
+              "transferInDate" -> "2017-04-06",
               "reasonNotCreated" -> "INTERNAL_SERVER_ERROR"
             )))(any())
         }
@@ -643,36 +643,36 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
     "return the correct json" when {
       "returning a valid open account response" in {
-        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", "2011-03-23", "OPEN", "ACTIVE", None, None, None)))
+        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", "2017-04-06", "OPEN", "ACTIVE", None, None, None)))
         doSyncGetAccountDetailsRequest(res => {
           status(res) mustBe OK
-          contentAsJson(res) mustBe Json.toJson (GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", "2011-03-23", "OPEN", "ACTIVE", None, None, None))
+          contentAsJson(res) mustBe Json.toJson (GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", "2017-04-06", "OPEN", "ACTIVE", None, None, None))
         })
       }
 
       "returning a valid close account response" in {
-        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", "2011-03-23", "CLOSED", "ACTIVE", Some("All funds withdrawn"), Some("2017-01-03"), None)))
+        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", "2017-04-06", "CLOSED", "ACTIVE", Some("All funds withdrawn"), Some("2017-01-03"), None)))
         doSyncGetAccountDetailsRequest(res => {
           status(res) mustBe OK
-          contentAsJson(res) mustBe Json.toJson (GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", "2011-03-23",  "CLOSED", "ACTIVE", Some("All funds withdrawn"), Some("2017-01-03"), None))
+          contentAsJson(res) mustBe Json.toJson (GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", "2017-04-06",  "CLOSED", "ACTIVE", Some("All funds withdrawn"), Some("2017-01-03"), None))
         })
       }
 
       "returning a valid transfer account response" in {
         when(mockService.getAccount(any(), any())(any())).
-          thenReturn(Future.successful(GetLisaAccountSuccessResponse("9876543210", "8765432100", "Transferred", "2011-03-23", "OPEN", "ACTIVE", None, None, Some(GetLisaAccountTransferAccount("8765432102", "Z543333", new DateTime("2015-12-13"))))))
+          thenReturn(Future.successful(GetLisaAccountSuccessResponse("9876543210", "8765432100", "Transferred", "2017-04-06", "OPEN", "ACTIVE", None, None, Some(GetLisaAccountTransferAccount("8765432102", "Z543333", new DateTime("2017-04-06"))))))
 
         doSyncGetAccountDetailsRequest(res => {
           status(res) mustBe OK
-          contentAsJson(res) mustBe Json.toJson (GetLisaAccountSuccessResponse("9876543210", "8765432100", "Transferred", "2011-03-23", "OPEN", "ACTIVE", None, None, Some(GetLisaAccountTransferAccount("8765432102", "Z543333", new DateTime("2015-12-13")))))
+          contentAsJson(res) mustBe Json.toJson (GetLisaAccountSuccessResponse("9876543210", "8765432100", "Transferred", "2017-04-06", "OPEN", "ACTIVE", None, None, Some(GetLisaAccountTransferAccount("8765432102", "Z543333", new DateTime("2017-04-06")))))
         })
       }
 
       "returning a valid void account response" in {
-        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", "2011-03-23", "VOID", "ACTIVE", None, None, None)))
+        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", "2017-04-06", "VOID", "ACTIVE", None, None, None)))
         doSyncGetAccountDetailsRequest(res => {
           status(res) mustBe OK
-          contentAsJson(res) mustBe Json.toJson (GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", "2011-03-23", "VOID", "ACTIVE", None, None, None))
+          contentAsJson(res) mustBe Json.toJson (GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", "2017-04-06", "VOID", "ACTIVE", None, None, None))
         })
       }
 
@@ -709,7 +709,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               auditData = matchersEquals(Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountClosureReason" -> "All funds withdrawn",
-                "closureDate" -> "2000-06-23",
+                "closureDate" -> "2017-04-06",
                 "accountId" -> accountId
                )))(any())
           }
@@ -728,7 +728,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
             auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountClosureReason" -> "All funds withdrawn",
-              "closureDate" -> "2000-06-23",
+              "closureDate" -> "2017-04-06",
               "accountId" -> accountId,
               "reasonNotClosed" -> "INVESTOR_ACCOUNT_ALREADY_VOID"
             )))(any())
@@ -745,7 +745,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
             auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountClosureReason" -> "All funds withdrawn",
-              "closureDate" -> "2000-06-23",
+              "closureDate" -> "2017-04-06",
               "accountId" -> accountId,
               "reasonNotClosed" -> "INVESTOR_ACCOUNT_ALREADY_CLOSED"
             )))(any())
@@ -762,7 +762,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
             auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountClosureReason" -> "All funds withdrawn",
-              "closureDate" -> "2000-06-23",
+              "closureDate" -> "2017-04-06",
               "accountId" -> accountId,
               "reasonNotClosed" -> "CANCELLATION_PERIOD_EXCEEDED"
             )))(any())
@@ -779,7 +779,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
             auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountClosureReason" -> "All funds withdrawn",
-              "closureDate" -> "2000-06-23",
+              "closureDate" -> "2017-04-06",
               "accountId" -> accountId,
               "reasonNotClosed" -> "ACCOUNT_WITHIN_CANCELLATION_PERIOD"
             )))(any())
@@ -796,7 +796,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
             auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountClosureReason" -> "All funds withdrawn",
-              "closureDate" -> "2000-06-23",
+              "closureDate" -> "2017-04-06",
               "accountId" -> accountId,
               "reasonNotClosed" -> "INVESTOR_ACCOUNTID_NOT_FOUND"
             )))(any())
@@ -815,7 +815,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               auditData = matchersEquals(Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountClosureReason" -> "All funds withdrawn",
-                "closureDate" -> "2000-06-23",
+                "closureDate" -> "2017-04-06",
                 "accountId" -> accountId,
                 "reasonNotClosed" -> "INTERNAL_SERVER_ERROR"
               )))(any())
