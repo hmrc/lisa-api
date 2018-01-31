@@ -25,7 +25,7 @@
       "$ref": "#/definitions/ISO8601-Date"
     },
     "accountStatus": {
-      "description": "Status of the account that has been created.",
+      "description": "The status of the account.",
       "type": "string",
       "enum": [
         "OPEN",
@@ -34,7 +34,7 @@
       ]
     },
     "subscriptionStatus": {
-      "description": "The subscription status for the current financial year.",
+      "description": "The subscription status for the current tax year.",
       "type": "string",
       "enum": [
         "AVAILABLE",
@@ -47,7 +47,7 @@
     "accountClosureReason": {
       "description": "The reason the account was closed.",
       "type": "string"
-     },
+    },
     "closureDate": {
       "description": "The date the account was closed. This can't be in the future.",
       "$ref": "#/definitions/ISO8601-Date"
@@ -79,39 +79,39 @@
       ]
     }
   }
-  ,
+,
 
   "required": [
-      "investorId",
-      "accountId",
-      "creationReason",
-      "firstSubscriptionDate"
-    ],
-    "additionalProperties": false,
-    "definitions": {
-      "ISO8601-Date": {
-        "id": "full-date",
-        "type": "string",
-        "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
-        "example": "2017-04-20"
-      },
-      "IDType": {
-        "type": "string",
-        "pattern": "^\\d{10}$",
-        "example": "1234567890"
-      },
-      "LISAManagerReferenceNumberType": {
-        "type": "string",
-        "pattern": "^Z([0-9]{4}|[0-9]{6})$",
-        "example": "Z1234"
-      }
-    ,
-      "accountIdType": {
-        "type": "string",
-        "example": "AB9876543210",
-        "pattern": "^[a-zA-Z0-9 :/-]{1,20}$"
-      }
+    "investorId",
+    "accountId",
+    "creationReason",
+    "firstSubscriptionDate"
+  ],
+  "additionalProperties": false,
+  "definitions": {
+    "ISO8601-Date": {
+      "id": "full-date",
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+      "example": "2017-04-20"
+    },
+    "IDType": {
+      "type": "string",
+      "pattern": "^\\d{10}$",
+      "example": "1234567890"
+    },
+    "LISAManagerReferenceNumberType": {
+      "type": "string",
+      "pattern": "^Z([0-9]{4}|[0-9]{6})$",
+      "example": "Z1234"
     }
+  ,
+    "accountIdType": {
+      "type": "string",
+      "example": "AB9876543210",
+      "pattern": "^[a-zA-Z0-9 :/-]{1,20}$"
+    }
+  }
 
 
 }
