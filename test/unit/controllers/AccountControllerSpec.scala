@@ -453,7 +453,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
           (json \ "errors" \ 0 \ "path").as[String] mustBe "/firstSubscriptionDate"
         }
       }
-      "given a firstSubscriptionDate and transferInDate prior to 6 April 2017" ignore {
+      "given a firstSubscriptionDate and transferInDate prior to 6 April 2017" in {
         when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountSuccessResponse(accountId)))
 
         val invalidJson = transferAccountJson.replace(s"$validDate", "2017-04-05")
