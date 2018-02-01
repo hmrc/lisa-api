@@ -85,7 +85,8 @@
     "investorId",
     "accountId",
     "creationReason",
-    "firstSubscriptionDate"
+    "firstSubscriptionDate",
+    "accountStatus"
   ],
   "additionalProperties": false,
   "definitions": {
