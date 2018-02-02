@@ -122,7 +122,12 @@ class BonusPaymentControllerSpec extends PlaySpec
 
         val ibp = validBonusPayment.inboundPayments.copy(newSubsForPeriod = Some(1), newSubsYTD = 0, totalSubsForPeriod = 0)
         val htb = validBonusPayment.htbTransfer.get.copy(htbTransferInForPeriod = 1, htbTransferTotalYTD = 0)
-        val request = validBonusPayment.copy(inboundPayments = ibp, htbTransfer = Some(htb))
+        val request = validBonusPayment.copy(
+                        inboundPayments = ibp,
+                        htbTransfer = Some(htb),
+                        periodStartDate = new DateTime(2017,3,6,0,0),
+                        periodEndDate = new DateTime(2017,4,5,0,0)
+        )
 
         doRequest(Json.toJson(request).toString()) { res =>
           status(res) mustBe FORBIDDEN
@@ -131,12 +136,11 @@ class BonusPaymentControllerSpec extends PlaySpec
 
           (json \ "code").as[String] mustBe "FORBIDDEN"
 
-          val errors = (json \ "errors").as[List[Map[String, String]]]
-
-          errors.size mustBe 3
-          errors(0)("path") mustBe "/inboundPayments/newSubsYTD"
-          errors(1)("path") mustBe "/htbTransfer/htbTransferTotalYTD"
-          errors(2)("path") mustBe "/inboundPayments/totalSubsForPeriod"
+          (json \ "errors" \ 0 \ "path").as[String] mustBe "/inboundPayments/newSubsYTD"
+          (json \ "errors" \ 1 \ "path").as[String] mustBe "/htbTransfer/htbTransferTotalYTD"
+          (json \ "errors" \ 2 \ "path").as[String] mustBe "/inboundPayments/totalSubsForPeriod"
+          (json \ "errors" \ 3 \ "path").as[String] mustBe "/periodStartDate"
+          (json \ "errors" \ 4 \ "path").as[String] mustBe "/periodEndDate"
         }
       }
 

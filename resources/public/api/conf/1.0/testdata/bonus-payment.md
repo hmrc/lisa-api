@@ -202,75 +202,80 @@
             </td>
             <td>
                 <p class ="code--block"> {<br>
-                                             "lifeEventId": "1234567891",<br>
-                                             "periodStartDate": "9999-04-05",<br>
-                                             "periodEndDate": "9999-06-05",<br>
-                                             "htbTransfer": {<br>
-                                                 "htbTransferInForPeriod": 0.00,<br>
-                                                 "htbTransferTotalYTD": 0.00<br>
-                                             },<br>
-                                             "inboundPayments": {<br>
-                                                 "newSubsForPeriod": 0.00,<br>
-                                                 "newSubsYTD": 0.00,<br>
-                                                 "totalSubsForPeriod": 0.0,<br>
-                                                 "totalSubsYTD": 0.00<br>
-                                             },<br>
-                                             "bonuses": {<br>
-                                                 "bonusPaidYTD": 0.0,<br>
-                                                 "bonusDueForPeriod": 0.0,<br>
-                                                 "totalBonusDueYTD": 0.0,<br>
-                                                 "claimReason": "Life Event"<br>
-                                             }<br>
-                                         }
+                     "lifeEventId": "1234567891",<br>
+                     "periodStartDate": "9999-04-05",<br>
+                     "periodEndDate": "2016-06-05",<br>
+                     "htbTransfer": {<br>
+                         "htbTransferInForPeriod": 0.00,<br>
+                         "htbTransferTotalYTD": 0.00<br>
+                     },<br>
+                     "inboundPayments": {<br>
+                         "newSubsForPeriod": 0.00,<br>
+                         "newSubsYTD": 0.00,<br>
+                         "totalSubsForPeriod": 0.0,<br>
+                         "totalSubsYTD": 0.00<br>
+                     },<br>
+                     "bonuses": {<br>
+                         "bonusPaidYTD": 0.0,<br>
+                         "bonusDueForPeriod": 0.0,<br>
+                         "totalBonusDueYTD": 0.0,<br>
+                         "claimReason": "Life Event"<br>
+                     }<br>
+                 } 
                 </p>
             </td>
             <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
                 <p class ="code--block"> {<br>
-                                              "code": "FORBIDDEN",<br>
-                                              "message": "There is a problem with the request data",<br>
-                                              "errors": [<br>
-                                                  {<br>
-                                                      "code": "INVALID_MONETARY_AMOUNT",<br>
-                                                      "message": "newSubsForPeriod and htbTransferInForPeriod cannot both be 0",<br>
-                                                      "path": "/inboundPayments/newSubsForPeriod"<br>
-                                                  },<br>
-                                                  {<br>
-                                                      "code": "INVALID_MONETARY_AMOUNT",<br>
-                                                      "message": "newSubsForPeriod and htbTransferInForPeriod cannot both be 0",<br>
-                                                      "path": "/htbTransfer/htbTransferInForPeriod"<br>
-                                                  },<br>
-                                                  {<br>
-                                                      "code": "INVALID_MONETARY_AMOUNT",<br>
-                                                      "message": "totalSubsForPeriod must be more than 0",<br>
-                                                      "path": "/inboundPayments/totalSubsForPeriod"<br>
-                                                  },<br>
-                                                  {<br>
-                                                      "code": "INVALID_MONETARY_AMOUNT",<br>
-                                                      "message": "bonusDueForPeriod must be more than 0",<br>
-                                                      "path": "/bonuses/bonusDueForPeriod"<br>
-                                                  },<br>
-                                                  {<br>
-                                                      "code": "INVALID_MONETARY_AMOUNT",<br>
-                                                      "message": "totalBonusDueYTD must be more than 0",<br>
-                                                      "path": "/bonuses/totalBonusDueYTD"<br>
-                                                  },<br>
-                                                  {<br>
-                                                      "code": "INVALID_DATE",<br>
-                                                      "message": "The periodStartDate must be the 6th day of the month",<br>
-                                                      "path": "/periodStartDate"<br>
-                                                  },<br>
-                                                  {<br>
-                                                      "code": "INVALID_DATE",<br>
-                                                      "message": "The periodEndDate must be the 5th day of the month which occurs after the periodStartDate",<br>
-                                                      "path": "/periodEndDate"<br>
-                                                  },<br>
-                                                  {<br>
-                                                      "code": "INVALID_DATE",<br>
-                                                      "message": "The periodStartDate may not be a future date",<br>
-                                                      "path": "/periodStartDate"<br>
-                                                  }<br>
-                                              ]<br>
-                                          }
+                      "code": "FORBIDDEN",<br>
+                      "message": "There is a problem with the request data",<br>
+                      "errors": [<br>
+                          {<br>
+                              "code": "INVALID_MONETARY_AMOUNT",<br>
+                              "message": "newSubsForPeriod and htbTransferInForPeriod cannot both be 0",<br>
+                              "path": "/inboundPayments/newSubsForPeriod"<br>
+                          },<br>
+                          {<br>
+                              "code": "INVALID_MONETARY_AMOUNT",<br>
+                              "message": "newSubsForPeriod and htbTransferInForPeriod cannot both be 0",<br>
+                              "path": "/htbTransfer/htbTransferInForPeriod"<br>
+                          },<br>
+                          {<br>
+                              "code": "INVALID_MONETARY_AMOUNT",<br>
+                              "message": "totalSubsForPeriod must be more than 0",<br>
+                              "path": "/inboundPayments/totalSubsForPeriod"<br>
+                          },<br>
+                          {<br>
+                              "code": "INVALID_MONETARY_AMOUNT",<br>
+                              "message": "bonusDueForPeriod must be more than 0",<br>
+                              "path": "/bonuses/bonusDueForPeriod"<br>
+                          },<br>
+                          {<br>
+                              "code": "INVALID_MONETARY_AMOUNT",<br>
+                              "message": "totalBonusDueYTD must be more than 0",<br>
+                              "path": "/bonuses/totalBonusDueYTD"<br>
+                          },<br>
+                          {<br>
+                              "code": "INVALID_DATE",<br>
+                              "message": "The periodStartDate must be the 6th day of the month",<br>
+                              "path": "/periodStartDate"<br>
+                          },<br>
+                          {<br>
+                              "code": "INVALID_DATE",<br>
+                              "message": "The periodEndDate must be the 5th day of the month which occurs after the periodStartDate",<br>
+                              "path": "/periodEndDate"<br>
+                          },<br>
+                          {<br>
+                              "code": "INVALID_DATE",<br>
+                              "message": "The periodStartDate may not be a future date",<br>
+                              "path": "/periodStartDate"<br>
+                          },<br>
+                          {<br>
+                              "code": "INVALID_DATE",<br>
+                              "message": "The periodEndDate cannot be before 6 April 2017",<br>
+                              "path": "/periodEndDate"<br>
+                          }<br>
+                      ]<br>
+                  }
                 </p>
             </td>
         </tr>
