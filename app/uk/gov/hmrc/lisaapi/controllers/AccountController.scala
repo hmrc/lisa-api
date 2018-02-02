@@ -266,7 +266,7 @@ class AccountController extends LisaController with LisaConstants {
       }
 
       def transferInDateError(request: CreateLisaAccountTransferRequest) = {
-        if (transferRequest.firstSubscriptionDate.isBefore(LISA_START_DATE)) {
+        if (transferRequest.transferAccount.transferInDate.isBefore(LISA_START_DATE)) {
           Some(ErrorValidation("INVALID_DATE", "The transferInDate cannot be before 6 April 2017", Some("/transferAccount/transferInDate")))
         }
         else {
