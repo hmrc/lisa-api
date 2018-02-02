@@ -33,6 +33,7 @@ trait BonusPaymentValidator {
   val monetaryErrorCode: String = "INVALID_MONETARY_AMOUNT"
   val dateErrorCode: String = "INVALID_DATE"
   val currentDateService: CurrentDateService
+  val firstValidDate: DateTime = new DateTime(2017, 4, 6, 0, 0)
 
   def validate(data: RequestBonusPaymentRequest): Seq[ErrorValidation] = {
     (
@@ -45,7 +46,9 @@ trait BonusPaymentValidator {
       totalBonusDueYTDGtZero andThen
       periodStartDateIsSixth andThen
       periodEndDateIsFifthOfMonthAfterPeriodStartDate andThen
-      periodStartDateIsNotInFuture
+      periodStartDateIsNotInFuture andThen
+      periodStartDateIsNotBeforeFirstValidDate andThen
+      periodEndDateIsNotBeforeFirstValidDate
     ).apply(BonusPaymentValidationRequest(data)).errors
   }
 
@@ -144,6 +147,36 @@ trait BonusPaymentValidator {
         message = "The periodEndDate must be the 5th day of the month which occurs after the periodStartDate",
         path = Some(s"/periodEndDate")
       ))
+    }
+  }
+
+  private val periodStartDateIsNotBeforeFirstValidDate: (BonusPaymentValidationRequest) => BonusPaymentValidationRequest =
+    (req: BonusPaymentValidationRequest) => {
+
+    if (req.data.periodStartDate.isBefore(firstValidDate)) {
+      req.copy(errors = req.errors :+ ErrorValidation(
+        errorCode = dateErrorCode,
+        message = "The periodStartDate cannot be before 6 April 2017",
+        path = Some(s"/periodStartDate")
+      ))
+    }
+    else {
+      req
+    }
+  }
+
+  private val periodEndDateIsNotBeforeFirstValidDate: (BonusPaymentValidationRequest) => BonusPaymentValidationRequest =
+    (req: BonusPaymentValidationRequest) => {
+
+    if (req.data.periodEndDate.isBefore(firstValidDate)) {
+      req.copy(errors = req.errors :+ ErrorValidation(
+        errorCode = dateErrorCode,
+        message = "The periodEndDate cannot be before 6 April 2017",
+        path = Some(s"/periodEndDate")
+      ))
+    }
+    else {
+      req
     }
   }
 
