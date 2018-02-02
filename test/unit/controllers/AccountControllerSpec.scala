@@ -855,6 +855,25 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
       }
     }
 
+    "return with status 403 forbidden and a code of FORBIDDEN" when {
+      "given a closure date prior to 6 April 2017" in {
+        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountSuccessResponse(accountId)))
+
+        val json = closeAccountJson.replace(validDate, "2017-04-05")
+
+        doCloseRequest(json) { res =>
+          status(res) mustBe (FORBIDDEN)
+
+          val json = contentAsJson(res)
+
+          (json \ "code").as[String] mustBe "FORBIDDEN"
+          (json \ "errors" \ 0 \ "code").as[String] mustBe "INVALID_DATE"
+          (json \ "errors" \ 0 \ "message").as[String] mustBe "The closureDate cannot be before 6 April 2017"
+          (json \ "errors" \ 0 \ "path").as[String] mustBe "/closureDate"
+        }
+      }
+    }
+
     "return with status 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_VOID" when {
       "the data service returns a CloseLisaAccountAlreadyVoidResponse" in {
         when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountAlreadyVoidResponse))

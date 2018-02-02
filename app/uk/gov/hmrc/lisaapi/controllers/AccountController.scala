@@ -395,108 +395,115 @@ class AccountController extends LisaController with LisaConstants {
   }
 
   private def processAccountClosure(lisaManager: String, accountId: String, closeLisaAccountRequest: CloseLisaAccountRequest)(implicit hc: HeaderCarrier, startTime:Long) = {
-    service.closeAccount(lisaManager, accountId, closeLisaAccountRequest).map { result =>
-      result match {
-        case CloseLisaAccountSuccessResponse(accountId) => {
-          LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.CLOSE)
+    if (closeLisaAccountRequest.closureDate.isBefore(LISA_START_DATE)) {
+      Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
+        ErrorValidation("INVALID_DATE", "The closureDate cannot be before 6 April 2017", Some("/closureDate"))
+      )))))
+    }
+    else {
+      service.closeAccount(lisaManager, accountId, closeLisaAccountRequest).map { result =>
+        result match {
+          case CloseLisaAccountSuccessResponse(accountId) => {
+            LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.CLOSE)
 
-          auditService.audit(
-            auditType = "accountClosed",
-            path = getCloseEndpointUrl(lisaManager, accountId),
-            auditData = closeLisaAccountRequest.toStringMap ++ Map(ZREF -> lisaManager,
-              "accountId" -> accountId)
-          )
+            auditService.audit(
+              auditType = "accountClosed",
+              path = getCloseEndpointUrl(lisaManager, accountId),
+              auditData = closeLisaAccountRequest.toStringMap ++ Map(ZREF -> lisaManager,
+                "accountId" -> accountId)
+            )
 
-          val data = ApiResponseData(message = "LISA account closed", accountId = Some(accountId))
+            val data = ApiResponseData(message = "LISA account closed", accountId = Some(accountId))
 
-          Ok(Json.toJson(ApiResponse(data = Some(data), success = true, status = 200)))
+            Ok(Json.toJson(ApiResponse(data = Some(data), success = true, status = 200)))
+          }
+          case CloseLisaAccountAlreadyVoidResponse => {
+            auditService.audit(
+              auditType = "accountNotClosed",
+              path = getCloseEndpointUrl(lisaManager, accountId),
+              auditData = closeLisaAccountRequest.toStringMap ++ Map(ZREF -> lisaManager,
+                "accountId" -> accountId,
+                "reasonNotClosed" -> ErrorAccountAlreadyVoided.errorCode)
+            )
+            LisaMetrics.incrementMetrics(startTime,
+              LisaMetricKeys.lisaError(FORBIDDEN, LisaMetricKeys.CLOSE))
+
+            Forbidden(Json.toJson(ErrorAccountAlreadyVoided))
+          }
+          case CloseLisaAccountAlreadyClosedResponse => {
+            auditService.audit(
+              auditType = "accountNotClosed",
+              path = getCloseEndpointUrl(lisaManager, accountId),
+              auditData = closeLisaAccountRequest.toStringMap ++ Map(ZREF -> lisaManager,
+                "accountId" -> accountId,
+                "reasonNotClosed" -> ErrorAccountAlreadyClosed.errorCode)
+            )
+            LisaMetrics.incrementMetrics(startTime,
+              LisaMetricKeys.lisaError(FORBIDDEN, LisaMetricKeys.CLOSE))
+
+            Forbidden(Json.toJson(ErrorAccountAlreadyClosed))
+          }
+          case CloseLisaAccountCancellationPeriodExceeded => {
+            auditService.audit(
+              auditType = "accountNotClosed",
+              path = getCloseEndpointUrl(lisaManager, accountId),
+              auditData = closeLisaAccountRequest.toStringMap ++ Map(ZREF -> lisaManager,
+                "accountId" -> accountId,
+                "reasonNotClosed" -> ErrorAccountCancellationPeriodExceeded.errorCode)
+            )
+            LisaMetrics.incrementMetrics(startTime,
+              LisaMetricKeys.lisaError(FORBIDDEN, LisaMetricKeys.CLOSE))
+
+            Forbidden(Json.toJson(ErrorAccountCancellationPeriodExceeded))
+          }
+          case CloseLisaAccountWithinCancellationPeriod => {
+            auditService.audit(
+              auditType = "accountNotClosed",
+              path = getCloseEndpointUrl(lisaManager, accountId),
+              auditData = closeLisaAccountRequest.toStringMap ++ Map(ZREF -> lisaManager,
+                "accountId" -> accountId,
+                "reasonNotClosed" -> ErrorAccountWithinCancellationPeriod.errorCode)
+            )
+            LisaMetrics.incrementMetrics(startTime,
+              LisaMetricKeys.lisaError(FORBIDDEN, LisaMetricKeys.CLOSE))
+
+            Forbidden(Json.toJson(ErrorAccountWithinCancellationPeriod))
+          }
+          case CloseLisaAccountNotFoundResponse => {
+            auditService.audit(
+              auditType = "accountNotClosed",
+              path = getCloseEndpointUrl(lisaManager, accountId),
+              auditData = closeLisaAccountRequest.toStringMap ++ Map(ZREF -> lisaManager,
+                "accountId" -> accountId,
+                "reasonNotClosed" -> ErrorAccountNotFound.errorCode)
+            )
+            LisaMetrics.incrementMetrics(startTime,
+              LisaMetricKeys.lisaError(NOT_FOUND, LisaMetricKeys.CLOSE))
+
+            NotFound(Json.toJson(ErrorAccountNotFound))
+          }
+          case _ => {
+            auditService.audit(
+              auditType = "accountNotClosed",
+              path = getCloseEndpointUrl(lisaManager, accountId),
+              auditData = closeLisaAccountRequest.toStringMap ++ Map(ZREF -> lisaManager,
+                "accountId" -> accountId,
+                "reasonNotClosed" -> ErrorInternalServerError.errorCode)
+            )
+            Logger.error(s"AccountController: closeAccount unknown case from DES returning internal server error")
+            LisaMetrics.incrementMetrics(startTime,
+              LisaMetricKeys.lisaError(INTERNAL_SERVER_ERROR, LisaMetricKeys.CLOSE))
+
+            InternalServerError(Json.toJson(ErrorInternalServerError))
+          }
         }
-        case CloseLisaAccountAlreadyVoidResponse => {
-          auditService.audit(
-            auditType = "accountNotClosed",
-            path = getCloseEndpointUrl(lisaManager, accountId),
-            auditData = closeLisaAccountRequest.toStringMap ++ Map(ZREF -> lisaManager,
-              "accountId" -> accountId,
-              "reasonNotClosed" -> ErrorAccountAlreadyVoided.errorCode)
-          )
+      } recover {
+        case e: Exception => Logger.error(s"AccountController: closeAccount: An error occurred due to ${e.getMessage} returning internal server error")
           LisaMetrics.incrementMetrics(startTime,
-            LisaMetricKeys.lisaError(FORBIDDEN,LisaMetricKeys.CLOSE))
-
-          Forbidden(Json.toJson(ErrorAccountAlreadyVoided))
-        }
-        case CloseLisaAccountAlreadyClosedResponse => {
-          auditService.audit(
-            auditType = "accountNotClosed",
-            path = getCloseEndpointUrl(lisaManager, accountId),
-            auditData = closeLisaAccountRequest.toStringMap ++ Map(ZREF -> lisaManager,
-              "accountId" -> accountId,
-              "reasonNotClosed" -> ErrorAccountAlreadyClosed.errorCode)
-          )
-          LisaMetrics.incrementMetrics(startTime,
-            LisaMetricKeys.lisaError(FORBIDDEN,LisaMetricKeys.CLOSE))
-
-          Forbidden(Json.toJson(ErrorAccountAlreadyClosed))
-        }
-        case CloseLisaAccountCancellationPeriodExceeded => {
-          auditService.audit(
-            auditType = "accountNotClosed",
-            path = getCloseEndpointUrl(lisaManager, accountId),
-            auditData = closeLisaAccountRequest.toStringMap ++ Map(ZREF -> lisaManager,
-              "accountId" -> accountId,
-              "reasonNotClosed" -> ErrorAccountCancellationPeriodExceeded.errorCode)
-          )
-          LisaMetrics.incrementMetrics(startTime,
-            LisaMetricKeys.lisaError(FORBIDDEN,LisaMetricKeys.CLOSE))
-
-          Forbidden(Json.toJson(ErrorAccountCancellationPeriodExceeded))
-        }
-        case CloseLisaAccountWithinCancellationPeriod => {
-          auditService.audit(
-            auditType = "accountNotClosed",
-            path = getCloseEndpointUrl(lisaManager, accountId),
-            auditData = closeLisaAccountRequest.toStringMap ++ Map(ZREF -> lisaManager,
-              "accountId" -> accountId,
-              "reasonNotClosed" -> ErrorAccountWithinCancellationPeriod.errorCode)
-          )
-          LisaMetrics.incrementMetrics(startTime,
-            LisaMetricKeys.lisaError(FORBIDDEN,LisaMetricKeys.CLOSE))
-
-          Forbidden(Json.toJson(ErrorAccountWithinCancellationPeriod))
-        }
-        case CloseLisaAccountNotFoundResponse => {
-          auditService.audit(
-            auditType = "accountNotClosed",
-            path = getCloseEndpointUrl(lisaManager, accountId),
-            auditData = closeLisaAccountRequest.toStringMap ++ Map(ZREF -> lisaManager,
-              "accountId" -> accountId,
-              "reasonNotClosed" -> ErrorAccountNotFound.errorCode)
-          )
-          LisaMetrics.incrementMetrics(startTime,
-            LisaMetricKeys.lisaError(NOT_FOUND,LisaMetricKeys.CLOSE))
-
-          NotFound(Json.toJson(ErrorAccountNotFound))
-        }
-        case _ => {
-          auditService.audit(
-            auditType = "accountNotClosed",
-            path = getCloseEndpointUrl(lisaManager, accountId),
-            auditData = closeLisaAccountRequest.toStringMap ++ Map(ZREF -> lisaManager,
-              "accountId" -> accountId,
-              "reasonNotClosed" -> ErrorInternalServerError.errorCode)
-          )
-          Logger.error(s"AccountController: closeAccount unknown case from DES returning internal server error" )
-          LisaMetrics.incrementMetrics(startTime,
-            LisaMetricKeys.lisaError(INTERNAL_SERVER_ERROR,LisaMetricKeys.CLOSE))
-
+            LisaMetricKeys.lisaError(INTERNAL_SERVER_ERROR, LisaMetricKeys.CLOSE))
           InternalServerError(Json.toJson(ErrorInternalServerError))
-        }
       }
-    } recover {
-        case e:Exception  =>     Logger.error(s"AccountController: closeAccount: An error occurred due to ${e.getMessage} returning internal server error")
-                              LisaMetrics.incrementMetrics(startTime,
-                                LisaMetricKeys.lisaError(INTERNAL_SERVER_ERROR,LisaMetricKeys.CLOSE))
-                              InternalServerError(Json.toJson(ErrorInternalServerError))
-       }
+    }
   }
 
   private def hasAccountTransferData(js: JsObject): Boolean = {
