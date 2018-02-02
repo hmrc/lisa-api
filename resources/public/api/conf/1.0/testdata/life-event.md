@@ -77,6 +77,30 @@
             </td>
         </tr>
         <tr>
+            <td><p>Request containing an event date before 6 April 2017</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890</p></td>
+            <td>
+                <p class ="code--block"> {<br>
+                                            "eventType" : "LISA Investor Terminal Ill Health",<br>
+                                            "eventDate" : "2017-04-05"<br>
+                                        }
+                </p>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
+                <p class ="code--block"> {<br>
+					  "code": "FORBIDDEN",<br>
+					  "message": "There is a problem with the request data",<br>
+					  "errors": [<br>
+					    {<br>
+					      "code": "INVALID_DATE",<br>
+					      "message": "The eventDate cannot be before 6 April 2017",<br>
+					      "path": "/eventDate"<br>
+					    }<br>
+					  ]<br>
+					}
+                </p>
+            </td>
+        </tr>
+        <tr>
             <td><p>Request containing a life event that conflicts with a previously reported event</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 0000000403</p></td>
             <td>
                 <p class ="code--block"> {<br>

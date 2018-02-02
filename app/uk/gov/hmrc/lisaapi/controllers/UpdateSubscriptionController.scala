@@ -87,7 +87,7 @@ class UpdateSubscriptionController extends LisaController with LisaConstants {
   private def withValidDate(req: UpdateSubscriptionRequest)(success: (UpdateSubscriptionRequest) => Future[Result]) = {
     if (req.firstSubscriptionDate.isBefore(LISA_START_DATE)) {
       Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
-        ErrorValidation("INVALID_DATE", "The firstSubscriptionDate must not be before the 6th of April 2017", Some("/firstSubscriptionDate"))
+        ErrorValidation("INVALID_DATE", "The firstSubscriptionDate cannot be before the 6th of April 2017", Some("/firstSubscriptionDate"))
       )))))
     }
     else {
