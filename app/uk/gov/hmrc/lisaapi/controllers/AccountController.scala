@@ -319,10 +319,6 @@ class AccountController extends LisaController with LisaConstants {
       }
     }
 
-    private def getAccountDetailsEndpointUrl(lisaManagerReferenceNumber: String, accountId: String): String = {
-      s"/manager/$lisaManagerReferenceNumber/accounts/$accountId"
-    }
-
   //endregion
 
   //region Close Account
@@ -339,7 +335,8 @@ class AccountController extends LisaController with LisaConstants {
       }
     }
 
-    private def processAccountClosure(lisaManager: String, accountId: String, closeLisaAccountRequest: CloseLisaAccountRequest)(implicit hc: HeaderCarrier, startTime:Long) = {
+    private def processAccountClosure(lisaManager: String, accountId: String, closeLisaAccountRequest: CloseLisaAccountRequest)
+                                     (implicit hc: HeaderCarrier, startTime:Long) = {
       if (closeLisaAccountRequest.closureDate.isBefore(LISA_START_DATE)) {
         auditService.audit(
           auditType = "accountNotClosed",
@@ -453,10 +450,12 @@ class AccountController extends LisaController with LisaConstants {
             }
           }
         } recover {
-          case e: Exception => Logger.error(s"AccountController: closeAccount: An error occurred due to ${e.getMessage} returning internal server error")
+          case e: Exception => {
+            Logger.error(s"AccountController: closeAccount: An error occurred due to ${e.getMessage} returning internal server error")
             LisaMetrics.incrementMetrics(startTime,
               LisaMetricKeys.lisaError(INTERNAL_SERVER_ERROR, LisaMetricKeys.CLOSE))
             InternalServerError(Json.toJson(ErrorInternalServerError))
+          }
         }
       }
     }
