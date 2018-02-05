@@ -17,6 +17,7 @@
 package uk.gov.hmrc.lisaapi.utils
 
 import org.joda.time.DateTime
+import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.controllers.ErrorValidation
 import uk.gov.hmrc.lisaapi.models.RequestBonusPaymentRequest
 import uk.gov.hmrc.lisaapi.services.CurrentDateService
@@ -25,7 +26,7 @@ import scala.collection.mutable.ListBuffer
 
 case class BonusPaymentValidationRequest(data: RequestBonusPaymentRequest, errors: Seq[ErrorValidation] = Nil)
 
-trait BonusPaymentValidator {
+trait BonusPaymentValidator extends LisaConstants {
 
   val inboundPayments: String = "/inboundPayments"
   val htbTransfer: String = "/htbTransfer"
@@ -156,7 +157,7 @@ trait BonusPaymentValidator {
     if (req.data.periodStartDate.isBefore(firstValidDate)) {
       req.copy(errors = req.errors :+ ErrorValidation(
         errorCode = dateErrorCode,
-        message = "The periodStartDate cannot be before 6 April 2017",
+        message = LISA_START_DATE_ERROR.format("periodStartDate"),
         path = Some(s"/periodStartDate")
       ))
     }
@@ -171,7 +172,7 @@ trait BonusPaymentValidator {
     if (req.data.periodEndDate.isBefore(firstValidDate)) {
       req.copy(errors = req.errors :+ ErrorValidation(
         errorCode = dateErrorCode,
-        message = "The periodEndDate cannot be before 6 April 2017",
+        message = LISA_START_DATE_ERROR.format("periodEndDate"),
         path = Some(s"/periodEndDate")
       ))
     }

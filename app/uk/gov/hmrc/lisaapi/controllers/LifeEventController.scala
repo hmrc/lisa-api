@@ -50,7 +50,7 @@ class LifeEventController extends LisaController with LisaConstants {
                 LisaMetricKeys.lisaError(FORBIDDEN, request.uri))
 
               Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
-                ErrorValidation("INVALID_DATE", "The eventDate cannot be before 6 April 2017", Some("/eventDate"))
+                ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("eventDate"), Some("/eventDate"))
               )))))
             }
             else {
