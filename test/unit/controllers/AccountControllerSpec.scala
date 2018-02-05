@@ -48,6 +48,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
   }
   
   val validDate = "2017-04-06"
+  val invalidDate = "2015-04-05"
 
   val createAccountJson = s"""{
                             |  "investorId" : "9876543210",
@@ -119,6 +120,20 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
     }
 
     "audit an accountNotCreated event" when {
+      "the json fails date validation" in {
+        doSyncCreateOrTransferRequest(createAccountJson.replace(validDate, invalidDate)) { _ =>
+          verify(mockAuditService).audit(
+            auditType = matchersEquals("accountNotCreated"),
+            path= matchersEquals(s"/manager/$lisaManager/accounts"),
+            auditData = matchersEquals(Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "investorId" -> "9876543210",
+              "accountId" -> "8765/432100",
+              "firstSubscriptionDate" -> invalidDate,
+              "reasonNotCreated" -> "FORBIDDEN"
+            )))(any())
+        }
+      }
       "the data service returns a CreateLisaAccountInvestorNotFoundResponse for a create request" in {
         when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorNotFoundResponse))
 
@@ -246,6 +261,23 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
     }
 
     "audit an accountNotTransferred event" when {
+      "the json fails date validation" in {
+        doSyncCreateOrTransferRequest(transferAccountJson.replace(validDate, invalidDate)) { _ =>
+          verify(mockAuditService).audit(
+            auditType = matchersEquals("accountNotTransferred"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts"),
+            auditData = matchersEquals(Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "investorId" -> "9876543210",
+              "accountId" -> "8765/432100",
+              "firstSubscriptionDate" -> invalidDate,
+              "transferredFromAccountId" -> "Z54/3210",
+              "transferredFromLMRN" -> "Z543333",
+              "transferInDate" -> invalidDate,
+              "reasonNotCreated" -> "FORBIDDEN"
+            )))(any())
+        }
+      }
       "the data service returns a CreateLisaAccountInvestorNotFoundResponse for a transfer request" in {
         when(mockService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorNotFoundResponse))
 
@@ -724,7 +756,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
     when(mockAuthCon.authorise[Option[String]](any(),any())(any(), any())).thenReturn(Future(Some("1234")))
 
-    "audit an account closed event" when {
+    "audit an accountClosed event" when {
       "return with status 200 ok" when {
         "submitted a valid close account request" in {
           when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountSuccessResponse(accountId)))
@@ -736,7 +768,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               auditData = matchersEquals(Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountClosureReason" -> "All funds withdrawn",
-                "closureDate" -> s"$validDate",
+                "closureDate" -> validDate,
                 "accountId" -> accountId
                )))(any())
           }
@@ -745,6 +777,20 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
     }
 
     "audit an accountNotClosed event" when {
+      "the json fails date validation" in {
+        doSyncCloseRequest(closeAccountJson.replace(validDate, invalidDate)) { res =>
+          verify(mockAuditService).audit(
+            auditType = matchersEquals("accountNotClosed"),
+            path=matchersEquals(s"/manager/$lisaManager/accounts/$accountId/close-account"),
+            auditData = matchersEquals(Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountClosureReason" -> "All funds withdrawn",
+              "closureDate" -> invalidDate,
+              "accountId" -> accountId,
+              "reasonNotClosed" -> "FORBIDDEN"
+            )))(any())
+        }
+      }
       "the data service returns a CloseLisaAccountAlreadyVoidResponse" in {
         when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountAlreadyVoidResponse))
 

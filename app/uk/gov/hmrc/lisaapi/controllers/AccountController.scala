@@ -133,6 +133,15 @@ class AccountController extends LisaController with LisaConstants {
 
   private def processAccountCreation(lisaManager: String, creationRequest: CreateLisaAccountCreationRequest)(implicit hc: HeaderCarrier,startTime:Long) = {
     if (creationRequest.firstSubscriptionDate.isBefore(LISA_START_DATE)) {
+      auditService.audit(
+        auditType = "accountNotCreated",
+        path = getEndpointUrl(lisaManager),
+        auditData = creationRequest.toStringMap ++ Map(ZREF -> lisaManager,
+          "reasonNotCreated" -> "FORBIDDEN")
+      )
+
+      LisaMetrics.incrementMetrics(System.currentTimeMillis(), LisaMetricKeys.lisaError(FORBIDDEN, LisaMetricKeys.ACCOUNT))
+
       Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
         ErrorValidation("INVALID_DATE", "The firstSubscriptionDate cannot be before 6 April 2017", Some("/firstSubscriptionDate"))
       )))))
@@ -278,6 +287,15 @@ class AccountController extends LisaController with LisaConstants {
                     filter(_.isDefined).
                     map(_.get)
 
+      auditService.audit(
+        auditType = "accountNotTransferred",
+        path = getEndpointUrl(lisaManager),
+        auditData = transferRequest.toStringMap ++ Map(ZREF -> lisaManager,
+          "reasonNotCreated" -> "FORBIDDEN")
+      )
+
+      LisaMetrics.incrementMetrics(System.currentTimeMillis(), LisaMetricKeys.lisaError(FORBIDDEN, LisaMetricKeys.ACCOUNT))
+
       Future.successful(Forbidden(Json.toJson(ErrorForbidden(errors))))
     }
     else {
@@ -396,6 +414,16 @@ class AccountController extends LisaController with LisaConstants {
 
   private def processAccountClosure(lisaManager: String, accountId: String, closeLisaAccountRequest: CloseLisaAccountRequest)(implicit hc: HeaderCarrier, startTime:Long) = {
     if (closeLisaAccountRequest.closureDate.isBefore(LISA_START_DATE)) {
+      auditService.audit(
+        auditType = "accountNotClosed",
+        path = getCloseEndpointUrl(lisaManager, accountId),
+        auditData = closeLisaAccountRequest.toStringMap ++ Map(ZREF -> lisaManager,
+          "accountId" -> accountId,
+          "reasonNotClosed" -> "FORBIDDEN")
+      )
+
+      LisaMetrics.incrementMetrics(System.currentTimeMillis(), LisaMetricKeys.lisaError(FORBIDDEN, LisaMetricKeys.CLOSE))
+
       Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
         ErrorValidation("INVALID_DATE", "The closureDate cannot be before 6 April 2017", Some("/closureDate"))
       )))))
