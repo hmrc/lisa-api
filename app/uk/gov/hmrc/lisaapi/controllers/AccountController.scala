@@ -138,11 +138,10 @@ class AccountController extends LisaController with LisaConstants {
     auditService.audit(
       auditType = "accountNotCreated",
       path = getEndpointUrl(lisaManager),
-      auditData = creationRequest.toStringMap ++ Map(ZREF -> lisaManager,
-        "reasonNotCreated" -> e.errorCode)
+      auditData = creationRequest.toStringMap ++ Map(ZREF -> lisaManager, "reasonNotCreated" -> e.errorCode)
     )
-    LisaMetrics.incrementMetrics(System.currentTimeMillis(),
-      LisaMetricKeys.lisaError(status, LisaMetricKeys.ACCOUNT))
+
+    LisaMetrics.incrementMetrics(System.currentTimeMillis(), LisaMetricKeys.lisaError(status, LisaMetricKeys.ACCOUNT))
 
     Status(status).apply(Json.toJson(e))
   }
