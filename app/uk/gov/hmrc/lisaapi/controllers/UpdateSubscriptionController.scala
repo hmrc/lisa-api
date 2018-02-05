@@ -39,8 +39,16 @@ class UpdateSubscriptionController extends LisaController with LisaConstants {
     LisaMetrics.startMetrics(startTime, LisaMetricKeys.UPDATE_SUBSCRIPTION)
     withValidLMRN(lisaManager) {
       withValidAccountId(accountId) {
-        withValidJson[UpdateSubscriptionRequest]( req => {
-          withValidDate(req) { updateSubsRequest =>
+        withValidJson[UpdateSubscriptionRequest]( updateSubsRequest => {
+          if (updateSubsRequest.firstSubscriptionDate.isBefore(LISA_START_DATE)) {
+            Logger.debug("First Subscription date not updated - failed business rule validation")
+            doAudit(lisaManager, accountId, updateSubsRequest, "firstSubscriptionDateNotUpdated", Map("reasonNotUpdated" -> "FORBIDDEN"))
+            LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getErrorKey(FORBIDDEN, request.uri))
+            Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
+              ErrorValidation("INVALID_DATE", "The firstSubscriptionDate cannot be before the 6th of April 2017", Some("/firstSubscriptionDate"))
+            )))))
+          }
+          else {
             service.updateSubscription(lisaManager, accountId, updateSubsRequest) map { result =>
               Logger.debug("Entering Updated subscription Controller and the response is " + result.toString)
               result match {
@@ -81,17 +89,6 @@ class UpdateSubscriptionController extends LisaController with LisaConstants {
           }
         }, lisaManager = lisaManager)
       }
-    }
-  }
-
-  private def withValidDate(req: UpdateSubscriptionRequest)(success: (UpdateSubscriptionRequest) => Future[Result]) = {
-    if (req.firstSubscriptionDate.isBefore(LISA_START_DATE)) {
-      Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
-        ErrorValidation("INVALID_DATE", "The firstSubscriptionDate cannot be before the 6th of April 2017", Some("/firstSubscriptionDate"))
-      )))))
-    }
-    else {
-      success(req)
     }
   }
 

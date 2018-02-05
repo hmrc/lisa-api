@@ -76,6 +76,21 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
       }
     }
     "audit a firstSubscriptionDateNotUpdated event" when {
+      "the json fails date validation" in {
+        doUpdateSubsDate(updateFirstSubscriptionDate.replace("2017-04-06", "2017-04-05")) { result =>
+          await(result)
+          verify(mockAuditService).audit(
+            auditType = matchersEquals("firstSubscriptionDateNotUpdated"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/update-subscription"),
+            auditData = matchersEquals(Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountID" -> accountId,
+              "firstSubscriptionDate" -> "2017-04-05",
+              "reasonNotUpdated" -> "FORBIDDEN"
+            ))
+          )(any())
+        }
+      }
       "the data service returns a UpdateFirstSubscriptionDateAccountAlreadyVoidedResponse" in {
         when(mockService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionAccountVoidedResponse))
 

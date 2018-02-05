@@ -43,6 +43,12 @@ class LifeEventController extends LisaController with LisaConstants {
       withValidLMRN(lisaManager) {
         withValidJson[ReportLifeEventRequest](req => {
             if (req.eventDate.isBefore(LISA_START_DATE)) {
+              Logger.debug("Life event not reported - invalid event date")
+
+              doAudit(lisaManager, accountId, req, "lifeEventNotReported", Map("reasonNotReported" -> "FORBIDDEN"))
+              LisaMetrics.incrementMetrics(startTime,
+                LisaMetricKeys.lisaError(FORBIDDEN, request.uri))
+
               Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
                 ErrorValidation("INVALID_DATE", "The eventDate cannot be before 6 April 2017", Some("/eventDate"))
               )))))

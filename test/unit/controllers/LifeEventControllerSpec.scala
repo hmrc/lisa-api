@@ -48,6 +48,7 @@ class LifeEventControllerSpec extends PlaySpec
   val accountId = "ABC/12345"
   val eventId = "1234567890"
   val validDate = "2017-04-06"
+  val invalidDate = "2017-04-05"
 
   implicit val hc:HeaderCarrier = HeaderCarrier()
 
@@ -78,7 +79,7 @@ class LifeEventControllerSpec extends PlaySpec
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountID" -> accountId,
               "eventType" -> "LISA Investor Terminal Ill Health",
-              "eventDate" -> s"$validDate"
+              "eventDate" -> validDate
             ))
           )(any())
         }
@@ -86,6 +87,22 @@ class LifeEventControllerSpec extends PlaySpec
     }
 
     "audit lifeEventNotReported" when {
+      "the json fails date validation" in {
+        doReportLifeEventRequest(reportLifeEventJson.replace(validDate, invalidDate)){res =>
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = matchersEquals("lifeEventNotReported"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events"),
+            auditData = matchersEquals(Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountID" -> accountId,
+              "eventType" -> "LISA Investor Terminal Ill Health",
+              "eventDate" -> invalidDate,
+              "reasonNotReported" -> "FORBIDDEN"
+            ))
+          )(any())
+        }
+      }
       "the request results in a ReportLifeEventInappropriateResponse" in {
         when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventInappropriateResponse))
         doReportLifeEventRequest(reportLifeEventJson){res =>
@@ -97,7 +114,7 @@ class LifeEventControllerSpec extends PlaySpec
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountID" -> accountId,
               "eventType" -> "LISA Investor Terminal Ill Health",
-              "eventDate" -> s"$validDate",
+              "eventDate" -> validDate,
               "reasonNotReported" -> "LIFE_EVENT_INAPPROPRIATE"
             ))
           )(any())
@@ -114,7 +131,7 @@ class LifeEventControllerSpec extends PlaySpec
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountID" -> accountId,
               "eventType" -> "LISA Investor Terminal Ill Health",
-              "eventDate" -> s"$validDate",
+              "eventDate" -> validDate,
               "reasonNotReported" -> "LIFE_EVENT_ALREADY_EXISTS"
             ))
           )(any())
@@ -131,7 +148,7 @@ class LifeEventControllerSpec extends PlaySpec
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountID" -> accountId,
               "eventType" -> "LISA Investor Terminal Ill Health",
-              "eventDate" -> s"$validDate",
+              "eventDate" -> validDate,
               "reasonNotReported" -> "INVESTOR_ACCOUNTID_NOT_FOUND"
             ))
           )(any())
@@ -150,7 +167,7 @@ class LifeEventControllerSpec extends PlaySpec
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountID" -> accountId,
               "eventType" -> "LISA Investor Terminal Ill Health",
-              "eventDate" -> s"$validDate",
+              "eventDate" -> validDate,
               "reasonNotReported" -> "INTERNAL_SERVER_ERROR"
             ))
           )(any())
