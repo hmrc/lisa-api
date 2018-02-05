@@ -98,7 +98,7 @@ class AccountController extends LisaController with LisaConstants {
                                         (implicit hc: HeaderCarrier, startTime:Long) = {
         val action = "Created"
 
-        hasValidSubscriptionDate(lisaManager, creationRequest) { () =>
+        hasValidDatesForCreation(lisaManager, creationRequest) { () =>
           service.createAccount(lisaManager, creationRequest).map { result =>
             result match {
               case CreateLisaAccountSuccessResponse(accountId) => {
@@ -138,7 +138,7 @@ class AccountController extends LisaController with LisaConstants {
         }
       }
 
-      private def hasValidSubscriptionDate(lisaManager: String, creationRequest: CreateLisaAccountCreationRequest)
+      private def hasValidDatesForCreation(lisaManager: String, creationRequest: CreateLisaAccountCreationRequest)
                                           (success: () => Future[Result])
                                           (implicit hc: HeaderCarrier, startTime:Long): Future[Result] = {
 
@@ -153,7 +153,7 @@ class AccountController extends LisaController with LisaConstants {
           LisaMetrics.incrementMetrics(System.currentTimeMillis(), LisaMetricKeys.lisaError(FORBIDDEN, LisaMetricKeys.ACCOUNT))
 
           Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
-            ErrorValidation("INVALID_DATE", "The firstSubscriptionDate cannot be before 6 April 2017", Some("/firstSubscriptionDate"))
+            ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("firstSubscriptionDate"), Some("/firstSubscriptionDate"))
           )))))
         }
         else {
@@ -169,7 +169,7 @@ class AccountController extends LisaController with LisaConstants {
                                         (implicit hc: HeaderCarrier, startTime:Long) = {
         val action = "Transferred"
 
-        hasValidTransferDates(lisaManager, transferRequest){ () =>
+        hasValidDatesForTransfer(lisaManager, transferRequest){ () =>
           service.transferAccount(lisaManager, transferRequest).map { result =>
             result match {
               case CreateLisaAccountSuccessResponse(accountId) => {
@@ -209,7 +209,7 @@ class AccountController extends LisaController with LisaConstants {
         }
       }
 
-      private def hasValidTransferDates(lisaManager: String, transferRequest: CreateLisaAccountTransferRequest)
+      private def hasValidDatesForTransfer(lisaManager: String, transferRequest: CreateLisaAccountTransferRequest)
                                        (success: () => Future[Result])
                                        (implicit hc: HeaderCarrier, startTime:Long): Future[Result] = {
 
@@ -219,7 +219,7 @@ class AccountController extends LisaController with LisaConstants {
 
           def firstSubscriptionDateError(request: CreateLisaAccountTransferRequest) = {
             if (transferRequest.firstSubscriptionDate.isBefore(LISA_START_DATE)) {
-              Some(ErrorValidation("INVALID_DATE", "The firstSubscriptionDate cannot be before 6 April 2017", Some("/firstSubscriptionDate")))
+              Some(ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("firstSubscriptionDate"), Some("/firstSubscriptionDate")))
             }
             else {
               None
@@ -228,7 +228,7 @@ class AccountController extends LisaController with LisaConstants {
 
           def transferInDateError(request: CreateLisaAccountTransferRequest) = {
             if (transferRequest.transferAccount.transferInDate.isBefore(LISA_START_DATE)) {
-              Some(ErrorValidation("INVALID_DATE", "The transferInDate cannot be before 6 April 2017", Some("/transferAccount/transferInDate")))
+              Some(ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("transferInDate"), Some("/transferAccount/transferInDate")))
             }
             else {
               None
@@ -286,7 +286,7 @@ class AccountController extends LisaController with LisaConstants {
 
   //region Get Account
 
-    def getAccountDetails (lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
+    def getAccountDetails(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
       implicit val startTime = System.currentTimeMillis()
       LisaMetrics.startMetrics(startTime, LisaMetricKeys.ACCOUNT)
       withValidLMRN(lisaManager) {
@@ -337,7 +337,7 @@ class AccountController extends LisaController with LisaConstants {
 
     private def processAccountClosure(lisaManager: String, accountId: String, closeLisaAccountRequest: CloseLisaAccountRequest)
                                      (implicit hc: HeaderCarrier, startTime:Long) = {
-      hasValidClosureDate(lisaManager, accountId, closeLisaAccountRequest) { () =>
+      hasValidDatesForClosure(lisaManager, accountId, closeLisaAccountRequest) { () =>
         service.closeAccount(lisaManager, accountId, closeLisaAccountRequest).map { result =>
           result match {
             case CloseLisaAccountSuccessResponse(accountId) => {
@@ -355,28 +355,28 @@ class AccountController extends LisaController with LisaConstants {
               Ok(Json.toJson(ApiResponse(data = Some(data), success = true, status = 200)))
             }
             case CloseLisaAccountAlreadyVoidResponse =>
-              processCloseFailure(lisaManager, accountId, closeLisaAccountRequest, ErrorAccountAlreadyVoided, FORBIDDEN)
+              processClosureFailure(lisaManager, accountId, closeLisaAccountRequest, ErrorAccountAlreadyVoided, FORBIDDEN)
             case CloseLisaAccountAlreadyClosedResponse =>
-              processCloseFailure(lisaManager, accountId, closeLisaAccountRequest, ErrorAccountAlreadyClosed, FORBIDDEN)
+              processClosureFailure(lisaManager, accountId, closeLisaAccountRequest, ErrorAccountAlreadyClosed, FORBIDDEN)
             case CloseLisaAccountCancellationPeriodExceeded =>
-              processCloseFailure(lisaManager, accountId, closeLisaAccountRequest, ErrorAccountCancellationPeriodExceeded, FORBIDDEN)
+              processClosureFailure(lisaManager, accountId, closeLisaAccountRequest, ErrorAccountCancellationPeriodExceeded, FORBIDDEN)
             case CloseLisaAccountWithinCancellationPeriod =>
-              processCloseFailure(lisaManager, accountId, closeLisaAccountRequest, ErrorAccountWithinCancellationPeriod, FORBIDDEN)
+              processClosureFailure(lisaManager, accountId, closeLisaAccountRequest, ErrorAccountWithinCancellationPeriod, FORBIDDEN)
             case CloseLisaAccountNotFoundResponse =>
-              processCloseFailure(lisaManager, accountId, closeLisaAccountRequest, ErrorAccountNotFound, NOT_FOUND)
+              processClosureFailure(lisaManager, accountId, closeLisaAccountRequest, ErrorAccountNotFound, NOT_FOUND)
             case _ =>
-              processCloseFailure(lisaManager, accountId, closeLisaAccountRequest, ErrorInternalServerError, INTERNAL_SERVER_ERROR)
+              processClosureFailure(lisaManager, accountId, closeLisaAccountRequest, ErrorInternalServerError, INTERNAL_SERVER_ERROR)
           }
         } recover {
           case e: Exception => {
             Logger.error(s"AccountController: closeAccount: An error occurred due to ${e.getMessage} returning internal server error")
-            processCloseFailure(lisaManager, accountId, closeLisaAccountRequest, ErrorInternalServerError, INTERNAL_SERVER_ERROR)
+            processClosureFailure(lisaManager, accountId, closeLisaAccountRequest, ErrorInternalServerError, INTERNAL_SERVER_ERROR)
           }
         }
       }
     }
 
-    private def hasValidClosureDate(lisaManager: String, accountId: String, req: CloseLisaAccountRequest)
+    private def hasValidDatesForClosure(lisaManager: String, accountId: String, req: CloseLisaAccountRequest)
                                    (success: () => Future[Result])
                                    (implicit hc: HeaderCarrier, startTime:Long): Future[Result] = {
 
@@ -393,7 +393,7 @@ class AccountController extends LisaController with LisaConstants {
           LisaMetricKeys.lisaError(FORBIDDEN, LisaMetricKeys.CLOSE))
 
         Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
-          ErrorValidation("INVALID_DATE", "The closureDate cannot be before 6 April 2017", Some("/closureDate"))
+          ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("closureDate"), Some("/closureDate"))
         )))))
       }
       else {
@@ -401,7 +401,7 @@ class AccountController extends LisaController with LisaConstants {
       }
     }
 
-    private def processCloseFailure(lisaManager: String,
+    private def processClosureFailure(lisaManager: String,
                                     accountId: String,
                                     requestData: Product,
                                     e: ErrorResponse,

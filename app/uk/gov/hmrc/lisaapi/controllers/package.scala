@@ -52,5 +52,7 @@ package object controllers {
 trait LisaConstants {
   val ZREF: String = "lisaManagerReferenceNumber"
   val NOTIFICATION:String  = "lateNotification"
+  val DATE_ERROR = "INVALID_DATE"
   val LISA_START_DATE = new DateTime(2017, 4, 6, 0, 0)
+  val LISA_START_DATE_ERROR = "The %s cannot be before 6 April 2017"
 }
