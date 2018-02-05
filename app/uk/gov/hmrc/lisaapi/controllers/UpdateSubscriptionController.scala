@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
-import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, Result}
@@ -24,8 +23,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models.{UpdateSubscriptionSuccessResponse, _}
-import uk.gov.hmrc.lisaapi.services.AuditService
-import uk.gov.hmrc.lisaapi.services.UpdateSubscriptionService
+import uk.gov.hmrc.lisaapi.services.{AuditService, UpdateSubscriptionService}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -34,61 +32,75 @@ class UpdateSubscriptionController extends LisaController with LisaConstants {
   val service: UpdateSubscriptionService = UpdateSubscriptionService
   val auditService: AuditService = AuditService
 
+  val failureEvent: String = "firstSubscriptionDateNotUpdated"
+  val failureReason: String = "reasonNotUpdated"
+
   def updateSubscription (lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
-    implicit val startTime = System.currentTimeMillis()
+    implicit val startTime: Long = System.currentTimeMillis()
     LisaMetrics.startMetrics(startTime, LisaMetricKeys.UPDATE_SUBSCRIPTION)
     withValidLMRN(lisaManager) {
       withValidAccountId(accountId) {
         withValidJson[UpdateSubscriptionRequest]( updateSubsRequest => {
-          if (updateSubsRequest.firstSubscriptionDate.isBefore(LISA_START_DATE)) {
-            Logger.debug("First Subscription date not updated - failed business rule validation")
-            doAudit(lisaManager, accountId, updateSubsRequest, "firstSubscriptionDateNotUpdated", Map("reasonNotUpdated" -> "FORBIDDEN"))
-            LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getErrorKey(FORBIDDEN, request.uri))
-            Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
-              ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("firstSubscriptionDate"), Some("/firstSubscriptionDate"))
-            )))))
-          }
-          else {
+          hasValidDates(lisaManager, accountId, updateSubsRequest, request.uri) { () =>
             service.updateSubscription(lisaManager, accountId, updateSubsRequest) map { result =>
               Logger.debug("Entering Updated subscription Controller and the response is " + result.toString)
               result match {
-                case success: UpdateSubscriptionSuccessResponse => {
+                case success: UpdateSubscriptionSuccessResponse =>
                   Logger.debug("First Subscription date updated")
                   doAudit(lisaManager, accountId, updateSubsRequest, "firstSubscriptionDateUpdated")
                   val data = ApiResponseData(message = success.message, code = Some(success.code), accountId = Some(accountId))
                   LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.UPDATE_SUBSCRIPTION)
-                  Ok(Json.toJson(ApiResponse(data = Some(data), success = true, status = 200)))
-                }
-                case UpdateSubscriptionAccountNotFoundResponse => {
+                  Ok(Json.toJson(ApiResponse(data = Some(data), success = true, status = OK)))
+                case UpdateSubscriptionAccountNotFoundResponse =>
                   Logger.debug("First Subscription date not updated")
-                  doAudit(lisaManager, accountId, updateSubsRequest, "firstSubscriptionDateNotUpdated", Map("reasonNotUpdated" -> ErrorAccountNotFound.errorCode))
+                  doAudit(lisaManager, accountId, updateSubsRequest, failureEvent,
+                    Map(failureReason -> ErrorAccountNotFound.errorCode))
                   LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getErrorKey(NOT_FOUND, request.uri))
                   NotFound(Json.toJson(ErrorAccountNotFound))
-                }
-                case UpdateSubscriptionAccountClosedResponse => {
+                case UpdateSubscriptionAccountClosedResponse =>
                   Logger.error("Account Closed")
-                  doAudit(lisaManager, accountId, updateSubsRequest, "firstSubscriptionDateNotUpdated", Map("reasonNotUpdated" -> ErrorAccountAlreadyClosed.errorCode))
+                  doAudit(lisaManager, accountId, updateSubsRequest, failureEvent,
+                    Map(failureReason -> ErrorAccountAlreadyClosed.errorCode))
                   LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaError(FORBIDDEN, request.uri))
                   Forbidden(Json.toJson(ErrorAccountAlreadyClosed))
-                }
-                case UpdateSubscriptionAccountVoidedResponse => {
+                case UpdateSubscriptionAccountVoidedResponse =>
                   Logger.error("Account Voided")
-                  doAudit(lisaManager, accountId, updateSubsRequest, "firstSubscriptionDateNotUpdated", Map("reasonNotUpdated" -> ErrorAccountAlreadyVoided.errorCode))
+                  doAudit(lisaManager, accountId, updateSubsRequest, failureEvent,
+                    Map(failureReason -> ErrorAccountAlreadyVoided.errorCode))
                   LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaError(FORBIDDEN, request.uri))
                   Forbidden(Json.toJson(ErrorAccountAlreadyVoided))
-                }
-                case _ => {
+                case _ =>
                   Logger.debug("Matched Error")
-                  doAudit(lisaManager, accountId, updateSubsRequest, "firstSubscriptionDateNotUpdated", Map("reasonNotUpdated" -> ErrorInternalServerError.errorCode))
+                  doAudit(lisaManager, accountId, updateSubsRequest, failureEvent,
+                    Map(failureReason -> ErrorInternalServerError.errorCode))
                   Logger.error(s"First Subscription date not updated : DES unknown case , returning internal server error")
                   LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getErrorKey(INTERNAL_SERVER_ERROR, request.uri))
                   InternalServerError(Json.toJson(ErrorInternalServerError))
-                }
               }
             }
           }
         }, lisaManager = lisaManager)
       }
+    }
+  }
+
+  private def hasValidDates(lisaManager: String, accountId: String, updateSubsRequest: UpdateSubscriptionRequest, uri: String)
+                                     (success: () => Future[Result])
+                                     (implicit hc: HeaderCarrier, startTime:Long): Future[Result] = {
+
+    if (updateSubsRequest.firstSubscriptionDate.isBefore(LISA_START_DATE)) {
+      Logger.debug("First Subscription date not updated - failed business rule validation")
+
+      doAudit(lisaManager, accountId, updateSubsRequest, "firstSubscriptionDateNotUpdated", Map("reasonNotUpdated" -> "FORBIDDEN"))
+
+      LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getErrorKey(FORBIDDEN, uri))
+
+      Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
+        ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("firstSubscriptionDate"), Some("/firstSubscriptionDate"))
+      )))))
+    }
+    else {
+      success()
     }
   }
 
