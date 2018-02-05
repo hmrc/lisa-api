@@ -20,10 +20,10 @@ import play.api.Logger
 import play.api.libs.json.Json
 
 sealed abstract class ErrorResponse(
-                                     val httpStatusCode: Int,
-                                     val errorCode: String,
-                                     val message: String
-                                   )
+                           val httpStatusCode: Int,
+                           val errorCode: String,
+                           val message: String
+                         )
 
 sealed abstract class ErrorResponseWithErrors(
                                      val httpStatusCode: Int,
@@ -46,12 +46,12 @@ case class ErrorResponseWithLifeEventId(
                                          lifeEventID: String
                                        )
 
-case class ErrorResponseWithAccountId(
-                                         httpStatusCode: Int,
-                                         errorCode: String,
-                                         message: String,
+case class ErrorResponseWithAccountId (
+                                         override val httpStatusCode: Int,
+                                         override val errorCode: String,
+                                         override val message: String,
                                          accountId: String
-                                       )
+                                       ) extends ErrorResponse(httpStatusCode, errorCode, message)
 
 
 case class ErrorValidation(

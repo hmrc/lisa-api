@@ -20,7 +20,7 @@ import play.api.Logger
 import play.api.data.validation.ValidationError
 import play.api.libs.json.{JsObject, JsPath, JsValue, Json}
 import play.api.libs.json.Json.toJson
-import play.api.mvc.{Action, AnyContent}
+import play.api.mvc.{Action, AnyContent, Result}
 import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models.{GetLisaAccountDoesNotExistResponse, _}
@@ -131,7 +131,26 @@ class AccountController extends LisaController with LisaConstants {
     }
   }
 
-  private def processAccountCreation(lisaManager: String, creationRequest: CreateLisaAccountCreationRequest)(implicit hc: HeaderCarrier,startTime:Long) = {
+  private def returnCreationFailure(lisaManager: String,
+                                    creationRequest: CreateLisaAccountCreationRequest,
+                                    e: ErrorResponse, status: Int)
+                                   (implicit hc: HeaderCarrier, startTime:Long) = {
+    auditService.audit(
+      auditType = "accountNotCreated",
+      path = getEndpointUrl(lisaManager),
+      auditData = creationRequest.toStringMap ++ Map(ZREF -> lisaManager,
+        "reasonNotCreated" -> e.errorCode)
+    )
+    LisaMetrics.incrementMetrics(System.currentTimeMillis(),
+      LisaMetricKeys.lisaError(status, LisaMetricKeys.ACCOUNT))
+
+    Status(status).apply(Json.toJson(e))
+  }
+
+  private def hasValidSubscriptionDate(lisaManager: String, creationRequest: CreateLisaAccountCreationRequest)
+                                      (success: () => Future[Result])
+                                      (implicit hc: HeaderCarrier, startTime:Long): Future[Result] = {
+
     if (creationRequest.firstSubscriptionDate.isBefore(LISA_START_DATE)) {
       auditService.audit(
         auditType = "accountNotCreated",
@@ -147,6 +166,14 @@ class AccountController extends LisaController with LisaConstants {
       )))))
     }
     else {
+      success()
+    }
+  }
+
+  private def processAccountCreation(lisaManager: String, creationRequest: CreateLisaAccountCreationRequest)
+                                    (implicit hc: HeaderCarrier, startTime:Long) = {
+
+    hasValidSubscriptionDate(lisaManager, creationRequest) { () =>
       service.createAccount(lisaManager, creationRequest).map { result =>
         result match {
           case CreateLisaAccountSuccessResponse(accountId) => {
@@ -158,103 +185,29 @@ class AccountController extends LisaController with LisaConstants {
             val data = ApiResponseData(message = "Account created", accountId = Some(accountId))
             LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.ACCOUNT)
 
-            Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = 201)))
+            Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
           }
-          case CreateLisaAccountInvestorNotFoundResponse => {
-            auditService.audit(
-              auditType = "accountNotCreated",
-              path = getEndpointUrl(lisaManager),
-              auditData = creationRequest.toStringMap ++ Map(ZREF -> lisaManager,
-                "reasonNotCreated" -> ErrorInvestorNotFound.errorCode)
-            )
-            LisaMetrics.incrementMetrics(System.currentTimeMillis(),
-              LisaMetricKeys.lisaError(FORBIDDEN, LisaMetricKeys.ACCOUNT))
-
-            Forbidden(Json.toJson(ErrorInvestorNotFound))
-          }
-          case CreateLisaAccountInvestorNotEligibleResponse => {
-            auditService.audit(
-              auditType = "accountNotCreated",
-              path = getEndpointUrl(lisaManager),
-              auditData = creationRequest.toStringMap ++ Map(ZREF -> lisaManager,
-                "reasonNotCreated" -> ErrorInvestorNotEligible.errorCode)
-            )
-            LisaMetrics.incrementMetrics(System.currentTimeMillis(),
-              LisaMetricKeys.lisaError(FORBIDDEN, LisaMetricKeys.ACCOUNT))
-
-            Forbidden(Json.toJson(ErrorInvestorNotEligible))
-          }
-          case CreateLisaAccountInvestorComplianceCheckFailedResponse => {
-            auditService.audit(
-              auditType = "accountNotCreated",
-              path = getEndpointUrl(lisaManager),
-              auditData = creationRequest.toStringMap ++ Map(ZREF -> lisaManager,
-                "reasonNotCreated" -> ErrorInvestorComplianceCheckFailedCreateTransfer.errorCode)
-            )
-            LisaMetrics.incrementMetrics(System.currentTimeMillis(),
-              LisaMetricKeys.lisaError(FORBIDDEN, LisaMetricKeys.ACCOUNT))
-
-            Forbidden(Json.toJson(ErrorInvestorComplianceCheckFailedCreateTransfer))
-          }
-          case CreateLisaAccountInvestorAccountAlreadyClosedResponse => {
-            auditService.audit(
-              auditType = "accountNotCreated",
-              path = getEndpointUrl(lisaManager),
-              auditData = creationRequest.toStringMap ++ Map(ZREF -> lisaManager,
-                "reasonNotCreated" -> ErrorAccountAlreadyClosed.errorCode)
-            )
-            LisaMetrics.incrementMetrics(System.currentTimeMillis(),
-              LisaMetricKeys.lisaError(FORBIDDEN, LisaMetricKeys.ACCOUNT))
-
-            Forbidden(Json.toJson(ErrorAccountAlreadyClosed))
-          }
-          case CreateLisaAccountInvestorAccountAlreadyVoidResponse => {
-            auditService.audit(
-              auditType = "accountNotCreated",
-              path = getEndpointUrl(lisaManager),
-              auditData = creationRequest.toStringMap ++ Map(ZREF -> lisaManager,
-                "reasonNotCreated" -> ErrorAccountAlreadyVoided.errorCode)
-            )
-            LisaMetrics.incrementMetrics(System.currentTimeMillis(),
-              LisaMetricKeys.lisaError(FORBIDDEN, LisaMetricKeys.ACCOUNT))
-
-            Forbidden(Json.toJson(ErrorAccountAlreadyVoided))
-          }
-          case CreateLisaAccountAlreadyExistsResponse => {
-            val result = ErrorAccountAlreadyExists(creationRequest.accountId)
-            auditService.audit(
-              auditType = "accountNotCreated",
-              path = getEndpointUrl(lisaManager),
-              auditData = creationRequest.toStringMap ++ Map(ZREF -> lisaManager,
-                "reasonNotCreated" -> result.errorCode)
-            )
-            LisaMetrics.startMetrics(System.currentTimeMillis(),
-              LisaMetricKeys.lisaError(CONFLICT, LisaMetricKeys.ACCOUNT))
-
-            Conflict(Json.toJson(result))
-          }
+          case CreateLisaAccountInvestorNotFoundResponse =>
+            returnCreationFailure(lisaManager, creationRequest, ErrorInvestorNotFound, FORBIDDEN)
+          case CreateLisaAccountInvestorNotEligibleResponse =>
+            returnCreationFailure(lisaManager, creationRequest, ErrorInvestorNotEligible, FORBIDDEN)
+          case CreateLisaAccountInvestorComplianceCheckFailedResponse =>
+            returnCreationFailure(lisaManager, creationRequest, ErrorInvestorComplianceCheckFailedCreateTransfer, FORBIDDEN)
+          case CreateLisaAccountInvestorAccountAlreadyClosedResponse =>
+            returnCreationFailure(lisaManager, creationRequest, ErrorAccountAlreadyClosed, FORBIDDEN)
+          case CreateLisaAccountInvestorAccountAlreadyVoidResponse =>
+            returnCreationFailure(lisaManager, creationRequest, ErrorAccountAlreadyVoided, FORBIDDEN)
+          case CreateLisaAccountAlreadyExistsResponse =>
+            returnCreationFailure(lisaManager, creationRequest, ErrorAccountAlreadyExists(creationRequest.accountId), CONFLICT)
           case _ => {
-            auditService.audit(
-              auditType = "accountNotCreated",
-              path = getEndpointUrl(lisaManager),
-              auditData = creationRequest.toStringMap ++ Map(ZREF -> lisaManager,
-                "reasonNotCreated" -> ErrorInternalServerError.errorCode)
-            )
-            LisaMetrics.incrementMetrics(System.currentTimeMillis(),
-              LisaMetricKeys.lisaError(INTERNAL_SERVER_ERROR, LisaMetricKeys.ACCOUNT))
-
             Logger.error(s"AccountController: createAccount unknown case from DES returning internal server error")
-            InternalServerError(Json.toJson(ErrorInternalServerError))
+            returnCreationFailure(lisaManager, creationRequest, ErrorInternalServerError, INTERNAL_SERVER_ERROR)
           }
         }
       } recover {
         case e: Exception => {
           Logger.error(s"AccountController: An error occurred due to ${e.getMessage} returning internal server error")
-
-          LisaMetrics.startMetrics(System.currentTimeMillis(),
-            LisaMetricKeys.lisaError(INTERNAL_SERVER_ERROR, LisaMetricKeys.ACCOUNT))
-
-          InternalServerError(Json.toJson(ErrorInternalServerError))
+          returnCreationFailure(lisaManager, creationRequest, ErrorInternalServerError, INTERNAL_SERVER_ERROR)
         }
       }
     }
