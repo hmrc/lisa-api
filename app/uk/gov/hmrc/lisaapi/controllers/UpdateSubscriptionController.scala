@@ -45,7 +45,7 @@ class UpdateSubscriptionController extends LisaController with LisaConstants {
             doAudit(lisaManager, accountId, updateSubsRequest, "firstSubscriptionDateNotUpdated", Map("reasonNotUpdated" -> "FORBIDDEN"))
             LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getErrorKey(FORBIDDEN, request.uri))
             Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
-              ErrorValidation("INVALID_DATE", "The firstSubscriptionDate cannot be before the 6th of April 2017", Some("/firstSubscriptionDate"))
+              ErrorValidation("INVALID_DATE", "The firstSubscriptionDate cannot be before 6 April 2017", Some("/firstSubscriptionDate"))
             )))))
           }
           else {
