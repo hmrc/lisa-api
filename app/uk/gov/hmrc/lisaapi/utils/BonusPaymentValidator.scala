@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.lisaapi.utils
 
-import org.joda.time.DateTime
 import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.controllers.ErrorValidation
 import uk.gov.hmrc.lisaapi.models.RequestBonusPaymentRequest
@@ -32,7 +31,6 @@ trait BonusPaymentValidator extends LisaConstants {
   val htbTransfer: String = "/htbTransfer"
   val bonuses: String = "/bonuses"
   val currentDateService: CurrentDateService
-  val firstValidDate: DateTime = new DateTime(2017, 4, 6, 0, 0)
 
   def validate(data: RequestBonusPaymentRequest): Seq[ErrorValidation] = {
     (
@@ -152,7 +150,7 @@ trait BonusPaymentValidator extends LisaConstants {
   private val periodStartDateIsNotBeforeFirstValidDate: (BonusPaymentValidationRequest) => BonusPaymentValidationRequest =
     (req: BonusPaymentValidationRequest) => {
 
-    if (req.data.periodStartDate.isBefore(firstValidDate)) {
+    if (req.data.periodStartDate.isBefore(LISA_START_DATE)) {
       req.copy(errors = req.errors :+ ErrorValidation(
         errorCode = DATE_ERROR,
         message = LISA_START_DATE_ERROR.format("periodStartDate"),
@@ -167,7 +165,7 @@ trait BonusPaymentValidator extends LisaConstants {
   private val periodEndDateIsNotBeforeFirstValidDate: (BonusPaymentValidationRequest) => BonusPaymentValidationRequest =
     (req: BonusPaymentValidationRequest) => {
 
-    if (req.data.periodEndDate.isBefore(firstValidDate)) {
+    if (req.data.periodEndDate.isBefore(LISA_START_DATE)) {
       req.copy(errors = req.errors :+ ErrorValidation(
         errorCode = DATE_ERROR,
         message = LISA_START_DATE_ERROR.format("periodEndDate"),
