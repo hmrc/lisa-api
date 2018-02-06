@@ -25,23 +25,19 @@ package object controllers {
     def writes(e: ErrorValidation): JsValue = Json.obj("code" -> e.errorCode, "message" -> e.message, "path" -> e.path)
   }
 
-
   implicit val errorResponseWrites = new Writes[ErrorResponse] {
-    def writes(e: ErrorResponse): JsValue = Json.obj("code" -> e.errorCode, "message" -> e.message)
+    def writes(e: ErrorResponse): JsValue = e match {
+      case e:ErrorResponseWithAccountId => Json.obj("code" -> e.errorCode, "message" -> e.message, "accountId" -> e.accountId)
+      case _ => Json.obj ("code" -> e.errorCode, "message" -> e.message)
+    }
   }
-
 
   implicit val errorResponseWithErrorsWrites = new Writes[ErrorResponseWithErrors] {
     def writes(e: ErrorResponseWithErrors): JsValue = Json.obj("code" -> e.errorCode, "message" -> e.message, "errors" -> e.errors)
   }
 
-
   implicit val errorResponseWithIdWrites = new Writes[ErrorResponseWithId] {
     def writes(e: ErrorResponseWithId): JsValue = Json.obj("code" -> e.errorCode, "message" -> e.message, "id" -> e.id)
-  }
-
-  implicit val errorResponseWithAccountIdWrites = new Writes[ErrorResponseWithAccountId] {
-    def writes(e: ErrorResponseWithAccountId): JsValue = Json.obj("code" -> e.errorCode, "message" -> e.message, "accountId" -> e.accountId)
   }
 
   implicit val errorResponseWithLifeEventIdWrites = new Writes[ErrorResponseWithLifeEventId] {

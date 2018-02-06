@@ -640,16 +640,20 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
         when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountAlreadyExistsResponse))
 
         doCreateOrTransferRequest(createAccountJson) { res =>
-          status(res) mustBe (CONFLICT)
-          (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ACCOUNT_ALREADY_EXISTS")
+          status(res) mustBe CONFLICT
+          val json = contentAsJson(res)
+          (json \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_EXISTS"
+          (json \ "accountId").as[String] mustBe "8765/432100"
         }
       }
       "the data service returns a CreateLisaAccountAlreadyExistsResponse for a transfer request" in {
         when(mockService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountAlreadyExistsResponse))
 
         doCreateOrTransferRequest(transferAccountJson) { res =>
-          status(res) mustBe (CONFLICT)
-          (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ACCOUNT_ALREADY_EXISTS")
+          status(res) mustBe CONFLICT
+          val json = contentAsJson(res)
+          (json \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_EXISTS"
+          (json \ "accountId").as[String] mustBe "8765/432100"
         }
       }
     }
