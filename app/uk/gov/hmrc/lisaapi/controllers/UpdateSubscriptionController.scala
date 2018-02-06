@@ -41,7 +41,7 @@ class UpdateSubscriptionController extends LisaController with LisaConstants {
     withValidLMRN(lisaManager) {
       withValidAccountId(accountId) {
         withValidJson[UpdateSubscriptionRequest]( updateSubsRequest => {
-          hasValidDates(lisaManager, accountId, updateSubsRequest, request.uri) { () =>
+          withValidDates(lisaManager, accountId, updateSubsRequest, request.uri) { () =>
             service.updateSubscription(lisaManager, accountId, updateSubsRequest) map { result =>
               Logger.debug("Entering Updated subscription Controller and the response is " + result.toString)
               result match {
@@ -84,7 +84,7 @@ class UpdateSubscriptionController extends LisaController with LisaConstants {
     }
   }
 
-  private def hasValidDates(lisaManager: String, accountId: String, updateSubsRequest: UpdateSubscriptionRequest, uri: String)
+  private def withValidDates(lisaManager: String, accountId: String, updateSubsRequest: UpdateSubscriptionRequest, uri: String)
                                      (success: () => Future[Result])
                                      (implicit hc: HeaderCarrier, startTime:Long): Future[Result] = {
 
