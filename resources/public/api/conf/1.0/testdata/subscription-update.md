@@ -92,10 +92,33 @@
             </td>
         </tr>
         <tr>
+            <td><p>Request containing a first subscription date before 6 April 2017</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890</p></td>
+            <td>
+                <p class ="code--block"> {<br>
+                                     	  "firstSubscriptionDate": "2017-04-05"<br>
+                                        }
+                </p>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
+                <p class ="code--block"> {<br>
+                                              "code": "FORBIDDEN",<br>
+                                              "message": "There is a problem with the request data",<br>
+                                              "errors": [<br>
+                                                {<br>
+                                                  "code": "INVALID_DATE",<br>
+                                                  "message": "The firstSubscriptionDate cannot be before 6 April 2017",<br>
+                                                  "path": "/firstSubscriptionDate"<br>
+                                                }<br>
+                                              ]<br>
+}
+                </p>
+            </td>
+        </tr>
+        <tr>
             <td><p>Request for an account that has already been closed</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 0000000901</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                     	  "firstSubscriptionDate": "2017-01-20"<br>
+                                     	  "firstSubscriptionDate": "2017-05-20"<br>
                                         }
                 </p>
             </td>
@@ -111,7 +134,7 @@
             <td><p>Request for an account that has already been void</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 0000000902</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                          "firstSubscriptionDate": "2017-01-20"<br>
+                                          "firstSubscriptionDate": "2017-05-20"<br>
                                         }
                 </p>
             </td>
@@ -127,7 +150,7 @@
             <td><p>Request containing an account ID that does not exist</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 0000000404</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                     	  "firstSubscriptionDate": "2017-01-20"<br>
+                                     	  "firstSubscriptionDate": "2017-05-20"<br>
                                         }
                 </p>
             </td>
@@ -143,7 +166,7 @@
             <td><p>Request with an invalid 'Accept' header</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890<br><br>Accept: application/vnd.hmrc.1.0</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                          "firstSubscriptionDate": "2017-01-20"<br>
+                                          "firstSubscriptionDate": "2017-05-20"<br>
                                         }
                 </p>
             </td>

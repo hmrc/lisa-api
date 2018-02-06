@@ -15,7 +15,7 @@
             <td>
                 <p class ="code--block"> {<br>
                                      	  "accountClosureReason":"All funds withdrawn",<br>
-                                     	  "closureDate": "2017-01-20"<br>
+                                     	  "closureDate": "2017-05-20"<br>
                                         }
                 </p>
             </td>
@@ -36,7 +36,7 @@
             <td>
                 <p class ="code--block"> {<br>
                                           "accountClosureReason":"Cancellation",<br>
-                                          "closureDate": "2017-01-20"<br>
+                                          "closureDate": "2017-05-20"<br>
                                         }
                 </p>
             </td>
@@ -57,7 +57,7 @@
             <td>
                 <p class ="code--block"> {<br>
                                      	  "accountClosureReason":"All funds withdrawn",<br>
-                                     	  "closureDate": "2017-01-20"<br>
+                                     	  "closureDate": "2017-05-20"<br>
                                         }
                 </p>
             </td>
@@ -73,27 +73,51 @@
             <td><p>Request containing invalid and/or missing data</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890</p></td>
             <td>
                 <p class ="code--block"> {<br>
-                                     	  "closureDate": "3000-01-01"<br>
+                                     	  "closureDate": "3000"<br>
                                         }
                 </p>
             </td>
             <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
                 <p class ="code--block"> {<br>
-  "code": "BAD_REQUEST",<br>
-  "message": "Bad Request",<br>
-  "errors": [<br>
-    {<br>
-      "code": "INVALID_DATE",<br>
-      "message": "Date is invalid",<br>
-      "path": "/closureDate"<br>
-    },<br>
-    {<br>
-      "code": "MISSING_FIELD",<br>
-      "message": "This field is required",<br>
-      "path": "/accountClosureReason"<br>
-    }<br>
-  ]<br>
-}
+                      "code": "BAD_REQUEST",<br>
+                      "message": "Bad Request",<br>
+                      "errors": [<br>
+                        {<br>
+                          "code": "INVALID_DATE",<br>
+                          "message": "Date is invalid",<br>
+                          "path": "/closureDate"<br>
+                        },<br>
+                        {<br>
+                          "code": "MISSING_FIELD",<br>
+                          "message": "This field is required",<br>
+                          "path": "/accountClosureReason"<br>
+                        }<br>
+                      ]<br>
+                    }
+                </p>
+            </td>
+        </tr>
+        <tr>
+            <td><p>Request containing a closure date before 6 April 2017</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890</p></td>
+            <td>
+                <p class ="code--block"> {<br>
+                      "accountClosureReason": "All funds withdrawn",
+                      "closureDate": "2017-04-05"<br>
+                    }
+                </p>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
+                <p class ="code--block"> {<br>
+                      "code": "FORBIDDEN",<br>
+                      "message": "There is a problem with the request data",<br>
+                      "errors": [<br>
+                        {<br>
+                          "code": "INVALID_DATE",<br>
+                          "message": "The closureDate cannot be before 6 April 2017",<br>
+                          "path": "/closureDate"<br>
+                        }<br>
+                      ]<br>
+                    }
                 </p>
             </td>
         </tr>
@@ -102,7 +126,7 @@
             <td>
                 <p class ="code--block"> {<br>
                                      	  "accountClosureReason": "All funds withdrawn",<br>
-                                     	  "closureDate": "2017-01-20"<br>
+                                     	  "closureDate": "2017-05-20"<br>
                                         }
                 </p>
             </td>
@@ -119,7 +143,7 @@
             <td>
                 <p class ="code--block"> {<br>
                                      	  "accountClosureReason": "All funds withdrawn",<br>
-                                     	  "closureDate": "2017-01-20"<br>
+                                     	  "closureDate": "2017-05-20"<br>
                                         }
                 </p>
             </td>
@@ -136,7 +160,7 @@
             <td>
                 <p class ="code--block"> {<br>
                                           "accountClosureReason": "Cancellation",<br>
-                                          "closureDate": "2017-01-20"<br>
+                                          "closureDate": "2017-05-20"<br>
                                         }
                 </p>
             </td>
@@ -154,7 +178,7 @@
             <td>
                 <p class ="code--block"> {<br>
                                           "accountClosureReason": "All funds withdrawn",<br>
-                                          "closureDate": "2017-01-20"<br>
+                                          "closureDate": "2017-05-20"<br>
                                         }
                 </p>
             </td>
@@ -171,7 +195,7 @@
             <td>
                 <p class ="code--block"> {<br>
                                      	  "accountClosureReason": "All funds withdrawn",<br>
-                                     	  "closureDate": "2017-01-20"<br>
+                                     	  "closureDate": "2017-05-20"<br>
                                         }
                 </p>
             </td>
@@ -188,7 +212,7 @@
             <td>
                 <p class ="code--block"> {<br>
                                           "accountClosureReason": "All funds withdrawn",<br>
-                                          "closureDate": "2017-01-20"<br>
+                                          "closureDate": "2017-05-20"<br>
                                         }
                 </p>
             </td>

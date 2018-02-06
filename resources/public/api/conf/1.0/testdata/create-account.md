@@ -17,7 +17,7 @@
                                      	    "investorId": "9876543210",<br>
                                      	    "creationReason": "New",<br>
                                      	    "accountId": "1234567890",<br>
-                                     	    "firstSubscriptionDate": "2011-03-23"<br>
+                                     	    "firstSubscriptionDate": "2017-04-06"<br>
                                         }
                 </p>
             </td>
@@ -40,11 +40,11 @@
                                               "investorId": "9876543210",<br>
                                               "creationReason": "Transferred",<br>
                                               "accountId": "1234567890",<br>
-                                              "firstSubscriptionDate": "2011-03-23",<br>
+                                              "firstSubscriptionDate": "2017-04-06",<br>
                                               "transferAccount": {<br>
                                                 "transferredFromAccountId": "8765432100",<br>
                                                 "transferredFromLMRN": "Z654321",<br>
-                                                "transferInDate": "2015-12-13"<br>
+                                                "transferInDate": "2017-04-06"<br>
                                               }<br>
                                         }
                 </p>
@@ -68,7 +68,7 @@
                                      	    "investorId": "9876543210",<br>
                                      	    "creationReason": "New",<br>
                                      	    "accountId": "1234567890",<br>
-                                     	    "firstSubscriptionDate": "2011-03-23"<br>
+                                     	    "firstSubscriptionDate": "2017-04-06"<br>
                                         }
                 </p>
             </td>
@@ -86,7 +86,7 @@
                 <p class ="code--block"> {<br>
                                      	    "investorId": "9876543",<br>
                                      	    "creationReason": "New",<br>
-                                     	    "firstSubscriptionDate": 2011<br>
+                                     	    "firstSubscriptionDate": "2011"<br>
                                         }
                 </p>
             </td>
@@ -116,13 +116,49 @@
             </td>
         </tr>
         <tr>
+            <td><p>Request containing dates before 6 April 2017</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a></p></td>
+            <td>
+                <p class ="code--block"> {<br>
+                                              "investorId": "9876543210",<br>
+                                              "creationReason": "Transferred",<br>
+                                              "accountId": "1234567890",<br>
+                                              "firstSubscriptionDate": "2016-04-06",<br>
+                                              "transferAccount": {<br>
+                                                "transferredFromAccountId": "8765432100",<br>
+                                                "transferredFromLMRN": "Z654321",<br>
+                                                "transferInDate": "2016-04-06"<br>
+                                              }<br>
+                                        }
+                </p>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
+                <p class ="code--block">{<br>
+						  "code": "FORBIDDEN",<br>
+						  "message": "There is a problem with the request data",<br>
+						  "errors": [<br>
+						    {<br>
+						      "code": "INVALID_DATE",<br>
+						      "message": "The firstSubscriptionDate cannot be before 6 April 2017",<br>
+						      "path": "/firstSubscriptionDate"<br>
+						    },<br>
+						    {<br>
+						      "code": "INVALID_DATE",<br>
+						      "message": "The transferInDate cannot be before 6 April 2017",<br>
+						      "path": "/transferAccount/transferInDate"<br>
+						    }
+						  ]<br>
+						}
+                </p>
+            </td>
+        </tr>
+        <tr>
             <td><p>Request containing investor details which can't be found</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a></p></td>
             <td>
                 <p class ="code--block"> {<br>
                                      	    "investorId": "1234567890",<br>
                                      	    "creationReason": "New",<br>
                                      	    "accountId": "1234567890",<br>
-                                     	    "firstSubscriptionDate": "2011-03-23"<br>
+                                     	    "firstSubscriptionDate": "2017-04-06"<br>
                                         }
                 </p>
             </td>
@@ -141,7 +177,7 @@
                                      	    "investorId": "1234567891",<br>
                                      	    "creationReason": "New",<br>
                                      	    "accountId": "1234567890",<br>
-                                     	    "firstSubscriptionDate": "2011-03-23"<br>
+                                     	    "firstSubscriptionDate": "2017-04-06"<br>
                                         }
                 </p>
             </td>
@@ -160,7 +196,7 @@
                                             "investorId": "1234567892",<br>
                                      	    "creationReason": "New",<br>
                                      	    "accountId": "1234567890",<br>
-                                     	    "firstSubscriptionDate": "2011-03-23"<br>
+                                     	    "firstSubscriptionDate": "2017-04-06"<br>
                                         }
                 </p>
             </td>
@@ -179,11 +215,11 @@
                                               "investorId": "1234567889",<br>
                                               "creationReason": "Transferred",<br>
                                               "accountId": "1234567890",<br>
-                                              "firstSubscriptionDate": "2011-03-23",<br>
+                                              "firstSubscriptionDate": "2017-04-06",<br>
                                               "transferAccount": {<br>
                                                 "transferredFromAccountId": "8765432100",<br>
                                                 "transferredFromLMRN": "Z654321",<br>
-                                                "transferInDate": "2015-12-13"<br>
+                                                "transferInDate": "2017-04-06"<br>
                                               }<br>
                                         }
                 </p>
@@ -203,7 +239,7 @@
                                                "investorId":"9876543210",<br>
                                                "creationReason":"Transferred",<br>
                                                "accountId":"1234567890",<br>
-                                               "firstSubscriptionDate":"2011-03-23"<br>
+                                               "firstSubscriptionDate":"2017-04-06"<br>
                                         }
                 </p>
             </td>
@@ -222,11 +258,11 @@
                                      	     "investorId": "9876543210",<br>
                                      	     "creationReason": "New",<br>
                                      	     "accountId": "1234567890",<br>
-                                     	     "firstSubscriptionDate": "2011-03-23",<br>
+                                     	     "firstSubscriptionDate": "2017-04-06",<br>
 	                                          "transferAccount": {<br>
 	                                            "transferredFromAccountId": "8765432100",<br>
 	                                            "transferredFromLMRN": "Z654321",<br>
-	                                            "transferInDate": "2015-12-13"<br>
+	                                            "transferInDate": "2017-04-06"<br>
 	                                          }<br>
                                         }
                 </p>
@@ -246,7 +282,7 @@
                                      	    "investorId": "0000000403",<br>
                                      	    "creationReason": "New",<br>
                                      	    "accountId": "1234567890",<br>
-                                     	    "firstSubscriptionDate": "2011-03-23"<br>
+                                     	    "firstSubscriptionDate": "2017-04-06"<br>
                                         }
                 </p>
             </td>
@@ -265,7 +301,7 @@
                                      	    "investorId": "1000000403",<br>
                                      	    "creationReason": "New",<br>
                                      	    "accountId": "1234567890",<br>
-                                     	    "firstSubscriptionDate": "2011-03-23"<br>
+                                     	    "firstSubscriptionDate": "2017-04-06"<br>
                                         }
                 </p>
             </td>
@@ -284,7 +320,7 @@
                                      	    "investorId": "9876543210",<br>
                                      	    "creationReason": "New",<br>
                                      	    "accountId": "1234567890",<br>
-                                     	    "firstSubscriptionDate": "2011-03-23"<br>
+                                     	    "firstSubscriptionDate": "2017-04-06"<br>
                                         }
                 </p>
             </td>
@@ -303,7 +339,7 @@
                                      	    "investorId": "1234567899",<br>
                                      	    "creationReason": "New",<br>
                                      	    "accountId": "1234567890",<br>
-                                     	    "firstSubscriptionDate": "2011-03-23"<br>
+                                     	    "firstSubscriptionDate": "2017-04-06"<br>
                                         }
                 </p>
             </td>

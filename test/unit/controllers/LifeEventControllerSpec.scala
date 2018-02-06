@@ -47,14 +47,16 @@ class LifeEventControllerSpec extends PlaySpec
   val lisaManager = "Z019283"
   val accountId = "ABC/12345"
   val eventId = "1234567890"
+  val validDate = "2017-04-06"
+  val invalidDate = "2017-04-05"
 
   implicit val hc:HeaderCarrier = HeaderCarrier()
 
   val reportLifeEventJson =
-    """
+    s"""
       |{
       |  "eventType" : "LISA Investor Terminal Ill Health",
-      |  "eventDate" : "2017-01-01"
+      |  "eventDate" : "$validDate"
       |}
     """.stripMargin
 
@@ -77,7 +79,7 @@ class LifeEventControllerSpec extends PlaySpec
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountID" -> accountId,
               "eventType" -> "LISA Investor Terminal Ill Health",
-              "eventDate" -> "2017-01-01"
+              "eventDate" -> validDate
             ))
           )(any())
         }
@@ -85,6 +87,22 @@ class LifeEventControllerSpec extends PlaySpec
     }
 
     "audit lifeEventNotReported" when {
+      "the json fails date validation" in {
+        doReportLifeEventRequest(reportLifeEventJson.replace(validDate, invalidDate)){res =>
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = matchersEquals("lifeEventNotReported"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events"),
+            auditData = matchersEquals(Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountID" -> accountId,
+              "eventType" -> "LISA Investor Terminal Ill Health",
+              "eventDate" -> invalidDate,
+              "reasonNotReported" -> "FORBIDDEN"
+            ))
+          )(any())
+        }
+      }
       "the request results in a ReportLifeEventInappropriateResponse" in {
         when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventInappropriateResponse))
         doReportLifeEventRequest(reportLifeEventJson){res =>
@@ -96,7 +114,7 @@ class LifeEventControllerSpec extends PlaySpec
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountID" -> accountId,
               "eventType" -> "LISA Investor Terminal Ill Health",
-              "eventDate" -> "2017-01-01",
+              "eventDate" -> validDate,
               "reasonNotReported" -> "LIFE_EVENT_INAPPROPRIATE"
             ))
           )(any())
@@ -113,7 +131,7 @@ class LifeEventControllerSpec extends PlaySpec
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountID" -> accountId,
               "eventType" -> "LISA Investor Terminal Ill Health",
-              "eventDate" -> "2017-01-01",
+              "eventDate" -> validDate,
               "reasonNotReported" -> "LIFE_EVENT_ALREADY_EXISTS"
             ))
           )(any())
@@ -130,7 +148,7 @@ class LifeEventControllerSpec extends PlaySpec
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountID" -> accountId,
               "eventType" -> "LISA Investor Terminal Ill Health",
-              "eventDate" -> "2017-01-01",
+              "eventDate" -> validDate,
               "reasonNotReported" -> "INVESTOR_ACCOUNTID_NOT_FOUND"
             ))
           )(any())
@@ -149,7 +167,7 @@ class LifeEventControllerSpec extends PlaySpec
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountID" -> accountId,
               "eventType" -> "LISA Investor Terminal Ill Health",
-              "eventDate" -> "2017-01-01",
+              "eventDate" -> validDate,
               "reasonNotReported" -> "INTERNAL_SERVER_ERROR"
             ))
           )(any())
@@ -175,7 +193,7 @@ class LifeEventControllerSpec extends PlaySpec
         }
       }
       "given a future eventDate" in {
-        val invalidJson = reportLifeEventJson.replace("2017-01-01", DateTime.now.plusDays(1).toString("yyyy-MM-dd"))
+        val invalidJson = reportLifeEventJson.replace(s"$validDate", DateTime.now.plusDays(1).toString("yyyy-MM-dd"))
 
         doReportLifeEventRequest(invalidJson) { res =>
           status(res) mustBe (BAD_REQUEST)
@@ -190,6 +208,21 @@ class LifeEventControllerSpec extends PlaySpec
 
           (json \ "code").as[String] mustBe ErrorBadRequestLmrn.errorCode
           (json \ "message").as[String] mustBe ErrorBadRequestLmrn.message
+        }
+      }
+    }
+
+    "return with 403 forbidden and a code of FORBIDDEN" when {
+      "given a eventDate prior to 6 April 2017" in {
+        when(mockService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful((ReportLifeEventSuccessResponse("1928374"))))
+
+        doReportLifeEventRequest(reportLifeEventJson.replace(validDate, "2017-04-05")) { res =>
+          status(res) mustBe (FORBIDDEN)
+          val json = contentAsJson(res)
+          (json \ "code").as[String] mustBe "FORBIDDEN"
+          (json \ "errors" \ 0 \ "code").as[String] mustBe "INVALID_DATE"
+          (json \ "errors" \ 0 \ "message").as[String] mustBe "The eventDate cannot be before 6 April 2017"
+          (json \ "errors" \ 0 \ "path").as[String] mustBe "/eventDate"
         }
       }
     }

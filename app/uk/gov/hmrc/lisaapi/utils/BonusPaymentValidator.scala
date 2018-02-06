@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.lisaapi.utils
 
-import org.joda.time.DateTime
+import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.controllers.ErrorValidation
 import uk.gov.hmrc.lisaapi.models.RequestBonusPaymentRequest
 import uk.gov.hmrc.lisaapi.services.CurrentDateService
@@ -25,13 +25,11 @@ import scala.collection.mutable.ListBuffer
 
 case class BonusPaymentValidationRequest(data: RequestBonusPaymentRequest, errors: Seq[ErrorValidation] = Nil)
 
-trait BonusPaymentValidator {
+trait BonusPaymentValidator extends LisaConstants {
 
   val inboundPayments: String = "/inboundPayments"
   val htbTransfer: String = "/htbTransfer"
   val bonuses: String = "/bonuses"
-  val monetaryErrorCode: String = "INVALID_MONETARY_AMOUNT"
-  val dateErrorCode: String = "INVALID_DATE"
   val currentDateService: CurrentDateService
 
   def validate(data: RequestBonusPaymentRequest): Seq[ErrorValidation] = {
@@ -45,7 +43,9 @@ trait BonusPaymentValidator {
       totalBonusDueYTDGtZero andThen
       periodStartDateIsSixth andThen
       periodEndDateIsFifthOfMonthAfterPeriodStartDate andThen
-      periodStartDateIsNotInFuture
+      periodStartDateIsNotInFuture andThen
+      periodStartDateIsNotBeforeFirstValidDate andThen
+      periodEndDateIsNotBeforeFirstValidDate
     ).apply(BonusPaymentValidationRequest(data)).errors
   }
 
@@ -68,7 +68,7 @@ trait BonusPaymentValidator {
       req.data.inboundPayments.newSubsForPeriod.get > 0 &&
       req.data.inboundPayments.newSubsYTD <= 0) => {
 
-      req.copy(errors = req.errors :+ ErrorValidation(monetaryErrorCode, "newSubsYTD must be more than 0", Some(s"$inboundPayments/newSubsYTD")))
+      req.copy(errors = req.errors :+ ErrorValidation(MONETARY_ERROR, "newSubsYTD must be more than 0", Some(s"$inboundPayments/newSubsYTD")))
     }
     case req: BonusPaymentValidationRequest => req
   }
@@ -79,14 +79,14 @@ trait BonusPaymentValidator {
       req.data.htbTransfer.get.htbTransferInForPeriod > 0 &&
       req.data.htbTransfer.get.htbTransferTotalYTD <= 0) => {
 
-      req.copy(errors = req.errors :+ ErrorValidation(monetaryErrorCode, "htbTransferTotalYTD must be more than 0", Some(s"$htbTransfer/htbTransferTotalYTD")))
+      req.copy(errors = req.errors :+ ErrorValidation(MONETARY_ERROR, "htbTransferTotalYTD must be more than 0", Some(s"$htbTransfer/htbTransferTotalYTD")))
     }
     case req: BonusPaymentValidationRequest => req
   }
 
   private val totalSubsForPeriodGtZero: PartialFunction[BonusPaymentValidationRequest, BonusPaymentValidationRequest] = {
     case req: BonusPaymentValidationRequest if (req.data.inboundPayments.totalSubsForPeriod <= 0) => {
-      req.copy(errors = req.errors :+ ErrorValidation(monetaryErrorCode, "totalSubsForPeriod must be more than 0", Some(s"$inboundPayments/totalSubsForPeriod")))
+      req.copy(errors = req.errors :+ ErrorValidation(MONETARY_ERROR, "totalSubsForPeriod must be more than 0", Some(s"$inboundPayments/totalSubsForPeriod")))
     }
     case req: BonusPaymentValidationRequest => req
   }
@@ -94,7 +94,7 @@ trait BonusPaymentValidator {
   private val totalSubsYTDGteTotalSubsForPeriod: PartialFunction[BonusPaymentValidationRequest, BonusPaymentValidationRequest] = {
     case req: BonusPaymentValidationRequest if (req.data.inboundPayments.totalSubsYTD < req.data.inboundPayments.totalSubsForPeriod) => {
       req.copy(errors = req.errors :+
-        ErrorValidation(monetaryErrorCode, "totalSubsYTD must be more than or equal to totalSubsForPeriod", Some(s"$inboundPayments/totalSubsYTD"))
+        ErrorValidation(MONETARY_ERROR, "totalSubsYTD must be more than or equal to totalSubsForPeriod", Some(s"$inboundPayments/totalSubsYTD"))
       )
     }
     case req: BonusPaymentValidationRequest => req
@@ -102,28 +102,28 @@ trait BonusPaymentValidator {
 
   private val bonusDueForPeriodGtZero: PartialFunction[BonusPaymentValidationRequest, BonusPaymentValidationRequest] = {
     case req: BonusPaymentValidationRequest if (req.data.bonuses.bonusDueForPeriod <= 0) => {
-      req.copy(errors = req.errors :+ ErrorValidation(monetaryErrorCode, "bonusDueForPeriod must be more than 0", Some(s"$bonuses/bonusDueForPeriod")))
+      req.copy(errors = req.errors :+ ErrorValidation(MONETARY_ERROR, "bonusDueForPeriod must be more than 0", Some(s"$bonuses/bonusDueForPeriod")))
     }
     case req: BonusPaymentValidationRequest => req
   }
 
   private val totalBonusDueYTDGtZero: PartialFunction[BonusPaymentValidationRequest, BonusPaymentValidationRequest] = {
     case req: BonusPaymentValidationRequest if (req.data.bonuses.totalBonusDueYTD <= 0) => {
-      req.copy(errors = req.errors :+ ErrorValidation(monetaryErrorCode, "totalBonusDueYTD must be more than 0", Some(s"$bonuses/totalBonusDueYTD")))
+      req.copy(errors = req.errors :+ ErrorValidation(MONETARY_ERROR, "totalBonusDueYTD must be more than 0", Some(s"$bonuses/totalBonusDueYTD")))
     }
     case req: BonusPaymentValidationRequest => req
   }
 
   private val periodStartDateIsSixth: PartialFunction[BonusPaymentValidationRequest, BonusPaymentValidationRequest] = {
     case req: BonusPaymentValidationRequest if req.data.periodStartDate.getDayOfMonth() != 6 => {
-      req.copy(errors = req.errors :+ ErrorValidation(dateErrorCode, "The periodStartDate must be the 6th day of the month", Some(s"/periodStartDate")))
+      req.copy(errors = req.errors :+ ErrorValidation(DATE_ERROR, "The periodStartDate must be the 6th day of the month", Some(s"/periodStartDate")))
     }
     case req: BonusPaymentValidationRequest => req
   }
 
   private val periodStartDateIsNotInFuture: PartialFunction[BonusPaymentValidationRequest, BonusPaymentValidationRequest] = {
     case req: BonusPaymentValidationRequest if req.data.periodStartDate.toDate.after(currentDateService.now().toDate) => {
-      req.copy(errors = req.errors :+ ErrorValidation(dateErrorCode, "The periodStartDate may not be a future date", Some(s"/periodStartDate")))
+      req.copy(errors = req.errors :+ ErrorValidation(DATE_ERROR, "The periodStartDate may not be a future date", Some(s"/periodStartDate")))
     }
     case req: BonusPaymentValidationRequest => req
   }
@@ -140,10 +140,40 @@ trait BonusPaymentValidator {
     }
     else {
       req.copy(errors = req.errors :+ ErrorValidation(
-        errorCode = dateErrorCode,
+        errorCode = DATE_ERROR,
         message = "The periodEndDate must be the 5th day of the month which occurs after the periodStartDate",
         path = Some(s"/periodEndDate")
       ))
+    }
+  }
+
+  private val periodStartDateIsNotBeforeFirstValidDate: (BonusPaymentValidationRequest) => BonusPaymentValidationRequest =
+    (req: BonusPaymentValidationRequest) => {
+
+    if (req.data.periodStartDate.isBefore(LISA_START_DATE)) {
+      req.copy(errors = req.errors :+ ErrorValidation(
+        errorCode = DATE_ERROR,
+        message = LISA_START_DATE_ERROR.format("periodStartDate"),
+        path = Some(s"/periodStartDate")
+      ))
+    }
+    else {
+      req
+    }
+  }
+
+  private val periodEndDateIsNotBeforeFirstValidDate: (BonusPaymentValidationRequest) => BonusPaymentValidationRequest =
+    (req: BonusPaymentValidationRequest) => {
+
+    if (req.data.periodEndDate.isBefore(LISA_START_DATE)) {
+      req.copy(errors = req.errors :+ ErrorValidation(
+        errorCode = DATE_ERROR,
+        message = LISA_START_DATE_ERROR.format("periodEndDate"),
+        path = Some(s"/periodEndDate")
+      ))
+    }
+    else {
+      req
     }
   }
 
@@ -155,8 +185,8 @@ trait BonusPaymentValidator {
 
     val errorMessage = "newSubsForPeriod and htbTransferInForPeriod cannot both be 0"
 
-    if (showSubError) newErrs += ErrorValidation(monetaryErrorCode, errorMessage, Some(s"$inboundPayments/newSubsForPeriod"))
-    if (showHtbError) newErrs += ErrorValidation(monetaryErrorCode, errorMessage, Some(s"$htbTransfer/htbTransferInForPeriod"))
+    if (showSubError) newErrs += ErrorValidation(MONETARY_ERROR, errorMessage, Some(s"$inboundPayments/newSubsForPeriod"))
+    if (showHtbError) newErrs += ErrorValidation(MONETARY_ERROR, errorMessage, Some(s"$htbTransfer/htbTransferInForPeriod"))
 
     newErrs
   }
