@@ -25,7 +25,7 @@ import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
-import uk.gov.hmrc.lisaapi.controllers.{BulkPaymentController, ErrorBadRequestStartEnd}
+import uk.gov.hmrc.lisaapi.controllers.{BulkPaymentController, ErrorBadRequestEnd, ErrorBadRequestStart, ErrorBadRequestStartEnd}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.BulkPaymentService
 
@@ -81,22 +81,22 @@ class BulkPaymentControllerSpec extends PlaySpec
 
         val json = contentAsJson(result)
 
-        (json \ "code").as[String] mustBe ErrorBadRequestStartEnd.errorCode
-        (json \ "message").as[String] mustBe ErrorBadRequestStartEnd.message
+        (json \ "code").as[String] mustBe ErrorBadRequestStart.errorCode
+        (json \ "message").as[String] mustBe ErrorBadRequestStart.message
       }
       "the endDate parameter is invalid" in {
-        val result = SUT.getBulkPayment(lmrn, invalidDate, validDate).
+        val result = SUT.getBulkPayment(lmrn, validDate, invalidDate).
           apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
 
         status(result) mustBe BAD_REQUEST
 
         val json = contentAsJson(result)
 
-        (json \ "code").as[String] mustBe ErrorBadRequestStartEnd.errorCode
-        (json \ "message").as[String] mustBe ErrorBadRequestStartEnd.message
+        (json \ "code").as[String] mustBe ErrorBadRequestEnd.errorCode
+        (json \ "message").as[String] mustBe ErrorBadRequestEnd.message
       }
       "the startDate and endDate parameters are invalid" in {
-        val result = SUT.getBulkPayment(lmrn, invalidDate, validDate).
+        val result = SUT.getBulkPayment(lmrn, invalidDate, invalidDate).
           apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
 
         status(result) mustBe BAD_REQUEST
@@ -106,6 +106,11 @@ class BulkPaymentControllerSpec extends PlaySpec
         (json \ "code").as[String] mustBe ErrorBadRequestStartEnd.errorCode
         (json \ "message").as[String] mustBe ErrorBadRequestStartEnd.message
       }
+      // TODO: add more error validation. error when:
+      // * end date is in the future
+      // * end date is before start date
+      // * start date is before 6 april 2017
+      // * there's more than a year between start date and end date
     }
 
     "return 404 PAYMENT_NOT_FOUND" when {

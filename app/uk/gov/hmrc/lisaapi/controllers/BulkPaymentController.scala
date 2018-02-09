@@ -56,6 +56,8 @@ class BulkPaymentController extends LisaController with LisaConstants {
 
     (start, end) match {
       case (Some(s), Some(e)) => success(s, e)
+      case (None, Some(_)) => Future.successful(BadRequest(Json.toJson(ErrorBadRequestStart)))
+      case (Some(_), None) => Future.successful(BadRequest(Json.toJson(ErrorBadRequestEnd)))
       case _ => Future.successful(BadRequest(Json.toJson(ErrorBadRequestStartEnd)))
     }
   }
