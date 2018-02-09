@@ -111,6 +111,8 @@ case object ErrorAccountAlreadyOpen extends ErrorResponse(403, "INVESTOR_ACCOUNT
 
 case object ErrorAccountNotFound extends ErrorResponse(404, "INVESTOR_ACCOUNTID_NOT_FOUND", "The accountId does not match HMRC’s records")
 
+case object ErrorPaymentNotFound extends ErrorResponse(404, "PAYMENT_NOT_FOUND", "No bonus payments have been made for this date range")
+
 case object ErrorTransferAccountDataNotProvided extends ErrorResponse(403, "TRANSFER_ACCOUNT_DATA_NOT_PROVIDED", "You must give a transferredFromAccountId, transferredFromLMRN and transferInDate when the creationReason is transferred")
 
 case object ErrorTransferAccountDataProvided extends ErrorResponse(403, "TRANSFER_ACCOUNT_DATA_PROVIDED", "You must only give a transferredFromAccountId, transferredFromLMRN, and transferInDate when the creationReason is transferred")
