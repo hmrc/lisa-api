@@ -23,6 +23,8 @@ import uk.gov.hmrc.lisaapi.models.des.DesResponse
 
 trait GetBulkPaymentResponse
 
+case object GetBulkPaymentNothingFoundResponse extends GetBulkPaymentResponse
+
 case class BulkPayment(paymentDate: DateTime,
                        paymentReference: String,
                        paymentAmount: Amount)
