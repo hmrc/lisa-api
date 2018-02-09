@@ -17,5 +17,4 @@ POST      /manager/:id/accounts/:accountId/transactions                         
 GET       /manager/:id/accounts/:accountId/transactions/:transactionId              @uk.gov.hmrc.lisaapi.controllers.BonusPaymentController.getBonusPayment(id: String, accountId: String, transactionId: String)
 GET       /manager/:id/accounts/:accountId/transactions/:transactionId/payments     @uk.gov.hmrc.lisaapi.controllers.TransactionController.getTransaction(id: String, accountId: String, transactionId: String)
 POST      /manager/:id/accounts/:accountId/update-subscription                      @uk.gov.hmrc.lisaapi.controllers.UpdateSubscriptionController.updateSubscription(id: String, accountId: String)
-
-
+GET       /manager/:id/payments                                                     @uk.gov.hmrc.lisaapi.controllers.BulkPaymentController.getBulkPayment(id: String, startDate: String, endDate: String)
