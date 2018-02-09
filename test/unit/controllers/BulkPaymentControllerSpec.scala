@@ -107,6 +107,18 @@ class BulkPaymentControllerSpec extends PlaySpec
         (json \ "message").as[String] mustBe ErrorBadRequestStartEnd.message
       }
       // TODO: add more error validation. error when:
+      "the endDate parameter is in the future" in {
+        val futureDate = DateTime.now().plusDays(1).toString("yyyy-MM-dd")
+        val result = SUT.getBulkPayment(lmrn, validDate, futureDate).
+          apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
+
+        status(result) mustBe BAD_REQUEST
+
+        val json = contentAsJson(result)
+
+        (json \ "code").as[String] mustBe ErrorBadRequestEndInFuture.errorCode
+        (json \ "message").as[String] mustBe ErrorBadRequestEndInFuture.message
+      }
       // * end date is in the future
       // * end date is before start date
       // * start date is before 6 april 2017

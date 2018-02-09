@@ -55,11 +55,50 @@ class BulkPaymentController extends LisaController with LisaConstants {
     val end = parseDate(endDate)
 
     (start, end) match {
-      case (Some(s), Some(e)) => success(s, e)
+      case (Some(s), Some(e)) => {
+        withDatesWithinBusinessRules(s, e) { () =>
+          success(s, e)
+        }
+      }
       case (None, Some(_)) => Future.successful(BadRequest(Json.toJson(ErrorBadRequestStart)))
       case (Some(_), None) => Future.successful(BadRequest(Json.toJson(ErrorBadRequestEnd)))
       case _ => Future.successful(BadRequest(Json.toJson(ErrorBadRequestStartEnd)))
     }
+  }
+
+  private def withDatesWithinBusinessRules(startDate: DateTime, endDate: DateTime)
+                                          (success: () => Future[Result]): Future[Result] = {
+
+    // TODO: add more error validation. error when:
+
+    // end date is in the future
+    if (endDate.isAfterNow()) {
+      // error
+      Future.successful(BadRequest(Json.toJson(ErrorBadRequestEndInFuture)))
+    }
+
+    // end date is before start date
+    else if (endDate.isBefore(startDate)) {
+      // error
+      Future.successful(BadRequest(Json.toJson(ErrorGenericBadRequest)))
+    }
+
+    // start date is before 6 april 2017
+    else if (startDate.isBefore(LISA_START_DATE)) {
+      // error
+      Future.successful(BadRequest(Json.toJson(ErrorGenericBadRequest)))
+    }
+
+    // there's more than a year between start date and end date
+    else if (endDate.isAfter(startDate.plusYears(1))) {
+      // error
+      Future.successful(BadRequest(Json.toJson(ErrorGenericBadRequest)))
+    }
+
+    else {
+      success()
+    }
+
   }
 
   private def parseDate(input: String): Option[DateTime] = {
