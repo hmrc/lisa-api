@@ -23,7 +23,8 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
-import uk.gov.hmrc.lisaapi.models.{GetBulkPaymentNothingFoundResponse, GetBulkPaymentResponse, GetBulkPaymentSuccessResponse}
+import uk.gov.hmrc.lisaapi.models.des.DesFailureResponse
+import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.BulkPaymentService
 
 import scala.concurrent.{Await, Future}
@@ -35,13 +36,63 @@ class BulkPaymentServiceSpec extends PlaySpec
 
   "Get Bulk Payment" must {
 
+    "return payments" when {
+      "the connector passes a success message with some payments" in {
+        val successResponse = GetBulkPaymentSuccessResponse(lmrn, List(
+          BulkPayment(date, "12345", 950.25)
+        ))
+
+        when(mockDesConnector.getBulkPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(successResponse))
+
+        doRequest{ response =>
+          response mustBe successResponse
+        }
+      }
+    }
+
     "return payment not found" when {
       "the connector passes a success message with no payments" in {
         when(mockDesConnector.getBulkPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(GetBulkPaymentSuccessResponse(lmrn, Nil)))
 
         doRequest{ response =>
-          response mustBe GetBulkPaymentNothingFoundResponse
+          response mustBe GetBulkPaymentNotFoundResponse
+        }
+      }
+      "the connector returns a NOT_FOUND error" in {
+        when(mockDesConnector.getBulkPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(DesFailureResponse("NOT_FOUND", "not found")))
+
+        doRequest{ response =>
+          response mustBe GetBulkPaymentNotFoundResponse
+        }
+      }
+      "the connector returns a INVALID_CALCULATEACCRUEDINTEREST error" in {
+        when(mockDesConnector.getBulkPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(DesFailureResponse("INVALID_CALCULATEACCRUEDINTEREST", "not found")))
+
+        doRequest{ response =>
+          response mustBe GetBulkPaymentNotFoundResponse
+        }
+      }
+      "the connector returns a INVALID_CUSTOMERPAYMENTINFORMATION error" in {
+        when(mockDesConnector.getBulkPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(DesFailureResponse("INVALID_CUSTOMERPAYMENTINFORMATION", "not found")))
+
+        doRequest{ response =>
+          response mustBe GetBulkPaymentNotFoundResponse
+        }
+      }
+    }
+
+    "return error" when {
+      "the connector returns any other error" in {
+        when(mockDesConnector.getBulkPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(DesFailureResponse("code", "reason")))
+
+        doRequest{ response =>
+          response mustBe GetBulkPaymentErrorResponse
         }
       }
     }

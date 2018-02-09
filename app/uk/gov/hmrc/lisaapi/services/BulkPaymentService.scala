@@ -19,7 +19,8 @@ package uk.gov.hmrc.lisaapi.services
 import org.joda.time.DateTime
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
-import uk.gov.hmrc.lisaapi.models.{GetBulkPaymentNothingFoundResponse, GetBulkPaymentResponse, GetBulkPaymentSuccessResponse}
+import uk.gov.hmrc.lisaapi.models.des.DesFailureResponse
+import uk.gov.hmrc.lisaapi.models.{GetBulkPaymentErrorResponse, GetBulkPaymentNotFoundResponse, GetBulkPaymentResponse, GetBulkPaymentSuccessResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -32,7 +33,16 @@ trait BulkPaymentService {
     val response = desConnector.getBulkPayment(lisaManager, startDate, endDate)
 
     response map {
-      case _ => GetBulkPaymentNothingFoundResponse
+      case s: GetBulkPaymentSuccessResponse if s.payments.isEmpty => GetBulkPaymentNotFoundResponse
+      case s: GetBulkPaymentSuccessResponse => s
+      case f: DesFailureResponse => {
+        f.code match {
+          case "NOT_FOUND" |
+               "INVALID_CALCULATEACCRUEDINTEREST" |
+               "INVALID_CUSTOMERPAYMENTINFORMATION" => GetBulkPaymentNotFoundResponse
+          case _ => GetBulkPaymentErrorResponse
+        }
+      }
     }
   }
 
