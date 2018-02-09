@@ -41,7 +41,11 @@ object GetBulkPaymentResponse {
     (JsPath \ "paymentAmount").read[Amount]
   )(BulkPayment.apply _)
 
-  implicit val bpWrites = Json.writes[BulkPayment]
+  implicit val bpWrites: Writes[BulkPayment] = (
+    (JsPath \ "paymentDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
+    (JsPath \ "paymentReference").write[String] and
+    (JsPath \ "paymentAmount").write[Amount]
+  )(unlift(BulkPayment.unapply))
 
   implicit val successReads: Reads[GetBulkPaymentSuccessResponse] = (
     (JsPath \ "idNumber").read(JsonReads.lmrn) and
@@ -58,4 +62,5 @@ object GetBulkPaymentResponse {
   )
 
   implicit val successWrites: Writes[GetBulkPaymentSuccessResponse] = Json.writes[GetBulkPaymentSuccessResponse]
+
 }

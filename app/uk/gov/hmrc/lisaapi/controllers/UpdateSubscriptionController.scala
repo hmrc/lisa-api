@@ -38,8 +38,8 @@ class UpdateSubscriptionController extends LisaController with LisaConstants {
   def updateSubscription (lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
     implicit val startTime: Long = System.currentTimeMillis()
     LisaMetrics.startMetrics(startTime, LisaMetricKeys.UPDATE_SUBSCRIPTION)
-    withValidLMRN(lisaManager) {
-      withValidAccountId(accountId) {
+    withValidLMRN(lisaManager) { () =>
+      withValidAccountId(accountId) { () =>
         withValidJson[UpdateSubscriptionRequest]( updateSubsRequest => {
           withValidDates(lisaManager, accountId, updateSubsRequest, request.uri) { () =>
             service.updateSubscription(lisaManager, accountId, updateSubsRequest) map { result =>

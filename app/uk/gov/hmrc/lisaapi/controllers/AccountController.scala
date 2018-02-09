@@ -42,7 +42,7 @@ class AccountController extends LisaController with LisaConstants {
       implicit val startTime: Long = System.currentTimeMillis()
       LisaMetrics.startMetrics(startTime,LisaMetricKeys.ACCOUNT)
 
-      withValidLMRN(lisaManager) {
+      withValidLMRN(lisaManager) { () =>
         withValidJson[CreateLisaAccountRequest](
           {
             case createRequest: CreateLisaAccountCreationRequest =>
@@ -267,8 +267,8 @@ class AccountController extends LisaController with LisaConstants {
     def getAccountDetails(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
       LisaMetrics.startMetrics(startTime, LisaMetricKeys.ACCOUNT)
-      withValidLMRN(lisaManager) {
-        withValidAccountId(accountId) {
+      withValidLMRN(lisaManager) { () =>
+        withValidAccountId(accountId) { () =>
           processGetAccountDetails(lisaManager, accountId)
         }
       }
@@ -297,7 +297,7 @@ class AccountController extends LisaController with LisaConstants {
   //region Close Account
 
     def closeLisaAccount(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
-      withValidLMRN(lisaManager) {
+      withValidLMRN(lisaManager) { () =>
         withValidJson[CloseLisaAccountRequest]( closeRequest =>
           {
               implicit val startTime: Long = System.currentTimeMillis()

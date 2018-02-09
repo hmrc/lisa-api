@@ -41,9 +41,9 @@ trait LisaController extends BaseController with HeaderValidator with RunMode wi
   val authConnector: LisaAuthConnector = LisaAuthConnector
   lazy val errorConverter: ErrorConverter = ErrorConverter
 
-  protected def withValidLMRN(lisaManager: String)(success: Future[Result])(implicit request: Request[AnyContent]): Future[Result] = {
+  protected def withValidLMRN(lisaManager: String)(success: () => Future[Result])(implicit request: Request[AnyContent]): Future[Result] = {
     if (lisaManager.matches("^Z([0-9]{4}|[0-9]{6})$")) {
-      success
+      success()
     }
     else {
       LisaMetrics.incrementMetrics(System.currentTimeMillis,LisaMetricKeys.getErrorKey(BAD_REQUEST,request.uri))
@@ -51,9 +51,9 @@ trait LisaController extends BaseController with HeaderValidator with RunMode wi
     }
   }
 
-  protected def withValidAccountId(accountId: String)(success: Future[Result])(implicit request: Request[AnyContent]): Future[Result] = {
+  protected def withValidAccountId(accountId: String)(success: () => Future[Result])(implicit request: Request[AnyContent]): Future[Result] = {
     if (accountId.matches("^[a-zA-Z0-9 :/-]{1,20}$")) {
-      success
+      success()
     }
     else {
       LisaMetrics.incrementMetrics(System.currentTimeMillis,LisaMetricKeys.getErrorKey(NOT_FOUND,request.uri))

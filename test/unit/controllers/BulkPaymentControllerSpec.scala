@@ -16,17 +16,18 @@
 
 package unit.controllers
 
+import org.joda.time.DateTime
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.test.{FakeRequest, Helpers}
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
-import uk.gov.hmrc.lisaapi.controllers.BulkPaymentController
-import uk.gov.hmrc.lisaapi.models.GetBulkPaymentNotFoundResponse
-import uk.gov.hmrc.lisaapi.services.{AuditService, BulkPaymentService}
+import uk.gov.hmrc.lisaapi.controllers.{BulkPaymentController, ErrorBadRequestStartEnd}
+import uk.gov.hmrc.lisaapi.models._
+import uk.gov.hmrc.lisaapi.services.BulkPaymentService
 
 import scala.concurrent.Future
 
@@ -35,14 +36,84 @@ class BulkPaymentControllerSpec extends PlaySpec
   with OneAppPerSuite {
 
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
+  val validDate = "2018-01-01"
+  val invalidDate = "01-01-2018"
+  val lmrn = "Z123456"
 
   "Get Bulk Payment" must {
-    "return not found" when {
+
+    "return 200 success" when {
+      "the service returns a GetBulkPaymentSuccessResponse" in {
+        when(mockService.getBulkPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(successResponse))
+
+        val result = SUT.getBulkPayment(lmrn, validDate, validDate).
+          apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
+
+        status(result) mustBe OK
+
+        val json = contentAsJson(result)
+
+        (json \ "lisaManagerReferenceNumber").as[String] mustBe lmrn
+        (json \ "payments" \ 0 \ "paymentAmount").as[Amount] mustBe successResponse.payments(0).paymentAmount
+        (json \ "payments" \ 0 \ "paymentDate").as[String] mustBe successResponse.payments(0).paymentDate.toString("yyyy-MM-dd")
+        (json \ "payments" \ 0 \ "paymentReference").as[String] mustBe successResponse.payments(0).paymentReference
+      }
+    }
+
+    "return 400 BAD_REQUEST" when {
+      "the lisa manager reference number is invalid" in {
+        val result = SUT.getBulkPayment("Z1234567", validDate, validDate).
+          apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
+
+        status(result) mustBe BAD_REQUEST
+
+        val json = contentAsJson(result)
+
+        (json \ "code").as[String] mustBe "BAD_REQUEST"
+        (json \ "message").as[String] mustBe "lisaManagerReferenceNumber in the URL is in the wrong format"
+      }
+      "the startDate parameter is invalid" in {
+        val result = SUT.getBulkPayment(lmrn, invalidDate, validDate).
+          apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
+
+        status(result) mustBe BAD_REQUEST
+
+        val json = contentAsJson(result)
+
+        (json \ "code").as[String] mustBe ErrorBadRequestStartEnd.errorCode
+        (json \ "message").as[String] mustBe ErrorBadRequestStartEnd.message
+      }
+      "the endDate parameter is invalid" in {
+        val result = SUT.getBulkPayment(lmrn, invalidDate, validDate).
+          apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
+
+        status(result) mustBe BAD_REQUEST
+
+        val json = contentAsJson(result)
+
+        (json \ "code").as[String] mustBe ErrorBadRequestStartEnd.errorCode
+        (json \ "message").as[String] mustBe ErrorBadRequestStartEnd.message
+      }
+      "the startDate and endDate parameters are invalid" in {
+        val result = SUT.getBulkPayment(lmrn, invalidDate, validDate).
+          apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
+
+        status(result) mustBe BAD_REQUEST
+
+        val json = contentAsJson(result)
+
+        (json \ "code").as[String] mustBe ErrorBadRequestStartEnd.errorCode
+        (json \ "message").as[String] mustBe ErrorBadRequestStartEnd.message
+      }
+    }
+
+    "return 404 PAYMENT_NOT_FOUND" when {
       "the service returns a GetBulkPaymentNotFoundResponse" in {
         when(mockService.getBulkPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(GetBulkPaymentNotFoundResponse))
 
-        val result = SUT.getBulkPayment("Z123456", "2018-01-01", "2018-01-01").
+        val result = SUT.getBulkPayment(lmrn, validDate, validDate).
           apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
 
         status(result) mustBe NOT_FOUND
@@ -53,10 +124,33 @@ class BulkPaymentControllerSpec extends PlaySpec
         (json \ "message").as[String] mustBe "No bonus payments have been made for this date range"
       }
     }
+
+    "return 500 INTERNAL_SERVER_ERROR" when {
+      "the service return a GetBulkPaymentErrorResponse" in {
+        when(mockService.getBulkPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(GetBulkPaymentErrorResponse))
+
+        val result = SUT.getBulkPayment(lmrn, validDate, validDate).
+          apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
+
+        status(result) mustBe INTERNAL_SERVER_ERROR
+
+        val json = contentAsJson(result)
+
+        (json \ "code").as[String] mustBe "INTERNAL_SERVER_ERROR"
+        (json \ "message").as[String] mustBe "Internal server error"
+      }
+    }
+
   }
 
+  val successResponse: GetBulkPaymentSuccessResponse = GetBulkPaymentSuccessResponse(
+    lmrn,
+    List(BulkPayment(new DateTime("2018-01-01"), "123", 75.15))
+  )
   val mockService: BulkPaymentService = mock[BulkPaymentService]
-  val mockAuthCon :LisaAuthConnector = mock[LisaAuthConnector]
+  val mockAuthCon: LisaAuthConnector = mock[LisaAuthConnector]
+
   val SUT = new BulkPaymentController {
     override val service: BulkPaymentService = mockService
     override val authConnector = mockAuthCon

@@ -25,7 +25,7 @@ class DiscoverController extends LisaController {
 
 
   def discover(lisaManagerReferenceNumber: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
-    withValidLMRN(lisaManagerReferenceNumber) {
+    withValidLMRN(lisaManagerReferenceNumber) { () =>
 //      To be used when all the get endpoints is made visible to the customer
 //      val result = s"""{
 //        "lisaManagerReferenceNumber" : "${lisaManagerReferenceNumber}",
