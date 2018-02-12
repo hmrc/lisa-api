@@ -66,10 +66,15 @@ case class ErrorForbidden(errs: List[ErrorValidation]) extends ErrorResponseWith
 
 case object ErrorBadRequestLmrn extends ErrorResponse(400, "BAD_REQUEST", "lisaManagerReferenceNumber in the URL is in the wrong format")
 
+// specific errors for bulk payment url validation
 case object ErrorBadRequestStart extends ErrorResponse(400, "BAD_REQUEST", "startDate in the URL is in the wrong format")
 case object ErrorBadRequestEnd extends ErrorResponse(400, "BAD_REQUEST", "endDate in the URL is in the wrong format")
 case object ErrorBadRequestStartEnd extends ErrorResponse(400, "BAD_REQUEST", "startDate and endDate in the URL are in the wrong format")
-case object ErrorBadRequestEndInFuture extends ErrorResponse(400, "BAD_REQUEST", "endDate cannot be in the future")
+case object ErrorBadRequestEndInFuture extends ErrorResponse(400, "BAD_REQUEST", "endDate in the URL cannot be in the future")
+case object ErrorBadRequestEndBeforeStart extends ErrorResponse(400, "BAD_REQUEST", "endDate cannot be before startDate in the URL")
+case object ErrorBadRequestStartBefore6April2017 extends ErrorResponse(400, "BAD_REQUEST", "startDate in the URL cannot be before 6 April 2017")
+case object ErrorBadRequestOverYearBetweenStartAndEnd extends ErrorResponse(400, "BAD_REQUEST", "There cannot be more than a year between startDate and endDate in the URL")
+// end
 
 case object ErrorNotImplemented extends ErrorResponse(501, "NOT_IMPLEMENTED", "Not implemented")
 

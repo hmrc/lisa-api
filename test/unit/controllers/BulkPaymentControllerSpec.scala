@@ -19,26 +19,34 @@ package unit.controllers
 import org.joda.time.DateTime
 import org.mockito.Matchers._
 import org.mockito.Mockito._
+import org.scalatest.BeforeAndAfter
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
-import uk.gov.hmrc.lisaapi.controllers.{BulkPaymentController, ErrorBadRequestEnd, ErrorBadRequestEndInFuture, ErrorBadRequestStart, ErrorBadRequestStartEnd}
+import uk.gov.hmrc.lisaapi.controllers.{BulkPaymentController, ErrorBadRequestEnd, ErrorBadRequestEndBeforeStart, ErrorBadRequestEndInFuture, ErrorBadRequestOverYearBetweenStartAndEnd, ErrorBadRequestStart, ErrorBadRequestStartBefore6April2017, ErrorBadRequestStartEnd}
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.services.BulkPaymentService
+import uk.gov.hmrc.lisaapi.services.{BulkPaymentService, CurrentDateService}
 
 import scala.concurrent.Future
 
 class BulkPaymentControllerSpec extends PlaySpec
   with MockitoSugar
-  with OneAppPerSuite {
+  with OneAppPerSuite
+  with BeforeAndAfter {
 
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
+  val currentDate = new DateTime("2020-01-01")
   val validDate = "2018-01-01"
   val invalidDate = "01-01-2018"
   val lmrn = "Z123456"
+
+  before {
+    when(mockCurrentDateService.now()).
+      thenReturn(currentDate)
+  }
 
   "Get Bulk Payment" must {
 
@@ -47,7 +55,8 @@ class BulkPaymentControllerSpec extends PlaySpec
         when(mockService.getBulkPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(successResponse))
 
-        val result = SUT.getBulkPayment(lmrn, validDate, validDate).
+        val oneYearInFuture = new DateTime(validDate).plusYears(1).toString("yyyy-MM-dd")
+        val result = SUT.getBulkPayment(lmrn, validDate, oneYearInFuture).
           apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
 
         status(result) mustBe OK
@@ -106,9 +115,8 @@ class BulkPaymentControllerSpec extends PlaySpec
         (json \ "code").as[String] mustBe ErrorBadRequestStartEnd.errorCode
         (json \ "message").as[String] mustBe ErrorBadRequestStartEnd.message
       }
-      // TODO: add more error validation. error when:
       "the endDate parameter is in the future" in {
-        val futureDate = DateTime.now().plusDays(1).toString("yyyy-MM-dd")
+        val futureDate = currentDate.plusDays(1).toString("yyyy-MM-dd")
         val result = SUT.getBulkPayment(lmrn, validDate, futureDate).
           apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
 
@@ -119,10 +127,41 @@ class BulkPaymentControllerSpec extends PlaySpec
         (json \ "code").as[String] mustBe ErrorBadRequestEndInFuture.errorCode
         (json \ "message").as[String] mustBe ErrorBadRequestEndInFuture.message
       }
-      // * end date is in the future
-      // * end date is before start date
-      // * start date is before 6 april 2017
-      // * there's more than a year between start date and end date
+      "the endDate is before the startDate" in {
+        val beforeDate = new DateTime(validDate).minusDays(1).toString("yyyy-MM-dd")
+        val result = SUT.getBulkPayment(lmrn, validDate, beforeDate).
+          apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
+
+        status(result) mustBe BAD_REQUEST
+
+        val json = contentAsJson(result)
+
+        (json \ "code").as[String] mustBe ErrorBadRequestEndBeforeStart.errorCode
+        (json \ "message").as[String] mustBe ErrorBadRequestEndBeforeStart.message
+      }
+      "the startDate is before 6 April 2017" in {
+        val result = SUT.getBulkPayment(lmrn, "2017-04-05", validDate).
+          apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
+
+        status(result) mustBe BAD_REQUEST
+
+        val json = contentAsJson(result)
+
+        (json \ "code").as[String] mustBe ErrorBadRequestStartBefore6April2017.errorCode
+        (json \ "message").as[String] mustBe ErrorBadRequestStartBefore6April2017.message
+      }
+      "there's more than a year between startDate and endDate" in {
+        val futureDate = new DateTime(validDate).plusYears(1).plusDays(1).toString("yyyy-MM-dd")
+        val result = SUT.getBulkPayment(lmrn, validDate, futureDate).
+          apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
+
+        status(result) mustBe BAD_REQUEST
+
+        val json = contentAsJson(result)
+
+        (json \ "code").as[String] mustBe ErrorBadRequestOverYearBetweenStartAndEnd.errorCode
+        (json \ "message").as[String] mustBe ErrorBadRequestOverYearBetweenStartAndEnd.message
+      }
     }
 
     "return 404 PAYMENT_NOT_FOUND" when {
@@ -167,10 +206,12 @@ class BulkPaymentControllerSpec extends PlaySpec
   )
   val mockService: BulkPaymentService = mock[BulkPaymentService]
   val mockAuthCon: LisaAuthConnector = mock[LisaAuthConnector]
+  val mockCurrentDateService: CurrentDateService = mock[CurrentDateService]
 
   val SUT = new BulkPaymentController {
     override val service: BulkPaymentService = mockService
     override val authConnector = mockAuthCon
+    override val currentDateService = mockCurrentDateService
   }
 
 }

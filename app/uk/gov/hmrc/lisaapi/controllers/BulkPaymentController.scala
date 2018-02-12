@@ -23,13 +23,14 @@ import play.api.mvc.{Action, AnyContent, Result}
 import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models.{GetBulkPaymentNotFoundResponse, GetBulkPaymentSuccessResponse}
-import uk.gov.hmrc.lisaapi.services.BulkPaymentService
+import uk.gov.hmrc.lisaapi.services.{BulkPaymentService, CurrentDateService}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class BulkPaymentController extends LisaController with LisaConstants {
 
+  val currentDateService: CurrentDateService = CurrentDateService
   val service: BulkPaymentService = BulkPaymentService
 
   def getBulkPayment(lisaManager: String, start: String, end: String): Action[AnyContent] =
@@ -69,30 +70,24 @@ class BulkPaymentController extends LisaController with LisaConstants {
   private def withDatesWithinBusinessRules(startDate: DateTime, endDate: DateTime)
                                           (success: () => Future[Result]): Future[Result] = {
 
-    // TODO: add more error validation. error when:
-
     // end date is in the future
-    if (endDate.isAfterNow()) {
-      // error
+    if (endDate.isAfter(currentDateService.now())) {
       Future.successful(BadRequest(Json.toJson(ErrorBadRequestEndInFuture)))
     }
 
     // end date is before start date
     else if (endDate.isBefore(startDate)) {
-      // error
-      Future.successful(BadRequest(Json.toJson(ErrorGenericBadRequest)))
+      Future.successful(BadRequest(Json.toJson(ErrorBadRequestEndBeforeStart)))
     }
 
     // start date is before 6 april 2017
     else if (startDate.isBefore(LISA_START_DATE)) {
-      // error
-      Future.successful(BadRequest(Json.toJson(ErrorGenericBadRequest)))
+      Future.successful(BadRequest(Json.toJson(ErrorBadRequestStartBefore6April2017)))
     }
 
     // there's more than a year between start date and end date
     else if (endDate.isAfter(startDate.plusYears(1))) {
-      // error
-      Future.successful(BadRequest(Json.toJson(ErrorGenericBadRequest)))
+      Future.successful(BadRequest(Json.toJson(ErrorBadRequestOverYearBetweenStartAndEnd)))
     }
 
     else {
