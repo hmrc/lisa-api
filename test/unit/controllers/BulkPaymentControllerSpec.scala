@@ -82,7 +82,7 @@ class BulkPaymentControllerSpec extends PlaySpec
         (json \ "code").as[String] mustBe "BAD_REQUEST"
         (json \ "message").as[String] mustBe "lisaManagerReferenceNumber in the URL is in the wrong format"
       }
-      "the startDate parameter is invalid" in {
+      "the startDate parameter is in the wrong format" in {
         val result = SUT.getBulkPayment(lmrn, invalidDate, validDate).
           apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
 
@@ -93,7 +93,7 @@ class BulkPaymentControllerSpec extends PlaySpec
         (json \ "code").as[String] mustBe ErrorBadRequestStart.errorCode
         (json \ "message").as[String] mustBe ErrorBadRequestStart.message
       }
-      "the endDate parameter is invalid" in {
+      "the endDate parameter is in the wrong format" in {
         val result = SUT.getBulkPayment(lmrn, validDate, invalidDate).
           apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
 
@@ -115,12 +115,15 @@ class BulkPaymentControllerSpec extends PlaySpec
         (json \ "code").as[String] mustBe ErrorBadRequestStartEnd.errorCode
         (json \ "message").as[String] mustBe ErrorBadRequestStartEnd.message
       }
+    }
+
+    "return 403 FORBIDDEN" when {
       "the endDate parameter is in the future" in {
         val futureDate = currentDate.plusDays(1).toString("yyyy-MM-dd")
         val result = SUT.getBulkPayment(lmrn, validDate, futureDate).
           apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
 
-        status(result) mustBe BAD_REQUEST
+        status(result) mustBe FORBIDDEN
 
         val json = contentAsJson(result)
 
@@ -132,7 +135,7 @@ class BulkPaymentControllerSpec extends PlaySpec
         val result = SUT.getBulkPayment(lmrn, validDate, beforeDate).
           apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
 
-        status(result) mustBe BAD_REQUEST
+        status(result) mustBe FORBIDDEN
 
         val json = contentAsJson(result)
 
@@ -143,7 +146,7 @@ class BulkPaymentControllerSpec extends PlaySpec
         val result = SUT.getBulkPayment(lmrn, "2017-04-05", validDate).
           apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
 
-        status(result) mustBe BAD_REQUEST
+        status(result) mustBe FORBIDDEN
 
         val json = contentAsJson(result)
 
@@ -155,7 +158,7 @@ class BulkPaymentControllerSpec extends PlaySpec
         val result = SUT.getBulkPayment(lmrn, validDate, futureDate).
           apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
 
-        status(result) mustBe BAD_REQUEST
+        status(result) mustBe FORBIDDEN
 
         val json = contentAsJson(result)
 

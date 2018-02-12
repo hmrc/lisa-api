@@ -72,22 +72,22 @@ class BulkPaymentController extends LisaController with LisaConstants {
 
     // end date is in the future
     if (endDate.isAfter(currentDateService.now())) {
-      Future.successful(BadRequest(Json.toJson(ErrorBadRequestEndInFuture)))
+      Future.successful(Forbidden(Json.toJson(ErrorBadRequestEndInFuture)))
     }
 
     // end date is before start date
     else if (endDate.isBefore(startDate)) {
-      Future.successful(BadRequest(Json.toJson(ErrorBadRequestEndBeforeStart)))
+      Future.successful(Forbidden(Json.toJson(ErrorBadRequestEndBeforeStart)))
     }
 
     // start date is before 6 april 2017
     else if (startDate.isBefore(LISA_START_DATE)) {
-      Future.successful(BadRequest(Json.toJson(ErrorBadRequestStartBefore6April2017)))
+      Future.successful(Forbidden(Json.toJson(ErrorBadRequestStartBefore6April2017)))
     }
 
     // there's more than a year between start date and end date
     else if (endDate.isAfter(startDate.plusYears(1))) {
-      Future.successful(BadRequest(Json.toJson(ErrorBadRequestOverYearBetweenStartAndEnd)))
+      Future.successful(Forbidden(Json.toJson(ErrorBadRequestOverYearBetweenStartAndEnd)))
     }
 
     else {
