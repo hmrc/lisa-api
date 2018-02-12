@@ -1114,6 +1114,11 @@ class DesConnectorSpec extends PlaySpec
                                         |            "clearingDate": "2017-06-02",
                                         |            "paymentReference": "1357",
                                         |            "paymentAmount": "2050.40"
+                                        |          },
+                                        |          {
+                                        |            "clearingDate": "2017-06-03",
+                                        |            "paymentReference": "1468",
+                                        |            "paymentAmount": "2050.40"
                                         |          }
                                         |        ]
                                         |      },
@@ -1137,7 +1142,56 @@ class DesConnectorSpec extends PlaySpec
           response mustBe GetBulkPaymentSuccessResponse(
             lisaManagerReferenceNumber = "Z5555",
             payments = List(
-              BulkPayment(paymentDate = new DateTime("2017-06-02"), paymentReference = "1357", paymentAmount = 2050.4)
+              BulkPayment(paymentDate = new DateTime("2017-06-02"), paymentReference = "1357", paymentAmount = 2050.4),
+              BulkPayment(paymentDate = new DateTime("2017-06-03"), paymentReference = "1468", paymentAmount = 2050.4)
+            )
+          )
+        }
+      }
+      "the DES response has some partially complete payment details" in {
+        val responseJson = Json.parse("""{
+                                        |    "idNumber": "Z5555",
+                                        |    "financialTransactions": [
+                                        |      {
+                                        |        "items": [
+                                        |          {
+                                        |            "clearingDate": "2017-06-02",
+                                        |            "paymentReference": "1357",
+                                        |            "paymentAmount": "2050.40"
+                                        |          },
+                                        |          {
+                                        |            "clearingDate": "2017-06-03",
+                                        |            "paymentReference": "1468",
+                                        |            "paymentAmount": "2050.40"
+                                        |          }
+                                        |        ]
+                                        |      },
+                                        |      {
+                                        |        "items": [
+                                        |          {
+                                        |            "clearingDate": "2017-06-02"
+                                        |          }
+                                        |        ]
+                                        |      }
+                                        |    ]
+                                        |}""".stripMargin)
+
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = OK,
+                responseJson = Some(responseJson)
+              )
+            )
+          )
+
+        doRetrieveBulkPaymentRequest { response =>
+          response mustBe GetBulkPaymentSuccessResponse(
+            lisaManagerReferenceNumber = "Z5555",
+            payments = List(
+              BulkPayment(paymentDate = new DateTime("2017-06-02"), paymentReference = "1357", paymentAmount = 2050.4),
+              BulkPayment(paymentDate = new DateTime("2017-06-03"), paymentReference = "1468", paymentAmount = 2050.4)
             )
           )
         }

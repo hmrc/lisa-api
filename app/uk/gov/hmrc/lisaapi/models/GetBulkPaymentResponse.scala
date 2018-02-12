@@ -56,7 +56,12 @@ object GetBulkPaymentResponse {
         lmrn,
         transactions.
           flatMap(transaction =>
-            (transaction \ "items").as[List[BulkPayment]]
+            (transaction \ "items").
+              as[List[JsValue]].map(ob =>
+                ob.asOpt[BulkPayment]
+              ).
+              filter(_.isDefined).
+              map(_.get)
           )
       )
   )
