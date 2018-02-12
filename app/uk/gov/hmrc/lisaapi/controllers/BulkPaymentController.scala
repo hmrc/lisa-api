@@ -43,9 +43,18 @@ class BulkPaymentController extends LisaController with LisaConstants {
             val response = service.getBulkPayment(lisaManager, start, end)
 
             response map {
-              case s: GetBulkPaymentSuccessResponse => Ok(Json.toJson(s))
-              case GetBulkPaymentNotFoundResponse => NotFound(Json.toJson(ErrorPaymentNotFound))
-              case _ => InternalServerError(Json.toJson(ErrorInternalServerError))
+              case s: GetBulkPaymentSuccessResponse => {
+                LisaMetrics.incrementMetrics(System.currentTimeMillis(), LisaMetricKeys.TRANSACTION)
+                Ok(Json.toJson(s))
+              }
+              case GetBulkPaymentNotFoundResponse => {
+                LisaMetrics.incrementMetrics(System.currentTimeMillis(), LisaMetricKeys.lisaError(NOT_FOUND, LisaMetricKeys.TRANSACTION))
+                NotFound(Json.toJson(ErrorPaymentNotFound))
+              }
+              case _ => {
+                LisaMetrics.incrementMetrics(System.currentTimeMillis(), LisaMetricKeys.lisaError(INTERNAL_SERVER_ERROR, LisaMetricKeys.TRANSACTION))
+                InternalServerError(Json.toJson(ErrorInternalServerError))
+              }
             }
           }
         }
