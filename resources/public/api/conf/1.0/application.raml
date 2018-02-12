@@ -785,7 +785,7 @@ types:
               get:
                   is: [headers.acceptHeader]
                   displayName: Retrieve payment details
-                  description: This allows a LISA provider to retrieve payments done by HMRC in a specific date range.
+                  description: This allows a LISA provider to retrieve payments made by HMRC in a specific date range.
                   (annotations.scope): "read:lisa"
                   securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
                   responses:
@@ -813,6 +813,27 @@ types:
                                     "code" : "BAD_REQUEST",
                                     "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
                                   }
+                              InvalidStartDate:
+                                description: startDate is in the wrong format
+                                value: |
+                                  {
+                                    "code" : "BAD_REQUEST",
+                                    "message" : "startDate is in the wrong format"
+                                  }
+                              InvalidEndDate:
+                                description: endDate is in the wrong format
+                                value: |
+                                  {
+                                    "code" : "BAD_REQUEST",
+                                    "message" : "endDate is in the wrong format"
+                                  }
+                              InvalidStartAndEndDates:
+                                description: startDate and endDate are in the wrong format
+                                value: |
+                                  {
+                                    "code" : "BAD_REQUEST",
+                                    "message" : "startDate and endDate are in the wrong format"
+                                  }
                       401:
                         body:
                           application/json:
@@ -824,6 +845,38 @@ types:
                                   {
                                     "code" : "UNAUTHORIZED",
                                     "message" : "lisaManagerReferenceNumber is not authorised"
+                                  }
+                      403:
+                        body:
+                          application/json:
+                            examples:
+                              endDateInFutureStatus:
+                                description: endDate cannot be in the future
+                                value: |
+                                  {
+                                    "code" : "FORBIDDEN",
+                                    "message" : "endDate cannot be in the future"
+                                  }
+                              endDateBeforeStartStatus:
+                                description: endDate cannot be before startDate
+                                value: |
+                                  {
+                                    "code" : "FORBIDDEN",
+                                    "message" : "endDate cannot be before startDate"
+                                  }
+                              startDateBeforeAprilStatus:
+                                description: startDate cannot be before 6 April 2017
+                                value: |
+                                  {
+                                    "code" : "FORBIDDEN",
+                                    "message" : "startDate cannot be before 6 April 2017"
+                                  }
+                              endDateOverYearAfterStatus:
+                                description: endDate cannot be in the future
+                                value: |
+                                  {
+                                    "code" : "FORBIDDEN",
+                                    "message" : "endDate cannot be more than a year after startDate"
                                   }
                       404:
                         body:
