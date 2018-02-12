@@ -1196,6 +1196,49 @@ class DesConnectorSpec extends PlaySpec
           )
         }
       }
+      "the DES response has only partially complete payment details" in {
+        val responseJson = Json.parse("""{
+                                        |    "idNumber": "Z5555",
+                                        |    "financialTransactions": [
+                                        |      {
+                                        |        "items": [
+                                        |          {
+                                        |            "paymentReference": "1357",
+                                        |            "paymentAmount": "2050.40"
+                                        |          },
+                                        |          {
+                                        |            "clearingDate": "2017-06-03",
+                                        |            "paymentAmount": "2050.40"
+                                        |          }
+                                        |        ]
+                                        |      },
+                                        |      {
+                                        |        "items": [
+                                        |          {
+                                        |            "clearingDate": "2017-06-02"
+                                        |          }
+                                        |        ]
+                                        |      }
+                                        |    ]
+                                        |}""".stripMargin)
+
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = OK,
+                responseJson = Some(responseJson)
+              )
+            )
+          )
+
+        doRetrieveBulkPaymentRequest { response =>
+          response mustBe GetBulkPaymentSuccessResponse(
+            lisaManagerReferenceNumber = "Z5555",
+            payments = Nil
+          )
+        }
+      }
     }
 
   }
