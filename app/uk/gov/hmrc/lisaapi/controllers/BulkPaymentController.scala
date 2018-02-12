@@ -38,13 +38,15 @@ class BulkPaymentController extends LisaController with LisaConstants {
       implicit val startTime: Long = System.currentTimeMillis()
       LisaMetrics.startMetrics(startTime, LisaMetricKeys.TRANSACTION)
       withValidLMRN(lisaManager) { () =>
-        withValidDates(startDate, endDate) { (start, end) =>
-          val response = service.getBulkPayment(lisaManager, start, end)
+        withEnrolment(lisaManager) { _ =>
+          withValidDates(startDate, endDate) { (start, end) =>
+            val response = service.getBulkPayment(lisaManager, start, end)
 
-          response map {
-            case s: GetBulkPaymentSuccessResponse => Ok(Json.toJson(s))
-            case GetBulkPaymentNotFoundResponse => NotFound(Json.toJson(ErrorPaymentNotFound))
-            case _ => InternalServerError(Json.toJson(ErrorInternalServerError))
+            response map {
+              case s: GetBulkPaymentSuccessResponse => Ok(Json.toJson(s))
+              case GetBulkPaymentNotFoundResponse => NotFound(Json.toJson(ErrorPaymentNotFound))
+              case _ => InternalServerError(Json.toJson(ErrorInternalServerError))
+            }
           }
         }
       }

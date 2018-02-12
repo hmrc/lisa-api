@@ -26,10 +26,11 @@ import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
-import uk.gov.hmrc.lisaapi.controllers.{BulkPaymentController, ErrorBadRequestEnd, ErrorBadRequestEndBeforeStart, ErrorBadRequestEndInFuture, ErrorBadRequestOverYearBetweenStartAndEnd, ErrorBadRequestStart, ErrorBadRequestStartBefore6April2017, ErrorBadRequestStartEnd}
+import uk.gov.hmrc.lisaapi.controllers._
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{BulkPaymentService, CurrentDateService}
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class BulkPaymentControllerSpec extends PlaySpec
@@ -44,6 +45,9 @@ class BulkPaymentControllerSpec extends PlaySpec
   val lmrn = "Z123456"
 
   before {
+    when(mockAuthCon.authorise[Option[String]](any(),any())(any(), any())).
+      thenReturn(Future(Some("1234")))
+
     when(mockCurrentDateService.now()).
       thenReturn(currentDate)
   }
@@ -207,6 +211,7 @@ class BulkPaymentControllerSpec extends PlaySpec
     lmrn,
     List(BulkPayment(new DateTime("2018-01-01"), "123", 75.15))
   )
+
   val mockService: BulkPaymentService = mock[BulkPaymentService]
   val mockAuthCon: LisaAuthConnector = mock[LisaAuthConnector]
   val mockCurrentDateService: CurrentDateService = mock[CurrentDateService]

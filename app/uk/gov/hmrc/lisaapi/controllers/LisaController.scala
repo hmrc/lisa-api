@@ -61,6 +61,16 @@ trait LisaController extends BaseController with HeaderValidator with RunMode wi
     }
   }
 
+  protected def withEnrolment(lisaManager: String)
+                             (callback: (Option[String]) => Future[Result])
+                             (implicit request: Request[AnyContent]): Future[Result] = {
+    authorised(Enrolment("HMRC-LISA-ORG").withIdentifier("ZREF", lisaManager)).retrieve(internalId) {id =>
+      callback(id)
+    } recoverWith {
+      handleFailure
+    }
+  }
+
   protected def withValidJson[T](
                                   success: (T) => Future[Result],
                                   invalid: Option[(Seq[(JsPath, Seq[ValidationError])]) => Future[Result]] = None,
@@ -68,7 +78,7 @@ trait LisaController extends BaseController with HeaderValidator with RunMode wi
                                 )(implicit request: Request[AnyContent], reads: Reads[T]): Future[Result] = {
 
     val startTime = System.currentTimeMillis
-    authorised((Enrolment("HMRC-LISA-ORG")).withIdentifier("ZREF", lisaManager)).retrieve(internalId) { id =>
+    withEnrolment(lisaManager) { _ =>
       request.body.asJson match {
         case Some(json) =>
           Try(json.validate[T]) match {
@@ -77,7 +87,7 @@ trait LisaController extends BaseController with HeaderValidator with RunMode wi
                 case Success(result) => result
                 case Failure(ex: Exception) => {
                   Logger.error(s"LisaController An error occurred in Json payload validation ${ex.getMessage}")
-                  LisaMetrics.incrementMetrics(System.currentTimeMillis,LisaMetricKeys.getErrorKey(INTERNAL_SERVER_ERROR,request.uri))
+                  LisaMetrics.incrementMetrics(System.currentTimeMillis, LisaMetricKeys.getErrorKey(INTERNAL_SERVER_ERROR, request.uri))
 
                   Future.successful(InternalServerError(toJson(ErrorInternalServerError)))
                 }
@@ -87,31 +97,33 @@ trait LisaController extends BaseController with HeaderValidator with RunMode wi
               invalid match {
                 case Some(invalidCallback) => invalidCallback(errors)
                 case None => {
-                  LisaMetrics.incrementMetrics(startTime,LisaMetricKeys.getErrorKey(BAD_REQUEST,request.uri))
+                  LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getErrorKey(BAD_REQUEST, request.uri))
                   Logger.error(s"The errors are ${errors.toString()}")
                   Future.successful(BadRequest(toJson(ErrorBadRequest(errorConverter.convert(errors)))))
                 }
               }
             }
             case Failure(e) => Logger.error(s"LisaController: An error occurred in lisa-api due to ${e.getMessage} returning internal server error")
-              LisaMetrics.incrementMetrics(System.currentTimeMillis,LisaMetricKeys.getErrorKey(INTERNAL_SERVER_ERROR,request.uri))
+              LisaMetrics.incrementMetrics(System.currentTimeMillis, LisaMetricKeys.getErrorKey(INTERNAL_SERVER_ERROR, request.uri))
               Future.successful(InternalServerError(toJson(ErrorInternalServerError)))
           }
 
-        case None =>   LisaMetrics.incrementMetrics(startTime,LisaMetricKeys.getErrorKey(BAD_REQUEST,request.uri))
-                       Future.successful(BadRequest(toJson(EmptyJson)))
+        case None => LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getErrorKey(BAD_REQUEST, request.uri))
+          Future.successful(BadRequest(toJson(EmptyJson)))
       }
-
-    } recoverWith {
-      handleFailure
     }
   }
 
   def handleFailure(implicit request: Request[_]): PartialFunction[Throwable, Future[Result]] = PartialFunction[Throwable, Future[Result]] {
-    case _: InsufficientEnrolments => Logger.warn(s"Unauthorised access for ${request.uri}");Future.successful(Unauthorized(Json.toJson(ErrorInvalidLisaManager)))
-    case _: AuthorisationException => Logger.warn(s"Unauthorised Exception for ${request.uri}"); Future.successful(Unauthorized(Json.toJson(ErrorUnauthorized)))
-    case _ => LisaMetrics.incrementMetrics(System.currentTimeMillis,LisaMetricKeys.getErrorKey(INTERNAL_SERVER_ERROR,request.uri))
-              Future.successful(InternalServerError(toJson(ErrorInternalServerError)))
+    case _: InsufficientEnrolments =>
+      Logger.warn(s"Unauthorised access for ${request.uri}")
+      Future.successful(Unauthorized(Json.toJson(ErrorInvalidLisaManager)))
+    case _: AuthorisationException =>
+      Logger.warn(s"Unauthorised Exception for ${request.uri}")
+      Future.successful(Unauthorized(Json.toJson(ErrorUnauthorized)))
+    case _ =>
+      LisaMetrics.incrementMetrics(System.currentTimeMillis,LisaMetricKeys.getErrorKey(INTERNAL_SERVER_ERROR,request.uri))
+      Future.successful(InternalServerError(toJson(ErrorInternalServerError)))
   }
 }
 
