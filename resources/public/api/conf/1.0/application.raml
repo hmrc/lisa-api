@@ -776,11 +776,11 @@ types:
               uriParameters:
                startDate:
                 type : ISO8601Date
-                description: The start date of the date range for the payment request.
+                description: The start date of the date range for the payment request. Cannot be before 6 April 2017.
                 example: "2017-05-20"
                endDate:
                 type : ISO8601Date
-                description: The end date of the date range for the payment request.
+                description: The end date of the date range for the payment request. Cannot be in the future, before the startDate, or more than a year after the startDate.
                 example: "2017-05-20"
               get:
                   is: [headers.acceptHeader]
@@ -788,6 +788,7 @@ types:
                   description: This allows a LISA provider to retrieve payments made by HMRC in a specific date range.
                   (annotations.scope): "read:lisa"
                   securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
+                  (annotations.sandboxData): !include testdata/get-bulk-payment.md
                   responses:
                       200:
                         body:
@@ -807,7 +808,7 @@ types:
                                     "message" : "Bad Request"
                                   }
                               InvalidLmrn:
-                                description: Invalid LISA Manager reference number
+                                description: lisaManagerReferenceNumber in the URL is in the wrong format
                                 value: |
                                   {
                                     "code" : "BAD_REQUEST",
@@ -872,7 +873,7 @@ types:
                                     "message" : "startDate cannot be before 6 April 2017"
                                   }
                               endDateOverYearAfterStatus:
-                                description: endDate cannot be in the future
+                                description: endDate cannot be more than a year after startDate
                                 value: |
                                   {
                                     "code" : "FORBIDDEN",
