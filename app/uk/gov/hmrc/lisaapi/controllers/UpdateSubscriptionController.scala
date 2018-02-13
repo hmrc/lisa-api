@@ -125,6 +125,6 @@ class UpdateSubscriptionController extends LisaController with LisaConstants {
   private def getEndpointUrl(lisaManagerReferenceNumber: String, accountId: AccountId): String = {
     s"/manager/$lisaManagerReferenceNumber/accounts/$accountId/update-subscription"
   }
-  
+
 }
 

@@ -232,6 +232,16 @@ class ReinstateAccountControllerSpec extends PlaySpec with MockitoSugar with One
           (json \ "message").as[String] mustBe ErrorBadRequestLmrn.message
         }
       }
+      "submitted an invalid accountId" in {
+        doReinstateRequest(reinstateAccountValidJson.replace(accountId, "1=2!"), lisaManager) { res =>
+          status(res) mustBe (BAD_REQUEST)
+          val json = contentAsJson(res)
+          (json \ "code").as[String] mustBe ErrorGenericBadRequest.errorCode
+          (json \ "message").as[String] mustBe ErrorGenericBadRequest.message
+          (json \ "errors" \ 0 \ "code").as[String] mustBe "INVALID_FORMAT"
+          (json \ "errors" \ 0 \ "path").as[String] mustBe "/accountId"
+        }
+      }
     }
 
     "return with status 500 internal server error" when {

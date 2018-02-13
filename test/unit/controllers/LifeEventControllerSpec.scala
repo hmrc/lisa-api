@@ -210,6 +210,16 @@ class LifeEventControllerSpec extends PlaySpec
           (json \ "message").as[String] mustBe ErrorBadRequestLmrn.message
         }
       }
+      "given an invalid accountId in the url" in {
+        doReportLifeEventRequest(reportLifeEventJson, accId = "1=2!") { res =>
+          status(res) mustBe BAD_REQUEST
+
+          val json = contentAsJson(res)
+
+          (json \ "code").as[String] mustBe ErrorBadRequestAccountId.errorCode
+          (json \ "message").as[String] mustBe ErrorBadRequestAccountId.message
+        }
+      }
     }
 
     "return with 403 forbidden and a code of FORBIDDEN" when {
@@ -312,9 +322,9 @@ class LifeEventControllerSpec extends PlaySpec
 
   }
 
-  def doReportLifeEventRequest(jsonString: String, lmrn: String = lisaManager)(callback: (Future[Result]) =>  Unit): Unit = {
+  def doReportLifeEventRequest(jsonString: String, lmrn: String = lisaManager, accId: String = accountId)(callback: (Future[Result]) =>  Unit): Unit = {
     val req = FakeRequest(Helpers.PUT, "/")
-    val res = SUT.reportLisaLifeEvent(lmrn, accountId).apply(req.withHeaders(acceptHeader).
+    val res = SUT.reportLisaLifeEvent(lmrn, accId).apply(req.withHeaders(acceptHeader).
       withBody(AnyContentAsJson(Json.parse(jsonString))))
 
     callback(res)
