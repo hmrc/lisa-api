@@ -40,7 +40,7 @@ class LifeEventController extends LisaController with LisaConstants {
       val startTime = System.currentTimeMillis()
       LisaMetrics.startMetrics(startTime, LisaMetricKeys.EVENT)
 
-      withValidLMRN(lisaManager) {
+      withValidLMRN(lisaManager) { () =>
         withValidJson[ReportLifeEventRequest](req => {
             if (req.eventDate.isBefore(LISA_START_DATE)) {
               Logger.debug("Life event not reported - invalid event date")
@@ -127,7 +127,7 @@ class LifeEventController extends LisaController with LisaConstants {
       val startTime = System.currentTimeMillis()
       LisaMetrics.startMetrics(startTime, LisaMetricKeys.EVENT)
 
-      withValidLMRN(lisaManager) {
+      withValidLMRN(lisaManager) { () =>
         service.getLifeEvent(lisaManager, accountId, eventId) map { res =>
           Logger.debug("Entering LifeEvent Controller GET and the response is " + res.toString)
           res match {

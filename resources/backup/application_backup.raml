@@ -71,61 +71,7 @@ types:
                                             "code" : "BAD_REQUEST",
                                             "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
                                           }
-                    /payments?start={startDate}&end={endDate}:
-                      uriParameters:
-                       startDate:
-                        type : ISO8601Date
-                        description: The start date of the date range for the payment request.
-                        example: "2017-05-20"
-                       endDate:
-                        type : ISO8601Date
-                        description: The end date of the date range for the payment request.
-                        example: "2017-05-20"
-                      get:
-                          is: [headers.acceptHeader]
-                          displayName: Retrieve payment details
-                          description: This allows a LISA provider to retrieve payments done by HMRC in a specific date range.
-                          (annotations.scope): "read:lisa"
-                          securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
-                          responses:
-                              200:
-                                body:
-                                  application/json:
-                                    type: !include schemas/LISAManager.payment.get.schema.json
-                                    example: !include examples/LISAManager.payment.get.json
-                              204:
-                               description: No Payments made during the requested period.
-                              400:
-                                body:
-                                  application/json:
-                                    type: !include schemas/ErrorCodes.schema.json
-                                    examples:
-                                      notOpenStatus:
-                                        description: Bad Request
-                                        value: |
-                                          {
-                                            "code" : "BAD_REQUEST",
-                                            "message" : "Bad Request"
-                                          }
-                                      InvalidLmrn:
-                                        description: Invalid LISA Manager reference number
-                                        value: |
-                                          {
-                                            "code" : "BAD_REQUEST",
-                                            "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
-                                          }
-                              401:
-                                body:
-                                  application/json:
-                                    type: !include schemas/ErrorCodes.schema.json
-                                    examples:
-                                      notOpenStatus:
-                                        description: The lisaManagerReferenceNumber path parameter you've used doesn't match with an authorised LISA provider in HMRC's records.
-                                        value: |
-                                          {
-                                            "code" : "UNAUTHORIZED",
-                                            "message" : "lisaManagerReferenceNumber is not authorised"
-                                          }
+
                     /investors:
                       post:
                           is: [headers.acceptHeader, headers.contentHeader]

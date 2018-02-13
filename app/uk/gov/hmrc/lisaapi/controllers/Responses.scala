@@ -66,6 +66,16 @@ case class ErrorForbidden(errs: List[ErrorValidation]) extends ErrorResponseWith
 
 case object ErrorBadRequestLmrn extends ErrorResponse(400, "BAD_REQUEST", "lisaManagerReferenceNumber in the URL is in the wrong format")
 
+// specific errors for bulk payment url validation
+case object ErrorBadRequestStart extends ErrorResponse(400, "BAD_REQUEST", "startDate is in the wrong format")
+case object ErrorBadRequestEnd extends ErrorResponse(400, "BAD_REQUEST", "endDate is in the wrong format")
+case object ErrorBadRequestStartEnd extends ErrorResponse(400, "BAD_REQUEST", "startDate and endDate are in the wrong format")
+case object ErrorBadRequestEndInFuture extends ErrorResponse(403, "FORBIDDEN", "endDate cannot be in the future")
+case object ErrorBadRequestEndBeforeStart extends ErrorResponse(403, "FORBIDDEN", "endDate cannot be before startDate")
+case object ErrorBadRequestStartBefore6April2017 extends ErrorResponse(403, "FORBIDDEN", "startDate cannot be before 6 April 2017")
+case object ErrorBadRequestOverYearBetweenStartAndEnd extends ErrorResponse(403, "FORBIDDEN", "endDate cannot be more than a year after startDate")
+// end
+
 case object ErrorNotImplemented extends ErrorResponse(501, "NOT_IMPLEMENTED", "Not implemented")
 
 case object ErrorUnauthorized extends ErrorResponse(401, "UNAUTHORIZED", "Bearer token is missing or not authorized")
@@ -110,6 +120,8 @@ case object ErrorAccountAlreadyClosed extends ErrorResponse(403, "INVESTOR_ACCOU
 case object ErrorAccountAlreadyOpen extends ErrorResponse(403, "INVESTOR_ACCOUNT_ALREADY_OPEN", "You cannot reinstate this account because it is already open")
 
 case object ErrorAccountNotFound extends ErrorResponse(404, "INVESTOR_ACCOUNTID_NOT_FOUND", "The accountId does not match HMRC’s records")
+
+case object ErrorPaymentNotFound extends ErrorResponse(404, "PAYMENT_NOT_FOUND", "No bonus payments have been made for this date range")
 
 case object ErrorTransferAccountDataNotProvided extends ErrorResponse(403, "TRANSFER_ACCOUNT_DATA_NOT_PROVIDED", "You must give a transferredFromAccountId, transferredFromLMRN and transferInDate when the creationReason is transferred")
 

@@ -111,7 +111,7 @@ class LisaControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite 
     }
 
     def testLMRNValidator(lmrn: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
-      withValidLMRN(lmrn){Future.successful(Ok)}
+      withValidLMRN(lmrn){() => Future.successful(Ok)}
     }
   }
 

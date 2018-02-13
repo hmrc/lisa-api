@@ -33,13 +33,14 @@ class InvestorController extends LisaController with LisaConstants  {
 
   val service: InvestorService = InvestorService
   val auditService: AuditService = AuditService
+
   def createLisaInvestor(lisaManager: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async {
     implicit request =>
       val startTime = System.currentTimeMillis()
       LisaMetrics.startMetrics(startTime,LisaMetricKeys.INVESTOR)
       Logger.debug(s"LISA HTTP Request: ${request.uri} and method: ${request.method}")
 
-      withValidLMRN(lisaManager) {
+      withValidLMRN(lisaManager) { () =>
         withValidJson[CreateLisaInvestorRequest](
           createRequest => {
             service.createInvestor(lisaManager, createRequest).map { res =>

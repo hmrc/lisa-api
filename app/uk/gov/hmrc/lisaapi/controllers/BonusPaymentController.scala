@@ -41,7 +41,7 @@ class BonusPaymentController extends LisaController with LisaConstants {
       val startTime = System.currentTimeMillis()
       LisaMetrics.startMetrics(startTime,LisaMetricKeys.BONUS_PAYMENT)
 
-      withValidLMRN(lisaManager) {
+      withValidLMRN(lisaManager) { () =>
         withValidJson[RequestBonusPaymentRequest](req =>
           (req.bonuses.claimReason, req.lifeEventId) match {
             case ("Life Event", None) =>
@@ -73,8 +73,8 @@ class BonusPaymentController extends LisaController with LisaConstants {
     validateAccept(acceptHeaderValidationRules).async { implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
       LisaMetrics.startMetrics(startTime, LisaMetricKeys.BONUS_PAYMENT)
-      withValidLMRN(lisaManager) {
-        withValidAccountId(accountId) {
+      withValidLMRN(lisaManager) { () =>
+        withValidAccountId(accountId) { () =>
           processGetBonusPayment(lisaManager, accountId, transactionId)
         }
       }
