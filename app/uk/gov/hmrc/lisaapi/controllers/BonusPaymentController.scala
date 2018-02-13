@@ -42,30 +42,32 @@ class BonusPaymentController extends LisaController with LisaConstants {
       LisaMetrics.startMetrics(startTime,LisaMetricKeys.BONUS_PAYMENT)
 
       withValidLMRN(lisaManager) {
-        withValidJson[RequestBonusPaymentRequest](req =>
-          (req.bonuses.claimReason, req.lifeEventId) match {
-            case ("Life Event", None) =>
-              handleLifeEventNotProvided(lisaManager, accountId, req)
-            case _ =>
-              withValidData(req)(lisaManager, accountId) { () =>
-                service.requestBonusPayment(lisaManager, accountId, req) map { res =>
-                  Logger.debug("Entering Bonus Payment Controller and the response is " + res.toString)
+        withValidAccountId(accountId) {
+          withValidJson[RequestBonusPaymentRequest](req =>
+            (req.bonuses.claimReason, req.lifeEventId) match {
+              case ("Life Event", None) =>
+                handleLifeEventNotProvided(lisaManager, accountId, req)
+              case _ =>
+                withValidData(req)(lisaManager, accountId) { () =>
+                  service.requestBonusPayment(lisaManager, accountId, req) map { res =>
+                    Logger.debug("Entering Bonus Payment Controller and the response is " + res.toString)
 
-                  res match {
-                    case successResponse: RequestBonusPaymentSuccessResponse =>
-                      LisaMetrics.incrementMetrics(System.currentTimeMillis(), LisaMetricKeys.BONUS_PAYMENT)
-                      handleSuccess(lisaManager, accountId, req, successResponse)
-                    case errorResponse: RequestBonusPaymentErrorResponse =>
-                      handleFailure(lisaManager, accountId, req, errorResponse)
+                    res match {
+                      case successResponse: RequestBonusPaymentSuccessResponse =>
+                        LisaMetrics.incrementMetrics(System.currentTimeMillis(), LisaMetricKeys.BONUS_PAYMENT)
+                        handleSuccess(lisaManager, accountId, req, successResponse)
+                      case errorResponse: RequestBonusPaymentErrorResponse =>
+                        handleFailure(lisaManager, accountId, req, errorResponse)
+                    }
+                  } recover {
+                    case e: Exception => Logger.error(s"requestBonusPayment: An error occurred due to ${e.getMessage} returning internal server error")
+                      handleError(lisaManager, accountId, req)
+
                   }
-                } recover {
-                  case e: Exception => Logger.error(s"requestBonusPayment: An error occurred due to ${e.getMessage} returning internal server error")
-                    handleError(lisaManager, accountId, req)
-
                 }
-              }
-          }, lisaManager = lisaManager
-        )
+            }, lisaManager = lisaManager
+          )
+        }
       }
   }
 

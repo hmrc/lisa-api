@@ -32,8 +32,6 @@ class ReinstateAccountController extends LisaController with LisaConstants {
   val service: ReinstateAccountService = ReinstateAccountService
   val auditService: AuditService = AuditService
 
-
-
   def reinstateAccount (lisaManager: String): Action[AnyContent] = Action.async{ implicit request =>
     implicit val startTime = System.currentTimeMillis()
     LisaMetrics.startMetrics(startTime, LisaMetricKeys.REINSTATE)
@@ -44,9 +42,6 @@ class ReinstateAccountController extends LisaController with LisaConstants {
     }
 
   }
-
-
-
 
   private def processReinstateAccount(lisaManager: String, accountId: String)(implicit hc: HeaderCarrier, startTime:Long) = {
     service.reinstateAccountService(lisaManager, accountId).map { result =>

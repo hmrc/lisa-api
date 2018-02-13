@@ -33,6 +33,7 @@ class InvestorController extends LisaController with LisaConstants  {
 
   val service: InvestorService = InvestorService
   val auditService: AuditService = AuditService
+
   def createLisaInvestor(lisaManager: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async {
     implicit request =>
       val startTime = System.currentTimeMillis()
