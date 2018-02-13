@@ -69,6 +69,22 @@
             </td>
         </tr>
         <tr>
+            <td><p>Request with a valid payload and LISA Manager reference number, but an invalid and account ID</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234=5678</p></td>
+            <td>
+                <p class ="code--block"> {<br>
+                                     	  "firstSubscriptionDate" : "2017-05-20"<br>
+                                          }
+                </p>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
+                <p class ="code--block"> {<br>
+                    "code": "BAD_REQUEST",<br>
+                    "message": "accountId in the URL is in the wrong format"<br>
+                  }
+                </p>
+            </td>
+        </tr>
+        <tr>
             <td><p>Request containing invalid and/or missing data</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890</p></td>
             <td>
                 <p class ="code--block"> {<br>
