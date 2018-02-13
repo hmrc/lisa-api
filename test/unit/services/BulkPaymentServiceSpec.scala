@@ -52,6 +52,14 @@ class BulkPaymentServiceSpec extends PlaySpec
     }
 
     "return payment not found" when {
+      "the connector passes a not found response" in {
+        when(mockDesConnector.getBulkPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(GetBulkPaymentNotFoundResponse))
+
+        doRequest{ response =>
+          response mustBe GetBulkPaymentNotFoundResponse
+        }
+      }
       "the connector passes a success message with no payments" in {
         when(mockDesConnector.getBulkPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(GetBulkPaymentSuccessResponse(lmrn, Nil)))

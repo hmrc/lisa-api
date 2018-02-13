@@ -286,7 +286,7 @@ trait DesConnector extends ServicesConfig {
 
     result.map(res => {
       Logger.debug("Get Bulk payment details returned status: " + res.status)
-      parseDesResponse[GetBulkPaymentSuccessResponse](res)._2
+      parseDesResponse[GetBulkPaymentResponse](res)._2
     })
   }
 

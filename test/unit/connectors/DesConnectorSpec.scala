@@ -960,28 +960,8 @@ class DesConnectorSpec extends PlaySpec
           response mustBe DesFailureResponse()
         }
       }
-      "the DES response is invalid" in {
-        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                responseStatus = OK,
-                responseJson = Some(Json.parse(
-                  """{
-                    | "status": "Due"
-                  }""".stripMargin))
-              )
-            )
-          )
-
-        doRetrieveBulkPaymentRequest { response =>
-          response mustBe DesFailureResponse()
-        }
-      }
-      "the DES response is missing required fields" in {
-        val responseJson = Json.parse("""{
-                                        |    "idNumber": "Z5555"
-                                        |}""".stripMargin)
+      "the DES response is missing a processingDate" in {
+        val responseJson = Json.parse("{}")
 
         when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
           .thenReturn(
@@ -1002,6 +982,7 @@ class DesConnectorSpec extends PlaySpec
     "return a success response" when {
       "the DES response is the appropriate json response" in {
         val responseJson = Json.parse("""{
+                                        |    "processingDate": "2017-03-07T09:30:00.000Z",
                                         |    "idNumber": "Z5555",
                                         |    "financialTransactions": [
                                         |      {
@@ -1051,8 +1032,9 @@ class DesConnectorSpec extends PlaySpec
           )
         }
       }
-      "the DES response has no financial transactions" in {
+      "the DES response has no financial transactions data" in {
         val responseJson = Json.parse("""{
+                                        |    "processingDate": "2017-03-07T09:30:00.000Z",
                                         |    "idNumber": "Z5555",
                                         |    "financialTransactions": []
                                         |}""".stripMargin)
@@ -1076,6 +1058,7 @@ class DesConnectorSpec extends PlaySpec
       }
       "the DES response has no items in all of its financial transactions" in {
         val responseJson = Json.parse("""{
+                                        |    "processingDate": "2017-03-07T09:30:00.000Z",
                                         |    "idNumber": "Z5555",
                                         |    "financialTransactions": [
                                         |      {
@@ -1106,6 +1089,7 @@ class DesConnectorSpec extends PlaySpec
       }
       "the DES response has no items in some of its financial transactions" in {
         val responseJson = Json.parse("""{
+                                        |    "processingDate": "2017-03-07T09:30:00.000Z",
                                         |    "idNumber": "Z5555",
                                         |    "financialTransactions": [
                                         |      {
@@ -1150,6 +1134,7 @@ class DesConnectorSpec extends PlaySpec
       }
       "the DES response has some partially complete payment details" in {
         val responseJson = Json.parse("""{
+                                        |    "processingDate": "2017-03-07T09:30:00.000Z",
                                         |    "idNumber": "Z5555",
                                         |    "financialTransactions": [
                                         |      {
@@ -1198,6 +1183,7 @@ class DesConnectorSpec extends PlaySpec
       }
       "the DES response has only partially complete payment details" in {
         val responseJson = Json.parse("""{
+                                        |    "processingDate": "2017-03-07T09:30:00.000Z",
                                         |    "idNumber": "Z5555",
                                         |    "financialTransactions": [
                                         |      {
@@ -1237,6 +1223,71 @@ class DesConnectorSpec extends PlaySpec
             lisaManagerReferenceNumber = "Z5555",
             payments = Nil
           )
+        }
+      }
+    }
+
+    "return a not found response" when {
+      "the DES response has no financial transactions field" in {
+        val responseJson = Json.parse(
+          """{
+            | "processingDate": "2017-03-07T09:30:00.000Z",
+            | "idNumber": "Z1234"
+            |}""".stripMargin)
+
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = OK,
+                responseJson = Some(responseJson)
+              )
+            )
+          )
+
+        doRetrieveBulkPaymentRequest { response =>
+          response mustBe GetBulkPaymentNotFoundResponse
+        }
+      }
+      "the DES response has no id number field" in {
+        val responseJson = Json.parse(
+          """{
+            | "processingDate": "2017-03-07T09:30:00.000Z",
+            | "financialTransactions": []
+            |}""".stripMargin)
+
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = OK,
+                responseJson = Some(responseJson)
+              )
+            )
+          )
+
+        doRetrieveBulkPaymentRequest { response =>
+          response mustBe GetBulkPaymentNotFoundResponse
+        }
+      }
+      "the DES response has no id number or financial transactions field" in {
+        val responseJson = Json.parse(
+          """{
+            | "processingDate": "2017-03-07T09:30:00.000Z"
+            |}""".stripMargin)
+
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = OK,
+                responseJson = Some(responseJson)
+              )
+            )
+          )
+
+        doRetrieveBulkPaymentRequest { response =>
+          response mustBe GetBulkPaymentNotFoundResponse
         }
       }
     }

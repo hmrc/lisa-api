@@ -33,6 +33,7 @@ trait BulkPaymentService {
     val response = desConnector.getBulkPayment(lisaManager, startDate, endDate)
 
     response map {
+      case GetBulkPaymentNotFoundResponse => GetBulkPaymentNotFoundResponse
       case s: GetBulkPaymentSuccessResponse if s.payments.isEmpty => GetBulkPaymentNotFoundResponse
       case s: GetBulkPaymentSuccessResponse => s
       case f: DesFailureResponse => {

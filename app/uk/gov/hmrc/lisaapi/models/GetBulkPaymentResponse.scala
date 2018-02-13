@@ -21,7 +21,7 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import uk.gov.hmrc.lisaapi.models.des.DesResponse
 
-trait GetBulkPaymentResponse
+trait GetBulkPaymentResponse extends DesResponse
 
 case object GetBulkPaymentNotFoundResponse extends GetBulkPaymentResponse
 case object GetBulkPaymentErrorResponse extends GetBulkPaymentResponse
@@ -32,9 +32,10 @@ case class BulkPayment(paymentDate: DateTime,
 
 case class GetBulkPaymentSuccessResponse(lisaManagerReferenceNumber: LisaManagerReferenceNumber,
                                          payments: List[BulkPayment]
-                                        ) extends GetBulkPaymentResponse with DesResponse
+                                        ) extends GetBulkPaymentResponse
 
 object GetBulkPaymentResponse {
+
   implicit val bpReads: Reads[BulkPayment] = (
     (JsPath \ "clearingDate").read(JsonReads.isoDate).map(new DateTime(_)) and
     (JsPath \ "paymentReference").read[String] and
@@ -67,5 +68,21 @@ object GetBulkPaymentResponse {
   )
 
   implicit val successWrites: Writes[GetBulkPaymentSuccessResponse] = Json.writes[GetBulkPaymentSuccessResponse]
+
+  implicit val gbpReads: Reads[GetBulkPaymentResponse] = Reads[GetBulkPaymentResponse] { json =>
+    // processing date is the only required field so if it's present and the other fields aren't then
+    // we can assume the request was processed correctly, but no transactions were found
+    val processingDate = (json \ "processingDate").asOpt[String]
+
+    // we need both of these to be present for a successful response
+    val idNumber = (json \ "idNumber").asOpt[String]
+    val financialTransactions = (json \ "financialTransactions").asOpt[JsArray]
+
+    (processingDate, idNumber, financialTransactions) match {
+      case (Some(_), Some(_), Some(_)) => successReads.reads(json)
+      case (Some(_), _, _) => JsSuccess(GetBulkPaymentNotFoundResponse)
+      case _ => JsError()
+    }
+  }
 
 }
