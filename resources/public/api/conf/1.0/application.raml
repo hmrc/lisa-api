@@ -299,6 +299,20 @@ types:
                         application/json:
                           type: !include schemas/ErrorCodes.schema.json
                           examples:
+                            InvalidPayload:
+                              description: Bad Request
+                              value: |
+                                {
+                                    "code": "BAD_REQUEST",
+                                    "message": "Bad Request",
+                                    "errors": [
+                                        {
+                                            "code": "INVALID_FORMAT",
+                                            "message": "Invalid format has been used",
+                                            "path": "/accountId"
+                                        }
+                                    ]
+                                }
                             InvalidLmrn:
                               description: lisaManagerReferenceNumber in the URL is in the wrong format
                               value: |
