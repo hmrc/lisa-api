@@ -1169,7 +1169,7 @@ class DesConnectorSpec extends PlaySpec
                                         |      {
                                         |        "items": [
                                         |          {
-                                        |            "clearingDate": "2017-06-02"
+                                        |            "clearingDate": "2017-06-04"
                                         |          }
                                         |        ]
                                         |      }
