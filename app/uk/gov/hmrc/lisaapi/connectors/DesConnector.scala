@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.lisaapi.connectors
 
+import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.json.{JsValue, Json, Reads}
 import play.utils.UriEncoding
@@ -266,6 +267,26 @@ trait DesConnector extends ServicesConfig {
     result.map(res => {
       Logger.debug("Get Transaction details returned status: " + res.status)
       parseDesResponse[DesGetTransactionResponse](res)._2
+    })
+  }
+
+  def getBulkPayment(lisaManager: String, startDate: DateTime, endDate: DateTime)
+                    (implicit hc:HeaderCarrier): Future[DesResponse] = {
+    val uri = s"$desUrl/enterprise/financial-data/ZISA/$lisaManager/LISA" +
+      s"?dateFrom=${startDate.toString("yyyy-MM-dd")}" +
+      s"&dateTo=${endDate.toString("yyyy-MM-dd")}"
+
+    Logger.debug("Getting Bulk payment details from des: " + uri)
+
+    val result: Future[HttpResponse] = httpGet.GET(uri)(
+      httpReads,
+      hc = updateHeaderCarrierWithAllDesHeaders(hc),
+      MdcLoggingExecutionContext.fromLoggingDetails(hc)
+    )
+
+    result.map(res => {
+      Logger.debug("Get Bulk payment details returned status: " + res.status)
+      parseDesResponse[GetBulkPaymentResponse](res)._2
     })
   }
 

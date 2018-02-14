@@ -40,7 +40,7 @@ class InvestorController extends LisaController with LisaConstants  {
       LisaMetrics.startMetrics(startTime,LisaMetricKeys.INVESTOR)
       Logger.debug(s"LISA HTTP Request: ${request.uri} and method: ${request.method}")
 
-      withValidLMRN(lisaManager) {
+      withValidLMRN(lisaManager) { () =>
         withValidJson[CreateLisaInvestorRequest](
           createRequest => {
             service.createInvestor(lisaManager, createRequest).map { res =>

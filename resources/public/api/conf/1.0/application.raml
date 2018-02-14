@@ -814,3 +814,121 @@ types:
                                       "code" : "BONUS_CLAIM_ALREADY_EXISTS",
                                       "message" : "The investor’s bonus payment has already been requested"
                                     }
+            /payments?startDate={startDate}&endDate={endDate}:
+              uriParameters:
+               startDate:
+                type : ISO8601Date
+                description: The start date of the date range for the payment request. Cannot be before 6 April 2017.
+                example: "2017-05-20"
+               endDate:
+                type : ISO8601Date
+                description: The end date of the date range for the payment request. Cannot be in the future, before the startDate, or more than a year after the startDate.
+                example: "2017-05-20"
+              get:
+                  is: [headers.acceptHeader]
+                  displayName: Retrieve payment details
+                  description: This allows a LISA provider to retrieve payments made by HMRC in a specific date range.
+                  (annotations.scope): "read:lisa"
+                  securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
+                  (annotations.sandboxData): !include testdata/get-bulk-payment.md
+                  responses:
+                      200:
+                        body:
+                          application/json:
+                            type: !include schemas/LISAManager.payment.get.schema.json
+                            example: !include examples/LISAManager.payment.get.json
+                      400:
+                        body:
+                          application/json:
+                            type: !include schemas/ErrorCodes.schema.json
+                            examples:
+                              notOpenStatus:
+                                description: Bad Request
+                                value: |
+                                  {
+                                    "code" : "BAD_REQUEST",
+                                    "message" : "Bad Request"
+                                  }
+                              InvalidLmrn:
+                                description: lisaManagerReferenceNumber in the URL is in the wrong format
+                                value: |
+                                  {
+                                    "code" : "BAD_REQUEST",
+                                    "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
+                                  }
+                              InvalidStartDate:
+                                description: startDate is in the wrong format
+                                value: |
+                                  {
+                                    "code" : "BAD_REQUEST",
+                                    "message" : "startDate is in the wrong format"
+                                  }
+                              InvalidEndDate:
+                                description: endDate is in the wrong format
+                                value: |
+                                  {
+                                    "code" : "BAD_REQUEST",
+                                    "message" : "endDate is in the wrong format"
+                                  }
+                              InvalidStartAndEndDates:
+                                description: startDate and endDate are in the wrong format
+                                value: |
+                                  {
+                                    "code" : "BAD_REQUEST",
+                                    "message" : "startDate and endDate are in the wrong format"
+                                  }
+                      401:
+                        body:
+                          application/json:
+                            type: !include schemas/ErrorCodes.schema.json
+                            examples:
+                              notOpenStatus:
+                                description: The lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
+                                value: |
+                                  {
+                                    "code" : "UNAUTHORIZED",
+                                    "message" : "lisaManagerReferenceNumber is not authorised"
+                                  }
+                      403:
+                        body:
+                          application/json:
+                            examples:
+                              endDateInFutureStatus:
+                                description: endDate cannot be in the future
+                                value: |
+                                  {
+                                    "code" : "FORBIDDEN",
+                                    "message" : "endDate cannot be in the future"
+                                  }
+                              endDateBeforeStartStatus:
+                                description: endDate cannot be before startDate
+                                value: |
+                                  {
+                                    "code" : "FORBIDDEN",
+                                    "message" : "endDate cannot be before startDate"
+                                  }
+                              startDateBeforeAprilStatus:
+                                description: startDate cannot be before 6 April 2017
+                                value: |
+                                  {
+                                    "code" : "FORBIDDEN",
+                                    "message" : "startDate cannot be before 6 April 2017"
+                                  }
+                              endDateOverYearAfterStatus:
+                                description: endDate cannot be more than a year after startDate
+                                value: |
+                                  {
+                                    "code" : "FORBIDDEN",
+                                    "message" : "endDate cannot be more than a year after startDate"
+                                  }
+                      404:
+                        body:
+                          application/json:
+                            examples:
+                              noPaymentsFound:
+                                description: No bonus payments have been made for this date range
+                                value: |
+                                  {
+                                    "code": "PAYMENT_NOT_FOUND",
+                                    "message": "No bonus payments have been made for this date range"
+                                  }

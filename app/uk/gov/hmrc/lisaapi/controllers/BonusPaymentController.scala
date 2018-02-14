@@ -41,8 +41,8 @@ class BonusPaymentController extends LisaController with LisaConstants {
       val startTime = System.currentTimeMillis()
       LisaMetrics.startMetrics(startTime,LisaMetricKeys.BONUS_PAYMENT)
 
-      withValidLMRN(lisaManager) {
-        withValidAccountId(accountId) {
+      withValidLMRN(lisaManager) { () =>
+        withValidAccountId(accountId) { () =>
           withValidJson[RequestBonusPaymentRequest](req =>
             (req.bonuses.claimReason, req.lifeEventId) match {
               case ("Life Event", None) =>
@@ -62,7 +62,6 @@ class BonusPaymentController extends LisaController with LisaConstants {
                   } recover {
                     case e: Exception => Logger.error(s"requestBonusPayment: An error occurred due to ${e.getMessage} returning internal server error")
                       handleError(lisaManager, accountId, req)
-
                   }
                 }
             }, lisaManager = lisaManager
@@ -75,8 +74,8 @@ class BonusPaymentController extends LisaController with LisaConstants {
     validateAccept(acceptHeaderValidationRules).async { implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
       LisaMetrics.startMetrics(startTime, LisaMetricKeys.BONUS_PAYMENT)
-      withValidLMRN(lisaManager) {
-        withValidAccountId(accountId) {
+      withValidLMRN(lisaManager) { () =>
+        withValidAccountId(accountId) { () =>
           processGetBonusPayment(lisaManager, accountId, transactionId)
         }
       }

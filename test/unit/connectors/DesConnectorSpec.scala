@@ -21,7 +21,7 @@ import org.mockito.Matchers._
 import org.mockito.Mockito.when
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des._
@@ -923,6 +923,377 @@ class DesConnectorSpec extends PlaySpec
 
   }
 
+  "Retrieve Bulk Payment endpoint" must {
+
+    "return a failure response" when {
+      "the DES response is a failure response" in {
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = OK,
+                responseJson = Some(Json.parse(
+                  """{
+                    | "code": "ERROR_CODE",
+                    | "reason" : "ERROR MESSAGE"
+                  }""".stripMargin))
+              )
+            )
+          )
+
+        doRetrieveBulkPaymentRequest { response =>
+          response mustBe DesFailureResponse("ERROR_CODE", "ERROR MESSAGE")
+        }
+      }
+      "the DES response has no json body" in {
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = OK,
+                responseJson = None
+              )
+            )
+          )
+
+        doRetrieveBulkPaymentRequest { response =>
+          response mustBe DesFailureResponse()
+        }
+      }
+      "the DES response is missing a processingDate" in {
+        val responseJson = Json.parse("{}")
+
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = OK,
+                responseJson = Some(responseJson)
+              )
+            )
+          )
+
+        doRetrieveBulkPaymentRequest { response =>
+          response mustBe DesFailureResponse()
+        }
+      }
+    }
+
+    "return a success response" when {
+      "the DES response is the appropriate json response" in {
+        val responseJson = Json.parse("""{
+                                        |    "processingDate": "2017-03-07T09:30:00.000Z",
+                                        |    "idNumber": "Z5555",
+                                        |    "financialTransactions": [
+                                        |      {
+                                        |        "items": [
+                                        |          {
+                                        |            "clearingDate": "2017-06-01",
+                                        |            "paymentReference": "1234",
+                                        |            "paymentAmount": "1200.00"
+                                        |          },
+                                        |          {
+                                        |            "clearingDate": "2017-06-02",
+                                        |            "paymentReference": "1357",
+                                        |            "paymentAmount": "2050.40"
+                                        |          }
+                                        |        ]
+                                        |      },
+                                        |      {
+                                        |        "items": [
+                                        |          {
+                                        |            "clearingDate": "2017-07-01",
+                                        |            "paymentReference": "5678",
+                                        |            "paymentAmount": "5520.55"
+                                        |          }
+                                        |        ]
+                                        |      }
+                                        |    ]
+                                        |}""".stripMargin)
+
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = OK,
+                responseJson = Some(responseJson)
+              )
+            )
+          )
+
+        doRetrieveBulkPaymentRequest { response =>
+          response mustBe GetBulkPaymentSuccessResponse(
+            lisaManagerReferenceNumber = "Z5555",
+            payments = List(
+              BulkPayment(paymentDate = new DateTime("2017-06-01"), paymentReference = "1234", paymentAmount = 1200.0),
+              BulkPayment(paymentDate = new DateTime("2017-06-02"), paymentReference = "1357", paymentAmount = 2050.4),
+              BulkPayment(paymentDate = new DateTime("2017-07-01"), paymentReference = "5678", paymentAmount = 5520.55)
+            )
+          )
+        }
+      }
+      "the DES response has no financial transactions data" in {
+        val responseJson = Json.parse("""{
+                                        |    "processingDate": "2017-03-07T09:30:00.000Z",
+                                        |    "idNumber": "Z5555",
+                                        |    "financialTransactions": []
+                                        |}""".stripMargin)
+
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = OK,
+                responseJson = Some(responseJson)
+              )
+            )
+          )
+
+        doRetrieveBulkPaymentRequest { response =>
+          response mustBe GetBulkPaymentSuccessResponse(
+            lisaManagerReferenceNumber = "Z5555",
+            payments = Nil
+          )
+        }
+      }
+      "the DES response has no items in all of its financial transactions" in {
+        val responseJson = Json.parse("""{
+                                        |    "processingDate": "2017-03-07T09:30:00.000Z",
+                                        |    "idNumber": "Z5555",
+                                        |    "financialTransactions": [
+                                        |      {
+                                        |        "items": []
+                                        |      },
+                                        |      {
+                                        |        "items": []
+                                        |      }
+                                        |    ]
+                                        |}""".stripMargin)
+
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = OK,
+                responseJson = Some(responseJson)
+              )
+            )
+          )
+
+        doRetrieveBulkPaymentRequest { response =>
+          response mustBe GetBulkPaymentSuccessResponse(
+            lisaManagerReferenceNumber = "Z5555",
+            payments = Nil
+          )
+        }
+      }
+      "the DES response has no items in some of its financial transactions" in {
+        val responseJson = Json.parse("""{
+                                        |    "processingDate": "2017-03-07T09:30:00.000Z",
+                                        |    "idNumber": "Z5555",
+                                        |    "financialTransactions": [
+                                        |      {
+                                        |        "items": [
+                                        |          {
+                                        |            "clearingDate": "2017-06-02",
+                                        |            "paymentReference": "1357",
+                                        |            "paymentAmount": "2050.40"
+                                        |          },
+                                        |          {
+                                        |            "clearingDate": "2017-06-03",
+                                        |            "paymentReference": "1468",
+                                        |            "paymentAmount": "2050.40"
+                                        |          }
+                                        |        ]
+                                        |      },
+                                        |      {
+                                        |        "items": []
+                                        |      }
+                                        |    ]
+                                        |}""".stripMargin)
+
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = OK,
+                responseJson = Some(responseJson)
+              )
+            )
+          )
+
+        doRetrieveBulkPaymentRequest { response =>
+          response mustBe GetBulkPaymentSuccessResponse(
+            lisaManagerReferenceNumber = "Z5555",
+            payments = List(
+              BulkPayment(paymentDate = new DateTime("2017-06-02"), paymentReference = "1357", paymentAmount = 2050.4),
+              BulkPayment(paymentDate = new DateTime("2017-06-03"), paymentReference = "1468", paymentAmount = 2050.4)
+            )
+          )
+        }
+      }
+      "the DES response has some partially complete payment details" in {
+        val responseJson = Json.parse("""{
+                                        |    "processingDate": "2017-03-07T09:30:00.000Z",
+                                        |    "idNumber": "Z5555",
+                                        |    "financialTransactions": [
+                                        |      {
+                                        |        "items": [
+                                        |          {
+                                        |            "clearingDate": "2017-06-02",
+                                        |            "paymentReference": "1357",
+                                        |            "paymentAmount": "2050.40"
+                                        |          },
+                                        |          {
+                                        |            "clearingDate": "2017-06-03",
+                                        |            "paymentReference": "1468",
+                                        |            "paymentAmount": "2050.40"
+                                        |          }
+                                        |        ]
+                                        |      },
+                                        |      {
+                                        |        "items": [
+                                        |          {
+                                        |            "clearingDate": "2017-06-04"
+                                        |          }
+                                        |        ]
+                                        |      }
+                                        |    ]
+                                        |}""".stripMargin)
+
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = OK,
+                responseJson = Some(responseJson)
+              )
+            )
+          )
+
+        doRetrieveBulkPaymentRequest { response =>
+          response mustBe GetBulkPaymentSuccessResponse(
+            lisaManagerReferenceNumber = "Z5555",
+            payments = List(
+              BulkPayment(paymentDate = new DateTime("2017-06-02"), paymentReference = "1357", paymentAmount = 2050.4),
+              BulkPayment(paymentDate = new DateTime("2017-06-03"), paymentReference = "1468", paymentAmount = 2050.4)
+            )
+          )
+        }
+      }
+      "the DES response has only partially complete payment details" in {
+        val responseJson = Json.parse("""{
+                                        |    "processingDate": "2017-03-07T09:30:00.000Z",
+                                        |    "idNumber": "Z5555",
+                                        |    "financialTransactions": [
+                                        |      {
+                                        |        "items": [
+                                        |          {
+                                        |            "paymentReference": "1357",
+                                        |            "paymentAmount": "2050.40"
+                                        |          },
+                                        |          {
+                                        |            "clearingDate": "2017-06-03",
+                                        |            "paymentAmount": "2050.40"
+                                        |          }
+                                        |        ]
+                                        |      },
+                                        |      {
+                                        |        "items": [
+                                        |          {
+                                        |            "clearingDate": "2017-06-02"
+                                        |          }
+                                        |        ]
+                                        |      }
+                                        |    ]
+                                        |}""".stripMargin)
+
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = OK,
+                responseJson = Some(responseJson)
+              )
+            )
+          )
+
+        doRetrieveBulkPaymentRequest { response =>
+          response mustBe GetBulkPaymentSuccessResponse(
+            lisaManagerReferenceNumber = "Z5555",
+            payments = Nil
+          )
+        }
+      }
+    }
+
+    "return a not found response" when {
+      "the DES response has no financial transactions field" in {
+        val responseJson = Json.parse(
+          """{
+            | "processingDate": "2017-03-07T09:30:00.000Z",
+            | "idNumber": "Z1234"
+            |}""".stripMargin)
+
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = OK,
+                responseJson = Some(responseJson)
+              )
+            )
+          )
+
+        doRetrieveBulkPaymentRequest { response =>
+          response mustBe GetBulkPaymentNotFoundResponse
+        }
+      }
+      "the DES response has no id number field" in {
+        val responseJson = Json.parse(
+          """{
+            | "processingDate": "2017-03-07T09:30:00.000Z",
+            | "financialTransactions": []
+            |}""".stripMargin)
+
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = OK,
+                responseJson = Some(responseJson)
+              )
+            )
+          )
+
+        doRetrieveBulkPaymentRequest { response =>
+          response mustBe GetBulkPaymentNotFoundResponse
+        }
+      }
+      "the DES response has no id number or financial transactions field" in {
+        val responseJson = Json.parse(
+          """{
+            | "processingDate": "2017-03-07T09:30:00.000Z"
+            |}""".stripMargin)
+
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = OK,
+                responseJson = Some(responseJson)
+              )
+            )
+          )
+
+        doRetrieveBulkPaymentRequest { response =>
+          response mustBe GetBulkPaymentNotFoundResponse
+        }
+      }
+    }
+
+  }
+
   val validBonusPaymentResponseJson = Source.fromInputStream(getClass().getResourceAsStream("/json/request.valid.bonus-payment-response.json")).mkString
 
   private def doCreateInvestorRequest(callback: ((Int,DesResponse)) => Unit) = {
@@ -1004,6 +1375,12 @@ class DesConnectorSpec extends PlaySpec
 
   private def doRetrieveTransactionRequest(callback: (DesResponse) => Unit) = {
     val response = Await.result(SUT.getTransaction("Z123456", "ABC12345", "123456"), Duration.Inf)
+
+    callback(response)
+  }
+
+  private def doRetrieveBulkPaymentRequest(callback: (DesResponse) => Unit) = {
+    val response = Await.result(SUT.getBulkPayment("Z123456", new DateTime("2018-01-01"), new DateTime("2018-01-01")), Duration.Inf)
 
     callback(response)
   }

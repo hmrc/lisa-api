@@ -35,8 +35,8 @@ class TransactionController extends LisaController with LisaConstants {
       val startTime = System.currentTimeMillis()
       LisaMetrics.startMetrics(startTime, LisaMetricKeys.TRANSACTION)
 
-      withValidLMRN(lisaManager) {
-        withValidAccountId(accountId) {
+      withValidLMRN(lisaManager) { () =>
+        withValidAccountId(accountId) { () =>
           service.getTransaction(lisaManager, accountId, transactionId) map {
             case success: GetTransactionSuccessResponse => {
               Logger.debug("Matched Valid Response")
