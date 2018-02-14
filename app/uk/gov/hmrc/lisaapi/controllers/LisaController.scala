@@ -57,7 +57,7 @@ trait LisaController extends BaseController with HeaderValidator with RunMode wi
     }
     else {
       LisaMetrics.incrementMetrics(System.currentTimeMillis,LisaMetricKeys.getErrorKey(NOT_FOUND,request.uri))
-      Future.successful(NotFound(toJson(ErrorAccountNotFound)))
+      Future.successful(BadRequest(toJson(ErrorBadRequestAccountId)))
     }
   }
 

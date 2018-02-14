@@ -184,11 +184,21 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
       "an invalid lmrn is sent" in {
         when(mockService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionSuccessResponse("code", "message")))
 
-        doUpdateSubsDateInvalidLMRN(updateFirstSubscriptionDate) { res =>
+        doUpdateSubsDate(updateFirstSubscriptionDate, lmrn = "123") { res =>
           status(res) mustBe (BAD_REQUEST)
           val json = contentAsJson(res)
           (json \ "code").as[String] mustBe ErrorBadRequestLmrn.errorCode
           (json \ "message").as[String] mustBe ErrorBadRequestLmrn.message
+        }
+      }
+      "an invalid accountId is sent" in {
+        when(mockService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionSuccessResponse("code", "message")))
+
+        doUpdateSubsDate(updateFirstSubscriptionDate, accId = "1=2!") { res =>
+          status(res) mustBe (BAD_REQUEST)
+          val json = contentAsJson(res)
+          (json \ "code").as[String] mustBe ErrorBadRequestAccountId.errorCode
+          (json \ "message").as[String] mustBe ErrorBadRequestAccountId.message
         }
       }
     }
@@ -247,15 +257,8 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
     }
   }
 
-  def doUpdateSubsDate(jsonString: String)(callback: (Future[Result]) => Unit) {
-    val res = SUT.updateSubscription(lisaManager, accountId).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
-      withBody(AnyContentAsJson(Json.parse(jsonString))))
-
-    callback(res)
-  }
-
-  def doUpdateSubsDateInvalidLMRN(jsonString: String)(callback: (Future[Result]) => Unit) {
-    val res = SUT.updateSubscription("12345678", accountId).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
+  def doUpdateSubsDate(jsonString: String, lmrn: String = lisaManager, accId: String = accountId)(callback: (Future[Result]) => Unit) {
+    val res = SUT.updateSubscription(lmrn, accId).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
       withBody(AnyContentAsJson(Json.parse(jsonString))))
 
     callback(res)

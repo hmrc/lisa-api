@@ -993,6 +993,14 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
           (json \ "message").as[String] mustBe ErrorBadRequestLmrn.message
         }
       }
+      "submitted an invalid accountId" in {
+        doCloseRequest(closeAccountJson, accId = "1=2!") { res =>
+          status(res) mustBe (BAD_REQUEST)
+          val json = contentAsJson(res)
+          (json \ "code").as[String] mustBe ErrorBadRequestAccountId.errorCode
+          (json \ "message").as[String] mustBe ErrorBadRequestAccountId.message
+        }
+      }
     }
 
     "return with status 500 internal server error" when {
@@ -1034,8 +1042,8 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
   }
 
 
-  def doCloseRequest(jsonString: String, lmrn: String = lisaManager)(callback: (Future[Result]) => Unit) {
-    val res = SUT.closeLisaAccount(lmrn, accountId).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
+  def doCloseRequest(jsonString: String, lmrn: String = lisaManager, accId: String = accountId)(callback: (Future[Result]) => Unit) {
+    val res = SUT.closeLisaAccount(lmrn, accId).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
       withBody(AnyContentAsJson(Json.parse(jsonString))))
 
     callback(res)

@@ -299,6 +299,20 @@ types:
                         application/json:
                           type: !include schemas/ErrorCodes.schema.json
                           examples:
+                            InvalidPayload:
+                              description: Bad Request
+                              value: |
+                                {
+                                    "code": "BAD_REQUEST",
+                                    "message": "Bad Request",
+                                    "errors": [
+                                        {
+                                            "code": "INVALID_FORMAT",
+                                            "message": "Invalid format has been used",
+                                            "path": "/accountId"
+                                        }
+                                    ]
+                                }
                             InvalidLmrn:
                               description: lisaManagerReferenceNumber in the URL is in the wrong format
                               value: |
@@ -411,6 +425,13 @@ types:
                                     "code" : "BAD_REQUEST",
                                     "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
                                   }
+                              InvalidAccountId:
+                                description: accountId in the URL is in the wrong format
+                                value: |
+                                  {
+                                    "code" : "BAD_REQUEST",
+                                    "message" : "accountId in the URL is in the wrong format"
+                                  }
                       401:
                         body:
                           application/json:
@@ -509,6 +530,13 @@ types:
                                     "code" : "BAD_REQUEST",
                                     "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
                                   }
+                              InvalidAccountId:
+                                description: accountId in the URL is in the wrong format
+                                value: |
+                                  {
+                                    "code" : "BAD_REQUEST",
+                                    "message" : "accountId in the URL is in the wrong format"
+                                  }
                       401:
                         body:
                           application/json:
@@ -595,6 +623,13 @@ types:
                                   {
                                     "code" : "BAD_REQUEST",
                                     "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
+                                  }
+                              InvalidAccountId:
+                                description: accountId in the URL is in the wrong format
+                                value: |
+                                  {
+                                    "code" : "BAD_REQUEST",
+                                    "message" : "accountId in the URL is in the wrong format"
                                   }
                       401:
                         body:
@@ -695,6 +730,13 @@ types:
                                   {
                                     "code" : "BAD_REQUEST",
                                     "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
+                                  }
+                              InvalidAccountId:
+                                description: accountId in the URL is in the wrong format
+                                value: |
+                                  {
+                                    "code" : "BAD_REQUEST",
+                                    "message" : "accountId in the URL is in the wrong format"
                                   }
                       401:
                         body:

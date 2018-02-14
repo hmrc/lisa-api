@@ -298,13 +298,15 @@ class AccountController extends LisaController with LisaConstants {
 
     def closeLisaAccount(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
       withValidLMRN(lisaManager) { () =>
-        withValidJson[CloseLisaAccountRequest]( closeRequest =>
-          {
+        withValidAccountId(accountId) { () =>
+          withValidJson[CloseLisaAccountRequest](closeRequest => {
               implicit val startTime: Long = System.currentTimeMillis()
-              LisaMetrics.startMetrics(startTime,LisaMetricKeys.CLOSE)
+              LisaMetrics.startMetrics(startTime, LisaMetricKeys.CLOSE)
               processAccountClosure(lisaManager, accountId, closeRequest)
-          }, lisaManager = lisaManager
-        )
+            },
+            lisaManager = lisaManager
+          )
+        }
       }
     }
 

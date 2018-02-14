@@ -41,7 +41,8 @@ class LifeEventController extends LisaController with LisaConstants {
       LisaMetrics.startMetrics(startTime, LisaMetricKeys.EVENT)
 
       withValidLMRN(lisaManager) { () =>
-        withValidJson[ReportLifeEventRequest](req => {
+        withValidAccountId(accountId) { () =>
+          withValidJson[ReportLifeEventRequest](req => {
             if (req.eventDate.isBefore(LISA_START_DATE)) {
               Logger.debug("Life event not reported - invalid event date")
 
@@ -118,7 +119,8 @@ class LifeEventController extends LisaController with LisaConstants {
               }
             }
           }, lisaManager = lisaManager
-        )
+          )
+        }
       }
   }
 
@@ -128,37 +130,39 @@ class LifeEventController extends LisaController with LisaConstants {
       LisaMetrics.startMetrics(startTime, LisaMetricKeys.EVENT)
 
       withValidLMRN(lisaManager) { () =>
-        service.getLifeEvent(lisaManager, accountId, eventId) map { res =>
-          Logger.debug("Entering LifeEvent Controller GET and the response is " + res.toString)
-          res match {
-            case success: RequestLifeEventSuccessResponse => {
-              Logger.debug("Matched Valid Response ")
+        withValidAccountId(accountId) { () =>
+          service.getLifeEvent(lisaManager, accountId, eventId) map { res =>
+            Logger.debug("Entering LifeEvent Controller GET and the response is " + res.toString)
+            res match {
+              case success: RequestLifeEventSuccessResponse => {
+                Logger.debug("Matched Valid Response ")
 
-              LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.EVENT)
+                LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.EVENT)
 
-              Ok(Json.toJson(success))
-            }
-            case ReportLifeEventAccountNotFoundResponse => {
-              Logger.debug("Matched Not Found")
+                Ok(Json.toJson(success))
+              }
+              case ReportLifeEventAccountNotFoundResponse => {
+                Logger.debug("Matched Not Found")
 
-              LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getErrorKey(NOT_FOUND, request.uri))
+                LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getErrorKey(NOT_FOUND, request.uri))
 
-              NotFound(Json.toJson(ErrorAccountNotFound))
-            }
-            case ReportLifeEventIdNotFoundResponse => {
-              Logger.debug("Matched Not Found")
+                NotFound(Json.toJson(ErrorAccountNotFound))
+              }
+              case ReportLifeEventIdNotFoundResponse => {
+                Logger.debug("Matched Not Found")
 
-              LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getErrorKey(NOT_FOUND, request.uri))
+                LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getErrorKey(NOT_FOUND, request.uri))
 
-              NotFound(Json.toJson(ErrorLifeEventIdNotFound))
-            }
-            case _ => {
-              Logger.debug("Matched Error")
-              Logger.error("Life Event Not returned : DES unknown case , returning internal server error")
+                NotFound(Json.toJson(ErrorLifeEventIdNotFound))
+              }
+              case _ => {
+                Logger.debug("Matched Error")
+                Logger.error("Life Event Not returned : DES unknown case , returning internal server error")
 
-              LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getErrorKey(INTERNAL_SERVER_ERROR, request.uri))
+                LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getErrorKey(INTERNAL_SERVER_ERROR, request.uri))
 
-              InternalServerError(Json.toJson(ErrorInternalServerError))
+                InternalServerError(Json.toJson(ErrorInternalServerError))
+              }
             }
           }
         }

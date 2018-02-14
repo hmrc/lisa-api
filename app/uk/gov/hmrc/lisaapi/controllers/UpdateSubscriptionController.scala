@@ -29,6 +29,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class UpdateSubscriptionController extends LisaController with LisaConstants {
+
   val service: UpdateSubscriptionService = UpdateSubscriptionService
   val auditService: AuditService = AuditService
 
@@ -124,5 +125,6 @@ class UpdateSubscriptionController extends LisaController with LisaConstants {
   private def getEndpointUrl(lisaManagerReferenceNumber: String, accountId: AccountId): String = {
     s"/manager/$lisaManagerReferenceNumber/accounts/$accountId/update-subscription"
   }
+
 }
 
