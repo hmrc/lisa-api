@@ -12,7 +12,7 @@
       "$ref": "#/definitions/ISO8601-Date"
     },
     "paymentDate": {
-      "description":"The date payment has been made.",
+      "description":"The date payment was made.",
       "$ref": "#/definitions/ISO8601-Date"
     },
     "paymentDueDate": {
@@ -25,10 +25,7 @@
       "enum": [
         "Paid",
         "Pending",
-        "Cancelled",
-        "Superceded",
-        "Due",
-        "Overdue"
+        "Cancelled"
       ],
       "example": "Paid"
     },

@@ -955,7 +955,25 @@ types:
                                  type: !include schemas/InvestorPayment.get.response.schema.json
                                  examples:
                                    paid: !include examples/InvestorPayment.get.response.json
-                                   charge: !include examples/InvestorPayment.get.response.1.json
+                           400:
+                             body:
+                               application/json:
+                                 type: !include schemas/ErrorCodes.schema.json
+                                 examples:
+                                   InvalidLmrn:
+                                     description: lisaManagerReferenceNumber in the URL is in the wrong format
+                                     value: |
+                                       {
+                                         "code" : "BAD_REQUEST",
+                                         "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
+                                       }
+                                   InvalidAccountId:
+                                     description: accountId in the URL is in the wrong format
+                                     value: |
+                                       {
+                                         "code" : "BAD_REQUEST",
+                                         "message" : "accountId in the URL is in the wrong format"
+                                       }
                            401:
                              body:
                                application/json:
