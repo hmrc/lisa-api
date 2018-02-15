@@ -67,37 +67,23 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request for a superceded transaction</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 2000000200</p></td>
-            <td></td>
-            <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
-                <p class ="code--block">{<br>
-						    "transactionId": "2000000200",<br>
-						    "creationDate": "2017-05-20",<br>
-						    "bonusDueForPeriod": 1000,<br>
-						    "status": "Superceded",<br>						}
-                </p>
-            </td>
-        </tr>
-        <tr>
-            <td><p>Request for a transaction where a charge is owed</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 5000000200</p></td>
-            <td></td>
-            <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
-                <p class ="code--block">{<br>
-					     "transactionId": "5000000200",<br>
-					     "creationDate": "2017-05-20",<br>
-					     "status": "Due",<br>
-					     "chargeReference": "XM002610108957"<br>
-						}
-                </p>
-            </td>
-        </tr>
-        <tr>
             <td><p>Request with a valid account ID and Transaction ID, but an invalid LISA Manager reference number</p><p class ="code--block">lisaManagerReferenceNumber: 123456<br>accountId: 1234567890<br>transactionId: 1234567890</p></td>
                         <td></td>
             <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
                 <p class ="code--block"> {<br>
                     "code": "BAD_REQUEST",<br>
                     "message": "lisaManagerReferenceNumber in the URL is in the wrong format"<br>
+                  }
+                </p>
+            </td>
+        </tr>
+        <tr>
+            <td><p>Request with a valid LISA Manager reference number and Transaction ID, but an invalid account ID</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234=5678<br>transactionId: 1234567890</p></td>
+                        <td></td>
+            <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
+                <p class ="code--block"> {<br>
+                    "code": "BAD_REQUEST",<br>
+                    "message": "accountId in the URL is in the wrong format"<br>
                   }
                 </p>
             </td>
@@ -119,7 +105,7 @@
             <td><p>HTTP status: <code class="code--slim">404 (Not found)</code></p>
                 <p class ="code--block"> {<br>
                                             "code": "INVESTOR_ACCOUNTID_NOT_FOUND",<br>
-                                            "message": "The accountId does not match HMRC’s records."<br>
+                                            "message": "The accountId does not match HMRC’s records"<br>
                                           }
                 </p>
             </td>
