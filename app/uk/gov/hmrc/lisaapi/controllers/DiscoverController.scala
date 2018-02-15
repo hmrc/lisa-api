@@ -28,27 +28,27 @@ class DiscoverController extends LisaController {
     withValidLMRN(lisaManagerReferenceNumber) { () =>
 
       val result = s"""{
-        "lisaManagerReferenceNumber": "Z543210",
+        "lisaManagerReferenceNumber": "$lisaManagerReferenceNumber",
         "_links":
         {
-          "self": {"href": "/lifetime-isa/manager/{lisaManagerReferenceNumber}", "methods": ["GET"]},
-          "investors": {"href": "/lifetime-isa/manager/{lisaManagerReferenceNumber}/investors", "methods": ["POST"]},
+          "self": {"href": "/lifetime-isa/manager/$lisaManagerReferenceNumber", "methods": ["GET"]},
+          "investors": {"href": "/lifetime-isa/manager/$lisaManagerReferenceNumber/investors", "methods": ["POST"]},
           "accounts": [
-            {"href": "/lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts", "methods": ["POST"]},
-            {"href": "/lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}", "methods": ["GET"]}
+            {"href": "/lifetime-isa/manager/$lisaManagerReferenceNumber/accounts", "methods": ["POST"]},
+            {"href": "/lifetime-isa/manager/$lisaManagerReferenceNumber/accounts/{accountId}", "methods": ["GET"]}
           ],
-          "close account": {"href": "/lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/close-account", "methods": ["POST"]},
-          "reinstate account": {"href": "/lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/reinstate-account", "methods": ["POST"]},
-          "update subscription": {"href": "/lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/update-subscription", "methods": ["POST"]},
+          "close account": {"href": "/lifetime-isa/manager/$lisaManagerReferenceNumber/accounts/{accountId}/close-account", "methods": ["POST"]},
+          "reinstate account": {"href": "/lifetime-isa/manager/$lisaManagerReferenceNumber/accounts/reinstate-account", "methods": ["POST"]},
+          "update subscription": {"href": "/lifetime-isa/manager/$lisaManagerReferenceNumber/accounts/{accountId}/update-subscription", "methods": ["POST"]},
           "life events": [
-            {"href": "/lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/events", "methods": ["POST"]},
-            {"href": "/lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/events/{lifeEventId}", "methods": [ "GET"]}
+            {"href": "/lifetime-isa/manager/$lisaManagerReferenceNumber/accounts/{accountId}/events", "methods": ["POST"]},
+            {"href": "/lifetime-isa/manager/$lisaManagerReferenceNumber/accounts/{accountId}/events/{lifeEventId}", "methods": [ "GET"]}
           ],
           "bonus payments": [
-            {"href": "/lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/transactions", "methods": ["POST"]},
-            {"href": "/lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/transactions/{transactionId}", "methods": ["GET"]}
+            {"href": "/lifetime-isa/manager/$lisaManagerReferenceNumber/accounts/{accountId}/transactions", "methods": ["POST"]},
+            {"href": "/lifetime-isa/manager/$lisaManagerReferenceNumber/accounts/{accountId}/transactions/{transactionId}", "methods": ["GET"]}
           ],
-          "bulk payments": {"href": "/lifetime-isa/manager/{lisaManagerReferenceNumber}/payments?startDate={startDate}&endDate={endDate}", "methods": ["GET"]}
+          "bulk payments": {"href": "/lifetime-isa/manager/$lisaManagerReferenceNumber/payments?startDate={startDate}&endDate={endDate}", "methods": ["GET"]}
         }
       }"""
 
