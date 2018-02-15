@@ -71,6 +71,18 @@ types:
                               "code" : "BAD_REQUEST",
                               "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
                             }
+                401:
+                  body:
+                    application/json:
+                      type: !include schemas/ErrorCodes.schema.json
+                      examples:
+                        notOpenStatus:
+                          description: lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
+                          value: |
+                            {
+                              "code" : "UNAUTHORIZED",
+                              "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
+                            }
             /investors:
               post:
                   is: [headers.acceptHeader, headers.contentHeader]

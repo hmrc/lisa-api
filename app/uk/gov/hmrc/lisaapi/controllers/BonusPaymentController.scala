@@ -75,8 +75,10 @@ class BonusPaymentController extends LisaController with LisaConstants {
       implicit val startTime: Long = System.currentTimeMillis()
       LisaMetrics.startMetrics(startTime, LisaMetricKeys.BONUS_PAYMENT)
       withValidLMRN(lisaManager) { () =>
-        withValidAccountId(accountId) { () =>
-          processGetBonusPayment(lisaManager, accountId, transactionId)
+        withEnrolment(lisaManager) { (_) =>
+          withValidAccountId(accountId) { () =>
+            processGetBonusPayment(lisaManager, accountId, transactionId)
+          }
         }
       }
     }

@@ -268,8 +268,10 @@ class AccountController extends LisaController with LisaConstants {
       implicit val startTime: Long = System.currentTimeMillis()
       LisaMetrics.startMetrics(startTime, LisaMetricKeys.ACCOUNT)
       withValidLMRN(lisaManager) { () =>
-        withValidAccountId(accountId) { () =>
-          processGetAccountDetails(lisaManager, accountId)
+        withEnrolment(lisaManager) { (_) =>
+          withValidAccountId(accountId) { () =>
+            processGetAccountDetails(lisaManager, accountId)
+          }
         }
       }
     }
