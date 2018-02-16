@@ -899,6 +899,7 @@ types:
                         200:
                           body:
                             application/json:
+                              type: !include schemas/BonusPaymentRequest.post.schema.json
                               examples:
                                 example-1: !include examples/LISATransaction.get.response.json
                                 example-2: !include examples/LISATransaction.get.response.1.json
