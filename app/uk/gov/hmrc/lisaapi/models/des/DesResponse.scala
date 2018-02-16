@@ -103,12 +103,64 @@ object DesResponse {
 
   implicit val desGetBonusPaymentResponse: Reads[DesGetBonusPaymentResponse] = (
     (JsPath \ "lifeEventId").readNullable(JsonReads.lifeEventId) and
-    (JsPath \ "periodStartDate").read(JsonReads.isoDate).map(new DateTime(_)) and
-    (JsPath \ "periodEndDate").read(JsonReads.isoDate).map(new DateTime(_)) and
-    (JsPath \ "htbTransfer").readNullable[HelpToBuyTransfer] and
-    (JsPath \ "inboundPayments").read[InboundPayments] and
-    (JsPath \ "bonuses").read[Bonuses] and
+    (JsPath \ "claimPeriodStart").read(JsonReads.isoDate).map(new DateTime(_)) and
+    (JsPath \ "claimPeriodEnd").read(JsonReads.isoDate).map(new DateTime(_)) and
+    (JsPath \ "htbInAmountForPeriod").readNullable[Amount] and
+    (JsPath \ "htbInAmountYtd").readNullable[Amount] and
+    (JsPath \ "newSubsInPeriod").readNullable[Amount] and
+    (JsPath \ "newSubsYtd").read[Amount] and
+    (JsPath \ "totalSubsInPeriod").read[Amount] and
+    (JsPath \ "totalSubsYtd").read[Amount] and
+    (JsPath \ "bonusDueForPeriod").read[Amount] and
+    (JsPath \ "bonusDueYtd").read[Amount] and
+    (JsPath \ "bonusPaidYtd").readNullable[Amount] and
+    (JsPath \ "claimReason").read[String] and
     (JsPath \ "creationDate").read(JsonReads.isoDate).map(new DateTime(_)) and
-    (JsPath \ "status").read[String]
-  )(DesGetBonusPaymentResponse.apply _)
+    (JsPath \ "paymentStatus").read[String]
+  )(
+    (lifeEventId,
+     periodStartDate,
+     periodEndDate,
+     htbInAmountForPeriod,
+     htbInAmountYtd,
+     newSubsInPeriod,
+     newSubsYtd,
+     totalSubsInPeriod,
+     totalSubsYtd,
+     bonusDueForPeriod,
+     bonusDueYtd,
+     bonusPaidYtd,
+     claimReason,
+     creationDate,
+     status) =>
+        DesGetBonusPaymentResponse(
+          lifeEventId,
+          periodStartDate,
+          periodEndDate,
+          (htbInAmountForPeriod, htbInAmountYtd) match {
+            case (Some(amountForPeriod), Some(amountYtd)) => {
+              Some(HelpToBuyTransfer(amountForPeriod, amountYtd))
+            }
+            case _ => None
+          },
+          InboundPayments(newSubsInPeriod,
+            newSubsYtd,
+            totalSubsInPeriod,
+            totalSubsYtd
+          ),
+          Bonuses(bonusDueForPeriod,
+            bonusDueYtd,
+            bonusPaidYtd,
+            claimReason match {
+              // todo: finish defining all the possible claim reasons
+              case "LIFE_EVENT" => "Life Event"
+            }
+          ),
+          creationDate,
+          status match {
+            // todo: finish defining all the possible statuses
+            case "PAID" => "Paid"
+          }
+        )
+  )
 }
