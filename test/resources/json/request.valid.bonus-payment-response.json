@@ -1,28 +1,17 @@
 {
-  "lifeEventId": "1234567891",
-  "periodStartDate": "2017-04-06",
-  "periodEndDate": "2017-05-05",
-  "transactionType": "Bonus",
-
-  "htbTransfer": {
-    "htbTransferInForPeriod": 0.00,
-    "htbTransferTotalYTD": 10.00
-  },
-
-  "inboundPayments": {
-    "newSubsForPeriod": 4000.00,
-    "newSubsYTD": 4000.00,
-    "totalSubsForPeriod": 4000.00,
-    "totalSubsYTD": 4000.00
-  },
-
-  "bonuses": {
-    "bonusDueForPeriod": 1000.00,
-    "totalBonusDueYTD": 1000.00,
-    "bonusPaidYTD": 1000.00,
-    "claimReason": "Life Event"
-  },
-
   "creationDate": "2017-05-05",
-  "status": "Paid"
+  "claimPeriodStart": "2017-04-06",
+  "claimPeriodEnd": "2017-05-05",
+  "lifeEventId": "1234567891",
+  "htbInAmountForPeriod": 0,
+  "htbInAmountYtd": 10,
+  "newSubsInPeriod": 4000,
+  "newSubsYtd": 4000,
+  "totalSubsInPeriod": 4000,
+  "totalSubsYtd": 4000,
+  "bonusDueForPeriod": 1000,
+  "bonusDueYtd": 1000,
+  "bonusPaidYtd": 1000,
+  "claimReason": "LIFE_EVENT",
+  "paymentStatus": "PAID"
 }
