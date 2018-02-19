@@ -152,14 +152,16 @@ object DesResponse {
             bonusDueYtd,
             bonusPaidYtd,
             claimReason match {
-              // todo: finish defining all the possible claim reasons
               case "LIFE_EVENT" => "Life Event"
+              case "REGULAR_BONUS" => "Regular Bonus"
             }
           ),
           creationDate,
           status match {
-            // todo: finish defining all the possible statuses
+            case "PENDING" => "Pending"
             case "PAID" => "Paid"
+            case "VOID" => "Void"
+            case "CANCELLED" => "Cancelled"
           }
         )
   )

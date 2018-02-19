@@ -38,7 +38,7 @@ trait TransactionService {
 
             handleETMP(lisaManager, accountId, transactionId, bonus)
           }
-          case "Pending" | "Cancelled" | "Superceded" => {
+          case "Pending" | "Void" | "Cancelled" => {
             Logger.debug(s"Matched a ${bonus.status} bonus payment in ITMP")
 
             Future.successful(GetTransactionSuccessResponse(

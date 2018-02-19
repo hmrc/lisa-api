@@ -138,30 +138,6 @@ class TransactionServiceSpec extends PlaySpec
       }
     }
 
-    "return a Superceded transaction" when {
-      "ITMP returns a Superceded status" in {
-        when(mockDesConnector.getBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesGetBonusPaymentResponse(
-            lifeEventId = None,
-            periodStartDate = new DateTime("2001-01-01"),
-            periodEndDate = new DateTime("2002-01-01"),
-            htbTransfer = None,
-            inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
-            bonuses = Bonuses(1.0, 1.0, None, "X"),
-            creationDate = new DateTime("2000-01-01"),
-            status = "Superceded")))
-
-        val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
-
-        result mustBe GetTransactionSuccessResponse(
-          transactionId = "12345",
-          creationDate = new DateTime("2000-01-01"),
-          bonusDueForPeriod = Some(1.0),
-          status = "Superceded"
-        )
-      }
-    }
-
     "return a Paid transaction" when {
       "ITMP returns a Paid status and ETMP returns a Paid status" in {
         when(mockDesConnector.getBonusPayment(any(), any(), any())(any())).
@@ -283,7 +259,7 @@ class TransactionServiceSpec extends PlaySpec
     }
 
     "return a Generic error" when {
-      "ITMP returns a status other than Pending, Paid, Cancelled and Superceded" in {
+      "ITMP returns a status other than Pending, Paid, Void or Cancelled" in {
         when(mockDesConnector.getBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(DesGetBonusPaymentResponse(
             lifeEventId = None,
