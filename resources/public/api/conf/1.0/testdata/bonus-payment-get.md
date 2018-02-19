@@ -101,7 +101,8 @@
 				<p class ="code--block">
 					{<br>
 						"code": "BONUS_PAYMENT_TRANSACTION_NOT_FOUND",<br>
-						"message": "transactionId does not match HMRC’s records"<br>					}
+						"message": "transactionId does not match HMRC’s records"<br>
+					}
 				</p>
 			</td>
 		</tr>
@@ -120,7 +121,8 @@
 				<p class ="code--block">
 					{<br>
 						"code": "INVESTOR_ACCOUNTID_NOT_FOUND",<br>
-						"message": "The accountId does not match HMRC’s records"<br>					}
+						"message": "The accountId does not match HMRC’s records"<br>
+					}
 				</p>
 			</td>
 		</tr>
