@@ -88,7 +88,7 @@
 		</tr>
 	   <tr>
 		    <td>
-		    	<p>Request with an invalid LISA account</p>
+		    	<p>Request with an invalid bonus payment transaction</p>
 		    	<p class ="code--block">
 		    		lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
 		    		accountId: 1234567890<br>
@@ -100,14 +100,14 @@
 				<p>HTTP status: <code class="code--slim">404 (Not Found)</code></p>
 				<p class ="code--block">
 					{<br>
-						"code": "INVESTOR_ACCOUNTID_NOT_FOUND",<br>
-						"message": "The accountId does not match HMRC’s records"<br>					}
+						"code": "BONUS_PAYMENT_TRANSACTION_NOT_FOUND",<br>
+						"message": "transactionId does not match HMRC’s records"<br>					}
 				</p>
 			</td>
 		</tr>
 	   <tr>
 		    <td>
-		    	<p>Request with an invalid bonus payment transaction</p>
+		    	<p>Request with an invalid LISA account</p>
 		    	<p class ="code--block">
 		    		lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
 		    		accountId: 1234567890<br>
@@ -119,8 +119,8 @@
 				<p>HTTP status: <code class="code--slim">404 (Not Found)</code></p>
 				<p class ="code--block">
 					{<br>
-						"code": "BONUS_PAYMENT_TRANSACTION_NOT_FOUND",<br>
-						"message": "transactionId does not match HMRC’s records"<br>					}
+						"code": "INVESTOR_ACCOUNTID_NOT_FOUND",<br>
+						"message": "The accountId does not match HMRC’s records"<br>					}
 				</p>
 			</td>
 		</tr>
