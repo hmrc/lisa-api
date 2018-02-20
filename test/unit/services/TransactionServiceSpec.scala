@@ -201,7 +201,7 @@ class TransactionServiceSpec extends PlaySpec
     "return a Transaction Not Found error" when {
       "ITMP returns a Transaction Not Found error" in {
         when(mockDesConnector.getBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("BONUS_PAYMENT_TRANSACTION_NOT_FOUND")))
+          thenReturn(Future.successful(DesFailureResponse("TRANSACTION_ID_NOT_FOUND")))
 
         val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
 
@@ -220,7 +220,7 @@ class TransactionServiceSpec extends PlaySpec
             status = "Paid")))
 
         when(mockDesConnector.getTransaction(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("BONUS_PAYMENT_TRANSACTION_NOT_FOUND")))
+          thenReturn(Future.successful(DesFailureResponse("TRANSACTION_ID_NOT_FOUND")))
 
         val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
 
