@@ -704,7 +704,7 @@ class DesConnectorSpec extends PlaySpec
 
   "Retrieve Bonus Payment endpoint" must {
 
-    "return a specific DesFailureResponse" when {
+    "return a DesFailureResponse" when {
 
       "a specific failure is returned" in {
         when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
@@ -744,7 +744,7 @@ class DesConnectorSpec extends PlaySpec
 
     }
 
-    "return a success response" when {
+    "return a DesGetBonusPaymentResponse" when {
 
       "DES returns successfully" in {
 
