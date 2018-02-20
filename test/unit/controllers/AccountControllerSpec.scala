@@ -705,6 +705,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
   }
 
+  /*
   "The Get Account Details endpoint" must {
 
     when(mockAuthCon.authorise[Option[String]](any(), any())(any(), any())).thenReturn(Future(Some("1234")))
@@ -755,6 +756,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
     }
 
   }
+  */
 
   "The Close Account endpoint" must {
 

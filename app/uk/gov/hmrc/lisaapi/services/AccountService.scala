@@ -66,7 +66,7 @@ trait AccountService {
         }
 
         GetLisaAccountSuccessResponse(
-          res.accountId,
+          accountId,
           res.investorId,
           res.creationReason,
           res.firstSubscriptionDate,

@@ -31,7 +31,7 @@ case class DesGetAccountResponse(
   creationReason: String,
   firstSubscriptionDate:String,
   accountStatus:String,
-  subscriptionStatus:String,
+  subscriptionStatus:Option[String],
   accountClosureReason:Option[String],
   closureDate:Option[String],
   transferAccount: Option[DesGetAccountTransferResponse]
@@ -76,7 +76,6 @@ object DesResponse {
     (JsPath \ "transferInDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd"))
   )(unlift(DesGetAccountTransferResponse.unapply))
 
-  implicit val desGetAccountResponseFormats: OFormat[DesGetAccountResponse] = Json.format[DesGetAccountResponse]
   implicit val desCreateInvestorResponseFormats: OFormat[DesCreateInvestorResponse] = Json.format[DesCreateInvestorResponse]
   implicit val desLifeEventResponseFormats: OFormat[DesLifeEventResponse] = Json.format[DesLifeEventResponse]
   implicit val desTransactionResponseFormats: OFormat[DesTransactionResponse] = Json.format[DesTransactionResponse]
@@ -165,4 +164,62 @@ object DesResponse {
           }
         )
   )
+
+
+  implicit val desGetAccountResponseReads: Reads[DesGetAccountResponse] = (
+      (JsPath \ "investorId").read(JsonReads.investorId) and
+      (JsPath \ "status").read[String] and
+      (JsPath \ "creationDate").read(JsonReads.isoDate).map(new DateTime(_)) and
+      (JsPath \ "creationReason").read[String] and
+      (JsPath \ "accountClosureReason").readNullable[String] and
+      (JsPath \ "lisaManagerClosureDate").readNullable(JsonReads.isoDate).map(_.map(new DateTime(_))) and
+      (JsPath \ "subscriptionStatus").readNullable[String] and
+      (JsPath \ "firstSubscriptionDate").read(JsonReads.isoDate).map(new DateTime(_)) and
+      (JsPath \ "transferInDate").readNullable(JsonReads.isoDate).map(_.map(new DateTime(_))) and
+      (JsPath \ "xferredFromAccountId").readNullable(JsonReads.accountId) and
+      (JsPath \ "xferredFromLmrn").readNullable(JsonReads.lmrn)
+  )(
+    (investorId, status, _, creationReason, accountClosureReason, lisaManagerClosureDate, subscriptionStatus,
+     firstSubscriptionDate, transferInDate, xferredFromAccountId, xferredFromLmrn) =>
+      DesGetAccountResponse(
+        accountId = "",
+        investorId = investorId,
+        creationReason = creationReason match {
+          case "NEW" => "New"
+          case "TRANSFERRED" => "Transferred"
+          case "REINSTATED" => "Reinstated"
+        },
+        firstSubscriptionDate = firstSubscriptionDate.toString("yyyy-MM-dd"),
+        accountStatus = status match {
+          case "OPEN" => "Open"
+          case "CLOSED" => "Closed"
+          case "VOID" => "Void"
+        },
+        subscriptionStatus = subscriptionStatus.map(st => st match {
+          case "AVAILABLE" => "Available"
+          case "ACTIVE" => "Active"
+          case "CANCELLED" => "Cancelled"
+          case "LOCKED" => "Locked"
+          case "VOID" => "Void"
+        }),
+        accountClosureReason = accountClosureReason.map(cr => cr match {
+          case "TRANSFERRED_OUT" => "Transferred out"
+          case "ALL_FUNDS_WITHDRAWN" => "All funds withdrawn"
+          case "VOIDED" => "Voided"
+          case "CANCELLED" => "Cancelled"
+        }),
+        closureDate = lisaManagerClosureDate.map(_.toString("yyyy-MM-dd")),
+        transferAccount = (xferredFromAccountId, xferredFromLmrn, transferInDate) match {
+          case (Some(accountId), Some(lmrn), Some(date)) => Some(DesGetAccountTransferResponse(
+            transferredFromAccountId = accountId,
+            transferredFromLMRN = lmrn,
+            transferInDate = date
+          ))
+          case _ => None
+        }
+      )
+  )
+
+  implicit val desGetAccountResponseWrites = Json.writes[DesGetAccountResponse]
+
 }

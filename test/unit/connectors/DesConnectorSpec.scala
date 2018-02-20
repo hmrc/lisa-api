@@ -1353,20 +1353,20 @@ class DesConnectorSpec extends PlaySpec
     "return a success response" when {
       "the DES response is the appropriate json response" in {
         val responseJson = Json.parse("""{
-                                        |  "investorId": "1234567890",
-                                        |  "status": "OPEN",
-                                        |  "creationDate": "2016-01-01",
-                                        |  "creationReason": "REINSTATED",
-                                        |  "hmrcClosureDate": "2016-02-01",
-                                        |  "accountClosureReason": "TRANSFERRED_OUT",
-                                        |  "transferInDate": "2016-03-01",
-                                        |  "transferOutDate": "2016-04-01",
-                                        |  "xferredFromAccountId": "123abc789ABC34567890",
-                                        |  "xferredFromLmrn": "Z123453",
-                                        |  "lisaManagerClosureDate": "2016-05-01",
-                                        |  "subscriptionStatus": "AVAILABLE",
-                                        |  "firstSubscriptionDate": "2016-01-06"
-                                        |}""".stripMargin)
+                                          |  "investorId": "1234567890",
+                                          |  "status": "OPEN",
+                                          |  "creationDate": "2016-01-01",
+                                          |  "creationReason": "REINSTATED",
+                                          |  "hmrcClosureDate": "2016-02-01",
+                                          |  "accountClosureReason": "TRANSFERRED_OUT",
+                                          |  "transferInDate": "2016-03-01",
+                                          |  "transferOutDate": "2016-04-01",
+                                          |  "xferredFromAccountId": "123abc789ABC34567890",
+                                          |  "xferredFromLmrn": "Z123453",
+                                          |  "lisaManagerClosureDate": "2016-05-01",
+                                          |  "subscriptionStatus": "AVAILABLE",
+                                          |  "firstSubscriptionDate": "2016-01-06"
+                                          |}""".stripMargin)
 
         when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
           .thenReturn(
@@ -1380,13 +1380,13 @@ class DesConnectorSpec extends PlaySpec
 
         doRetrieveAccountRequest { response =>
           response mustBe DesGetAccountResponse(
-            accountId = "",
+            accountId = "123456",
             investorId = "1234567890",
-            creationReason = "REINSTATED",
+            creationReason = "Reinstated",
             firstSubscriptionDate = "2016-01-06",
-            accountStatus = "OPEN",
-            subscriptionStatus = "AVAILABLE",
-            accountClosureReason = Some("TRANSFERRED_OUT"),
+            accountStatus = "Open",
+            subscriptionStatus = Some("Available"),
+            accountClosureReason = Some("Transferred out"),
             closureDate = Some("2016-05-01"),
             transferAccount = Some(DesGetAccountTransferResponse(
               transferredFromAccountId = "123abc789ABC34567890",
@@ -1490,7 +1490,7 @@ class DesConnectorSpec extends PlaySpec
     callback(response)
   }
 
-  private def doRetrieveAccountRequest(callback: (DesResponse) => Unit) = {
+  private def  doRetrieveAccountRequest(callback: (DesResponse) => Unit) = {
     val response = Await.result(SUT.getAccountInformation("Z123456", "123456"), Duration.Inf)
 
     callback(response)
