@@ -38,7 +38,7 @@ trait TransactionService {
 
             handleETMP(lisaManager, accountId, transactionId, bonus)
           }
-          case "Pending" | "Cancelled" | "Superceded" => {
+          case "Pending" | "Void" | "Cancelled" => {
             Logger.debug(s"Matched a ${bonus.status} bonus payment in ITMP")
 
             Future.successful(GetTransactionSuccessResponse(
@@ -116,7 +116,7 @@ trait TransactionService {
 
   private def handleError(code: String): GetTransactionResponse = {
     code match {
-      case "BONUS_PAYMENT_TRANSACTION_NOT_FOUND" => GetTransactionTransactionNotFoundResponse
+      case "TRANSACTION_ID_NOT_FOUND" => GetTransactionTransactionNotFoundResponse
       case "INVESTOR_ACCOUNTID_NOT_FOUND" => GetTransactionAccountNotFoundResponse
       case _ => GetTransactionErrorResponse
     }
