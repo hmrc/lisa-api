@@ -17,7 +17,8 @@
       "type": "string",
       "enum": [
         "New",
-        "Transferred"
+        "Transferred",
+        "Reinstated"
       ]
     },
     "firstSubscriptionDate": {
