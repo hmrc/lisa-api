@@ -190,18 +190,8 @@ object DesResponse {
           case "REINSTATED" => "Reinstated"
         },
         firstSubscriptionDate = firstSubscriptionDate.toString("yyyy-MM-dd"),
-        accountStatus = status match {
-          case "OPEN" => "Open"
-          case "CLOSED" => "Closed"
-          case "VOID" => "Void"
-        },
-        subscriptionStatus = subscriptionStatus.map(st => st match {
-          case "AVAILABLE" => "Available"
-          case "ACTIVE" => "Active"
-          case "CANCELLED" => "Cancelled"
-          case "LOCKED" => "Locked"
-          case "VOID" => "Void"
-        }),
+        accountStatus = status,
+        subscriptionStatus = subscriptionStatus,
         accountClosureReason = accountClosureReason.map(cr => cr match {
           case "TRANSFERRED_OUT" => "Transferred out"
           case "ALL_FUNDS_WITHDRAWN" => "All funds withdrawn"
