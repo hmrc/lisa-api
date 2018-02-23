@@ -50,7 +50,6 @@ trait DesConnector extends ServicesConfig {
     headerCarrier.copy(extraHeaders = Seq(("Environment" -> AppContext.desUrlHeaderEnv)),
           authorization = Some(Authorization(s"Bearer ${AppContext.desAuthToken}")))
 
-
   private def updateHeaderCarrierWithAllDesHeaders(headerCarrier: HeaderCarrier) =
     headerCarrier.copy(extraHeaders = Seq(("Environment" -> AppContext.desUrlHeaderEnv), ("OriginatorId" -> "DA2_LISA")),
       authorization = Some(Authorization(s"Bearer ${AppContext.desAuthToken}")))
@@ -98,11 +97,14 @@ trait DesConnector extends ServicesConfig {
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}"
     Logger.debug("Getting the Account details from des: " + uri)
 
-    val result: Future[HttpResponse] = httpGet.GET(uri)(httpReads, hc = updateHeaderCarrier(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
+    val result: Future[HttpResponse] = httpGet.GET(uri)(httpReads, hc = updateHeaderCarrierWithAllDesHeaders(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
 
     result.map(res => {
       Logger.debug("Get Account request returned status: " + res.status)
-      parseDesResponse[DesGetAccountResponse](res)._2
+      parseDesResponse[GetLisaAccountSuccessResponse](res)._2 match {
+        case success: GetLisaAccountSuccessResponse => success.copy(accountId = accountId)
+        case fail: DesResponse => fail
+      }
     })
   }
 
@@ -296,7 +298,7 @@ trait DesConnector extends ServicesConfig {
     Try(res.json.as[A]) match {
       case Success(data) =>
         (res.status, data)
-      case Failure(_) =>
+      case Failure(er) =>
         Try(res.json.as[DesFailureResponse]) match {
           case Success(data) => Logger.info(s"DesFailureResponse from DES :${data}")
              (res.status, data)

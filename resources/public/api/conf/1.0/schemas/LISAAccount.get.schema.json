@@ -17,7 +17,8 @@
       "type": "string",
       "enum": [
         "New",
-        "Transferred"
+        "Transferred",
+        "Reinstated"
       ]
     },
     "firstSubscriptionDate": {
@@ -46,7 +47,13 @@
     },
     "accountClosureReason": {
       "description": "The reason the account was closed.",
-      "type": "string"
+      "type": "string",
+      "enum": [
+        "All funds withdrawn",
+        "Cancellation",
+        "Transferred out",
+        "Voided"
+      ]
     },
     "closureDate": {
       "description": "The date the account was closed. This cannot be in the future.",

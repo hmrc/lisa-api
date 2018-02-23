@@ -711,33 +711,133 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
     "return the correct json" when {
       "returning a valid open account response" in {
-        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", s"$validDate", "OPEN", "ACTIVE", None, None, None)))
-        doSyncGetAccountDetailsRequest(res => {
-          status(res) mustBe OK
-          contentAsJson(res) mustBe Json.toJson (GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", s"$validDate", "OPEN", "ACTIVE", None, None, None))
-        })
-      }
-      "returning a valid close account response" in {
-        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", s"$validDate", "CLOSED", "ACTIVE", Some("All funds withdrawn"), Some("2017-01-03"), None)))
-        doSyncGetAccountDetailsRequest(res => {
-          status(res) mustBe OK
-          contentAsJson(res) mustBe Json.toJson (GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", s"$validDate",  "CLOSED", "ACTIVE", Some("All funds withdrawn"), Some("2017-01-03"), None))
-        })
-      }
-      "returning a valid transfer account response" in {
-        when(mockService.getAccount(any(), any())(any())).
-          thenReturn(Future.successful(GetLisaAccountSuccessResponse("9876543210", "8765432100", "Transferred", s"$validDate", "OPEN", "ACTIVE", None, None, Some(GetLisaAccountTransferAccount("8765432102", "Z543333", new DateTime(s"$validDate"))))))
+        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(
+          GetLisaAccountSuccessResponse(
+            investorId = "9876543210",
+            accountId = "8765432100",
+            creationReason = "New",
+            firstSubscriptionDate = new DateTime(validDate),
+            accountStatus = "OPEN",
+            subscriptionStatus = None,
+            accountClosureReason = None,
+            closureDate = None,
+            transferAccount = None
+          )
+        ))
 
         doSyncGetAccountDetailsRequest(res => {
           status(res) mustBe OK
-          contentAsJson(res) mustBe Json.toJson (GetLisaAccountSuccessResponse("9876543210", "8765432100", "Transferred", s"$validDate", "OPEN", "ACTIVE", None, None, Some(GetLisaAccountTransferAccount("8765432102", "Z543333", new DateTime(s"$validDate")))))
+          val json = contentAsJson(res)
+
+          (json \ "investorId").as[String] mustBe "9876543210"
+          (json \ "accountId").as[String] mustBe "8765432100"
+          (json \ "creationReason").as[String] mustBe "New"
+          (json \ "firstSubscriptionDate").as[String] mustBe validDate
+          (json \ "accountStatus").as[String] mustBe "OPEN"
+          (json \ "subscriptionStatus").asOpt[String] mustBe None
+          (json \ "accountClosureReason").asOpt[String] mustBe None
+          (json \ "closureDate").asOpt[String] mustBe None
+          (json \ "transferAccount").asOpt[JsObject] mustBe None
+        })
+      }
+      "returning a valid close account response" in {
+        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(
+          GetLisaAccountSuccessResponse(
+            investorId = "9876543210",
+            accountId = "8765432100",
+            creationReason = "New",
+            firstSubscriptionDate = new DateTime(validDate),
+            accountStatus = "CLOSED",
+            subscriptionStatus = Some("ACTIVE"),
+            accountClosureReason = Some("All funds withdrawn"),
+            closureDate = Some(new DateTime(validDate)),
+            transferAccount = None)
+        ))
+
+        doSyncGetAccountDetailsRequest(res => {
+          status(res) mustBe OK
+
+          val json = contentAsJson(res)
+
+          (json \ "investorId").as[String] mustBe "9876543210"
+          (json \ "accountId").as[String] mustBe "8765432100"
+          (json \ "creationReason").as[String] mustBe "New"
+          (json \ "firstSubscriptionDate").as[String] mustBe validDate
+          (json \ "accountStatus").as[String] mustBe "CLOSED"
+          (json \ "subscriptionStatus").asOpt[String] mustBe Some("ACTIVE")
+          (json \ "accountClosureReason").asOpt[String] mustBe Some("All funds withdrawn")
+          (json \ "closureDate").asOpt[String] mustBe Some(validDate)
+          (json \ "transferAccount").asOpt[JsObject] mustBe None
+        })
+      }
+      "returning a valid transfer account response" in {
+        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(
+          GetLisaAccountSuccessResponse(
+            investorId = "9876543210",
+            accountId = "8765432100",
+            creationReason = "Transferred",
+            firstSubscriptionDate = new DateTime(validDate),
+            accountStatus = "OPEN",
+            subscriptionStatus = Some("ACTIVE"),
+            accountClosureReason = None,
+            closureDate = None,
+            transferAccount = Some(
+              GetLisaAccountTransferAccount(
+                "8765432102",
+                "Z543333",
+                new DateTime(validDate)
+              )
+            )
+          )
+        ))
+
+        doSyncGetAccountDetailsRequest(res => {
+          status(res) mustBe OK
+
+          val json = contentAsJson(res)
+
+          (json \ "investorId").as[String] mustBe "9876543210"
+          (json \ "accountId").as[String] mustBe "8765432100"
+          (json \ "creationReason").as[String] mustBe "Transferred"
+          (json \ "firstSubscriptionDate").as[String] mustBe validDate
+          (json \ "accountStatus").as[String] mustBe "OPEN"
+          (json \ "subscriptionStatus").asOpt[String] mustBe Some("ACTIVE")
+          (json \ "accountClosureReason").asOpt[String] mustBe None
+          (json \ "closureDate").asOpt[String] mustBe None
+          (json \ "transferAccount" \ "transferredFromAccountId").as[String] mustBe "8765432102"
+          (json \ "transferAccount" \ "transferredFromLMRN").as[String] mustBe "Z543333"
+          (json \ "transferAccount" \ "transferInDate").as[String] mustBe validDate
         })
       }
       "returning a valid void account response" in {
-        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", s"$validDate", "VOID", "ACTIVE", None, None, None)))
+        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(
+          GetLisaAccountSuccessResponse(
+            investorId = "9876543210",
+            accountId = "8765432100",
+            creationReason = "New",
+            firstSubscriptionDate = new DateTime(validDate),
+            accountStatus = "VOID",
+            subscriptionStatus = Some("ACTIVE"),
+            accountClosureReason = None,
+            closureDate = None,
+            transferAccount = None
+          )
+        ))
+
         doSyncGetAccountDetailsRequest(res => {
           status(res) mustBe OK
-          contentAsJson(res) mustBe Json.toJson (GetLisaAccountSuccessResponse("9876543210", "8765432100", "New", s"$validDate", "VOID", "ACTIVE", None, None, None))
+
+          val json = contentAsJson(res)
+
+          (json \ "investorId").as[String] mustBe "9876543210"
+          (json \ "accountId").as[String] mustBe "8765432100"
+          (json \ "creationReason").as[String] mustBe "New"
+          (json \ "firstSubscriptionDate").as[String] mustBe validDate
+          (json \ "accountStatus").as[String] mustBe "VOID"
+          (json \ "subscriptionStatus").asOpt[String] mustBe Some("ACTIVE")
+          (json \ "accountClosureReason").asOpt[String] mustBe None
+          (json \ "closureDate").asOpt[String] mustBe None
+          (json \ "transferAccount").asOpt[JsObject] mustBe None
         })
       }
       "returning a account not found response" in {

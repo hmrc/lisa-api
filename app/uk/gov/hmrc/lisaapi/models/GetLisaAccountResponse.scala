@@ -19,6 +19,7 @@ package uk.gov.hmrc.lisaapi.models
 import org.joda.time.DateTime
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsPath, Json, Reads, Writes}
+import uk.gov.hmrc.lisaapi.models.des.DesResponse
 
 sealed trait GetLisaAccountResponse
 
@@ -26,13 +27,13 @@ case class GetLisaAccountSuccessResponse(
   accountId: String,
   investorId: String,
   creationReason: String,
-  firstSubscriptionDate:String,
-  accountStatus:String,
-  subscriptionStatus:String,
+  firstSubscriptionDate: DateTime,
+  accountStatus: String,
+  subscriptionStatus: Option[String],
   accountClosureReason: Option[String],
-  closureDate: Option[String],
+  closureDate: Option[DateTime],
   transferAccount: Option[GetLisaAccountTransferAccount]
-) extends GetLisaAccountResponse
+) extends GetLisaAccountResponse with DesResponse
 
 case class GetLisaAccountTransferAccount(
   transferredFromAccountId: String,
@@ -44,12 +45,6 @@ case object GetLisaAccountDoesNotExistResponse extends GetLisaAccountResponse
 case object GetLisaAccountErrorResponse extends GetLisaAccountResponse
 
 object GetLisaAccountTransferAccount {
-  implicit val reads: Reads[GetLisaAccountTransferAccount] = (
-    (JsPath \ "transferredFromAccountId").read(JsonReads.accountId) and
-    (JsPath \ "transferredFromLMRN").read(JsonReads.lmrn) and
-    (JsPath \ "transferInDate").read(JsonReads.notFutureDate).map(new DateTime(_))
-  )(GetLisaAccountTransferAccount.apply _)
-
   implicit val writes: Writes[GetLisaAccountTransferAccount] = (
     (JsPath \ "transferredFromAccountId").write[String] and
     (JsPath \ "transferredFromLMRN").write[String] and
@@ -58,5 +53,59 @@ object GetLisaAccountTransferAccount {
 }
 
 object GetLisaAccountSuccessResponse {
-  implicit val format = Json.format[GetLisaAccountSuccessResponse]
+  implicit val getAccountSuccessReads: Reads[GetLisaAccountSuccessResponse] = (
+    (JsPath \ "investorId").read(JsonReads.investorId) and
+    (JsPath \ "status").read[String] and
+    (JsPath \ "creationDate").read(JsonReads.isoDate).map(new DateTime(_)) and
+    (JsPath \ "creationReason").read[String] and
+    (JsPath \ "accountClosureReason").readNullable[String] and
+    (JsPath \ "lisaManagerClosureDate").readNullable(JsonReads.isoDate).map(_.map(new DateTime(_))) and
+    (JsPath \ "subscriptionStatus").readNullable[String] and
+    (JsPath \ "firstSubscriptionDate").read(JsonReads.isoDate).map(new DateTime(_)) and
+    (JsPath \ "transferInDate").readNullable(JsonReads.isoDate).map(_.map(new DateTime(_))) and
+    (JsPath \ "xferredFromAccountId").readNullable(JsonReads.accountId) and
+    (JsPath \ "xferredFromLmrn").readNullable(JsonReads.lmrn)
+  )(
+  (investorId, status, _, creationReason, accountClosureReason, lisaManagerClosureDate, subscriptionStatus,
+   firstSubscriptionDate, transferInDate, xferredFromAccountId, xferredFromLmrn) =>
+    GetLisaAccountSuccessResponse(
+      accountId = "",
+      investorId = investorId,
+      creationReason = creationReason match {
+        case "NEW" => "New"
+        case "TRANSFERRED" => "Transferred"
+        case "REINSTATED" => "Reinstated"
+      },
+      firstSubscriptionDate = firstSubscriptionDate,
+      accountStatus = status,
+      subscriptionStatus = subscriptionStatus,
+      accountClosureReason = accountClosureReason.map(cr => cr match {
+        case "TRANSFERRED_OUT" => "Transferred out"
+        case "ALL_FUNDS_WITHDRAWN" => "All funds withdrawn"
+        case "VOIDED" => "Voided"
+        case "CANCELLED" => "Cancellation"
+      }),
+      closureDate = lisaManagerClosureDate,
+      transferAccount = (xferredFromAccountId, xferredFromLmrn, transferInDate) match {
+        case (Some(accountId), Some(lmrn), Some(date)) => Some(GetLisaAccountTransferAccount(
+          transferredFromAccountId = accountId,
+          transferredFromLMRN = lmrn,
+          transferInDate = date
+        ))
+        case _ => None
+      }
+    )
+  )
+
+  implicit val getAccountSuccessWrites: Writes[GetLisaAccountSuccessResponse] = (
+    (JsPath \ "accountId").write[String] and
+    (JsPath \ "investorId").write[String] and
+    (JsPath \ "creationReason").write[String] and
+    (JsPath \ "firstSubscriptionDate").write[String].contramap[DateTime](_.toString("yyyy-MM-dd")) and
+    (JsPath \ "accountStatus").write[String] and
+    (JsPath \ "subscriptionStatus").writeNullable[String] and
+    (JsPath \ "accountClosureReason").writeNullable[String] and
+    (JsPath \ "closureDate").writeNullable[String].contramap[Option[DateTime]](_.map(_.toString("yyyy-MM-dd"))) and
+    (JsPath \ "transferAccount").writeNullable[GetLisaAccountTransferAccount]
+  )(unlift(GetLisaAccountSuccessResponse.unapply))
 }

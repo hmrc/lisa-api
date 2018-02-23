@@ -23,7 +23,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models.{RequestBonusPaymentResponse, _}
-import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesGetAccountResponse, DesGetBonusPaymentResponse, DesTransactionResponse}
+import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesGetBonusPaymentResponse, DesTransactionResponse}
 import uk.gov.hmrc.lisaapi.services.BonusPaymentService
 
 import scala.concurrent.duration.Duration

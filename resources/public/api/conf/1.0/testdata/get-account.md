@@ -22,19 +22,19 @@
       <td>
         <p>HTTP status: <code class="code--slim">200 (OK)</code></p>
         <p class ="code--block"> {<br>
-          "accountId": "1234567890",
-          "investorId": "9876543210",<br>
-          "creationReason": "New",<br>
-          "firstSubscriptionDate": "2011-03-23",<br>
-          "accountStatus": "OPEN",<br>
-          "subscriptionStatus": "ACTIVE"<br>
-        }
+                "accountId": "1234567890",<br>
+                "investorId": "9876543210",<br>
+                "creationReason": "New",<br>
+                "firstSubscriptionDate": "2017-04-06",<br>
+                "accountStatus": "OPEN",<br>
+                "subscriptionStatus": "ACTIVE"<br>
+            }
         </p>
       </td>
     </tr>
     <tr>
       <td>
-        <p>Request with a valid LISA Manager reference number and account ID (transferred acount)</p>
+        <p>Request with a valid LISA Manager reference number and account ID (transferred account)</p>
         <p class ="code--block">
           lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
           accountId: 0000000200
@@ -44,24 +44,24 @@
       <td>
         <p>HTTP status: <code class="code--slim">200 (OK)</code></p>
         <p class ="code--block"> {<br>
-          "accountId": "0000000200",<br>
-          "investorId": "9876543210",<br>
-          "creationReason": "Transferred",<br>
-          "firstSubscriptionDate": "2011-03-23",<br>
-          "accountStatus": "OPEN",<br>
-          "subscriptionStatus": "ACTIVE",<br>
-          "transferAccount": {<br>
-            "transferredFromAccountId": "8765432102",<br>
-            "transferredFromLMRN": "Z543333",<br>
-            "transferInDate": "2015-12-13"<br>
-          }
-        }
+                 "accountId": "0000000200",<br>
+                 "investorId": "9876543210",<br>
+                 "creationReason": "Transferred",<br>
+                 "firstSubscriptionDate": "2017-04-06",<br>
+                 "accountStatus": "OPEN",<br>
+                 "subscriptionStatus": "AVAILABLE",<br>
+                 "transferAccount": {<br>
+                     "transferredFromAccountId": "8765432102",<br>
+                     "transferredFromLMRN": "Z543333",<br>
+                     "transferInDate": "2017-04-06"<br>
+                 }<br>
+             }
         </p>
       </td>
     </tr>
     <tr>
       <td>
-        <p>Request with a valid LISA Manager reference number and account ID (voided acount)</p>
+        <p>Request with a valid LISA Manager reference number and account ID (voided account)</p>
         <p class ="code--block">
           lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
           accountId: 1000000200
@@ -71,19 +71,19 @@
       <td>
         <p>HTTP status: <code class="code--slim">200 (OK)</code></p>
         <p class ="code--block"> {<br>
-          "accountId": "1000000200",<br>
-          "investorId": "9876543210",<br>
-          "creationReason": "New",<br>
-          "firstSubscriptionDate": "2011-03-23",<br>
-          "accountStatus": "VOID",<br>
-          "subscriptionStatus": "VOID"<br>
-        }
+                 "accountId": "1000000200",<br>
+                 "investorId": "9876543210",<br>
+                 "creationReason": "New",<br>
+                 "firstSubscriptionDate": "2017-04-06",<br>
+                 "accountStatus": "VOID",<br>
+                 "subscriptionStatus": "VOID"<br>
+             }
         </p>
       </td>
     </tr>
     <tr>
       <td>
-        <p>Request with a valid LISA Manager reference number and account ID (closed acount)</p>
+        <p>Request with a valid LISA Manager reference number and account ID (closed account)</p>
         <p class ="code--block">
           lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
           accountId: 2000000200
@@ -93,15 +93,14 @@
       <td>
         <p>HTTP status: <code class="code--slim">200 (OK)</code></p>
         <p class ="code--block"> {<br>
-          "accountId": "2000000200",<br>
-          "investorId": "9876543210",<br>
-          "creationReason": "New",<br>
-          "firstSubscriptionDate": "2011-03-23",<br>
-          "accountStatus": "CLOSED",<br>
-          "subscriptionStatus": "VOID",<br>
-          "accountClosureReason": "All funds withdrawn",<br>
-          "closureDate": "2017-01-20"<br>
-        }
+                 "accountId": "2000000200",<br>
+                 "investorId": "9876543210",<br>
+                 "creationReason": "New",<br>
+                 "firstSubscriptionDate": "2017-04-06",<br>
+                 "accountStatus": "CLOSED",<br>
+                 "accountClosureReason": "All funds withdrawn",<br>
+                 "closureDate": "2017-10-25"<br>
+             }
         </p>
       </td>
     </tr>

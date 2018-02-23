@@ -1,12 +1,13 @@
 {
-  "investorId" : "9876543210",
-  "accountId" :"acc654321",
-  "creationReason" : "Transferred",
-  "firstSubscriptionDate" : "2011-03-23",
-  "accountStatus" : "OPEN",
+  "accountId": "0000000200",
+  "investorId": "9876543210",
+  "creationReason": "Transferred",
+  "firstSubscriptionDate": "2017-04-06",
+  "accountStatus": "OPEN",
+  "subscriptionStatus": "ACTIVE",
   "transferAccount": {
-    "transferredFromAccountId": "98123459898",
+    "transferredFromAccountId": "8765432102",
     "transferredFromLMRN": "Z543333",
-    "transferInDate": "2015-12-13"
+    "transferInDate": "2017-04-06"
   }
 }

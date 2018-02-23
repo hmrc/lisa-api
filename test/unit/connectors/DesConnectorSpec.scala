@@ -1294,6 +1294,112 @@ class DesConnectorSpec extends PlaySpec
 
   }
 
+  "Retrieve Account endpoint" must {
+
+    "return a failure response" when {
+      "the DES response is a failure response" in {
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = OK,
+                responseJson = Some(Json.parse(
+                  """{
+                    | "code": "ERROR_CODE",
+                    | "reason" : "ERROR MESSAGE"
+                  }""".stripMargin))
+              )
+            )
+          )
+
+        doRetrieveAccountRequest { response =>
+          response mustBe DesFailureResponse("ERROR_CODE", "ERROR MESSAGE")
+        }
+      }
+      "the DES response has no json body" in {
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = OK,
+                responseJson = None
+              )
+            )
+          )
+
+        doRetrieveAccountRequest { response =>
+          response mustBe DesFailureResponse()
+        }
+      }
+      "the DES response is missing required fields" in {
+        val responseJson = Json.parse("{}")
+
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = OK,
+                responseJson = Some(responseJson)
+              )
+            )
+          )
+
+        doRetrieveAccountRequest { response =>
+          response mustBe DesFailureResponse()
+        }
+      }
+    }
+
+    "return a success response" when {
+      "the DES response is the appropriate json response" in {
+        val responseJson = Json.parse("""{
+                                          |  "investorId": "1234567890",
+                                          |  "status": "OPEN",
+                                          |  "creationDate": "2016-01-01",
+                                          |  "creationReason": "REINSTATED",
+                                          |  "hmrcClosureDate": "2016-02-01",
+                                          |  "accountClosureReason": "TRANSFERRED_OUT",
+                                          |  "transferInDate": "2016-03-01",
+                                          |  "transferOutDate": "2016-04-01",
+                                          |  "xferredFromAccountId": "123abc789ABC34567890",
+                                          |  "xferredFromLmrn": "Z123453",
+                                          |  "lisaManagerClosureDate": "2016-05-01",
+                                          |  "subscriptionStatus": "AVAILABLE",
+                                          |  "firstSubscriptionDate": "2016-01-06"
+                                          |}""".stripMargin)
+
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = OK,
+                responseJson = Some(responseJson)
+              )
+            )
+          )
+
+        doRetrieveAccountRequest { response =>
+          response mustBe GetLisaAccountSuccessResponse(
+            accountId = "123456",
+            investorId = "1234567890",
+            creationReason = "Reinstated",
+            firstSubscriptionDate = new DateTime("2016-01-06"),
+            accountStatus = "OPEN",
+            subscriptionStatus = Some("AVAILABLE"),
+            accountClosureReason = Some("Transferred out"),
+            closureDate = Some(new DateTime("2016-05-01")),
+            transferAccount = Some(GetLisaAccountTransferAccount(
+              transferredFromAccountId = "123abc789ABC34567890",
+              transferredFromLMRN = "Z123453",
+              transferInDate = new DateTime("2016-03-01")
+            ))
+          )
+        }
+      }
+    }
+
+  }
+
   val validBonusPaymentResponseJson = Source.fromInputStream(getClass().getResourceAsStream("/json/request.valid.bonus-payment-response.json")).mkString
 
   private def doCreateInvestorRequest(callback: ((Int,DesResponse)) => Unit) = {
@@ -1324,7 +1430,6 @@ class DesConnectorSpec extends PlaySpec
 
     callback(response)
   }
-
 
   private def doReinstateAccountRequest(callback: (DesResponse) => Unit) = {
     val response = Await.result(SUT.reinstateAccount("Z123456", "ABC12345"), Duration.Inf)
@@ -1381,6 +1486,12 @@ class DesConnectorSpec extends PlaySpec
 
   private def doRetrieveBulkPaymentRequest(callback: (DesResponse) => Unit) = {
     val response = Await.result(SUT.getBulkPayment("Z123456", new DateTime("2018-01-01"), new DateTime("2018-01-01")), Duration.Inf)
+
+    callback(response)
+  }
+
+  private def  doRetrieveAccountRequest(callback: (DesResponse) => Unit) = {
+    val response = Await.result(SUT.getAccountInformation("Z123456", "123456"), Duration.Inf)
 
     callback(response)
   }

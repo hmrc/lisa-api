@@ -346,6 +346,47 @@ class AccountServiceSpec extends PlaySpec
 
   }
 
+  "Get Account" must {
+
+    "return a Success Response" when {
+
+      "given a success response" in {
+        val successResponse = GetLisaAccountSuccessResponse("123", "456", "All funds withdrawn", new DateTime("201-04-06"), "OPEN", None, None, None, None)
+
+        when(mockDesConnector.getAccountInformation(any(), any())(any()))
+          .thenReturn(Future.successful(successResponse))
+
+        val res = Await.result(SUT.getAccount(testLMRN, "A123456")(HeaderCarrier()), Duration.Inf)
+
+        res mustBe successResponse
+      }
+
+    }
+
+    "return the type-appropriate response" when {
+
+      "given failureResponse for a INVESTOR_ACCOUNTID_NOT_FOUND" in {
+        when(mockDesConnector.getAccountInformation(any(), any())(any()))
+          .thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNTID_NOT_FOUND")))
+
+        val res = Await.result(SUT.getAccount(testLMRN, "A123456")(HeaderCarrier()), Duration.Inf)
+
+        res mustBe GetLisaAccountDoesNotExistResponse
+      }
+
+      "given any other failureResponse" in {
+        when(mockDesConnector.getAccountInformation(any(), any())(any()))
+          .thenReturn(Future.successful(DesFailureResponse("X")))
+
+        val res = Await.result(SUT.getAccount(testLMRN, "A123456")(HeaderCarrier()), Duration.Inf)
+
+        res mustBe GetLisaAccountErrorResponse
+      }
+
+    }
+
+  }
+
   private def doCreateRequest(callback: (CreateLisaAccountResponse) => Unit) = {
     val request = CreateLisaAccountCreationRequest("1234567890",  "9876543210", testDate)
     val response = Await.result(SUT.createAccount(testLMRN, request)(HeaderCarrier()), Duration.Inf)
