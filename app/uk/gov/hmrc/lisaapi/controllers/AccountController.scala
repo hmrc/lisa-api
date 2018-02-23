@@ -284,12 +284,12 @@ class AccountController extends LisaController with LisaConstants {
 
         case GetLisaAccountDoesNotExistResponse =>
           LisaMetrics.incrementMetrics(System.currentTimeMillis(),
-            LisaMetricKeys.lisaError(FORBIDDEN, LisaMetricKeys.ACCOUNT))
+            LisaMetricKeys.lisaError(NOT_FOUND, LisaMetricKeys.ACCOUNT))
           NotFound(Json.toJson(ErrorAccountNotFound))
 
         case _ =>
           LisaMetrics.incrementMetrics(System.currentTimeMillis(),
-            LisaMetricKeys.lisaError(FORBIDDEN, LisaMetricKeys.ACCOUNT))
+            LisaMetricKeys.lisaError(INTERNAL_SERVER_ERROR, LisaMetricKeys.ACCOUNT))
           InternalServerError(Json.toJson(ErrorInternalServerError))
       }
     }
