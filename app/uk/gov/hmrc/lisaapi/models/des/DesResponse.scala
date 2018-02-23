@@ -196,7 +196,7 @@ object DesResponse {
           case "TRANSFERRED_OUT" => "Transferred out"
           case "ALL_FUNDS_WITHDRAWN" => "All funds withdrawn"
           case "VOIDED" => "Voided"
-          case "CANCELLED" => "Cancelled"
+          case "CANCELLED" => "Cancellation"
         }),
         closureDate = lisaManagerClosureDate.map(_.toString("yyyy-MM-dd")),
         transferAccount = (xferredFromAccountId, xferredFromLmrn, transferInDate) match {

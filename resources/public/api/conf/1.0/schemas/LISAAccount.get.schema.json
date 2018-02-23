@@ -49,10 +49,10 @@
       "description": "The reason the account was closed.",
       "type": "string",
       "enum": [
-        "Transferred out",
         "All funds withdrawn",
-        "Voided",
-        "Cancelled"
+        "Cancellation",
+        "Transferred out",
+        "Voided"
       ]
     },
     "closureDate": {
