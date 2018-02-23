@@ -58,7 +58,7 @@ object ServiceLocatorConnector extends ServiceLocatorConnector {
   override lazy val appUrl = AppContext.appUrl
   override lazy val serviceUrl = AppContext.serviceLocatorUrl
   override val http: HttpPost = WSHttp
-  override val handlerOK: () => Unit = () => Logger.info("Service is registered on the service locator")
+  override val handlerOK: () => Unit = () => Logger.warn("Service is registered on the service locator")
   override val handlerError: Throwable => Unit = e => Logger.error(s"Service could not register on the service locator", e)
   override val metadata: Option[Map[String, String]] = Some(Map("third-party-api" -> "true"))
 }
