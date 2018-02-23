@@ -899,7 +899,6 @@ types:
                         200:
                           body:
                             application/json:
-                              type: !include schemas/BonusPaymentRequest.post.schema.json
                               examples:
                                 example-1: !include examples/LISATransaction.get.response.json
                                 example-2: !include examples/LISATransaction.get.response.1.json
@@ -1018,20 +1017,20 @@ types:
                                          "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
                                          "message": "The accountId does not match HMRC’s records"
                                        }
-            /payments?startDate={startDate}&endDate={endDate}:
-              uriParameters:
-               startDate:
-                type : ISO8601Date
-                description: The start date of the date range for the payment request. This cannot be before 6 April 2017.
-                example: "2017-05-20"
-               endDate:
-                type : ISO8601Date
-                description: The end date of the date range for the payment request. This cannot be in the future, before the startDate, or more than a year after the startDate.
-                example: "2017-05-20"
+            /payments:
               get:
                   is: [headers.acceptHeader]
                   displayName: Retrieve payment details
                   description: This allows a LISA provider to retrieve payments made by HMRC in a specific date range.
+                  queryParameters:
+                     startDate:
+                      type : ISO8601Date
+                      description: The start date of the date range for the payment request. This cannot be before 6 April 2017.
+                      example: "2017-05-20"
+                     endDate:
+                      type : ISO8601Date
+                      description: The end date of the date range for the payment request. This cannot be in the future, before the startDate, or more than a year after the startDate.
+                      example: "2017-05-20"
                   (annotations.scope): "read:lisa"
                   securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
                   (annotations.sandboxData): !include testdata/get-bulk-payment.md
