@@ -1331,7 +1331,7 @@ class DesConnectorSpec extends PlaySpec
           response mustBe DesFailureResponse()
         }
       }
-      "the DES response is missing a processingDate" in {
+      "the DES response is missing required fields" in {
         val responseJson = Json.parse("{}")
 
         when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
@@ -1379,16 +1379,16 @@ class DesConnectorSpec extends PlaySpec
           )
 
         doRetrieveAccountRequest { response =>
-          response mustBe DesGetAccountResponse(
+          response mustBe GetLisaAccountSuccessResponse(
             accountId = "123456",
             investorId = "1234567890",
             creationReason = "Reinstated",
-            firstSubscriptionDate = "2016-01-06",
+            firstSubscriptionDate = new DateTime("2016-01-06"),
             accountStatus = "OPEN",
             subscriptionStatus = Some("AVAILABLE"),
             accountClosureReason = Some("Transferred out"),
-            closureDate = Some("2016-05-01"),
-            transferAccount = Some(DesGetAccountTransferResponse(
+            closureDate = Some(new DateTime("2016-05-01")),
+            transferAccount = Some(GetLisaAccountTransferAccount(
               transferredFromAccountId = "123abc789ABC34567890",
               transferredFromLMRN = "Z123453",
               transferInDate = new DateTime("2016-03-01")

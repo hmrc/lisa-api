@@ -101,8 +101,8 @@ trait DesConnector extends ServicesConfig {
 
     result.map(res => {
       Logger.debug("Get Account request returned status: " + res.status)
-      parseDesResponse[DesGetAccountResponse](res)._2 match {
-        case success: DesGetAccountResponse => success.copy(accountId = accountId)
+      parseDesResponse[GetLisaAccountSuccessResponse](res)._2 match {
+        case success: GetLisaAccountSuccessResponse => success.copy(accountId = accountId)
         case fail: DesResponse => fail
       }
     })

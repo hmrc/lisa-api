@@ -25,24 +25,6 @@ trait DesResponse
 
 case class DesAccountResponse(accountID: String) extends DesResponse
 
-case class DesGetAccountResponse(
-  accountId: String,
-  investorId: String,
-  creationReason: String,
-  firstSubscriptionDate:String,
-  accountStatus:String,
-  subscriptionStatus:Option[String],
-  accountClosureReason:Option[String],
-  closureDate:Option[String],
-  transferAccount: Option[DesGetAccountTransferResponse]
-) extends DesResponse
-
-case class DesGetAccountTransferResponse(
-  transferredFromAccountId: String,
-  transferredFromLMRN: String,
-  transferInDate: DateTime
-)
-
 case class DesLifeEventResponse(lifeEventID: String) extends DesResponse
 case class DesLifeEventRetrievalResponse(lifeEventID: LifeEventId, eventType: LifeEventType, eventDate: DateTime) extends DesResponse
 case class DesCreateInvestorResponse(investorID: String) extends DesResponse
@@ -63,18 +45,6 @@ case class DesGetBonusPaymentResponse(lifeEventId: Option[LifeEventId],
 
 object DesResponse {
   implicit val desCreateAccountResponseFormats: OFormat[DesAccountResponse] = Json.format[DesAccountResponse]
-
-  implicit val desGetAccountTransferResponseReads: Reads[DesGetAccountTransferResponse] = (
-    (JsPath \ "transferredFromAccountId").read(JsonReads.accountId) and
-    (JsPath \ "transferredFromLMRN").read(JsonReads.lmrn) and
-    (JsPath \ "transferInDate").read(JsonReads.notFutureDate).map(new DateTime(_))
-  )(DesGetAccountTransferResponse.apply _)
-
-  implicit val desGetAccountTransferResponseWrites: Writes[DesGetAccountTransferResponse] = (
-    (JsPath \ "transferredFromAccountId").write[String] and
-    (JsPath \ "transferredFromLMRN").write[String] and
-    (JsPath \ "transferInDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd"))
-  )(unlift(DesGetAccountTransferResponse.unapply))
 
   implicit val desCreateInvestorResponseFormats: OFormat[DesCreateInvestorResponse] = Json.format[DesCreateInvestorResponse]
   implicit val desLifeEventResponseFormats: OFormat[DesLifeEventResponse] = Json.format[DesLifeEventResponse]
@@ -164,52 +134,5 @@ object DesResponse {
           }
         )
   )
-
-
-  implicit val desGetAccountResponseReads: Reads[DesGetAccountResponse] = (
-      (JsPath \ "investorId").read(JsonReads.investorId) and
-      (JsPath \ "status").read[String] and
-      (JsPath \ "creationDate").read(JsonReads.isoDate).map(new DateTime(_)) and
-      (JsPath \ "creationReason").read[String] and
-      (JsPath \ "accountClosureReason").readNullable[String] and
-      (JsPath \ "lisaManagerClosureDate").readNullable(JsonReads.isoDate).map(_.map(new DateTime(_))) and
-      (JsPath \ "subscriptionStatus").readNullable[String] and
-      (JsPath \ "firstSubscriptionDate").read(JsonReads.isoDate).map(new DateTime(_)) and
-      (JsPath \ "transferInDate").readNullable(JsonReads.isoDate).map(_.map(new DateTime(_))) and
-      (JsPath \ "xferredFromAccountId").readNullable(JsonReads.accountId) and
-      (JsPath \ "xferredFromLmrn").readNullable(JsonReads.lmrn)
-  )(
-    (investorId, status, _, creationReason, accountClosureReason, lisaManagerClosureDate, subscriptionStatus,
-     firstSubscriptionDate, transferInDate, xferredFromAccountId, xferredFromLmrn) =>
-      DesGetAccountResponse(
-        accountId = "",
-        investorId = investorId,
-        creationReason = creationReason match {
-          case "NEW" => "New"
-          case "TRANSFERRED" => "Transferred"
-          case "REINSTATED" => "Reinstated"
-        },
-        firstSubscriptionDate = firstSubscriptionDate.toString("yyyy-MM-dd"),
-        accountStatus = status,
-        subscriptionStatus = subscriptionStatus,
-        accountClosureReason = accountClosureReason.map(cr => cr match {
-          case "TRANSFERRED_OUT" => "Transferred out"
-          case "ALL_FUNDS_WITHDRAWN" => "All funds withdrawn"
-          case "VOIDED" => "Voided"
-          case "CANCELLED" => "Cancellation"
-        }),
-        closureDate = lisaManagerClosureDate.map(_.toString("yyyy-MM-dd")),
-        transferAccount = (xferredFromAccountId, xferredFromLmrn, transferInDate) match {
-          case (Some(accountId), Some(lmrn), Some(date)) => Some(DesGetAccountTransferResponse(
-            transferredFromAccountId = accountId,
-            transferredFromLMRN = lmrn,
-            transferInDate = date
-          ))
-          case _ => None
-        }
-      )
-  )
-
-  implicit val desGetAccountResponseWrites = Json.writes[DesGetAccountResponse]
 
 }
