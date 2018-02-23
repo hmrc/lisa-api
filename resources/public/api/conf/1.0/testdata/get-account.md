@@ -44,17 +44,18 @@
       <td>
         <p>HTTP status: <code class="code--slim">200 (OK)</code></p>
         <p class ="code--block"> {<br>
-                "accountId": "0000000200",<br>
-                "investorId": "9876543210",<br>
-                "creationReason": "Transferred",<br>
-                "firstSubscriptionDate": "2017-04-06",<br>
-                "accountStatus": "OPEN",<br>
-                "transferAccount": {<br>
-                    "transferredFromAccountId": "8765432102",<br>
-                    "transferredFromLMRN": "Z543333",<br>
-                    "transferInDate": "2017-04-06"<br>
-                }<br>
-            }
+                 "accountId": "0000000200",<br>
+                 "investorId": "9876543210",<br>
+                 "creationReason": "Transferred",<br>
+                 "firstSubscriptionDate": "2017-04-06",<br>
+                 "accountStatus": "OPEN",<br>
+                 "subscriptionStatus": "AVAILABLE",<br>
+                 "transferAccount": {<br>
+                     "transferredFromAccountId": "8765432102",<br>
+                     "transferredFromLMRN": "Z543333",<br>
+                     "transferInDate": "2017-04-06"<br>
+                 }<br>
+             }
         </p>
       </td>
     </tr>
@@ -97,7 +98,6 @@
                  "creationReason": "New",<br>
                  "firstSubscriptionDate": "2017-04-06",<br>
                  "accountStatus": "CLOSED",<br>
-                 "subscriptionStatus": "VOID",<br>
                  "accountClosureReason": "All funds withdrawn",<br>
                  "closureDate": "2017-10-25"<br>
              }

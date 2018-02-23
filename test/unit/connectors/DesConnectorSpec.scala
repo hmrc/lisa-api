@@ -1384,8 +1384,8 @@ class DesConnectorSpec extends PlaySpec
             investorId = "1234567890",
             creationReason = "Reinstated",
             firstSubscriptionDate = "2016-01-06",
-            accountStatus = "Open",
-            subscriptionStatus = Some("Available"),
+            accountStatus = "OPEN",
+            subscriptionStatus = Some("AVAILABLE"),
             accountClosureReason = Some("Transferred out"),
             closureDate = Some("2016-05-01"),
             transferAccount = Some(DesGetAccountTransferResponse(
