@@ -78,7 +78,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request with a valid LISA Manager reference number and Transaction ID, but an invalid account ID</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234=5678<br>transactionId: 1234567890</p></td>
+            <td><p>Request with a valid LISA Manager reference number and Transaction ID, but an invalid account ID</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234%3D5678<br>transactionId: 1234567890</p></td>
                         <td></td>
             <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
                 <p class ="code--block"> {<br>
