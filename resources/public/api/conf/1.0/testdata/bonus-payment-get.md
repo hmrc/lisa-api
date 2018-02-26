@@ -71,7 +71,7 @@
 		    	<p>Request with an invalid accountId</p>
 		    	<p class ="code--block">
 		    		lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
-		    		accountId: 1234=5678<br>
+		    		accountId: 1234%3D5678<br>
 		    		transactionId: 1234567890
 		    	</p>
 			</td>

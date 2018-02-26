@@ -134,7 +134,7 @@
             <td>
               <p>Request with a valid payload and LISA Manager reference number, but an invalid account ID</p>
               <p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
-              accountId: 1234=5678</p>
+              accountId: 1234%3D5678</p>
             </td>
             <td>
                 <p class ="code--block"> {<br>
