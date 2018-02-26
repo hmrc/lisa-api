@@ -56,7 +56,7 @@
             </td>
             <td>
                 <p class ="code--block"> {<br>
-                                            "accountId": "1234%3D5678"<br>
+                                            "accountId": "1234=5678"<br>
                                         }
                 </p>            
             </td>
