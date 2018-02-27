@@ -87,7 +87,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request containing investor details which don't match HMRC's records</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a></p></td>
+            <td><p>Request containing investor details which do not match HMRC’s records</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a></p></td>
             <td><p class ="code--block">{<br>
                                         "investorNINO": "AA111111A",<br>
                                         "firstName": "First Name",<br>
@@ -121,7 +121,7 @@
            </td>
         </tr>
         <tr>
-            <td><p>Request containing a pre-existing investor's details</p> <p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a></p></td>
+            <td><p>Request containing a pre-existing investor’s details</p> <p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a></p></td>
             <td><p class ="code--block">{<br>
                                         "investorNINO": "AA222222A",<br>
                                         "firstName": "First Name",<br>

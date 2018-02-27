@@ -152,7 +152,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request containing investor details which can't be found</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a></p></td>
+            <td><p>Request containing investor details which cannot be found</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a></p></td>
             <td>
                 <p class ="code--block"> {<br>
                                      	    "investorId": "1234567890",<br>
@@ -171,7 +171,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request containing an investor who isn't eligible for a LISA account</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a></p></td>
+            <td><p>Request containing an investor who is not eligible for a LISA account</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a></p></td>
             <td>
                 <p class ="code--block"> {<br>
                                      	    "investorId": "1234567891",<br>
@@ -190,7 +190,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request containing an investor who hasn't passed the compliance check</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a></p></td>
+            <td><p>Request containing an investor who has not passed the compliance check</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a></p></td>
             <td>
                 <p class ="code--block"> {<br>
                                             "investorId": "1234567892",<br>
@@ -209,7 +209,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Transfer request containing transfer details which can't be found in HMRC's records</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a></p></td>
+            <td><p>Transfer request containing transfer details which cannot be found in HMRC's records</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a></p></td>
             <td>
                 <p class ="code--block"> {<br>
                                               "investorId": "1234567889",<br>
