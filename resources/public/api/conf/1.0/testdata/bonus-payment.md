@@ -469,7 +469,7 @@
         </tr>
         <tr>
             <td>
-              <p>Request containing an account ID that doesn't exist</p>
+              <p>Request containing an account ID that does not exist</p>
               <p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a>
               <br>accountId: 0000000404</p>
             </td>
@@ -507,7 +507,7 @@
         </tr>
         <tr>
             <td>
-              <p>Request for a bonus claim that's already been requested</p>
+              <p>Request for a bonus claim that has already been requested</p>
               <p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a>
               <br>accountId: 0000000409</p>
             </td>

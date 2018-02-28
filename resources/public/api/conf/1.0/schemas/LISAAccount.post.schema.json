@@ -21,7 +21,7 @@
       ]
     },
     "firstSubscriptionDate": {
-      "description":"The date of the first deposit into the account - if this is a transfer, use the date of deposit into the account managed by the previous provider. This can't be in the future.",
+      "description":"The date of the first deposit into the account - if this is a transfer, use the date of deposit into the account managed by the previous provider. This cannot be in the future.",
       "$ref": "#/definitions/ISO8601-Date"
 
     },
@@ -40,7 +40,7 @@
           "example": "Z4567"
         },
         "transferInDate": {
-          "description": "The date the account transferred from the previous provider to the new one. This can't be in the future.",
+          "description": "The date the account transferred from the previous provider to the new one. This cannot be in the future.",
           "$ref": "#/definitions/ISO8601-Date"
         }
       },
