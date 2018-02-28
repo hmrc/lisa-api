@@ -4,6 +4,8 @@
 
 This API allows financial organisations to report Lifetime ISA (LISA) information to HM Revenue and Customs (HMRC) and get information about payments made by HMRC.
 
+This repository has API specification in RAML format and code process requests from users based on the HMRMC api-platform architecture.
+
 This version of the API is in development and is very likely to change.
 
 The current API allows the financial organisation to:
