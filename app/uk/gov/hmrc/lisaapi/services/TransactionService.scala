@@ -90,14 +90,6 @@ trait TransactionService {
           paymentAmount = Some(pending.paymentAmount)
         )
       }
-      case charge: DesGetTransactionCharge => {
-        GetTransactionSuccessResponse(
-          transactionId = transactionId,
-          creationDate = bonusPayment.creationDate,
-          status = charge.status,
-          chargeReference = Some(charge.chargeReference)
-        )
-      }
       case DesGetTransactionCancelled => {
         GetTransactionSuccessResponse(
           transactionId = transactionId,
