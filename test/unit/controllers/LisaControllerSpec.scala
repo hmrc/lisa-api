@@ -16,6 +16,8 @@
 
 package unit.controllers
 
+import org.mockito.Matchers._
+import org.mockito.Mockito.when
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.functional.syntax._
@@ -24,14 +26,11 @@ import play.api.mvc.{Action, AnyContent, AnyContentAsJson}
 import play.api.test.Helpers._
 import play.api.test._
 import play.mvc.Http.HeaderNames
-import uk.gov.hmrc.lisaapi.controllers.AccountController
-import uk.gov.hmrc.lisaapi.services.{AccountService, AuditService}
-import uk.gov.hmrc.lisaapi.utils.ErrorConverter
-import org.mockito.Matchers._
-import org.mockito.Mockito.when
-import org.mockito.Mockito.verify
-import org.mockito.Mockito.times
 import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
+import uk.gov.hmrc.lisaapi.controllers.{AccountController, ErrorNotImplemented}
+import uk.gov.hmrc.lisaapi.services.AccountService
+import uk.gov.hmrc.lisaapi.utils.ErrorConverter
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -96,6 +95,16 @@ class LisaControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite 
     }
 
   }
+  "The todo endpoint" must {
+              "return 501 not implemented" in {
+            val result = SUT.todo("Z1234", "ABCD1234","").apply(FakeRequest(Helpers.POST, "/").
+                                withHeaders(acceptHeader).withBody(AnyContentAsJson(Json.parse("{}"))))
+
+            status(result) mustBe NOT_IMPLEMENTED
+            contentAsJson(result) mustBe Json.toJson(ErrorNotImplemented)
+          }
+
+        }
 
   val mockService = mock[AccountService]
   val mockErrorConverter = mock[ErrorConverter]

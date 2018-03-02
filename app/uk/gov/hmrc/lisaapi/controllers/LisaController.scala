@@ -20,17 +20,15 @@ import play.api.Logger
 import play.api.data.validation.ValidationError
 import play.api.libs.json.Json.toJson
 import play.api.libs.json._
-import play.api.mvc.{AnyContent, Request, Result}
+import play.api.mvc.{Action, AnyContent, Request, Result}
 import uk.gov.hmrc.api.controllers.HeaderValidator
-import uk.gov.hmrc.lisaapi.utils.ErrorConverter
-import uk.gov.hmrc.play.config.RunMode
-import uk.gov.hmrc.play.microservice.controller.BaseController
 import uk.gov.hmrc.auth.core.retrieve.Retrievals.internalId
-
 import uk.gov.hmrc.auth.core.{AuthorisationException, AuthorisedFunctions, Enrolment, InsufficientEnrolments}
 import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
-import uk.gov.hmrc.lisaapi.models.AccountId
+import uk.gov.hmrc.lisaapi.utils.ErrorConverter
+import uk.gov.hmrc.play.config.RunMode
+import uk.gov.hmrc.play.microservice.controller.BaseController
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -125,6 +123,10 @@ trait LisaController extends BaseController with HeaderValidator with RunMode wi
       LisaMetrics.incrementMetrics(System.currentTimeMillis,LisaMetricKeys.getErrorKey(INTERNAL_SERVER_ERROR,request.uri))
       Future.successful(InternalServerError(toJson(ErrorInternalServerError)))
   }
+
+  def todo(id: String,accountId:String,transactionId:String): Action[AnyContent] = Action.async { _ =>
+        Future.successful(NotImplemented(Json.toJson(ErrorNotImplemented)))
+      }
 }
 
 
