@@ -29,7 +29,7 @@ case class GetLisaAccountSuccessResponse(
   creationReason: String,
   firstSubscriptionDate: DateTime,
   accountStatus: String,
-  subscriptionStatus: Option[String],
+  subscriptionStatus: String,
   accountClosureReason: Option[String],
   closureDate: Option[DateTime],
   transferAccount: Option[GetLisaAccountTransferAccount]
@@ -78,7 +78,7 @@ object GetLisaAccountSuccessResponse {
       },
       firstSubscriptionDate = firstSubscriptionDate,
       accountStatus = status,
-      subscriptionStatus = subscriptionStatus,
+      subscriptionStatus = if (subscriptionStatus.isEmpty) "AVAILABLE" else subscriptionStatus.get,
       accountClosureReason = accountClosureReason.map(cr => cr match {
         case "TRANSFERRED_OUT" => "Transferred out"
         case "ALL_FUNDS_WITHDRAWN" => "All funds withdrawn"
@@ -103,7 +103,7 @@ object GetLisaAccountSuccessResponse {
     (JsPath \ "creationReason").write[String] and
     (JsPath \ "firstSubscriptionDate").write[String].contramap[DateTime](_.toString("yyyy-MM-dd")) and
     (JsPath \ "accountStatus").write[String] and
-    (JsPath \ "subscriptionStatus").writeNullable[String] and
+    (JsPath \ "subscriptionStatus").write[String] and
     (JsPath \ "accountClosureReason").writeNullable[String] and
     (JsPath \ "closureDate").writeNullable[String].contramap[Option[DateTime]](_.map(_.toString("yyyy-MM-dd"))) and
     (JsPath \ "transferAccount").writeNullable[GetLisaAccountTransferAccount]

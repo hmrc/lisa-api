@@ -98,6 +98,7 @@
                  "creationReason": "New",<br>
                  "firstSubscriptionDate": "2017-04-06",<br>
                  "accountStatus": "CLOSED",<br>
+                 "subscriptionStatus": "VOID",<br>
                  "accountClosureReason": "All funds withdrawn",<br>
                  "closureDate": "2017-10-25"<br>
              }

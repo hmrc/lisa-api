@@ -718,7 +718,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
             creationReason = "New",
             firstSubscriptionDate = new DateTime(validDate),
             accountStatus = "OPEN",
-            subscriptionStatus = None,
+            subscriptionStatus = "AVAILABLE",
             accountClosureReason = None,
             closureDate = None,
             transferAccount = None
@@ -734,7 +734,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
           (json \ "creationReason").as[String] mustBe "New"
           (json \ "firstSubscriptionDate").as[String] mustBe validDate
           (json \ "accountStatus").as[String] mustBe "OPEN"
-          (json \ "subscriptionStatus").asOpt[String] mustBe None
+          (json \ "subscriptionStatus").as[String] mustBe "AVAILABLE"
           (json \ "accountClosureReason").asOpt[String] mustBe None
           (json \ "closureDate").asOpt[String] mustBe None
           (json \ "transferAccount").asOpt[JsObject] mustBe None
@@ -748,7 +748,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
             creationReason = "New",
             firstSubscriptionDate = new DateTime(validDate),
             accountStatus = "CLOSED",
-            subscriptionStatus = Some("ACTIVE"),
+            subscriptionStatus = "ACTIVE",
             accountClosureReason = Some("All funds withdrawn"),
             closureDate = Some(new DateTime(validDate)),
             transferAccount = None)
@@ -764,7 +764,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
           (json \ "creationReason").as[String] mustBe "New"
           (json \ "firstSubscriptionDate").as[String] mustBe validDate
           (json \ "accountStatus").as[String] mustBe "CLOSED"
-          (json \ "subscriptionStatus").asOpt[String] mustBe Some("ACTIVE")
+          (json \ "subscriptionStatus").as[String] mustBe "ACTIVE"
           (json \ "accountClosureReason").asOpt[String] mustBe Some("All funds withdrawn")
           (json \ "closureDate").asOpt[String] mustBe Some(validDate)
           (json \ "transferAccount").asOpt[JsObject] mustBe None
@@ -778,7 +778,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
             creationReason = "Transferred",
             firstSubscriptionDate = new DateTime(validDate),
             accountStatus = "OPEN",
-            subscriptionStatus = Some("ACTIVE"),
+            subscriptionStatus = "ACTIVE",
             accountClosureReason = None,
             closureDate = None,
             transferAccount = Some(
@@ -801,7 +801,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
           (json \ "creationReason").as[String] mustBe "Transferred"
           (json \ "firstSubscriptionDate").as[String] mustBe validDate
           (json \ "accountStatus").as[String] mustBe "OPEN"
-          (json \ "subscriptionStatus").asOpt[String] mustBe Some("ACTIVE")
+          (json \ "subscriptionStatus").as[String] mustBe "ACTIVE"
           (json \ "accountClosureReason").asOpt[String] mustBe None
           (json \ "closureDate").asOpt[String] mustBe None
           (json \ "transferAccount" \ "transferredFromAccountId").as[String] mustBe "8765432102"
@@ -817,7 +817,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
             creationReason = "New",
             firstSubscriptionDate = new DateTime(validDate),
             accountStatus = "VOID",
-            subscriptionStatus = Some("ACTIVE"),
+            subscriptionStatus = "ACTIVE",
             accountClosureReason = None,
             closureDate = None,
             transferAccount = None
@@ -834,7 +834,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
           (json \ "creationReason").as[String] mustBe "New"
           (json \ "firstSubscriptionDate").as[String] mustBe validDate
           (json \ "accountStatus").as[String] mustBe "VOID"
-          (json \ "subscriptionStatus").asOpt[String] mustBe Some("ACTIVE")
+          (json \ "subscriptionStatus").as[String] mustBe "ACTIVE"
           (json \ "accountClosureReason").asOpt[String] mustBe None
           (json \ "closureDate").asOpt[String] mustBe None
           (json \ "transferAccount").asOpt[JsObject] mustBe None
@@ -1140,7 +1140,6 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
     val res = SUT.getAccountDetails(lisaManager, accountId).apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
     callback(res)
   }
-
 
   def doCloseRequest(jsonString: String, lmrn: String = lisaManager, accId: String = accountId)(callback: (Future[Result]) => Unit) {
     val res = SUT.closeLisaAccount(lmrn, accId).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
