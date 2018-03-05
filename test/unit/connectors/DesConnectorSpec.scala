@@ -1364,7 +1364,54 @@ class DesConnectorSpec extends PlaySpec
             creationReason = "Reinstated",
             firstSubscriptionDate = new DateTime("2016-01-06"),
             accountStatus = "OPEN",
-            subscriptionStatus = Some("AVAILABLE"),
+            subscriptionStatus = "AVAILABLE",
+            accountClosureReason = Some("Transferred out"),
+            closureDate = Some(new DateTime("2016-05-01")),
+            transferAccount = Some(GetLisaAccountTransferAccount(
+              transferredFromAccountId = "123abc789ABC34567890",
+              transferredFromLMRN = "Z123453",
+              transferInDate = new DateTime("2016-03-01")
+            ))
+          )
+        }
+      }
+    }
+
+    "return a subscriptionStatus of AVAILABLE" when {
+      "there is no subscriptionStatus in the json response from DES" in {
+        val responseJson = Json.parse("""{
+                                        |  "investorId": "1234567890",
+                                        |  "status": "OPEN",
+                                        |  "creationDate": "2016-01-01",
+                                        |  "creationReason": "REINSTATED",
+                                        |  "hmrcClosureDate": "2016-02-01",
+                                        |  "accountClosureReason": "TRANSFERRED_OUT",
+                                        |  "transferInDate": "2016-03-01",
+                                        |  "transferOutDate": "2016-04-01",
+                                        |  "xferredFromAccountId": "123abc789ABC34567890",
+                                        |  "xferredFromLmrn": "Z123453",
+                                        |  "lisaManagerClosureDate": "2016-05-01",
+                                        |  "firstSubscriptionDate": "2016-01-06"
+                                        |}""".stripMargin)
+
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = OK,
+                responseJson = Some(responseJson)
+              )
+            )
+          )
+
+        doRetrieveAccountRequest { response =>
+          response mustBe GetLisaAccountSuccessResponse(
+            accountId = "123456",
+            investorId = "1234567890",
+            creationReason = "Reinstated",
+            firstSubscriptionDate = new DateTime("2016-01-06"),
+            accountStatus = "OPEN",
+            subscriptionStatus = "AVAILABLE",
             accountClosureReason = Some("Transferred out"),
             closureDate = Some(new DateTime("2016-05-01")),
             transferAccount = Some(GetLisaAccountTransferAccount(

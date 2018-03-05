@@ -85,15 +85,14 @@
         "transferInDate"
       ]
     }
-  }
-,
-
+  },
   "required": [
     "investorId",
     "accountId",
     "creationReason",
     "firstSubscriptionDate",
-    "accountStatus"
+    "accountStatus",
+    "subscriptionStatus"
   ],
   "additionalProperties": false,
   "definitions": {

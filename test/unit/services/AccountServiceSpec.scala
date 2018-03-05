@@ -351,7 +351,7 @@ class AccountServiceSpec extends PlaySpec
     "return a Success Response" when {
 
       "given a success response" in {
-        val successResponse = GetLisaAccountSuccessResponse("123", "456", "All funds withdrawn", new DateTime("201-04-06"), "OPEN", None, None, None, None)
+        val successResponse = GetLisaAccountSuccessResponse("123", "456", "All funds withdrawn", new DateTime("201-04-06"), "OPEN", "AVAILABLE", None, None, None)
 
         when(mockDesConnector.getAccountInformation(any(), any())(any()))
           .thenReturn(Future.successful(successResponse))
