@@ -299,13 +299,16 @@ trait DesConnector extends ServicesConfig {
       case Success(data) =>
         (res.status, data)
       case Failure(er) =>
-        Try(res.json.as[DesFailureResponse]) match {
-          case Success(data) => Logger.info(s"DesFailureResponse from DES :${data}")
-             (res.status, data)
-          case Failure(ex) => Logger.error(s"Error from DES :${ex.getMessage}")
-             (500, DesFailureResponse())
+        if (res.status == 200) {
+          Logger.error(s"Error from DES (parsing as DesResponse): ${er.getMessage}")
         }
 
+        Try(res.json.as[DesFailureResponse]) match {
+          case Success(data) => Logger.info(s"DesFailureResponse from DES: ${data}")
+             (res.status, data)
+          case Failure(ex) => Logger.error(s"Error from DES (parsing as DesFailureResponse): ${ex.getMessage}")
+             (500, DesFailureResponse())
+        }
     }
   }
 
