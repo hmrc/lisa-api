@@ -34,11 +34,6 @@
       "type" : "string",
       "example": "12345"
     },
-    "chargeReference" : {
-      "description": "The reference for a charge due.",
-      "type" : "string",
-      "example": "12345"
-    },
     "paymentAmount" : {
       "description": "The amount paid for the transaction.",
       "type" : "number",
