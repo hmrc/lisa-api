@@ -561,7 +561,7 @@ types:
                   post:
                     is: [headers.acceptHeader, headers.contentHeader]
                     displayName: Modify date of first subscription of a LISA account
-                    description: Modify date investor first subscribed to a LISA account
+                    description: Modify the date when the first deposit was paid after a LISA account was created
                     (annotations.scope): "write:lisa"
                     securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
                     (annotations.sandboxData): !include testdata/subscription-update.md
