@@ -120,7 +120,7 @@ class ReinstateAccountController extends LisaController with LisaConstants {
 
     Status(status).apply(Json.toJson(Some(data)))
   }
-  
+
 }
 
 
