@@ -44,30 +44,6 @@ class ReinstateAccountController extends LisaController with LisaConstants {
 
   }
 
-  private def processReinstateFailure(lisaManager: String, accountId: String, err: ErrorResponse, status: Int, message: Option[String])
-                                     (implicit hc: HeaderCarrier, startTime: Long): Result = {
-    auditService.audit(
-      auditType = "accountNotReinstated",
-      path = getReinstateEndpointUrl(lisaManager, accountId),
-      auditData = Map(
-        ZREF -> lisaManager,
-        "accountId" -> accountId,
-        "reasonNotReinstated" -> err.errorCode
-      )
-    )
-
-    LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(status, LisaMetricKeys.REINSTATE))
-
-    val msg = message match {
-      case Some(text) => text
-      case None => err.message
-    }
-
-    val data = ApiResponseData(code = Some(err.errorCode), message = msg)
-
-    Status(status).apply(Json.toJson(Some(data)))
-  }
-
   private def processReinstateAccount(lisaManager: String, accountId: String)
                                      (implicit hc: HeaderCarrier, startTime: Long) = {
 
@@ -120,6 +96,31 @@ class ReinstateAccountController extends LisaController with LisaConstants {
   private def getReinstateEndpointUrl(lisaManagerReferenceNumber: String, accountID: String): String = {
     s"/manager/$lisaManagerReferenceNumber/accounts/$accountID/reinstate"
   }
+
+  private def processReinstateFailure(lisaManager: String, accountId: String, err: ErrorResponse, status: Int, message: Option[String])
+                                     (implicit hc: HeaderCarrier, startTime: Long): Result = {
+    auditService.audit(
+      auditType = "accountNotReinstated",
+      path = getReinstateEndpointUrl(lisaManager, accountId),
+      auditData = Map(
+        ZREF -> lisaManager,
+        "accountId" -> accountId,
+        "reasonNotReinstated" -> err.errorCode
+      )
+    )
+
+    LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(status, LisaMetricKeys.REINSTATE))
+
+    val msg = message match {
+      case Some(text) => text
+      case None => err.message
+    }
+
+    val data = ApiResponseData(code = Some(err.errorCode), message = msg)
+
+    Status(status).apply(Json.toJson(Some(data)))
+  }
+  
 }
 
 
