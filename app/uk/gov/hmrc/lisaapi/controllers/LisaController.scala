@@ -100,12 +100,14 @@ trait LisaController extends BaseController with HeaderValidator with RunMode wi
                 }
               }
             }
-            case Failure(e) => Logger.error(s"LisaController: An error occurred in lisa-api due to ${e.getMessage} returning internal server error")
+            case Failure(e) =>
+              Logger.error(s"LisaController: An error occurred in lisa-api due to ${e.getMessage} returning internal server error")
               LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getMetricKey(INTERNAL_SERVER_ERROR, request.uri))
               Future.successful(InternalServerError(toJson(ErrorInternalServerError)))
           }
 
-        case None => LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getMetricKey(BAD_REQUEST, request.uri))
+        case None =>
+          LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getMetricKey(BAD_REQUEST, request.uri))
           Future.successful(BadRequest(toJson(EmptyJson)))
       }
     }
