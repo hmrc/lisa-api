@@ -36,7 +36,7 @@ class InvestorController extends LisaController with LisaConstants  {
 
   def createLisaInvestor(lisaManager: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async {
     implicit request =>
-      val startTime = System.currentTimeMillis()
+      implicit val startTime = System.currentTimeMillis()
       LisaMetrics.startMetrics(startTime,LisaMetricKeys.INVESTOR)
       Logger.debug(s"LISA HTTP Request: ${request.uri} and method: ${request.method}")
 
@@ -49,7 +49,7 @@ class InvestorController extends LisaController with LisaConstants  {
                   LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.INVESTOR)
                   handleCreatedResponse(lisaManager, createRequest, investorId)
                 case CreateLisaInvestorAlreadyExistsResponse(investorId) =>
-                  LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaError(CONFLICT,LisaMetricKeys.INVESTOR))
+                  LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(CONFLICT,LisaMetricKeys.INVESTOR))
                   handleExistsResponse(lisaManager, createRequest, investorId)
                 case errorResponse: CreateLisaInvestorErrorResponse =>
                   handleFailureResponse(lisaManager, createRequest, errorResponse)
@@ -57,7 +57,7 @@ class InvestorController extends LisaController with LisaConstants  {
             } recover {
               case e: Exception =>
                 LisaMetrics.incrementMetrics(startTime,
-                  LisaMetricKeys.lisaError(INTERNAL_SERVER_ERROR,LisaMetricKeys.INVESTOR))
+                  LisaMetricKeys.lisaMetric(INTERNAL_SERVER_ERROR,LisaMetricKeys.INVESTOR))
                 Logger.error(s"createLisaInvestor: An error occurred due to ${e.getMessage} returning internal server error")
                 handleError(lisaManager, createRequest)
             }
@@ -113,7 +113,7 @@ class InvestorController extends LisaController with LisaConstants  {
       )
     )
     LisaMetrics.incrementMetrics(System.currentTimeMillis(),
-      LisaMetricKeys.lisaError(errorResponse.status,LisaMetricKeys.INVESTOR))
+      LisaMetricKeys.lisaMetric(errorResponse.status,LisaMetricKeys.INVESTOR))
 
     Status(errorResponse.status).apply(Json.toJson(errorResponse.data))
   }

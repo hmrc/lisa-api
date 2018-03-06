@@ -56,26 +56,26 @@ class UpdateSubscriptionController extends LisaController with LisaConstants {
                   Logger.debug("First Subscription date not updated")
                   doAudit(lisaManager, accountId, updateSubsRequest, failureEvent,
                     Map(failureReason -> ErrorAccountNotFound.errorCode))
-                  LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getErrorKey(NOT_FOUND, request.uri))
+                  LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getMetricKey(NOT_FOUND, request.uri))
                   NotFound(Json.toJson(ErrorAccountNotFound))
                 case UpdateSubscriptionAccountClosedResponse =>
                   Logger.error("Account Closed")
                   doAudit(lisaManager, accountId, updateSubsRequest, failureEvent,
                     Map(failureReason -> ErrorAccountAlreadyClosed.errorCode))
-                  LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaError(FORBIDDEN, request.uri))
+                  LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(FORBIDDEN, request.uri))
                   Forbidden(Json.toJson(ErrorAccountAlreadyClosed))
                 case UpdateSubscriptionAccountVoidedResponse =>
                   Logger.error("Account Voided")
                   doAudit(lisaManager, accountId, updateSubsRequest, failureEvent,
                     Map(failureReason -> ErrorAccountAlreadyVoided.errorCode))
-                  LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaError(FORBIDDEN, request.uri))
+                  LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(FORBIDDEN, request.uri))
                   Forbidden(Json.toJson(ErrorAccountAlreadyVoided))
                 case _ =>
                   Logger.debug("Matched Error")
                   doAudit(lisaManager, accountId, updateSubsRequest, failureEvent,
                     Map(failureReason -> ErrorInternalServerError.errorCode))
                   Logger.error(s"First Subscription date not updated : DES unknown case , returning internal server error")
-                  LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getErrorKey(INTERNAL_SERVER_ERROR, request.uri))
+                  LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getMetricKey(INTERNAL_SERVER_ERROR, request.uri))
                   InternalServerError(Json.toJson(ErrorInternalServerError))
               }
             }
@@ -94,7 +94,7 @@ class UpdateSubscriptionController extends LisaController with LisaConstants {
 
       doAudit(lisaManager, accountId, updateSubsRequest, "firstSubscriptionDateNotUpdated", Map("reasonNotUpdated" -> "FORBIDDEN"))
 
-      LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getErrorKey(FORBIDDEN, uri))
+      LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getMetricKey(FORBIDDEN, uri))
 
       Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
         ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("firstSubscriptionDate"), Some("/firstSubscriptionDate"))

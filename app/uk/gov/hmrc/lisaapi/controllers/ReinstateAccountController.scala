@@ -67,7 +67,7 @@ class ReinstateAccountController extends LisaController with LisaConstants {
               "reasonNotReinstated" -> ErrorAccountAlreadyClosed.errorCode)
           )
           LisaMetrics.incrementMetrics(startTime,
-            LisaMetricKeys.lisaError(FORBIDDEN,LisaMetricKeys.REINSTATE))
+            LisaMetricKeys.lisaMetric(FORBIDDEN,LisaMetricKeys.REINSTATE))
           val data = ApiResponseData( code = Some(ErrorAccountAlreadyClosed.errorCode), message = "You cannot reinstate this account because it was closed with a closure reason of transferred out")
           Forbidden(Json.toJson(Some(data)))
         }
@@ -80,7 +80,7 @@ class ReinstateAccountController extends LisaController with LisaConstants {
               "reasonNotReinstated" -> ErrorAccountAlreadyClosed.errorCode)
           )
           LisaMetrics.incrementMetrics(startTime,
-            LisaMetricKeys.lisaError(FORBIDDEN,LisaMetricKeys.REINSTATE))
+            LisaMetricKeys.lisaMetric(FORBIDDEN,LisaMetricKeys.REINSTATE))
           val data = ApiResponseData( code = Some(ErrorAccountAlreadyClosed.errorCode), message = "You cannot reinstate this account because it was closed with a closure reason of cancellation")
           Forbidden(Json.toJson(Some(data)))
         }
@@ -93,7 +93,7 @@ class ReinstateAccountController extends LisaController with LisaConstants {
               "reasonNotReinstated" -> ErrorAccountAlreadyOpen.errorCode)
           )
           LisaMetrics.incrementMetrics(startTime,
-            LisaMetricKeys.lisaError(FORBIDDEN,LisaMetricKeys.REINSTATE))
+            LisaMetricKeys.lisaMetric(FORBIDDEN,LisaMetricKeys.REINSTATE))
 
           Forbidden(Json.toJson(ErrorAccountAlreadyOpen))
         }
@@ -106,7 +106,7 @@ class ReinstateAccountController extends LisaController with LisaConstants {
               "reasonNotReinstated" -> ErrorInvestorComplianceCheckFailedReinstate.errorCode)
           )
           LisaMetrics.incrementMetrics(startTime,
-            LisaMetricKeys.lisaError(FORBIDDEN,LisaMetricKeys.REINSTATE))
+            LisaMetricKeys.lisaMetric(FORBIDDEN,LisaMetricKeys.REINSTATE))
 
           Forbidden(Json.toJson(ErrorInvestorComplianceCheckFailedReinstate))
         }
@@ -119,7 +119,7 @@ class ReinstateAccountController extends LisaController with LisaConstants {
               "reasonNotReinstated" -> ErrorAccountNotFound.errorCode)
           )
           LisaMetrics.incrementMetrics(startTime,
-          LisaMetricKeys.lisaError(NOT_FOUND,LisaMetricKeys.REINSTATE))
+          LisaMetricKeys.lisaMetric(NOT_FOUND,LisaMetricKeys.REINSTATE))
 
           NotFound(Json.toJson(ErrorAccountNotFound))
         }
@@ -132,7 +132,7 @@ class ReinstateAccountController extends LisaController with LisaConstants {
           )
           Logger.error(s"ReinstateAccountController: reinstateAccount unknown case from DES returning internal server error" )
           LisaMetrics.incrementMetrics(startTime,
-            LisaMetricKeys.lisaError(INTERNAL_SERVER_ERROR,LisaMetricKeys.CLOSE))
+            LisaMetricKeys.lisaMetric(INTERNAL_SERVER_ERROR,LisaMetricKeys.CLOSE))
 
           InternalServerError(Json.toJson(ErrorInternalServerError))
         }
@@ -140,7 +140,7 @@ class ReinstateAccountController extends LisaController with LisaConstants {
     } recover {
         case e:Exception  =>     Logger.error(s"ReinstateAccountController: reinstateAccount: An error occurred due to ${e.getMessage} returning internal server error")
                               LisaMetrics.incrementMetrics(startTime,
-                                LisaMetricKeys.lisaError(INTERNAL_SERVER_ERROR,LisaMetricKeys.CLOSE))
+                                LisaMetricKeys.lisaMetric(INTERNAL_SERVER_ERROR,LisaMetricKeys.CLOSE))
                               InternalServerError(Json.toJson(ErrorInternalServerError))
        }
   }

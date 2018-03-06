@@ -37,7 +37,7 @@ class LifeEventController extends LisaController with LisaConstants {
 
   def reportLisaLifeEvent(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async {
     implicit request =>
-      val startTime = System.currentTimeMillis()
+      implicit val startTime = System.currentTimeMillis()
       LisaMetrics.startMetrics(startTime, LisaMetricKeys.EVENT)
 
       withValidLMRN(lisaManager) { () =>
@@ -48,7 +48,7 @@ class LifeEventController extends LisaController with LisaConstants {
 
               doAudit(lisaManager, accountId, req, "lifeEventNotReported", Map("reasonNotReported" -> "FORBIDDEN"))
               LisaMetrics.incrementMetrics(startTime,
-                LisaMetricKeys.lisaError(FORBIDDEN, request.uri))
+                LisaMetricKeys.lisaMetric(FORBIDDEN, request.uri))
 
               Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
                 ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("eventDate"), Some("/eventDate"))
@@ -74,14 +74,14 @@ class LifeEventController extends LisaController with LisaConstants {
 
                     doAudit(lisaManager, accountId, req, "lifeEventNotReported", Map("reasonNotReported" -> ErrorLifeEventInappropriate.errorCode))
                     LisaMetrics.incrementMetrics(startTime,
-                      LisaMetricKeys.lisaError(FORBIDDEN, request.uri))
+                      LisaMetricKeys.lisaMetric(FORBIDDEN, request.uri))
 
                     Forbidden(Json.toJson(ErrorLifeEventInappropriate))
                   }
                   case ReportLifeEventAccountClosedResponse => {
                     Logger.error(("Account Closed or VOID"))
                     LisaMetrics.incrementMetrics(startTime,
-                      LisaMetricKeys.lisaError(FORBIDDEN, request.uri))
+                      LisaMetricKeys.lisaMetric(FORBIDDEN, request.uri))
 
                     Forbidden(Json.toJson(ErrorAccountAlreadyClosedOrVoid))
                   }
@@ -91,7 +91,7 @@ class LifeEventController extends LisaController with LisaConstants {
 
                     doAudit(lisaManager, accountId, req, "lifeEventNotReported", Map("reasonNotReported" -> result.errorCode))
                     LisaMetrics.incrementMetrics(startTime,
-                      LisaMetricKeys.getErrorKey(CONFLICT, request.uri))
+                      LisaMetricKeys.getMetricKey(CONFLICT, request.uri))
 
                     Conflict(Json.toJson(result))
                   }
@@ -100,7 +100,7 @@ class LifeEventController extends LisaController with LisaConstants {
 
                     doAudit(lisaManager, accountId, req, "lifeEventNotReported", Map("reasonNotReported" -> ErrorAccountNotFound.errorCode))
                     LisaMetrics.incrementMetrics(startTime,
-                      LisaMetricKeys.getErrorKey(NOT_FOUND, request.uri))
+                      LisaMetricKeys.getMetricKey(NOT_FOUND, request.uri))
 
                     NotFound(Json.toJson(ErrorAccountNotFound))
                   }
@@ -111,7 +111,7 @@ class LifeEventController extends LisaController with LisaConstants {
 
                     Logger.error(s"Life Event Not reported : DES unknown case , returning internal server error")
                     LisaMetrics.incrementMetrics(startTime,
-                      LisaMetricKeys.getErrorKey(INTERNAL_SERVER_ERROR, request.uri))
+                      LisaMetricKeys.getMetricKey(INTERNAL_SERVER_ERROR, request.uri))
 
                     InternalServerError(Json.toJson(ErrorInternalServerError))
                   }
@@ -126,7 +126,7 @@ class LifeEventController extends LisaController with LisaConstants {
 
   def getLifeEvent(lisaManager: String, accountId: String, eventId: String): Action[AnyContent] =
     validateAccept(acceptHeaderValidationRules).async { implicit request =>
-      val startTime = System.currentTimeMillis()
+      implicit val startTime = System.currentTimeMillis()
       LisaMetrics.startMetrics(startTime, LisaMetricKeys.EVENT)
 
       withValidLMRN(lisaManager) { () =>
@@ -145,14 +145,14 @@ class LifeEventController extends LisaController with LisaConstants {
                 case ReportLifeEventAccountNotFoundResponse => {
                   Logger.debug("Matched Not Found")
 
-                  LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getErrorKey(NOT_FOUND, request.uri))
+                  LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getMetricKey(NOT_FOUND, request.uri))
 
                   NotFound(Json.toJson(ErrorAccountNotFound))
                 }
                 case ReportLifeEventIdNotFoundResponse => {
                   Logger.debug("Matched Not Found")
 
-                  LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getErrorKey(NOT_FOUND, request.uri))
+                  LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getMetricKey(NOT_FOUND, request.uri))
 
                   NotFound(Json.toJson(ErrorLifeEventIdNotFound))
                 }
@@ -160,7 +160,7 @@ class LifeEventController extends LisaController with LisaConstants {
                   Logger.debug("Matched Error")
                   Logger.error("Life Event Not returned : DES unknown case , returning internal server error")
 
-                  LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getErrorKey(INTERNAL_SERVER_ERROR, request.uri))
+                  LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getMetricKey(INTERNAL_SERVER_ERROR, request.uri))
 
                   InternalServerError(Json.toJson(ErrorInternalServerError))
                 }

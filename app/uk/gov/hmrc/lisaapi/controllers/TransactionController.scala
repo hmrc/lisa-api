@@ -32,7 +32,7 @@ class TransactionController extends LisaController with LisaConstants {
 
   def getTransaction(lisaManager: String, accountId: String, transactionId: String): Action[AnyContent] =
     validateAccept(acceptHeaderValidationRules).async { implicit request =>
-      val startTime = System.currentTimeMillis()
+      implicit val startTime = System.currentTimeMillis()
       LisaMetrics.startMetrics(startTime, LisaMetricKeys.TRANSACTION)
 
       withValidLMRN(lisaManager) { () =>
@@ -49,21 +49,21 @@ class TransactionController extends LisaController with LisaConstants {
               case GetTransactionAccountNotFoundResponse => {
                 Logger.debug("Matched Not Found Response")
 
-                LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getErrorKey(NOT_FOUND, request.uri))
+                LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getMetricKey(NOT_FOUND, request.uri))
 
                 NotFound(Json.toJson(ErrorAccountNotFound))
               }
               case GetTransactionTransactionNotFoundResponse => {
                 Logger.debug("Matched Not Found Response")
 
-                LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getErrorKey(NOT_FOUND, request.uri))
+                LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getMetricKey(NOT_FOUND, request.uri))
 
                 NotFound(Json.toJson(ErrorTransactionNotFound))
               }
               case GetTransactionErrorResponse => {
                 Logger.debug("Matched an error")
 
-                LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getErrorKey(INTERNAL_SERVER_ERROR, request.uri))
+                LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getMetricKey(INTERNAL_SERVER_ERROR, request.uri))
 
                 InternalServerError(Json.toJson(ErrorInternalServerError))
               }
