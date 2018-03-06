@@ -33,7 +33,6 @@ class TransactionController extends LisaController with LisaConstants {
   def getTransaction(lisaManager: String, accountId: String, transactionId: String): Action[AnyContent] =
     validateAccept(acceptHeaderValidationRules).async { implicit request =>
       implicit val startTime = System.currentTimeMillis()
-      LisaMetrics.startMetrics(startTime, LisaMetricKeys.TRANSACTION)
 
       withValidLMRN(lisaManager) { () =>
         withEnrolment(lisaManager) { (_) =>
@@ -42,28 +41,28 @@ class TransactionController extends LisaController with LisaConstants {
               case success: GetTransactionSuccessResponse => {
                 Logger.debug("Matched Valid Response")
 
-                LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.TRANSACTION)
+                LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(OK, LisaMetricKeys.TRANSACTION))
 
                 Ok(Json.toJson(success))
               }
               case GetTransactionAccountNotFoundResponse => {
                 Logger.debug("Matched Not Found Response")
 
-                LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getMetricKey(NOT_FOUND, request.uri))
+                LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(NOT_FOUND, LisaMetricKeys.TRANSACTION))
 
                 NotFound(Json.toJson(ErrorAccountNotFound))
               }
               case GetTransactionTransactionNotFoundResponse => {
                 Logger.debug("Matched Not Found Response")
 
-                LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getMetricKey(NOT_FOUND, request.uri))
+                LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(NOT_FOUND, LisaMetricKeys.TRANSACTION))
 
                 NotFound(Json.toJson(ErrorTransactionNotFound))
               }
               case GetTransactionErrorResponse => {
                 Logger.debug("Matched an error")
 
-                LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getMetricKey(INTERNAL_SERVER_ERROR, request.uri))
+                LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(INTERNAL_SERVER_ERROR, LisaMetricKeys.TRANSACTION))
 
                 InternalServerError(Json.toJson(ErrorInternalServerError))
               }
