@@ -60,7 +60,8 @@ class LifeEventController extends LisaController with LisaConstants {
                                              accountId: String,
                                              startTime: Long,
                                              req: ReportLifeEventRequest,
-                                             res: ReportLifeEventResponse) = {
+                                             res: ReportLifeEventResponse)
+                                           (implicit hc: HeaderCarrier) = {
     res match {
       case ReportLifeEventSuccessResponse(lifeEventId) => {
         Logger.debug("Matched Valid Response ")
@@ -105,7 +106,7 @@ class LifeEventController extends LisaController with LisaConstants {
 
   private def withValidDates(lisaManager: String, accountId: String, req: ReportLifeEventRequest)
                             (success: () => Future[Result])
-                            (implicit startTime: Long) = {
+                            (implicit hc: HeaderCarrier, startTime: Long) = {
     if (req.eventDate.isBefore(LISA_START_DATE)) {
       Logger.debug("Life event not reported - invalid event date")
 
@@ -168,7 +169,8 @@ class LifeEventController extends LisaController with LisaConstants {
       }
     }
 
-  private def doAudit(lisaManager: String, accountId: String, req: ReportLifeEventRequest, auditType: String, extraData: Map[String, String] = Map())(implicit hc: HeaderCarrier) = {
+  private def doAudit(lisaManager: String, accountId: String, req: ReportLifeEventRequest, auditType: String, extraData: Map[String, String] = Map())
+                     (implicit hc: HeaderCarrier) = {
     auditService.audit(
       auditType = auditType,
       path = getEndpointUrl(lisaManager, accountId),
