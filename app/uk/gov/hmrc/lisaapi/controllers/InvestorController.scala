@@ -45,10 +45,8 @@ class InvestorController extends LisaController with LisaConstants  {
             service.createInvestor(lisaManager, createRequest).map { res =>
               res match {
                 case CreateLisaInvestorSuccessResponse(investorId) =>
-                  LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.INVESTOR)
                   handleCreatedResponse(lisaManager, createRequest, investorId)
                 case CreateLisaInvestorAlreadyExistsResponse(investorId) =>
-                  LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(CONFLICT,LisaMetricKeys.INVESTOR))
                   handleExistsResponse(lisaManager, createRequest, investorId)
                 case errorResponse: CreateLisaInvestorErrorResponse =>
                   handleFailureResponse(lisaManager, createRequest, errorResponse)
