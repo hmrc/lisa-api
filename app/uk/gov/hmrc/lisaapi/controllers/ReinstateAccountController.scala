@@ -18,7 +18,7 @@ package uk.gov.hmrc.lisaapi.controllers
 
 import play.api.Logger
 import play.api.libs.json.{JsObject, JsPath, Json}
-import play.api.mvc.{Action, AnyContent}
+import play.api.mvc.{Action, AnyContent, Result}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
@@ -26,6 +26,7 @@ import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, ReinstateAccountService}
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class ReinstateAccountController extends LisaController with LisaConstants {
 
@@ -34,120 +35,92 @@ class ReinstateAccountController extends LisaController with LisaConstants {
 
   def reinstateAccount (lisaManager: String): Action[AnyContent] = Action.async{ implicit request =>
     implicit val startTime = System.currentTimeMillis()
-    LisaMetrics.startMetrics(startTime, LisaMetricKeys.REINSTATE)
     withValidLMRN(lisaManager) { () =>
-      withValidJson[ReinstateLisaAccountRequest] (req => {
-        processReinstateAccount(lisaManager, req.accountId.toString)
-      }, lisaManager = lisaManager)
+      withValidJson[ReinstateLisaAccountRequest] (
+        req => processReinstateAccount(lisaManager, req.accountId.toString),
+        lisaManager = lisaManager
+      )
     }
 
   }
 
-  private def processReinstateAccount(lisaManager: String, accountId: String)(implicit hc: HeaderCarrier, startTime:Long) = {
+  private def processReinstateAccount(lisaManager: String, accountId: String)
+                                     (implicit hc: HeaderCarrier, startTime: Long) = {
+
     service.reinstateAccountService(lisaManager, accountId).map { result =>
       result match {
-        case success: ReinstateLisaAccountSuccessResponse => {
-           LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.REINSTATE)
-
+        case _: ReinstateLisaAccountSuccessResponse => {
           auditService.audit(
             auditType = "accountReinstated",
             path = getReinstateEndpointUrl(lisaManager, accountId),
             auditData = Map(ZREF -> lisaManager, "accountId" -> accountId)
           )
-
+          LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(OK, LisaMetricKeys.REINSTATE))
           val data = ApiResponseData(message = "This account has been reinstated", accountId = Some(accountId))
-
-          Ok(Json.toJson(ApiResponse(data = Some(data), success = true, status = 200)))
+          Ok(Json.toJson(ApiResponse(data = Some(data), success = true, status = OK)))
         }
-        case ReinstateLisaAccountAlreadyClosedResponse => {
-          auditService.audit(
-            auditType = "accountNotReinstated",
-            path = getReinstateEndpointUrl(lisaManager, accountId),
-            auditData = Map(ZREF -> lisaManager, "accountId" -> accountId,
-              "reasonNotReinstated" -> ErrorAccountAlreadyClosed.errorCode)
+        case ReinstateLisaAccountAlreadyClosedResponse =>
+          processReinstateFailure(
+            lisaManager,
+            accountId,
+            ErrorAccountAlreadyClosed,
+            FORBIDDEN,
+            Some("You cannot reinstate this account because it was closed with a closure reason of transferred out")
           )
-          LisaMetrics.incrementMetrics(startTime,
-            LisaMetricKeys.lisaError(FORBIDDEN,LisaMetricKeys.REINSTATE))
-          val data = ApiResponseData( code = Some(ErrorAccountAlreadyClosed.errorCode), message = "You cannot reinstate this account because it was closed with a closure reason of transferred out")
-          Forbidden(Json.toJson(Some(data)))
-        }
-
-        case ReinstateLisaAccountAlreadyCancelledResponse => {
-          auditService.audit(
-            auditType = "accountNotReinstated",
-            path = getReinstateEndpointUrl(lisaManager, accountId),
-            auditData = Map(ZREF -> lisaManager, "accountId" -> accountId,
-              "reasonNotReinstated" -> ErrorAccountAlreadyClosed.errorCode)
+        case ReinstateLisaAccountAlreadyCancelledResponse =>
+          processReinstateFailure(
+            lisaManager,
+            accountId,
+            ErrorAccountAlreadyClosed,
+            FORBIDDEN,
+            Some("You cannot reinstate this account because it was closed with a closure reason of cancellation")
           )
-          LisaMetrics.incrementMetrics(startTime,
-            LisaMetricKeys.lisaError(FORBIDDEN,LisaMetricKeys.REINSTATE))
-          val data = ApiResponseData( code = Some(ErrorAccountAlreadyClosed.errorCode), message = "You cannot reinstate this account because it was closed with a closure reason of cancellation")
-          Forbidden(Json.toJson(Some(data)))
-        }
-
-        case ReinstateLisaAccountAlreadyOpenResponse => {
-          auditService.audit(
-            auditType = "accountNotReinstated",
-            path = getReinstateEndpointUrl(lisaManager, accountId),
-            auditData = Map(ZREF -> lisaManager, "accountId" -> accountId,
-              "reasonNotReinstated" -> ErrorAccountAlreadyOpen.errorCode)
-          )
-          LisaMetrics.incrementMetrics(startTime,
-            LisaMetricKeys.lisaError(FORBIDDEN,LisaMetricKeys.REINSTATE))
-
-          Forbidden(Json.toJson(ErrorAccountAlreadyOpen))
-        }
-
-        case ReinstateLisaAccountInvestorComplianceCheckFailedResponse => {
-          auditService.audit(
-            auditType = "accountNotReinstated",
-            path = getReinstateEndpointUrl(lisaManager, accountId),
-            auditData = Map(ZREF -> lisaManager, "accountId" -> accountId,
-              "reasonNotReinstated" -> ErrorInvestorComplianceCheckFailedReinstate.errorCode)
-          )
-          LisaMetrics.incrementMetrics(startTime,
-            LisaMetricKeys.lisaError(FORBIDDEN,LisaMetricKeys.REINSTATE))
-
-          Forbidden(Json.toJson(ErrorInvestorComplianceCheckFailedReinstate))
-        }
-
-        case ReinstateLisaAccountNotFoundResponse => {
-          auditService.audit(
-            auditType = "accountNotReinstated",
-            path = getReinstateEndpointUrl(lisaManager, accountId),
-            auditData = Map(ZREF -> lisaManager, "accountId" -> accountId,
-              "reasonNotReinstated" -> ErrorAccountNotFound.errorCode)
-          )
-          LisaMetrics.incrementMetrics(startTime,
-          LisaMetricKeys.lisaError(NOT_FOUND,LisaMetricKeys.REINSTATE))
-
-          NotFound(Json.toJson(ErrorAccountNotFound))
-        }
-        case _ => {
-          auditService.audit(
-            auditType = "accountNotReinstated",
-            path = getReinstateEndpointUrl(lisaManager, accountId),
-            auditData = Map(ZREF -> lisaManager, "accountId" -> accountId,
-              "reasonNotReinstated" -> ErrorInternalServerError.errorCode)
-          )
-          Logger.error(s"ReinstateAccountController: reinstateAccount unknown case from DES returning internal server error" )
-          LisaMetrics.incrementMetrics(startTime,
-            LisaMetricKeys.lisaError(INTERNAL_SERVER_ERROR,LisaMetricKeys.CLOSE))
-
-          InternalServerError(Json.toJson(ErrorInternalServerError))
-        }
+        case ReinstateLisaAccountAlreadyOpenResponse =>
+          processReinstateFailure(lisaManager, accountId, ErrorAccountAlreadyOpen, FORBIDDEN, None)
+        case ReinstateLisaAccountInvestorComplianceCheckFailedResponse =>
+          processReinstateFailure(lisaManager, accountId, ErrorInvestorComplianceCheckFailedReinstate, FORBIDDEN, None)
+        case ReinstateLisaAccountNotFoundResponse =>
+          processReinstateFailure(lisaManager, accountId, ErrorAccountNotFound, NOT_FOUND, None)
+        case _ =>
+          processReinstateFailure(lisaManager, accountId, ErrorInternalServerError, INTERNAL_SERVER_ERROR, None)
       }
     } recover {
-        case e:Exception  =>     Logger.error(s"ReinstateAccountController: reinstateAccount: An error occurred due to ${e.getMessage} returning internal server error")
-                              LisaMetrics.incrementMetrics(startTime,
-                                LisaMetricKeys.lisaError(INTERNAL_SERVER_ERROR,LisaMetricKeys.CLOSE))
-                              InternalServerError(Json.toJson(ErrorInternalServerError))
-       }
+      case _:Exception  => {
+        Logger.error(s"ReinstateAccountController: reinstateAccount: An error occurred returning internal server error")
+        LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(INTERNAL_SERVER_ERROR, LisaMetricKeys.REINSTATE))
+        InternalServerError(Json.toJson(ErrorInternalServerError))
+      }
+    }
   }
 
   private def getReinstateEndpointUrl(lisaManagerReferenceNumber: String, accountID: String): String = {
     s"/manager/$lisaManagerReferenceNumber/accounts/$accountID/reinstate"
   }
+
+  private def processReinstateFailure(lisaManager: String, accountId: String, err: ErrorResponse, status: Int, message: Option[String])
+                                     (implicit hc: HeaderCarrier, startTime: Long): Result = {
+    auditService.audit(
+      auditType = "accountNotReinstated",
+      path = getReinstateEndpointUrl(lisaManager, accountId),
+      auditData = Map(
+        ZREF -> lisaManager,
+        "accountId" -> accountId,
+        "reasonNotReinstated" -> err.errorCode
+      )
+    )
+
+    LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(status, LisaMetricKeys.REINSTATE))
+
+    val msg = message match {
+      case Some(text) => text
+      case None => err.message
+    }
+
+    val data = ApiResponseData(code = Some(err.errorCode), message = msg)
+
+    Status(status).apply(Json.toJson(Some(data)))
+  }
+
 }
 
 

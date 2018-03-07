@@ -33,6 +33,7 @@ object LisaMetrics extends LisaMetrics with MicroserviceMetrics {
 
   override def timer(diff: Long, unit: TimeUnit, metricType: String):Unit =   registry.timer(s"${metricType}").update(diff, unit)
 
+  @deprecated("Method does not work the way you would expect.")
   def startMetrics(startTime: Long, api: String): Unit =  LisaMetrics.timer(startTime, TimeUnit.MILLISECONDS, api.toString)
 
   def incrementMetrics(startTime: Long, api: String): Unit = {
@@ -63,9 +64,9 @@ trait LisaMetricKeys  {
     "update-subscription" -> UPDATE_SUBSCRIPTION
   )
 
-  def lisaError(status:Int, name:String):String =  s"${name}_${status}"
+  def lisaMetric(status:Int, name:String):String =  s"${name}_${status}"
 
-  def getErrorKey(status:Int, url:String):String = lisaError(status, keys.getOrElse(Try(url.split("/").last).getOrElse("discover"),"UNKNOWN"))
+  def getMetricKey(status:Int, url:String):String = lisaMetric(status, keys.getOrElse(Try(url.split("/").last).getOrElse("discover"),"UNKNOWN"))
 
 }
 object LisaMetricKeys extends LisaMetricKeys

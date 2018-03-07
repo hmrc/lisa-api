@@ -36,7 +36,6 @@ class BulkPaymentController extends LisaController with LisaConstants {
   def getBulkPayment(lisaManager: String, startDate: String, endDate: String): Action[AnyContent] =
     validateAccept(acceptHeaderValidationRules).async { implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
-      LisaMetrics.startMetrics(startTime, LisaMetricKeys.TRANSACTION)
       withValidLMRN(lisaManager) { () =>
         withEnrolment(lisaManager) { _ =>
           withValidDates(startDate, endDate) { (start, end) =>
@@ -44,15 +43,15 @@ class BulkPaymentController extends LisaController with LisaConstants {
 
             response map {
               case s: GetBulkPaymentSuccessResponse => {
-                LisaMetrics.incrementMetrics(System.currentTimeMillis(), LisaMetricKeys.TRANSACTION)
+                LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(OK, LisaMetricKeys.TRANSACTION))
                 Ok(Json.toJson(s))
               }
               case GetBulkPaymentNotFoundResponse => {
-                LisaMetrics.incrementMetrics(System.currentTimeMillis(), LisaMetricKeys.lisaError(NOT_FOUND, LisaMetricKeys.TRANSACTION))
+                LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(NOT_FOUND, LisaMetricKeys.TRANSACTION))
                 NotFound(Json.toJson(ErrorPaymentNotFound))
               }
               case _ => {
-                LisaMetrics.incrementMetrics(System.currentTimeMillis(), LisaMetricKeys.lisaError(INTERNAL_SERVER_ERROR, LisaMetricKeys.TRANSACTION))
+                LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(INTERNAL_SERVER_ERROR, LisaMetricKeys.TRANSACTION))
                 InternalServerError(Json.toJson(ErrorInternalServerError))
               }
             }
@@ -62,7 +61,9 @@ class BulkPaymentController extends LisaController with LisaConstants {
     }
 
   private def withValidDates(startDate: String, endDate: String)
-                            (success: (DateTime, DateTime) => Future[Result]): Future[Result] = {
+                            (success: (DateTime, DateTime) => Future[Result])
+                            (implicit startTime: Long): Future[Result] = {
+
     val start = parseDate(startDate)
     val end = parseDate(endDate)
 
@@ -72,32 +73,43 @@ class BulkPaymentController extends LisaController with LisaConstants {
           success(s, e)
         }
       }
-      case (None, Some(_)) => Future.successful(BadRequest(Json.toJson(ErrorBadRequestStart)))
-      case (Some(_), None) => Future.successful(BadRequest(Json.toJson(ErrorBadRequestEnd)))
-      case _ => Future.successful(BadRequest(Json.toJson(ErrorBadRequestStartEnd)))
+      case (None, Some(_)) =>
+        LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(BAD_REQUEST, LisaMetricKeys.TRANSACTION))
+        Future.successful(BadRequest(Json.toJson(ErrorBadRequestStart)))
+      case (Some(_), None) =>
+        LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(BAD_REQUEST, LisaMetricKeys.TRANSACTION))
+        Future.successful(BadRequest(Json.toJson(ErrorBadRequestEnd)))
+      case _ =>
+        LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(BAD_REQUEST, LisaMetricKeys.TRANSACTION))
+        Future.successful(BadRequest(Json.toJson(ErrorBadRequestStartEnd)))
     }
   }
 
   private def withDatesWithinBusinessRules(startDate: DateTime, endDate: DateTime)
-                                          (success: () => Future[Result]): Future[Result] = {
+                                          (success: () => Future[Result])
+                                          (implicit startTime: Long): Future[Result] = {
 
     // end date is in the future
     if (endDate.isAfter(currentDateService.now())) {
+      LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(FORBIDDEN, LisaMetricKeys.TRANSACTION))
       Future.successful(Forbidden(Json.toJson(ErrorBadRequestEndInFuture)))
     }
 
     // end date is before start date
     else if (endDate.isBefore(startDate)) {
+      LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(FORBIDDEN, LisaMetricKeys.TRANSACTION))
       Future.successful(Forbidden(Json.toJson(ErrorBadRequestEndBeforeStart)))
     }
 
     // start date is before 6 april 2017
     else if (startDate.isBefore(LISA_START_DATE)) {
+      LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(FORBIDDEN, LisaMetricKeys.TRANSACTION))
       Future.successful(Forbidden(Json.toJson(ErrorBadRequestStartBefore6April2017)))
     }
 
     // there's more than a year between start date and end date
     else if (endDate.isAfter(startDate.plusYears(1))) {
+      LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(FORBIDDEN, LisaMetricKeys.TRANSACTION))
       Future.successful(Forbidden(Json.toJson(ErrorBadRequestOverYearBetweenStartAndEnd)))
     }
 

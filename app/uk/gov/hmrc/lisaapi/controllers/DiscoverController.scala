@@ -18,13 +18,15 @@ package uk.gov.hmrc.lisaapi.controllers
 
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
+import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 
 import scala.concurrent.Future
 
 class DiscoverController extends LisaController {
 
-
   def discover(lisaManagerReferenceNumber: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
+    implicit val startTime = System.currentTimeMillis()
+
     withValidLMRN(lisaManagerReferenceNumber) { () =>
       withEnrolment(lisaManagerReferenceNumber) { (_) =>
         val result = s"""{
@@ -52,6 +54,7 @@ class DiscoverController extends LisaController {
             }
         }"""
 
+        LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(OK, LisaMetricKeys.DISCOVER))
         Future.successful(Ok(Json.parse(result)))
       }
     }

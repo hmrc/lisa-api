@@ -40,15 +40,13 @@ class AccountController extends LisaController with LisaConstants {
 
     def createOrTransferLisaAccount(lisaManager: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
-      LisaMetrics.startMetrics(startTime,LisaMetricKeys.ACCOUNT)
 
       withValidLMRN(lisaManager) { () =>
         withValidJson[CreateLisaAccountRequest](
           {
             case createRequest: CreateLisaAccountCreationRequest =>
               if (hasAccountTransferData(request.body.asJson.get.as[JsObject])) {
-                LisaMetrics.startMetrics(System.currentTimeMillis(),
-                  LisaMetricKeys.lisaError(FORBIDDEN, LisaMetricKeys.ACCOUNT))
+                LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(FORBIDDEN, LisaMetricKeys.ACCOUNT))
 
                 Future.successful(Forbidden(toJson(ErrorTransferAccountDataProvided)))
               }
@@ -67,14 +65,12 @@ class AccountController extends LisaController with LisaConstants {
               }
 
               if (transferAccountDataNotProvided > 0) {
-                LisaMetrics.incrementMetrics(startTime,
-                  LisaMetricKeys.lisaError(FORBIDDEN,LisaMetricKeys.ACCOUNT))
+                LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(FORBIDDEN, LisaMetricKeys.ACCOUNT))
 
                 Future.successful(Forbidden(toJson(ErrorTransferAccountDataNotProvided)))
               }
               else {
-                LisaMetrics.incrementMetrics(startTime,
-                  LisaMetricKeys.lisaError(BAD_REQUEST,LisaMetricKeys.ACCOUNT))
+                LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(BAD_REQUEST, LisaMetricKeys.ACCOUNT))
 
                 Future.successful(BadRequest(toJson(ErrorBadRequest(errorConverter.convert(errors)))))
               }
@@ -100,8 +96,10 @@ class AccountController extends LisaController with LisaConstants {
               path = getCreateOrTransferEndpointUrl(lisaManager),
               auditData = creationRequest.toStringMap + (ZREF -> lisaManager)
             )
+
             val data = ApiResponseData(message = "Account created", accountId = Some(accountId))
-            LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.ACCOUNT)
+
+            LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(CREATED, LisaMetricKeys.ACCOUNT))
 
             Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
           case CreateLisaAccountInvestorNotFoundResponse =>
@@ -139,8 +137,10 @@ class AccountController extends LisaController with LisaConstants {
               path = getCreateOrTransferEndpointUrl(lisaManager),
               auditData = transferRequest.toStringMap + (ZREF -> lisaManager)
             )
+
             val data = ApiResponseData(message = "Account transferred", accountId = Some(accountId))
-            LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.ACCOUNT)
+
+            LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(CREATED, LisaMetricKeys.ACCOUNT))
 
             Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
           case CreateLisaAccountInvestorNotFoundResponse =>
@@ -178,7 +178,7 @@ class AccountController extends LisaController with LisaConstants {
             "reasonNotCreated" -> "FORBIDDEN")
         )
 
-        LisaMetrics.incrementMetrics(System.currentTimeMillis(), LisaMetricKeys.lisaError(FORBIDDEN, LisaMetricKeys.ACCOUNT))
+        LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(FORBIDDEN, LisaMetricKeys.ACCOUNT))
 
         Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
           ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("firstSubscriptionDate"), Some("/firstSubscriptionDate"))
@@ -226,7 +226,7 @@ class AccountController extends LisaController with LisaConstants {
             "reasonNotCreated" -> "FORBIDDEN")
         )
 
-        LisaMetrics.incrementMetrics(System.currentTimeMillis(), LisaMetricKeys.lisaError(FORBIDDEN, LisaMetricKeys.ACCOUNT))
+        LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(FORBIDDEN, LisaMetricKeys.ACCOUNT))
 
         Future.successful(Forbidden(Json.toJson(ErrorForbidden(errors))))
       }
@@ -250,8 +250,7 @@ class AccountController extends LisaController with LisaConstants {
         )
       )
 
-      LisaMetrics.incrementMetrics(System.currentTimeMillis(),
-        LisaMetricKeys.lisaError(status, LisaMetricKeys.ACCOUNT))
+      LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(status, LisaMetricKeys.ACCOUNT))
 
       Status(status).apply(Json.toJson(e))
     }
@@ -266,7 +265,6 @@ class AccountController extends LisaController with LisaConstants {
 
     def getAccountDetails(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
-      LisaMetrics.startMetrics(startTime, LisaMetricKeys.ACCOUNT)
       withValidLMRN(lisaManager) { () =>
         withEnrolment(lisaManager) { (_) =>
           withValidAccountId(accountId) { () =>
@@ -276,20 +274,19 @@ class AccountController extends LisaController with LisaConstants {
       }
     }
 
-    private def processGetAccountDetails(lisaManager:String, accountId:String)(implicit hc: HeaderCarrier,startTime:Long) = {
+    private def processGetAccountDetails(lisaManager:String, accountId:String)
+                                        (implicit hc: HeaderCarrier, startTime:Long) = {
       service.getAccount(lisaManager, accountId).map {
         case response: GetLisaAccountSuccessResponse =>
-          LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.ACCOUNT)
+          LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(OK, LisaMetricKeys.ACCOUNT))
           Ok(Json.toJson(response))
 
         case GetLisaAccountDoesNotExistResponse =>
-          LisaMetrics.incrementMetrics(System.currentTimeMillis(),
-            LisaMetricKeys.lisaError(NOT_FOUND, LisaMetricKeys.ACCOUNT))
+          LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(NOT_FOUND, LisaMetricKeys.ACCOUNT))
           NotFound(Json.toJson(ErrorAccountNotFound))
 
         case _ =>
-          LisaMetrics.incrementMetrics(System.currentTimeMillis(),
-            LisaMetricKeys.lisaError(INTERNAL_SERVER_ERROR, LisaMetricKeys.ACCOUNT))
+          LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(INTERNAL_SERVER_ERROR, LisaMetricKeys.ACCOUNT))
           InternalServerError(Json.toJson(ErrorInternalServerError))
       }
     }
@@ -299,13 +296,11 @@ class AccountController extends LisaController with LisaConstants {
   //region Close Account
 
     def closeLisaAccount(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
+      implicit val startTime = System.currentTimeMillis()
       withValidLMRN(lisaManager) { () =>
         withValidAccountId(accountId) { () =>
-          withValidJson[CloseLisaAccountRequest](closeRequest => {
-              implicit val startTime: Long = System.currentTimeMillis()
-              LisaMetrics.startMetrics(startTime, LisaMetricKeys.CLOSE)
-              processAccountClosure(lisaManager, accountId, closeRequest)
-            },
+          withValidJson[CloseLisaAccountRequest](
+            closeRequest => processAccountClosure(lisaManager, accountId, closeRequest),
             lisaManager = lisaManager
           )
         }
@@ -313,18 +308,18 @@ class AccountController extends LisaController with LisaConstants {
     }
 
     private def processAccountClosure(lisaManager: String, accountId: String, closeLisaAccountRequest: CloseLisaAccountRequest)
-                                     (implicit hc: HeaderCarrier, startTime:Long) = {
+                                     (implicit hc: HeaderCarrier, startTime: Long) = {
       hasValidDatesForClosure(lisaManager, accountId, closeLisaAccountRequest) { () =>
         service.closeAccount(lisaManager, accountId, closeLisaAccountRequest).map {
           case CloseLisaAccountSuccessResponse(`accountId`) =>
-            LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.CLOSE)
-
             auditService.audit(
               auditType = "accountClosed",
               path = getCloseEndpointUrl(lisaManager, accountId),
               auditData = closeLisaAccountRequest.toStringMap ++ Map(ZREF -> lisaManager,
                 "accountId" -> accountId)
             )
+
+            LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(OK, LisaMetricKeys.CLOSE))
 
             val data = ApiResponseData(message = "LISA account closed", accountId = Some(accountId))
 
@@ -362,8 +357,7 @@ class AccountController extends LisaController with LisaConstants {
           "reasonNotClosed" -> "FORBIDDEN")
         )
 
-        LisaMetrics.incrementMetrics(startTime,
-          LisaMetricKeys.lisaError(FORBIDDEN, LisaMetricKeys.CLOSE))
+        LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(FORBIDDEN, LisaMetricKeys.CLOSE))
 
         Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
           ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("closureDate"), Some("/closureDate"))
@@ -388,8 +382,7 @@ class AccountController extends LisaController with LisaConstants {
           "reasonNotClosed" -> e.errorCode)
       )
 
-      LisaMetrics.incrementMetrics(startTime,
-        LisaMetricKeys.lisaError(status, LisaMetricKeys.CLOSE))
+      LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(status, LisaMetricKeys.CLOSE))
 
       Status(status).apply(Json.toJson(e))
     }

@@ -18,7 +18,7 @@ package uk.gov.hmrc.lisaapi.controllers
 
 import play.api.Logger
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent}
+import play.api.mvc.{Action, AnyContent, Result}
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, LifeEventService}
@@ -37,122 +37,102 @@ class LifeEventController extends LisaController with LisaConstants {
 
   def reportLisaLifeEvent(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async {
     implicit request =>
-      val startTime = System.currentTimeMillis()
-      LisaMetrics.startMetrics(startTime, LisaMetricKeys.EVENT)
+      implicit val startTime = System.currentTimeMillis()
 
       withValidLMRN(lisaManager) { () =>
         withValidAccountId(accountId) { () =>
-          withValidJson[ReportLifeEventRequest](req => {
-            if (req.eventDate.isBefore(LISA_START_DATE)) {
-              Logger.debug("Life event not reported - invalid event date")
-
-              doAudit(lisaManager, accountId, req, "lifeEventNotReported", Map("reasonNotReported" -> "FORBIDDEN"))
-              LisaMetrics.incrementMetrics(startTime,
-                LisaMetricKeys.lisaError(FORBIDDEN, request.uri))
-
-              Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
-                ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("eventDate"), Some("/eventDate"))
-              )))))
-            }
-            else {
-              service.reportLifeEvent(lisaManager, accountId, req) map { res =>
-                Logger.debug("Entering LifeEvent Controller and the response is " + res.toString)
-                res match {
-                  case ReportLifeEventSuccessResponse(lifeEventId) => {
-                    Logger.debug("Matched Valid Response ")
-
-                    doAudit(lisaManager, accountId, req, "lifeEventReported")
-
-                    val data = ApiResponseData(message = "Life event created", lifeEventId = Some(lifeEventId))
-
-                    LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.EVENT)
-
-                    Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = 201)))
-                  }
-                  case ReportLifeEventInappropriateResponse => {
-                    Logger.debug("Matched Inappropriate")
-
-                    doAudit(lisaManager, accountId, req, "lifeEventNotReported", Map("reasonNotReported" -> ErrorLifeEventInappropriate.errorCode))
-                    LisaMetrics.incrementMetrics(startTime,
-                      LisaMetricKeys.lisaError(FORBIDDEN, request.uri))
-
-                    Forbidden(Json.toJson(ErrorLifeEventInappropriate))
-                  }
-                  case ReportLifeEventAccountClosedResponse => {
-                    Logger.error(("Account Closed or VOID"))
-                    LisaMetrics.incrementMetrics(startTime,
-                      LisaMetricKeys.lisaError(FORBIDDEN, request.uri))
-
-                    Forbidden(Json.toJson(ErrorAccountAlreadyClosedOrVoid))
-                  }
-                  case ReportLifeEventAlreadyExistsResponse(lifeEventId) => {
-                    val result = ErrorLifeEventAlreadyExists(lifeEventId)
-                    Logger.debug("Matched Already Exists")
-
-                    doAudit(lisaManager, accountId, req, "lifeEventNotReported", Map("reasonNotReported" -> result.errorCode))
-                    LisaMetrics.incrementMetrics(startTime,
-                      LisaMetricKeys.getErrorKey(CONFLICT, request.uri))
-
-                    Conflict(Json.toJson(result))
-                  }
-                  case ReportLifeEventAccountNotFoundResponse => {
-                    Logger.debug("Matched Not Found")
-
-                    doAudit(lisaManager, accountId, req, "lifeEventNotReported", Map("reasonNotReported" -> ErrorAccountNotFound.errorCode))
-                    LisaMetrics.incrementMetrics(startTime,
-                      LisaMetricKeys.getErrorKey(NOT_FOUND, request.uri))
-
-                    NotFound(Json.toJson(ErrorAccountNotFound))
-                  }
-                  case _ => {
-                    Logger.debug("Matched Error")
-
-                    doAudit(lisaManager, accountId, req, "lifeEventNotReported", Map("reasonNotReported" -> ErrorInternalServerError.errorCode))
-
-                    Logger.error(s"Life Event Not reported : DES unknown case , returning internal server error")
-                    LisaMetrics.incrementMetrics(startTime,
-                      LisaMetricKeys.getErrorKey(INTERNAL_SERVER_ERROR, request.uri))
-
-                    InternalServerError(Json.toJson(ErrorInternalServerError))
-                  }
+          withValidJson[ReportLifeEventRequest](
+            req => {
+              withValidDates(lisaManager, accountId, req) { () =>
+                service.reportLifeEvent(lisaManager, accountId, req) map { res =>
+                  Logger.debug("Entering LifeEvent Controller and the response is " + res.toString)
+                  handleReportLifeEventResponse(lisaManager, accountId, startTime, req, res)
                 }
               }
-            }
-          }, lisaManager = lisaManager
+            },
+            lisaManager = lisaManager
           )
         }
       }
   }
 
+  private def handleReportLifeEventResponse(lisaManager: String,
+                                             accountId: String,
+                                             startTime: Long,
+                                             req: ReportLifeEventRequest,
+                                             res: ReportLifeEventResponse)
+                                           (implicit hc: HeaderCarrier) = {
+    res match {
+      case ReportLifeEventSuccessResponse(lifeEventId) => {
+        Logger.debug("Matched Valid Response ")
+        doAudit(lisaManager, accountId, req, true)
+        LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(CREATED, LisaMetricKeys.EVENT))
+        val data = ApiResponseData(message = "Life event created", lifeEventId = Some(lifeEventId))
+        Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
+      }
+      case ReportLifeEventInappropriateResponse => {
+        Logger.debug("Matched Inappropriate")
+        doAudit(lisaManager, accountId, req, false, lifeEventAuditData(ErrorLifeEventInappropriate.errorCode))
+        LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(FORBIDDEN, LisaMetricKeys.EVENT))
+        Forbidden(Json.toJson(ErrorLifeEventInappropriate))
+      }
+      case ReportLifeEventAccountClosedResponse => {
+        Logger.debug("Account Closed or VOID")
+        doAudit(lisaManager, accountId, req, false, lifeEventAuditData(ErrorAccountAlreadyClosedOrVoid.errorCode))
+        LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(FORBIDDEN, LisaMetricKeys.EVENT))
+        Forbidden(Json.toJson(ErrorAccountAlreadyClosedOrVoid))
+      }
+      case ReportLifeEventAlreadyExistsResponse(lifeEventId) => {
+        val result = ErrorLifeEventAlreadyExists(lifeEventId)
+        Logger.debug("Matched Already Exists")
+        doAudit(lisaManager, accountId, req, false, lifeEventAuditData(result.errorCode))
+        LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getMetricKey(CONFLICT, LisaMetricKeys.EVENT))
+        Conflict(Json.toJson(result))
+      }
+      case ReportLifeEventAccountNotFoundResponse => {
+        Logger.debug("Matched Account Not Found")
+        doAudit(lisaManager, accountId, req, false, lifeEventAuditData(ErrorAccountNotFound.errorCode))
+        LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getMetricKey(NOT_FOUND, LisaMetricKeys.EVENT))
+        NotFound(Json.toJson(ErrorAccountNotFound))
+      }
+      case _ => {
+        Logger.debug("Matched Error")
+        doAudit(lisaManager, accountId, req, false, lifeEventAuditData(ErrorInternalServerError.errorCode))
+        LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getMetricKey(INTERNAL_SERVER_ERROR, LisaMetricKeys.EVENT))
+        InternalServerError(Json.toJson(ErrorInternalServerError))
+      }
+    }
+  }
+
   def getLifeEvent(lisaManager: String, accountId: String, eventId: String): Action[AnyContent] =
     validateAccept(acceptHeaderValidationRules).async { implicit request =>
-      val startTime = System.currentTimeMillis()
-      LisaMetrics.startMetrics(startTime, LisaMetricKeys.EVENT)
+      implicit val startTime = System.currentTimeMillis()
 
       withValidLMRN(lisaManager) { () =>
         withEnrolment(lisaManager) { (_) =>
           withValidAccountId(accountId) { () =>
             service.getLifeEvent(lisaManager, accountId, eventId) map { res =>
               Logger.debug("Entering LifeEvent Controller GET and the response is " + res.toString)
+
               res match {
                 case success: RequestLifeEventSuccessResponse => {
                   Logger.debug("Matched Valid Response ")
 
-                  LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.EVENT)
+                  LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getMetricKey(OK, LisaMetricKeys.EVENT))
 
                   Ok(Json.toJson(success))
                 }
                 case ReportLifeEventAccountNotFoundResponse => {
-                  Logger.debug("Matched Not Found")
+                  Logger.debug("Matched Account Not Found")
 
-                  LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getErrorKey(NOT_FOUND, request.uri))
+                  LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getMetricKey(NOT_FOUND, LisaMetricKeys.EVENT))
 
                   NotFound(Json.toJson(ErrorAccountNotFound))
                 }
                 case ReportLifeEventIdNotFoundResponse => {
-                  Logger.debug("Matched Not Found")
+                  Logger.debug("Matched Life Event Not Found")
 
-                  LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getErrorKey(NOT_FOUND, request.uri))
+                  LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getMetricKey(NOT_FOUND, LisaMetricKeys.EVENT))
 
                   NotFound(Json.toJson(ErrorLifeEventIdNotFound))
                 }
@@ -160,7 +140,7 @@ class LifeEventController extends LisaController with LisaConstants {
                   Logger.debug("Matched Error")
                   Logger.error("Life Event Not returned : DES unknown case , returning internal server error")
 
-                  LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getErrorKey(INTERNAL_SERVER_ERROR, request.uri))
+                  LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getMetricKey(INTERNAL_SERVER_ERROR, LisaMetricKeys.EVENT))
 
                   InternalServerError(Json.toJson(ErrorInternalServerError))
                 }
@@ -171,15 +151,38 @@ class LifeEventController extends LisaController with LisaConstants {
       }
     }
 
-  private def doAudit(lisaManager: String, accountId: String, req: ReportLifeEventRequest, auditType: String, extraData: Map[String, String] = Map())(implicit hc: HeaderCarrier) = {
+  private def doAudit(lisaManager: String, accountId: String, req: ReportLifeEventRequest, success: Boolean, extraData: Map[String, String] = Map())
+                     (implicit hc: HeaderCarrier) = {
     auditService.audit(
-      auditType = auditType,
+      auditType = if (success) "lifeEventReported" else "lifeEventNotReported",
       path = getEndpointUrl(lisaManager, accountId),
       auditData = req.toStringMap ++ Map(
         "lisaManagerReferenceNumber" -> lisaManager,
         "accountID" -> accountId
       ) ++ extraData
     )
+  }
+
+  private def withValidDates(lisaManager: String, accountId: String, req: ReportLifeEventRequest)
+                            (success: () => Future[Result])
+                            (implicit hc: HeaderCarrier, startTime: Long) = {
+    if (req.eventDate.isBefore(LISA_START_DATE)) {
+      Logger.debug("Life event not reported - invalid event date")
+
+      doAudit(lisaManager, accountId, req, false, lifeEventAuditData("FORBIDDEN"))
+      LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(FORBIDDEN, LisaMetricKeys.EVENT))
+
+      Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
+        ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("eventDate"), Some("/eventDate"))
+      )))))
+    }
+    else {
+      success()
+    }
+  }
+
+  private def lifeEventAuditData(reasonNotReported: String): Map[String, String] = {
+    Map("reasonNotReported" -> reasonNotReported)
   }
 
   private def getEndpointUrl(lisaManager: String, accountId: String): String = {
