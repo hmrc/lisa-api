@@ -245,7 +245,7 @@ trait DesConnector extends ServicesConfig {
     */
   def getBonusPayment(lisaManager: String, accountId: String, transactionId: String)
                      (implicit hc: HeaderCarrier): Future[DesResponse] = {
-    val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/transactions/$transactionId"
+    val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/transaction/$transactionId"
     Logger.debug("Getting the Bonus Payment transaction details from des: " + uri)
 
     val result: Future[HttpResponse] = httpGet.GET(uri)(httpReads, hc = updateHeaderCarrierWithAllDesHeaders(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
@@ -261,7 +261,7 @@ trait DesConnector extends ServicesConfig {
     */
   def getTransaction(lisaManager: String, accountId: String, transactionId: String)
                     (implicit hc:HeaderCarrier): Future[DesResponse] = {
-    val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/transactions/$transactionId/payments"
+    val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/transaction/$transactionId/bonusChargeDetails"
     Logger.debug("Getting the Transaction details from des: " + uri)
 
     val result: Future[HttpResponse] = httpGet.GET(uri)(httpReads, hc = updateHeaderCarrier(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
