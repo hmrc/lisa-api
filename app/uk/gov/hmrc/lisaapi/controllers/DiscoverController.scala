@@ -54,7 +54,7 @@ class DiscoverController extends LisaController {
             }
         }"""
 
-        LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(OK, LisaMetricKeys.DISCOVER))
+        LisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.DISCOVER)
         Future.successful(Ok(Json.parse(result)))
       }
     }

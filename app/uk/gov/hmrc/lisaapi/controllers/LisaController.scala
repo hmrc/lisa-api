@@ -44,7 +44,7 @@ trait LisaController extends BaseController with HeaderValidator with RunMode wi
       success()
     }
     else {
-      LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getMetricKey(BAD_REQUEST, request.uri))
+      LisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.getMetricKey(request.uri))
       Future.successful(BadRequest(toJson(ErrorBadRequestLmrn)))
     }
   }
@@ -54,7 +54,7 @@ trait LisaController extends BaseController with HeaderValidator with RunMode wi
       success()
     }
     else {
-      LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getMetricKey(BAD_REQUEST, request.uri))
+      LisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.getMetricKey(request.uri))
       Future.successful(BadRequest(toJson(ErrorBadRequestAccountId)))
     }
   }
@@ -84,7 +84,7 @@ trait LisaController extends BaseController with HeaderValidator with RunMode wi
                 case Success(result) => result
                 case Failure(ex: Exception) => {
                   Logger.error(s"LisaController An error occurred in Json payload validation ${ex.getMessage}")
-                  LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getMetricKey(INTERNAL_SERVER_ERROR, request.uri))
+                  LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.getMetricKey(request.uri))
 
                   Future.successful(InternalServerError(toJson(ErrorInternalServerError)))
                 }
@@ -94,7 +94,7 @@ trait LisaController extends BaseController with HeaderValidator with RunMode wi
               invalid match {
                 case Some(invalidCallback) => invalidCallback(errors)
                 case None => {
-                  LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getMetricKey(BAD_REQUEST, request.uri))
+                  LisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.getMetricKey(request.uri))
                   Logger.error(s"The errors are ${errors.toString()}")
                   Future.successful(BadRequest(toJson(ErrorBadRequest(errorConverter.convert(errors)))))
                 }
@@ -102,12 +102,12 @@ trait LisaController extends BaseController with HeaderValidator with RunMode wi
             }
             case Failure(e) =>
               Logger.error(s"LisaController: An error occurred in lisa-api due to ${e.getMessage} returning internal server error")
-              LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getMetricKey(INTERNAL_SERVER_ERROR, request.uri))
+              LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.getMetricKey(request.uri))
               Future.successful(InternalServerError(toJson(ErrorInternalServerError)))
           }
 
         case None =>
-          LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getMetricKey(BAD_REQUEST, request.uri))
+          LisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.getMetricKey(request.uri))
           Future.successful(BadRequest(toJson(EmptyJson)))
       }
     }
@@ -116,14 +116,14 @@ trait LisaController extends BaseController with HeaderValidator with RunMode wi
   def handleFailure(implicit request: Request[_], startTime: Long): PartialFunction[Throwable, Future[Result]] = PartialFunction[Throwable, Future[Result]] {
     case _: InsufficientEnrolments =>
       Logger.warn(s"Unauthorised access for ${request.uri}")
-      LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getMetricKey(UNAUTHORIZED, request.uri))
+      LisaMetrics.incrementMetrics(startTime, UNAUTHORIZED, LisaMetricKeys.getMetricKey(request.uri))
       Future.successful(Unauthorized(Json.toJson(ErrorInvalidLisaManager)))
     case _: AuthorisationException =>
       Logger.warn(s"Unauthorised Exception for ${request.uri}")
-      LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getMetricKey(UNAUTHORIZED, request.uri))
+      LisaMetrics.incrementMetrics(startTime, UNAUTHORIZED, LisaMetricKeys.getMetricKey(request.uri))
       Future.successful(Unauthorized(Json.toJson(ErrorUnauthorized)))
     case _ =>
-      LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.getMetricKey(INTERNAL_SERVER_ERROR, request.uri))
+      LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.getMetricKey(request.uri))
       Future.successful(InternalServerError(toJson(ErrorInternalServerError)))
   }
 

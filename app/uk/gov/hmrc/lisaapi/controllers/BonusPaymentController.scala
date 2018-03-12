@@ -85,23 +85,23 @@ class BonusPaymentController extends LisaController with LisaConstants {
                                     (implicit hc: HeaderCarrier, startTime: Long) = {
     service.getBonusPayment(lisaManager, accountId, transactionId).map {
       case response: GetBonusPaymentSuccessResponse =>
-        LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(OK, LisaMetricKeys.BONUS_PAYMENT))
+        LisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.BONUS_PAYMENT)
         Ok(Json.toJson(response))
 
       case GetBonusPaymentLmrnDoesNotExistResponse =>
-        LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(BAD_REQUEST, LisaMetricKeys.BONUS_PAYMENT))
+        LisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.BONUS_PAYMENT)
         BadRequest(Json.toJson(ErrorBadRequestLmrn))
 
       case GetBonusPaymentTransactionNotFoundResponse =>
-        LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(NOT_FOUND, LisaMetricKeys.BONUS_PAYMENT))
+        LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.BONUS_PAYMENT)
         NotFound(Json.toJson(ErrorTransactionNotFound))
 
       case GetBonusPaymentInvestorNotFoundResponse =>
-        LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(NOT_FOUND, LisaMetricKeys.BONUS_PAYMENT))
+        LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.BONUS_PAYMENT)
         NotFound(Json.toJson(ErrorAccountNotFound))
 
       case _ =>
-        LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(INTERNAL_SERVER_ERROR, LisaMetricKeys.BONUS_PAYMENT))
+        LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.BONUS_PAYMENT)
         InternalServerError(Json.toJson(ErrorInternalServerError))
     }
   }
@@ -118,7 +118,7 @@ class BonusPaymentController extends LisaController with LisaConstants {
     else {
       auditFailure(lisaManager, accountId, data, "FORBIDDEN")
 
-      LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(FORBIDDEN, LisaMetricKeys.BONUS_PAYMENT))
+      LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.BONUS_PAYMENT)
 
       Future.successful(Forbidden(Json.toJson(ErrorForbidden(errors.toList))))
     }
@@ -151,7 +151,7 @@ class BonusPaymentController extends LisaController with LisaConstants {
         data
     }
 
-    LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(CREATED, LisaMetricKeys.BONUS_PAYMENT))
+    LisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.BONUS_PAYMENT)
 
     Created(Json.toJson(ApiResponse(data = Some(responseData), success = true, status = CREATED)))
   }
@@ -163,32 +163,32 @@ class BonusPaymentController extends LisaController with LisaConstants {
     errorResponse match {
       case RequestBonusPaymentBonusClaimError =>
         auditFailure(lisaManager, accountId, req, ErrorBonusClaimError.errorCode)
-        LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(FORBIDDEN, LisaMetricKeys.BONUS_PAYMENT))
+        LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.BONUS_PAYMENT)
 
         Forbidden(Json.toJson(ErrorBonusClaimError))
       case RequestBonusPaymentAccountClosed =>
         auditFailure(lisaManager, accountId, req, ErrorAccountAlreadyClosedOrVoid.errorCode)
-        LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(FORBIDDEN, LisaMetricKeys.BONUS_PAYMENT))
+        LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.BONUS_PAYMENT)
 
         Forbidden(Json.toJson(ErrorAccountAlreadyClosedOrVoid))
       case RequestBonusPaymentAccountNotFound =>
         auditFailure(lisaManager, accountId, req, ErrorAccountNotFound.errorCode)
-        LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(NOT_FOUND, LisaMetricKeys.BONUS_PAYMENT))
+        LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.BONUS_PAYMENT)
 
         NotFound(Json.toJson(ErrorAccountNotFound))
       case RequestBonusPaymentLifeEventNotFound =>
         auditFailure(lisaManager, accountId, req, ErrorLifeEventIdNotFound.errorCode)
-        LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(NOT_FOUND, LisaMetricKeys.BONUS_PAYMENT))
+        LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.BONUS_PAYMENT)
 
         NotFound(Json.toJson(ErrorLifeEventIdNotFound))
       case RequestBonusPaymentClaimAlreadyExists =>
         auditFailure(lisaManager, accountId, req, ErrorBonusClaimAlreadyExists.errorCode)
-        LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(CONFLICT, LisaMetricKeys.BONUS_PAYMENT))
+        LisaMetrics.incrementMetrics(startTime, CONFLICT, LisaMetricKeys.BONUS_PAYMENT)
 
         Conflict(Json.toJson(ErrorBonusClaimAlreadyExists))
       case _ =>
         auditFailure(lisaManager, accountId, req, ErrorInternalServerError.errorCode)
-        LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(INTERNAL_SERVER_ERROR, LisaMetricKeys.BONUS_PAYMENT))
+        LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.BONUS_PAYMENT)
 
         InternalServerError(Json.toJson(ErrorInternalServerError))
     }
@@ -199,7 +199,7 @@ class BonusPaymentController extends LisaController with LisaConstants {
     Logger.debug("An error occurred")
 
     auditFailure(lisaManager, accountId, req, ErrorInternalServerError.errorCode)
-    LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(INTERNAL_SERVER_ERROR, LisaMetricKeys.BONUS_PAYMENT))
+    LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.BONUS_PAYMENT)
 
     InternalServerError(Json.toJson(ErrorInternalServerError))
   }
@@ -209,7 +209,7 @@ class BonusPaymentController extends LisaController with LisaConstants {
     Logger.debug("Life event not provided")
 
     auditFailure(lisaManager, accountId, req, ErrorLifeEventNotProvided.errorCode)
-    LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(FORBIDDEN, LisaMetricKeys.BONUS_PAYMENT))
+    LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.BONUS_PAYMENT)
 
     Future.successful(Forbidden(Json.toJson(ErrorLifeEventNotProvided)))
   }

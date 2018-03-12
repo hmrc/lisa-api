@@ -55,7 +55,7 @@ class ReinstateAccountController extends LisaController with LisaConstants {
             path = getReinstateEndpointUrl(lisaManager, accountId),
             auditData = Map(ZREF -> lisaManager, "accountId" -> accountId)
           )
-          LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(OK, LisaMetricKeys.REINSTATE))
+          LisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.REINSTATE)
           val data = ApiResponseData(message = "This account has been reinstated", accountId = Some(accountId))
           Ok(Json.toJson(ApiResponse(data = Some(data), success = true, status = OK)))
         }
@@ -87,7 +87,7 @@ class ReinstateAccountController extends LisaController with LisaConstants {
     } recover {
       case _:Exception  => {
         Logger.error(s"ReinstateAccountController: reinstateAccount: An error occurred returning internal server error")
-        LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(INTERNAL_SERVER_ERROR, LisaMetricKeys.REINSTATE))
+        LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.REINSTATE)
         InternalServerError(Json.toJson(ErrorInternalServerError))
       }
     }
@@ -109,7 +109,7 @@ class ReinstateAccountController extends LisaController with LisaConstants {
       )
     )
 
-    LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(status, LisaMetricKeys.REINSTATE))
+    LisaMetrics.incrementMetrics(startTime, status, LisaMetricKeys.REINSTATE)
 
     val msg = message match {
       case Some(text) => text

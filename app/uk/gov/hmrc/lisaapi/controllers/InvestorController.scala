@@ -76,7 +76,7 @@ class InvestorController extends LisaController with LisaConstants  {
 
     val data = ApiResponseData(message = "Investor created", investorId = Some(investorId))
 
-    LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(CREATED, LisaMetricKeys.INVESTOR))
+    LisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.INVESTOR)
     
     Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
   }
@@ -97,7 +97,7 @@ class InvestorController extends LisaController with LisaConstants  {
       )
     )
 
-    LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(CONFLICT, LisaMetricKeys.INVESTOR))
+    LisaMetrics.incrementMetrics(startTime, CONFLICT, LisaMetricKeys.INVESTOR)
 
     Conflict(Json.toJson(result))
   }
@@ -116,10 +116,7 @@ class InvestorController extends LisaController with LisaConstants  {
       )
     )
 
-    LisaMetrics.incrementMetrics(
-      startTime,
-      LisaMetricKeys.lisaMetric(errorResponse.status, LisaMetricKeys.INVESTOR)
-    )
+    LisaMetrics.incrementMetrics(startTime, errorResponse.status, LisaMetricKeys.INVESTOR)
 
     Status(errorResponse.status).apply(Json.toJson(errorResponse.data))
   }
@@ -137,7 +134,7 @@ class InvestorController extends LisaController with LisaConstants  {
       )
     )
 
-    LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(INTERNAL_SERVER_ERROR, LisaMetricKeys.INVESTOR))
+    LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.INVESTOR)
 
     InternalServerError(Json.toJson(ErrorInternalServerError))
   }

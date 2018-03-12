@@ -46,7 +46,7 @@ class AccountController extends LisaController with LisaConstants {
           {
             case createRequest: CreateLisaAccountCreationRequest =>
               if (hasAccountTransferData(request.body.asJson.get.as[JsObject])) {
-                LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(FORBIDDEN, LisaMetricKeys.ACCOUNT))
+                LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.ACCOUNT)
 
                 Future.successful(Forbidden(toJson(ErrorTransferAccountDataProvided)))
               }
@@ -65,12 +65,12 @@ class AccountController extends LisaController with LisaConstants {
               }
 
               if (transferAccountDataNotProvided > 0) {
-                LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(FORBIDDEN, LisaMetricKeys.ACCOUNT))
+                LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.ACCOUNT)
 
                 Future.successful(Forbidden(toJson(ErrorTransferAccountDataNotProvided)))
               }
               else {
-                LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(BAD_REQUEST, LisaMetricKeys.ACCOUNT))
+                LisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.ACCOUNT)
 
                 Future.successful(BadRequest(toJson(ErrorBadRequest(errorConverter.convert(errors)))))
               }
@@ -99,7 +99,7 @@ class AccountController extends LisaController with LisaConstants {
 
             val data = ApiResponseData(message = "Account created", accountId = Some(accountId))
 
-            LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(CREATED, LisaMetricKeys.ACCOUNT))
+            LisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.ACCOUNT)
 
             Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
           case CreateLisaAccountInvestorNotFoundResponse =>
@@ -140,7 +140,7 @@ class AccountController extends LisaController with LisaConstants {
 
             val data = ApiResponseData(message = "Account transferred", accountId = Some(accountId))
 
-            LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(CREATED, LisaMetricKeys.ACCOUNT))
+            LisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.ACCOUNT)
 
             Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
           case CreateLisaAccountInvestorNotFoundResponse =>
@@ -178,7 +178,7 @@ class AccountController extends LisaController with LisaConstants {
             "reasonNotCreated" -> "FORBIDDEN")
         )
 
-        LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(FORBIDDEN, LisaMetricKeys.ACCOUNT))
+        LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.ACCOUNT)
 
         Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
           ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("firstSubscriptionDate"), Some("/firstSubscriptionDate"))
@@ -226,7 +226,7 @@ class AccountController extends LisaController with LisaConstants {
             "reasonNotCreated" -> "FORBIDDEN")
         )
 
-        LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(FORBIDDEN, LisaMetricKeys.ACCOUNT))
+        LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.ACCOUNT)
 
         Future.successful(Forbidden(Json.toJson(ErrorForbidden(errors))))
       }
@@ -250,7 +250,7 @@ class AccountController extends LisaController with LisaConstants {
         )
       )
 
-      LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(status, LisaMetricKeys.ACCOUNT))
+      LisaMetrics.incrementMetrics(startTime, status, LisaMetricKeys.ACCOUNT)
 
       Status(status).apply(Json.toJson(e))
     }
@@ -278,15 +278,15 @@ class AccountController extends LisaController with LisaConstants {
                                         (implicit hc: HeaderCarrier, startTime:Long) = {
       service.getAccount(lisaManager, accountId).map {
         case response: GetLisaAccountSuccessResponse =>
-          LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(OK, LisaMetricKeys.ACCOUNT))
+          LisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.ACCOUNT)
           Ok(Json.toJson(response))
 
         case GetLisaAccountDoesNotExistResponse =>
-          LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(NOT_FOUND, LisaMetricKeys.ACCOUNT))
+          LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.ACCOUNT)
           NotFound(Json.toJson(ErrorAccountNotFound))
 
         case _ =>
-          LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(INTERNAL_SERVER_ERROR, LisaMetricKeys.ACCOUNT))
+          LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.ACCOUNT)
           InternalServerError(Json.toJson(ErrorInternalServerError))
       }
     }
@@ -319,7 +319,7 @@ class AccountController extends LisaController with LisaConstants {
                 "accountId" -> accountId)
             )
 
-            LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(OK, LisaMetricKeys.CLOSE))
+            LisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.CLOSE)
 
             val data = ApiResponseData(message = "LISA account closed", accountId = Some(accountId))
 
@@ -357,7 +357,7 @@ class AccountController extends LisaController with LisaConstants {
           "reasonNotClosed" -> "FORBIDDEN")
         )
 
-        LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(FORBIDDEN, LisaMetricKeys.CLOSE))
+        LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.CLOSE)
 
         Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
           ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("closureDate"), Some("/closureDate"))
@@ -382,7 +382,7 @@ class AccountController extends LisaController with LisaConstants {
           "reasonNotClosed" -> e.errorCode)
       )
 
-      LisaMetrics.incrementMetrics(startTime, LisaMetricKeys.lisaMetric(status, LisaMetricKeys.CLOSE))
+      LisaMetrics.incrementMetrics(startTime, status, LisaMetricKeys.CLOSE)
 
       Status(status).apply(Json.toJson(e))
     }
