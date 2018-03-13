@@ -113,6 +113,7 @@ class LisaControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite 
     override val service: AccountService = mockService
     override val authConnector = mockAuthCon
     def testJsonValidator(): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
+      implicit val startTime = System.currentTimeMillis()
       withValidJson[TestType] ( _ =>
         Future.successful(PreconditionFailed) // we don't ever want this to return
         ,lisaManager = ""
@@ -120,6 +121,7 @@ class LisaControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite 
     }
 
     def testLMRNValidator(lmrn: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
+      implicit val startTime = System.currentTimeMillis()
       withValidLMRN(lmrn){() => Future.successful(Ok)}
     }
   }

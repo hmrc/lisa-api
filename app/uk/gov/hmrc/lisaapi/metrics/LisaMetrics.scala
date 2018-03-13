@@ -31,12 +31,14 @@ object LisaMetrics extends LisaMetrics with MicroserviceMetrics {
 
   val registry: MetricRegistry = metrics.defaultRegistry
 
-  override def timer(diff: Long, unit: TimeUnit, metricType: String):Unit =   registry.timer(s"${metricType}").update(diff, unit)
+  override def timer(diff: Long, unit: TimeUnit, metricType: String):Unit = registry.timer(s"${metricType}").update(diff, unit)
 
-  def startMetrics(startTime: Long, api: String): Unit =  LisaMetrics.timer(startTime, TimeUnit.MILLISECONDS, api.toString)
+  def incrementMetrics(startTime: Long, status: Int, api: String): Unit = {
+    val diff = System.currentTimeMillis() - startTime
+    val unit = TimeUnit.MILLISECONDS
 
-  def incrementMetrics(startTime: Long, api: String): Unit = {
-    LisaMetrics.timer(System.currentTimeMillis() - startTime, TimeUnit.MILLISECONDS, api.toString)
+    LisaMetrics.timer(diff, unit, api)
+    LisaMetrics.timer(diff, unit, LisaMetricKeys.lisaMetric(status, api))
   }
 
 }
@@ -63,9 +65,9 @@ trait LisaMetricKeys  {
     "update-subscription" -> UPDATE_SUBSCRIPTION
   )
 
-  def lisaError(status:Int, name:String):String =  s"${name}_${status}"
+  def lisaMetric(status:Int, name:String):String =  s"${name}_${status}"
 
-  def getErrorKey(status:Int, url:String):String = lisaError(status, keys.getOrElse(Try(url.split("/").last).getOrElse("discover"),"UNKNOWN"))
+  def getMetricKey(url:String):String = keys.getOrElse(Try(url.split("/").last).getOrElse("discover"), "UNKNOWN")
 
 }
 object LisaMetricKeys extends LisaMetricKeys
