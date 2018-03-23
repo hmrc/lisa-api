@@ -32,6 +32,7 @@
     "paymentReference" : {
       "description": "The reference of the payment made.",
       "type" : "string",
+      "pattern": "^.{1,12}$",
       "example": "12345"
     },
     "paymentAmount" : {
