@@ -570,7 +570,6 @@ types:
                         type: !include schemas/LISAAccount.updateSubscription.post.schema.json
                         examples:
                               example-1: !include examples/LISAAccount.subscription.post.json
-
                     responses:
                       200:
                         description: The first Subscription is updated successfully.
@@ -666,7 +665,7 @@ types:
                         description: The LifeEvent resource has been created.
                         headers:
                           Location:
-                            description: Relative URI to the created LISA event created
+                            description: Relative URI to the created LISA life event
                             type: string
                             example: /lifetime-isa/manager/Z876543/accounts/acc654321/events/1234567890
 

@@ -39,7 +39,7 @@
             <td><p>HTTP status: <code class="code--slim">404 (Not found)</code></p>
                 <p class ="code--block"> {<br>
                                             "code": "INVESTOR_ACCOUNTID_NOT_FOUND",<br>
-                                            "message": "The accountId does not match HMRC’s records."<br>
+                                            "message": "The accountId does not match HMRC’s records"<br>
                                           }
                 </p>
             </td>
@@ -50,7 +50,7 @@
             <td><p>HTTP status: <code class="code--slim">404 (Not found)</code></p>
                 <p class ="code--block"> {<br>
                                             "code": "LIFE_EVENT_NOT_FOUND",<br>
-                                            "message": "The lifeEventId does not match HMRC's records."<br>
+                                            "message": "The lifeEventId does not match HMRC’s records"<br>
                                           }
                 </p>
             </td>

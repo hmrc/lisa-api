@@ -15,8 +15,8 @@ documentation:
     content: !include https://developer.service.hmrc.gov.uk/api-documentation/assets/common/docs/versioning.md
   - title: Errors
     content: !include https://developer.service.hmrc.gov.uk/api-documentation/assets/common/docs/errors.md
-  - title: Testing the API
-    content: !include documentation/testing-approach.md
+  - title: Testing
+    content: !include documentation/testing.md
 
 uses:
   sec: https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/securitySchemes.raml
@@ -31,938 +31,1172 @@ types:
   LISAManagerReferenceNumberType:
     pattern: "^Z([0-9]{4}|[0-9]{6})$"
   accountIdType:
-    "pattern": "^[a-zA-Z0-9 :\\-]{1,20}$"
+    "pattern": "^[a-zA-Z0-9 :/-]{1,20}$"
   ISO8601Date:
     "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
 
 /lifetime-isa:
     /manager:
         description: This resource models the existence of a registered LISA Manager organisation.
-                          It is created by HMRC as a result of a LISA registration.  The registration process is not
-                          part of the API specification as it is a forms based process with manual verification by HMRC staff.
+                     It is created by HMRC as a result of a LISA registration.  The registration process is not
+                     part of the API specification as it is a forms based process with manual verification by HMRC staff.
         /{lisaManagerReferenceNumber}:
-                    uriParameters:
-                      lisaManagerReferenceNumber:
-                       type : LISAManagerReferenceNumberType
-                       description: The reference given to the LISA provider when they applied for approval from HMRC.
-                       example: "Z1234"
-                    get:
-                            is: [headers.acceptHeader]
-                            displayName: Discover available endpoints
-                            description: This allows a LISA provider to discover all the available endpoints.
-                            (annotations.scope): "read:lisa"
-                            securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
-                            (annotations.sandboxData): !include testdata/discover-endpoints.md
-                            responses:
-                              200:
-                                body:
-                                  application/json:
-                                    type: !include schemas/LISAManager.get.schema.json
-                                    example: !include examples/LISAManager.get.json
-                              400:
-                                body:
-                                  application/json:
-                                    type: !include schemas/ErrorCodes.schema.json
-                                    examples:
-                                      InvalidLmrn:
-                                        description: Invalid LISA Manager reference number
-                                        value: |
-                                          {
-                                            "code" : "BAD_REQUEST",
-                                            "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
-                                          }
+            uriParameters:
+              lisaManagerReferenceNumber:
+               type : LISAManagerReferenceNumberType
+               description: The reference given to the LISA provider when they applied for approval from HMRC.
+               example: "Z1234"
+            get:
+              is: [headers.acceptHeader]
+              displayName: Discover available endpoints
+              description: This allows a LISA provider to discover all the available endpoints.
+              (annotations.scope): "read:lisa"
+              securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
+              (annotations.sandboxData): !include testdata/discover-endpoints.md
+              responses:
+                200:
+                  body:
+                    application/json:
+                      type: !include schemas/LISAManager.get.schema.json
+                      example: !include examples/LISAManager.get.json
+                400:
+                  body:
+                    application/json:
+                      type: !include schemas/ErrorCodes.schema.json
+                      examples:
+                        InvalidLmrn:
+                          description: lisaManagerReferenceNumber in the URL is in the wrong format
+                          value: |
+                            {
+                              "code" : "BAD_REQUEST",
+                              "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
+                            }
+                401:
+                  body:
+                    application/json:
+                      type: !include schemas/ErrorCodes.schema.json
+                      examples:
+                        notOpenStatus:
+                          description: lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
+                          value: |
+                            {
+                              "code" : "UNAUTHORIZED",
+                              "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
+                            }
+            /investors:
+              post:
+                  is: [headers.acceptHeader, headers.contentHeader]
+                  displayName: Create a LISA investor
+                  description: !include documentation/LISAInvestor.post
+                  (annotations.scope): "write:lisa"
+                  securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
+                  (annotations.sandboxData): !include testdata/lisa-create-investor.md
+                  body:
+                    application/json:
+                      example: !include examples/LISAInvestor.post.json
+                      type: !include schemas/LISAInvestor.post.schema.json
+                  responses:
+                    201:
+                      description: The LISA investor resource has been created.
+                      body:
+                        application/json:
+                          example: !include examples/LISAInvestor.post.response.json
 
-                    /investors:
-                      post:
-                          is: [headers.acceptHeader, headers.contentHeader]
-                          displayName: Create a LISA investor
-                          description: !include documentation/LISAInvestor.post
-                          (annotations.scope): "write:lisa"
-                          securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
-                          (annotations.sandboxData): !include testdata/lisa-create-investor.md
-                          body:
-                            application/json:
-                              example: !include examples/LISAInvestor.post.json
-                              type: !include schemas/LISAInvestor.post.schema.json
-                          responses:
-                            201:
-                              description: The LISA investor resource has been created.
-                              body:
-                                application/json:
-                                  example: !include examples/LISAInvestor.post.response.json
+                    400:
+                      body:
+                        application/json:
+                          type: !include schemas/ErrorCodes.schema.json
+                          examples:
+                            notOpenStatus:
+                              description: Bad Request
+                              value: |
+                                {
+                                  "code" : "BAD_REQUEST",
+                                  "message" : "Bad Request"
+                                }
+                            InvalidLmrn:
+                              description: lisaManagerReferenceNumber in the URL is in the wrong format
+                              value: |
+                                {
+                                  "code" : "BAD_REQUEST",
+                                  "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
+                                }
+                    401:
+                      body:
+                        application/json:
+                          type: !include schemas/ErrorCodes.schema.json
+                          examples:
+                            notOpenStatus:
+                              description: lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
+                              value: |
+                                {
+                                  "code" : "UNAUTHORIZED",
+                                  "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
+                                }
+                    403:
+                      body:
+                        application/json:
+                          description: The investor details given do not match with HMRC’s records
+                          type: !include schemas/ErrorCodes.schema.json
+                          example: |
+                            {
+                              "code": "INVESTOR_NOT_FOUND",
+                              "message": "The investor details given do not match with HMRC’s records."
+                            }
+                    409:
+                      description: Matches already existing resource.
+                        Response contains a location header with link to the existing resource.
+                      body:
+                        application/json:
+                          type: !include schemas/ErrorCodes.schema.json
+                          examples:
+                            recordExists:
+                              description: The investor already has a record with HMRC
+                              value: |
+                                {
+                                  "code" : "INVESTOR_ALREADY_EXISTS",
+                                  "message" : "The investor already has a record with HMRC."
+                                }
+            /accounts:
+              description: !include documentation/LISAAccount
+              post:
+                    is: [headers.acceptHeader, headers.contentHeader]
+                    description: !include documentation/LISAAccount
+                    displayName: Create or transfer a LISA account
+                    (annotations.scope): "write:lisa"
+                    securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
+                    (annotations.sandboxData): !include testdata/create-account.md
+                    body:
+                      application/json:
+                        type: !include schemas/LISAAccount.post.schema.json
+                        examples:
+                          example-1: !include examples/LISAAccount.post1.json
+                          example-2: !include examples/LISAAccount.post.json
+                    responses:
+                      201:
+                        headers:
+                          Location:
+                            description: Relative URI to the created LISA account resource
+                            type: string
+                            example: /lifetime-isa/manager/Z876543/accounts/acc654321
+                        body:
+                          application/json:
+                            examples:
+                              example-1: !include examples/LISAAccount.post.response1.json
+                              example-2: !include examples/LISAAccount.post.response.json
+                      400:
+                        body:
+                          application/json:
+                            type: !include schemas/ErrorCodes.schema.json
+                            examples:
+                              badRequest:
+                                description: Bad Request
+                                value: |
+                                  {
+                                    "code" : "BAD_REQUEST",
+                                    "message" : "Bad Request"
+                                  }
+                              InvalidLmrn:
+                                description: lisaManagerReferenceNumber in the URL is in the wrong format
+                                value: |
+                                  {
+                                    "code" : "BAD_REQUEST",
+                                    "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
+                                  }
+                      401:
+                        body:
+                          application/json:
+                            type: !include schemas/ErrorCodes.schema.json
+                            examples:
+                              notOpenStatus:
+                                description: lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
+                                value: |
+                                  {
+                                    "code" : "UNAUTHORIZED",
+                                    "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
+                                  }
+                      403:
+                        body:
+                          application/json:
+                            type: !include schemas/ErrorCodes.schema.json
+                            examples:
+                              investorNotFound:
+                                description: The investor details given do not match with HMRC’s records
+                                value: |
+                                  {
+                                    "code" : "INVESTOR_NOT_FOUND",
+                                    "message" : "invalid status: must create with open status"
+                                  }
+                              outsideAgeRange:
+                                description: The investor is not eligible for a LISA account
+                                value: |
+                                  {
+                                    "code" : "INVESTOR_ELIGIBILITY_CHECK_FAILED",
+                                    "message" : "Can’t open a LISA if investor is older than 40 or younger than 18"
+                                   }
+                              complianceFail:
+                                description: You cannot create or transfer a LISA account because the investor has failed a compliance check
+                                value: |
+                                  {
+                                    "code" : "INVESTOR_COMPLIANCE_CHECK_FAILED",
+                                    "message" : "You cannot create or transfer a LISA account because the investor has failed a compliance check"
+                                  }
+                              prevAccntDoNoExists:
+                                description: The transferredFromAccountId and transferredFromLMRN given do not match an account on HMRC’s records
+                                value: |
+                                  {
+                                    "code" : "PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST",
+                                    "message" : "Previous Investor Account Doesn’t Exist"
+                                  }
+                              noTransferAccntData:
+                                description: You must give a transferredFromAccountId, transferredFromLMRN and transferInDate when the creationReason is transferred
+                                value: |
+                                  {
+                                    "code" : "TRANSFER_ACCOUNT_DATA_NOT_PROVIDED",
+                                    "message" : "transfer account data not provided"
+                                  }
+                              transferAccntDataProvided:
+                                description: You must only give a transferredFromAccountId, transferredFromLMRN, and transferInDate when the creationReason is transferred
+                                value: |
+                                  {
+                                    "code" : "TRANSFER_ACCOUNT_DATA_PROVIDED",
+                                    "message" : "transfer account data provided"
+                                  }
+                              accountClosed:
+                                description: The LISA account is already closed
+                                value: |
+                                  {
+                                    "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED",
+                                    "message": "The LISA account is already closed"
+                                  }
+                              accountVoided:
+                                description: The LISA account is already void
+                                value: |
+                                  {
+                                    "code": "INVESTOR_ACCOUNT_ALREADY_VOID",
+                                    "message": "The LISA account is already void"
+                                  }
+                      409:
+                        body:
+                          application/json:
+                            description: This investor already has a LISA account
+                            type: !include schemas/ErrorCodes.schema.json
+                            example: |
+                              {
+                                "code": "INVESTOR_ACCOUNT_ALREADY_EXISTS",
+                                "message": "This investor already has a LISA account",
+                                "accountId": "1234567890"
+                              }
+              /reinstate-account:
+                post:
+                  is: [headers.acceptHeader, headers.contentHeader]
+                  displayName: Reinstate a LISA account
+                  description: Re-open a LISA account that has been closed.
+                  (annotations.scope): "write:lisa"
+                  securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
+                  (annotations.sandboxData): !include testdata/reinstate-account.md
+                  body:
+                    application/json:
+                      type: !include schemas/LISAAccount.reinstate.post.schema.json
+                      examples:
+                            example: !include examples/LISAAccount.reinstate.post.request.json
+                  responses:
+                    200:
+                      description: The account is reinstated successfully.
+                      body:
+                        application/json:
+                            example: !include examples/LISAAccount.reinstate.post.response.json
+                    400:
+                      body:
+                        application/json:
+                          type: !include schemas/ErrorCodes.schema.json
+                          examples:
+                            InvalidPayload:
+                              description: Bad Request
+                              value: |
+                                {
+                                    "code": "BAD_REQUEST",
+                                    "message": "Bad Request",
+                                    "errors": [
+                                        {
+                                            "code": "INVALID_FORMAT",
+                                            "message": "Invalid format has been used",
+                                            "path": "/accountId"
+                                        }
+                                    ]
+                                }
+                            InvalidLmrn:
+                              description: lisaManagerReferenceNumber in the URL is in the wrong format
+                              value: |
+                                {
+                                  "code" : "BAD_REQUEST",
+                                  "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
+                                }
+                    401:
+                      body:
+                        application/json:
+                          type: !include schemas/ErrorCodes.schema.json
+                          examples:
+                            notOpenStatus:
+                              description: lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
+                              value: |
+                                {
+                                  "code" : "UNAUTHORIZED",
+                                  "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
+                                }
+                    404:
+                      body:
+                        application/json:
+                          type: !include schemas/ErrorCodes.schema.json
+                          examples:
+                            accountIdNOTFound:
+                              description: The accountId does not match HMRC’s records
+                              value: |
+                                {
+                                  "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
+                                  "message": "The accountId does not match HMRC’s records"
+                                }
 
-                            400:
-                              body:
-                                application/json:
-                                  type: !include schemas/ErrorCodes.schema.json
-                                  examples:
-                                    notOpenStatus:
-                                      description: Bad Request
-                                      value: |
-                                        {
-                                          "code" : "BAD_REQUEST",
-                                          "message" : "Bad Request"
-                                        }
-                                    InvalidLmrn:
-                                      description: Invalid LISA Manager reference number
-                                      value: |
-                                        {
-                                          "code" : "BAD_REQUEST",
-                                          "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
-                                        }
-                            401:
-                              body:
-                                application/json:
-                                  type: !include schemas/ErrorCodes.schema.json
-                                  examples:
-                                    notOpenStatus:
-                                      description: lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
-                                      value: |
-                                        {
-                                          "code" : "UNAUTHORIZED",
-                                          "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
-                                        }
-                            403:
-                              body:
-                                application/json:
-                                  description: The investor details given do not match with HMRC’s records
-                                  type: !include schemas/ErrorCodes.schema.json
-                                  example: |
-                                    {
-                                      "code": "INVESTOR_NOT_FOUND",
-                                      "message": "The investor details given do not match with HMRC’s records."
-                                    }
-                            409:
-                              description: Matches already existing resource.
-                                Response contains a location header with link to the existing resource.
-                              body:
-                                application/json:
-                                  type: !include schemas/ErrorCodes.schema.json
-                                  examples:
-                                    recordExists:
-                                      description: The investor already has a record with HMRC
-                                      value: |
-                                        {
-                                          "code" : "INVESTOR_ALREADY_EXISTS",
-                                          "message" : "The investor already has a record with HMRC."
-                                        }
-                    /accounts:
-                      description: !include documentation/LISAAccount
-                      post:
-                            is: [headers.acceptHeader, headers.contentHeader]
-                            description: !include documentation/LISAAccount
-                            displayName: Create or transfer a LISA account
-                            (annotations.scope): "write:lisa"
-                            securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
-                            (annotations.sandboxData): !include testdata/create-account.md
+                    403:
+                      body:
+                        application/json:
+                          description:  Investor account may have been transferred or is active.
+                          type: !include schemas/ErrorCodes.schema.json
+                          examples:
+                            accountClosed:
+                              description: You cannot reinstate this account because it was closed with a closure reason of transferred out
+                              value: |
+                                {
+                                  "code" : "INVESTOR_ACCOUNT_ALREADY_CLOSED",
+                                  "message" : "You cannot reinstate this account because it was closed with a closure reason of transferred out"
+                                }
+                            accountClosedCancelled:
+                              description: You cannot reinstate this account because it was closed with a closure reason of cancellation
+                              value: |
+                                {
+                                  "code" : "INVESTOR_ACCOUNT_ALREADY_CLOSED",
+                                  "message" : "You cannot reinstate this account because it was closed with a closure reason of cancellation"
+                                }
+                            accountVoided:
+                              description: You cannot reinstate this account because it is already open
+                              value: |
+                                {
+                                  "code" : "INVESTOR_ACCOUNT_ALREADY_OPEN",
+                                  "message" : "You cannot reinstate this account because it is already open"
+                                }
+                            complianceFail:
+                              description: You cannot reinstate this account because the investor has failed a compliance check
+                              value: |
+                                {
+                                  "code" : "INVESTOR_COMPLIANCE_CHECK_FAILED",
+                                  "message" : "You cannot reinstate this account because the investor has failed a compliance check"
+                                }
+              /{accountId}:
+                uriParameters:
+                  accountId:
+                    type: accountIdType
+                    description: The ID for the account.  This will be generated by the LISA Manager and will only
+                      be unique when used in combination with lisaManagerReferenceNumber. Any special characters should be URL encoded.
+                    example: "ABC12345"
+                get:
+                    displayName: Retrieve account details
+                    description: Retrieve account details by accountId
+                    is: [headers.acceptHeader, headers.contentHeader]
+                    (annotations.scope): "read:lisa"
+                    securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
+                    (annotations.sandboxData): !include testdata/get-account.md
+                    responses:
+                      200:
+                        body:
+                          application/json:
+                            example: !include examples/LISAAccount.get.json
+                            type: !include schemas/LISAAccount.get.schema.json
+                      400:
+                        body:
+                          application/json:
+                            type: !include schemas/ErrorCodes.schema.json
+                            examples:
+                              InvalidLmrn:
+                                description: lisaManagerReferenceNumber in the URL is in the wrong format
+                                value: |
+                                  {
+                                    "code" : "BAD_REQUEST",
+                                    "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
+                                  }
+                              InvalidAccountId:
+                                description: accountId in the URL is in the wrong format
+                                value: |
+                                  {
+                                    "code" : "BAD_REQUEST",
+                                    "message" : "accountId in the URL is in the wrong format"
+                                  }
+                      401:
+                        body:
+                          application/json:
+                            type: !include schemas/ErrorCodes.schema.json
+                            examples:
+                              notOpenStatus:
+                                description: lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
+                                value: |
+                                  {
+                                    "code" : "UNAUTHORIZED",
+                                    "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
+                                  }
+                      404:
+                        body:
+                          application/json:
+                            type: !include schemas/ErrorCodes.schema.json
+                            examples:
+                              accountIdNOTFound:
+                                description: The accountId does not match HMRC’s records
+                                value: |
+                                  {
+                                    "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
+                                    "message": "The accountId does not match HMRC’s records"
+                                  }
+                /close-account:
+                  post:
+                    is: [headers.acceptHeader, headers.contentHeader]
+                    displayName: Close an existing LISA account
+                    description: Close an account and report the reason and date.
+                    (annotations.scope): "write:lisa"
+                    securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
+                    (annotations.sandboxData): !include testdata/close-account.md
+                    body:
+                      application/json:
+                        type: !include schemas/LISAAccount.close.post.schema.json
+                        examples:
+                              example-1: !include examples/LISAAccount.close.post.json
+                              example-2: !include examples/LISAAccount.close.post1.json
+                    responses:
+                      200:
+                        description: The account is updated successfully.
+                        body:
+                          application/json:
+                              example: !include examples/LISAAccount.put.response.json
+                      400:
+                        body:
+                          application/json:
+                            type: !include schemas/ErrorCodes.schema.json
+                            examples:
+                              badRequest:
+                                description: Bad Request
+                                value: |
+                                  {
+                                    "code" : "BAD_REQUEST",
+                                    "message" : "Bad Request"
+                                  }
+                              InvalidLmrn:
+                                description: lisaManagerReferenceNumber in the URL is in the wrong format
+                                value: |
+                                  {
+                                    "code" : "BAD_REQUEST",
+                                    "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
+                                  }
+                              InvalidAccountId:
+                                description: accountId in the URL is in the wrong format
+                                value: |
+                                  {
+                                    "code" : "BAD_REQUEST",
+                                    "message" : "accountId in the URL is in the wrong format"
+                                  }
+                      401:
+                        body:
+                          application/json:
+                            type: !include schemas/ErrorCodes.schema.json
+                            examples:
+                              notOpenStatus:
+                                description: lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
+                                value: |
+                                  {
+                                    "code" : "UNAUTHORIZED",
+                                    "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
+                                  }
+                      403:
+                        body:
+                          application/json:
+                            type: !include schemas/ErrorCodes.schema.json
+                            examples:
+                              accountVoid:
+                                description: The LISA account is already void
+                                value: |
+                                  {
+                                    "code": "INVESTOR_ACCOUNT_ALREADY_VOID",
+                                    "message": "The LISA account is already void"
+                                  }
+                              accountClosed:
+                                description: The LISA account is already closed
+                                value: |
+                                  {
+                                    "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED",
+                                    "message": "The LISA account is already closed"
+                                  }
+                              accountCancellationPeriodExceeded:
+                                description: You cannot close the account with cancellation as the reason because the cancellation period is over
+                                value: |
+                                  {
+                                    "code": "CANCELLATION_PERIOD_EXCEEDED",
+                                    "message": "You cannot close the account with cancellation as the reason because the cancellation period is over"
+                                  }
+                              accountWithinCancellationPeriod:
+                                description: You cannot close the account with all funds withdrawn as the reason because it is within the cancellation period
+                                value: |
+                                  {
+                                    "code": "ACCOUNT_WITHIN_CANCELLATION_PERIOD",
+                                    "message": "You cannot close the account with all funds withdrawn as the reason because it is within the cancellation period"
+                                  }
+                      404:
+                        body:
+                          application/json:
+                            type: !include schemas/ErrorCodes.schema.json
+                            examples:
+                              accountIdNOTFound:
+                                description: The accountId does not match HMRC’s records
+                                value: |
+                                  {
+                                    "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
+                                    "message": "The accountId does not match HMRC’s records"
+                                  }
+                /update-subscription:
+                  post:
+                    is: [headers.acceptHeader, headers.contentHeader]
+                    displayName: Modify date of first subscription of a LISA account
+                    description: Modify the date when the first deposit was paid after a LISA account was created
+                    (annotations.scope): "write:lisa"
+                    securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
+                    (annotations.sandboxData): !include testdata/subscription-update.md
+                    body:
+                      application/json:
+                        type: !include schemas/LISAAccount.updateSubscription.post.schema.json
+                        examples:
+                              example-1: !include examples/LISAAccount.subscription.post.json
+                    responses:
+                      200:
+                        description: The first Subscription is updated successfully.
+                        body:
+                          application/json:
+                            examples:
+                              example-1: !include examples/LISAAccount.subscription.response.json
+                              example-2: !include examples/LISAAccount.update.voided.subscription.response.json
+                      400:
+                        body:
+                          application/json:
+                            type: !include schemas/ErrorCodes.schema.json
+                            examples:
+                              badRequest:
+                                description: Bad Request
+                                value: |
+                                  {
+                                    "code" : "BAD_REQUEST",
+                                    "message" : "Bad Request"
+                                  }
+                              InvalidLmrn:
+                                description: lisaManagerReferenceNumber in the URL is in the wrong format
+                                value: |
+                                  {
+                                    "code" : "BAD_REQUEST",
+                                    "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
+                                  }
+                              InvalidAccountId:
+                                description: accountId in the URL is in the wrong format
+                                value: |
+                                  {
+                                    "code" : "BAD_REQUEST",
+                                    "message" : "accountId in the URL is in the wrong format"
+                                  }
+                      401:
+                        body:
+                          application/json:
+                            type: !include schemas/ErrorCodes.schema.json
+                            examples:
+                              notOpenStatus:
+                                description: lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
+                                value: |
+                                  {
+                                    "code" : "UNAUTHORIZED",
+                                    "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
+                                  }
+                      403:
+                        body:
+                          application/json:
+                            type: !include schemas/ErrorCodes.schema.json
+                            examples:
+                              accountClosed:
+                                description: The LISA account is already closed
+                                value: |
+                                  {
+                                    "code" : "INVESTOR_ACCOUNT_ALREADY_CLOSED",
+                                    "message" : "The Investor Account is already closed"
+                                  }
+                              accountVoided:
+                                description: The LISA account is already void
+                                value: |
+                                  {
+                                    "code" : "INVESTOR_ACCOUNT_ALREADY_VOID",
+                                    "message" : "The Investor Account is already void"
+                                  }
+                      404:
+                        body:
+                          application/json:
+                            type: !include schemas/ErrorCodes.schema.json
+                            examples:
+                              accountIdNOTFound:
+                                description: The accountId does not match HMRC’s records
+                                value: |
+                                  {
+                                    "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
+                                    "message": "The accountId does not match HMRC’s records"
+                                  }
+                /events:
+                  description: !include documentation/LifeEvent
+                  post:
+                    is: [headers.acceptHeader, headers.contentHeader]
+                    displayName: Report a life event
+                    description: !include documentation/LifeEvent
+                    (annotations.scope): "write:lisa"
+                    securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
+                    (annotations.sandboxData): !include testdata/life-event.md
+                    body:
+                      application/json:
+                        type: !include schemas/LifeEvent.post.schema.json
+                        example: !include examples/LifeEvent.post.json
+                    responses:
+                      201:
+                        description: The LifeEvent resource has been created.
+                        headers:
+                          Location:
+                            description: Relative URI to the created LISA life event
+                            type: string
+                            example: /lifetime-isa/manager/Z876543/accounts/acc654321/events/1234567890
+
+                        body:
+                          application/json:
+                              example: !include examples/LifeEvent.post.response.json
+                      400:
+                        body:
+                          application/json:
+                            type: !include schemas/ErrorCodes.schema.json
+                            examples:
+                              notOpenStatus:
+                                description: Bad Request
+                                value: |
+                                  {
+                                    "code" : "BAD_REQUEST",
+                                    "message" : "Bad Request"
+                                  }
+                              InvalidLmrn:
+                                description: lisaManagerReferenceNumber in the URL is in the wrong format
+                                value: |
+                                  {
+                                    "code" : "BAD_REQUEST",
+                                    "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
+                                  }
+                              InvalidAccountId:
+                                description: accountId in the URL is in the wrong format
+                                value: |
+                                  {
+                                    "code" : "BAD_REQUEST",
+                                    "message" : "accountId in the URL is in the wrong format"
+                                  }
+                      401:
+                        body:
+                          application/json:
+                            type: !include schemas/ErrorCodes.schema.json
+                            examples:
+                              notOpenStatus:
+                                description: lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
+                                value: |
+                                  {
+                                    "code" : "UNAUTHORIZED",
+                                    "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
+                                  }
+                      403:
+                        description: Matches already existing resource.
+                          Response contains a location header with link to the existing resource.
+                        body:
+                          application/json:
+                            type: !include schemas/ErrorCodes.schema.json
+                            examples:
+                              lifeEventInvalid:
+                                description: The life event conflicts with a previous life event reported
+                                value: |
+                                  {
+                                    "code" : "LIFE_EVENT_INAPPROPRIATE",
+                                    "message" : "The life event conflicts with a previous life event reported"
+                                  }
+                              accountClosedOrVoided:
+                                description: This LISA account has already been closed or been made void by HMRC
+                                value: |
+                                  {
+                                    "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID",
+                                    "message": "This LISA account has already been closed or been made void by HMRC"
+                                  }
+                      404:
+                        body:
+                          application/json:
+                            type: !include schemas/ErrorCodes.schema.json
+                            examples:
+                              accountIdNOTFound:
+                                description: The accountId does not match HMRC’s records
+                                value: |
+                                  {
+                                    "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
+                                    "message": "The accountId does not match HMRC’s records"
+                                  }
+                      409:
+                        body:
+                          application/json:
+                            description: The investor’s life event has already been reported
+                            type: !include schemas/ErrorCodes.schema.json
+                            example: |
+                              {
+                                    "code" : "LIFE_EVENT_ALREADY_EXISTS",
+                                    "message" : "The investor’s life event has already been reported"
+                              }
+                  /{lifeEventId}:
+                      uriParameters:
+                        lifeEventId:
+                          type: IDtype
+                          description: The ID for the life event.
+                          example: "1234567890"
+                      get:
+                        is: [headers.acceptHeader, headers.contentHeader]
+                        displayName: Retrieve a life event
+                        (annotations.sandboxData): !include testdata/life-event-get.md
+                        responses:
+                          200:
                             body:
                               application/json:
-                                type: !include schemas/LISAAccount.post.schema.json
+                                example: !include examples/LifeEvent.post.json
+                          400:
+                            body:
+                              application/json:
+                                type: !include schemas/ErrorCodes.schema.json
                                 examples:
-                                  example-1: !include examples/LISAAccount.post1.json
-                                  example-2: !include examples/LISAAccount.post.json
-                            responses:
-                              201:
-                                headers:
-                                  Location:
-                                    description: Relative URI to the created LISA account resource
-                                    type: string
-                                    example: /lifetime-isa/manager/Z876543/accounts/acc654321
-                                body:
-                                  application/json:
-                                    examples:
-                                      example-1: !include examples/LISAAccount.post.response1.json
-                                      example-2: !include examples/LISAAccount.post.response.json
-                              400:
-                                body:
-                                  application/json:
-                                    type: !include schemas/ErrorCodes.schema.json
-                                    examples:
-                                      badRequest:
-                                        description: Bad Request
-                                        value: |
-                                          {
-                                            "code" : "BAD_REQUEST",
-                                            "message" : "Bad Request"
-                                          }
-                                      InvalidLmrn:
-                                        description: Invalid LISA Manager reference number
-                                        value: |
-                                          {
-                                            "code" : "BAD_REQUEST",
-                                            "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
-                                          }
-                              401:
-                                body:
-                                  application/json:
-                                    type: !include schemas/ErrorCodes.schema.json
-                                    examples:
-                                      notOpenStatus:
-                                        description: The lisaManagerReferenceNumber path parameter you've used doesn't match with an authorised LISA provider in HMRC's records.
-                                        value: |
-                                          {
-                                            "code" : "UNAUTHORIZED",
-                                            "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
-                                          }
-                              403:
-                                body:
-                                  application/json:
-                                    type: !include schemas/ErrorCodes.schema.json
-                                    examples:
-                                      investorNotFound:
-                                        description: The investorId given does not match with HMRC’s records.
-                                        value: |
-                                          {
-                                            "code" : "INVESTOR_NOT_FOUND",
-                                            "message" : "invalid status: must create with open status"
-                                          }
-                                      outsideAgeRange:
-                                        description: The investor is not eligible for a LISA account.
-                                        value: |
-                                          {
-                                            "code" : "INVESTOR_ELIGIBILITY_CHECK_FAILED",
-                                            "message" : "Can't open a LISA if investor is older than 40 or younger than 18"
-                                           }
-                                      complianceFail:
-                                        description: The investor has failed a compliance check - they may have breached  ISA guidelines or regulations.
-                                        value: |
-                                          {
-                                            "code" : "INVESTOR_COMPLIANCE_CHECK_FAILED",
-                                            "message" : "The investor has failed a compliance check - they may have breached  ISA guidelines or regulations."
-                                          }
-                                      prevAccntDoNoExists:
-                                        description: The transferredFromAccountId and transferredFromLMRN given don’t match with an account on HMRC’s records.
-                                        value: |
-                                          {
-                                            "code" : "PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST",
-                                            "message" : "Previous Investor Account Doesn’t Exist"
-                                          }
-                                      noTransferAccntData:
-                                        description: transferredFromAccountId, transferredFromLMRN and transferInDate are required when the creationReason is "Transferred".
-                                        value: |
-                                          {
-                                            "code" : "TRANSFER_ACCOUNT_DATA_NOT_PROVIDED",
-                                            "message" : "transfer account data not provided"
-                                          }
-                                      transferAccntDataProvided:
-                                        description: transferredFromAccountId, transferredFromLMRN, and transferInDate should only be completed when the creationReason is "Transferred".
-                                        value: |
-                                          {
-                                            "code" : "TRANSFER_ACCOUNT_DATA_PROVIDED",
-                                            "message" : "transfer account data provided"
-                                          }
-                                      accountClosedOrVoided:
-                                        description: The LISA account has already been closed or voided.
-                                        value: |
-                                          {
-                                            "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID",
-                                            "message": "The LISA account has already been closed or voided."
-                                          }
-                              409:
-                                body:
-                                  application/json:
-                                    description: This investor already has a LISA account.
-                                    type: !include schemas/ErrorCodes.schema.json
-                                    example: |
+                                  InvalidLmrn:
+                                    description: lisaManagerReferenceNumber in the URL is in the wrong format
+                                    value: |
                                       {
-                                        "code": "INVESTOR_ACCOUNT_ALREADY_EXISTS",
-                                        "message": "This investor already has a LISA account.",
-                                        "accountId": "1234567890"
+                                        "code" : "BAD_REQUEST",
+                                        "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
                                       }
-                      /{accountId}:
-                            uriParameters:
-                              accountId:
-                                type: accountIdType
-                                description: The ID for the account.  This will be generated by the LISA Manager and will only
-                                  be unique when used in combination with lisaManagerReferenceNumber. Any special characters should be URL encoded.
-                                example: "ABC12345"
-                            get:
-                                displayName: Retrieve account details
-                                description: Retrieve account details by accountId
-                                is: [headers.acceptHeader, headers.contentHeader]
-                                (annotations.scope): "read:lisa"
-                                securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
-                                (annotations.sandboxData): !include testdata/get-account.md
-                                responses:
-                                  200:
-                                    body:
-                                      application/json:
-                                        example: !include examples/LISAAccount.get.json
-                                        type: !include schemas/LISAAccount.get.schema.json
-                                  400:
-                                    body:
-                                      application/json:
-                                        type: !include schemas/ErrorCodes.schema.json
-                                        examples:
-                                          InvalidLmrn:
-                                            description: Invalid LISA Manager reference number
-                                            value: |
-                                              {
-                                                "code" : "BAD_REQUEST",
-                                                "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
-                                              }
-                                  401:
-                                    body:
-                                      application/json:
-                                        type: !include schemas/ErrorCodes.schema.json
-                                        examples:
-                                          notOpenStatus:
-                                            description: The lisaManagerReferenceNumber path parameter you've used doesn't match with an authorised LISA provider in HMRC's records.
-                                            value: |
-                                              {
-                                                "code" : "UNAUTHORIZED",
-                                                "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
-                                              }
-                                  404:
-                                    body:
-                                      application/json:
-                                        type: !include schemas/ErrorCodes.schema.json
-                                        examples:
-                                          accountIdNOTFound:
-                                            description: The accountId does not match HMRC’s records.
-                                            value: |
-                                              {
-                                                "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
-                                                "message": "The accountId does not match HMRC’s records."
-                                              }
-                            /close-account:
-                              post:
-                                is: [headers.acceptHeader, headers.contentHeader]
-                                displayName: Close an existing LISA account
-                                description: Close an account and report the reason and date.
-                                (annotations.scope): "write:lisa"
-                                securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
-                                (annotations.sandboxData): !include testdata/close-account.md
-                                body:
-                                  application/json:
-                                    type: !include schemas/LISAAccount.close.post.schema.json
-                                    examples:
-                                          example-1: !include examples/LISAAccount.close.post.json
-                                          example-2: !include examples/LISAAccount.close.post1.json
-                                responses:
-                                  200:
-                                    description: The account is updated successfully.
-                                    body:
-                                      application/json:
-                                          example: !include examples/LISAAccount.put.response.json
-                                  400:
-                                    body:
-                                      application/json:
-                                        type: !include schemas/ErrorCodes.schema.json
-                                        examples:
-                                          badRequest:
-                                            description: Bad Request
-                                            value: |
-                                              {
-                                                "code" : "BAD_REQUEST",
-                                                "message" : "Bad Request"
-                                              }
-                                          InvalidLmrn:
-                                            description: Invalid LISA Manager reference number
-                                            value: |
-                                              {
-                                                "code" : "BAD_REQUEST",
-                                                "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
-                                              }
-                                  401:
-                                    body:
-                                      application/json:
-                                        type: !include schemas/ErrorCodes.schema.json
-                                        examples:
-                                          notOpenStatus:
-                                            description: The lisaManagerReferenceNumber path parameter you've used doesn't match with an authorised LISA provider in HMRC's records.
-                                            value: |
-                                              {
-                                                "code" : "UNAUTHORIZED",
-                                                "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
-                                              }
-                                  403:
-                                    body:
-                                      application/json:
-                                        type: !include schemas/ErrorCodes.schema.json
-                                        examples:
-                                          accountClosedOrVoided:
-                                            description: The LISA account has already been closed or voided.
-                                            value: |
-                                              {
-                                                "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID",
-                                                "message": "The LISA account has already been closed or voided."
-                                              }
-                                          accountCancellationPeriodExceeded:
-                                            description: You cannot close the account with cancellation as the reason because the cancellation period is over
-                                            value: |
-                                              {
-                                                "code": "CANCELLATION_PERIOD_EXCEEDED",
-                                                "message": "You cannot close the account with cancellation as the reason because the cancellation period is over"
-                                              }
-                                          accountWithinCancellationPeriod:
-                                            description: You cannot close the account with all funds withdrawn as the reason because it is within the cancellation period
-                                            value: |
-                                              {
-                                                "code": "ACCOUNT_WITHIN_CANCELLATION_PERIOD",
-                                                "message": "You cannot close the account with all funds withdrawn as the reason because it is within the cancellation period"
-                                              }
-                                          accountBonusPaymentRequired:
-                                            description: You cannot close the account with cancellation as the reason because you need to repay a bonus payment
-                                            value: |
-                                              {
-                                                "code": "BONUS_REPAYMENT_REQUIRED",
-                                                "message": "You cannot close the account with cancellation as the reason because you need to repay a bonus payment"
-                                              }
-                                  404:
-                                    body:
-                                      application/json:
-                                        type: !include schemas/ErrorCodes.schema.json
-                                        examples:
-                                          accountIdNOTFound:
-                                            description: The accountId does not match HMRC’s records.
-                                            value: |
-                                              {
-                                                "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
-                                                "message": "The accountId does not match HMRC’s records."
-                                              }
-                            /reinstate-account:
-                              post:
-                                is: [headers.acceptHeader, headers.contentHeader]
-                                displayName: Reinstate a LISA account
-                                description: Reinstate a LISA account that has been closed.
-                                (annotations.scope): "write:lisa"
-                                securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
-                                (annotations.sandboxData): !include testdata/reinstate-account.md
-                                body:
-                                  application/json:
-                                    example: ""
-                                responses:
-                                  200:
-                                    description: The account is reinstated successfully.
-                                    body:
-                                      application/json:
-                                          example: !include examples/LISAAccount.reinstate.post.response.json
-                                  400:
-                                    body:
-                                      application/json:
-                                        type: !include schemas/ErrorCodes.schema.json
-                                        examples:
-                                          InvalidLmrn:
-                                            description: Invalid LISA Manager reference number
-                                            value: |
-                                              {
-                                                "code" : "BAD_REQUEST",
-                                                "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
-                                              }
-                                  401:
-                                    body:
-                                      application/json:
-                                        type: !include schemas/ErrorCodes.schema.json
-                                        examples:
-                                          notOpenStatus:
-                                            description: The lisaManagerReferenceNumber path parameter you've used doesn't match with an authorised LISA provider in HMRC's records.
-                                            value: |
-                                              {
-                                                "code" : "UNAUTHORIZED",
-                                                "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
-                                              }
-                                  404:
-                                    body:
-                                      application/json:
-                                        type: !include schemas/ErrorCodes.schema.json
-                                        examples:
-                                          accountIdNOTFound:
-                                            description: The accountId does not match HMRC’s records.
-                                            value: |
-                                              {
-                                                "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
-                                                "message": "The accountId does not match HMRC’s records."
-                                              }
+                                  InvalidAccountId:
+                                    description: accountId in the URL is in the wrong format
+                                    value: |
+                                      {
+                                        "code" : "BAD_REQUEST",
+                                        "message" : "accountId in the URL is in the wrong format"
+                                      }
 
-                                  403:
-                                    body:
-                                      application/json:
-                                        description:  Investor account may have been transferred or is active.
-                                        type: !include schemas/ErrorCodes.schema.json
-                                        example: |
-                                          {
-                                            "code": "INVESTOR_ACCOUNT_CANNOT_BE_REINSTATED",
-                                            "message": "Account transfer or the account is already open"
-                                          }
-                            /update-subscription:
-                              post:
-                                is: [headers.acceptHeader, headers.contentHeader]
-                                displayName: Modify date of first subscription of a LISA account
-                                description: Modify date investor first subscribed to a LISA account
-                                (annotations.scope): "write:lisa"
-                                securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
-                                (annotations.sandboxData): !include testdata/subscription-update.md
-                                body:
-                                  application/json:
-                                    type: !include schemas/LISAAccount.updateSubscription.post.schema.json
-                                    examples:
-                                          example-1: !include examples/LISAAccount.subscription.post.json
-
-                                responses:
-                                  200:
-                                    description: The first Subscription is updated successfully.
-                                    body:
-                                      application/json:
-                                        examples:
-                                          example-1: !include examples/LISAAccount.subscription.response.json
-                                          example-2: !include examples/LISAAccount.update.opened.subscription.response.json
-                                          example-3: !include examples/LISAAccount.update.voided.subscription.response.json
-                                  400:
-                                    body:
-                                      application/json:
-                                        type: !include schemas/ErrorCodes.schema.json
-                                        examples:
-                                          badRequest:
-                                            description: Bad Request
-                                            value: |
-                                              {
-                                                "code" : "BAD_REQUEST",
-                                                "message" : "Bad Request"
-                                              }
-                                          InvalidLmrn:
-                                            description: Invalid LISA Manager reference number
-                                            value: |
-                                              {
-                                                "code" : "BAD_REQUEST",
-                                                "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
-                                              }
-                                  401:
-                                    body:
-                                      application/json:
-                                        type: !include schemas/ErrorCodes.schema.json
-                                        examples:
-                                          notOpenStatus:
-                                            description: The lisaManagerReferenceNumber path parameter you've used doesn't match with an authorised LISA provider in HMRC's records.
-                                            value: |
-                                              {
-                                                "code" : "UNAUTHORIZED",
-                                                "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
-                                              }
-                                  403:
-                                    body:
-                                      application/json:
-                                        type: !include schemas/ErrorCodes.schema.json
-                                        examples:
-                                          accountClosed:
-                                            description: The LISA account is already closed.
-                                            value: |
-                                              {
-                                                "code" : "INVESTOR_ACCOUNT_ALREADY_CLOSED",
-                                                "message" : "The Investor Account is already closed"
-                                              }
-                                          accountVoided:
-                                            description: The LISA account is already void.
-                                            value: |
-                                              {
-                                                "code" : "INVESTOR_ACCOUNT_ALREADY_VOID",
-                                                "message" : "The Investor Account is already void"
-                                              }
-                                  404:
-                                    body:
-                                      application/json:
-                                        type: !include schemas/ErrorCodes.schema.json
-                                        examples:
-                                          accountIdNOTFound:
-                                            description: The accountId does not match HMRC’s records.
-                                            value: |
-                                              {
-                                                "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
-                                                "message": "The accountId does not match HMRC’s records."
-                                              }
-                            /events:
-                              description: !include documentation/LifeEvent
-                              post:
-                                is: [headers.acceptHeader, headers.contentHeader]
-                                displayName: Report a life event
-                                description: !include documentation/LifeEvent
-                                (annotations.scope): "write:lisa"
-                                securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
-                                (annotations.sandboxData): !include testdata/life-event.md
-                                body:
-                                  application/json:
-                                    type: !include schemas/LifeEvent.post.schema.json
-                                    example: !include examples/LifeEvent.post.json
-                                responses:
-                                  201:
-                                    description: The LifeEvent resource has been created.
-                                    headers:
-                                      Location:
-                                        description: Relative URI to the created LISA event created
-                                        type: string
-                                        example: /lifetime-isa/manager/Z876543/accounts/acc654321/events/1234567890
-
-                                    body:
-                                      application/json:
-                                          example: !include examples/LifeEvent.post.response.json
-                                  400:
-                                    body:
-                                      application/json:
-                                        type: !include schemas/ErrorCodes.schema.json
-                                        examples:
-                                          notOpenStatus:
-                                            description: Bad Request
-                                            value: |
-                                              {
-                                                "code" : "BAD_REQUEST",
-                                                "message" : "Bad Request"
-                                              }
-                                          InvalidLmrn:
-                                            description: Invalid LISA Manager reference number
-                                            value: |
-                                              {
-                                                "code" : "BAD_REQUEST",
-                                                "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
-                                              }
-                                  401:
-                                    body:
-                                      application/json:
-                                        type: !include schemas/ErrorCodes.schema.json
-                                        examples:
-                                          notOpenStatus:
-                                            description: The lisaManagerReferenceNumber path parameter you've used doesn't match with an authorised LISA provider in HMRC's records.
-                                            value: |
-                                              {
-                                                "code" : "UNAUTHORIZED",
-                                                "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
-                                              }
-                                  403:
-                                    description: Matches already existing resource.
-                                      Response contains a location header with link to the existing resource.
-                                    body:
-                                      application/json:
-                                        type: !include schemas/ErrorCodes.schema.json
-                                        examples:
-                                          lifeEventInvalid:
-                                            description: The life event conflicts with previous life event reported.
-                                            value: |
-                                              {
-                                                "code" : "LIFE_EVENT_INAPPROPRIATE",
-                                                "message" : "The Life Event conflicts with previous Life Event reported."
-                                              }
-                                          accountClosedOrVoided:
-                                            description: The LISA account has already been closed or voided.
-                                            value: |
-                                              {
-                                                "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID",
-                                                "message": "The LISA account has already been closed or voided."
-                                              }
-                                  404:
-                                    body:
-                                      application/json:
-                                        type: !include schemas/ErrorCodes.schema.json
-                                        examples:
-                                          accountIdNOTFound:
-                                            description: The accountId does not match HMRC’s records.
-                                            value: |
-                                              {
-                                                "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
-                                                "message": "The accountId does not match HMRC’s records."
-                                              }
-                                  409:
-                                    body:
-                                      application/json:
-                                        description: The investor’s life event has already been reported.
-                                        type: !include schemas/ErrorCodes.schema.json
-                                        example: |
-                                          {
-                                                "code" : "LIFE_EVENT_ALREADY_EXISTS",
-                                                "message" : "The investor’s life event has already been reported."
-                                          }
-                              /{lifeEventId}:
-                                uriParameters:
-                                  lifeEventId:
-                                    type: IDtype
-                                    description: The ID for the life event.
-                                    example: "1234567890"
-                                get:
-                                  is: [headers.acceptHeader, headers.contentHeader]
-                                  displayName: Retrieve a life event
-                                  (annotations.sandboxData): !include testdata/life-event-get.md
-                                  responses:
-                                    200:
-                                      body:
-                                        application/json:
-                                          example: !include examples/LifeEvent.post.json
-                                    400:
-                                      body:
-                                        application/json:
-                                          type: !include schemas/ErrorCodes.schema.json
-                                          examples:
-                                            InvalidLmrn:
-                                              description: lisaManagerReferenceNumber in the URL is in the wrong format
-                                              value: |
-                                                {
-                                                  "code" : "BAD_REQUEST",
-                                                  "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
-                                                }
-                                            InvalidAccountId:
-                                              description: accountId in the URL is in the wrong format
-                                              value: |
-                                                {
-                                                  "code" : "BAD_REQUEST",
-                                                  "message" : "accountId in the URL is in the wrong format"
-                                                }
-
-                                    401:
-                                      body:
-                                        application/json:
-                                          type: !include schemas/ErrorCodes.schema.json
-                                          examples:
-                                            notOpenStatus:
-                                              description: lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
-                                              value: |
-                                                {
-                                                  "code" : "UNAUTHORIZED",
-                                                  "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
-                                                }
-                                    404:
-                                      body:
-                                        application/json:
-                                          type: !include schemas/ErrorCodes.schema.json
-                                          examples:
-                                            accountIdNOTFound:
-                                              description: The accountId does not match HMRC’s records
-                                              value: |
-                                                {
-                                                  "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
-                                                  "message": "The accountId does not match HMRC’s records"
-                                                }
-                                            lifeEventIdNOTFound:
-                                              description: The lifeEventId does not match HMRC’s records
-                                              value: |
-                                                {
-                                                  "code": "LIFE_EVENT_NOT_FOUND",
-                                                  "message": "The lifeEventId does not match HMRC's records"
-                                                }
-                            /transactions:
-                              description: !include documentation/LISATransaction
-                              post:
-                                is: [headers.acceptHeader, headers.contentHeader]
-                                displayName: Request a bonus payment
-                                description: Request a bonus payment from HMRC and provide a reason for the request.
-                                (annotations.scope): "write:lisa"
-                                securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
-                                (annotations.sandboxData): !include testdata/bonus-payment.md
-                                body:
-                                  application/json:
-                                    type: !include schemas/BonusPaymentRequest.post.schema.json
-                                    example: !include examples/BonusPaymentRequest.post.json
-                                responses:
-                                  201:
-                                    description: The LISA transaction resource has been created.
-                                    headers:
-                                      Location:
-                                        description: Relative URI to the created bonus payment resource
-                                        type: string
-                                        example: /lifetime-isa/manager/Z876543/accounts/acc654321/transactions/7777777777
-                                    body:
-                                      application/json:
-                                        examples:
-                                          example-1: !include examples/LISATransaction.post.response.json
-                                          example-2: !include examples/LISATransaction.post.response.1.json
-                                  400:
-                                    body:
-                                      application/json:
-                                        type: !include schemas/ErrorCodes.schema.json
-                                        examples:
-                                          badRequest:
-                                            description: Bad Request
-                                            value: |
-                                              {
-                                                "code" : "BAD_REQUEST",
-                                                "message" : "Bad Request"
-                                              }
-                                          InvalidLmrn:
-                                            description: Invalid LISA Manager reference number
-                                            value: |
-                                              {
-                                                "code" : "BAD_REQUEST",
-                                                "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
-                                              }
-                                  401:
-                                    body:
-                                      application/json:
-                                        type: !include schemas/ErrorCodes.schema.json
-                                        examples:
-                                          notOpenStatus:
-                                            description: The lisaManagerReferenceNumber path parameter you've used doesn't match with an authorised LISA provider in HMRC's records.
-                                            value: |
-                                              {
-                                                "code" : "UNAUTHORIZED",
-                                                "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
-                                              }
-                                  403:
-                                    body:
-                                      application/json:
-                                        type: !include schemas/ErrorCodes.schema.json
-                                        examples:
-                                          forbidden:
-                                            description: Request data does not meet business rules.
-                                            value: |
-                                              {
-                                                "code" : "FORBIDDEN",
-                                                "message" : "Forbidden"
-                                              }
-                                          lifeEventNotProvided:
-                                            description: lifeEventId is required when the claimReason is "Life Event".
-                                            value: |
-                                              {
-                                                "code" : "LIFE_EVENT_NOT_PROVIDED",
-                                                "message" : "lifeEventId is required when the claimReason is \"Life Event\"."
-                                              }
-                                          bonusWrong:
-                                            description: The bonus information given exceeds the maximum annual amount, the qualifying deposits exceed the maximum annual amount, or the bonus claim doesn't equal the correct percentage of stated qualifying funds.
-                                            value: |
-                                              {
-                                                "code" : "BONUS_CLAIM_ERROR",
-                                                "message" : "Bonus Claim Error"
-                                              }
-                                          accountClosedOrVoided:
-                                            description: The LISA account has already been closed or voided.
-                                            value: |
-                                              {
-                                                "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID",
-                                                "message": "The LISA account has already been closed or voided."
-                                              }
-                                  404:
-                                    body:
-                                      application/json:
-                                        type: !include schemas/ErrorCodes.schema.json
-                                        examples:
-                                          noLifeEvent:
-                                            description: The lifeEventId does not match with HMRC’s records.
-                                            value: |
-                                              {
-                                                "code" : "LIFE_EVENT_NOT_FOUND",
-                                                "message" : "The lifeEventId does not match with HMRC’s records."
-                                              }
-                                          accountIdNOTFound:
-                                            description: The accountId does not match HMRC’s records.
-                                            value: |
-                                              {
-                                                "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
-                                                "message": "The accountId does not match HMRC’s records."
-                                              }
-                                  409:
-                                      body:
-                                        application/json:
-                                          type: !include schemas/ErrorCodes.schema.json
-                                          examples:
-                                            noLifeEvent:
-                                              description: The investor's bonus payment has already been requested.
-                                              value: |
-                                                {
-                                                  "code" : "BONUS_CLAIM_ALREADY_EXISTS",
-                                                  "message" : "The investor's bonus payment has already been requested"
-                                                }
-                              /{transactionId}:
-                                   uriParameters:
-                                     transactionId:
-                                      type: string
-                                      description: The ID for the transaction.
-                                      example: "1234567890"
-                                   get:
-                                     displayName: Retrieve bonus payment submitted
-                                     description: Retrieve bonus payment submitted earlier by transactionID
-                                     is: [headers.acceptHeader, headers.contentHeader]
-                                     (annotations.scope): "read:lisa"
-                                     securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
-                                     (annotations.sandboxData): !include testdata/bonus-payment-get.md
-                                     responses:
-                                       200:
-                                         body:
-                                           application/json:
-                                             examples:
-                                               example-1: !include examples/LISATransaction.get.response.json
-                                               example-2: !include examples/LISATransaction.get.response.1.json
-                                       400:
-                                         body:
-                                           application/json:
-                                             type: !include schemas/ErrorCodes.schema.json
-                                             examples:
-                                               InvalidLmrn:
-                                                 description: Invalid LISA Manager reference number
-                                                 value: |
-                                                   {
-                                                     "code" : "BAD_REQUEST",
-                                                     "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
-                                                   }
-                                       401:
-                                         body:
-                                           application/json:
-                                             type: !include schemas/ErrorCodes.schema.json
-                                             examples:
-                                               notOpenStatus:
-                                                 description: The lisaManagerReferenceNumber path parameter you have used does not match with an authorised LISA provider in HMRC's records
-                                                 value: |
-                                                   {
-                                                     "code" : "UNAUTHORIZED",
-                                                     "message" : "The lisaManagerReferenceNumber path parameter you have used does not match with an authorised LISA provider in HMRC's records"
-                                                   }
-                                       404:
-                                         body:
-                                           application/json:
-                                             type: !include schemas/ErrorCodes.schema.json
-                                             examples:
-                                               noTransaction:
-                                                 description: The transactionId does not match HMRC’s records
-                                                 value: |
-                                                   {
-                                                     "code" : "BONUS_PAYMENT_TRANSACTION_NOT_FOUND",
-                                                     "message" : "The transactionId does not match HMRC’s records"
-                                                   }
-                                               accountIdNOTFound:
-                                                 description: The accountId does not match HMRC’s records
-                                                 value: |
-                                                   {
-                                                     "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
-                                                     "message": "The accountId does not match HMRC’s records"
-                                                   }
-                                   /payments:
-                                     get:
-                                        displayName: Retrieve payment details for an investor's transaction ID
-                                        description: Retrieve payment details for an investor's transaction ID.
-                                        is: [headers.acceptHeader, headers.contentHeader]
-                                        (annotations.scope): "read:lisa"
-                                        securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
-                                        (annotations.sandboxData): !include testdata/get-investor-payment.md
-                                        responses:
-                                          200:
-                                            body:
-                                              application/json:
-                                                type: !include schemas/InvestorPayment.get.response.schema.json
-                                                examples:
-                                                  paid: !include examples/InvestorPayment.get.response.json
-                                                  charge: !include examples/InvestorPayment.get.response.1.json
-                                          401:
-                                            body:
-                                              application/json:
-                                                type: !include schemas/ErrorCodes.schema.json
-                                                examples:
-                                                  notOpenStatus:
-                                                    description: The lisaManagerReferenceNumber path parameter you have used does not match with an authorised LISA provider in HMRC's records
-                                                    value: |
-                                                      {
-                                                        "code" : "UNAUTHORIZED",
-                                                        "message" : "The lisaManagerReferenceNumber path parameter you have used does not match with an authorised LISA provider in HMRC's records"
-                                                      }
-                                          404:
-                                            body:
-                                              application/json:
-                                                type: !include schemas/ErrorCodes.schema.json
-                                                examples:
-                                                  noTransaction:
-                                                    description: The transactionId does not match HMRC’s records
-                                                    value: |
-                                                      {
-                                                        "code" : "BONUS_PAYMENT_TRANSACTION_NOT_FOUND",
-                                                        "message" : "The transactionId does not match HMRC’s records"
-                                                      }
-                                                  accountIdNOTFound:
-                                                    description: The accountId does not match HMRC’s records
-                                                    value: |
-                                                      {
-                                                        "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
-                                                        "message": "The accountId does not match HMRC’s records"
-                                                      }
+                          401:
+                            body:
+                              application/json:
+                                type: !include schemas/ErrorCodes.schema.json
+                                examples:
+                                  notOpenStatus:
+                                    description: lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
+                                    value: |
+                                      {
+                                        "code" : "UNAUTHORIZED",
+                                        "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
+                                      }
+                          404:
+                            body:
+                              application/json:
+                                type: !include schemas/ErrorCodes.schema.json
+                                examples:
+                                  accountIdNOTFound:
+                                    description: The accountId does not match HMRC’s records
+                                    value: |
+                                      {
+                                        "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
+                                        "message": "The accountId does not match HMRC’s records"
+                                      }
+                                  lifeEventIdNOTFound:
+                                    description: The lifeEventId does not match HMRC’s records
+                                    value: |
+                                      {
+                                        "code": "LIFE_EVENT_NOT_FOUND",
+                                        "message": "The lifeEventId does not match HMRC's records"
+                                      }
+                /transactions:
+                  description: !include documentation/LISATransaction
+                  post:
+                    is: [headers.acceptHeader, headers.contentHeader]
+                    displayName: Request a bonus payment
+                    description: Request a bonus payment from HMRC and provide a reason for the request.
+                    (annotations.scope): "write:lisa"
+                    securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
+                    (annotations.sandboxData): !include testdata/bonus-payment.md
+                    body:
+                      application/json:
+                        type: !include schemas/BonusPaymentRequest.post.schema.json
+                        example: !include examples/BonusPaymentRequest.post.json
+                    responses:
+                      201:
+                        description: The LISA transaction resource has been created.
+                        headers:
+                          Location:
+                            description: Relative URI to the created bonus payment resource
+                            type: string
+                            example: /lifetime-isa/manager/Z876543/accounts/acc654321/transactions/7777777777
+                        body:
+                          application/json:
+                            examples:
+                              example-1: !include examples/LISATransaction.post.response.json
+                              example-2: !include examples/LISATransaction.post.response.1.json
+                      400:
+                        body:
+                          application/json:
+                            type: !include schemas/ErrorCodes.schema.json
+                            examples:
+                              badRequest:
+                                description: Bad Request
+                                value: |
+                                  {
+                                    "code" : "BAD_REQUEST",
+                                    "message" : "Bad Request"
+                                  }
+                              InvalidLmrn:
+                                description: lisaManagerReferenceNumber in the URL is in the wrong format
+                                value: |
+                                  {
+                                    "code" : "BAD_REQUEST",
+                                    "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
+                                  }
+                              InvalidAccountId:
+                                description: accountId in the URL is in the wrong format
+                                value: |
+                                  {
+                                    "code" : "BAD_REQUEST",
+                                    "message" : "accountId in the URL is in the wrong format"
+                                  }
+                      401:
+                        body:
+                          application/json:
+                            type: !include schemas/ErrorCodes.schema.json
+                            examples:
+                              notOpenStatus:
+                                description: lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
+                                value: |
+                                  {
+                                    "code" : "UNAUTHORIZED",
+                                    "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
+                                  }
+                      403:
+                        body:
+                          application/json:
+                            type: !include schemas/ErrorCodes.schema.json
+                            examples:
+                              forbidden:
+                                description: There is a problem with the request data
+                                value: |
+                                  {
+                                    "code" : "FORBIDDEN",
+                                    "message" : "There is a problem with the request data"
+                                  }
+                              lifeEventNotProvided:
+                                description: lifeEventId is required when the claimReason is a life event
+                                value: |
+                                  {
+                                    "code" : "LIFE_EVENT_NOT_PROVIDED",
+                                    "message" : "lifeEventId is required when the claimReason is a life event"
+                                  }
+                              bonusWrong:
+                                description: The bonus amount given is above the maximum annual amount, or the qualifying deposits are above the maximum annual amount or the bonus claim does not equal the correct percentage of qualifying funds
+                                value: |
+                                  {
+                                    "code" : "BONUS_CLAIM_ERROR",
+                                    "message" : "The bonus amount given is above the maximum annual amount, or the qualifying deposits are above the maximum annual amount or the bonus claim does not equal the correct percentage of qualifying funds"
+                                  }
+                              accountClosedOrVoided:
+                                description: This LISA account has already been closed or been made void by HMRC
+                                value: |
+                                  {
+                                    "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID",
+                                    "message": "This LISA account has already been closed or been made void by HMRC"
+                                  }
+                      404:
+                        body:
+                          application/json:
+                            type: !include schemas/ErrorCodes.schema.json
+                            examples:
+                              noLifeEvent:
+                                description: The lifeEventId does not match with HMRC’s records
+                                value: |
+                                  {
+                                    "code" : "LIFE_EVENT_NOT_FOUND",
+                                    "message" : "The lifeEventId does not match with HMRC’s records"
+                                  }
+                              accountIdNOTFound:
+                                description: The accountId does not match HMRC’s records
+                                value: |
+                                  {
+                                    "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
+                                    "message": "The accountId does not match HMRC’s records"
+                                  }
+                      409:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                noLifeEvent:
+                                  description: The investor’s bonus payment has already been requested.
+                                  value: |
+                                    {
+                                      "code" : "BONUS_CLAIM_ALREADY_EXISTS",
+                                      "message" : "The investor’s bonus payment has already been requested"
+                                    }
+                  /{transactionId}:
+                    uriParameters:
+                      transactionId:
+                        type: string
+                        description: The ID for the transaction.
+                        example: "1234567890"
+                    get:
+                      displayName: Retrieve bonus payment submitted
+                      description: Retrieve bonus payment submitted earlier by transactionID
+                      is: [headers.acceptHeader, headers.contentHeader]
+                      (annotations.scope): "read:lisa"
+                      securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
+                      (annotations.sandboxData): !include testdata/bonus-payment-get.md
+                      responses:
+                        200:
+                          body:
+                            application/json:
+                              examples:
+                                example-1: !include examples/LISATransaction.get.response.json
+                                example-2: !include examples/LISATransaction.get.response.1.json
+                        400:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                InvalidLmrn:
+                                  description: lisaManagerReferenceNumber in the URL is in the wrong format
+                                  value: |
+                                    {
+                                      "code" : "BAD_REQUEST",
+                                      "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
+                                    }
+                                InvalidAccountId:
+                                  description: accountId in the URL is in the wrong format
+                                  value: |
+                                    {
+                                      "code" : "BAD_REQUEST",
+                                      "message" : "accountId in the URL is in the wrong format"
+                                    }
+                        401:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                notOpenStatus:
+                                  description: lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
+                                  value: |
+                                    {
+                                      "code" : "UNAUTHORIZED",
+                                      "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
+                                    }
+                        404:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                noTransaction:
+                                  description: The transactionId does not match HMRC’s records
+                                  value: |
+                                    {
+                                      "code" : "BONUS_PAYMENT_TRANSACTION_NOT_FOUND",
+                                      "message" : "The transactionId does not match HMRC’s records"
+                                    }
+                                accountIdNOTFound:
+                                  description: The accountId does not match HMRC’s records
+                                  value: |
+                                    {
+                                      "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
+                                      "message": "The accountId does not match HMRC’s records"
+                                    }
+                    /payments:
+                      get:
+                         displayName: Retrieve payment details for an investor’s transaction ID
+                         description: Retrieve payment details for an investor’s transaction ID.
+                         is: [headers.acceptHeader, headers.contentHeader]
+                         (annotations.scope): "read:lisa"
+                         securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
+                         (annotations.sandboxData): !include testdata/get-investor-payment.md
+                         responses:
+                           200:
+                             body:
+                               application/json:
+                                 type: !include schemas/InvestorPayment.get.response.schema.json
+                                 examples:
+                                   paid: !include examples/InvestorPayment.get.response.json
+                           400:
+                             body:
+                               application/json:
+                                 type: !include schemas/ErrorCodes.schema.json
+                                 examples:
+                                   InvalidLmrn:
+                                     description: lisaManagerReferenceNumber in the URL is in the wrong format
+                                     value: |
+                                       {
+                                         "code" : "BAD_REQUEST",
+                                         "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
+                                       }
+                                   InvalidAccountId:
+                                     description: accountId in the URL is in the wrong format
+                                     value: |
+                                       {
+                                         "code" : "BAD_REQUEST",
+                                         "message" : "accountId in the URL is in the wrong format"
+                                       }
+                           401:
+                             body:
+                               application/json:
+                                 type: !include schemas/ErrorCodes.schema.json
+                                 examples:
+                                   notOpenStatus:
+                                     description: lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
+                                     value: |
+                                       {
+                                         "code" : "UNAUTHORIZED",
+                                         "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
+                                       }
+                           404:
+                             body:
+                               application/json:
+                                 type: !include schemas/ErrorCodes.schema.json
+                                 examples:
+                                   noTransaction:
+                                     description: The transactionId does not match HMRC’s records
+                                     value: |
+                                       {
+                                         "code" : "BONUS_PAYMENT_TRANSACTION_NOT_FOUND",
+                                         "message" : "The transactionId does not match HMRC’s records"
+                                       }
+                                   accountIdNOTFound:
+                                     description: The accountId does not match HMRC’s records
+                                     value: |
+                                       {
+                                         "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
+                                         "message": "The accountId does not match HMRC’s records"
+                                       }
+            /payments:
+              get:
+                  is: [headers.acceptHeader]
+                  displayName: Retrieve payment details
+                  description: This allows a LISA provider to retrieve payments made by HMRC in a specific date range.
+                  (annotations.scope): "read:lisa"
+                  securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
+                  (annotations.sandboxData): !include testdata/get-bulk-payment.md
+                  queryParameters:
+                    startDate:
+                      type : ISO8601Date
+                      description: The start date of the date range for the payment request. This cannot be before 6 April 2017.
+                      example: "2017-05-20"
+                    endDate:
+                      type : ISO8601Date
+                      description: The end date of the date range for the payment request. This cannot be in the future, before the startDate, or more than a year after the startDate.
+                      example: "2017-05-20"
+                  responses:
+                      200:
+                        body:
+                          application/json:
+                            type: !include schemas/LISAManager.payment.get.schema.json
+                            example: !include examples/LISAManager.payment.get.json
+                      400:
+                        body:
+                          application/json:
+                            type: !include schemas/ErrorCodes.schema.json
+                            examples:
+                              notOpenStatus:
+                                description: Bad Request
+                                value: |
+                                  {
+                                    "code" : "BAD_REQUEST",
+                                    "message" : "Bad Request"
+                                  }
+                              InvalidLmrn:
+                                description: lisaManagerReferenceNumber in the URL is in the wrong format
+                                value: |
+                                  {
+                                    "code" : "BAD_REQUEST",
+                                    "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
+                                  }
+                              InvalidStartDate:
+                                description: startDate is in the wrong format
+                                value: |
+                                  {
+                                    "code" : "BAD_REQUEST",
+                                    "message" : "startDate is in the wrong format"
+                                  }
+                              InvalidEndDate:
+                                description: endDate is in the wrong format
+                                value: |
+                                  {
+                                    "code" : "BAD_REQUEST",
+                                    "message" : "endDate is in the wrong format"
+                                  }
+                              InvalidStartAndEndDates:
+                                description: startDate and endDate are in the wrong format
+                                value: |
+                                  {
+                                    "code" : "BAD_REQUEST",
+                                    "message" : "startDate and endDate are in the wrong format"
+                                  }
+                      401:
+                        body:
+                          application/json:
+                            type: !include schemas/ErrorCodes.schema.json
+                            examples:
+                              notOpenStatus:
+                                description: lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
+                                value: |
+                                  {
+                                    "code" : "UNAUTHORIZED",
+                                    "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
+                                  }
+                      403:
+                        body:
+                          application/json:
+                            examples:
+                              endDateInFutureStatus:
+                                description: endDate cannot be in the future
+                                value: |
+                                  {
+                                    "code" : "FORBIDDEN",
+                                    "message" : "endDate cannot be in the future"
+                                  }
+                              endDateBeforeStartStatus:
+                                description: endDate cannot be before startDate
+                                value: |
+                                  {
+                                    "code" : "FORBIDDEN",
+                                    "message" : "endDate cannot be before startDate"
+                                  }
+                              startDateBeforeAprilStatus:
+                                description: startDate cannot be before 6 April 2017
+                                value: |
+                                  {
+                                    "code" : "FORBIDDEN",
+                                    "message" : "startDate cannot be before 6 April 2017"
+                                  }
+                              endDateOverYearAfterStatus:
+                                description: endDate cannot be more than a year after startDate
+                                value: |
+                                  {
+                                    "code" : "FORBIDDEN",
+                                    "message" : "endDate cannot be more than a year after startDate"
+                                  }
+                      404:
+                        body:
+                          application/json:
+                            examples:
+                              noPaymentsFound:
+                                description: No bonus payments have been made for this date range
+                                value: |
+                                  {
+                                    "code": "PAYMENT_NOT_FOUND",
+                                    "message": "No bonus payments have been made for this date range"
+                                  }
