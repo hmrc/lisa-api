@@ -87,7 +87,7 @@ trait TransactionService {
           bonusDueForPeriod = Some(bonusPayment.bonuses.bonusDueForPeriod),
           paymentStatus = "Pending",
           paymentDueDate = Some(pending.paymentDueDate),
-          paymentAmount = Some(pending.paymentAmount)
+          paymentAmount = None
         )
       }
       case error: DesFailureResponse => {

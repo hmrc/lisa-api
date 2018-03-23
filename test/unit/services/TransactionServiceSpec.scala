@@ -73,9 +73,7 @@ class TransactionServiceSpec extends PlaySpec
             status = "Paid")))
 
         when(mockDesConnector.getTransaction(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesGetTransactionPending(
-            paymentDueDate = new DateTime("2000-01-01"),
-            paymentAmount = 1.0)))
+          thenReturn(Future.successful(DesGetTransactionPending(new DateTime("2000-01-01"))))
 
         val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
 
@@ -85,7 +83,7 @@ class TransactionServiceSpec extends PlaySpec
           bonusDueForPeriod = Some(1.0),
           paymentStatus = "Pending",
           paymentDueDate = Some(new DateTime("2000-01-01")),
-          paymentAmount = Some(1.0)
+          paymentAmount = None
         )
       }
     }
