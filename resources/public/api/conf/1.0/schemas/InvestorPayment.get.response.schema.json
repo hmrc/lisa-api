@@ -5,6 +5,7 @@
     "transactionId" : {
       "description": "The transactionId for which the payment details have been requested.",
       "type" : "string",
+      "pattern": "^\\d{1,10}$",
       "example": "7777777777"
     },
     "creationDate": {
