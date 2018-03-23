@@ -23,7 +23,6 @@ import uk.gov.hmrc.lisaapi.models.{Amount, JsonReads}
 
 trait DesGetTransactionResponse extends DesResponse
 
-case object DesGetTransactionCancelled extends DesGetTransactionResponse
 case class DesGetTransactionPending(paymentDueDate: DateTime, paymentAmount: Amount) extends DesGetTransactionResponse
 case class DesGetTransactionPaid(paymentDate: DateTime, paymentReference: String, paymentAmount: Amount) extends DesGetTransactionResponse
 
@@ -43,7 +42,6 @@ object DesGetTransactionResponse {
     val status: String = (json \ "status").as[String]
 
     status match {
-      case "Cancelled" => JsSuccess(DesGetTransactionCancelled)
       case "Pending" => pendingReads.reads(json)
       case "Paid" => paidReads.reads(json)
     }

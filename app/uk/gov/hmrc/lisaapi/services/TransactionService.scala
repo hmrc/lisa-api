@@ -90,14 +90,6 @@ trait TransactionService {
           paymentAmount = Some(pending.paymentAmount)
         )
       }
-      case DesGetTransactionCancelled => {
-        GetTransactionSuccessResponse(
-          transactionId = transactionId,
-          creationDate = bonusPayment.creationDate,
-          bonusDueForPeriod = Some(bonusPayment.bonuses.bonusDueForPeriod),
-          status = "Cancelled"
-        )
-      }
       case error: DesFailureResponse => {
         Logger.debug(s"Error from ETMP: ${error.code}")
 

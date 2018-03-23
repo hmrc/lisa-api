@@ -857,23 +857,6 @@ class DesConnectorSpec extends PlaySpec
           )
         }
       }
-      "the DES response is a valid Cancelled transaction" in {
-        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                responseStatus = OK,
-                responseJson = Some(Json.parse("""{
-                                                 |    "status": "Cancelled"
-                                                 |}""".stripMargin))
-              )
-            )
-          )
-
-        doRetrieveTransactionRequest { response =>
-          response mustBe DesGetTransactionCancelled
-        }
-      }
       "the DES response is a valid Paid transaction" in {
         when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
           .thenReturn(
