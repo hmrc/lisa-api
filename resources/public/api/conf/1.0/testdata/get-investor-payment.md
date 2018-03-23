@@ -48,8 +48,7 @@
 						    "creationDate": "2017-05-20",<br>
 						    "bonusDueForPeriod": 1000,<br>
 						    "paymentStatus": "Pending",<br>
-						    "paymentDueDate": "2017-06-20",<br>
-						    "paymentAmount": 1000<br>
+						    "paymentDueDate": "2017-06-20"
 						}
                 </p>
             </td>
