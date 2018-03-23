@@ -19,7 +19,7 @@
       "description":"The date the payment is due.",
       "$ref": "#/definitions/ISO8601-Date"
     },
-    "status" : {
+    "paymentStatus" : {
       "description": "The status of the payment for a transaction.",
       "type" : "string",
       "enum": [

@@ -45,7 +45,7 @@ trait TransactionService {
               transactionId = transactionId,
               creationDate = bonus.creationDate,
               bonusDueForPeriod = Some(bonus.bonuses.bonusDueForPeriod),
-              status = bonus.status
+              paymentStatus = bonus.status
             ))
           }
           case _ => {
@@ -74,7 +74,7 @@ trait TransactionService {
           transactionId = transactionId,
           creationDate = bonusPayment.creationDate,
           bonusDueForPeriod = Some(bonusPayment.bonuses.bonusDueForPeriod),
-          status = "Paid",
+          paymentStatus = "Paid",
           paymentDate = Some(paid.paymentDate),
           paymentAmount = Some(paid.paymentAmount),
           paymentReference = Some(paid.paymentReference)
@@ -85,7 +85,7 @@ trait TransactionService {
           transactionId = transactionId,
           creationDate = bonusPayment.creationDate,
           bonusDueForPeriod = Some(bonusPayment.bonuses.bonusDueForPeriod),
-          status = "Pending",
+          paymentStatus = "Pending",
           paymentDueDate = Some(pending.paymentDueDate),
           paymentAmount = Some(pending.paymentAmount)
         )

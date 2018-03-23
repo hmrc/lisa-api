@@ -18,7 +18,7 @@
 					     "transactionId": "1234567890",<br>
 					     "creationDate": "2017-05-20",<br>
 					     "bonusDueForPeriod": 1000,<br>
-					     "status": "Paid",<br>
+					     "paymentStatus": "Paid",<br>
 					     "paymentDate": "2017-05-20",<br>
 					     "paymentReference": "002630000993",<br>
 					     "paymentAmount": 1000<br>
@@ -34,7 +34,7 @@
 						     "transactionId": "0000000200",<br>
 						     "creationDate": "2017-05-20",<br>
 						     "bonusDueForPeriod": 1000,<br>
-						     "status": "Pending"<br>
+						     "paymentStatus": "Pending"<br>
 						}
                 </p>
             </td>
@@ -47,7 +47,7 @@
 						    "transactionId": "3000000200",<br>
 						    "creationDate": "2017-05-20",<br>
 						    "bonusDueForPeriod": 1000,<br>
-						    "status": "Pending",<br>
+						    "paymentStatus": "Pending",<br>
 						    "paymentDueDate": "2017-06-20",<br>
 						    "paymentAmount": 1000<br>
 						}
@@ -62,7 +62,7 @@
 						    "transactionId": "1000000200",<br>
 						    "creationDate": "2017-05-20",<br>
 						    "bonusDueForPeriod": 1000,<br>
-						    "status": "Cancelled",<br>						}
+						    "paymentStatus": "Cancelled",<br>						}
                 </p>
             </td>
         </tr>

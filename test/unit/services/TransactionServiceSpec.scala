@@ -57,7 +57,7 @@ class TransactionServiceSpec extends PlaySpec
           transactionId = "12345",
           creationDate = new DateTime("2000-01-01"),
           bonusDueForPeriod = Some(1.0),
-          status = "Pending"
+          paymentStatus = "Pending"
         )
       }
       "ITMP returns a Paid status and ETMP returns a Pending status" in {
@@ -83,7 +83,7 @@ class TransactionServiceSpec extends PlaySpec
           transactionId = "12345",
           creationDate = new DateTime("2000-01-01"),
           bonusDueForPeriod = Some(1.0),
-          status = "Pending",
+          paymentStatus = "Pending",
           paymentDueDate = Some(new DateTime("2000-01-01")),
           paymentAmount = Some(1.0)
         )
@@ -109,7 +109,7 @@ class TransactionServiceSpec extends PlaySpec
           transactionId = "12345",
           creationDate = new DateTime("2000-01-01"),
           bonusDueForPeriod = Some(1.0),
-          status = "Cancelled"
+          paymentStatus = "Cancelled"
         )
       }
     }
@@ -139,7 +139,7 @@ class TransactionServiceSpec extends PlaySpec
           transactionId = "12345",
           creationDate = new DateTime("2000-01-01"),
           bonusDueForPeriod = Some(1.0),
-          status = "Paid",
+          paymentStatus = "Paid",
           paymentDate = Some(new DateTime("2000-01-01")),
           paymentReference = Some("002630000993"),
           paymentAmount = Some(1.0)
