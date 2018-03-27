@@ -27,7 +27,6 @@ case object GetTransactionTransactionNotFoundResponse extends GetTransactionResp
 case object GetTransactionAccountNotFoundResponse extends GetTransactionResponse
 
 case class GetTransactionSuccessResponse(transactionId: String,
-                                         creationDate: DateTime,
                                          paymentStatus: String,
                                          bonusDueForPeriod: Option[Amount] = None,
                                          paymentDate: Option[DateTime] = None,
@@ -40,7 +39,6 @@ object GetTransactionResponse {
 
   implicit val successWrites: Writes[GetTransactionSuccessResponse] = (
     (JsPath \ "transactionId").write[String] and
-    (JsPath \ "creationDate").write[String].contramap[DateTime](d => d.toString(dateFormat)) and
     (JsPath \ "paymentStatus").write[String] and
     (JsPath \ "bonusDueForPeriod").writeNullable[Amount] and
     (JsPath \ "paymentDate").writeNullable[String].contramap[Option[DateTime]](d => d.map(v => v.toString(dateFormat))) and

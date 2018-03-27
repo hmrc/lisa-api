@@ -16,7 +16,6 @@
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
                 <p class ="code--block">{<br>
 					     "transactionId": "1234567890",<br>
-					     "creationDate": "2017-05-20",<br>
 					     "bonusDueForPeriod": 1000,<br>
 					     "paymentStatus": "Paid",<br>
 					     "paymentDate": "2017-05-20",<br>
@@ -32,7 +31,6 @@
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
                 <p class ="code--block">{<br>
 						     "transactionId": "0000000200",<br>
-						     "creationDate": "2017-05-20",<br>
 						     "bonusDueForPeriod": 1000,<br>
 						     "paymentStatus": "Pending"<br>
 						}
@@ -45,7 +43,6 @@
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
                 <p class ="code--block">{<br>
 						    "transactionId": "3000000200",<br>
-						    "creationDate": "2017-05-20",<br>
 						    "bonusDueForPeriod": 1000,<br>
 						    "paymentStatus": "Pending",<br>
 						    "paymentDueDate": "2017-06-20"
@@ -59,7 +56,6 @@
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
                 <p class ="code--block">{<br>
 						    "transactionId": "1000000200",<br>
-						    "creationDate": "2017-05-20",<br>
 						    "bonusDueForPeriod": 1000,<br>
 						    "paymentStatus": "Cancelled",<br>						}
                 </p>
@@ -71,7 +67,6 @@
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
                 <p class ="code--block">{<br>
 						    "transactionId": "2000000200",<br>
-						    "creationDate": "2017-05-20",<br>
 						    "bonusDueForPeriod": 1000,<br>
 						    "paymentStatus": "Void",<br>						}
                 </p>

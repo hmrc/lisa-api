@@ -43,7 +43,6 @@ trait TransactionService {
 
             Future.successful(GetTransactionSuccessResponse(
               transactionId = transactionId,
-              creationDate = bonus.creationDate,
               bonusDueForPeriod = Some(bonus.bonuses.bonusDueForPeriod),
               paymentStatus = bonus.status
             ))
@@ -72,7 +71,6 @@ trait TransactionService {
       case paid: DesGetTransactionPaid => {
         GetTransactionSuccessResponse(
           transactionId = transactionId,
-          creationDate = bonusPayment.creationDate,
           bonusDueForPeriod = Some(bonusPayment.bonuses.bonusDueForPeriod),
           paymentStatus = "Paid",
           paymentDate = Some(paid.paymentDate),
@@ -83,7 +81,6 @@ trait TransactionService {
       case pending: DesGetTransactionPending => {
         GetTransactionSuccessResponse(
           transactionId = transactionId,
-          creationDate = bonusPayment.creationDate,
           bonusDueForPeriod = Some(bonusPayment.bonuses.bonusDueForPeriod),
           paymentStatus = "Pending",
           paymentDueDate = Some(pending.paymentDueDate),

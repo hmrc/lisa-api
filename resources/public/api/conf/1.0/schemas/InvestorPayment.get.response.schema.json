@@ -8,10 +8,6 @@
       "pattern": "^\\d{1,10}$",
       "example": "7777777777"
     },
-    "creationDate": {
-      "description":"The date the transaction has been created.",
-      "$ref": "#/definitions/ISO8601-Date"
-    },
     "paymentDate": {
       "description":"The date payment was made.",
       "$ref": "#/definitions/ISO8601-Date"
@@ -51,7 +47,6 @@
   },
   "required": [
      "transactionId",
-     "creationDate",
      "paymentStatus"
   ],
 	"additionalProperties": false,
