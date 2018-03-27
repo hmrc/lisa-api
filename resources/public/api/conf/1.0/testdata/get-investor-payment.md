@@ -66,6 +66,18 @@
             </td>
         </tr>
         <tr>
+            <td><p>Request for a void transaction</p><p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 2000000200</p></td>
+            <td></td>
+            <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
+                <p class ="code--block">{<br>
+						    "transactionId": "2000000200",<br>
+						    "creationDate": "2017-05-20",<br>
+						    "bonusDueForPeriod": 1000,<br>
+						    "paymentStatus": "Void",<br>						}
+                </p>
+            </td>
+        </tr>
+        <tr>
             <td><p>Request with a valid account ID and Transaction ID, but an invalid LISA Manager reference number</p><p class ="code--block">lisaManagerReferenceNumber: 123456<br>accountId: 1234567890<br>transactionId: 1234567890</p></td>
                         <td></td>
             <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
