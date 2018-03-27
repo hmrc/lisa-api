@@ -55,7 +55,6 @@ class TransactionServiceSpec extends PlaySpec
 
         result mustBe GetTransactionSuccessResponse(
           transactionId = "12345",
-          creationDate = new DateTime("2000-01-01"),
           bonusDueForPeriod = Some(1.0),
           paymentStatus = "Pending"
         )
@@ -79,7 +78,6 @@ class TransactionServiceSpec extends PlaySpec
 
         result mustBe GetTransactionSuccessResponse(
           transactionId = "12345",
-          creationDate = new DateTime("2000-01-01"),
           bonusDueForPeriod = Some(1.0),
           paymentStatus = "Pending",
           paymentDueDate = Some(new DateTime("2000-01-01")),
@@ -105,7 +103,6 @@ class TransactionServiceSpec extends PlaySpec
 
         result mustBe GetTransactionSuccessResponse(
           transactionId = "12345",
-          creationDate = new DateTime("2000-01-01"),
           bonusDueForPeriod = Some(1.0),
           paymentStatus = "Cancelled"
         )
@@ -135,7 +132,6 @@ class TransactionServiceSpec extends PlaySpec
 
         result mustBe GetTransactionSuccessResponse(
           transactionId = "12345",
-          creationDate = new DateTime("2000-01-01"),
           bonusDueForPeriod = Some(1.0),
           paymentStatus = "Paid",
           paymentDate = Some(new DateTime("2000-01-01")),
