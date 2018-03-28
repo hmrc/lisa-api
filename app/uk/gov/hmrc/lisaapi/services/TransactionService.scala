@@ -43,9 +43,8 @@ trait TransactionService {
 
             Future.successful(GetTransactionSuccessResponse(
               transactionId = transactionId,
-              creationDate = bonus.creationDate,
               bonusDueForPeriod = Some(bonus.bonuses.bonusDueForPeriod),
-              status = bonus.status
+              paymentStatus = bonus.status
             ))
           }
           case _ => {
@@ -72,9 +71,8 @@ trait TransactionService {
       case paid: DesGetTransactionPaid => {
         GetTransactionSuccessResponse(
           transactionId = transactionId,
-          creationDate = bonusPayment.creationDate,
           bonusDueForPeriod = Some(bonusPayment.bonuses.bonusDueForPeriod),
-          status = "Paid",
+          paymentStatus = "Paid",
           paymentDate = Some(paid.paymentDate),
           paymentAmount = Some(paid.paymentAmount),
           paymentReference = Some(paid.paymentReference)
@@ -83,19 +81,10 @@ trait TransactionService {
       case pending: DesGetTransactionPending => {
         GetTransactionSuccessResponse(
           transactionId = transactionId,
-          creationDate = bonusPayment.creationDate,
           bonusDueForPeriod = Some(bonusPayment.bonuses.bonusDueForPeriod),
-          status = "Pending",
+          paymentStatus = "Pending",
           paymentDueDate = Some(pending.paymentDueDate),
-          paymentAmount = Some(pending.paymentAmount)
-        )
-      }
-      case DesGetTransactionCancelled => {
-        GetTransactionSuccessResponse(
-          transactionId = transactionId,
-          creationDate = bonusPayment.creationDate,
-          bonusDueForPeriod = Some(bonusPayment.bonuses.bonusDueForPeriod),
-          status = "Cancelled"
+          paymentAmount = None
         )
       }
       case error: DesFailureResponse => {

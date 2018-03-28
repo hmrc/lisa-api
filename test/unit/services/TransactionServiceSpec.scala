@@ -55,9 +55,8 @@ class TransactionServiceSpec extends PlaySpec
 
         result mustBe GetTransactionSuccessResponse(
           transactionId = "12345",
-          creationDate = new DateTime("2000-01-01"),
           bonusDueForPeriod = Some(1.0),
-          status = "Pending"
+          paymentStatus = "Pending"
         )
       }
       "ITMP returns a Paid status and ETMP returns a Pending status" in {
@@ -73,19 +72,16 @@ class TransactionServiceSpec extends PlaySpec
             status = "Paid")))
 
         when(mockDesConnector.getTransaction(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesGetTransactionPending(
-            paymentDueDate = new DateTime("2000-01-01"),
-            paymentAmount = 1.0)))
+          thenReturn(Future.successful(DesGetTransactionPending(new DateTime("2000-01-01"))))
 
         val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
 
         result mustBe GetTransactionSuccessResponse(
           transactionId = "12345",
-          creationDate = new DateTime("2000-01-01"),
           bonusDueForPeriod = Some(1.0),
-          status = "Pending",
+          paymentStatus = "Pending",
           paymentDueDate = Some(new DateTime("2000-01-01")),
-          paymentAmount = Some(1.0)
+          paymentAmount = None
         )
       }
     }
@@ -107,33 +103,8 @@ class TransactionServiceSpec extends PlaySpec
 
         result mustBe GetTransactionSuccessResponse(
           transactionId = "12345",
-          creationDate = new DateTime("2000-01-01"),
           bonusDueForPeriod = Some(1.0),
-          status = "Cancelled"
-        )
-      }
-      "ITMP returns a Paid status and ETMP returns a Cancelled status" in {
-        when(mockDesConnector.getBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesGetBonusPaymentResponse(
-            lifeEventId = None,
-            periodStartDate = new DateTime("2001-01-01"),
-            periodEndDate = new DateTime("2002-01-01"),
-            htbTransfer = None,
-            inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
-            bonuses = Bonuses(1.0, 1.0, None, "X"),
-            creationDate = new DateTime("2000-01-01"),
-            status = "Paid")))
-
-        when(mockDesConnector.getTransaction(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesGetTransactionCancelled))
-
-        val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
-
-        result mustBe GetTransactionSuccessResponse(
-          transactionId = "12345",
-          creationDate = new DateTime("2000-01-01"),
-          bonusDueForPeriod = Some(1.0),
-          status = "Cancelled"
+          paymentStatus = "Cancelled"
         )
       }
     }
@@ -161,9 +132,8 @@ class TransactionServiceSpec extends PlaySpec
 
         result mustBe GetTransactionSuccessResponse(
           transactionId = "12345",
-          creationDate = new DateTime("2000-01-01"),
           bonusDueForPeriod = Some(1.0),
-          status = "Paid",
+          paymentStatus = "Paid",
           paymentDate = Some(new DateTime("2000-01-01")),
           paymentReference = Some("002630000993"),
           paymentAmount = Some(1.0)

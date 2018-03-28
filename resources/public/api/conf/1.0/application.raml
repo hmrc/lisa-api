@@ -31,9 +31,11 @@ types:
   LISAManagerReferenceNumberType:
     pattern: "^Z([0-9]{4}|[0-9]{6})$"
   accountIdType:
-    "pattern": "^[a-zA-Z0-9 :/-]{1,20}$"
+    pattern: "^[a-zA-Z0-9 :/-]{1,20}$"
+  transactionIdtype:
+    pattern: "^\\d{1,10}$"
   ISO8601Date:
-    "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+    pattern: "^\\d{4}-\\d{2}-\\d{2}$"
 
 /lifetime-isa:
     /manager:
@@ -884,7 +886,7 @@ types:
                   /{transactionId}:
                     uriParameters:
                       transactionId:
-                        type: string
+                        type: transactionIdtype
                         description: The ID for the transaction.
                         example: "1234567890"
                     get:

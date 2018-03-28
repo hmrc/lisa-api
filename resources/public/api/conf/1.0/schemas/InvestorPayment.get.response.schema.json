@@ -5,11 +5,8 @@
     "transactionId" : {
       "description": "The transactionId for which the payment details have been requested.",
       "type" : "string",
+      "pattern": "^\\d{1,10}$",
       "example": "7777777777"
-    },
-    "creationDate": {
-      "description":"The date the transaction has been created.",
-      "$ref": "#/definitions/ISO8601-Date"
     },
     "paymentDate": {
       "description":"The date payment was made.",
@@ -19,19 +16,21 @@
       "description":"The date the payment is due.",
       "$ref": "#/definitions/ISO8601-Date"
     },
-    "status" : {
+    "paymentStatus" : {
       "description": "The status of the payment for a transaction.",
       "type" : "string",
       "enum": [
         "Paid",
         "Pending",
-        "Cancelled"
+        "Cancelled",
+        "Void"
       ],
       "example": "Paid"
     },
     "paymentReference" : {
       "description": "The reference of the payment made.",
       "type" : "string",
+      "pattern": "^.{1,12}$",
       "example": "12345"
     },
     "paymentAmount" : {
@@ -48,8 +47,7 @@
   },
   "required": [
      "transactionId",
-     "creationDate",
-     "status"
+     "paymentStatus"
   ],
 	"additionalProperties": false,
 	"definitions": {

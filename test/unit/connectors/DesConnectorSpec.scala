@@ -842,9 +842,8 @@ class DesConnectorSpec extends PlaySpec
               HttpResponse(
                 responseStatus = OK,
                 responseJson = Some(Json.parse("""{
-                                                 |    "status": "Pending",
-                                                 |    "paymentDueDate": "2000-01-01",
-                                                 |    "paymentAmount": 1.00
+                                                 |    "paymentStatus": "PENDING",
+                                                 |    "paymentDueDate": "2000-01-01"
                                                  |}""".stripMargin))
               )
             )
@@ -852,26 +851,8 @@ class DesConnectorSpec extends PlaySpec
 
         doRetrieveTransactionRequest { response =>
           response mustBe DesGetTransactionPending(
-            paymentDueDate = new DateTime("2000-01-01"),
-            paymentAmount = 1.0
+            paymentDueDate = new DateTime("2000-01-01")
           )
-        }
-      }
-      "the DES response is a valid Cancelled transaction" in {
-        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                responseStatus = OK,
-                responseJson = Some(Json.parse("""{
-                                                 |    "status": "Cancelled"
-                                                 |}""".stripMargin))
-              )
-            )
-          )
-
-        doRetrieveTransactionRequest { response =>
-          response mustBe DesGetTransactionCancelled
         }
       }
       "the DES response is a valid Paid transaction" in {
@@ -881,7 +862,7 @@ class DesConnectorSpec extends PlaySpec
               HttpResponse(
                 responseStatus = OK,
                 responseJson = Some(Json.parse("""{
-                                                 |    "status": "Paid",
+                                                 |    "paymentStatus": "PAID",
                                                  |    "paymentDate": "2000-01-01",
                                                  |    "paymentReference": "002630000993",
                                                  |    "paymentAmount": 1.00

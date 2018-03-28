@@ -23,15 +23,12 @@ import uk.gov.hmrc.lisaapi.models.{Amount, JsonReads}
 
 trait DesGetTransactionResponse extends DesResponse
 
-case object DesGetTransactionCancelled extends DesGetTransactionResponse
-case class DesGetTransactionPending(paymentDueDate: DateTime, paymentAmount: Amount) extends DesGetTransactionResponse
+case class DesGetTransactionPending(paymentDueDate: DateTime) extends DesGetTransactionResponse
 case class DesGetTransactionPaid(paymentDate: DateTime, paymentReference: String, paymentAmount: Amount) extends DesGetTransactionResponse
 
 object DesGetTransactionResponse {
-  implicit val pendingReads: Reads[DesGetTransactionPending] = (
-    (JsPath \ "paymentDueDate").read(JsonReads.isoDate).map(new DateTime(_)) and
-    (JsPath \ "paymentAmount").read[Amount]
-  )(DesGetTransactionPending.apply _)
+  implicit val pendingReads: Reads[DesGetTransactionPending] = (JsPath \ "paymentDueDate").
+    read(JsonReads.isoDate).map {dateString => DesGetTransactionPending(new DateTime(dateString))}
 
   implicit val paidReads: Reads[DesGetTransactionPaid] = (
     (JsPath \ "paymentDate").read(JsonReads.isoDate).map(new DateTime(_)) and
@@ -40,12 +37,11 @@ object DesGetTransactionResponse {
   )(DesGetTransactionPaid.apply _)
 
   implicit val reads: Reads[DesGetTransactionResponse] = Reads[DesGetTransactionResponse] { json =>
-    val status: String = (json \ "status").as[String]
+    val status: String = (json \ "paymentStatus").as[String]
 
     status match {
-      case "Cancelled" => JsSuccess(DesGetTransactionCancelled)
-      case "Pending" => pendingReads.reads(json)
-      case "Paid" => paidReads.reads(json)
+      case "PENDING" => pendingReads.reads(json)
+      case "PAID" => paidReads.reads(json)
     }
   }
 }
