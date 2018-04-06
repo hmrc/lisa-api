@@ -299,7 +299,7 @@ trait DesConnector extends ServicesConfig {
       case Success(data) =>
         (res.status, data)
       case Failure(er) =>
-        if (res.status == 200) {
+        if (res.status == 200 | res.status == 201) {
           Logger.error(s"Error from DES (parsing as DesResponse): ${er.getMessage}")
         }
 
