@@ -26,9 +26,48 @@ trait GetBulkPaymentResponse extends DesResponse
 case object GetBulkPaymentNotFoundResponse extends GetBulkPaymentResponse
 case object GetBulkPaymentErrorResponse extends GetBulkPaymentResponse
 
-case class BulkPayment(paymentDate: DateTime,
-                       paymentReference: String,
-                       paymentAmount: Amount)
+trait BulkPayment
+case class BulkPaymentPaid(paymentAmount: Amount, paymentDate: DateTime, paymentReference: String) extends BulkPayment
+case class BulkPaymentPending(paymentAmount: Amount, dueDate: DateTime) extends BulkPayment
+object BulkPayment {
+  implicit val bpPaidReads: Reads[BulkPaymentPaid] = (
+    (JsPath \ "clearedAmount").read[Amount] and
+    (JsPath \ "items" \ 0 \ "clearingDate").read(JsonReads.isoDate).map(new DateTime(_)) and
+    (JsPath \ "sapDocumentNumber").read[String]
+  )((amount, date, ref) => BulkPaymentPaid.apply(amount.abs, date, ref))
+
+  implicit val bpPaidWrites: Writes[BulkPaymentPaid] = (
+    (JsPath \ "paymentAmount").write[Amount] and
+    (JsPath \ "paymentDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
+    (JsPath \ "paymentReference").write[String]
+  )(unlift(BulkPaymentPaid.unapply))
+
+  implicit val bpPendingReads: Reads[BulkPaymentPending] = (
+    (JsPath \ "outstandingAmount").read[Amount] and
+    (JsPath \ "items" \ 0 \ "dueDate").read(JsonReads.isoDate).map(new DateTime(_))
+  )((amount, date) => BulkPaymentPending.apply(amount.abs, date))
+
+  implicit val bpPendingWrites: Writes[BulkPaymentPending] = (
+    (JsPath \ "paymentAmount").write[Amount] and
+    (JsPath \ "dueDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd"))
+  )(unlift(BulkPaymentPending.unapply))
+
+  implicit val bpReads: Reads[BulkPayment] = Reads[BulkPayment] { json =>
+    val clearingDate = (json \ "items" \ 0 \ "clearingDate").asOpt[String]
+
+    clearingDate match {
+      case Some(_) => bpPaidReads.reads(json)
+      case _ => bpPendingReads.reads(json)
+    }
+  }
+
+  implicit val bpWrites: Writes[BulkPayment] = Writes[BulkPayment] { bp =>
+    bp match {
+      case paid: BulkPaymentPaid => bpPaidWrites.writes(paid)
+      case pending: BulkPaymentPending => bpPendingWrites.writes(pending)
+    }
+  }
+}
 
 case class GetBulkPaymentSuccessResponse(lisaManagerReferenceNumber: LisaManagerReferenceNumber,
                                          payments: List[BulkPayment]
@@ -36,36 +75,10 @@ case class GetBulkPaymentSuccessResponse(lisaManagerReferenceNumber: LisaManager
 
 object GetBulkPaymentResponse {
 
-  implicit val bpReads: Reads[BulkPayment] = (
-    (JsPath \ "clearingDate").read(JsonReads.isoDate).map(new DateTime(_)) and
-    (JsPath \ "paymentReference").read[String] and
-    (JsPath \ "paymentAmount").read[Amount]
-  )(BulkPayment.apply _)
-
-  implicit val bpWrites: Writes[BulkPayment] = (
-    (JsPath \ "paymentDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
-    (JsPath \ "paymentReference").write[String] and
-    (JsPath \ "paymentAmount").write[Amount]
-  )(unlift(BulkPayment.unapply))
-
   implicit val successReads: Reads[GetBulkPaymentSuccessResponse] = (
     (JsPath \ "idNumber").read(JsonReads.lmrn) and
-    (JsPath \ "financialTransactions").read[List[JsValue]]
-  )(
-    (lmrn, transactions) =>
-      GetBulkPaymentSuccessResponse(
-        lmrn,
-        transactions.
-          flatMap(transaction =>
-            (transaction \ "items").
-              as[List[JsValue]].map(ob =>
-                ob.asOpt[BulkPayment]
-              ).
-              filter(_.isDefined).
-              map(_.get)
-          )
-      )
-  )
+    (JsPath \ "financialTransactions").read[List[BulkPayment]]
+  )(GetBulkPaymentSuccessResponse.apply _)
 
   implicit val successWrites: Writes[GetBulkPaymentSuccessResponse] = Json.writes[GetBulkPaymentSuccessResponse]
 

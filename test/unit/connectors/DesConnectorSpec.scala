@@ -946,25 +946,19 @@ class DesConnectorSpec extends PlaySpec
                                         |    "idNumber": "Z5555",
                                         |    "financialTransactions": [
                                         |      {
+                                        |        "clearedAmount": -1000,
+                                        |        "sapDocumentNumber": "ABC123456789",
                                         |        "items": [
                                         |          {
-                                        |            "clearingDate": "2017-06-01",
-                                        |            "paymentReference": "1234",
-                                        |            "paymentAmount": "1200.00"
-                                        |          },
-                                        |          {
-                                        |            "clearingDate": "2017-06-02",
-                                        |            "paymentReference": "1357",
-                                        |            "paymentAmount": "2050.40"
+                                        |            "clearingDate": "2017-06-01"
                                         |          }
                                         |        ]
                                         |      },
                                         |      {
+                                        |        "outstandingAmount": -1500.55,
                                         |        "items": [
                                         |          {
-                                        |            "clearingDate": "2017-07-01",
-                                        |            "paymentReference": "5678",
-                                        |            "paymentAmount": "5520.55"
+                                        |            "dueDate": "2017-07-01"
                                         |          }
                                         |        ]
                                         |      }
@@ -985,203 +979,9 @@ class DesConnectorSpec extends PlaySpec
           response mustBe GetBulkPaymentSuccessResponse(
             lisaManagerReferenceNumber = "Z5555",
             payments = List(
-              BulkPayment(paymentDate = new DateTime("2017-06-01"), paymentReference = "1234", paymentAmount = 1200.0),
-              BulkPayment(paymentDate = new DateTime("2017-06-02"), paymentReference = "1357", paymentAmount = 2050.4),
-              BulkPayment(paymentDate = new DateTime("2017-07-01"), paymentReference = "5678", paymentAmount = 5520.55)
+              BulkPaymentPaid(paymentDate = new DateTime("2017-06-01"), paymentReference = "ABC123456789", paymentAmount = 1000.00),
+              BulkPaymentPending(dueDate = new DateTime("2017-07-01"), paymentAmount = 1500.55)
             )
-          )
-        }
-      }
-      "the DES response has no financial transactions data" in {
-        val responseJson = Json.parse("""{
-                                        |    "processingDate": "2017-03-07T09:30:00.000Z",
-                                        |    "idNumber": "Z5555",
-                                        |    "financialTransactions": []
-                                        |}""".stripMargin)
-
-        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                responseStatus = OK,
-                responseJson = Some(responseJson)
-              )
-            )
-          )
-
-        doRetrieveBulkPaymentRequest { response =>
-          response mustBe GetBulkPaymentSuccessResponse(
-            lisaManagerReferenceNumber = "Z5555",
-            payments = Nil
-          )
-        }
-      }
-      "the DES response has no items in all of its financial transactions" in {
-        val responseJson = Json.parse("""{
-                                        |    "processingDate": "2017-03-07T09:30:00.000Z",
-                                        |    "idNumber": "Z5555",
-                                        |    "financialTransactions": [
-                                        |      {
-                                        |        "items": []
-                                        |      },
-                                        |      {
-                                        |        "items": []
-                                        |      }
-                                        |    ]
-                                        |}""".stripMargin)
-
-        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                responseStatus = OK,
-                responseJson = Some(responseJson)
-              )
-            )
-          )
-
-        doRetrieveBulkPaymentRequest { response =>
-          response mustBe GetBulkPaymentSuccessResponse(
-            lisaManagerReferenceNumber = "Z5555",
-            payments = Nil
-          )
-        }
-      }
-      "the DES response has no items in some of its financial transactions" in {
-        val responseJson = Json.parse("""{
-                                        |    "processingDate": "2017-03-07T09:30:00.000Z",
-                                        |    "idNumber": "Z5555",
-                                        |    "financialTransactions": [
-                                        |      {
-                                        |        "items": [
-                                        |          {
-                                        |            "clearingDate": "2017-06-02",
-                                        |            "paymentReference": "1357",
-                                        |            "paymentAmount": "2050.40"
-                                        |          },
-                                        |          {
-                                        |            "clearingDate": "2017-06-03",
-                                        |            "paymentReference": "1468",
-                                        |            "paymentAmount": "2050.40"
-                                        |          }
-                                        |        ]
-                                        |      },
-                                        |      {
-                                        |        "items": []
-                                        |      }
-                                        |    ]
-                                        |}""".stripMargin)
-
-        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                responseStatus = OK,
-                responseJson = Some(responseJson)
-              )
-            )
-          )
-
-        doRetrieveBulkPaymentRequest { response =>
-          response mustBe GetBulkPaymentSuccessResponse(
-            lisaManagerReferenceNumber = "Z5555",
-            payments = List(
-              BulkPayment(paymentDate = new DateTime("2017-06-02"), paymentReference = "1357", paymentAmount = 2050.4),
-              BulkPayment(paymentDate = new DateTime("2017-06-03"), paymentReference = "1468", paymentAmount = 2050.4)
-            )
-          )
-        }
-      }
-      "the DES response has some partially complete payment details" in {
-        val responseJson = Json.parse("""{
-                                        |    "processingDate": "2017-03-07T09:30:00.000Z",
-                                        |    "idNumber": "Z5555",
-                                        |    "financialTransactions": [
-                                        |      {
-                                        |        "items": [
-                                        |          {
-                                        |            "clearingDate": "2017-06-02",
-                                        |            "paymentReference": "1357",
-                                        |            "paymentAmount": "2050.40"
-                                        |          },
-                                        |          {
-                                        |            "clearingDate": "2017-06-03",
-                                        |            "paymentReference": "1468",
-                                        |            "paymentAmount": "2050.40"
-                                        |          }
-                                        |        ]
-                                        |      },
-                                        |      {
-                                        |        "items": [
-                                        |          {
-                                        |            "clearingDate": "2017-06-04"
-                                        |          }
-                                        |        ]
-                                        |      }
-                                        |    ]
-                                        |}""".stripMargin)
-
-        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                responseStatus = OK,
-                responseJson = Some(responseJson)
-              )
-            )
-          )
-
-        doRetrieveBulkPaymentRequest { response =>
-          response mustBe GetBulkPaymentSuccessResponse(
-            lisaManagerReferenceNumber = "Z5555",
-            payments = List(
-              BulkPayment(paymentDate = new DateTime("2017-06-02"), paymentReference = "1357", paymentAmount = 2050.4),
-              BulkPayment(paymentDate = new DateTime("2017-06-03"), paymentReference = "1468", paymentAmount = 2050.4)
-            )
-          )
-        }
-      }
-      "the DES response has only partially complete payment details" in {
-        val responseJson = Json.parse("""{
-                                        |    "processingDate": "2017-03-07T09:30:00.000Z",
-                                        |    "idNumber": "Z5555",
-                                        |    "financialTransactions": [
-                                        |      {
-                                        |        "items": [
-                                        |          {
-                                        |            "paymentReference": "1357",
-                                        |            "paymentAmount": "2050.40"
-                                        |          },
-                                        |          {
-                                        |            "clearingDate": "2017-06-03",
-                                        |            "paymentAmount": "2050.40"
-                                        |          }
-                                        |        ]
-                                        |      },
-                                        |      {
-                                        |        "items": [
-                                        |          {
-                                        |            "clearingDate": "2017-06-02"
-                                        |          }
-                                        |        ]
-                                        |      }
-                                        |    ]
-                                        |}""".stripMargin)
-
-        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                responseStatus = OK,
-                responseJson = Some(responseJson)
-              )
-            )
-          )
-
-        doRetrieveBulkPaymentRequest { response =>
-          response mustBe GetBulkPaymentSuccessResponse(
-            lisaManagerReferenceNumber = "Z5555",
-            payments = Nil
           )
         }
       }

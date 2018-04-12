@@ -276,7 +276,8 @@ trait DesConnector extends ServicesConfig {
                     (implicit hc:HeaderCarrier): Future[DesResponse] = {
     val uri = s"$desUrl/enterprise/financial-data/ZISA/$lisaManager/LISA" +
       s"?dateFrom=${startDate.toString("yyyy-MM-dd")}" +
-      s"&dateTo=${endDate.toString("yyyy-MM-dd")}"
+      s"&dateTo=${endDate.toString("yyyy-MM-dd")}" +
+      "onlyOpenItems=false"
 
     Logger.debug("Getting Bulk payment details from des: " + uri)
 

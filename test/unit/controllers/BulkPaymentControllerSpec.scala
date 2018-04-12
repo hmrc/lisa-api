@@ -68,9 +68,9 @@ class BulkPaymentControllerSpec extends PlaySpec
         val json = contentAsJson(result)
 
         (json \ "lisaManagerReferenceNumber").as[String] mustBe lmrn
-        (json \ "payments" \ 0 \ "paymentAmount").as[Amount] mustBe successResponse.payments(0).paymentAmount
-        (json \ "payments" \ 0 \ "paymentDate").as[String] mustBe successResponse.payments(0).paymentDate.toString("yyyy-MM-dd")
-        (json \ "payments" \ 0 \ "paymentReference").as[String] mustBe successResponse.payments(0).paymentReference
+        (json \ "payments" \ 0 \ "paymentAmount").as[Amount] mustBe successResponse.payments(0).asInstanceOf[BulkPaymentPaid].paymentAmount
+        (json \ "payments" \ 0 \ "paymentDate").as[String] mustBe successResponse.payments(0).asInstanceOf[BulkPaymentPaid].paymentDate.toString("yyyy-MM-dd")
+        (json \ "payments" \ 0 \ "paymentReference").as[String] mustBe successResponse.payments(0).asInstanceOf[BulkPaymentPaid].paymentReference
       }
     }
 
@@ -209,7 +209,10 @@ class BulkPaymentControllerSpec extends PlaySpec
 
   val successResponse: GetBulkPaymentSuccessResponse = GetBulkPaymentSuccessResponse(
     lmrn,
-    List(BulkPayment(new DateTime("2018-01-01"), "123", 75.15))
+    List(
+      BulkPaymentPaid(75.15, new DateTime("2018-01-01"), "123"),
+      BulkPaymentPending(100.0, new DateTime("2018-02-02"))
+    )
   )
 
   val mockService: BulkPaymentService = mock[BulkPaymentService]
