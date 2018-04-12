@@ -7,31 +7,55 @@
       "$ref": "#/definitions/LISAManagerReferenceNumberType"
     },
     "payments": {
-      "description": "Payments made by HMRC in the specific date range.",
+      "description": "Payments made by or due from HMRC in the specific date range.",
       "type": "array",
       "min": 1,
       "items": {
         "type": "object",
-        "properties": {
-          "paymentReference": {
-            "description": "Payment reference number.",
-            "$ref": "#/definitions/PaymentRefType"
+        "oneOf": [
+          {
+            "description": "Paid payment",
+            "properties": {
+              "paymentReference": {
+                "description": "Payment reference number.",
+                "$ref": "#/definitions/PaymentRefType"
+              },
+              "paymentAmount": {
+                "description": "Amount paid to the LISA provider.",
+                "type": "number",
+                "example": "23456.00"
+              },
+              "paymentDate": {
+                "description": "Date the payment was made.",
+                "$ref": "#/definitions/ISO8601-Date"
+              }
+            },
+            "required": [
+              "paymentReference",
+              "paymentAmount",
+              "paymentDate"
+            ],
+            "additionalProperties": false
           },
-          "paymentAmount": {
-            "description": "Amount paid to the LISA provider.",
-            "type": "number",
-            "example": "23456.00"
-          },
-          "paymentDate": {
-            "description": "Date the payment was made.",
-            "$ref": "#/definitions/ISO8601-Date"
+          {
+            "description": "Pending payment",
+            "properties": {
+              "paymentAmount": {
+                "description": "Amount paid to the LISA provider.",
+                "type": "number",
+                "example": "23456.00"
+              },
+              "dueDate": {
+                "description": "Date the payment was made.",
+                "$ref": "#/definitions/ISO8601-Date"
+              }
+            },
+            "required": [
+              "paymentAmount",
+              "dueDate"
+            ],
+            "additionalProperties": false
           }
-        },
-        "required" :
-        [
-          "paymentReference",
-          "paymentAmount",
-          "paymentDate"
         ]
       }
     }
@@ -43,7 +67,7 @@
   "additionalProperties": false,
   "definitions": {
     "LISAManagerReferenceNumberType": {
-      "type" : "string",
+      "type": "string",
       "pattern": "^Z([0-9]{4}|[0-9]{6})$",
       "example": "Z1234"
     },

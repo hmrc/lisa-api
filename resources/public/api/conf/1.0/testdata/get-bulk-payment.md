@@ -22,20 +22,19 @@
             <td></td>
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
                 <p class ="code--block">{<br>
-                        "lisaManagerReferenceNumber": "Z123456",<br>
-                        "payments": [<br>
-                            {<br>
-                                "paymentDate": "2017-06-01",<br>
-                                "paymentReference": "a",<br>
-                                "paymentAmount": 10000<br>
-                            },<br>
-                            {<br>
-                                "paymentDate": "2017-07-04",<br>
-                                "paymentReference": "b",<br>
-                                "paymentAmount": 12000<br>
-                            }<br>
-                        ]<br>
-                    }
+                                          "lisaManagerReferenceNumber": "Z123456",<br>
+                                          "payments": [<br>
+                                            {<br>
+                                              "paymentAmount": 10000,<br>
+                                              "paymentDate": "2017-06-01",<br>
+                                              "paymentReference": "1040000872"<br>
+                                            },<br>
+                                            {<br>
+                                              "paymentAmount": 12000,<br>
+                                              "dueDate": "2017-07-04"<br>
+                                            }<br>
+                                          ]<br>
+                                        }
                 </p>
             </td>
         </tr>
