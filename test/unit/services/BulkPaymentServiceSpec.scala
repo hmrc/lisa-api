@@ -39,7 +39,7 @@ class BulkPaymentServiceSpec extends PlaySpec
     "return payments" when {
       "the connector passes a success message with some payments" in {
         val successResponse = GetBulkPaymentSuccessResponse(lmrn, List(
-          BulkPayment(date, "12345", 950.25)
+          BulkPaymentPaid(950.2, date, "12345")
         ))
 
         when(mockDesConnector.getBulkPayment(any(), any(), any())(any())).

@@ -7,32 +7,34 @@
       "$ref": "#/definitions/LISAManagerReferenceNumberType"
     },
     "payments": {
-      "description": "Payments made by HMRC in the specific date range.",
+      "description": "Payments made by or due from HMRC in the specific date range.",
       "type": "array",
       "min": 1,
       "items": {
         "type": "object",
         "properties": {
-          "paymentReference": {
-            "description": "Payment reference number.",
-            "$ref": "#/definitions/PaymentRefType"
-          },
           "paymentAmount": {
-            "description": "Amount paid to the LISA provider.",
+            "description": "Amount paid or due to be paid to the LISA provider.",
             "type": "number",
             "example": "23456.00"
           },
+          "paymentReference": {
+            "description": "Payment reference number. Will be returned only for a paid payment.",
+            "$ref": "#/definitions/PaymentRefType"
+          },
           "paymentDate": {
-            "description": "Date the payment was made.",
+            "description": "Date the payment was made. Will be returned only for a paid payment.",
+            "$ref": "#/definitions/ISO8601-Date"
+          },
+          "dueDate": {
+            "description": "Date the payment is due to be paid on. Will be returned only for a pending payment.",
             "$ref": "#/definitions/ISO8601-Date"
           }
         },
-        "required" :
-        [
-          "paymentReference",
-          "paymentAmount",
-          "paymentDate"
-        ]
+        "required": [
+          "paymentAmount"
+        ],
+        "additionalProperties": false
       }
     }
   },
@@ -43,7 +45,7 @@
   "additionalProperties": false,
   "definitions": {
     "LISAManagerReferenceNumberType": {
-      "type" : "string",
+      "type": "string",
       "pattern": "^Z([0-9]{4}|[0-9]{6})$",
       "example": "Z1234"
     },
