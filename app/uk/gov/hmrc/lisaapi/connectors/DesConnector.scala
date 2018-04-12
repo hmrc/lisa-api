@@ -277,7 +277,7 @@ trait DesConnector extends ServicesConfig {
     val uri = s"$desUrl/enterprise/financial-data/ZISA/$lisaManager/LISA" +
       s"?dateFrom=${startDate.toString("yyyy-MM-dd")}" +
       s"&dateTo=${endDate.toString("yyyy-MM-dd")}" +
-      "onlyOpenItems=false"
+      "&onlyOpenItems=false"
 
     Logger.debug("Getting Bulk payment details from des: " + uri)
 
