@@ -60,14 +60,17 @@ trait DesConnector extends ServicesConfig {
     * @return A tuple of the http status code and an (optional) data response
     */
   def createInvestor(lisaManager: String, request: CreateLisaInvestorRequest)
-                    (implicit hc: HeaderCarrier): Future[(Int, DesResponse)] = {
+                    (implicit hc: HeaderCarrier): Future[DesResponse] = {
     val uri = s"$lisaServiceUrl/$lisaManager/investors"
     Logger.debug("Posting Create Investor request to des: " + uri)
     val result = httpPost.POST[CreateLisaInvestorRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
 
     result.map(res => {
       Logger.debug("Create Investor request returned status: " + res.status)
-      parseDesResponse[DesCreateInvestorResponse](res)
+      res.status match {
+        case 409 => parseDesResponse[CreateLisaInvestorAlreadyExistsResponse](res)
+        case _ => parseDesResponse[CreateLisaInvestorSuccessResponse](res)
+      }
     })
   }
 
@@ -84,7 +87,7 @@ trait DesConnector extends ServicesConfig {
       Logger.debug("Create Account request returned status: " + res.status)
       res.status match {
         case 201 => DesAccountResponse(request.accountId)
-        case _ => parseDesResponse[DesFailureResponse](res)._2
+        case _ => parseDesResponse[DesFailureResponse](res)
       }
     })
   }
@@ -101,7 +104,7 @@ trait DesConnector extends ServicesConfig {
 
     result.map(res => {
       Logger.debug("Get Account request returned status: " + res.status)
-      parseDesResponse[GetLisaAccountSuccessResponse](res)._2 match {
+      parseDesResponse[GetLisaAccountSuccessResponse](res) match {
         case success: GetLisaAccountSuccessResponse => success.copy(accountId = accountId)
         case fail: DesResponse => fail
       }
@@ -117,11 +120,11 @@ trait DesConnector extends ServicesConfig {
     Logger.debug("Reinstate Account request returned status: " + uri)
 
     val result = httpPut.PUT[JsValue,HttpResponse](uri,Json.toJson(""))(implicitly,httpReads, updateHeaderCarrierWithAllDesHeaders(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
-    result.map(r => {
-      Logger.debug("Reinstate Account request returned status: " + r.status)
-      r.status match {
-        case 200 => parseDesResponse[DesReinstateAccountSuccessResponse](r)._2
-        case _ => parseDesResponse[DesFailureResponse](r)._2
+    result.map(res => {
+      Logger.debug("Reinstate Account request returned status: " + res.status)
+      res.status match {
+        case 200 => parseDesResponse[DesReinstateAccountSuccessResponse](res)
+        case _ => parseDesResponse[DesFailureResponse](res)
       }
     })
   }
@@ -139,7 +142,7 @@ trait DesConnector extends ServicesConfig {
       Logger.debug("Create Transfer request returned status: " + res.status)
       res.status match {
         case 201 => DesAccountResponse(request.accountId)
-        case _ => parseDesResponse[DesFailureResponse](res)._2
+        case _ => parseDesResponse[DesFailureResponse](res)
       }
     })
   }
@@ -155,11 +158,11 @@ trait DesConnector extends ServicesConfig {
     Logger.debug("Posting Close Account request to des: " + uri)
     val result = httpPost.POST[CloseLisaAccountRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
 
-    result.map(r => {
-      Logger.debug("Close Account request returned status: " + r.status)
-      r.status match {
+    result.map(res => {
+      Logger.debug("Close Account request returned status: " + res.status)
+      res.status match {
         case 200 => DesEmptySuccessResponse
-        case _ => parseDesResponse[DesFailureResponse](r)._2
+        case _ => parseDesResponse[DesFailureResponse](res)
       }
     })
   }
@@ -178,9 +181,9 @@ trait DesConnector extends ServicesConfig {
       Logger.debug("Life Event request returned status: " + res.status)
       res.status match {
         case 409 => {
-          parseDesResponse[DesLifeEventExistResponse](res)._2
+          parseDesResponse[DesLifeEventExistResponse](res)
         }
-        case _ => parseDesResponse[DesLifeEventResponse](res)._2
+        case _ => parseDesResponse[DesLifeEventResponse](res)
       }
 
     })
@@ -199,8 +202,8 @@ trait DesConnector extends ServicesConfig {
     result.map(res => {
       Logger.debug("Update first subscription date request returned status: " + res.status)
       res.status match {
-        case 200 => parseDesResponse[DesUpdateSubscriptionSuccessResponse](res)._2
-        case _ => parseDesResponse[DesFailureResponse](res)._2
+        case 200 => parseDesResponse[DesUpdateSubscriptionSuccessResponse](res)
+        case _ => parseDesResponse[DesFailureResponse](res)
       }
 
     })
@@ -218,7 +221,7 @@ trait DesConnector extends ServicesConfig {
 
     result.map(res => {
       Logger.debug("Get Life Event request returned status: " + res.status)
-      parseDesResponse[DesLifeEventRetrievalResponse](res)._2
+      parseDesResponse[DesLifeEventRetrievalResponse](res)
     })
   }
 
@@ -236,7 +239,7 @@ trait DesConnector extends ServicesConfig {
 
     result.map(res => {
       Logger.debug("Bonus Payment request returned status: " + res.status)
-      parseDesResponse[DesTransactionResponse](res)._2
+      parseDesResponse[DesTransactionResponse](res)
     })
   }
 
@@ -252,7 +255,7 @@ trait DesConnector extends ServicesConfig {
 
     result.map(res => {
       Logger.debug("Get Bonus Payment transaction details returned status: " + res.status)
-      parseDesResponse[DesGetBonusPaymentResponse](res)._2
+      parseDesResponse[DesGetBonusPaymentResponse](res)
     })
   }
 
@@ -268,7 +271,7 @@ trait DesConnector extends ServicesConfig {
 
     result.map(res => {
       Logger.debug("Get Transaction details returned status: " + res.status)
-      parseDesResponse[DesGetTransactionResponse](res)._2
+      parseDesResponse[DesGetTransactionResponse](res)
     })
   }
 
@@ -289,16 +292,16 @@ trait DesConnector extends ServicesConfig {
 
     result.map(res => {
       Logger.debug("Get Bulk payment details returned status: " + res.status)
-      parseDesResponse[GetBulkPaymentResponse](res)._2
+      parseDesResponse[GetBulkPaymentResponse](res)
     })
   }
 
   // scalastyle:off magic.number
   def parseDesResponse[A <: DesResponse](res: HttpResponse)
-                                        (implicit reads:Reads[A]): (Int, DesResponse) = {
+                                        (implicit reads:Reads[A]): DesResponse = {
     Try(res.json.as[A]) match {
       case Success(data) =>
-        (res.status, data)
+        data
       case Failure(er) =>
         if (res.status == 200 | res.status == 201) {
           Logger.error(s"Error from DES (parsing as DesResponse): ${er.getMessage}")
@@ -306,9 +309,9 @@ trait DesConnector extends ServicesConfig {
 
         Try(res.json.as[DesFailureResponse]) match {
           case Success(data) => Logger.info(s"DesFailureResponse from DES: ${data}")
-             (res.status, data)
+             data
           case Failure(ex) => Logger.error(s"Error from DES (parsing as DesFailureResponse): ${ex.getMessage}")
-             (500, DesFailureResponse())
+             DesFailureResponse()
         }
     }
   }

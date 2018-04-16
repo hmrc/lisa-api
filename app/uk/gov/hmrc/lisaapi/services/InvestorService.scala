@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.lisaapi.services
 
+import play.api.Logger
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des.{DesCreateInvestorResponse, DesFailureResponse}
@@ -32,10 +33,18 @@ trait InvestorService  {
     val response = desConnector.createInvestor(lisaManager, request)
 
     response map {
-      case (409, existsResponse: DesCreateInvestorResponse) => CreateLisaInvestorAlreadyExistsResponse(existsResponse.investorID)
-      case (_, successResponse: DesCreateInvestorResponse) => CreateLisaInvestorSuccessResponse(successResponse.investorID)
-      case (status: Int, errorResponse: DesFailureResponse) => CreateLisaInvestorErrorResponse(status, errorResponse)
-                                                          }
+      case successResponse: CreateLisaInvestorSuccessResponse => successResponse
+      case existsResponse: CreateLisaInvestorAlreadyExistsResponse => existsResponse
+      case error: DesFailureResponse => {
+        error.code match {
+          case "INVESTOR_NOT_FOUND" => CreateLisaInvestorInvestorNotFoundResponse
+          case _ => {
+            Logger.warn(s"Create investor returned error code ${error.code}")
+            CreateLisaInvestorErrorResponse(error.code)
+          }
+        }
+      }
+    }
   }
 
 }
