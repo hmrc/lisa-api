@@ -57,7 +57,7 @@ class AccountServiceSpec extends PlaySpec
           .thenReturn(Future.successful(DesFailureResponse(code = "UNEXPECTED_ERROR")))
 
         doCreateRequest { response =>
-          response mustBe CreateLisaAccountErrorResponse
+          response mustBe CreateLisaAccountErrorResponse("UNEXPECTED_ERROR")
         }
       }
       "a NOT_FOUND response comes from DES" in {
@@ -65,7 +65,7 @@ class AccountServiceSpec extends PlaySpec
           .thenReturn(Future.successful(DesFailureResponse(code = "NOT_FOUND")))
 
         doCreateRequest { response =>
-          response mustBe CreateLisaAccountErrorResponse
+          response mustBe CreateLisaAccountErrorResponse("NOT_FOUND")
         }
       }
       "a INTERNAL_SERVER_ERROR response comes from DES" in {
@@ -73,7 +73,7 @@ class AccountServiceSpec extends PlaySpec
           .thenReturn(Future.successful(DesFailureResponse(code = "INTERNAL_SERVER_ERROR")))
 
         doCreateRequest { response =>
-          response mustBe CreateLisaAccountErrorResponse
+          response mustBe CreateLisaAccountErrorResponse("INTERNAL_SERVER_ERROR")
         }
       }
       "a PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST response comes from DES" in {
@@ -81,7 +81,7 @@ class AccountServiceSpec extends PlaySpec
           .thenReturn(Future.successful(DesFailureResponse(code = "PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST")))
 
         doCreateRequest { response =>
-          response mustBe CreateLisaAccountErrorResponse
+          response mustBe CreateLisaAccountErrorResponse("PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST")
         }
       }
     }
@@ -168,7 +168,7 @@ class AccountServiceSpec extends PlaySpec
           .thenReturn(Future.successful(DesFailureResponse(code = "UNEXPECTED_ERROR")))
 
         doTransferRequest { response =>
-          response mustBe CreateLisaAccountErrorResponse
+          response mustBe CreateLisaAccountErrorResponse("UNEXPECTED_ERROR")
         }
       }
       "a NOT_FOUND response comes from DES" in {
@@ -176,7 +176,7 @@ class AccountServiceSpec extends PlaySpec
           .thenReturn(Future.successful(DesFailureResponse(code = "NOT_FOUND")))
 
         doTransferRequest { response =>
-          response mustBe CreateLisaAccountErrorResponse
+          response mustBe CreateLisaAccountErrorResponse("NOT_FOUND")
         }
       }
       "a INTERNAL_SERVER_ERROR response comes from DES" in {
@@ -184,7 +184,7 @@ class AccountServiceSpec extends PlaySpec
           .thenReturn(Future.successful(DesFailureResponse(code = "INTERNAL_SERVER_ERROR")))
 
         doTransferRequest { response =>
-          response mustBe CreateLisaAccountErrorResponse
+          response mustBe CreateLisaAccountErrorResponse("INTERNAL_SERVER_ERROR")
         }
       }
       "a INVESTOR_ELIGIBILITY_CHECK_FAILED response comes from DES" in {
@@ -192,7 +192,7 @@ class AccountServiceSpec extends PlaySpec
           .thenReturn(Future.successful(DesFailureResponse(code = "INVESTOR_ELIGIBILITY_CHECK_FAILED")))
 
         doTransferRequest { response =>
-          response mustBe CreateLisaAccountErrorResponse
+          response mustBe CreateLisaAccountErrorResponse("INVESTOR_ELIGIBILITY_CHECK_FAILED")
         }
       }
     }
@@ -380,7 +380,7 @@ class AccountServiceSpec extends PlaySpec
 
         val res = Await.result(SUT.getAccount(testLMRN, "A123456")(HeaderCarrier()), Duration.Inf)
 
-        res mustBe GetLisaAccountErrorResponse
+        res mustBe GetLisaAccountErrorResponse("X")
       }
 
     }

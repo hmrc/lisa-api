@@ -114,9 +114,9 @@ class AccountController extends LisaController with LisaConstants {
             handleCreateOrTransferFailure(lisaManager, creationRequest, ErrorAccountAlreadyVoided, FORBIDDEN, action)
           case CreateLisaAccountAlreadyExistsResponse =>
             handleCreateOrTransferFailure(lisaManager, creationRequest, ErrorAccountAlreadyExists(creationRequest.accountId), CONFLICT, action)
-          case _ =>
+          case err: CreateLisaAccountErrorResponse =>
             Logger.error(s"AccountController: createAccount unknown case from DES returning internal server error")
-            handleCreateOrTransferFailure(lisaManager, creationRequest, ErrorInternalServerError, INTERNAL_SERVER_ERROR, action)
+            handleCreateOrTransferFailure(lisaManager, creationRequest, ErrorInternalServerError, INTERNAL_SERVER_ERROR, action, Some(err.errorCode))
         } recover {
           case e: Exception =>
             Logger.error(s"AccountController: An error occurred due to ${e.getMessage} returning internal server error")
@@ -155,9 +155,9 @@ class AccountController extends LisaController with LisaConstants {
             handleCreateOrTransferFailure(lisaManager, transferRequest, ErrorAccountAlreadyVoided, FORBIDDEN, action)
           case CreateLisaAccountAlreadyExistsResponse =>
             handleCreateOrTransferFailure(lisaManager, transferRequest, ErrorAccountAlreadyExists(transferRequest.accountId), CONFLICT, action)
-          case _ =>
+          case err: CreateLisaAccountErrorResponse =>
             Logger.error(s"AccountController: transferAccount unknown case from DES returning internal server error")
-            handleCreateOrTransferFailure(lisaManager, transferRequest, ErrorInternalServerError, INTERNAL_SERVER_ERROR, action)
+            handleCreateOrTransferFailure(lisaManager, transferRequest, ErrorInternalServerError, INTERNAL_SERVER_ERROR, action, Some(err.errorCode))
         } recover {
           case e: Exception =>
             Logger.error(s"AccountController: An error occurred in due to ${e.getMessage} returning internal server error")
@@ -239,14 +239,15 @@ class AccountController extends LisaController with LisaConstants {
                                               requestData: Product,
                                               e: ErrorResponse,
                                               status: Int,
-                                              action: String)
+                                              action: String,
+                                              desErrorCode: Option[String] = None)
                                              (implicit hc: HeaderCarrier, startTime:Long) = {
       auditService.audit(
         auditType = s"accountNot$action",
         path = getCreateOrTransferEndpointUrl(lisaManager),
         auditData = requestData.toStringMap ++ Map(
           ZREF -> lisaManager,
-          s"reasonNotCreated" -> e.errorCode
+          s"reasonNotCreated" -> desErrorCode.getOrElse(e.errorCode)
         )
       )
 
@@ -334,8 +335,8 @@ class AccountController extends LisaController with LisaConstants {
             handleClosureFailure(lisaManager, accountId, closeLisaAccountRequest, ErrorAccountWithinCancellationPeriod, FORBIDDEN)
           case CloseLisaAccountNotFoundResponse =>
             handleClosureFailure(lisaManager, accountId, closeLisaAccountRequest, ErrorAccountNotFound, NOT_FOUND)
-          case _ =>
-            handleClosureFailure(lisaManager, accountId, closeLisaAccountRequest, ErrorInternalServerError, INTERNAL_SERVER_ERROR)
+          case err: CloseLisaAccountErrorResponse =>
+            handleClosureFailure(lisaManager, accountId, closeLisaAccountRequest, ErrorInternalServerError, INTERNAL_SERVER_ERROR, Some(err.errorCode))
         } recover {
           case e: Exception =>
             Logger.error(s"AccountController: closeAccount: An error occurred due to ${e.getMessage} returning internal server error")
@@ -372,14 +373,15 @@ class AccountController extends LisaController with LisaConstants {
                                     accountId: String,
                                     requestData: Product,
                                     e: ErrorResponse,
-                                    status: Int)
+                                    status: Int,
+                                    errorCode: Option[String] = None)
                                    (implicit hc: HeaderCarrier, startTime:Long) = {
       auditService.audit(
         auditType = "accountNotClosed",
         path = getCloseEndpointUrl(lisaManager, accountId),
         auditData = requestData.toStringMap ++ Map(ZREF -> lisaManager,
           "accountId" -> accountId,
-          "reasonNotClosed" -> e.errorCode)
+          "reasonNotClosed" -> errorCode.getOrElse(e.errorCode))
       )
 
       LisaMetrics.incrementMetrics(startTime, status, LisaMetricKeys.CLOSE)

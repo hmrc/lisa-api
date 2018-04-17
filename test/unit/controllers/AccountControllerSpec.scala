@@ -222,7 +222,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
         }
       }
       "the data service returns an error for a create request" in {
-        when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountErrorResponse))
+        when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountErrorResponse("INTERNAL_SERVER_ERROR")))
 
         doSyncCreateOrTransferRequest(createAccountJson) { _ =>
           verify(mockAuditService).audit(
@@ -393,7 +393,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
         }
       }
       "the data service returns an error for a transfer request" in {
-        when(mockService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountErrorResponse))
+        when(mockService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountErrorResponse("INTERNAL_SERVER_ERROR")))
 
         doSyncCreateOrTransferRequest(transferAccountJson) { res =>
           verify(mockAuditService).audit(
@@ -660,14 +660,14 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
     "return with status 500 internal server error" when {
       "the data service returns an error for a create request" in {
-        when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountErrorResponse))
+        when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountErrorResponse("INTERNAL_SERVER_ERROR")))
 
         doCreateOrTransferRequest(createAccountJson) { res =>
           status(res) mustBe (INTERNAL_SERVER_ERROR)
         }
       }
       "the data service returns an error for a transfer request" in {
-        when(mockService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountErrorResponse))
+        when(mockService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountErrorResponse("INTERNAL_SERVER_ERROR")))
 
         doCreateOrTransferRequest(transferAccountJson) { res =>
           status(res) mustBe (INTERNAL_SERVER_ERROR)
@@ -847,7 +847,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
         })
       }
       "returning a internal server error response" in {
-        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountErrorResponse))
+        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountErrorResponse("INTERNAL_SERVER_ERROR")))
         doSyncGetAccountDetailsRequest(res => {
           (contentAsJson(res) \ "code").as[String] mustBe "INTERNAL_SERVER_ERROR"
         })
@@ -977,7 +977,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
         }
       }
       "the data service returns a CloseLisaAccountErrorResponse" in {
-        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountErrorResponse))
+        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountErrorResponse("INTERNAL_SERVER_ERROR")))
 
         doSyncCloseRequest(closeAccountJson) { res =>
           verify(mockAuditService).audit(
@@ -1105,7 +1105,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
     "return with status 500 internal server error" when {
       "the data service returns an error" in {
-        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountErrorResponse))
+        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountErrorResponse("INTERNAL_SERVER_ERROR")))
 
         doCloseRequest(closeAccountJson) { res =>
           status(res) mustBe (INTERNAL_SERVER_ERROR)
