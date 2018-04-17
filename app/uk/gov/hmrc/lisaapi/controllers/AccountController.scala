@@ -115,7 +115,7 @@ class AccountController extends LisaController with LisaConstants {
           case CreateLisaAccountAlreadyExistsResponse =>
             handleCreateOrTransferFailure(lisaManager, creationRequest, ErrorAccountAlreadyExists(creationRequest.accountId), CONFLICT, action)
           case err: CreateLisaAccountErrorResponse =>
-            Logger.error(s"AccountController: createAccount unknown case from DES returning internal server error")
+            Logger.error(s"AccountController: createAccount unknown case from DES returning internal server error. Error code: ${err.errorCode}")
             handleCreateOrTransferFailure(lisaManager, creationRequest, ErrorInternalServerError, INTERNAL_SERVER_ERROR, action, Some(err.errorCode))
         } recover {
           case e: Exception =>
@@ -156,7 +156,7 @@ class AccountController extends LisaController with LisaConstants {
           case CreateLisaAccountAlreadyExistsResponse =>
             handleCreateOrTransferFailure(lisaManager, transferRequest, ErrorAccountAlreadyExists(transferRequest.accountId), CONFLICT, action)
           case err: CreateLisaAccountErrorResponse =>
-            Logger.error(s"AccountController: transferAccount unknown case from DES returning internal server error")
+            Logger.error(s"AccountController: transferAccount unknown case from DES returning internal server error. Error code: ${err.errorCode}")
             handleCreateOrTransferFailure(lisaManager, transferRequest, ErrorInternalServerError, INTERNAL_SERVER_ERROR, action, Some(err.errorCode))
         } recover {
           case e: Exception =>
@@ -335,8 +335,10 @@ class AccountController extends LisaController with LisaConstants {
             handleClosureFailure(lisaManager, accountId, closeLisaAccountRequest, ErrorAccountWithinCancellationPeriod, FORBIDDEN)
           case CloseLisaAccountNotFoundResponse =>
             handleClosureFailure(lisaManager, accountId, closeLisaAccountRequest, ErrorAccountNotFound, NOT_FOUND)
-          case err: CloseLisaAccountErrorResponse =>
+          case err: CloseLisaAccountErrorResponse => {
+            Logger.error(s"Account closure returned error: ${err.errorCode}")
             handleClosureFailure(lisaManager, accountId, closeLisaAccountRequest, ErrorInternalServerError, INTERNAL_SERVER_ERROR, Some(err.errorCode))
+          }
         } recover {
           case e: Exception =>
             Logger.error(s"AccountController: closeAccount: An error occurred due to ${e.getMessage} returning internal server error")
