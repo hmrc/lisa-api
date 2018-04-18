@@ -46,7 +46,7 @@ trait ReinstateAccountService {
           case "INVESTOR_COMPLIANCE_CHECK_FAILED" => ReinstateLisaAccountInvestorComplianceCheckFailedResponse
           case _ => {
             Logger.warn(s"Reinstate account returned error ${failureResponse.code}")
-            ReinstateLisaAccountErrorResponse(failureResponse.code)
+            ReinstateLisaAccountErrorResponse
           }
         }
       }

@@ -50,7 +50,7 @@ class InvestorController extends LisaController with LisaConstants  {
                   handleExistsResponse(lisaManager, createRequest, investorId)
                 case CreateLisaInvestorInvestorNotFoundResponse =>
                   handleInvestorNotFound(lisaManager, createRequest)
-                case CreateLisaInvestorErrorResponse(_) =>
+                case CreateLisaInvestorErrorResponse =>
                   handleError(lisaManager, createRequest)
               }
             } recover {

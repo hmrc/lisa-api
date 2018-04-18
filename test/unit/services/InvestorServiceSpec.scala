@@ -86,7 +86,7 @@ class InvestorServiceSpec extends PlaySpec
           )
 
         doRequest{response =>
-          response mustBe CreateLisaInvestorErrorResponse("INVALID_PAYLOAD")
+          response mustBe CreateLisaInvestorErrorResponse
         }
       }
     }

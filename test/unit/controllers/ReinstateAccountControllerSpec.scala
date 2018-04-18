@@ -143,7 +143,7 @@ class ReinstateAccountControllerSpec extends PlaySpec with MockitoSugar with One
         }
       }
       "the data service returns an error" in {
-        when(mockService.reinstateAccountService(any(), any())(any())).thenReturn(Future.successful(ReinstateLisaAccountErrorResponse("INTERNAL_SERVER_ERROR")))
+        when(mockService.reinstateAccountService(any(), any())(any())).thenReturn(Future.successful(ReinstateLisaAccountErrorResponse))
 
         doSyncReinstateAccount (reinstateAccountValidJson){ res =>
           verify(mockAuditService).audit(
@@ -246,7 +246,7 @@ class ReinstateAccountControllerSpec extends PlaySpec with MockitoSugar with One
 
     "return with status 500 internal server error" when {
       "the data service returns an error" in {
-        when(mockService.reinstateAccountService(any(), any())(any())).thenReturn(Future.successful(ReinstateLisaAccountErrorResponse("ERROR")))
+        when(mockService.reinstateAccountService(any(), any())(any())).thenReturn(Future.successful(ReinstateLisaAccountErrorResponse))
 
         doReinstateRequest(reinstateAccountValidJson) { res =>
           status(res) mustBe (INTERNAL_SERVER_ERROR)

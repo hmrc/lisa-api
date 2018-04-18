@@ -40,7 +40,7 @@ trait InvestorService  {
           case "INVESTOR_NOT_FOUND" => CreateLisaInvestorInvestorNotFoundResponse
           case _ => {
             Logger.warn(s"Create investor returned error code ${error.code}")
-            CreateLisaInvestorErrorResponse(error.code)
+            CreateLisaInvestorErrorResponse
           }
         }
       }

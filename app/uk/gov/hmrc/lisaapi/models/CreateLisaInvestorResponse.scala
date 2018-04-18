@@ -25,7 +25,7 @@ trait CreateLisaInvestorResponse extends DesResponse
 case class CreateLisaInvestorSuccessResponse(investorId: String) extends CreateLisaInvestorResponse
 case class CreateLisaInvestorAlreadyExistsResponse(investorId: String) extends CreateLisaInvestorResponse
 case object CreateLisaInvestorInvestorNotFoundResponse extends CreateLisaInvestorResponse
-case class CreateLisaInvestorErrorResponse(code: String) extends CreateLisaInvestorResponse
+case object CreateLisaInvestorErrorResponse extends CreateLisaInvestorResponse
 
 object CreateLisaInvestorResponse {
   implicit val successReads: Reads[CreateLisaInvestorSuccessResponse] =

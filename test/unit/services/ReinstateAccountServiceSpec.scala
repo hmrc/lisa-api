@@ -130,7 +130,7 @@ class ReinstateAccountServiceSpec extends PlaySpec
           )
 
         doReinstateRequest { response =>
-          response mustBe ReinstateLisaAccountErrorResponse("ERROR1234")
+          response mustBe ReinstateLisaAccountErrorResponse
         }
       }
     }
