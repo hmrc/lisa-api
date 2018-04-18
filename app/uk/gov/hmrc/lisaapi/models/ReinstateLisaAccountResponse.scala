@@ -18,8 +18,8 @@ package uk.gov.hmrc.lisaapi.models
 
 sealed trait ReinstateLisaAccountResponse
 
-case class ReinstateLisaAccountSuccessResponse (code: String, reason: String) extends ReinstateLisaAccountResponse
-case object ReinstateLisaAccountErrorResponse extends ReinstateLisaAccountResponse
+case class ReinstateLisaAccountSuccessResponse(code: String, reason: String) extends ReinstateLisaAccountResponse
+case class ReinstateLisaAccountErrorResponse(errorCode: String) extends ReinstateLisaAccountResponse
 case object ReinstateLisaAccountAlreadyClosedResponse extends ReinstateLisaAccountResponse
 case object ReinstateLisaAccountAlreadyCancelledResponse extends ReinstateLisaAccountResponse
 case object ReinstateLisaAccountAlreadyOpenResponse extends ReinstateLisaAccountResponse
