@@ -82,8 +82,7 @@ class ReinstateAccountController extends LisaController with LisaConstants {
         case ReinstateLisaAccountNotFoundResponse =>
           processReinstateFailure(lisaManager, accountId, ErrorAccountNotFound, NOT_FOUND, None)
         case err: ReinstateLisaAccountErrorResponse => {
-          Logger.error(s"ReinstateAccountController: reinstateAccount: Error ${err.errorCode} returned")
-          processReinstateFailure(lisaManager, accountId, ErrorInternalServerError, INTERNAL_SERVER_ERROR, None, Some(err.errorCode))
+          processReinstateFailure(lisaManager, accountId, ErrorInternalServerError, INTERNAL_SERVER_ERROR, None)
         }
       }
     } recover {
@@ -99,7 +98,7 @@ class ReinstateAccountController extends LisaController with LisaConstants {
     s"/manager/$lisaManagerReferenceNumber/accounts/$accountID/reinstate"
   }
 
-  private def processReinstateFailure(lisaManager: String, accountId: String, err: ErrorResponse, status: Int, message: Option[String], errorCode: Option[String] = None)
+  private def processReinstateFailure(lisaManager: String, accountId: String, err: ErrorResponse, status: Int, message: Option[String])
                                      (implicit hc: HeaderCarrier, startTime: Long): Result = {
     auditService.audit(
       auditType = "accountNotReinstated",
@@ -107,7 +106,7 @@ class ReinstateAccountController extends LisaController with LisaConstants {
       auditData = Map(
         ZREF -> lisaManager,
         "accountId" -> accountId,
-        "reasonNotReinstated" -> errorCode.getOrElse(err.errorCode)
+        "reasonNotReinstated" -> err.errorCode
       )
     )
 

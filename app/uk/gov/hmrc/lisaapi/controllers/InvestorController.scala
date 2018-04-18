@@ -50,8 +50,8 @@ class InvestorController extends LisaController with LisaConstants  {
                   handleExistsResponse(lisaManager, createRequest, investorId)
                 case CreateLisaInvestorInvestorNotFoundResponse =>
                   handleInvestorNotFound(lisaManager, createRequest)
-                case CreateLisaInvestorErrorResponse(errorCode) =>
-                  handleError(lisaManager, createRequest, Some(errorCode))
+                case CreateLisaInvestorErrorResponse(_) =>
+                  handleError(lisaManager, createRequest)
               }
             } recover {
               case e: Exception =>
@@ -122,7 +122,7 @@ class InvestorController extends LisaController with LisaConstants  {
     Forbidden(Json.toJson(ErrorInvestorNotFound))
   }
 
-  private def handleError(lisaManager: String, createRequest: CreateLisaInvestorRequest, errorCode: Option[String] = None)
+  private def handleError(lisaManager: String, createRequest: CreateLisaInvestorRequest)
                          (implicit hc: HeaderCarrier, startTime: Long) = {
     auditService.audit(
       auditType = "investorNotCreated",
@@ -131,7 +131,7 @@ class InvestorController extends LisaController with LisaConstants  {
         ZREF -> lisaManager,
         "investorNINO" -> createRequest.investorNINO,
         "dateOfBirth" -> createRequest.dateOfBirth.toString("yyyy-MM-dd"),
-        "reasonNotCreated" -> errorCode.getOrElse(ErrorInternalServerError.errorCode)
+        "reasonNotCreated" -> ErrorInternalServerError.errorCode
       )
     )
 

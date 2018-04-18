@@ -44,7 +44,10 @@ trait ReinstateAccountService {
           case "INVESTOR_ACCOUNT_ALREADY_CANCELLED" => ReinstateLisaAccountAlreadyCancelledResponse
           case "INVESTOR_ACCOUNT_ALREADY_OPEN" => ReinstateLisaAccountAlreadyOpenResponse
           case "INVESTOR_COMPLIANCE_CHECK_FAILED" => ReinstateLisaAccountInvestorComplianceCheckFailedResponse
-          case _ => ReinstateLisaAccountErrorResponse(failureResponse.code)
+          case _ => {
+            Logger.warn(s"Reinstate account returned error ${failureResponse.code}")
+            ReinstateLisaAccountErrorResponse(failureResponse.code)
+          }
         }
       }
     }
