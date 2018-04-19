@@ -118,8 +118,8 @@ class InvestorControllerSpec extends PlaySpec
     "return with status 403 forbidden" when {
       "given the Investor details cannot be found" in {
         when(mockService.createInvestor(any(), any())(any())).
-          thenReturn(Future.successful(CreateLisaInvestorErrorResponse(403,
-            DesFailureResponse("INVESTOR_NOT_FOUND","The investor details given do not match with HMRC’s records"))))
+          thenReturn(Future.successful(CreateLisaInvestorInvestorNotFoundResponse))
+
         val res = SUT.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT,"/").withHeaders(acceptHeader).
           withBody(AnyContentAsJson(Json.parse(investorJson))))
         status(res) must be (FORBIDDEN)
@@ -196,25 +196,24 @@ class InvestorControllerSpec extends PlaySpec
 
     "audit an investorNotCreated event" when {
       "a investor not found response is returned" in {
-        when(mockService.createInvestor(any(), any())(any())).
-          thenReturn(Future.successful(CreateLisaInvestorErrorResponse(403,
-            DesFailureResponse("INVESTOR_NOT_FOUND","The investor details given do not match with HMRC’s records"))))
+          when(mockService.createInvestor(any(), any())(any())).
+            thenReturn(Future.successful(CreateLisaInvestorInvestorNotFoundResponse))
 
-        await(SUT.createLisaInvestor(lisaManager).
-          apply(FakeRequest(Helpers.PUT, "/").
-            withHeaders(acceptHeader).
-            withBody(AnyContentAsJson(Json.parse(investorJson)))))
+          await(SUT.createLisaInvestor(lisaManager).
+            apply(FakeRequest(Helpers.PUT, "/").
+              withHeaders(acceptHeader).
+              withBody(AnyContentAsJson(Json.parse(investorJson)))))
 
-        verify(mockAuditService).audit(
-          auditType = matchersEquals("investorNotCreated"),
-          path = matchersEquals(s"/manager/$lisaManager/investors"),
-          auditData = matchersEquals(Map(
-            "lisaManagerReferenceNumber" -> lisaManager,
-            "investorNINO" -> "AB123456D",
-            "dateOfBirth" -> "1973-03-24",
-            "reasonNotCreated" -> ErrorInvestorNotFound.errorCode
-          )))(any())
-      }
+          verify(mockAuditService).audit(
+            auditType = matchersEquals("investorNotCreated"),
+            path = matchersEquals(s"/manager/$lisaManager/investors"),
+            auditData = matchersEquals(Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "investorNINO" -> "AB123456D",
+              "dateOfBirth" -> "1973-03-24",
+              "reasonNotCreated" -> ErrorInvestorNotFound.errorCode
+            )))(any())
+        }
 
       "a investor already exists response is returned" in {
         val investorId = "9876543210"

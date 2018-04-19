@@ -97,7 +97,7 @@ class ReinstateAccountServiceSpec extends PlaySpec
         }
       }
 
-      "given failureResponse for a Complaince check failure" in {
+      "given failureResponse for a Compliance check failure" in {
         when(mockDesConnector.reinstateAccount(any(), any())(any()))
           .thenReturn(
             Future.successful(
@@ -119,6 +119,18 @@ class ReinstateAccountServiceSpec extends PlaySpec
 
         doReinstateRequest { response =>
           response mustBe ReinstateLisaAccountNotFoundResponse
+        }
+      }
+
+
+      "given failureResponse for any other error" in {
+        when(mockDesConnector.reinstateAccount(any(), any())(any()))
+          .thenReturn(
+            Future.successful(DesFailureResponse("ERROR1234"))
+          )
+
+        doReinstateRequest { response =>
+          response mustBe ReinstateLisaAccountErrorResponse
         }
       }
     }

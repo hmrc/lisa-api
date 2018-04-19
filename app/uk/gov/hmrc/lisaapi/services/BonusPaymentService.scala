@@ -50,7 +50,10 @@ trait BonusPaymentService {
           case "BONUS_CLAIM_ERROR" => RequestBonusPaymentBonusClaimError
           case "INVESTOR_ACCOUNTID_NOT_FOUND" => RequestBonusPaymentAccountNotFound
           case "BONUS_CLAIM_ALREADY_EXISTS" => RequestBonusPaymentClaimAlreadyExists
-          case _ => RequestBonusPaymentError
+          case _ => {
+            Logger.warn(s"Request bonus payment returned error: ${failureResponse.code}")
+            RequestBonusPaymentError
+          }
         }
       }
     }
@@ -81,7 +84,10 @@ trait BonusPaymentService {
           case "TRANSACTION_ID_NOT_FOUND" => GetBonusPaymentTransactionNotFoundResponse
           case "BAD_REQUEST" => GetBonusPaymentLmrnDoesNotExistResponse
           case "INVESTOR_ACCOUNTID_NOT_FOUND" => GetBonusPaymentInvestorNotFoundResponse
-          case _ => GetBonusPaymentErrorResponse
+          case _ => {
+            Logger.warn(s"Get bonus payment returned error: ${failureResponse.code}")
+            GetBonusPaymentErrorResponse
+          }
         }
 
       }

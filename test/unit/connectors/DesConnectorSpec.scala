@@ -38,7 +38,7 @@ class DesConnectorSpec extends PlaySpec
 
   "Create Lisa Investor endpoint" must {
 
-    "Return a populated DesCreateInvestorResponse" when {
+    "return a populated CreateLisaInvestorSuccessResponse" when {
 
       "The DES response has a json body that is in the correct format" in {
         when(mockHttpPost.POST[CreateLisaInvestorRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
@@ -46,16 +46,15 @@ class DesConnectorSpec extends PlaySpec
             Future.successful(
               HttpResponse(
                 responseStatus = CREATED,
-                responseJson = Some(Json.parse(s"""{"investorID": "AB123456"}"""))
+                responseJson = Some(Json.parse(s"""{"investorID": "1234567890"}"""))
               )
             )
           )
 
         doCreateInvestorRequest { response =>
-          response must be((
-            CREATED,
-            DesCreateInvestorResponse(investorID = "AB123456")
-          ))
+          response must be(
+            CreateLisaInvestorSuccessResponse("1234567890")
+          )
         }
       }
 
@@ -75,7 +74,7 @@ class DesConnectorSpec extends PlaySpec
           )
 
         doCreateInvestorRequest { response =>
-          response must be((INTERNAL_SERVER_ERROR, DesFailureResponse()))
+          response must be(DesFailureResponse())
         }
       }
 
@@ -91,12 +90,12 @@ class DesConnectorSpec extends PlaySpec
           )
 
         doCreateInvestorRequest { response =>
-          response must be((INTERNAL_SERVER_ERROR, DesFailureResponse()))
+          response must be(DesFailureResponse())
         }
       }
     }
 
-    "return an investor already exists response" when {
+    "return a populated CreateLisaInvestorAlreadyExistsResponse" when {
 
       "the investor already exists response is returned" in {
         val investorID = "1234567890"
@@ -111,7 +110,7 @@ class DesConnectorSpec extends PlaySpec
           )
 
         doCreateInvestorRequest { response =>
-          response must be((CONFLICT, DesCreateInvestorResponse(investorID)))
+          response must be(CreateLisaInvestorAlreadyExistsResponse(investorID))
         }
       }
 
@@ -131,7 +130,7 @@ class DesConnectorSpec extends PlaySpec
           )
 
         doCreateInvestorRequest { response =>
-          response must be((FORBIDDEN, DesFailureResponse("INVESTOR_NOT_FOUND", "The investor details given do not match with HMRC’s records.")))
+          response must be(DesFailureResponse("INVESTOR_NOT_FOUND", "The investor details given do not match with HMRC’s records."))
         }
       }
 
@@ -1209,7 +1208,7 @@ class DesConnectorSpec extends PlaySpec
 
   val validBonusPaymentResponseJson = Source.fromInputStream(getClass().getResourceAsStream("/json/request.valid.bonus-payment-response.json")).mkString
 
-  private def doCreateInvestorRequest(callback: ((Int,DesResponse)) => Unit) = {
+  private def doCreateInvestorRequest(callback: (DesResponse) => Unit) = {
     val request = CreateLisaInvestorRequest("AB123456A", "A", "B", new DateTime("2000-01-01"))
     val response = Await.result(SUT.createInvestor("Z019283", request), Duration.Inf)
 

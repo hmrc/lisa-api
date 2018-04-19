@@ -51,6 +51,7 @@ trait LifeEventService {
           case "INVESTOR_ACCOUNTID_NOT_FOUND" => ReportLifeEventAccountNotFoundResponse
           case "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID" => ReportLifeEventAccountClosedResponse
           case _ => {
+            Logger.warn(s"Report life event returned error: ${failureResponse.code}")
             ReportLifeEventErrorResponse
           }
         }
@@ -74,6 +75,7 @@ trait LifeEventService {
           case "INVESTOR_ACCOUNTID_NOT_FOUND" => ReportLifeEventAccountNotFoundResponse
           case "LIFE_EVENT_NOT_FOUND" => ReportLifeEventIdNotFoundResponse
           case _ => {
+            Logger.warn(s"Get life event returned error: ${failureResponse.code}")
             ReportLifeEventErrorResponse
           }
         }

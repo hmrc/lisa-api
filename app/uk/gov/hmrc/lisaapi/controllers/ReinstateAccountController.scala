@@ -81,8 +81,9 @@ class ReinstateAccountController extends LisaController with LisaConstants {
           processReinstateFailure(lisaManager, accountId, ErrorInvestorComplianceCheckFailedReinstate, FORBIDDEN, None)
         case ReinstateLisaAccountNotFoundResponse =>
           processReinstateFailure(lisaManager, accountId, ErrorAccountNotFound, NOT_FOUND, None)
-        case _ =>
+        case ReinstateLisaAccountErrorResponse => {
           processReinstateFailure(lisaManager, accountId, ErrorInternalServerError, INTERNAL_SERVER_ERROR, None)
+        }
       }
     } recover {
       case _:Exception  => {

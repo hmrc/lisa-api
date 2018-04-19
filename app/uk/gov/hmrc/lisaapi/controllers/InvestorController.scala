@@ -48,8 +48,10 @@ class InvestorController extends LisaController with LisaConstants  {
                   handleCreatedResponse(lisaManager, createRequest, investorId)
                 case CreateLisaInvestorAlreadyExistsResponse(investorId) =>
                   handleExistsResponse(lisaManager, createRequest, investorId)
-                case errorResponse: CreateLisaInvestorErrorResponse =>
-                  handleFailureResponse(lisaManager, createRequest, errorResponse)
+                case CreateLisaInvestorInvestorNotFoundResponse =>
+                  handleInvestorNotFound(lisaManager, createRequest)
+                case CreateLisaInvestorErrorResponse =>
+                  handleError(lisaManager, createRequest)
               }
             } recover {
               case e: Exception =>
@@ -102,9 +104,8 @@ class InvestorController extends LisaController with LisaConstants  {
     Conflict(Json.toJson(result))
   }
 
-  private def handleFailureResponse(lisaManager: String, createRequest: CreateLisaInvestorRequest, errorResponse: CreateLisaInvestorErrorResponse)
-                                   (implicit hc: HeaderCarrier, startTime: Long) = {
-
+  private def handleInvestorNotFound(lisaManager: String, createRequest: CreateLisaInvestorRequest)
+                                    (implicit hc: HeaderCarrier, startTime: Long) = {
     auditService.audit(
       auditType = "investorNotCreated",
       path = getEndpointUrl(lisaManager),
@@ -112,13 +113,13 @@ class InvestorController extends LisaController with LisaConstants  {
         ZREF -> lisaManager,
         "investorNINO" -> createRequest.investorNINO,
         "dateOfBirth" -> createRequest.dateOfBirth.toString("yyyy-MM-dd"),
-        "reasonNotCreated" -> errorResponse.data.code
+        "reasonNotCreated" -> ErrorInvestorNotFound.errorCode
       )
     )
 
-    LisaMetrics.incrementMetrics(startTime, errorResponse.status, LisaMetricKeys.INVESTOR)
+    LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.INVESTOR)
 
-    Status(errorResponse.status).apply(Json.toJson(errorResponse.data))
+    Forbidden(Json.toJson(ErrorInvestorNotFound))
   }
 
   private def handleError(lisaManager: String, createRequest: CreateLisaInvestorRequest)

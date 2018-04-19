@@ -48,7 +48,10 @@ trait AccountService {
           case "INVESTOR_ACCOUNT_ALREADY_CANCELLED" => CreateLisaAccountInvestorAccountAlreadyClosedResponse
           case "INVESTOR_ACCOUNT_ALREADY_CLOSED" => CreateLisaAccountInvestorAccountAlreadyClosedResponse
           case "INVESTOR_ACCOUNT_ALREADY_VOID" => CreateLisaAccountInvestorAccountAlreadyVoidResponse
-          case _ => CreateLisaAccountErrorResponse
+          case _ => {
+            Logger.warn(s"Create account returned error: ${failureResponse.code}")
+            CreateLisaAccountErrorResponse
+          }
         }
       }
     }
@@ -69,7 +72,10 @@ trait AccountService {
 
         failureResponse.code match {
           case "INVESTOR_ACCOUNTID_NOT_FOUND" => GetLisaAccountDoesNotExistResponse
-          case _ => GetLisaAccountErrorResponse
+          case _ => {
+            Logger.warn(s"Get account returned error: ${failureResponse.code}")
+            GetLisaAccountErrorResponse
+          }
         }
       }
     }
@@ -95,7 +101,10 @@ trait AccountService {
           case "INVESTOR_ACCOUNT_ALREADY_CANCELLED" => CreateLisaAccountInvestorAccountAlreadyClosedResponse
           case "INVESTOR_ACCOUNT_ALREADY_CLOSED" => CreateLisaAccountInvestorAccountAlreadyClosedResponse
           case "INVESTOR_ACCOUNT_ALREADY_VOID" => CreateLisaAccountInvestorAccountAlreadyVoidResponse
-          case _ => CreateLisaAccountErrorResponse
+          case _ => {
+            Logger.warn(s"Transfer account returned error: ${failureResponse.code}")
+            CreateLisaAccountErrorResponse
+          }
         }
       }
     }
@@ -117,7 +126,10 @@ trait AccountService {
           case "INVESTOR_ACCOUNTID_NOT_FOUND" => CloseLisaAccountNotFoundResponse
           case "CANCELLATION_PERIOD_EXCEEDED" => CloseLisaAccountCancellationPeriodExceeded
           case "ACCOUNT_WITHIN_CANCELLATION_PERIOD" => CloseLisaAccountWithinCancellationPeriod
-          case _ => CloseLisaAccountErrorResponse
+          case _ => {
+            Logger.warn(s"Close account returned error: ${failureResponse.code}")
+            CloseLisaAccountErrorResponse
+          }
         }
       }
     }

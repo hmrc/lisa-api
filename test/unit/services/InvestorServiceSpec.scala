@@ -37,55 +37,58 @@ class InvestorServiceSpec extends PlaySpec
   "InvestorService" must {
 
     "return a Success Response" when {
-
-      "given a investor id from the DES connector" in {
+      "given a success response from the DES connector" in {
         when(mockDesConnector.createInvestor(any(), any())(any()))
           .thenReturn(
-            Future.successful((
-              201,
-
-              DesCreateInvestorResponse(investorID = "AB123456")
-            ))
+            Future.successful(CreateLisaInvestorSuccessResponse(investorId = investorId))
           )
 
         doRequest { response =>
-          response mustBe CreateLisaInvestorSuccessResponse("AB123456")
+          response mustBe CreateLisaInvestorSuccessResponse(investorId)
+        }
+      }
+    }
+
+    "return an Investor Already Exists Response" when {
+
+      "given a already exists response from the DES connector" in {
+
+        when(mockDesConnector.createInvestor(any(), any())(any()))
+          .thenReturn(Future.successful(CreateLisaInvestorAlreadyExistsResponse(investorId)))
+
+        doRequest{response =>
+          response mustBe CreateLisaInvestorAlreadyExistsResponse(investorId)
+        }
+      }
+
+    }
+
+    "return an Investor Not Found response" when {
+
+      "given a investor not found response from the DES connector" in {
+        when(mockDesConnector.createInvestor(any(), any())(any()))
+          .thenReturn(
+            Future.successful(DesFailureResponse("INVESTOR_NOT_FOUND"))
+          )
+
+        doRequest{response =>
+          response mustBe CreateLisaInvestorInvestorNotFoundResponse
         }
       }
 
     }
 
     "return an Error Response" when {
-      "given an error response from the DES connector" in {
+      "given any other response from the DES connector" in {
         when(mockDesConnector.createInvestor(any(), any())(any()))
           .thenReturn(
-            Future.successful((500, DesFailureResponse("code1", "reason1"))
-          )
+            Future.successful(DesFailureResponse("INVALID_PAYLOAD", "Submission has not passed validation."))
           )
 
         doRequest{response =>
-          response mustBe CreateLisaInvestorErrorResponse(500, DesFailureResponse("code1", "reason1"))
-        }
-
-      }
-    }
-
-    "return an Investor Already Exists Response" when {
-
-      "given a 409 status and CreateInvestor response from DES" in {
-        val investorID = "1234567890"
-
-        when(mockDesConnector.createInvestor(any(), any())(any()))
-          .thenReturn(
-            Future.successful((409, DesCreateInvestorResponse(investorID))
-            )
-          )
-
-        doRequest{response =>
-          response mustBe CreateLisaInvestorAlreadyExistsResponse(investorID)
+          response mustBe CreateLisaInvestorErrorResponse
         }
       }
-
     }
 
   }
@@ -97,6 +100,7 @@ class InvestorServiceSpec extends PlaySpec
     callback(response)
   }
 
+  val investorId = "1234567890"
   val mockDesConnector = mock[DesConnector]
   object SUT extends InvestorService {
     override val desConnector: DesConnector = mockDesConnector

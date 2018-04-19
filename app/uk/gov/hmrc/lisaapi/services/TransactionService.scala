@@ -48,7 +48,7 @@ trait TransactionService {
             ))
           }
           case _ => {
-            Logger.debug(s"ITMP returned an unexpected status: ${bonus.status}, returning an error")
+            Logger.warn(s"ITMP returned an unexpected status: ${bonus.status}, returning an error")
 
             Future.successful(GetTransactionErrorResponse)
           }
@@ -57,7 +57,7 @@ trait TransactionService {
       case error: DesFailureResponse => {
         Logger.debug(s"Error from ITMP: ${error.code}")
 
-        Future.successful(handleError(error.code))
+        Future.successful(handleError(error.code, "ITMP"))
       }
     }
   }
@@ -90,16 +90,19 @@ trait TransactionService {
       case error: DesFailureResponse => {
         Logger.debug(s"Error from ETMP: ${error.code}")
 
-        handleError(error.code)
+        handleError(error.code, "ETMP")
       }
     }
   }
 
-  private def handleError(code: String): GetTransactionResponse = {
+  private def handleError(code: String, hod: String): GetTransactionResponse = {
     code match {
       case "TRANSACTION_ID_NOT_FOUND" => GetTransactionTransactionNotFoundResponse
       case "INVESTOR_ACCOUNTID_NOT_FOUND" => GetTransactionAccountNotFoundResponse
-      case _ => GetTransactionErrorResponse
+      case _ => {
+        Logger.warn(s"Get transaction returned error: $code from $hod")
+        GetTransactionErrorResponse
+      }
     }
   }
 
