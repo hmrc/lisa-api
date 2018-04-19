@@ -114,7 +114,7 @@ class AccountController extends LisaController with LisaConstants {
             handleCreateOrTransferFailure(lisaManager, creationRequest, ErrorAccountAlreadyVoided, FORBIDDEN, action)
           case CreateLisaAccountAlreadyExistsResponse =>
             handleCreateOrTransferFailure(lisaManager, creationRequest, ErrorAccountAlreadyExists(creationRequest.accountId), CONFLICT, action)
-          case _: CreateLisaAccountErrorResponse =>
+          case CreateLisaAccountErrorResponse =>
             handleCreateOrTransferFailure(lisaManager, creationRequest, ErrorInternalServerError, INTERNAL_SERVER_ERROR, action)
         } recover {
           case e: Exception =>
@@ -154,7 +154,7 @@ class AccountController extends LisaController with LisaConstants {
             handleCreateOrTransferFailure(lisaManager, transferRequest, ErrorAccountAlreadyVoided, FORBIDDEN, action)
           case CreateLisaAccountAlreadyExistsResponse =>
             handleCreateOrTransferFailure(lisaManager, transferRequest, ErrorAccountAlreadyExists(transferRequest.accountId), CONFLICT, action)
-          case _: CreateLisaAccountErrorResponse =>
+          case CreateLisaAccountErrorResponse =>
             handleCreateOrTransferFailure(lisaManager, transferRequest, ErrorInternalServerError, INTERNAL_SERVER_ERROR, action)
         } recover {
           case e: Exception =>
@@ -332,7 +332,7 @@ class AccountController extends LisaController with LisaConstants {
             handleClosureFailure(lisaManager, accountId, closeLisaAccountRequest, ErrorAccountWithinCancellationPeriod, FORBIDDEN)
           case CloseLisaAccountNotFoundResponse =>
             handleClosureFailure(lisaManager, accountId, closeLisaAccountRequest, ErrorAccountNotFound, NOT_FOUND)
-          case CloseLisaAccountErrorResponse(_) => {
+          case CloseLisaAccountErrorResponse => {
             handleClosureFailure(lisaManager, accountId, closeLisaAccountRequest, ErrorInternalServerError, INTERNAL_SERVER_ERROR)
           }
         } recover {

@@ -19,7 +19,7 @@ package uk.gov.hmrc.lisaapi.models
 sealed trait CloseLisaAccountResponse
 
 case class CloseLisaAccountSuccessResponse(accountId: String) extends CloseLisaAccountResponse
-case class CloseLisaAccountErrorResponse(errorCode: String) extends CloseLisaAccountResponse
+case object CloseLisaAccountErrorResponse extends CloseLisaAccountResponse
 case object CloseLisaAccountAlreadyVoidResponse extends CloseLisaAccountResponse
 case object CloseLisaAccountAlreadyClosedResponse extends CloseLisaAccountResponse
 case object CloseLisaAccountNotFoundResponse extends CloseLisaAccountResponse

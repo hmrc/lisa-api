@@ -50,7 +50,7 @@ trait AccountService {
           case "INVESTOR_ACCOUNT_ALREADY_VOID" => CreateLisaAccountInvestorAccountAlreadyVoidResponse
           case _ => {
             Logger.warn(s"Create account returned error: ${failureResponse.code}")
-            CreateLisaAccountErrorResponse(failureResponse.code)
+            CreateLisaAccountErrorResponse
           }
         }
       }
@@ -74,7 +74,7 @@ trait AccountService {
           case "INVESTOR_ACCOUNTID_NOT_FOUND" => GetLisaAccountDoesNotExistResponse
           case _ => {
             Logger.warn(s"Get account returned error: ${failureResponse.code}")
-            GetLisaAccountErrorResponse(failureResponse.code)
+            GetLisaAccountErrorResponse
           }
         }
       }
@@ -103,7 +103,7 @@ trait AccountService {
           case "INVESTOR_ACCOUNT_ALREADY_VOID" => CreateLisaAccountInvestorAccountAlreadyVoidResponse
           case _ => {
             Logger.warn(s"Transfer account returned error: ${failureResponse.code}")
-            CreateLisaAccountErrorResponse(failureResponse.code)
+            CreateLisaAccountErrorResponse
           }
         }
       }
@@ -128,7 +128,7 @@ trait AccountService {
           case "ACCOUNT_WITHIN_CANCELLATION_PERIOD" => CloseLisaAccountWithinCancellationPeriod
           case _ => {
             Logger.warn(s"Close account returned error: ${failureResponse.code}")
-            CloseLisaAccountErrorResponse(failureResponse.code)
+            CloseLisaAccountErrorResponse
           }
         }
       }
