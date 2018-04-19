@@ -50,6 +50,7 @@ trait UpdateSubscriptionService {
           case Constants.accCancelled => UpdateSubscriptionAccountClosedResponse
           case Constants.accVoid => UpdateSubscriptionAccountVoidedResponse
           case _ => {
+            Logger.warn(s"Update date of first subscription returned error: ${failureResponse.code}")
             UpdateSubscriptionErrorResponse
           }
         }

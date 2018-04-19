@@ -17,6 +17,7 @@
 package uk.gov.hmrc.lisaapi.services
 
 import org.joda.time.DateTime
+import play.api.Logger
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models.des.DesFailureResponse
@@ -41,7 +42,10 @@ trait BulkPaymentService {
           case "NOT_FOUND" |
                "INVALID_CALCULATEACCRUEDINTEREST" |
                "INVALID_CUSTOMERPAYMENTINFORMATION" => GetBulkPaymentNotFoundResponse
-          case _ => GetBulkPaymentErrorResponse
+          case _ => {
+            Logger.warn(s"Get bulk payment returned error: ${f.code}")
+            GetBulkPaymentErrorResponse
+          }
         }
       }
     }
