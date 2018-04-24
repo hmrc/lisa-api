@@ -57,7 +57,16 @@ trait TransactionService {
       case error: DesFailureResponse => {
         Logger.debug(s"Error from ITMP: ${error.code}")
 
-        Future.successful(handleError(error.code, "ITMP"))
+        Future.successful(
+          error.code match {
+            case "TRANSACTION_ID_NOT_FOUND" => GetTransactionTransactionNotFoundResponse
+            case "INVESTOR_ACCOUNTID_NOT_FOUND" => GetTransactionAccountNotFoundResponse
+            case _ => {
+              Logger.warn(s"Get transaction returned error: ${error.code} from ITMP")
+              GetTransactionErrorResponse
+            }
+          }
+        )
       }
     }
   }
@@ -95,19 +104,8 @@ trait TransactionService {
         )
       }
       case error: DesFailureResponse => {
-        Logger.debug(s"Error from ETMP: ${error.code}")
+        Logger.warn(s"Get transaction returned error: ${error.code} from ETMP")
 
-        handleError(error.code, "ETMP")
-      }
-    }
-  }
-
-  private def handleError(code: String, hod: String): GetTransactionResponse = {
-    code match {
-      case "TRANSACTION_ID_NOT_FOUND" => GetTransactionTransactionNotFoundResponse
-      case "INVESTOR_ACCOUNTID_NOT_FOUND" => GetTransactionAccountNotFoundResponse
-      case _ => {
-        Logger.warn(s"Get transaction returned error: $code from $hod")
         GetTransactionErrorResponse
       }
     }
