@@ -84,6 +84,29 @@ class TransactionServiceSpec extends PlaySpec
           paymentAmount = None
         )
       }
+      "ITMP returns a Paid status and ETMP returns a Not Found error" in {
+        when(mockDesConnector.getBonusPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(DesGetBonusPaymentResponse(
+            lifeEventId = None,
+            periodStartDate = new DateTime("2001-01-01"),
+            periodEndDate = new DateTime("2002-01-01"),
+            htbTransfer = None,
+            inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
+            bonuses = Bonuses(1.0, 1.0, None, "X"),
+            creationDate = new DateTime("2000-01-01"),
+            status = "Paid")))
+
+        when(mockDesConnector.getTransaction(any(), any(), any())(any())).
+          thenReturn(Future.successful(DesFailureResponse("NOT_FOUND")))
+
+        val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
+
+        result mustBe GetTransactionSuccessResponse(
+          transactionId = "12345",
+          bonusDueForPeriod = Some(1.0),
+          paymentStatus = "Pending"
+        )
+      }
     }
 
     "return a Cancelled transaction" when {
@@ -150,49 +173,11 @@ class TransactionServiceSpec extends PlaySpec
 
         result mustBe GetTransactionTransactionNotFoundResponse
       }
-      "ITMP returns a Paid status and ETMP returns a Transaction Not Found error" in {
-        when(mockDesConnector.getBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesGetBonusPaymentResponse(
-            lifeEventId = None,
-            periodStartDate = new DateTime("2001-01-01"),
-            periodEndDate = new DateTime("2002-01-01"),
-            htbTransfer = None,
-            inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
-            bonuses = Bonuses(1.0, 1.0, None, "X"),
-            creationDate = new DateTime("2000-01-01"),
-            status = "Paid")))
-
-        when(mockDesConnector.getTransaction(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("TRANSACTION_ID_NOT_FOUND")))
-
-        val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
-
-        result mustBe GetTransactionTransactionNotFoundResponse
-      }
     }
 
     "return a Account Not Found error" when {
       "ITMP returns a Account Not Found error" in {
         when(mockDesConnector.getBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNTID_NOT_FOUND")))
-
-        val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
-
-        result mustBe GetTransactionAccountNotFoundResponse
-      }
-      "ITMP returns a Paid status and ETMP returns a Account Not Found error" in {
-        when(mockDesConnector.getBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesGetBonusPaymentResponse(
-            lifeEventId = None,
-            periodStartDate = new DateTime("2001-01-01"),
-            periodEndDate = new DateTime("2002-01-01"),
-            htbTransfer = None,
-            inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
-            bonuses = Bonuses(1.0, 1.0, None, "X"),
-            creationDate = new DateTime("2000-01-01"),
-            status = "Paid")))
-
-        when(mockDesConnector.getTransaction(any(), any(), any())(any())).
           thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNTID_NOT_FOUND")))
 
         val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
