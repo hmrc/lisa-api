@@ -87,6 +87,13 @@ trait TransactionService {
           paymentAmount = None
         )
       }
+      case error: DesFailureResponse if error.code == "NOT_FOUND" => {
+        GetTransactionSuccessResponse(
+          transactionId = transactionId,
+          bonusDueForPeriod = Some(bonusPayment.bonuses.bonusDueForPeriod),
+          paymentStatus = "Pending"
+        )
+      }
       case error: DesFailureResponse => {
         Logger.debug(s"Error from ETMP: ${error.code}")
 
