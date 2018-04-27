@@ -54,7 +54,7 @@
         </tr>
         <tr>
             <td>
-              <p>Request with a valid payload, LISA Manager reference number and account ID</p>
+              <p>Request with a valid payload, LISA Manager reference number and account ID (late notification)</p>
               <p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
               accountId: 0000000905</p>
             </td>
@@ -89,6 +89,47 @@
                                            "data": {<br>
                                              "message": "Bonus transaction created - late notification",<br>
                                              "transactionId": "8888888888"<br>
+                                           }<br>
+                                       }
+                </p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <p>Request with a valid payload, LISA Manager reference number and account ID (regular bonus)</p>
+              <p class ="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+              accountId: 1234567890</p>
+            </td>
+            <td>
+                <p class ="code--block"> {<br>
+                                               "periodStartDate": "2017-04-06",<br>
+                                               "periodEndDate": "2017-05-05",<br>
+                                               "htbTransfer": {<br>
+                                                  "htbTransferInForPeriod": 0.00,<br>
+                                                  "htbTransferTotalYTD": 0.00<br>
+                                               },<br>
+                                               "inboundPayments": {<br>
+                                                 "newSubsForPeriod": 4000.00,<br>
+                                                 "newSubsYTD": 4000.00,<br>
+                                                 "totalSubsForPeriod": 40000.00,<br>
+                                                 "totalSubsYTD": 40000.00<br>
+                                               },<br>
+                                               "bonuses": {<br>
+                                                 "bonusPaidYTD": 0.0,<br>
+                                                 "bonusDueForPeriod": 10000.00,<br>
+                                                 "totalBonusDueYTD": 10000.00,<br>
+                                                 "claimReason": "Regular Bonus"<br>
+                                               }<br>
+                                             }
+                </p>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">201 (Created)</code></p>
+                <p class ="code--block"> {<br>
+                                           "status": 201,<br>
+                                           "success": true,<br>
+                                           "data": {<br>
+                                             "message": "Bonus transaction created",<br>
+                                             "transactionId": "7777777777"<br>
                                            }<br>
                                        }
                 </p>
