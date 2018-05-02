@@ -900,9 +900,10 @@ types:
                         200:
                           body:
                             application/json:
+                              type: !include schemas/LISATransaction.get.response.schema.json
                               examples:
-                                example-1: !include examples/LISATransaction.get.response.json
-                                example-2: !include examples/LISATransaction.get.response.1.json
+                                withHtb: !include examples/LISATransaction.get.response.json
+                                withoutHtb: !include examples/LISATransaction.get.response.1.json
                         400:
                           body:
                             application/json:
