@@ -103,6 +103,7 @@ types:
                       body:
                         application/json:
                           example: !include examples/LISAInvestor.post.response.json
+                          type: !include schemas/LISAInvestor.post.response.schema.json
 
                     400:
                       body:
@@ -183,6 +184,7 @@ types:
                             example: /lifetime-isa/manager/Z876543/accounts/acc654321
                         body:
                           application/json:
+                            type: !include schemas/LISAAccount.post.response.schema.json
                             examples:
                               example-1: !include examples/LISAAccount.post.response1.json
                               example-2: !include examples/LISAAccount.post.response.json
@@ -307,6 +309,7 @@ types:
                       description: The account is reinstated successfully.
                       body:
                         application/json:
+                            type: !include schemas/LISAAccount.reinstate.post.response.schema.json
                             example: !include examples/LISAAccount.reinstate.post.response.json
                     400:
                       body:
@@ -475,6 +478,7 @@ types:
                         description: The account is updated successfully.
                         body:
                           application/json:
+                              type: !include schemas/LISAAccount.close.post.response.schema.json
                               example: !include examples/LISAAccount.put.response.json
                       400:
                         body:
@@ -577,6 +581,7 @@ types:
                         description: The first Subscription is updated successfully.
                         body:
                           application/json:
+                            type: !include schemas/LISAAccount.updateSubscription.post.response.schema.json
                             examples:
                               example-1: !include examples/LISAAccount.subscription.response.json
                               example-2: !include examples/LISAAccount.update.voided.subscription.response.json
@@ -673,6 +678,7 @@ types:
 
                         body:
                           application/json:
+                              type: !include schemas/LifeEvent.post.response.schema.json
                               example: !include examples/LifeEvent.post.response.json
                       400:
                         body:
@@ -778,6 +784,7 @@ types:
                             example: /lifetime-isa/manager/Z876543/accounts/acc654321/transactions/7777777777
                         body:
                           application/json:
+                            type: !include schemas/BonusPaymentRequest.post.response.schema.json
                             examples:
                               example-1: !include examples/LISATransaction.post.response.json
                               example-2: !include examples/LISATransaction.post.response.1.json
