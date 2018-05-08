@@ -3,7 +3,7 @@
   "type": "object",
   "properties": {
     "data" : {
-      "description": "Response information needed by the caller of the API.",
+      "description": "Response details.",
       "type": "object",
       "properties": {
         "transactionId": {
