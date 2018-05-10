@@ -42,7 +42,7 @@
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
                 <p class ="code--block"> {<br>
                                          "data": {<br>
-                                           "message": "Successfully updated the firstSubscriptionDate for the LISA account and changed the account status to void because the investor has another account with a more recent firstSubscriptionDate",<br>
+                                           "message": "Successfully updated the firstSubscriptionDate for the LISA account and changed the account status to void because the investor has another account with an earlier firstSubscriptionDate",<br>
                                            "code": "UPDATED_AND_ACCOUNT_VOID",<br>
                                            "accountId": "1234567892"<br>
                                          }<br>

@@ -69,8 +69,8 @@ object Constants {
   val updateCode = "UPDATED"
   val voidCode = "UPDATED_AND_ACCOUNT_VOID"
   val updateMsg = "Successfully updated the firstSubscriptionDate for the LISA account"
-  val voidMsg = "Successfully updated the firstSubscriptionDate for the LISA account and " +
-    "changed the account status to void because the investor has another account with a more recent firstSubscriptionDate"
+  val voidMsg = "Successfully updated the firstSubscriptionDate for the LISA account and changed the account status " +
+                "to void because the investor has another account with an earlier firstSubscriptionDate"
   val accNotFound = "INVESTOR_ACCOUNTID_NOT_FOUND"
   val accClosed = "INVESTOR_ACCOUNT_ALREADY_CLOSED"
   val accCancelled = "INVESTOR_ACCOUNT_ALREADY_CANCELLED"
