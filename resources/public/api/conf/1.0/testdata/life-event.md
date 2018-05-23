@@ -27,7 +27,7 @@
   "success": true,
   "data": {
     "message": "Life event created",
-    "lifeEventId": "9876543210"
+    "lifeEventId": "1234567890"
   }
 }
 </pre>
