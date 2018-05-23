@@ -734,7 +734,7 @@
                 <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
                 <br>
                 <strong>accountId:</strong><br>
-                1234567890
+                0000000409
               </p>
             </td>
             <td>
@@ -766,8 +766,7 @@
 <pre class ="code--block">
 {
   "code": "BONUS_CLAIM_ALREADY_EXISTS",
-  "message": "The investor's bonus payment has already been requested",
-  "id": "1234567890"
+  "message": "The investor's bonus payment has already been requested"
 }
 </pre>
             </td>
