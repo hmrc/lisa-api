@@ -45,7 +45,7 @@ class UpdateSubscriptionServiceSpec extends PlaySpec with MockitoSugar with OneA
         when(mockDesConnector.updateFirstSubDate(any(), any(),any())(any())).thenReturn(Future.successful(DesUpdateSubscriptionSuccessResponse("INVESTOR_ACCOUNT_NOW_VOID","message")))
 
         doRequest{response => response mustBe UpdateSubscriptionSuccessResponse("UPDATED_AND_ACCOUNT_VOID",
-          "Successfully updated the firstSubscriptionDate for the LISA account and changed the account status to void because the investor has another account with a more recent firstSubscriptionDate")}
+          "Successfully updated the firstSubscriptionDate for the LISA account and changed the account status to void because the investor has another account with an earlier firstSubscriptionDate")}
       }
     }
 
