@@ -21,7 +21,7 @@
 			</td>
 			<td>
 				<p>HTTP status: <code class="code--slim">200 (OK)</code></p>
-<pre class ="code--block">
+<pre class="code--block">
 {
 	"lifeEventId": "1234567890",
 	"periodStartDate": "2017-04-06",
@@ -56,7 +56,7 @@
 			</td>
 			<td>
 				<p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
-<pre class ="code--block">
+<pre class="code--block">
 {
 	"code": "BAD_REQUEST",
 	"message": "lisaManagerReferenceNumber in the URL is in the wrong format"
@@ -75,7 +75,7 @@
 			</td>
 			<td>
 				<p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
-<pre class ="code--block">
+<pre class="code--block">
 {
 	"code": "BAD_REQUEST",
 	"message": "accountId in the URL is in the wrong format"
@@ -94,7 +94,7 @@
 			</td>
 			<td>
 				<p>HTTP status: <code class="code--slim">404 (Not Found)</code></p>
-<pre class ="code--block">
+<pre class="code--block">
 {
 	"code": "BONUS_PAYMENT_TRANSACTION_NOT_FOUND",
 	"message": "transactionId does not match HMRC’s records"
@@ -113,7 +113,7 @@
 			</td>
 			<td>
 				<p>HTTP status: <code class="code--slim">404 (Not Found)</code></p>
-<pre class ="code--block">
+<pre class="code--block">
 {
 	"code": "INVESTOR_ACCOUNTID_NOT_FOUND",
 	"message": "The accountId does not match HMRC’s records"
