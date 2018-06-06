@@ -1,86 +1,133 @@
 {
-	"$schema": "http://json-schema.org/draft-04/schema#",
-	"type": "object",
-	"properties":
-	{
-        "lifeEventId" : {
-          "description": "A reference number for a life event.",
-          "$ref": "#/definitions/IDType"},
-		"periodStartDate" : {
-          "description": "The first date in the claim period.",
-          "$ref": "#/definitions/ISO8601-Date"},
-	    "periodEndDate" : {
-          "description": "The end date of the claim period.",
-          "$ref": "#/definitions/ISO8601-Date1"},
-
-		"htbTransfer" :
-		{
-          "description": "Details about Help to Buy funds.",
-			"type" : "object",
-			"properties":
-			{
-				"htbTransferInForPeriod" :{
-                  "description": "The total amount of Help to Buy funds in the account during the claim period.",
-                  "type" : "number"},
-			    "htbTransferTotalYTD" :{
-                  "description": "The total amount of Help to Buy funds in the account in the tax year to date.",
-                  "type" : "number"}
-			},
-          "required":
-          [
-            "htbTransferInForPeriod",
-            "htbTransferTotalYTD"
-          ]
-		},
-
-		"inboundPayments" :
-		{
-          "description": "Details about qualifying deposits and account balance.",
-			"type" : "object",
-			"properties":
-			{
-			  "newSubsForPeriod" :{"description": "The total value of new qualifying deposits paid in to the account during the claim period.", "type" : "number"},
-			  "newSubsYTD" :{"description": "The total value of new qualifying deposits paid in to the account during the tax year to date.", "type" : "number"},
-			  "totalSubsForPeriod" :{"description": "The total amount in the account during the claim period that qualifies for a bonus payment.", "type" : "number"},
-			  "totalSubsYTD" :{"description": "The total amount in the account during the tax year to date that qualifies for a bonus payment.", "type" : "number"}
-			},
-		  "required":
-		  [
-			"newSubsYTD",
-			"totalSubsForPeriod",
-			"totalSubsYTD"
-		  ]
-		},
-      "bonuses" :
-      {
-        "description": "Bonus payment details.",
-        "type": "object",
-        "properties" :
-        {
-          "bonusDueForPeriod" :{"description": "The total bonus payment amount due for the claim period.", "type" : "number"},
-          "totalBonusDueYTD" :{"description": "The total bonus payment amount due for the tax year to date.", "type" : "number"},
-          "bonusPaidYTD" :{"description": "The total bonus payment that has already been claimed and paid in the tax year to date.", "type" : "number"},
-          "claimReason" : {"description": "The reason the bonus payment was claimed.", "$ref": "#/definitions/claimReasonType"}
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "lifeEventId": {
+      "description": "A reference number for a life event.",
+      "$ref": "#/definitions/IDType"
+    },
+    "periodStartDate": {
+      "description": "The first date in the claim period.",
+      "$ref": "#/definitions/ISO8601-Date"
+    },
+    "periodEndDate": {
+      "description": "The end date of the claim period.",
+      "$ref": "#/definitions/ISO8601-Date1"
+    },
+    "htbTransfer": {
+      "description": "Details about Help to Buy funds.",
+      "type": "object",
+      "properties": {
+        "htbTransferInForPeriod": {
+          "description": "The total amount of Help to Buy funds in the account during the claim period.",
+          "type": "number"
         },
-        "required":
-        [
-          "bonusDueForPeriod" ,
-          "totalBonusDueYTD",
-          "claimReason"
-        ]
-
-      }
-
-	},
-	"required": [
-		"periodStartDate",
-		"periodEndDate",
-		"inboundPayments",
-        "bonuses"
+        "htbTransferTotalYTD": {
+          "description": "The total amount of Help to Buy funds in the account in the tax year to date.",
+          "type": "number"
+        }
+      },
+      "required": [
+        "htbTransferInForPeriod",
+        "htbTransferTotalYTD"
+      ]
+    },
+    "inboundPayments": {
+      "description": "Details about qualifying deposits and account balance.",
+      "type": "object",
+      "properties": {
+        "newSubsForPeriod": {
+          "description": "The total value of new qualifying deposits paid in to the account during the claim period.",
+          "type": "number"
+        },
+        "newSubsYTD": {
+          "description": "The total value of new qualifying deposits paid in to the account during the tax year to date.",
+          "type": "number"
+        },
+        "totalSubsForPeriod": {
+          "description": "The total amount in the account during the claim period that qualifies for a bonus payment.",
+          "type": "number"
+        },
+        "totalSubsYTD": {
+          "description": "The total amount in the account during the tax year to date that qualifies for a bonus payment.",
+          "type": "number"
+        }
+      },
+      "required": [
+        "newSubsYTD",
+        "totalSubsForPeriod",
+        "totalSubsYTD"
+      ]
+    },
+    "bonuses": {
+      "description": "Bonus payment details.",
+      "type": "object",
+      "properties": {
+        "bonusDueForPeriod": {
+          "description": "The total bonus payment amount due for the claim period.",
+          "type": "number"
+        },
+        "totalBonusDueYTD": {
+          "description": "The total bonus payment amount due for the tax year to date.",
+          "type": "number"
+        },
+        "bonusPaidYTD": {
+          "description": "The total bonus payment that has already been claimed and paid in the tax year to date.",
+          "type": "number"
+        },
+        "claimReason": {
+          "description": "The reason the bonus payment was claimed.",
+          "$ref": "#/definitions/claimReasonType"
+        }
+      },
+      "required": [
+        "bonusDueForPeriod",
+        "totalBonusDueYTD",
+        "claimReason"
+      ]
+    },
+    "supersede": {
+      "description": "Supresede bonus payment by requesting for an additional bonus amount or recover an overpaid amount",
+      "type": "object",
+      "properties": {
+        "automaticRecoveryAmount": {
+          "description": "***TODO****",
+          "type": "number"
+        },
+        "supersededTransactionID": {
+          "description": "***TODO****",
+          "type": "number"
+        },
+        "supersededTransactionAmount": {
+          "description": "***TODO****",
+          "type": "number"
+        },
+        "supersededTransactionResult": {
+          "description": "****TODO****",
+          "type": "number"
+        },
+        "supersededReason": {
+          "description": "The reason for the bonus payment being superseded.",
+          "$ref": "#/definitions/supersededReasonType"
+        }
+      },
+      "required": [
+        "automaticRecoveryAmount",
+        "supersededTransactionID",
+        "supersededTransactionAmount",
+        "supersededTransactionResult",
+        "supersededReason"
+      ]
+    }
+  },
+    "required": [
+      "periodStartDate",
+      "periodEndDate",
+      "inboundPayments",
+      "bonuses"
     ],
-	"additionalProperties": false,
-	"definitions":
-	{
+    "additionalProperties": false,
+    "definitions": {
       "ISO8601-Date": {
         "id": "full-date",
         "type": "string",
@@ -93,18 +140,32 @@
         "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
         "example": "2017-06-05"
       },
-		"IDType": {
-			"type": "string",
-			"pattern": "^\\d{10}$",
-          "example": "0987654321"
-		},
-      "claimReasonType" : {
-        "type" : "string",
-        "enum": ["Life Event", "Regular Bonus"]
+      "IDType": {
+        "type": "string",
+        "pattern": "^\\d{10}$",
+        "example": "0987654321"
       },
-      "chargeReasonType" : {
-        "type" : "string",
-        "enum": ["Unauthorised withdrawal", "Others TBD"]
+      "claimReasonType": {
+        "type": "string",
+        "enum": [
+          "Life Event",
+          "Regular Bonus"
+        ]
+      },
+      "chargeReasonType": {
+        "type": "string",
+        "enum": [
+          "Unauthorised withdrawal",
+          "Others TBD"
+        ]
+      },
+      "supersededReasonType": {
+        "type": "string",
+        "enum": [
+          "Bonus recovery",
+          "Additional bonus"
+        ]
       }
-	}
-}
+    }
+  }
+
