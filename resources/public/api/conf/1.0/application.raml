@@ -766,7 +766,7 @@ types:
                   post:
                     is: [headers.acceptHeader, headers.contentHeader]
                     displayName: Request a bonus payment
-                    description: Request a bonus payment from HMRC and provide a reason for the request.You can also correct a bonus claim during or after the claim reporting period. You can repay any overpaid amounts to HMRC and receive additional payments from corrected claims.
+                    description: Request a bonus payment from HMRC and provide a reason for the request. You can also correct a bonus claim during or after the claim reporting period. You can repay any overpaid amounts to HMRC and receive additional payments from corrected claims.
                     (annotations.scope): "write:lisa"
                     securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
                     (annotations.sandboxData): !include testdata/bonus-payment.md
@@ -863,11 +863,11 @@ types:
                                     "message": "This LISA account has already been closed or been made void by HMRC"
                                   }
                               helpToBuyNotApplicable:
-                                description: Help to Buy is not applicable on this account.
+                                description: Help to Buy is not applicable on this account
                                 value: |
                                   {
                                     "code": "HELP_TO_BUY_NOT_APPLICABLE",
-                                    "message": "Help to Buy is not applicable on this account."
+                                    "message": "Help to Buy is not applicable on this account"
                                   }
                               bonusClaimTimescalesExceeded:
                                 description: The timescale for claiming a bonus has passed. The claim period lasts for 6 years and 14 days.
@@ -877,12 +877,12 @@ types:
                                     "message": "The timescale for claiming a bonus has passed. The claim period lasts for 6 years and 14 days."
                                   }
                               supersededBonusRequestAmountMismatch:
-                                description: The 'supersededTransactionID' on the request does not match to an existing Transaction ID or does not match the'bonusDueForPeriod' amount.
+                                description: The 'supersededTransactionID' on the request does not match to an existing Transaction ID or does not match the 'bonusDueForPeriod' amount
                                 value: |
                                   {
                                     "code": "SUPERSEDED_BONUS_REQUEST_AMOUNT_MISMATCH",
-                                    "message": "The 'supersededTransactionID' on the request does not match to an existing Transaction ID or does not match the'bonusDueForPeriod' amount."
-                                  }SUPERSEDED_BONUS_REQUEST_OUTCOME_ERROR
+                                    "message": "The 'supersededTransactionID' on the request does not match to an existing Transaction ID or does not match the 'bonusDueForPeriod' amount"
+                                  }
                               supersededBonusRequestOutcomeError:
                                 description: TODO
                                 value: |
@@ -922,11 +922,11 @@ types:
                                       "message" : "The investor’s bonus payment has already been requested"
                                     }
                                 bonusRequestAlreadySuperseded:
-                                  description: The 'supersededTransactionID' and 'Superseded Transaction Amount' in the request match to a transaction ID and corresponding 'bonusDueForPeriod' amount on an existing transaction record for this account.
+                                  description: The 'supersededTransactionID' and 'supersededTransactionAmount' in the request match to a transaction ID and corresponding 'bonusDueForPeriod' amount on an existing transaction record for this account
                                   value: |
                                     {
                                       "code" : "BONUS_REQUEST_ALREADY_SUPERSEDED",
-                                      "message" : "The 'supersededTransactionID' and 'Superseded Transaction Amount' in the request match to a transaction ID and corresponding 'bonusDueForPeriod' amount on an existing transaction record for this account."
+                                      "message" : "The 'supersededTransactionID' and 'supersededTransactionAmount' in the request match to a transaction ID and corresponding 'bonusDueForPeriod' amount on an existing transaction record for this account"
                                     }
                   /{transactionId}:
                     uriParameters:
