@@ -3,6 +3,8 @@
   "creationReason": "Transferred",
   "accountId": "1234567891",
   "firstSubscriptionDate": "2017-04-06",
+  "accountStatus": "OPEN",
+  "subscriptionStatus": "AVAILABLE",
   "transferAccount": {
     "transferredFromAccountId": "8765432100",
     "transferredFromLMRN": "Z654321",
