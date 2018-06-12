@@ -13,10 +13,10 @@
     "claimReason": "Regular Bonus"
   },
   "supersede" : {
-    "automaticRecoveryAmount":300.00,
-    "supersededTransactionID":1234567891,
-    "supersededTransactionAmount":-300.00,
-    "supersededTransactionResult":300.00,
-    "supersededReason":"Bonus recovery"
+    "automaticRecoveryAmount": 300.00,
+    "supersededTransactionID": 1234567891,
+    "supersededTransactionAmount": -300.00,
+    "supersededTransactionResult": 300.00,
+    "supersededReason": "Bonus recovery"
   }
 }
