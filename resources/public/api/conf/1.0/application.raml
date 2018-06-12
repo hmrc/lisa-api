@@ -50,8 +50,8 @@ types:
                example: "Z1234"
             get:
               is: [headers.acceptHeader]
-              displayName: Discover available endpoints
-              description: This allows a LISA provider to discover all the available endpoints.
+              displayName: Get a list of all available endpoints
+              description: Use a LISA manager reference to get a list of all available endpoints.
               (annotations.scope): "read:lisa"
               securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
               (annotations.sandboxData): !include testdata/discover-endpoints.md
@@ -404,8 +404,8 @@ types:
                       be unique when used in combination with lisaManagerReferenceNumber. Any special characters should be URL encoded.
                     example: "ABC12345"
                 get:
-                    displayName: Retrieve account details
-                    description: Retrieve account details by accountId
+                    displayName: Get account details
+                    description: Use an account ID to get account details.
                     is: [headers.acceptHeader, headers.contentHeader]
                     (annotations.scope): "read:lisa"
                     securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
@@ -567,7 +567,7 @@ types:
                   post:
                     is: [headers.acceptHeader, headers.contentHeader]
                     displayName: Modify date of first subscription of a LISA account
-                    description: Modify the date when the first deposit was paid after a LISA account was created
+                    description: Modify the date when the first deposit was paid after a LISA account was created.
                     (annotations.scope): "write:lisa"
                     securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
                     (annotations.sandboxData): !include testdata/subscription-update.md
@@ -935,8 +935,8 @@ types:
                         description: The ID for the transaction.
                         example: "1234567890"
                     get:
-                      displayName: Retrieve bonus payment submitted
-                      description: Retrieve bonus payment submitted earlier by transactionID
+                      displayName: Get details of a bonus request
+                      description: Use an investor’s transaction ID to get a request for a bonus payment that has been submitted to HMRC.
                       is: [headers.acceptHeader, headers.contentHeader]
                       (annotations.scope): "read:lisa"
                       securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
@@ -1002,8 +1002,8 @@ types:
                                     }
                     /payments:
                       get:
-                         displayName: Retrieve payment details for an investor’s transaction ID
-                         description: Retrieve payment details for an investor’s transaction ID.
+                         displayName: Get details about an investor’s bonus payment
+                         description: Use an investor’s transaction ID to get details about a bonus payment, including when the payment is due.
                          is: [headers.acceptHeader, headers.contentHeader]
                          (annotations.scope): "read:lisa"
                          securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
@@ -1068,8 +1068,8 @@ types:
             /payments:
               get:
                   is: [headers.acceptHeader]
-                  displayName: Retrieve payment details
-                  description: This allows a LISA provider to retrieve payments made by HMRC in a specific date range.
+                  displayName: Get a list of all bonus payments in a date range
+                  description: Get a list of all completed and due bonus payments from HMRC in a specific date range.
                   (annotations.scope): "read:lisa"
                   securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
                   (annotations.sandboxData): !include testdata/get-bulk-payment.md
