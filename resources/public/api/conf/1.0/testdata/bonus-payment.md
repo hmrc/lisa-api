@@ -783,7 +783,7 @@
                 123456<br>
                 <br>
                 <strong>accountId:</strong><br>
-                1234567890
+                1000000403
               </p>
             </td>
             <td>
@@ -830,7 +830,7 @@
                 123456<br>
                 <br>
                 <strong>accountId:</strong><br>
-                1234567890
+                2000000403
               </p>
             </td>
             <td>
@@ -1012,7 +1012,7 @@
                 123456<br>
                 <br>
                 <strong>accountId:</strong><br>
-                1234567890
+                1000000409
               </p>
             </td>
             <td>
@@ -1045,7 +1045,7 @@
             <td><p>HTTP status: <code class="code--slim">409 (Conflict)</code></p>
 <pre class ="code--block">
 {
-  "code": "SUPERSEDED_BONUS_ALREADY_SUPERSEDED",
+  "code": "BONUS_REQUEST_ALREADY_SUPERSEDED",
   "message": "TODO"
 }
 </pre>
