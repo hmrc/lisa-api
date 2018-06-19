@@ -2,18 +2,18 @@
 
 [![Build Status](https://travis-ci.org/hmrc/lisa-api.svg)](https://travis-ci.org/hmrc/lisa-api) [ ![Download](https://api.bintray.com/packages/hmrc/releases/lisa-api/images/download.svg) ](https://bintray.com/hmrc/releases/lisa-api/_latestVersion)
 
-This API allows financial organisations to report Lifetime ISA (LISA) information to HM Revenue and Customs (HMRC) and get information about payments made by HMRC.
+This REST API allows Lifetime ISA (LISA) managers to:
 
-This repository has API specification in RAML format and code process requests from users based on the HMRMC api-platform architecture.
+* report investor information to HM Revenue and Customs (HMRC)
+* get information about payments made by HMRC
 
-This version of the API is in development and is very likely to change.
+The code in this repository is a work in progress.
+ 
+A version of this API currently runs on the HMRC API platform and is limited to private beta testers only.
+  
+If you are one of our private beta testers, you should refer to the [API Developer Hub](https://developer.service.hmrc.gov.uk/api-documentation) for the latest API specification. You will have to log in.
 
-The current API allows the financial organisation to:
-
-  * report a new investor to HMRC    
-  * create, transfer or close a LISA account    
-  * report an investor life event    
-  * request a bonus payment    
+If you want to join our private beta testing, email <savings.audit@hmrc.gsi.gov.uk>.
 
 ### License
 
