@@ -884,11 +884,11 @@ types:
                                     "message": "The 'supersededTransactionID' on the request does not match to an existing Transaction ID or does not match the 'bonusDueForPeriod' amount"
                                   }
                               supersededBonusRequestOutcomeError:
-                                description: TODO
+                                description: The calculation from your superseded bonus claim is incorrect
                                 value: |
                                   {
                                     "code": "SUPERSEDED_BONUS_REQUEST_OUTCOME_ERROR",
-                                    "message": "TODO"
+                                    "message": "The calculation from your superseded bonus claim is incorrect"
                                   }
                       404:
                         body:
@@ -922,11 +922,11 @@ types:
                                       "message" : "The investor’s bonus payment has already been requested"
                                     }
                                 bonusRequestAlreadySuperseded:
-                                  description: The 'supersededTransactionID' and 'supersededTransactionAmount' in the request match to a transaction ID and corresponding 'bonusDueForPeriod' amount on an existing transaction record for this account
+                                  description: The 'supersededTransactionID' and 'supersededTransactionAmount' match to a transaction ID and 'bonusDueForPeriod' amount on an existing transaction record for this account
                                   value: |
                                     {
                                       "code" : "BONUS_REQUEST_ALREADY_SUPERSEDED",
-                                      "message" : "The 'supersededTransactionID' and 'supersededTransactionAmount' in the request match to a transaction ID and corresponding 'bonusDueForPeriod' amount on an existing transaction record for this account"
+                                      "message" : "The 'supersededTransactionID' and 'supersededTransactionAmount' match to a transaction ID and 'bonusDueForPeriod' amount on an existing transaction record for this account"
                                     }
                   /{transactionId}:
                     uriParameters:

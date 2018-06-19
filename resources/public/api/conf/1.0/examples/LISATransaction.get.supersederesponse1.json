@@ -10,13 +10,13 @@
   "bonuses": {
     "bonusDueForPeriod": 0.00,
     "totalBonusDueYTD": 0.00,
-    "claimReason": "Regular Bonus"
+    "claimReason": "Superseding bonus claim"
   },
   "supersede" : {
     "automaticRecoveryAmount":300.00,
-    "supersededTransactionID":1234567891,
-    "supersededTransactionAmount":-300.00,
-    "supersededTransactionResult":300.00,
-    "supersededReason":"Bonus recovery"
+    "transactionID":1234567891,
+    "transactionAmount":-300.00,
+    "transactionResult":300.00,
+    "reason":"Bonus recovery"
   }
 }
