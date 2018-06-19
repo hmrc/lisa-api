@@ -770,7 +770,7 @@
 <pre class ="code--block">
 {
   "code": "BONUS_CLAIM_TIMESCALES_EXCEEDED",
-  "message": "The timescale for claiming a bonus has passed. The claim period lasts for 6 years and 14 days."
+  "message": "The timescale for claiming a bonus has passed. The claim period lasts for 6 years and 14 days"
 }
 </pre>
             </td>
@@ -817,7 +817,7 @@
 <pre class ="code--block">
 {
   "code": "SUPERSEDED_BONUS_REQUEST_AMOUNT_MISMATCH",
-  "message": "The 'supersededTransactionID' on the request does not match to an existing Transaction ID or does not match the 'bonusDueForPeriod' amount"
+  "message": "The supersededTransactionID on the request does not match to an existing Transaction ID or does not match the bonusDueForPeriod amount"
 }
 </pre>
             </td>
@@ -999,7 +999,7 @@
 <pre class ="code--block">
 {
   "code": "BONUS_CLAIM_ALREADY_EXISTS",
-  "message": "The investor's bonus payment has already been requested"
+  "message": "The investor’s bonus payment has already been requested"
 }
 </pre>
             </td>
@@ -1046,7 +1046,7 @@
 <pre class ="code--block">
 {
   "code": "BONUS_REQUEST_ALREADY_SUPERSEDED",
-  "message": "TODO"
+  "message": "The supersededTransactionID and supersededTransactionAmount in the request match to a Transaction ID and corresponding bonusDueForPeriod amount on an existing transaction record for this account"
 }
 </pre>
             </td>
@@ -1139,7 +1139,7 @@
 <pre class ="code--block">
 {
   "code": "BONUS_CLAIM_ALREADY_EXISTS",
-  "message": "The investor's bonus payment has already been requested"
+  "message": "The investor’s bonus payment has already been requested"
 }
 </pre>
             </td>
