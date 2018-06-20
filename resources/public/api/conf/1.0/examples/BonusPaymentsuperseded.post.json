@@ -1,0 +1,22 @@
+{
+  "periodStartDate": "2018-04-06",
+  "periodEndDate": "2018-05-05",
+  "inboundPayments": {
+    "newSubsForPeriod": 0.00,
+    "newSubsYTD": 0.00,
+    "totalSubsForPeriod": 0.00,
+    "totalSubsYTD": 0.00
+  },
+  "bonuses": {
+    "bonusDueForPeriod": 0.00,
+    "totalBonusDueYTD": 0.00,
+    "claimReason": "Superseding bonus claim"
+  },
+  "supersede" : {
+    "automaticRecoveryAmount":300.00,
+    "transactionID":1234567891,
+    "transactionAmount":-300.00,
+    "transactionResult":300.00,
+    "reason":"Bonus recovery"
+  }
+}

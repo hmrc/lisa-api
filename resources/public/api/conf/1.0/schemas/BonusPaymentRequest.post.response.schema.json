@@ -16,7 +16,8 @@
           "type": "string",
           "enum": [
 						"Bonus transaction created",
-            "Bonus transaction created - late notification"
+            "Bonus transaction created - late notification",
+            "Bonus transaction superseded"
           ]
         }
       },
