@@ -173,21 +173,21 @@ types:
                       application/json:
                         type: !include schemas/LISAAccount.post.schema.json
                         examples:
-                          example-1: !include examples/LISAAccount.post1.json
-                          example-2: !include examples/LISAAccount.post.json
+                          example-1: !include examples/LISAAccount.post.json
+                          example-2: !include examples/LISAAccount.post1.json
                     responses:
                       201:
                         headers:
                           Location:
                             description: Relative URI to the created LISA account resource
                             type: string
-                            example: /lifetime-isa/manager/Z876543/accounts/acc654321
+                            example: /lifetime-isa/manager/Z123456/accounts/1234567890
                         body:
                           application/json:
                             type: !include schemas/LISAAccount.post.response.schema.json
                             examples:
-                              example-1: !include examples/LISAAccount.post.response1.json
-                              example-2: !include examples/LISAAccount.post.response.json
+                              example-1: !include examples/LISAAccount.post.response.json
+                              example-2: !include examples/LISAAccount.post.response1.json
                       400:
                         body:
                           application/json:
@@ -414,8 +414,10 @@ types:
                       200:
                         body:
                           application/json:
-                            example: !include examples/LISAAccount.get.json
                             type: !include schemas/LISAAccount.get.schema.json
+                            examples:
+                                example-1: !include examples/LISAAccount.get.json
+                                example-2: !include examples/LISAAccount.get1.json
                       400:
                         body:
                           application/json:

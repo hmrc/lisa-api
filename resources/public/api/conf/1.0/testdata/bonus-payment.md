@@ -67,7 +67,7 @@
                 <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
                 <br>
                 <strong>accountId:</strong><br>
-                0000000905
+                1234567891
               </p>
             </td>
             <td>
@@ -76,10 +76,6 @@
   "lifeEventId": "1234567890",
   "periodStartDate": "2017-04-06",
   "periodEndDate": "2017-05-05",
-  "htbTransfer": {
-    "htbTransferInForPeriod": 0.00,
-    "htbTransferTotalYTD": 0.00
-  },
   "inboundPayments": {
     "newSubsForPeriod": 4000.00,
     "newSubsYTD": 4000.00,
@@ -124,10 +120,6 @@
 {
   "periodStartDate": "2017-04-06",
   "periodEndDate": "2017-05-05",
-  "htbTransfer": {
-    "htbTransferInForPeriod": 0.00,
-    "htbTransferTotalYTD": 0.00
-  },
   "inboundPayments": {
     "newSubsForPeriod": 4000.00,
     "newSubsYTD": 4000.00,
@@ -150,7 +142,7 @@
   "success": true,
   "data": {
     "message": "Bonus transaction created",
-    "transactionId": "7777777777"
+    "transactionId": "1234567892"
   }
 }
 </pre>
