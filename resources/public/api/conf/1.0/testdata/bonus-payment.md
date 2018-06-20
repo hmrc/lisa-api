@@ -856,7 +856,7 @@
 <pre class ="code--block">
 {
   "code": "SUPERSEDED_BONUS_REQUEST_OUTCOME_ERROR",
-  "message": "TODO"
+  "message": "The calculation from your superseded bonus claim is incorrect"
 }
 </pre>
             </td>
