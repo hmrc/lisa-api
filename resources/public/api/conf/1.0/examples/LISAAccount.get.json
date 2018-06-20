@@ -1,13 +1,8 @@
 {
-  "accountId": "0000000200",
   "investorId": "9876543210",
-  "creationReason": "Transferred",
+  "creationReason": "New",
+  "accountId": "1234567890",
   "firstSubscriptionDate": "2017-04-06",
   "accountStatus": "OPEN",
-  "subscriptionStatus": "ACTIVE",
-  "transferAccount": {
-    "transferredFromAccountId": "8765432102",
-    "transferredFromLMRN": "Z543333",
-    "transferInDate": "2017-04-06"
-  }
+  "subscriptionStatus": "ACTIVE"
 }

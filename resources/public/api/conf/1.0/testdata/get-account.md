@@ -20,9 +20,9 @@
         <p>HTTP status: <code class="code--slim">200 (OK)</code></p>
 <pre class="code--block">
 {
-  "accountId": "1234567890",
   "investorId": "9876543210",
   "creationReason": "New",
+  "accountId": "1234567890",
   "firstSubscriptionDate": "2017-04-06",
   "accountStatus": "OPEN",
   "subscriptionStatus": "ACTIVE"
@@ -35,22 +35,22 @@
         <p>Request with a valid LISA Manager reference number and account ID (transferred account)</p>
         <p class="code--block">
           lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
-          accountId: 0000000200
+          accountId: 1234567891
         </p>
       </td>
       <td>
         <p>HTTP status: <code class="code--slim">200 (OK)</code></p>
 <pre class="code--block">
 {
-  "accountId": "0000000200",
   "investorId": "9876543210",
   "creationReason": "Transferred",
+  "accountId": "1234567891",
   "firstSubscriptionDate": "2017-04-06",
   "accountStatus": "OPEN",
   "subscriptionStatus": "AVAILABLE",
   "transferAccount": {
-    "transferredFromAccountId": "8765432102",
-    "transferredFromLMRN": "Z543333",
+    "transferredFromAccountId": "8765432100",
+    "transferredFromLMRN": "Z654321",
     "transferInDate": "2017-04-06"
   }
 }

@@ -23,24 +23,56 @@
 				<p>HTTP status: <code class="code--slim">200 (OK)</code></p>
 <pre class="code--block">
 {
-	"lifeEventId": "1234567890",
-	"periodStartDate": "2017-04-06",
-	"periodEndDate": "2017-05-05",
-	"htbTransfer": {
-		"htbTransferInForPeriod": 0.00,
-		"htbTransferTotalYTD": 0.00
-	},
-	"inboundPayments": {
-		"newSubsForPeriod": 4000.00,
-		"newSubsYTD": 4000.00,
-		"totalSubsForPeriod": 4000.00,
-		"totalSubsYTD": 4000.00
-	},
-	"bonuses": {
-		"bonusDueForPeriod": 1000.00,
-		"totalBonusDueYTD": 1000.00,
-		"claimReason": "Life Event"
-	}
+  "lifeEventId": "1234567890",
+  "periodStartDate": "2017-04-06",
+  "periodEndDate": "2017-05-05",
+  "htbTransfer": {
+    "htbTransferInForPeriod": 0.00,
+    "htbTransferTotalYTD": 0.00
+  },
+  "inboundPayments": {
+    "newSubsForPeriod": 4000.00,
+    "newSubsYTD": 4000.00,
+    "totalSubsForPeriod": 40000.00,
+    "totalSubsYTD": 40000.00
+  },
+  "bonuses": {
+    "bonusPaidYTD": 0.0,
+    "bonusDueForPeriod": 10000.00,
+    "totalBonusDueYTD": 10000.00,
+    "claimReason": "Life Event"
+  }
+}
+</pre>
+			</td>
+		</tr>
+	    <tr>
+		    <td>
+		    	<p>Retrieve details for a bonus payment associated with a LISA account (regular bonus)</p>
+		    	<p class ="code--block">
+		    		<strong>lisaManagerReferenceNumber:</strong> <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+		    		<strong>accountId:</strong> 1234567890<br>
+		    		<strong>transactionId:</strong> 1234567892
+		    	</p>
+			</td>
+			<td>
+				<p>HTTP status: <code class="code--slim">200 (OK)</code></p>
+<pre class="code--block">
+{
+  "periodStartDate": "2017-04-06",
+  "periodEndDate": "2017-05-05",
+  "inboundPayments": {
+    "newSubsForPeriod": 4000.00,
+    "newSubsYTD": 4000.00,
+    "totalSubsForPeriod": 40000.00,
+    "totalSubsYTD": 40000.00
+  },
+  "bonuses": {
+    "bonusPaidYTD": 0.0,
+    "bonusDueForPeriod": 10000.00,
+    "totalBonusDueYTD": 10000.00,
+    "claimReason": "Regular Bonus"
+  }
 }
 </pre>
 			</td>
