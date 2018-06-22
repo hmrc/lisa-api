@@ -14,9 +14,9 @@
   },
   "supersede" : {
     "automaticRecoveryAmount": 0.00,
-    "supersededTransactionID": 1234567891,
-    "supersededTransactionAmount": 300.00,
-    "supersededTransactionResult": 100.00,
-    "supersededReason": "Additional bonus"
+    "transactionId": 1234567891,
+    "transactionAmount": 300.00,
+    "transactionResult": 100.00,
+    "reason": "Additional bonus"
   }
 }
