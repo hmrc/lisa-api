@@ -178,10 +178,10 @@
   }
   "supersede": {
     "automaticRecoveryAmount": 1000.00,
-    "supersededTransactionID": "1234567892",
-    "supersededTransactionAmount": 1000.00,
-    "supersededTransactionResult": -1000.00,
-    "supersededReason": "Bonus recovery"
+    "transactionId": "1234567892",
+    "transactionAmount": 1000.00,
+    "transactionResult": -1000.00,
+    "reason": "Bonus recovery"
   }
 }
 </pre>
@@ -232,10 +232,10 @@
     "claimReason": "Regular Bonus"
   }
   "supersede": {
-    "supersededTransactionID": "1234567892",
-    "supersededTransactionAmount": 10000.00,
-    "supersededTransactionResult": 500.00,
-    "supersededReason": "Additional bonus"
+    "transactionId": "1234567892",
+    "transactionAmount": 10000.00,
+    "transactionResult": 500.00,
+    "reason": "Additional bonus"
   }
 }
 </pre>
@@ -254,7 +254,7 @@
             </td>
         </tr>
 
-        
+
         <tr>
             <td>
               <p>Request with a valid payload and account ID, but an invalid LISA Manager reference number</p>
@@ -378,10 +378,10 @@
     "claimReason": "X"
   },
   "supersede": {
-    "supersededTransactionID": "ABC123",
-    "supersededTransactionAmount": true,
-    "supersededTransactionResult": -10.005,
-    "supersededReason": "Recovery"
+    "transactionId": "ABC123",
+    "transactionAmount": true,
+    "transactionResult": -10.005,
+    "reason": "Recovery"
   }
 }
 </pre>
@@ -750,10 +750,10 @@
     "claimReason": "Regular Bonus"
   }
   "supersede": {
-    "supersededTransactionID": "1234567892",
-    "supersededTransactionAmount": 10000.00,
-    "supersededTransactionResult": 500.00,
-    "supersededReason": "Additional bonus"
+    "transactionId": "1234567892",
+    "transactionAmount": 10000.00,
+    "transactionResult": 500.00,
+    "reason": "Additional bonus"
   }
 }
 </pre>
@@ -797,10 +797,10 @@
   }
   "supersede": {
     "automaticRecoveryAmount": 1000.00,
-    "supersededTransactionID": "1234567892",
-    "supersededTransactionAmount": 2000.00,
-    "supersededTransactionResult": -1000.00,
-    "supersededReason": "Bonus recovery"
+    "transactionId": "1234567892",
+    "transactionAmount": 2000.00,
+    "transactionResult": -1000.00,
+    "reason": "Bonus recovery"
   }
 }
 </pre>
@@ -844,10 +844,10 @@
   }
   "supersede": {
     "automaticRecoveryAmount": 1000.00,
-    "supersededTransactionID": "1234567892",
-    "supersededTransactionAmount": 2000.00,
-    "supersededTransactionResult": -1000.00,
-    "supersededReason": "Bonus recovery"
+    "transactionId": "1234567892",
+    "transactionAmount": 2000.00,
+    "transactionResult": -1000.00,
+    "reason": "Bonus recovery"
   }
 }
 </pre>
@@ -1026,10 +1026,10 @@
   }
   "supersede": {
     "automaticRecoveryAmount": 1000.00,
-    "supersededTransactionID": "1234567899",
-    "supersededTransactionAmount": 1000.00,
-    "supersededTransactionResult": -1000.00,
-    "supersededReason": "Bonus recovery"
+    "transactionId": "1234567899",
+    "transactionAmount": 1000.00,
+    "transactionResult": -1000.00,
+    "reason": "Bonus recovery"
   }
 }
 </pre>
