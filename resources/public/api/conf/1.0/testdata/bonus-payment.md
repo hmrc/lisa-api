@@ -175,7 +175,7 @@
     "bonusDueForPeriod": 0.00,
     "totalBonusDueYTD": 0.00,
     "claimReason": "Regular Bonus"
-  }
+  },
   "supersede": {
     "automaticRecoveryAmount": 1000.00,
     "transactionId": "1234567892",
@@ -230,7 +230,7 @@
     "bonusDueForPeriod": 10500.00,
     "totalBonusDueYTD": 10000.00,
     "claimReason": "Regular Bonus"
-  }
+  },
   "supersede": {
     "transactionId": "1234567892",
     "transactionAmount": 10000.00,
@@ -748,7 +748,7 @@
     "bonusDueForPeriod": 10500.00,
     "totalBonusDueYTD": 10000.00,
     "claimReason": "Regular Bonus"
-  }
+  },
   "supersede": {
     "transactionId": "1234567892",
     "transactionAmount": 10000.00,
@@ -794,7 +794,7 @@
     "bonusDueForPeriod": 0.00,
     "totalBonusDueYTD": 0.00,
     "claimReason": "Regular Bonus"
-  }
+  },
   "supersede": {
     "automaticRecoveryAmount": 1000.00,
     "transactionId": "1234567892",
@@ -841,7 +841,7 @@
     "bonusDueForPeriod": 0.00,
     "totalBonusDueYTD": 0.00,
     "claimReason": "Regular Bonus"
-  }
+  },
   "supersede": {
     "automaticRecoveryAmount": 1000.00,
     "transactionId": "1234567892",
@@ -1023,7 +1023,7 @@
     "bonusDueForPeriod": 0.00,
     "totalBonusDueYTD": 0.00,
     "claimReason": "Regular Bonus"
-  }
+  },
   "supersede": {
     "automaticRecoveryAmount": 1000.00,
     "transactionId": "1234567899",
