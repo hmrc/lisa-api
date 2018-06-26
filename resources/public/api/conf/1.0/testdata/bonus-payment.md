@@ -253,8 +253,6 @@
 </pre>
             </td>
         </tr>
-
-
         <tr>
             <td>
               <p>Request with a valid payload and account ID, but an invalid LISA Manager reference number</p>

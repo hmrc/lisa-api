@@ -62,7 +62,7 @@ package object models {
       "^(All funds withdrawn|Cancellation)$".r,
       "error.formatting.accountClosureReason")
     val bonusClaimReason: Reads[BonusClaimReason] = Reads.pattern(
-      "^(Life Event|Regular Bonus)$".r,
+      "^(Life Event|Regular Bonus|Superseding bonus claim)$".r,
       "error.formatting.claimReason"
     )
 

@@ -38,6 +38,7 @@ trait BonusPaymentService {
 
         successResponse.message match {
           case "Late" => RequestBonusPaymentLateResponse(successResponse.transactionID)
+          case "Superseded" => RequestBonusPaymentSupersededResponse(successResponse.transactionID)
           case _ => RequestBonusPaymentOnTimeResponse(successResponse.transactionID)
         }
       }

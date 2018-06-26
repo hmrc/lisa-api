@@ -83,7 +83,7 @@ object LisaInvestor {
   implicit val format = Json.format[LisaInvestor]
 }
 
-case class LisaAccount(investorID:ID,
+case class LisaAccount(investorID: ID,
                        accountID: AccountId,
                        lisaManagerReferenceNumber:ReferenceNumber,
                        creationReason:CreationReason,
@@ -142,6 +142,47 @@ object InboundPayments {
     (JsPath \ "totalSubsForPeriod").write[Amount] and
     (JsPath \ "totalSubsYTD").write[Amount]
   )(unlift(InboundPayments.unapply))
+}
+
+sealed trait Supersede
+
+case class BonusRecovery(
+  automaticRecoveryAmount: Amount,
+  transactionId: String,
+  transactionAmount: Amount,
+  transactionResult: Amount
+) extends Supersede
+
+case class AdditionalBonus(
+  transactionId: String,
+  transactionAmount: Amount,
+  transactionResult: Amount
+) extends Supersede
+
+
+// TODO: Add all the field level validation for supersede data
+object Supersede {
+
+  val bonusRecoveryReads = Json.reads[BonusRecovery]
+  val additionalBonusReads = Json.reads[AdditionalBonus]
+
+  implicit val supersedeReads: Reads[Supersede] = Reads[Supersede] { json =>
+    val reason = (json \ "reason").as[String]
+
+    reason match {
+      case "Bonus recovery" => bonusRecoveryReads.reads(json)
+      case "Additional bonus" => additionalBonusReads.reads(json)
+    }
+  }
+
+  val bonusRecoveryWrites = Json.writes[BonusRecovery]
+  val additionalBonusWrites = Json.writes[AdditionalBonus]
+
+  implicit val supersedeWrites: Writes[Supersede] = Writes[Supersede] {
+    case br: BonusRecovery => bonusRecoveryWrites.writes(br)
+    case ab: AdditionalBonus => additionalBonusWrites.writes(ab)
+  }
+
 }
 
 case class LifeEvent(accountID: AccountId,

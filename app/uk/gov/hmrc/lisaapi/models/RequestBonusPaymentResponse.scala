@@ -25,6 +25,7 @@ trait RequestBonusPaymentSuccessResponse extends RequestBonusPaymentResponse {
 }
 case class RequestBonusPaymentLateResponse(transactionId: String) extends RequestBonusPaymentSuccessResponse
 case class RequestBonusPaymentOnTimeResponse(transactionId: String) extends RequestBonusPaymentSuccessResponse
+case class RequestBonusPaymentSupersededResponse(transactionId: String) extends RequestBonusPaymentSuccessResponse
 
 trait RequestBonusPaymentErrorResponse extends RequestBonusPaymentResponse
 case object RequestBonusPaymentAccountClosed extends RequestBonusPaymentErrorResponse

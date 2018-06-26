@@ -21,13 +21,22 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsPath, Reads, Writes}
 
 case class RequestBonusPaymentRequest(
-                                       lifeEventId: Option[LifeEventId],
-                                       periodStartDate: DateTime,
-                                       periodEndDate: DateTime,
-                                       htbTransfer: Option[HelpToBuyTransfer],
-                                       inboundPayments: InboundPayments,
-                                       bonuses: Bonuses
-)
+  lifeEventId: Option[LifeEventId],
+  periodStartDate: DateTime,
+  periodEndDate: DateTime,
+  htbTransfer: Option[HelpToBuyTransfer],
+  inboundPayments: InboundPayments,
+  bonuses: Bonuses,
+  supersede: Option[Supersede] = None
+) {
+  val supersedeDataIsRequired = bonuses.claimReason == "Superseding bonus claim"
+  val supersedeDataIsPresent = supersede.isDefined
+
+  require(
+    supersedeDataIsRequired && supersedeDataIsPresent || !supersedeDataIsRequired,
+    "claimReason is Superseding bonus claim and supersede data is not provided"
+  )
+}
 
 object RequestBonusPaymentRequest {
   implicit val requestBonusPaymentReads: Reads[RequestBonusPaymentRequest] = (
@@ -36,7 +45,8 @@ object RequestBonusPaymentRequest {
     (JsPath \ "periodEndDate").read(JsonReads.isoDate).map(new DateTime(_)) and
     (JsPath \ "htbTransfer").readNullable[HelpToBuyTransfer] and
     (JsPath \ "inboundPayments").read[InboundPayments] and
-    (JsPath \ "bonuses").read[Bonuses]
+    (JsPath \ "bonuses").read[Bonuses] and
+    (JsPath \ "supersede").readNullable[Supersede]
   )(RequestBonusPaymentRequest.apply _)
 
   implicit val requestBonusPaymentWrites: Writes[RequestBonusPaymentRequest] = (
@@ -46,6 +56,18 @@ object RequestBonusPaymentRequest {
     (JsPath \ "transactionType").write[String] and
     (JsPath \ "htbTransfer").writeNullable[HelpToBuyTransfer] and
     (JsPath \ "inboundPayments").write[InboundPayments] and
-    (JsPath \ "bonuses").write[Bonuses]
-  ){req: RequestBonusPaymentRequest => (req.lifeEventId, req.periodStartDate, req.periodEndDate, "Bonus", req.htbTransfer, req.inboundPayments, req.bonuses)}
+    (JsPath \ "bonuses").write[Bonuses] and
+    (JsPath \ "supersede").writeNullable[Supersede]
+  ){
+    req: RequestBonusPaymentRequest => (
+      req.lifeEventId,
+      req.periodStartDate,
+      req.periodEndDate,
+      "Bonus",
+      req.htbTransfer,
+      req.inboundPayments,
+      req.bonuses,
+      req.supersede
+    )
+  }
 }
