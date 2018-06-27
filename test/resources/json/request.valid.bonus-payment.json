@@ -5,7 +5,7 @@
   "transactionType": "Bonus",
 
   "htbTransfer": {
-    "htbTransferInForPeriod": 0.00,
+    "htbTransferInForPeriod": 10.00,
     "htbTransferTotalYTD": 10.00
   },
 
