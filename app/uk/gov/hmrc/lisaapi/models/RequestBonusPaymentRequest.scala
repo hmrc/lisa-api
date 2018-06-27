@@ -28,15 +28,7 @@ case class RequestBonusPaymentRequest(
   inboundPayments: InboundPayments,
   bonuses: Bonuses,
   supersede: Option[Supersede] = None
-) {
-  val supersedeDataIsRequired = bonuses.claimReason == "Superseding bonus claim"
-  val supersedeDataIsPresent = supersede.isDefined
-
-  require(
-    supersedeDataIsRequired && supersedeDataIsPresent || !supersedeDataIsRequired,
-    "claimReason is Superseding bonus claim and supersede data is not provided"
-  )
-}
+)
 
 object RequestBonusPaymentRequest {
   implicit val requestBonusPaymentReads: Reads[RequestBonusPaymentRequest] = (

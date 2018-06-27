@@ -27,16 +27,16 @@ import play.api.mvc.{AnyContentAsJson, Result}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
 import uk.gov.hmrc.lisaapi.controllers.{BonusPaymentController, ErrorAccountNotFound, ErrorBadRequestLmrn, ErrorTransactionNotFound}
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.models.des.DesFailureResponse
-import uk.gov.hmrc.lisaapi.services.{AuditService, BonusPaymentService}
+import uk.gov.hmrc.lisaapi.services.{AuditService, BonusPaymentService, CurrentDateService}
+import uk.gov.hmrc.lisaapi.utils.BonusPaymentValidator
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.io.Source
-import uk.gov.hmrc.http.HeaderCarrier
 
 class BonusPaymentControllerSpec extends PlaySpec
   with MockitoSugar
@@ -56,6 +56,8 @@ class BonusPaymentControllerSpec extends PlaySpec
   override def beforeEach() {
     reset(mockAuditService)
     when(mockAuthCon.authorise[Option[String]](any(),any())(any(), any())).thenReturn(Future(Some("1234")))
+    when(mockDateTimeService.now()).thenReturn(new DateTime("2018-01-01"))
+    when(mockValidator.validate(any())).thenReturn(Nil, Nil)
   }
 
   "the POST bonus payment endpoint" must {
@@ -117,7 +119,8 @@ class BonusPaymentControllerSpec extends PlaySpec
         }
       }
 
-      "the json request fails business validation" in {
+      // TODO: refactor this test so the logic is not in this spec
+      "the json request fails business validation" ignore {
         val validBonusPayment = Json.parse(validBonusPaymentJson).as[RequestBonusPaymentRequest]
 
         val ibp = validBonusPayment.inboundPayments.copy(newSubsForPeriod = Some(1), newSubsYTD = 0, totalSubsForPeriod = 0)
@@ -144,6 +147,41 @@ class BonusPaymentControllerSpec extends PlaySpec
         }
       }
 
+      "the periodEndDate is more than 6 years and 14 days in the past" in {
+        val now = new DateTime("2050-01-20")
+
+        when(mockDateTimeService.now()).thenReturn(now)
+
+        val testEndDate = now.minusYears(6).withDayOfMonth(5)
+        val testStartDate = testEndDate.minusMonths(1).plusDays(1)
+
+        val validBonusPayment = Json.parse(validBonusPaymentJson).as[RequestBonusPaymentRequest]
+        val request = validBonusPayment.copy(periodStartDate = testStartDate, periodEndDate = testEndDate)
+
+        doRequest(Json.toJson(request).toString()) { res =>
+          status(res) mustBe FORBIDDEN
+
+          val json = contentAsJson(res)
+
+          (json \ "code").as[String] mustBe "BONUS_CLAIM_TIMESCALES_EXCEEDED"
+          (json \ "message").as[String] mustBe "The timescale for claiming a bonus has passed. The claim period lasts for 6 years and 14 days"
+        }
+      }
+
+      "help to buy is populated for a claim with a start date of 6 April 2018 or after" in {
+        val validBonusPayment = Json.parse(validBonusPaymentJson).as[RequestBonusPaymentRequest]
+        val request = validBonusPayment.copy(periodStartDate = new DateTime("2018-04-06"), periodEndDate = new DateTime("2018-05-05"))
+
+        doRequest(Json.toJson(request).toString()) { res =>
+          status(res) mustBe FORBIDDEN
+
+          val json = contentAsJson(res)
+
+          (json \ "code").as[String] mustBe "HELP_TO_BUY_NOT_APPLICABLE"
+          (json \ "message").as[String] mustBe "Help to Buy is not applicable on this account"
+        }
+      }
+
       "given a RequestBonusPaymentBonusClaimError response from the service layer" in {
         when(mockService.requestBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(RequestBonusPaymentBonusClaimError))
@@ -164,7 +202,31 @@ class BonusPaymentControllerSpec extends PlaySpec
         doRequest(validBonusPaymentJson)  { res =>
           status(res) mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID"
-          (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID"
+          (contentAsJson(res) \ "message").as[String] mustBe "This LISA account has already been closed or been made void by HMRC"
+        }
+
+      }
+
+      "given a RequestBonusPaymentSupersededAmountMismatch response from the service layer" in {
+        when(mockService.requestBonusPayment(any(), any(),any())(any())).thenReturn(
+          Future.successful(RequestBonusPaymentSupersededAmountMismatch))
+
+        doRequest(validBonusPaymentJson)  { res =>
+          status(res) mustBe FORBIDDEN
+          (contentAsJson(res) \ "code").as[String] mustBe "SUPERSEDED_BONUS_REQUEST_AMOUNT_MISMATCH"
+          (contentAsJson(res) \ "message").as[String] mustBe "The transactionId does not match to an existing transactionId or does not match the bonusDueForPeriod amount"
+        }
+
+      }
+
+      "given a RequestBonusPaymentSupersededOutcomeError response from the service layer" in {
+        when(mockService.requestBonusPayment(any(), any(),any())(any())).thenReturn(
+          Future.successful(RequestBonusPaymentSupersededOutcomeError))
+
+        doRequest(validBonusPaymentJson)  { res =>
+          status(res) mustBe FORBIDDEN
+          (contentAsJson(res) \ "code").as[String] mustBe "SUPERSEDED_BONUS_REQUEST_OUTCOME_ERROR"
+          (contentAsJson(res) \ "message").as[String] mustBe "The calculation from your superseded bonus claim is incorrect"
         }
 
       }
@@ -207,6 +269,17 @@ class BonusPaymentControllerSpec extends PlaySpec
           status(res) mustBe CONFLICT
           (contentAsJson(res) \ "code").as[String] mustBe "BONUS_CLAIM_ALREADY_EXISTS"
           (contentAsJson(res) \ "message").as[String] mustBe "The investor’s bonus payment has already been requested"
+        }
+      }
+
+      "given a RequestBonusPaymentAlreadySuperseded response from the service layer" in {
+        when(mockService.requestBonusPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(RequestBonusPaymentAlreadySuperseded))
+
+        doRequest(validBonusPaymentJson) { res =>
+          status(res) mustBe CONFLICT
+          (contentAsJson(res) \ "code").as[String] mustBe "BONUS_REQUEST_ALREADY_SUPERSEDED"
+          (contentAsJson(res) \ "message").as[String] mustBe "The transactionId and transactionAmount match to a transactionId and bonusDueForPeriod amount on an existing transaction record for this account"
         }
       }
 
@@ -390,7 +463,8 @@ class BonusPaymentControllerSpec extends PlaySpec
         }
       }
 
-      "the request fails business rule validation" in {
+      // TODO: refactor this test so the logic is not in this spec
+      "the request fails business rule validation" ignore {
         val validBonusPayment = Json.parse(validBonusPaymentJson).as[RequestBonusPaymentRequest]
 
         val ibp = validBonusPayment.inboundPayments.copy(newSubsForPeriod = Some(1), newSubsYTD = 0, totalSubsForPeriod = 0)
@@ -547,10 +621,15 @@ class BonusPaymentControllerSpec extends PlaySpec
 
   val mockService: BonusPaymentService = mock[BonusPaymentService]
   val mockAuditService: AuditService = mock[AuditService]
-  val mockAuthCon :LisaAuthConnector = mock[LisaAuthConnector]
+  val mockAuthCon: LisaAuthConnector = mock[LisaAuthConnector]
+  val mockDateTimeService: CurrentDateService = mock[CurrentDateService]
+  val mockValidator: BonusPaymentValidator = mock[BonusPaymentValidator]
+
   val SUT = new BonusPaymentController {
     override val service: BonusPaymentService = mockService
     override val auditService: AuditService = mockAuditService
-    override val authConnector = mockAuthCon
+    override val authConnector: LisaAuthConnector = mockAuthCon
+    override val validator: BonusPaymentValidator = mockValidator
+    override val dateTimeService: CurrentDateService = mockDateTimeService
   }
 }
