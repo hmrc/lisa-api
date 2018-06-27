@@ -732,7 +732,7 @@
     "bonusPaidYTD": 0.0,
     "bonusDueForPeriod": 10500.00,
     "totalBonusDueYTD": 10000.00,
-    "claimReason": "Regular Bonus"
+    "claimReason": "Superseding bonus claim"
   },
   "supersede": {
     "automaticRecoveryAmount": 1000.00,
@@ -779,7 +779,7 @@
     "bonusPaidYTD": 0.0,
     "bonusDueForPeriod": 10500.00,
     "totalBonusDueYTD": 10000.00,
-    "claimReason": "Regular Bonus"
+    "claimReason": "Superseding bonus claim"
   },
   "supersede": {
     "automaticRecoveryAmount": 1000.00,
@@ -961,7 +961,7 @@
     "bonusPaidYTD": 0.0,
     "bonusDueForPeriod": 10500.00,
     "totalBonusDueYTD": 10000.00,
-    "claimReason": "Regular Bonus"
+    "claimReason": "Superseding bonus claim"
   },
   "supersede": {
     "automaticRecoveryAmount": 1000.00,
