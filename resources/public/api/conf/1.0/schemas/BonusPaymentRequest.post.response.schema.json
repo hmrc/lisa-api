@@ -15,7 +15,7 @@
           "description": "A human-readable explanation for the result of the API call.",
           "type": "string",
           "enum": [
-						"Bonus transaction created",
+            "Bonus transaction created",
             "Bonus transaction created - late notification",
             "Bonus transaction superseded"
           ]

@@ -383,60 +383,55 @@
 	        <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
 <pre class="code--block">
 {
-  "code": "BAD_REQUEST",
-  "message": "Bad Request",
-  "errors": [
-    {
-      "code": "INVALID_MONETARY_AMOUNT",
-      "message": "Amount cannot be negative, and can only have up to 2 decimal places",
-      "path": "/htbTransfer/htbTransferTotalYTD"
-    },
-    {
-      "code": "INVALID_DATA_TYPE",
-      "message": "Invalid data type has been used",
-      "path": "/lifeEventId"
-    },
-    {
-      "code": "MISSING_FIELD",
-      "message": "This field is required",
-      "path": "/bonuses/totalBonusDueYTD"
-    },
-    {
-      "code": "INVALID_FORMAT",
-      "message": "Invalid format has been used",
-      "path": "/bonuses/claimReason"
-    },
-    {
-      "code": "INVALID_DATE",
-      "message": "Date is invalid",
-      "path": "/periodEndDate"
-    },
-    {
-      "code": "MISSING_FIELD",
-      "message": "This field is required",
-      "path": "/supersede/automaticRecoveryAmount"
-    },
-    {
-      "code": "INVALID_FORMAT",
-      "message": "Invalid format has been used",
-      "path": "/supersede/supersededTransactionID"
-    },
-    {
-      "code": "INVALID_DATA_TYPE",
-      "message": "Invalid data type has been used",
-      "path": "/supersede/supersededTransactionAmount"
-    },
-    {
-      "code": "INVALID_MONETARY_AMOUNT",
-      "message": "Amount can only have up to 2 decimal places",
-      "path": "/supersede/supersededTransactionResult"
-    },
-    {
-      "code": "INVALID_FORMAT",
-      "message": "Invalid format has been used",
-      "path": "/supersede/supersededReason"
-    }
-  ]
+    "code": "BAD_REQUEST",
+    "message": "Bad Request",
+    "errors": [
+        {
+            "code": "INVALID_DATA_TYPE",
+            "message": "Invalid data type has been used",
+            "path": "/lifeEventId"
+        },
+        {
+            "code": "INVALID_DATE",
+            "message": "Date is invalid",
+            "path": "/periodEndDate"
+        },
+        {
+            "code": "INVALID_MONETARY_AMOUNT",
+            "message": "Amount cannot be negative, and can only have up to 2 decimal places",
+            "path": "/htbTransfer/htbTransferTotalYTD"
+        },
+        {
+            "code": "MISSING_FIELD",
+            "message": "This field is required",
+            "path": "/bonuses/totalBonusDueYTD"
+        },
+        {
+            "code": "INVALID_FORMAT",
+            "message": "Invalid format has been used",
+            "path": "/bonuses/claimReason"
+        },
+        {
+            "code": "INVALID_FORMAT",
+            "message": "Invalid format has been used",
+            "path": "/supersede/transactionId"
+        },
+        {
+            "code": "INVALID_DATA_TYPE",
+            "message": "Invalid data type has been used",
+            "path": "/supersede/transactionAmount"
+        },
+        {
+            "code": "INVALID_MONETARY_AMOUNT",
+            "message": "Amount can only have up to 2 decimal places",
+            "path": "/supersede/transactionResult"
+        },
+        {
+            "code": "INVALID_FORMAT",
+            "message": "Invalid format has been used",
+            "path": "/supersede/reason"
+        }
+    ]
 }
 </pre>
 	        </td>
@@ -725,19 +720,19 @@
             <td>
 <pre class="code--block">
 {
-  "periodStartDate": "2017-04-06",
-  "periodEndDate": "2017-05-05",
+  "periodStartDate": "2018-04-06",
+  "periodEndDate": "2018-05-05",
   "inboundPayments": {
-    "newSubsForPeriod": 0.00,
-    "newSubsYTD": 0.00,
-    "totalSubsForPeriod": 0.00,
-    "totalSubsYTD": 0.00
+    "newSubsForPeriod": 4000.00,
+    "newSubsYTD": 4000.00,
+    "totalSubsForPeriod": 40000.00,
+    "totalSubsYTD": 40000.00
   },
   "bonuses": {
-    "bonusPaidYTD": 0.00,
-    "bonusDueForPeriod": 0.00,
-    "totalBonusDueYTD": 0.00,
-    "claimReason": "Superseding bonus claim"
+    "bonusPaidYTD": 0.0,
+    "bonusDueForPeriod": 10500.00,
+    "totalBonusDueYTD": 10000.00,
+    "claimReason": "Regular Bonus"
   },
   "supersede": {
     "automaticRecoveryAmount": 1000.00,
@@ -753,7 +748,7 @@
 <pre class ="code--block">
 {
   "code": "SUPERSEDED_BONUS_REQUEST_AMOUNT_MISMATCH",
-  "message": "The supersededTransactionID on the request does not match to an existing Transaction ID or does not match the bonusDueForPeriod amount"
+  "message": "The transactionId on the request does not match to an existing transactionId or does not match the bonusDueForPeriod amount"
 }
 </pre>
             </td>
@@ -772,19 +767,19 @@
             <td>
 <pre class="code--block">
 {
-  "periodStartDate": "2017-04-06",
-  "periodEndDate": "2017-05-05",
+  "periodStartDate": "2018-04-06",
+  "periodEndDate": "2018-05-05",
   "inboundPayments": {
-    "newSubsForPeriod": 0.00,
-    "newSubsYTD": 0.00,
-    "totalSubsForPeriod": 0.00,
-    "totalSubsYTD": 0.00
+    "newSubsForPeriod": 4000.00,
+    "newSubsYTD": 4000.00,
+    "totalSubsForPeriod": 40000.00,
+    "totalSubsYTD": 40000.00
   },
   "bonuses": {
-    "bonusPaidYTD": 0.00,
-    "bonusDueForPeriod": 0.00,
-    "totalBonusDueYTD": 0.00,
-    "claimReason": "Superseding bonus claim"
+    "bonusPaidYTD": 0.0,
+    "bonusDueForPeriod": 10500.00,
+    "totalBonusDueYTD": 10000.00,
+    "claimReason": "Regular Bonus"
   },
   "supersede": {
     "automaticRecoveryAmount": 1000.00,
@@ -954,24 +949,24 @@
             <td>
 <pre class="code--block">
 {
-  "periodStartDate": "2017-04-06",
-  "periodEndDate": "2017-05-05",
+  "periodStartDate": "2018-04-06",
+  "periodEndDate": "2018-05-05",
   "inboundPayments": {
-    "newSubsForPeriod": 0.00,
-    "newSubsYTD": 0.00,
-    "totalSubsForPeriod": 0.00,
-    "totalSubsYTD": 0.00
+    "newSubsForPeriod": 4000.00,
+    "newSubsYTD": 4000.00,
+    "totalSubsForPeriod": 40000.00,
+    "totalSubsYTD": 40000.00
   },
   "bonuses": {
-    "bonusPaidYTD": 0.00,
-    "bonusDueForPeriod": 0.00,
-    "totalBonusDueYTD": 0.00,
-    "claimReason": "Superseding bonus claim"
+    "bonusPaidYTD": 0.0,
+    "bonusDueForPeriod": 10500.00,
+    "totalBonusDueYTD": 10000.00,
+    "claimReason": "Regular Bonus"
   },
   "supersede": {
     "automaticRecoveryAmount": 1000.00,
-    "transactionId": "1234567899",
-    "transactionAmount": 1000.00,
+    "transactionId": "1234567892",
+    "transactionAmount": 2000.00,
     "transactionResult": -1000.00,
     "reason": "Bonus recovery"
   }
