@@ -159,19 +159,33 @@ case class AdditionalBonus(
   transactionResult: Amount
 ) extends Supersede
 
-
-// TODO: Add all the field level validation for supersede data
 object Supersede {
 
-  val bonusRecoveryReads = Json.reads[BonusRecovery]
-  val additionalBonusReads = Json.reads[AdditionalBonus]
+  val bonusRecoveryReads: Reads[BonusRecovery] = (
+    (JsPath \ "automaticRecoveryAmount").read(JsonReads.nonNegativeAmount) and
+    (JsPath \ "transactionId").read(JsonReads.transactionId) and
+    (JsPath \ "transactionAmount").read(JsonReads.nonNegativeAmount) and
+    (JsPath \ "transactionResult").read(JsonReads.amount) and
+    (JsPath \ "reason").read[String](Reads.pattern("Bonus recovery".r, "error.formatting.reason"))
+  )((automaticRecoveryAmount, transactionId, transactionAmount, transactionResult, _) => BonusRecovery(
+    automaticRecoveryAmount, transactionId, transactionAmount, transactionResult
+  ))
+
+  val additionalBonusReads: Reads[AdditionalBonus] = (
+    (JsPath \ "transactionId").read(JsonReads.transactionId) and
+    (JsPath \ "transactionAmount").read(JsonReads.nonNegativeAmount) and
+    (JsPath \ "transactionResult").read(JsonReads.amount) and
+    (JsPath \ "reason").read[String](Reads.pattern("Additional bonus".r, "error.formatting.reason"))
+  )((transactionId, transactionAmount, transactionResult, _) => AdditionalBonus(
+    transactionId, transactionAmount, transactionResult
+  ))
 
   implicit val supersedeReads: Reads[Supersede] = Reads[Supersede] { json =>
     val reason = (json \ "reason").as[String]
 
     reason match {
       case "Bonus recovery" => bonusRecoveryReads.reads(json)
-      case "Additional bonus" => additionalBonusReads.reads(json)
+      case _ => additionalBonusReads.reads(json)
     }
   }
 
