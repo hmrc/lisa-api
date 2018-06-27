@@ -204,7 +204,6 @@ class BonusPaymentController extends LisaController with LisaConstants {
       case _:RequestBonusPaymentSupersededResponse =>
         val data = ApiResponseData(message = "Bonus transaction superseded", transactionId = Some(resp.transactionId))
 
-        // TODO: Decide how we are auditing superseded bonuses
         auditService.audit(
           auditType = "bonusPaymentRequested",
           path = getEndpointUrl(lisaManager, accountId),
