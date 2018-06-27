@@ -175,8 +175,35 @@ object Supersede {
     }
   }
 
-  val bonusRecoveryWrites = Json.writes[BonusRecovery]
-  val additionalBonusWrites = Json.writes[AdditionalBonus]
+  implicit val bonusRecoveryWrites: Writes[BonusRecovery] = (
+    (JsPath \ "automaticRecoveryAmount").write[Amount] and
+    (JsPath \ "transactionId").write[String] and
+    (JsPath \ "transactionAmount").write[Amount] and
+    (JsPath \ "transactionResult").write[Amount] and
+    (JsPath \ "reason").write[String]
+  ){
+    b: BonusRecovery => (
+      b.automaticRecoveryAmount,
+      b.transactionId,
+      b.transactionAmount,
+      b.transactionResult,
+      "Bonus recovery"
+    )
+  }
+
+  implicit val additionalBonusWrites: Writes[AdditionalBonus] = (
+    (JsPath \ "transactionId").write[String] and
+    (JsPath \ "transactionAmount").write[Amount] and
+    (JsPath \ "transactionResult").write[Amount] and
+    (JsPath \ "reason").write[String]
+  ){
+    b: AdditionalBonus => (
+      b.transactionId,
+      b.transactionAmount,
+      b.transactionResult,
+      "Additional bonus"
+    )
+  }
 
   implicit val supersedeWrites: Writes[Supersede] = Writes[Supersede] {
     case br: BonusRecovery => bonusRecoveryWrites.writes(br)

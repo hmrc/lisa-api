@@ -1,22 +1,22 @@
 {
-  "periodStartDate": "2018-04-06",
-  "periodEndDate": "2018-05-05",
+  "periodStartDate": "2017-04-06",
+  "periodEndDate": "2017-05-05",
   "inboundPayments": {
-    "newSubsForPeriod": 1600.00,
-    "newSubsYTD": 1600.00,
-    "totalSubsForPeriod": 1600.00,
-    "totalSubsYTD": 1600.00
+    "newSubsForPeriod": 4000.00,
+    "newSubsYTD": 4000.00,
+    "totalSubsForPeriod": 4000.00,
+    "totalSubsYTD": 4000.00
   },
   "bonuses": {
-    "bonusDueForPeriod": 400.00,
-    "totalBonusDueYTD": 400.00,
-    "claimReason": "Regular Bonus"
+    "bonusPaidYTD": 0.0,
+    "bonusDueForPeriod": 1000.00,
+    "totalBonusDueYTD": 1000.00,
+    "claimReason": "Superseding bonus claim"
   },
-  "supersede" : {
-    "automaticRecoveryAmount": 0.00,
-    "transactionId": 1234567891,
-    "transactionAmount": 300.00,
-    "transactionResult": 100.00,
+  "supersede": {
+    "transactionId": "1234567893",
+    "transactionAmount": 4000.00,
+    "transactionResult": 4000.00,
     "reason": "Additional bonus"
   }
 }
