@@ -28,8 +28,9 @@ import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
-import uk.gov.hmrc.lisaapi.controllers.{BonusPaymentController, ErrorAccountNotFound, ErrorBadRequestLmrn, ErrorTransactionNotFound}
+import uk.gov.hmrc.lisaapi.controllers.{BonusPaymentController, ErrorAccountNotFound, ErrorBadRequestLmrn, ErrorTransactionNotFound, ErrorValidation}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, BonusPaymentService, CurrentDateService}
 import uk.gov.hmrc.lisaapi.utils.BonusPaymentValidator
@@ -41,7 +42,8 @@ import scala.io.Source
 class BonusPaymentControllerSpec extends PlaySpec
   with MockitoSugar
   with OneAppPerSuite
-  with BeforeAndAfterEach {
+  with BeforeAndAfterEach
+  with LisaConstants {
 
   case object TestBonusPaymentResponse extends RequestBonusPaymentResponse
 
@@ -55,9 +57,12 @@ class BonusPaymentControllerSpec extends PlaySpec
 
   override def beforeEach() {
     reset(mockAuditService)
+    reset(mockDateTimeService)
+    reset(mockValidator)
+
     when(mockAuthCon.authorise[Option[String]](any(),any())(any(), any())).thenReturn(Future(Some("1234")))
     when(mockDateTimeService.now()).thenReturn(new DateTime("2018-01-01"))
-    when(mockValidator.validate(any())).thenReturn(Nil, Nil)
+    when(mockValidator.validate(any())).thenReturn(Nil)
   }
 
   "the POST bonus payment endpoint" must {
@@ -119,18 +124,23 @@ class BonusPaymentControllerSpec extends PlaySpec
         }
       }
 
-      // TODO: refactor this test so the logic is not in this spec
-      "the json request fails business validation" ignore {
-        val validBonusPayment = Json.parse(validBonusPaymentJson).as[RequestBonusPaymentRequest]
-
-        val ibp = validBonusPayment.inboundPayments.copy(newSubsForPeriod = Some(1), newSubsYTD = 0, totalSubsForPeriod = 0)
-        val htb = validBonusPayment.htbTransfer.get.copy(htbTransferInForPeriod = 1, htbTransferTotalYTD = 0)
-        val request = validBonusPayment.copy(
-                        inboundPayments = ibp,
-                        htbTransfer = Some(htb),
-                        periodStartDate = new DateTime(2017,3,6,0,0),
-                        periodEndDate = new DateTime(2017,4,5,0,0)
+      "the json request fails business validation" in {
+        val errors = List(
+          ErrorValidation(
+            MONETARY_ERROR,
+            "htbTransferTotalYTD must be more than 0",
+            Some("/htbTransfer/htbTransferTotalYTD")
+          ),
+          ErrorValidation(
+            DATE_ERROR,
+            "The periodStartDate must be the 6th day of the month",
+            Some("/periodStartDate")
+          )
         )
+
+        when(mockValidator.validate(any())).thenReturn(errors)
+
+        val request = Json.parse(validBonusPaymentJson).as[RequestBonusPaymentRequest]
 
         doRequest(Json.toJson(request).toString()) { res =>
           status(res) mustBe FORBIDDEN
@@ -139,11 +149,8 @@ class BonusPaymentControllerSpec extends PlaySpec
 
           (json \ "code").as[String] mustBe "FORBIDDEN"
 
-          (json \ "errors" \ 0 \ "path").as[String] mustBe "/inboundPayments/newSubsYTD"
-          (json \ "errors" \ 1 \ "path").as[String] mustBe "/htbTransfer/htbTransferTotalYTD"
-          (json \ "errors" \ 2 \ "path").as[String] mustBe "/inboundPayments/totalSubsForPeriod"
-          (json \ "errors" \ 3 \ "path").as[String] mustBe "/periodStartDate"
-          (json \ "errors" \ 4 \ "path").as[String] mustBe "/periodEndDate"
+          (json \ "errors" \ 0 \ "path").as[String] mustBe "/htbTransfer/htbTransferTotalYTD"
+          (json \ "errors" \ 1 \ "path").as[String] mustBe "/periodStartDate"
         }
       }
 
@@ -463,13 +470,23 @@ class BonusPaymentControllerSpec extends PlaySpec
         }
       }
 
-      // TODO: refactor this test so the logic is not in this spec
-      "the request fails business rule validation" ignore {
-        val validBonusPayment = Json.parse(validBonusPaymentJson).as[RequestBonusPaymentRequest]
+      "the request fails business rule validation" in {
+        val errors = List(
+          ErrorValidation(
+            MONETARY_ERROR,
+            "htbTransferTotalYTD must be more than 0",
+            Some("/htbTransfer/htbTransferTotalYTD")
+          ),
+          ErrorValidation(
+            DATE_ERROR,
+            "The periodStartDate must be the 6th day of the month",
+            Some("/periodStartDate")
+          )
+        )
 
-        val ibp = validBonusPayment.inboundPayments.copy(newSubsForPeriod = Some(1), newSubsYTD = 0, totalSubsForPeriod = 0)
-        val htb = validBonusPayment.htbTransfer.get.copy(htbTransferInForPeriod = 1, htbTransferTotalYTD = 0)
-        val request = validBonusPayment.copy(inboundPayments = ibp, htbTransfer = Some(htb))
+        when(mockValidator.validate(any())).thenReturn(errors)
+
+        val request = Json.parse(validBonusPaymentJson).as[RequestBonusPaymentRequest]
         val json = Json.toJson(request)
 
         reset(mockService)
