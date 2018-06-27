@@ -781,11 +781,6 @@ types:
                     responses:
                       201:
                         description: The LISA transaction resource has been created.
-                        headers:
-                          Location:
-                            description: Relative URI to the created bonus payment resource
-                            type: string
-                            example: /lifetime-isa/manager/Z876543/accounts/acc654321/transactions/7777777777
                         body:
                           application/json:
                             type: !include schemas/BonusPaymentRequest.post.response.schema.json

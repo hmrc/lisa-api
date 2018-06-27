@@ -165,20 +165,20 @@
   "periodStartDate": "2017-04-06",
   "periodEndDate": "2017-05-05",
   "inboundPayments": {
-    "newSubsForPeriod": 0.00,
-    "newSubsYTD": 0.00,
-    "totalSubsForPeriod": 0.00,
-    "totalSubsYTD": 0.00
+    "newSubsForPeriod": 4000.00,
+    "newSubsYTD": 4000.00,
+    "totalSubsForPeriod": 4000.00,
+    "totalSubsYTD": 4000.00
   },
   "bonuses": {
-    "bonusPaidYTD": 0.00,
-    "bonusDueForPeriod": 0.00,
-    "totalBonusDueYTD": 0.00,
-    "claimReason": "Regular Bonus"
+    "bonusPaidYTD": 0.0,
+    "bonusDueForPeriod": 1000.00,
+    "totalBonusDueYTD": 1000.00,
+    "claimReason": "Superseding bonus claim"
   },
   "supersede": {
     "automaticRecoveryAmount": 1000.00,
-    "transactionId": "1234567892",
+    "transactionId": "1234567893",
     "transactionAmount": 1000.00,
     "transactionResult": -1000.00,
     "reason": "Bonus recovery"
@@ -215,26 +215,22 @@
 {
   "periodStartDate": "2017-04-06",
   "periodEndDate": "2017-05-05",
-  "htbTransfer": {
-    "htbTransferInForPeriod": 0.00,
-    "htbTransferTotalYTD": 0.00
-  },
   "inboundPayments": {
     "newSubsForPeriod": 4000.00,
     "newSubsYTD": 4000.00,
-    "totalSubsForPeriod": 40000.00,
-    "totalSubsYTD": 40000.00
+    "totalSubsForPeriod": 4000.00,
+    "totalSubsYTD": 4000.00
   },
   "bonuses": {
     "bonusPaidYTD": 0.0,
-    "bonusDueForPeriod": 10500.00,
-    "totalBonusDueYTD": 10000.00,
-    "claimReason": "Regular Bonus"
+    "bonusDueForPeriod": 1000.00,
+    "totalBonusDueYTD": 1000.00,
+    "claimReason": "Superseding bonus claim"
   },
   "supersede": {
-    "transactionId": "1234567892",
-    "transactionAmount": 10000.00,
-    "transactionResult": 500.00,
+    "transactionId": "1234567893",
+    "transactionAmount": 4000.00,
+    "transactionResult": 4000.00,
     "reason": "Additional bonus"
   }
 }
@@ -717,56 +713,6 @@
         </tr>
         <tr>
             <td>
-              <p>Request to supersede a bonus request from over 6 years and 14 days ago.</p>
-              <p class="code--block">
-                <strong>lisaManagerReferenceNumber:</strong><br>
-                123456<br>
-                <br>
-                <strong>accountId:</strong><br>
-                1234567890
-              </p>
-            </td>
-            <td>
-<pre class="code--block">
-{
-  "periodStartDate": "1999-12-06",
-  "periodEndDate": "2000-01-05",
-  "htbTransfer": {
-    "htbTransferInForPeriod": 0.00,
-    "htbTransferTotalYTD": 0.00
-  },
-  "inboundPayments": {
-    "newSubsForPeriod": 4000.00,
-    "newSubsYTD": 4000.00,
-    "totalSubsForPeriod": 40000.00,
-    "totalSubsYTD": 40000.00
-  },
-  "bonuses": {
-    "bonusPaidYTD": 0.0,
-    "bonusDueForPeriod": 10500.00,
-    "totalBonusDueYTD": 10000.00,
-    "claimReason": "Regular Bonus"
-  },
-  "supersede": {
-    "transactionId": "1234567892",
-    "transactionAmount": 10000.00,
-    "transactionResult": 500.00,
-    "reason": "Additional bonus"
-  }
-}
-</pre>
-            </td>
-            <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
-<pre class ="code--block">
-{
-  "code": "BONUS_CLAIM_TIMESCALES_EXCEEDED",
-  "message": "The timescale for claiming a bonus has passed. The claim period lasts for 6 years and 14 days"
-}
-</pre>
-            </td>
-        </tr>
-        <tr>
-            <td>
               <p>Superseded transaction containing details which don't match an existing transaction</p>
               <p class="code--block">
                 <strong>lisaManagerReferenceNumber:</strong><br>
@@ -791,7 +737,7 @@
     "bonusPaidYTD": 0.00,
     "bonusDueForPeriod": 0.00,
     "totalBonusDueYTD": 0.00,
-    "claimReason": "Regular Bonus"
+    "claimReason": "Superseding bonus claim"
   },
   "supersede": {
     "automaticRecoveryAmount": 1000.00,
@@ -814,7 +760,7 @@
         </tr>
         <tr>
             <td>
-              <p>Superseded transaction with an outcome error?</p>
+              <p>Superseded transaction with an outcome error</p>
               <p class="code--block">
                 <strong>lisaManagerReferenceNumber:</strong><br>
                 123456<br>
@@ -838,7 +784,7 @@
     "bonusPaidYTD": 0.00,
     "bonusDueForPeriod": 0.00,
     "totalBonusDueYTD": 0.00,
-    "claimReason": "Regular Bonus"
+    "claimReason": "Superseding bonus claim"
   },
   "supersede": {
     "automaticRecoveryAmount": 1000.00,
@@ -1020,7 +966,7 @@
     "bonusPaidYTD": 0.00,
     "bonusDueForPeriod": 0.00,
     "totalBonusDueYTD": 0.00,
-    "claimReason": "Regular Bonus"
+    "claimReason": "Superseding bonus claim"
   },
   "supersede": {
     "automaticRecoveryAmount": 1000.00,
@@ -1036,7 +982,7 @@
 <pre class ="code--block">
 {
   "code": "BONUS_REQUEST_ALREADY_SUPERSEDED",
-  "message": "The supersededTransactionID and supersededTransactionAmount in the request match to a Transaction ID and corresponding bonusDueForPeriod amount on an existing transaction record for this account"
+  "message": "The transactionId and transactionAmount in the request match to a transactionId and corresponding bonusDueForPeriod amount on an existing transaction record for this account"
 }
 </pre>
             </td>
