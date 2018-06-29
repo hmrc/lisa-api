@@ -27,27 +27,27 @@
   "periodStartDate": "2017-04-06",
   "periodEndDate": "2017-05-05",
   "htbTransfer": {
-    "htbTransferInForPeriod": 0.00,
-    "htbTransferTotalYTD": 0.00
+    "htbTransferInForPeriod": 0,
+    "htbTransferTotalYTD": 0
   },
   "inboundPayments": {
-    "newSubsForPeriod": 4000.00,
-    "newSubsYTD": 4000.00,
-    "totalSubsForPeriod": 40000.00,
-    "totalSubsYTD": 40000.00
+    "newSubsForPeriod": 4000,
+    "newSubsYTD": 4000,
+    "totalSubsForPeriod": 40000,
+    "totalSubsYTD": 40000
   },
   "bonuses": {
-    "bonusPaidYTD": 0.0,
-    "bonusDueForPeriod": 10000.00,
-    "totalBonusDueYTD": 10000.00,
+    "bonusPaidYTD": 0,
+    "bonusDueForPeriod": 10000,
+    "totalBonusDueYTD": 10000,
     "claimReason": "Life Event"
   }
 }
 </pre>
 			</td>
 		</tr>
-	    <tr>
-		    <td>
+    <tr>
+	    <td>
 		    	<p>Retrieve details for a bonus payment associated with a LISA account (regular bonus)</p>
 		    	<p class ="code--block">
 		    		<strong>lisaManagerReferenceNumber:</strong> <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
@@ -62,29 +62,141 @@
   "periodStartDate": "2017-04-06",
   "periodEndDate": "2017-05-05",
   "inboundPayments": {
-    "newSubsForPeriod": 4000.00,
-    "newSubsYTD": 4000.00,
-    "totalSubsForPeriod": 40000.00,
-    "totalSubsYTD": 40000.00
+    "newSubsForPeriod": 4000,
+    "newSubsYTD": 4000,
+    "totalSubsForPeriod": 40000,
+    "totalSubsYTD": 40000
   },
   "bonuses": {
-    "bonusPaidYTD": 0.0,
-    "bonusDueForPeriod": 10000.00,
-    "totalBonusDueYTD": 10000.00,
+    "bonusPaidYTD": 0,
+    "bonusDueForPeriod": 10000,
+    "totalBonusDueYTD": 10000,
     "claimReason": "Regular Bonus"
   }
 }
 </pre>
 			</td>
 		</tr>
-	   <tr>
-		    <td>
-		    	<p>Request with an invalid LISA Manager reference number</p>
-		    	<p class ="code--block">
-		    		<strong>lisaManagerReferenceNumber:</strong> 123456<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		<tr>
+	    <td>
+		    	<p>Retrieve a superseded transaction (bonus recovery)</p>
+		    	<p class="code--block">
+		    		<strong>lisaManagerReferenceNumber:</strong> <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
 		    		<strong>accountId:</strong> 1234567890<br>
-		    		<strong>transactionId:</strong> 1234567890
+		    		<strong>transactionId:</strong> 1234567893
 		    	</p>
+			</td>
+			<td>
+				<p>HTTP status: <code class="code--slim">200 (OK)</code></p>
+<pre class="code--block">
+{
+  "periodStartDate": "2017-04-06",
+  "periodEndDate": "2017-05-05",
+  "inboundPayments": {
+    "newSubsForPeriod": 4000,
+    "newSubsYTD": 4000,
+    "totalSubsForPeriod": 4000,
+    "totalSubsYTD": 4000
+  },
+  "bonuses": {
+    "bonusPaidYTD": 0,
+    "bonusDueForPeriod": 1000,
+    "totalBonusDueYTD": 1000,
+    "claimReason": "Superseding bonus claim"
+  },
+  "supersede": {
+    "automaticRecoveryAmount": 1000,
+    "transactionId": "1234567893",
+    "transactionAmount": 1000,
+    "transactionResult": -1000,
+    "reason": "Bonus recovery"
+  }
+}
+</pre>
+			</td>
+		</tr>
+		<tr>
+	    <td>
+		    	<p>Retrieve a superseded transaction (additional bonus)</p>
+		    	<p class="code--block">
+		    		<strong>lisaManagerReferenceNumber:</strong> <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+		    		<strong>accountId:</strong> 1234567890<br>
+		    		<strong>transactionId:</strong> 1234567894
+		    	</p>
+			</td>
+			<td>
+				<p>HTTP status: <code class="code--slim">200 (OK)</code></p>
+<pre class="code--block">
+{
+  "periodStartDate": "2017-04-06",
+  "periodEndDate": "2017-05-05",
+  "inboundPayments": {
+    "newSubsForPeriod": 4000,
+    "newSubsYTD": 4000,
+    "totalSubsForPeriod": 4000,
+    "totalSubsYTD": 4000
+  },
+  "bonuses": {
+    "bonusPaidYTD": 0,
+    "bonusDueForPeriod": 1000,
+    "totalBonusDueYTD": 1000,
+    "claimReason": "Superseding bonus claim"
+  },
+  "supersede": {
+    "transactionId": "1234567893",
+    "transactionAmount": 4000,
+    "transactionResult": 4000,
+    "reason": "Additional bonus"
+  }
+}
+</pre>
+			</td>
+		</tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		<tr>
+		  <td>
+				<p>Request with an invalid LISA Manager reference number</p>
+				<p class ="code--block">
+					<strong>lisaManagerReferenceNumber:</strong> 123456<br>
+					<strong>accountId:</strong> 1234567890<br>
+					<strong>transactionId:</strong> 1234567890
+				</p>
 			</td>
 			<td>
 				<p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
