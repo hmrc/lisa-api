@@ -41,6 +41,9 @@
     "bonusDueForPeriod": 10000,
     "totalBonusDueYTD": 10000,
     "claimReason": "Life Event"
+  },
+  "supersede": {
+    "supersededBy": "1234567893"
   }
 }
 </pre>
@@ -62,9 +65,9 @@
   "periodStartDate": "2017-04-06",
   "periodEndDate": "2017-05-05",
   "inboundPayments": {
-    "newSubsForPeriod": 4000,
-    "newSubsYTD": 4000,
-    "totalSubsForPeriod": 40000,
+  "newSubsForPeriod": 4000,
+  "newSubsYTD": 4000,
+  "totalSubsForPeriod": 40000,
     "totalSubsYTD": 40000
   },
   "bonuses": {
@@ -72,6 +75,9 @@
     "bonusDueForPeriod": 10000,
     "totalBonusDueYTD": 10000,
     "claimReason": "Regular Bonus"
+  },
+  "supersede": {
+    "supersededBy": "1234567894"
   }
 }
 </pre>
