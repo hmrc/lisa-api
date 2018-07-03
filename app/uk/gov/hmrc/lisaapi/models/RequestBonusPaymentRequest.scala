@@ -34,7 +34,7 @@ case class RequestBonusPaymentRequest(
 object RequestBonusPaymentRequest {
   implicit val requestBonusPaymentReads: Reads[RequestBonusPaymentRequest] = (
     (JsPath \ "lifeEventId").readNullable(JsonReads.lifeEventId) and
-    (JsPath \ "periodStartDate").read(JsonReads.isoDate).map(new DateTime(_)) and
+    (JsPath \ "periodStartDate").read(JsonReads.notFutureDate).map(new DateTime(_)) and
     (JsPath \ "periodEndDate").read(JsonReads.isoDate).map(new DateTime(_)) and
     (JsPath \ "htbTransfer").readNullable[HelpToBuyTransfer] and
     (JsPath \ "inboundPayments").read[InboundPayments] and
