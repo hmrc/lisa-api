@@ -27,19 +27,19 @@
   "periodStartDate": "2017-04-06",
   "periodEndDate": "2017-05-05",
   "htbTransfer": {
-    "htbTransferInForPeriod": 0.00,
-    "htbTransferTotalYTD": 0.00
+    "htbTransferInForPeriod": 0,
+    "htbTransferTotalYTD": 0
   },
   "inboundPayments": {
-    "newSubsForPeriod": 4000.00,
-    "newSubsYTD": 4000.00,
-    "totalSubsForPeriod": 40000.00,
-    "totalSubsYTD": 40000.00
+    "newSubsForPeriod": 4000,
+    "newSubsYTD": 4000,
+    "totalSubsForPeriod": 40000,
+    "totalSubsYTD": 40000
   },
   "bonuses": {
-    "bonusPaidYTD": 0.0,
-    "bonusDueForPeriod": 10000.00,
-    "totalBonusDueYTD": 10000.00,
+    "bonusPaidYTD": 0,
+    "bonusDueForPeriod": 10000,
+    "totalBonusDueYTD": 10000,
     "claimReason": "Life Event"
   }
 }
@@ -62,15 +62,15 @@
   "periodStartDate": "2017-04-06",
   "periodEndDate": "2017-05-05",
   "inboundPayments": {
-    "newSubsForPeriod": 4000.00,
-    "newSubsYTD": 4000.00,
-    "totalSubsForPeriod": 40000.00,
-    "totalSubsYTD": 40000.00
+    "newSubsForPeriod": 4000,
+    "newSubsYTD": 4000,
+    "totalSubsForPeriod": 40000,
+    "totalSubsYTD": 40000
   },
   "bonuses": {
-    "bonusPaidYTD": 0.0,
-    "bonusDueForPeriod": 10000.00,
-    "totalBonusDueYTD": 10000.00,
+    "bonusPaidYTD": 0,
+    "bonusDueForPeriod": 10000,
+    "totalBonusDueYTD": 10000,
     "claimReason": "Regular Bonus"
   }
 }
