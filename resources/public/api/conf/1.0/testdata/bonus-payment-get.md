@@ -127,7 +127,7 @@
   },
   "supersede": {
     "automaticRecoveryAmount": 1000,
-    "transactionId": "1234567893",
+    "transactionId": "1234567890",
     "transactionAmount": 1000,
     "transactionResult": -1000,
     "reason": "Bonus recovery"
@@ -164,7 +164,7 @@
     "claimReason": "Superseding bonus claim"
   },
   "supersede": {
-    "transactionId": "1234567893",
+    "transactionId": "1234567892",
     "transactionAmount": 4000,
     "transactionResult": 4000,
     "reason": "Additional bonus"
