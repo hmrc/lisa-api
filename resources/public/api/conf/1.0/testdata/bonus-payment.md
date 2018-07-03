@@ -667,7 +667,7 @@
               <p>Request for a bonus claim after 5 April 2018 containing help to buy funds.</p>
               <p class="code--block">
                 <strong>lisaManagerReferenceNumber:</strong><br>
-                123456<br>
+                <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
                 <br>
                 <strong>accountId:</strong><br>
                 1234567890
@@ -711,7 +711,7 @@
               <p>Superseded transaction containing details which don't match an existing transaction</p>
               <p class="code--block">
                 <strong>lisaManagerReferenceNumber:</strong><br>
-                123456<br>
+                <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
                 <br>
                 <strong>accountId:</strong><br>
                 1000000403
@@ -758,7 +758,7 @@
               <p>Superseded transaction with an outcome error</p>
               <p class="code--block">
                 <strong>lisaManagerReferenceNumber:</strong><br>
-                123456<br>
+                <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
                 <br>
                 <strong>accountId:</strong><br>
                 2000000403
@@ -940,7 +940,7 @@
               <p>Request to supersede a transaction that has already been superseded</p>
               <p class="code--block">
                 <strong>lisaManagerReferenceNumber:</strong><br>
-                123456<br>
+                <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
                 <br>
                 <strong>accountId:</strong><br>
                 1000000409
