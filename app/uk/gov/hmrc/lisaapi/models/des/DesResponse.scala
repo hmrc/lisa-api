@@ -41,7 +41,9 @@ case class DesGetBonusPaymentResponse(lifeEventId: Option[LifeEventId],
                                       inboundPayments: InboundPayments,
                                       bonuses: Bonuses,
                                       creationDate: DateTime,
-                                      status: String) extends DesResponse
+                                      status: String,
+                                      supersededBy: Option[TransactionId] = None,
+                                      supersede: Option[Supersede] = None) extends DesResponse
 
 object DesResponse {
   implicit val desCreateAccountResponseFormats: OFormat[DesAccountResponse] = Json.format[DesAccountResponse]
@@ -85,7 +87,14 @@ object DesResponse {
     (JsPath \ "bonusPaidYtd").readNullable[Amount] and
     (JsPath \ "claimReason").read[String] and
     (JsPath \ "creationDate").read(JsonReads.isoDate).map(new DateTime(_)) and
-    (JsPath \ "paymentStatus").read[String]
+    (JsPath \ "paymentStatus").read[String] and
+    (JsPath \ "supersededBy").readNullable(JsonReads.transactionId) and
+    (JsPath \ "automaticRecoveryAmount").readNullable[Amount] and
+    (JsPath \ "supersededTransactionId").readNullable(JsonReads.transactionId) and
+    (JsPath \ "supersededTransactionAmount").readNullable[Amount] and
+    (JsPath \ "supersededTransactionResult").readNullable[Amount] and
+    (JsPath \ "supersededReason").readNullable[String]
+
   )(
     (lifeEventId,
      periodStartDate,
@@ -101,7 +110,15 @@ object DesResponse {
      bonusPaidYtd,
      claimReason,
      creationDate,
-     status) =>
+     status,
+
+     supersededBy,
+     automaticRecoveryAmount,
+     supersededTransactionId,
+     supersededTransactionAmount,
+     supersededTransactionResult,
+     supersededReason
+    ) =>
         DesGetBonusPaymentResponse(
           lifeEventId,
           periodStartDate,
@@ -123,6 +140,7 @@ object DesResponse {
             claimReason match {
               case "LIFE_EVENT" => "Life Event"
               case "REGULAR_BONUS" => "Regular Bonus"
+              case "SUPERSEDING_BONUS_CLAIM" => "Superseding bonus claim"
             }
           ),
           creationDate,
@@ -131,7 +149,23 @@ object DesResponse {
             case "PAID" => "Paid"
             case "VOID" => "Void"
             case "CANCELLED" => "Cancelled"
+          },
+          supersededBy,
+          (
+            supersededTransactionId,
+            supersededTransactionAmount,
+            supersededTransactionResult,
+            supersededReason
+          ) match {
+            case (Some(transId), Some(transAmount), Some(transResult), Some(transReason)) => {
+              transReason match {
+                case "ADDITIONAL_BONUS" => Some(AdditionalBonus(transId, transAmount, transResult))
+                case "BONUS_RECOVERY" => Some(BonusRecovery(automaticRecoveryAmount.get, transId, transAmount, transResult))
+              }
+            }
+            case _ => None
           }
+
         )
   )
 
