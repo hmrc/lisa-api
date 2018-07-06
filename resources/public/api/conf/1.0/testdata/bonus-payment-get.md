@@ -16,14 +16,14 @@
 		    	<p class ="code--block">
 		    		<strong>lisaManagerReferenceNumber:</strong> <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
 		    		<strong>accountId:</strong> 1234567890<br>
-		    		<strong>transactionId:</strong> 1234567890
+		    		<strong>transactionId:</strong> 0123456789
 		    	</p>
 			</td>
 			<td>
 				<p>HTTP status: <code class="code--slim">200 (OK)</code></p>
 <pre class="code--block">
 {
-  "lifeEventId": "1234567890",
+  "lifeEventId": "1234567891",
   "periodStartDate": "2017-04-06",
   "periodEndDate": "2017-05-05",
   "htbTransfer": {
@@ -52,7 +52,7 @@
 		    	<p class ="code--block">
 		    		<strong>lisaManagerReferenceNumber:</strong> <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
 		    		<strong>accountId:</strong> 1234567890<br>
-		    		<strong>transactionId:</strong> 1234567892
+		    		<strong>transactionId:</strong> 0003456789
 		    	</p>
 			</td>
 			<td>
@@ -83,7 +83,7 @@
 		    	<p class ="code--block">
 		    		<strong>lisaManagerReferenceNumber:</strong> 123456<br>
 		    		<strong>accountId:</strong> 1234567890<br>
-		    		<strong>transactionId:</strong> 1234567890
+		    		<strong>transactionId:</strong> 0123456789
 		    	</p>
 			</td>
 			<td>
@@ -102,7 +102,7 @@
 		    	<p class ="code--block">
 		    		<strong>lisaManagerReferenceNumber:</strong> <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
 		    		<strong>accountId:</strong> 1234%3D5678<br>
-		    		<strong>transactionId:</strong> 1234567890
+		    		<strong>transactionId:</strong> 0123456789
 		    	</p>
 			</td>
 			<td>
@@ -139,7 +139,7 @@
 		    	<p>Request with an invalid LISA account</p>
 		    	<p class ="code--block">
 		    		<strong>lisaManagerReferenceNumber:</strong> <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
-		    		<strong>accountId:</strong> 1234567890<br>
+		    		<strong>accountId:</strong> 1234567899<br>
 		    		<strong>transactionId:</strong> 1000000404
 		    	</p>
 			</td>
