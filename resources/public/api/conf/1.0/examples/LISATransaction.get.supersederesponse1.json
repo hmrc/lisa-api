@@ -14,7 +14,7 @@
   },
   "supersede" : {
     "automaticRecoveryAmount": 300.00,
-    "transactionId": 1234567891,
+    "transactionId": "0000456789",
     "transactionAmount": -300.00,
     "transactionResult": 300.00,
     "reason": "Bonus recovery"
