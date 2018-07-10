@@ -24,7 +24,7 @@
             <td>
 <pre class="code--block">
 {
-  "lifeEventId": "1234567890",
+  "lifeEventId": "1234567891",
   "periodStartDate": "2017-04-06",
   "periodEndDate": "2017-05-05",
   "htbTransfer": {
@@ -53,7 +53,7 @@
   "success": true,
   "data": {
     "message": "Bonus transaction created",
-    "transactionId": "1234567890"
+    "transactionId": "0123456789"
   }
 }
 </pre>
@@ -73,7 +73,7 @@
             <td>
 <pre class ="code--block">
 {
-  "lifeEventId": "1234567890",
+  "lifeEventId": "1234567800",
   "periodStartDate": "2017-04-06",
   "periodEndDate": "2017-05-05",
   "inboundPayments": {
@@ -98,7 +98,7 @@
   "success": true,
   "data": {
     "message": "Bonus transaction created - late notification",
-    "transactionId": "1234567891"
+    "transactionId": "0023456789"
   }
 }
 </pre>
@@ -142,7 +142,7 @@
   "success": true,
   "data": {
     "message": "Bonus transaction created",
-    "transactionId": "1234567892"
+    "transactionId": "0003456789"
   }
 }
 </pre>
@@ -178,7 +178,7 @@
   },
   "supersede": {
     "automaticRecoveryAmount": 1000.00,
-    "transactionId": "1234567890",
+    "transactionId": "0000456789",
     "transactionAmount": 1000.00,
     "transactionResult": -1000.00,
     "reason": "Bonus recovery"
@@ -193,7 +193,7 @@
   "success": true,
   "data": {
     "message": "Bonus transaction superseded",
-    "transactionId": "1234567893"
+    "transactionId": "0000456789"
   }
 }
 </pre>
@@ -228,7 +228,7 @@
     "claimReason": "Superseding bonus claim"
   },
   "supersede": {
-    "transactionId": "1234567892",
+    "transactionId": "0000056789",
     "transactionAmount": 4000.00,
     "transactionResult": 4000.00,
     "reason": "Additional bonus"
@@ -243,7 +243,7 @@
   "success": true,
   "data": {
     "message": "Bonus transaction superseded",
-    "transactionId": "1234567894"
+    "transactionId": "0000056789"
   }
 }
 </pre>
@@ -263,7 +263,7 @@
             <td>
 <pre class="code--block">
 {
-  "lifeEventId": "1234567890",
+  "lifeEventId": "1234567891",
   "periodStartDate": "2017-04-06",
   "periodEndDate": "2017-05-05",
   "htbTransfer": {
@@ -308,7 +308,7 @@
             <td>
 <pre class="code--block">
 {
-  "lifeEventId": "1234567890",
+  "lifeEventId": "1234567891",
   "periodStartDate": "2017-04-06",
   "periodEndDate": "2017-05-05",
   "htbTransfer": {
@@ -450,7 +450,7 @@
             <td>
 <pre class="code--block">
 {
-  "lifeEventId": "1234567890",
+  "lifeEventId": "1234567891",
   "periodStartDate": "9999-04-05",
   "periodEndDate": "2016-06-05",
   "htbTransfer": {
@@ -586,7 +586,7 @@
             <td>
 <pre class="code--block">
 {
-  "lifeEventId": "1234567890",
+  "lifeEventId": "1234567801",
   "periodStartDate": "2017-04-06",
   "periodEndDate": "2017-05-05",
   "htbTransfer": {
@@ -631,7 +631,7 @@
             <td>
 <pre class="code--block">
 {
-  "lifeEventId": "1234567890",
+  "lifeEventId": "1234567802",
   "periodStartDate": "2017-04-06",
   "periodEndDate": "2017-05-05",
   "htbTransfer": {
@@ -667,7 +667,7 @@
               <p>Request for a bonus claim after 5 April 2018 containing help to buy funds.</p>
               <p class="code--block">
                 <strong>lisaManagerReferenceNumber:</strong><br>
-                123456<br>
+                <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
                 <br>
                 <strong>accountId:</strong><br>
                 1234567890
@@ -711,7 +711,7 @@
               <p>Superseded transaction containing details which don't match an existing transaction</p>
               <p class="code--block">
                 <strong>lisaManagerReferenceNumber:</strong><br>
-                123456<br>
+                <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
                 <br>
                 <strong>accountId:</strong><br>
                 1000000403
@@ -758,7 +758,7 @@
               <p>Superseded transaction with an outcome error</p>
               <p class="code--block">
                 <strong>lisaManagerReferenceNumber:</strong><br>
-                123456<br>
+                <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
                 <br>
                 <strong>accountId:</strong><br>
                 2000000403
@@ -814,7 +814,7 @@
             <td>
 <pre class="code--block">
 {
-  "lifeEventId": "1234567890",
+  "lifeEventId": "1234567803",
   "periodStartDate": "2017-04-06",
   "periodEndDate": "2017-05-05",
   "htbTransfer": {
@@ -859,7 +859,7 @@
             <td>
 <pre class="code--block">
 {
-  "lifeEventId": "1234567890",
+  "lifeEventId": "1234567804",
   "periodStartDate": "2017-04-06",
   "periodEndDate": "2017-05-05",
   "htbTransfer": {
@@ -904,7 +904,7 @@
             <td>
 <pre class="code--block">
 {
-  "lifeEventId": "1234567890",
+  "lifeEventId": "1234567891",
   "periodStartDate": "2017-04-06",
   "periodEndDate": "2017-05-05",
   "htbTransfer": {
@@ -940,7 +940,7 @@
               <p>Request to supersede a transaction that has already been superseded</p>
               <p class="code--block">
                 <strong>lisaManagerReferenceNumber:</strong><br>
-                123456<br>
+                <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
                 <br>
                 <strong>accountId:</strong><br>
                 1000000409
@@ -965,7 +965,7 @@
   },
   "supersede": {
     "automaticRecoveryAmount": 1000.00,
-    "transactionId": "1234567892",
+    "transactionId": "0000006789",
     "transactionAmount": 2000.00,
     "transactionResult": -1000.00,
     "reason": "Bonus recovery"
@@ -999,7 +999,7 @@
             <td>
 <pre class="code--block">
 {
-  "lifeEventId": "1234567890",
+  "lifeEventId": "1234567891",
   "periodStartDate": "2017-04-06",
   "periodEndDate": "2017-05-05",
   "htbTransfer": {

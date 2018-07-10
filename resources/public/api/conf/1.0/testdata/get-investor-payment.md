@@ -9,11 +9,11 @@
     </thead>
     <tbody>
         <tr>
-            <td><p>Request for a paid transaction</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 1234567890</p></td>
+            <td><p>Request for a paid transaction</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 0123456789</p></td>
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
 <pre class="code--block">
 {
-  "transactionId": "1234567890",
+  "transactionId": "0123456789",
   "bonusDueForPeriod": 1000,
   "paymentStatus": "Paid",
   "paymentDate": "2017-05-20",
@@ -73,7 +73,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request with a valid account ID and Transaction ID, but an invalid LISA Manager reference number</p><p class="code--block">lisaManagerReferenceNumber: 123456<br>accountId: 1234567890<br>transactionId: 1234567890</p></td>
+            <td><p>Request with a valid account ID and Transaction ID, but an invalid LISA Manager reference number</p><p class="code--block">lisaManagerReferenceNumber: 123456<br>accountId: 1234567890<br>transactionId: 0123456789</p></td>
             <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
 <pre class="code--block">
 {
@@ -84,7 +84,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request with a valid LISA Manager reference number and Transaction ID, but an invalid account ID</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234%3D5678<br>transactionId: 1234567890</p></td>
+            <td><p>Request with a valid LISA Manager reference number and Transaction ID, but an invalid account ID</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234%3D5678<br>transactionId: 0123456789</p></td>
             <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
 <pre class="code--block">
 {
@@ -106,7 +106,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request for an account that does not exist</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 1000000404</p></td>
+            <td><p>Request for an account that does not exist</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567899<br>transactionId: 1000000404</p></td>
             <td><p>HTTP status: <code class="code--slim">404 (Not found)</code></p>
 <pre class="code--block">
 {
@@ -117,7 +117,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request with an invalid 'Accept' header</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 1234567890<br><br>Accept: application/vnd.hmrc.1.0</p></td>
+            <td><p>Request with an invalid 'Accept' header</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 0123456789<br><br>Accept: application/vnd.hmrc.1.0</p></td>
             <td><p>HTTP status: <code class="code--slim">406 (Not Acceptable)</code></p>
 <pre class="code--block">
 {
