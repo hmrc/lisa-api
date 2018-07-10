@@ -28,18 +28,29 @@ package object models {
   type Nino = String
   type InvestorId = String
   type AccountId = String
+  type TransactionId = String
   type LifeEventId = String
   type LifeEventType = String
   type LisaManagerReferenceNumber = String
   type AccountClosureReason = String
   type BonusClaimReason = String
 
+  private val MIN_AMOUNT = BigDecimal("-99999999999999.98")
   private val MAX_AMOUNT = BigDecimal("99999999999999.98")
 
   object JsonReads {
+    val amount: Reads[Amount] = Reads
+      .of[JsNumber]
+      .filter(ValidationError("error.formatting.currencyNegativeAllowed"))(
+        value => {
+          val amount = value.as[BigDecimal]
+
+          amount >= MIN_AMOUNT && amount.scale < 3 && amount <= MAX_AMOUNT
+        }
+      ).map((value: JsNumber) => value.as[BigDecimal])
     val nonNegativeAmount: Reads[Amount] = Reads
       .of[JsNumber]
-      .filter(ValidationError("error.formatting.currency"))(
+      .filter(ValidationError("error.formatting.currencyNegativeDisallowed"))(
         value => {
           val amount = value.as[BigDecimal]
 
@@ -56,13 +67,14 @@ package object models {
       "error.formatting.name")
     val investorId: Reads[InvestorId] = Reads.pattern("^\\d{10}$".r, "error.formatting.investorId")
     val accountId: Reads[AccountId] = Reads.pattern("^[a-zA-Z0-9 :/-]{1,20}$".r, "error.formatting.accountId")
+    val transactionId: Reads[TransactionId] = Reads.pattern("^[0-9]{1,10}$".r, "error.formatting.transactionId")
     val lifeEventId: Reads[LifeEventId] = Reads.pattern("^\\d{10}$".r, "error.formatting.lifeEventId")
     val lifeEventType: Reads[LifeEventType] = Reads.pattern("^(LISA Investor Terminal Ill Health|LISA Investor Death)$".r, "error.formatting.lifeEventType")
     val accountClosureReason: Reads[AccountClosureReason] = Reads.pattern(
       "^(All funds withdrawn|Cancellation)$".r,
       "error.formatting.accountClosureReason")
     val bonusClaimReason: Reads[BonusClaimReason] = Reads.pattern(
-      "^(Life Event|Regular Bonus)$".r,
+      "^(Life Event|Regular Bonus|Superseding bonus claim)$".r,
       "error.formatting.claimReason"
     )
 

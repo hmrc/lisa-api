@@ -138,6 +138,16 @@ case object ErrorBonusClaimError extends ErrorResponse(403, "BONUS_CLAIM_ERROR",
 
 case object ErrorBonusClaimAlreadyExists extends ErrorResponse(409, "BONUS_CLAIM_ALREADY_EXISTS", "The investor’s bonus payment has already been requested")
 
+case object ErrorBonusClaimAlreadySuperseded extends ErrorResponse(409, "BONUS_REQUEST_ALREADY_SUPERSEDED", "The transactionId and transactionAmount match to a transactionId and bonusDueForPeriod amount on an existing transaction record for this account")
+
+case object ErrorBonusSupersededAmountMismatch extends ErrorResponse(403, "SUPERSEDED_BONUS_REQUEST_AMOUNT_MISMATCH", "The transactionId does not match to an existing transactionId or does not match the bonusDueForPeriod amount")
+
+case object ErrorBonusSupersededOutcomeError extends ErrorResponse(403, "SUPERSEDED_BONUS_REQUEST_OUTCOME_ERROR", "The calculation from your superseded bonus claim is incorrect")
+
+case object ErrorBonusClaimTimescaleExceeded extends ErrorResponse(403, "BONUS_CLAIM_TIMESCALES_EXCEEDED", "The timescale for claiming a bonus has passed. The claim period lasts for 6 years and 14 days")
+
+case object ErrorBonusHelpToBuyNotApplicable extends ErrorResponse(403, "HELP_TO_BUY_NOT_APPLICABLE", "Help to Buy is not applicable on this account")
+
 object ErrorInvestorAlreadyExists {
 
   def apply(investorId: String) = {

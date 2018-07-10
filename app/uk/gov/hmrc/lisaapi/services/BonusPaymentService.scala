@@ -28,6 +28,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 trait BonusPaymentService {
   val desConnector: DesConnector
 
+  // scalastyle:off cyclomatic.complexity
   def requestBonusPayment(lisaManager: String, accountId: String, request: RequestBonusPaymentRequest)
                          (implicit hc: HeaderCarrier): Future[RequestBonusPaymentResponse] = {
     val response = desConnector.requestBonusPayment(lisaManager, accountId, request)
@@ -38,6 +39,7 @@ trait BonusPaymentService {
 
         successResponse.message match {
           case "Late" => RequestBonusPaymentLateResponse(successResponse.transactionID)
+          case "Superseded" => RequestBonusPaymentSupersededResponse(successResponse.transactionID)
           case _ => RequestBonusPaymentOnTimeResponse(successResponse.transactionID)
         }
       }
@@ -50,6 +52,9 @@ trait BonusPaymentService {
           case "BONUS_CLAIM_ERROR" => RequestBonusPaymentBonusClaimError
           case "INVESTOR_ACCOUNTID_NOT_FOUND" => RequestBonusPaymentAccountNotFound
           case "BONUS_CLAIM_ALREADY_EXISTS" => RequestBonusPaymentClaimAlreadyExists
+          case "SUPERSEDED_BONUS_REQUEST_AMOUNT_MISMATCH" => RequestBonusPaymentSupersededAmountMismatch
+          case "SUPERSEDED_BONUS_REQUEST_OUTCOME_ERROR" => RequestBonusPaymentSupersededOutcomeError
+          case "BONUS_REQUEST_ALREADY_SUPERSEDED" => RequestBonusPaymentAlreadySuperseded
           case _ => {
             Logger.warn(s"Request bonus payment returned error: ${failureResponse.code}")
             RequestBonusPaymentError

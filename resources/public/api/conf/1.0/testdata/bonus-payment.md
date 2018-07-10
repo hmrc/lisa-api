@@ -150,6 +150,107 @@
         </tr>
         <tr>
             <td>
+              <p>Superseded transaction - Bonus recovery</p>
+              <p class="code--block">
+                <strong>lisaManagerReferenceNumber:</strong><br>
+                <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+                <br>
+                <strong>accountId:</strong><br>
+                1234567890
+              </p>
+            </td>
+            <td>
+<pre class="code--block">
+{
+  "periodStartDate": "2017-04-06",
+  "periodEndDate": "2017-05-05",
+  "inboundPayments": {
+    "newSubsForPeriod": 4000.00,
+    "newSubsYTD": 4000.00,
+    "totalSubsForPeriod": 4000.00,
+    "totalSubsYTD": 4000.00
+  },
+  "bonuses": {
+    "bonusPaidYTD": 0.0,
+    "bonusDueForPeriod": 1000.00,
+    "totalBonusDueYTD": 1000.00,
+    "claimReason": "Superseding bonus claim"
+  },
+  "supersede": {
+    "automaticRecoveryAmount": 1000.00,
+    "transactionId": "0000456789",
+    "transactionAmount": 1000.00,
+    "transactionResult": -1000.00,
+    "reason": "Bonus recovery"
+  }
+}
+</pre>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">201 (Created)</code></p>
+<pre class="code--block">
+{
+  "status": 201,
+  "success": true,
+  "data": {
+    "message": "Bonus transaction superseded",
+    "transactionId": "0000456789"
+  }
+}
+</pre>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <p>Superseded transaction - Additional bonus</p>
+              <p class="code--block">
+                <strong>lisaManagerReferenceNumber:</strong><br>
+                <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+                <br>
+                <strong>accountId:</strong><br>
+                1234567890
+              </p>
+            </td>
+            <td>
+<pre class="code--block">
+{
+  "periodStartDate": "2017-04-06",
+  "periodEndDate": "2017-05-05",
+  "inboundPayments": {
+    "newSubsForPeriod": 4000.00,
+    "newSubsYTD": 4000.00,
+    "totalSubsForPeriod": 4000.00,
+    "totalSubsYTD": 4000.00
+  },
+  "bonuses": {
+    "bonusPaidYTD": 0.0,
+    "bonusDueForPeriod": 1000.00,
+    "totalBonusDueYTD": 1000.00,
+    "claimReason": "Superseding bonus claim"
+  },
+  "supersede": {
+    "transactionId": "0000056789",
+    "transactionAmount": 4000.00,
+    "transactionResult": 4000.00,
+    "reason": "Additional bonus"
+  }
+}
+</pre>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">201 (Created)</code></p>
+<pre class="code--block">
+{
+  "status": 201,
+  "success": true,
+  "data": {
+    "message": "Bonus transaction superseded",
+    "transactionId": "0000056789"
+  }
+}
+</pre>
+            </td>
+        </tr>
+        <tr>
+            <td>
               <p>Request with a valid payload and account ID, but an invalid LISA Manager reference number</p>
               <p class="code--block">
                 <strong>lisaManagerReferenceNumber:</strong><br>
@@ -269,6 +370,12 @@
     "bonusPaidYTD": 0.0,
     "bonusDueForPeriod": 10000.00,
     "claimReason": "X"
+  },
+  "supersede": {
+    "transactionId": "ABC123",
+    "transactionAmount": true,
+    "transactionResult": -10.005,
+    "reason": "Recovery"
   }
 }
 </pre>
@@ -276,35 +383,55 @@
 	        <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
 <pre class="code--block">
 {
-  "code": "BAD_REQUEST",
-  "message": "Bad Request",
-  "errors": [
-    {
-      "code": "INVALID_MONETARY_AMOUNT",
-      "message": "Amount cannot be negative, and can only have up to 2 decimal places",
-      "path": "/htbTransfer/htbTransferTotalYTD"
-    },
-    {
-      "code": "INVALID_DATA_TYPE",
-      "message": "Invalid data type has been used",
-      "path": "/lifeEventId"
-    },
-    {
-      "code": "MISSING_FIELD",
-      "message": "This field is required",
-      "path": "/bonuses/totalBonusDueYTD"
-    },
-    {
-      "code": "INVALID_FORMAT",
-      "message": "Invalid format has been used",
-      "path": "/bonuses/claimReason"
-    },
-    {
-      "code": "INVALID_DATE",
-      "message": "Date is invalid",
-      "path": "/periodEndDate"
-    }
-  ]
+    "code": "BAD_REQUEST",
+    "message": "Bad Request",
+    "errors": [
+        {
+            "code": "INVALID_DATA_TYPE",
+            "message": "Invalid data type has been used",
+            "path": "/lifeEventId"
+        },
+        {
+            "code": "INVALID_DATE",
+            "message": "Date is invalid",
+            "path": "/periodEndDate"
+        },
+        {
+            "code": "INVALID_MONETARY_AMOUNT",
+            "message": "Amount cannot be negative, and can only have up to 2 decimal places",
+            "path": "/htbTransfer/htbTransferTotalYTD"
+        },
+        {
+            "code": "MISSING_FIELD",
+            "message": "This field is required",
+            "path": "/bonuses/totalBonusDueYTD"
+        },
+        {
+            "code": "INVALID_FORMAT",
+            "message": "Invalid format has been used",
+            "path": "/bonuses/claimReason"
+        },
+        {
+            "code": "INVALID_FORMAT",
+            "message": "Invalid format has been used",
+            "path": "/supersede/transactionId"
+        },
+        {
+            "code": "INVALID_DATA_TYPE",
+            "message": "Invalid data type has been used",
+            "path": "/supersede/transactionAmount"
+        },
+        {
+            "code": "INVALID_MONETARY_AMOUNT",
+            "message": "Amount can only have up to 2 decimal places",
+            "path": "/supersede/transactionResult"
+        },
+        {
+            "code": "INVALID_FORMAT",
+            "message": "Invalid format has been used",
+            "path": "/supersede/reason"
+        }
+    ]
 }
 </pre>
 	        </td>
@@ -535,6 +662,144 @@
 </pre>
             </td>
        </tr>
+       <tr>
+            <td>
+              <p>Request for a bonus claim after 5 April 2018 containing help to buy funds.</p>
+              <p class="code--block">
+                <strong>lisaManagerReferenceNumber:</strong><br>
+                <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+                <br>
+                <strong>accountId:</strong><br>
+                1234567890
+              </p>
+            </td>
+            <td>
+<pre class="code--block">
+{
+  "periodStartDate": "2018-04-06",
+  "periodEndDate": "2018-05-05",
+  "htbTransfer": {
+    "htbTransferInForPeriod": 1000.00,
+    "htbTransferTotalYTD": 1000.00
+  },
+  "inboundPayments": {
+    "newSubsForPeriod": 4000.00,
+    "newSubsYTD": 4000.00,
+    "totalSubsForPeriod": 40000.00,
+    "totalSubsYTD": 40000.00
+  },
+  "bonuses": {
+    "bonusPaidYTD": 0.0,
+    "bonusDueForPeriod": 10500.00,
+    "totalBonusDueYTD": 10000.00,
+    "claimReason": "Regular Bonus"
+  }
+}
+</pre>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
+<pre class ="code--block">
+{
+  "code": "HELP_TO_BUY_NOT_APPLICABLE",
+  "message": "Help to Buy is not applicable on this account"
+}
+</pre>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <p>Superseded transaction containing details which don't match an existing transaction</p>
+              <p class="code--block">
+                <strong>lisaManagerReferenceNumber:</strong><br>
+                <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+                <br>
+                <strong>accountId:</strong><br>
+                1000000403
+              </p>
+            </td>
+            <td>
+<pre class="code--block">
+{
+  "periodStartDate": "2018-04-06",
+  "periodEndDate": "2018-05-05",
+  "inboundPayments": {
+    "newSubsForPeriod": 4000.00,
+    "newSubsYTD": 4000.00,
+    "totalSubsForPeriod": 40000.00,
+    "totalSubsYTD": 40000.00
+  },
+  "bonuses": {
+    "bonusPaidYTD": 0.0,
+    "bonusDueForPeriod": 10500.00,
+    "totalBonusDueYTD": 10000.00,
+    "claimReason": "Superseding bonus claim"
+  },
+  "supersede": {
+    "automaticRecoveryAmount": 1000.00,
+    "transactionId": "1234567892",
+    "transactionAmount": 2000.00,
+    "transactionResult": -1000.00,
+    "reason": "Bonus recovery"
+  }
+}
+</pre>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
+<pre class ="code--block">
+{
+  "code": "SUPERSEDED_BONUS_REQUEST_AMOUNT_MISMATCH",
+  "message": "The transactionId on the request does not match to an existing transactionId or does not match the bonusDueForPeriod amount"
+}
+</pre>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <p>Superseded transaction with an outcome error</p>
+              <p class="code--block">
+                <strong>lisaManagerReferenceNumber:</strong><br>
+                <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+                <br>
+                <strong>accountId:</strong><br>
+                2000000403
+              </p>
+            </td>
+            <td>
+<pre class="code--block">
+{
+  "periodStartDate": "2018-04-06",
+  "periodEndDate": "2018-05-05",
+  "inboundPayments": {
+    "newSubsForPeriod": 4000.00,
+    "newSubsYTD": 4000.00,
+    "totalSubsForPeriod": 40000.00,
+    "totalSubsYTD": 40000.00
+  },
+  "bonuses": {
+    "bonusPaidYTD": 0.0,
+    "bonusDueForPeriod": 10500.00,
+    "totalBonusDueYTD": 10000.00,
+    "claimReason": "Superseding bonus claim"
+  },
+  "supersede": {
+    "automaticRecoveryAmount": 1000.00,
+    "transactionId": "1234567892",
+    "transactionAmount": 2000.00,
+    "transactionResult": -1000.00,
+    "reason": "Bonus recovery"
+  }
+}
+</pre>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
+<pre class ="code--block">
+{
+  "code": "SUPERSEDED_BONUS_REQUEST_OUTCOME_ERROR",
+  "message": "The calculation from your superseded bonus claim is incorrect"
+}
+</pre>
+            </td>
+        </tr>
         <tr>
             <td>
               <p>Request containing a life event ID that does not exist</p>
@@ -665,7 +930,54 @@
 <pre class ="code--block">
 {
   "code": "BONUS_CLAIM_ALREADY_EXISTS",
-  "message": "The investor's bonus payment has already been requested"
+  "message": "The investor’s bonus payment has already been requested"
+}
+</pre>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <p>Request to supersede a transaction that has already been superseded</p>
+              <p class="code--block">
+                <strong>lisaManagerReferenceNumber:</strong><br>
+                <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+                <br>
+                <strong>accountId:</strong><br>
+                1000000409
+              </p>
+            </td>
+            <td>
+<pre class="code--block">
+{
+  "periodStartDate": "2018-04-06",
+  "periodEndDate": "2018-05-05",
+  "inboundPayments": {
+    "newSubsForPeriod": 4000.00,
+    "newSubsYTD": 4000.00,
+    "totalSubsForPeriod": 40000.00,
+    "totalSubsYTD": 40000.00
+  },
+  "bonuses": {
+    "bonusPaidYTD": 0.0,
+    "bonusDueForPeriod": 10500.00,
+    "totalBonusDueYTD": 10000.00,
+    "claimReason": "Superseding bonus claim"
+  },
+  "supersede": {
+    "automaticRecoveryAmount": 1000.00,
+    "transactionId": "0000006789",
+    "transactionAmount": 2000.00,
+    "transactionResult": -1000.00,
+    "reason": "Bonus recovery"
+  }
+}
+</pre>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">409 (Conflict)</code></p>
+<pre class ="code--block">
+{
+  "code": "BONUS_REQUEST_ALREADY_SUPERSEDED",
+  "message": "The transactionId and transactionAmount in the request match to a transactionId and corresponding bonusDueForPeriod amount on an existing transaction record for this account"
 }
 </pre>
             </td>
@@ -714,6 +1026,51 @@
 {
   "code": "ACCEPT_HEADER_INVALID",
   "message": "The accept header is missing or invalid"
+}
+</pre>
+            </td>
+        </tr>
+        <tr>
+            <td>
+              <p>Request with a valid payload, LISA Manager reference number and account ID</p>
+              <p class="code--block">
+                <strong>lisaManagerReferenceNumber:</strong><br>
+                <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+                <br>
+                <strong>accountId:</strong><br>
+                0000000409
+              </p>
+            </td>
+            <td>
+<pre class="code--block">
+{
+  "lifeEventId": "1234567890",
+  "periodStartDate": "2017-04-06",
+  "periodEndDate": "2017-05-05",
+  "htbTransfer": {
+    "htbTransferInForPeriod": 0.00,
+    "htbTransferTotalYTD": 0.00
+  },
+  "inboundPayments": {
+    "newSubsForPeriod": 4000.00,
+    "newSubsYTD": 4000.00,
+    "totalSubsForPeriod": 40000.00,
+    "totalSubsYTD": 40000.00
+  },
+  "bonuses": {
+    "bonusPaidYTD": 0.0,
+    "bonusDueForPeriod": 10000.00,
+    "totalBonusDueYTD": 10000.00,
+    "claimReason": "Life Event"
+  }
+}
+</pre>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">409 (Conflict)</code></p>
+<pre class ="code--block">
+{
+  "code": "BONUS_CLAIM_ALREADY_EXISTS",
+  "message": "The investor’s bonus payment has already been requested"
 }
 </pre>
             </td>
