@@ -83,21 +83,6 @@
 </pre>
 			</td>
 		</tr>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 		<tr>
 	    <td>
 		    	<p>Retrieve a superseded transaction (bonus recovery)</p>
@@ -127,8 +112,8 @@
   },
   "supersede": {
     "automaticRecoveryAmount": 1000,
-    "transactionId": "1234567890",
-    "transactionAmount": 1000,
+    "originalTransactionId": "1234567890",
+    "originalBonusDueForPeriod": 1000,
     "transactionResult": -1000,
     "reason": "Bonus recovery"
   }
@@ -164,8 +149,8 @@
     "claimReason": "Superseding bonus claim"
   },
   "supersede": {
-    "transactionId": "1234567892",
-    "transactionAmount": 4000,
+    "originalTransactionId": "1234567892",
+    "originalBonusDueForPeriod": 4000,
     "transactionResult": 4000,
     "reason": "Additional bonus"
   }
@@ -173,28 +158,6 @@
 </pre>
 			</td>
 		</tr>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 		<tr>
 		  <td>
 				<p>Request with an invalid LISA Manager reference number</p>

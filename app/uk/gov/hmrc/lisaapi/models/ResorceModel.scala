@@ -191,8 +191,8 @@ object Supersede {
 
   implicit val bonusRecoveryWrites: Writes[BonusRecovery] = (
     (JsPath \ "automaticRecoveryAmount").write[Amount] and
-    (JsPath \ "transactionId").write[String] and
-    (JsPath \ "transactionAmount").write[Amount] and
+    (JsPath \ "originalTransactionId").write[String] and
+    (JsPath \ "originalBonusDueForPeriod").write[Amount] and
     (JsPath \ "transactionResult").write[Amount] and
     (JsPath \ "reason").write[String]
   ){
@@ -206,8 +206,8 @@ object Supersede {
   }
 
   implicit val additionalBonusWrites: Writes[AdditionalBonus] = (
-    (JsPath \ "transactionId").write[String] and
-    (JsPath \ "transactionAmount").write[Amount] and
+    (JsPath \ "originalTransactionId").write[String] and
+    (JsPath \ "originalBonusDueForPeriod").write[Amount] and
     (JsPath \ "transactionResult").write[Amount] and
     (JsPath \ "reason").write[String]
   ){
