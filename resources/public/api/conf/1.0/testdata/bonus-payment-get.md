@@ -43,7 +43,7 @@
     "claimReason": "Life Event"
   },
   "supersede": {
-    "supersededBy": "1234567893"
+    "supersededBy": "0000456789"
   }
 }
 </pre>
@@ -77,7 +77,7 @@
     "claimReason": "Regular Bonus"
   },
   "supersede": {
-    "supersededBy": "1234567894"
+    "supersededBy": "0000056789"
   }
 }
 </pre>
@@ -89,7 +89,7 @@
 		    	<p class="code--block">
 		    		<strong>lisaManagerReferenceNumber:</strong> <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
 		    		<strong>accountId:</strong> 1234567890<br>
-		    		<strong>transactionId:</strong> 0123456789
+		    		<strong>transactionId:</strong> 0000456789
 		    	</p>
 			</td>
 			<td>
@@ -112,7 +112,7 @@
   },
   "supersede": {
     "automaticRecoveryAmount": 1000,
-    "transactionId": "1234567890",
+    "transactionId": "0123456789",
     "transactionAmount": 1000,
     "transactionResult": -1000,
     "reason": "Bonus recovery"
@@ -127,7 +127,7 @@
 		    	<p class="code--block">
 		    		<strong>lisaManagerReferenceNumber:</strong> <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
 		    		<strong>accountId:</strong> 1234567890<br>
-		    		<strong>transactionId:</strong> 1234567894
+		    		<strong>transactionId:</strong> 0000056789
 		    	</p>
 			</td>
 			<td>
@@ -149,7 +149,7 @@
     "claimReason": "Superseding bonus claim"
   },
   "supersede": {
-    "transactionId": "1234567892",
+    "transactionId": "0003456789",
     "transactionAmount": 4000,
     "transactionResult": 4000,
     "reason": "Additional bonus"
@@ -164,7 +164,7 @@
 				<p class ="code--block">
 					<strong>lisaManagerReferenceNumber:</strong> 123456<br>
 					<strong>accountId:</strong> 1234567890<br>
-					<strong>transactionId:</strong> 1234567890
+					<strong>transactionId:</strong> 0123456789
 				</p>
 			</td>
 			<td>
