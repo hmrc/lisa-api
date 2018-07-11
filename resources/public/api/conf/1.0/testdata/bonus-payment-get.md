@@ -171,8 +171,8 @@
 				<p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
 <pre class="code--block">
 {
-	"code": "BAD_REQUEST",
-	"message": "lisaManagerReferenceNumber in the URL is in the wrong format"
+  "code": "BAD_REQUEST",
+  "message": "lisaManagerReferenceNumber in the URL is in the wrong format"
 }
 </pre>
 			</td>
@@ -190,8 +190,8 @@
 				<p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
 <pre class="code--block">
 {
-	"code": "BAD_REQUEST",
-	"message": "accountId in the URL is in the wrong format"
+  "code": "BAD_REQUEST",
+  "message": "accountId in the URL is in the wrong format"
 }
 </pre>
 			</td>
@@ -209,8 +209,8 @@
 				<p>HTTP status: <code class="code--slim">404 (Not Found)</code></p>
 <pre class="code--block">
 {
-	"code": "BONUS_PAYMENT_TRANSACTION_NOT_FOUND",
-	"message": "transactionId does not match HMRC’s records"
+  "code": "BONUS_PAYMENT_TRANSACTION_NOT_FOUND",
+  "message": "transactionId does not match HMRC’s records"
 }
 </pre>
 			</td>
@@ -228,8 +228,8 @@
 				<p>HTTP status: <code class="code--slim">404 (Not Found)</code></p>
 <pre class="code--block">
 {
-	"code": "INVESTOR_ACCOUNTID_NOT_FOUND",
-	"message": "The accountId does not match HMRC’s records"
+  "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
+  "message": "The accountId does not match HMRC’s records"
 }
 </pre>
 			</td>
