@@ -747,8 +747,8 @@
             <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
 <pre class ="code--block">
 {
-  "code": "SUPERSEDED_BONUS_REQUEST_AMOUNT_MISMATCH",
-  "message": "The transactionId on the request does not match to an existing transactionId or does not match the bonusDueForPeriod amount"
+  "code": "SUPERSEDED_BONUS_CLAIM_AMOUNT_MISMATCH",
+  "message": "originalTransactionId and the originalBonusDueForPeriod amount do not match the information in the original bonus request"
 }
 </pre>
             </td>
@@ -976,8 +976,8 @@
             <td><p>HTTP status: <code class="code--slim">409 (Conflict)</code></p>
 <pre class ="code--block">
 {
-  "code": "BONUS_REQUEST_ALREADY_SUPERSEDED",
-  "message": "The transactionId and transactionAmount in the request match to a transactionId and corresponding bonusDueForPeriod amount on an existing transaction record for this account"
+  "code": "BONUS_CLAIM_ALREADY_SUPERSEDED",
+  "message": "This bonus claim has already been superseded"
 }
 </pre>
             </td>
