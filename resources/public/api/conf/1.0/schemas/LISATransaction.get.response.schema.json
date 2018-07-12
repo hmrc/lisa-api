@@ -90,6 +90,7 @@
       "description": "Correct an existing bonus claim with an additional bonus or a recovery of an overpaid amount.",
       "type": "object",
       "properties": {
+        "supersededBy":{"description": "This is the transactionId given to the superseded bonus transaction.", "$ref": "#/definitions/TransactionIDType"},
         "automaticRecoveryAmount":{"description": "This is the amount HMRC can collect from the LISA manager in bonus recovery cases. If there are no funds available, this value must be 0.", "type" : "number"},
         "originalTransactionId" :{"description": "The transactionId of the original bonus affected by the correction or recovery. This is used together with the originalBonusDueForPeriod to make sure the right bonus transaction is replaced.", "type" : "number"},
         "originalBonusDueForPeriod" :{"description": "This is how much was in the bonusDueForPeriod in the original bonus request.", "type" : "number"},
