@@ -220,8 +220,8 @@ class BonusPaymentControllerSpec extends PlaySpec
 
         doRequest(validBonusPaymentJson)  { res =>
           status(res) mustBe FORBIDDEN
-          (contentAsJson(res) \ "code").as[String] mustBe "SUPERSEDED_BONUS_REQUEST_AMOUNT_MISMATCH"
-          (contentAsJson(res) \ "message").as[String] mustBe "The transactionId does not match to an existing transactionId or does not match the bonusDueForPeriod amount"
+          (contentAsJson(res) \ "code").as[String] mustBe "SUPERSEDED_BONUS_CLAIM_AMOUNT_MISMATCH"
+          (contentAsJson(res) \ "message").as[String] mustBe "originalTransactionId and the originalBonusDueForPeriod amount do not match the information in the original bonus request"
         }
 
       }
@@ -285,8 +285,8 @@ class BonusPaymentControllerSpec extends PlaySpec
 
         doRequest(validBonusPaymentJson) { res =>
           status(res) mustBe CONFLICT
-          (contentAsJson(res) \ "code").as[String] mustBe "BONUS_REQUEST_ALREADY_SUPERSEDED"
-          (contentAsJson(res) \ "message").as[String] mustBe "The transactionId and transactionAmount match to a transactionId and bonusDueForPeriod amount on an existing transaction record for this account"
+          (contentAsJson(res) \ "code").as[String] mustBe "BONUS_CLAIM_ALREADY_SUPERSEDED"
+          (contentAsJson(res) \ "message").as[String] mustBe "This bonus claim has already been superseded"
         }
       }
 

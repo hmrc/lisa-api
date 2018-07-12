@@ -138,9 +138,9 @@ case object ErrorBonusClaimError extends ErrorResponse(403, "BONUS_CLAIM_ERROR",
 
 case object ErrorBonusClaimAlreadyExists extends ErrorResponse(409, "BONUS_CLAIM_ALREADY_EXISTS", "The investor’s bonus payment has already been requested")
 
-case object ErrorBonusClaimAlreadySuperseded extends ErrorResponse(409, "BONUS_REQUEST_ALREADY_SUPERSEDED", "The transactionId and transactionAmount match to a transactionId and bonusDueForPeriod amount on an existing transaction record for this account")
+case object ErrorBonusClaimAlreadySuperseded extends ErrorResponse(409, "BONUS_CLAIM_ALREADY_SUPERSEDED", "This bonus claim has already been superseded")
 
-case object ErrorBonusSupersededAmountMismatch extends ErrorResponse(403, "SUPERSEDED_BONUS_REQUEST_AMOUNT_MISMATCH", "The transactionId does not match to an existing transactionId or does not match the bonusDueForPeriod amount")
+case object ErrorBonusSupersededAmountMismatch extends ErrorResponse(403, "SUPERSEDED_BONUS_CLAIM_AMOUNT_MISMATCH", "originalTransactionId and the originalBonusDueForPeriod amount do not match the information in the original bonus request")
 
 case object ErrorBonusSupersededOutcomeError extends ErrorResponse(403, "SUPERSEDED_BONUS_REQUEST_OUTCOME_ERROR", "The calculation from your superseded bonus claim is incorrect")
 

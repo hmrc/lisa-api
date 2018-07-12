@@ -14,7 +14,7 @@
     "claimReason": "Superseding bonus claim"
   },
   "supersede": {
-    "originalTransactionId": "1234567893",
+    "originalTransactionId": "0000056789",
     "originalBonusDueForPeriod": 4000.00,
     "transactionResult": 4000.00,
     "reason": "Additional bonus"

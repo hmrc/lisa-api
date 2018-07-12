@@ -129,6 +129,11 @@
         "pattern": "^\\d{10}$",
         "example": "0987654321"
       },
+      "TransactionIDType": {
+        "type": "string",
+        "pattern": "^\\d{1,10}$",
+        "example": "1234567890"
+      },
       "claimReasonType": {
         "type": "string",
         "enum": [
