@@ -112,9 +112,9 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
     }
 
     "return a superseded bonus request amount mismatch response" when {
-      "given the code SUPERSEDED_BONUS_REQUEST_AMOUNT_MISMATCH from the DES connector" in {
+      "given the code SUPERSEDED_BONUS_CLAIM_AMOUNT_MISMATCH from the DES connector" in {
         when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("SUPERSEDED_BONUS_REQUEST_AMOUNT_MISMATCH", "xxxxx")))
+          thenReturn(Future.successful(DesFailureResponse("SUPERSEDED_BONUS_CLAIM_AMOUNT_MISMATCH", "xxxxx")))
 
         doRequest { response =>
           response mustBe RequestBonusPaymentSupersededAmountMismatch
@@ -134,9 +134,9 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
     }
 
     "return a already superseded response" when {
-      "given the code BONUS_REQUEST_ALREADY_SUPERSEDED from the DES connector" in {
+      "given the code BONUS_CLAIM_ALREADY_SUPERSEDED from the DES connector" in {
         when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("BONUS_REQUEST_ALREADY_SUPERSEDED", "xxxxx")))
+          thenReturn(Future.successful(DesFailureResponse("BONUS_CLAIM_ALREADY_SUPERSEDED", "xxxxx")))
 
         doRequest { response =>
           response mustBe RequestBonusPaymentAlreadySuperseded

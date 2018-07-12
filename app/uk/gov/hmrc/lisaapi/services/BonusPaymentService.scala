@@ -52,9 +52,9 @@ trait BonusPaymentService {
           case "BONUS_CLAIM_ERROR" => RequestBonusPaymentBonusClaimError
           case "INVESTOR_ACCOUNTID_NOT_FOUND" => RequestBonusPaymentAccountNotFound
           case "BONUS_CLAIM_ALREADY_EXISTS" => RequestBonusPaymentClaimAlreadyExists
-          case "SUPERSEDED_BONUS_REQUEST_AMOUNT_MISMATCH" => RequestBonusPaymentSupersededAmountMismatch
+          case "SUPERSEDED_BONUS_CLAIM_AMOUNT_MISMATCH" => RequestBonusPaymentSupersededAmountMismatch
           case "SUPERSEDED_BONUS_REQUEST_OUTCOME_ERROR" => RequestBonusPaymentSupersededOutcomeError
-          case "BONUS_REQUEST_ALREADY_SUPERSEDED" => RequestBonusPaymentAlreadySuperseded
+          case "BONUS_CLAIM_ALREADY_SUPERSEDED" => RequestBonusPaymentAlreadySuperseded
           case _ => {
             Logger.warn(s"Request bonus payment returned error: ${failureResponse.code}")
             RequestBonusPaymentError
