@@ -27,7 +27,7 @@
   "success": true,
   "data": {
     "message": "Life event created",
-    "lifeEventId": "1234567890"
+    "lifeEventId": "1234567891"
   }
 }
 </pre>
@@ -218,7 +218,7 @@
 {
   "code": "LIFE_EVENT_ALREADY_EXISTS",
   "message": "The investor’s life event has already been reported",
-  "lifeEventId": "1234567890"
+  "lifeEventId": "1234567892"
 }
 </pre>
             </td>
