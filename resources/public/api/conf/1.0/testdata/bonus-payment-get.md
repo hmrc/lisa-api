@@ -42,9 +42,7 @@
     "totalBonusDueYTD": 10000,
     "claimReason": "Life Event"
   },
-  "supersede": {
-    "supersededBy": "1234567893"
-  }
+  "supersededBy": "0000456789"
 }
 </pre>
 			</td>
@@ -76,9 +74,7 @@
     "totalBonusDueYTD": 10000,
     "claimReason": "Regular Bonus"
   },
-  "supersede": {
-    "supersededBy": "1234567894"
-  }
+  "supersededBy": "0000056789"
 }
 </pre>
 			</td>
@@ -89,7 +85,7 @@
 		    	<p class="code--block">
 		    		<strong>lisaManagerReferenceNumber:</strong> <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
 		    		<strong>accountId:</strong> 1234567890<br>
-		    		<strong>transactionId:</strong> 0123456789
+		    		<strong>transactionId:</strong> 0000456789
 		    	</p>
 			</td>
 			<td>
@@ -112,7 +108,7 @@
   },
   "supersede": {
     "automaticRecoveryAmount": 1000,
-    "originalTransactionId": "1234567890",
+    "originalTransactionId": "0123456789",
     "originalBonusDueForPeriod": 1000,
     "transactionResult": -1000,
     "reason": "Bonus recovery"
@@ -127,7 +123,7 @@
 		    	<p class="code--block">
 		    		<strong>lisaManagerReferenceNumber:</strong> <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
 		    		<strong>accountId:</strong> 1234567890<br>
-		    		<strong>transactionId:</strong> 1234567894
+		    		<strong>transactionId:</strong> 0000056789
 		    	</p>
 			</td>
 			<td>
@@ -149,7 +145,7 @@
     "claimReason": "Superseding bonus claim"
   },
   "supersede": {
-    "originalTransactionId": "1234567892",
+    "originalTransactionId": "0003456789",
     "originalBonusDueForPeriod": 4000,
     "transactionResult": 4000,
     "reason": "Additional bonus"
@@ -164,15 +160,15 @@
 				<p class ="code--block">
 					<strong>lisaManagerReferenceNumber:</strong> 123456<br>
 					<strong>accountId:</strong> 1234567890<br>
-					<strong>transactionId:</strong> 1234567890
+					<strong>transactionId:</strong> 0123456789
 				</p>
 			</td>
 			<td>
 				<p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
 <pre class="code--block">
 {
-	"code": "BAD_REQUEST",
-	"message": "lisaManagerReferenceNumber in the URL is in the wrong format"
+  "code": "BAD_REQUEST",
+  "message": "lisaManagerReferenceNumber in the URL is in the wrong format"
 }
 </pre>
 			</td>
@@ -190,8 +186,8 @@
 				<p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
 <pre class="code--block">
 {
-	"code": "BAD_REQUEST",
-	"message": "accountId in the URL is in the wrong format"
+  "code": "BAD_REQUEST",
+  "message": "accountId in the URL is in the wrong format"
 }
 </pre>
 			</td>
@@ -209,8 +205,8 @@
 				<p>HTTP status: <code class="code--slim">404 (Not Found)</code></p>
 <pre class="code--block">
 {
-	"code": "BONUS_PAYMENT_TRANSACTION_NOT_FOUND",
-	"message": "transactionId does not match HMRC’s records"
+  "code": "BONUS_PAYMENT_TRANSACTION_NOT_FOUND",
+  "message": "transactionId does not match HMRC’s records"
 }
 </pre>
 			</td>
@@ -228,8 +224,8 @@
 				<p>HTTP status: <code class="code--slim">404 (Not Found)</code></p>
 <pre class="code--block">
 {
-	"code": "INVESTOR_ACCOUNTID_NOT_FOUND",
-	"message": "The accountId does not match HMRC’s records"
+  "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
+  "message": "The accountId does not match HMRC’s records"
 }
 </pre>
 			</td>

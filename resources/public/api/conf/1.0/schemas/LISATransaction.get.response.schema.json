@@ -86,6 +86,7 @@
         "claimReason"
       ]
     },
+    "supersededBy":{"description": "The transactionId of a bonus request which supersedes this one.", "$ref": "#/definitions/TransactionIDType"},
     "supersede": {
       "description": "Supersede bonus payment by requesting for an additional bonus amount or recover an overpaid amount.",
       "type": "object",

@@ -178,7 +178,7 @@
   },
   "supersede": {
     "automaticRecoveryAmount": 1000.00,
-    "originalTransactionId": "0000456789",
+    "originalTransactionId": "0123456789",
     "originalBonusDueForPeriod": 1000.00,
     "transactionResult": -1000.00,
     "reason": "Bonus recovery"
@@ -228,7 +228,7 @@
     "claimReason": "Superseding bonus claim"
   },
   "supersede": {
-    "originalTransactionId": "0000056789",
+    "originalTransactionId": "0003456789",
     "originalBonusDueForPeriod": 4000.00,
     "transactionResult": 4000.00,
     "reason": "Additional bonus"
@@ -383,55 +383,55 @@
 	        <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
 <pre class="code--block">
 {
-    "code": "BAD_REQUEST",
-    "message": "Bad Request",
-    "errors": [
-        {
-            "code": "INVALID_DATA_TYPE",
-            "message": "Invalid data type has been used",
-            "path": "/lifeEventId"
-        },
-        {
-            "code": "INVALID_DATE",
-            "message": "Date is invalid",
-            "path": "/periodEndDate"
-        },
-        {
-            "code": "INVALID_MONETARY_AMOUNT",
-            "message": "Amount cannot be negative, and can only have up to 2 decimal places",
-            "path": "/htbTransfer/htbTransferTotalYTD"
-        },
-        {
-            "code": "MISSING_FIELD",
-            "message": "This field is required",
-            "path": "/bonuses/totalBonusDueYTD"
-        },
-        {
-            "code": "INVALID_FORMAT",
-            "message": "Invalid format has been used",
-            "path": "/bonuses/claimReason"
-        },
-        {
-            "code": "INVALID_FORMAT",
-            "message": "Invalid format has been used",
-            "path": "/supersede/transactionId"
-        },
-        {
-            "code": "INVALID_DATA_TYPE",
-            "message": "Invalid data type has been used",
-            "path": "/supersede/transactionAmount"
-        },
-        {
-            "code": "INVALID_MONETARY_AMOUNT",
-            "message": "Amount can only have up to 2 decimal places",
-            "path": "/supersede/transactionResult"
-        },
-        {
-            "code": "INVALID_FORMAT",
-            "message": "Invalid format has been used",
-            "path": "/supersede/reason"
-        }
-    ]
+  "code": "BAD_REQUEST",
+  "message": "Bad Request",
+  "errors": [
+    {
+      "code": "INVALID_DATA_TYPE",
+      "message": "Invalid data type has been used",
+      "path": "/lifeEventId"
+    },
+    {
+      "code": "INVALID_DATE",
+      "message": "Date is invalid",
+      "path": "/periodEndDate"
+    },
+    {
+      "code": "INVALID_MONETARY_AMOUNT",
+      "message": "Amount cannot be negative, and can only have up to 2 decimal places",
+      "path": "/htbTransfer/htbTransferTotalYTD"
+    },
+    {
+      "code": "MISSING_FIELD",
+      "message": "This field is required",
+      "path": "/bonuses/totalBonusDueYTD"
+    },
+    {
+      "code": "INVALID_FORMAT",
+      "message": "Invalid format has been used",
+      "path": "/bonuses/claimReason"
+    },
+    {
+      "code": "INVALID_FORMAT",
+      "message": "Invalid format has been used",
+      "path": "/supersede/transactionId"
+    },
+    {
+      "code": "INVALID_DATA_TYPE",
+      "message": "Invalid data type has been used",
+      "path": "/supersede/transactionAmount"
+    },
+    {
+      "code": "INVALID_MONETARY_AMOUNT",
+      "message": "Amount can only have up to 2 decimal places",
+      "path": "/supersede/transactionResult"
+    },
+    {
+      "code": "INVALID_FORMAT",
+      "message": "Invalid format has been used",
+      "path": "/supersede/reason"
+    }
+  ]
 }
 </pre>
 	        </td>
