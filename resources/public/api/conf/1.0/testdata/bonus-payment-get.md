@@ -42,9 +42,7 @@
     "totalBonusDueYTD": 10000,
     "claimReason": "Life Event"
   },
-  "supersede": {
-    "supersededBy": "0000456789"
-  }
+  "supersededBy": "0000456789"
 }
 </pre>
 			</td>
@@ -76,9 +74,7 @@
     "totalBonusDueYTD": 10000,
     "claimReason": "Regular Bonus"
   },
-  "supersede": {
-    "supersededBy": "0000056789"
-  }
+  "supersededBy": "0000056789"
 }
 </pre>
 			</td>
