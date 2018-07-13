@@ -2,21 +2,21 @@
   "periodStartDate": "2018-04-06",
   "periodEndDate": "2018-05-05",
   "inboundPayments": {
-    "newSubsForPeriod": 0.00,
-    "newSubsYTD": 0.00,
-    "totalSubsForPeriod": 0.00,
-    "totalSubsYTD": 0.00
+    "newSubsForPeriod": 0,
+    "newSubsYTD": 0,
+    "totalSubsForPeriod": 0,
+    "totalSubsYTD": 0
   },
   "bonuses": {
-    "bonusDueForPeriod": 0.00,
-    "totalBonusDueYTD": 0.00,
+    "bonusDueForPeriod": 0,
+    "totalBonusDueYTD": 0,
     "claimReason": "Superseding bonus claim"
   },
   "supersede" : {
-    "automaticRecoveryAmount": 300.00,
-    "originalTransactionId": "0000456789",
-    "originalBonusDueForPeriod": -300.00,
-    "transactionResult": 300.00,
+    "automaticRecoveryAmount": 300,
+    "transactionId": "0000456789",
+    "transactionAmount": -300,
+    "transactionResult": 300,
     "reason": "Bonus recovery"
   }
 }
