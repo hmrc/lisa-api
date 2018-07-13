@@ -74,12 +74,16 @@ trait BonusPaymentService {
       case successResponse: DesGetBonusPaymentResponse => {
         Logger.debug("Matched DesGetBonusPaymentResponse")
 
-        GetBonusPaymentSuccessResponse(successResponse.lifeEventId,
-                                       successResponse.periodStartDate,
-                                       successResponse.periodEndDate,
-                                       successResponse.htbTransfer,
-                                       successResponse.inboundPayments,
-                                       successResponse.bonuses)
+        GetBonusPaymentSuccessResponse(
+          successResponse.lifeEventId,
+          successResponse.periodStartDate,
+          successResponse.periodEndDate,
+          successResponse.htbTransfer,
+          successResponse.inboundPayments,
+          successResponse.bonuses,
+          successResponse.supersededBy,
+          successResponse.supersede
+        )
       }
 
       case failureResponse: DesFailureResponse => {
