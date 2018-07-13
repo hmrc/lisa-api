@@ -86,16 +86,16 @@
         "claimReason"
       ]
     },
-    "supersededBy":{"description": "The transactionId of a bonus request which supersedes this one.", "$ref": "#/definitions/TransactionIDType"},
+    "supersededBy":{"description": "This is the transactionId given to the superseded bonus transaction.", "$ref": "#/definitions/TransactionIDType"},
     "supersede": {
-      "description": "Supersede bonus payment by requesting for an additional bonus amount or recover an overpaid amount.",
+      "description": "Correct an existing bonus claim with an additional bonus or a recovery of an overpaid amount.",
       "type": "object",
       "properties": {
-        "automaticRecoveryAmount":{"description": "This is used to confirm the amount due to HMRC from the LISA manager. If the superseded transaction result is a less than zero, you must give the automatic recovery amount. This is so that HMRC can calculate the amount to collect from the LISA manager. Leave it blank if there are no funds available. HMRC will recover overpaid funds from the LISA investor.", "type" : "number"},
+        "automaticRecoveryAmount":{"description": "This is the amount HMRC can collect from the LISA manager in bonus recovery cases. If there are no funds available, this value must be 0.", "type" : "number"},
         "originalTransactionId" :{"description": "The transactionId of the original bonus affected by the correction or recovery. This is used together with the originalBonusDueForPeriod to make sure the right bonus transaction is replaced.", "$ref": "#/definitions/TransactionIDType"},
         "originalBonusDueForPeriod" :{"description": "This is how much was in the bonusDueForPeriod in the original bonus request.", "type" : "number"},
-        "transactionResult" :{"description": "The amount to be added to or recovered from the original bonus. This is used to confirm the outcome of a correction. You must calculate the new bonus amount due for the period minus the old bonus amount due for the period and give this result.", "type" : "number"},
-        "reason" : {"description": "Used to confirm the outcome of a correction. You must give the outcome of the superseded bonus claim. This can be either an additional bonus amount due or the recovery of an amount from the bonus.", "$ref": "#/definitions/supersededReasonType"}
+        "transactionResult" :{"description": "The amount to be added to or recovered from the original bonus.", "type" : "number"},
+        "reason" : {"description": "Confirm whether an additional bonus amount is due or funds need to be recovered.", "$ref": "#/definitions/supersededReasonType"}
       },
       "required": [
         "originalTransactionId",
