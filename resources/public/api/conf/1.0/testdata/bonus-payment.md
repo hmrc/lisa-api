@@ -802,6 +802,53 @@
         </tr>
         <tr>
             <td>
+              <p>A bonus claim for an account with no subscriptions in the given tax year</p>
+              <p class="code--block">
+                <strong>lisaManagerReferenceNumber:</strong><br>
+                <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+                <br>
+                <strong>accountId:</strong><br>
+                3000000403
+              </p>
+            </td>
+            <td>
+<pre class="code--block">
+{
+  "periodStartDate": "2018-04-06",
+  "periodEndDate": "2018-05-05",
+  "inboundPayments": {
+    "newSubsForPeriod": 4000.00,
+    "newSubsYTD": 4000.00,
+    "totalSubsForPeriod": 40000.00,
+    "totalSubsYTD": 40000.00
+  },
+  "bonuses": {
+    "bonusPaidYTD": 0.0,
+    "bonusDueForPeriod": 10500.00,
+    "totalBonusDueYTD": 10000.00,
+    "claimReason": "Superseding bonus claim"
+  },
+  "supersede": {
+    "automaticRecoveryAmount": 1000.00,
+    "originalTransactionId":": "1234567892",
+    "originalBonusDueForPeriod"": 2000.00,
+    "transactionResult": -1000.00,
+    "reason": "Bonus recovery"
+  }
+}
+</pre>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
+<pre class ="code--block">
+{
+  "code": "ACCOUNT_ERROR_NO_SUBSCRIPTIONS_THIS_TAX_YEAR",
+  "message": "A bonus payment is not possible because the account has no subscriptions for that tax year"
+}
+</pre>
+            </td>
+        </tr>
+        <tr>
+            <td>
               <p>Request containing a life event ID that does not exist</p>
               <p class="code--block">
                 <strong>lisaManagerReferenceNumber:</strong><br>
