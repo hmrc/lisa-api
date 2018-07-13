@@ -63,9 +63,9 @@
   "periodStartDate": "2017-04-06",
   "periodEndDate": "2017-05-05",
   "inboundPayments": {
-  "newSubsForPeriod": 4000,
-  "newSubsYTD": 4000,
-  "totalSubsForPeriod": 40000,
+  	"newSubsForPeriod": 4000,
+  	"newSubsYTD": 4000,
+  	"totalSubsForPeriod": 40000,
     "totalSubsYTD": 40000
   },
   "bonuses": {
