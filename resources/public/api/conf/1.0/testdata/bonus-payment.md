@@ -178,8 +178,8 @@
   },
   "supersede": {
     "automaticRecoveryAmount": 1000.00,
-    "transactionId": "0123456789",
-    "transactionAmount": 1000.00,
+    "originalTransactionId": "0123456789",
+    "originalBonusDueForPeriod": 1000.00,
     "transactionResult": -1000.00,
     "reason": "Bonus recovery"
   }
@@ -228,8 +228,8 @@
     "claimReason": "Superseding bonus claim"
   },
   "supersede": {
-    "transactionId": "0003456789",
-    "transactionAmount": 4000.00,
+    "originalTransactionId": "0003456789",
+    "originalBonusDueForPeriod": 4000.00,
     "transactionResult": 4000.00,
     "reason": "Additional bonus"
   }
@@ -372,8 +372,8 @@
     "claimReason": "X"
   },
   "supersede": {
-    "transactionId": "ABC123",
-    "transactionAmount": true,
+    "originalTransactionId": "ABC123",
+    "originalBonusDueForPeriod": true,
     "transactionResult": -10.005,
     "reason": "Recovery"
   }
@@ -736,8 +736,8 @@
   },
   "supersede": {
     "automaticRecoveryAmount": 1000.00,
-    "transactionId": "1234567892",
-    "transactionAmount": 2000.00,
+    "originalTransactionId": "1234567892",
+    "originalBonusDueForPeriod": 2000.00,
     "transactionResult": -1000.00,
     "reason": "Bonus recovery"
   }
@@ -783,8 +783,8 @@
   },
   "supersede": {
     "automaticRecoveryAmount": 1000.00,
-    "transactionId": "1234567892",
-    "transactionAmount": 2000.00,
+    "originalTransactionId": "1234567892",
+    "originalBonusDueForPeriod": 2000.00,
     "transactionResult": -1000.00,
     "reason": "Bonus recovery"
   }
@@ -1012,8 +1012,8 @@
   },
   "supersede": {
     "automaticRecoveryAmount": 1000.00,
-    "transactionId": "0000006789",
-    "transactionAmount": 2000.00,
+    "originalTransactionId": "0000006789",
+    "originalBonusDueForPeriod": 2000.00,
     "transactionResult": -1000.00,
     "reason": "Bonus recovery"
   }

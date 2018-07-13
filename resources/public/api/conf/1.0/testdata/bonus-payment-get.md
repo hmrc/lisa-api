@@ -108,8 +108,8 @@
   },
   "supersede": {
     "automaticRecoveryAmount": 1000,
-    "transactionId": "0123456789",
-    "transactionAmount": 1000,
+    "originalTransactionId": "0123456789",
+    "originalBonusDueForPeriod": 1000,
     "transactionResult": -1000,
     "reason": "Bonus recovery"
   }
@@ -145,8 +145,8 @@
     "claimReason": "Superseding bonus claim"
   },
   "supersede": {
-    "transactionId": "0003456789",
-    "transactionAmount": 4000,
+    "originalTransactionId": "0003456789",
+    "originalBonusDueForPeriod": 4000,
     "transactionResult": 4000,
     "reason": "Additional bonus"
   }
