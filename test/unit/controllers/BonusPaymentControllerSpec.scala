@@ -238,6 +238,18 @@ class BonusPaymentControllerSpec extends PlaySpec
 
       }
 
+      "given a RequestBonusPaymentNoSubscriptions response from the service layer" in {
+        when(mockService.requestBonusPayment(any(), any(),any())(any())).thenReturn(
+          Future.successful(RequestBonusPaymentNoSubscriptions))
+
+        doRequest(validBonusPaymentJson)  { res =>
+          status(res) mustBe FORBIDDEN
+          (contentAsJson(res) \ "code").as[String] mustBe "ACCOUNT_ERROR_NO_SUBSCRIPTIONS_THIS_TAX_YEAR"
+          (contentAsJson(res) \ "message").as[String] mustBe "A bonus payment is not possible because the account has no subscriptions for that tax year"
+        }
+
+      }
+
     }
 
     "return with status 404 not found" when {

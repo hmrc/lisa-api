@@ -244,6 +244,11 @@ class BonusPaymentController extends LisaController with LisaConstants {
         LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.BONUS_PAYMENT)
 
         Forbidden(Json.toJson(ErrorBonusSupersededOutcomeError))
+      case RequestBonusPaymentNoSubscriptions =>
+        auditFailure(lisaManager, accountId, req, ErrorNoSubscriptions.errorCode)
+        LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.BONUS_PAYMENT)
+
+        Forbidden(Json.toJson(ErrorNoSubscriptions))
       case RequestBonusPaymentAccountNotFound =>
         auditFailure(lisaManager, accountId, req, ErrorAccountNotFound.errorCode)
         LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.BONUS_PAYMENT)

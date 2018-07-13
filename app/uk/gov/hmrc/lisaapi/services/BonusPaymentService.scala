@@ -55,6 +55,7 @@ trait BonusPaymentService {
           case "SUPERSEDED_BONUS_CLAIM_AMOUNT_MISMATCH" => RequestBonusPaymentSupersededAmountMismatch
           case "SUPERSEDED_BONUS_REQUEST_OUTCOME_ERROR" => RequestBonusPaymentSupersededOutcomeError
           case "BONUS_CLAIM_ALREADY_SUPERSEDED" => RequestBonusPaymentAlreadySuperseded
+          case "ACCOUNT_ERROR_NO_SUBSCRIPTIONS_THIS_TAX_YEAR" => RequestBonusPaymentNoSubscriptions
           case _ => {
             Logger.warn(s"Request bonus payment returned error: ${failureResponse.code}")
             RequestBonusPaymentError

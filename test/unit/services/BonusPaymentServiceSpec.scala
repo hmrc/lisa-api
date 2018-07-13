@@ -144,6 +144,17 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
       }
     }
 
+    "return a no subscriptions response" when {
+      "given the code BONUS_CLAIM_ALREADY_SUPERSEDED from the DES connector" in {
+        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(DesFailureResponse("ACCOUNT_ERROR_NO_SUBSCRIPTIONS_THIS_TAX_YEAR", "xxxxx")))
+
+        doRequest { response =>
+          response mustBe RequestBonusPaymentNoSubscriptions
+        }
+      }
+    }
+
     "return a generic error response" when {
       "given any other error code from the DES connector" in {
         when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
@@ -224,7 +235,6 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
       }
     }
   }
-
 
   private def doRequest(callback: (RequestBonusPaymentResponse) => Unit) = {
     val request = RequestBonusPaymentRequest(

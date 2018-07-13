@@ -148,6 +148,8 @@ case object ErrorBonusClaimTimescaleExceeded extends ErrorResponse(403, "BONUS_C
 
 case object ErrorBonusHelpToBuyNotApplicable extends ErrorResponse(403, "HELP_TO_BUY_NOT_APPLICABLE", "Help to Buy is not applicable on this account")
 
+case object ErrorNoSubscriptions extends ErrorResponse(403, "ACCOUNT_ERROR_NO_SUBSCRIPTIONS_THIS_TAX_YEAR", "A bonus payment is not possible because the account has no subscriptions for that tax year")
+
 object ErrorInvestorAlreadyExists {
 
   def apply(investorId: String) = {
