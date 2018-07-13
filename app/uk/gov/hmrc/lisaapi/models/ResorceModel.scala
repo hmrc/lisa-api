@@ -148,14 +148,14 @@ sealed trait Supersede
 
 case class BonusRecovery(
   automaticRecoveryAmount: Amount,
-  transactionId: String,
-  transactionAmount: Amount,
+  originalTransactionId: String,
+  originalBonusDueForPeriod: Amount,
   transactionResult: Amount
 ) extends Supersede
 
 case class AdditionalBonus(
-  transactionId: String,
-  transactionAmount: Amount,
+  originalTransactionId: String,
+  originalBonusDueForPeriod: Amount,
   transactionResult: Amount
 ) extends Supersede
 
@@ -163,8 +163,8 @@ object Supersede {
 
   val bonusRecoveryReads: Reads[BonusRecovery] = (
     (JsPath \ "automaticRecoveryAmount").read(JsonReads.nonNegativeAmount) and
-    (JsPath \ "transactionId").read(JsonReads.transactionId) and
-    (JsPath \ "transactionAmount").read(JsonReads.nonNegativeAmount) and
+    (JsPath \ "originalTransactionId").read(JsonReads.transactionId) and
+    (JsPath \ "originalBonusDueForPeriod").read(JsonReads.nonNegativeAmount) and
     (JsPath \ "transactionResult").read(JsonReads.amount) and
     (JsPath \ "reason").read[String](Reads.pattern("Bonus recovery".r, "error.formatting.reason"))
   )((automaticRecoveryAmount, transactionId, transactionAmount, transactionResult, _) => BonusRecovery(
@@ -172,8 +172,8 @@ object Supersede {
   ))
 
   val additionalBonusReads: Reads[AdditionalBonus] = (
-    (JsPath \ "transactionId").read(JsonReads.transactionId) and
-    (JsPath \ "transactionAmount").read(JsonReads.nonNegativeAmount) and
+    (JsPath \ "originalTransactionId").read(JsonReads.transactionId) and
+    (JsPath \ "originalBonusDueForPeriod").read(JsonReads.nonNegativeAmount) and
     (JsPath \ "transactionResult").read(JsonReads.amount) and
     (JsPath \ "reason").read[String](Reads.pattern("Additional bonus".r, "error.formatting.reason"))
   )((transactionId, transactionAmount, transactionResult, _) => AdditionalBonus(
@@ -191,29 +191,29 @@ object Supersede {
 
   implicit val bonusRecoveryWrites: Writes[BonusRecovery] = (
     (JsPath \ "automaticRecoveryAmount").write[Amount] and
-    (JsPath \ "transactionId").write[String] and
-    (JsPath \ "transactionAmount").write[Amount] and
+    (JsPath \ "originalTransactionId").write[String] and
+    (JsPath \ "originalBonusDueForPeriod").write[Amount] and
     (JsPath \ "transactionResult").write[Amount] and
     (JsPath \ "reason").write[String]
   ){
     b: BonusRecovery => (
       b.automaticRecoveryAmount,
-      b.transactionId,
-      b.transactionAmount,
+      b.originalTransactionId,
+      b.originalBonusDueForPeriod,
       b.transactionResult,
       "Bonus recovery"
     )
   }
 
   implicit val additionalBonusWrites: Writes[AdditionalBonus] = (
-    (JsPath \ "transactionId").write[String] and
-    (JsPath \ "transactionAmount").write[Amount] and
+    (JsPath \ "originalTransactionId").write[String] and
+    (JsPath \ "originalBonusDueForPeriod").write[Amount] and
     (JsPath \ "transactionResult").write[Amount] and
     (JsPath \ "reason").write[String]
   ){
     b: AdditionalBonus => (
-      b.transactionId,
-      b.transactionAmount,
+      b.originalTransactionId,
+      b.originalBonusDueForPeriod,
       b.transactionResult,
       "Additional bonus"
     )
