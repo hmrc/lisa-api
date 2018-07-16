@@ -414,12 +414,12 @@
     {
       "code": "INVALID_FORMAT",
       "message": "Invalid format has been used",
-      "path": "/supersede/transactionId"
+      "path": "/supersede/originalTransactionId"
     },
     {
       "code": "INVALID_DATA_TYPE",
       "message": "Invalid data type has been used",
-      "path": "/supersede/transactionAmount"
+      "path": "/supersede/originalBonusDueForPeriod"
     },
     {
       "code": "INVALID_MONETARY_AMOUNT",
