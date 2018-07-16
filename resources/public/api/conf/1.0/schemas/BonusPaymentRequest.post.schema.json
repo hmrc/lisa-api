@@ -60,7 +60,7 @@
           "bonusDueForPeriod" :{"description": "The total bonus payment amount due for the claim period. You can include an amount up to 2 decimal places. The bonusDueForPeriod must always be greater than 0.", "type" : "number"},
           "totalBonusDueYTD" :{"description": "The total bonus payment amount due for the tax year to date. You can include an amount up to 2 decimal places. The totalBonusDueYTD must always be greater than 0.", "type" : "number"},
           "bonusPaidYTD" :{"description": "The total bonus payment that has already been claimed and paid in the tax year to date. You can include an amount up to 2 decimal places.", "type" : "number"},
-          "claimReason" : {"description": "The reason the bonus payment was claimed.", "$ref": "#/definitions/claimReasonType"}
+          "claimReason" : {"description": "The reason the bonus payment was claimed. \"Superseding bonus claim\" is valid in the sandbox environment only.", "$ref": "#/definitions/claimReasonType"}
         },
         "required":
         [

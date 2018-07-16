@@ -81,7 +81,7 @@
 		</tr>
 		<tr>
 	    <td>
-		    	<p>Retrieve a superseded transaction (bonus recovery)</p>
+		    	<p>[sandbox-only] Retrieve a superseded transaction (bonus recovery)</p>
 		    	<p class="code--block">
 		    		<strong>lisaManagerReferenceNumber:</strong> <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
 		    		<strong>accountId:</strong> 1234567890<br>
@@ -119,7 +119,7 @@
 		</tr>
 		<tr>
 	    <td>
-		    	<p>Retrieve a superseded transaction (additional bonus)</p>
+		    	<p>[sandbox-only] Retrieve a superseded transaction (additional bonus)</p>
 		    	<p class="code--block">
 		    		<strong>lisaManagerReferenceNumber:</strong> <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
 		    		<strong>accountId:</strong> 1234567890<br>

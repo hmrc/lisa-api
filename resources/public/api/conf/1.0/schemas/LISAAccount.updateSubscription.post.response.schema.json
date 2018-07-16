@@ -20,11 +20,11 @@
           ]
         },
         "message": {
-          "description": "A human-readable explanation for the result of the API call.",
+          "description": "A human-readable explanation for the result of the API call. In the sandbox environment, the void message ends in \"with an earlier firstSubscriptionDate\", rather than \"with a more recent firstSubscriptionDate\"",
           "type": "string",
           "enum": [
             "Successfully updated the firstSubscriptionDate for the LISA account",
-            "Successfully updated the firstSubscriptionDate for the LISA account and changed the account status to void because the investor has another account with an earlier firstSubscriptionDate"
+            "Successfully updated the firstSubscriptionDate for the LISA account and changed the account status to void because the investor has another account with a more recent firstSubscriptionDate"
           ]
         }
       },
