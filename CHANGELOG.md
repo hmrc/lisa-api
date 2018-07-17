@@ -1,4 +1,12 @@
-# Next release
+# Change log
+
+## Next release
+
+Details TBC
+
+## 1.68.0
+
+Released 18 July 2018
 
 ### Bonus corrections added
  
