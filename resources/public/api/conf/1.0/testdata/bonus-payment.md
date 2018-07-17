@@ -150,7 +150,7 @@
         </tr>
         <tr>
             <td>
-              <p>Superseded transaction - Bonus recovery</p>
+              <p>[sandbox-only] Superseded transaction - Bonus recovery</p>
               <p class="code--block">
                 <strong>lisaManagerReferenceNumber:</strong><br>
                 <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
@@ -201,7 +201,7 @@
         </tr>
         <tr>
             <td>
-              <p>Superseded transaction - Additional bonus</p>
+              <p>[sandbox-only] Superseded transaction - Additional bonus</p>
               <p class="code--block">
                 <strong>lisaManagerReferenceNumber:</strong><br>
                 <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
@@ -664,7 +664,7 @@
        </tr>
        <tr>
             <td>
-              <p>Request for a bonus claim after 5 April 2018 containing help to buy funds.</p>
+              <p>[sandbox-only] Request for a bonus claim after 5 April 2018 containing help to buy funds.</p>
               <p class="code--block">
                 <strong>lisaManagerReferenceNumber:</strong><br>
                 <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
@@ -708,7 +708,7 @@
         </tr>
         <tr>
             <td>
-              <p>Superseded transaction containing details which don't match an existing transaction</p>
+              <p>[sandbox-only] Superseded transaction containing details which don't match an existing transaction</p>
               <p class="code--block">
                 <strong>lisaManagerReferenceNumber:</strong><br>
                 <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
@@ -755,7 +755,7 @@
         </tr>
         <tr>
             <td>
-              <p>Superseded transaction with an outcome error</p>
+              <p>[sandbox-only] Superseded transaction with an outcome error</p>
               <p class="code--block">
                 <strong>lisaManagerReferenceNumber:</strong><br>
                 <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
@@ -802,7 +802,7 @@
         </tr>
         <tr>
             <td>
-              <p>A bonus claim for an account with no subscriptions in the given tax year</p>
+              <p>[sandbox-only] A bonus claim for an account with no subscriptions in the given tax year</p>
               <p class="code--block">
                 <strong>lisaManagerReferenceNumber:</strong><br>
                 <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
@@ -984,7 +984,7 @@
         </tr>
         <tr>
             <td>
-              <p>Request to supersede a transaction that has already been superseded</p>
+              <p>[sandbox-only] Request to supersede a transaction that has already been superseded</p>
               <p class="code--block">
                 <strong>lisaManagerReferenceNumber:</strong><br>
                 <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
