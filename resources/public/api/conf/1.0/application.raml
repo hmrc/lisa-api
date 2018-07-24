@@ -999,6 +999,13 @@ types:
                             application/json:
                               type: !include schemas/ErrorCodes.schema.json
                               examples:
+                                forbidden:
+                                  description: There is a problem with the request data
+                                  value: |
+                                    {
+                                      "code" : "FORBIDDEN",
+                                      "message" : "There is a problem with the request data"
+                                    }
                                 accountClosed:
                                   description: This LISA account is already closed
                                   value: |
