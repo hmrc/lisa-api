@@ -17,7 +17,7 @@
             "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
 		},
 		"withdrawalAmount": {
-			"description": "This is the amount charged for the withdrawal.",
+			"description": "This is the amount that the investor has withdrawn from the LISA account.",
 			"type": "number"
 		},
 		"withdrawalChargeAmount": {
