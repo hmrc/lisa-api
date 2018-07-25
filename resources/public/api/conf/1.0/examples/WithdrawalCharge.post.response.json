@@ -1,0 +1,8 @@
+{
+  "success": true,
+  "status": 201,
+  "data": {
+    "transactionId": "2345678901",
+    "message": "Unauthorised withdrawal transaction created"
+  }
+}

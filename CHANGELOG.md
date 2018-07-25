@@ -2,7 +2,7 @@
 
 ## Next release
 
-Details TBC
+* Report withdrawal charge API added
 
 ## 1.68.0
 
