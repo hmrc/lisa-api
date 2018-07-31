@@ -30,7 +30,7 @@ import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
-import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountNotFound, ErrorInternalServerError, WithdrawalController}
+import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountAlreadyClosed, ErrorAccountAlreadyVoided, ErrorAccountNotFound, ErrorInternalServerError, ErrorWithdrawalExists, ErrorWithdrawalTimescalesExceeded, WithdrawalController}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, CurrentDateService, WithdrawalService}
 
@@ -49,7 +49,6 @@ class WithdrawalControllerSpec extends PlaySpec
   val accountId = "ABC/12345"
   val transactionId = "1234567890"
   val validWithdrawalJson = Source.fromInputStream(getClass().getResourceAsStream("/json/request.valid.withdrawal-charge.json")).mkString
-  val validWithdrawalMinimumFieldsJson = Source.fromInputStream(getClass().getResourceAsStream("/json/request.valid.withdrawal-charge.min.json")).mkString
   implicit val hc:HeaderCarrier = HeaderCarrier()
 
   override def beforeEach() {
@@ -99,6 +98,109 @@ class WithdrawalControllerSpec extends PlaySpec
 
     }
 
+    "return with status 403 forbidden" when {
+
+      "given a ReportWithdrawalChargeAccountClosed from the service layer" in {
+        when(mockService.reportWithdrawalCharge(any(), any(), any())(any())).
+          thenReturn(Future.successful(ReportWithdrawalChargeAccountClosed))
+
+        doRequest(validWithdrawalJson) { res =>
+          status(res) mustBe FORBIDDEN
+          (contentAsJson(res) \ "code").as[String] mustBe ErrorAccountAlreadyClosed.errorCode
+          (contentAsJson(res) \ "message").as[String] mustBe ErrorAccountAlreadyClosed.message
+        }
+      }
+
+      "given a ReportWithdrawalChargeAccountVoid from the service layer" in {
+        when(mockService.reportWithdrawalCharge(any(), any(), any())(any())).
+          thenReturn(Future.successful(ReportWithdrawalChargeAccountVoid))
+
+        doRequest(validWithdrawalJson) { res =>
+          status(res) mustBe FORBIDDEN
+          (contentAsJson(res) \ "code").as[String] mustBe ErrorAccountAlreadyVoided.errorCode
+          (contentAsJson(res) \ "message").as[String] mustBe ErrorAccountAlreadyVoided.message
+        }
+      }
+
+      "given a ReportWithdrawalChargeAccountCancelled from the service layer" in {
+        when(mockService.reportWithdrawalCharge(any(), any(), any())(any())).
+          thenReturn(Future.successful(ReportWithdrawalChargeAccountCancelled))
+
+        doRequest(validWithdrawalJson) { res =>
+          status(res) mustBe FORBIDDEN
+          (contentAsJson(res) \ "code").as[String] mustBe ErrorAccountAlreadyClosed.errorCode
+          (contentAsJson(res) \ "message").as[String] mustBe ErrorAccountAlreadyClosed.message
+        }
+      }
+
+      "given a ReportWithdrawalChargeReportingError from the service layer" in {
+        when(mockService.reportWithdrawalCharge(any(), any(), any())(any())).
+          thenReturn(Future.successful(ReportWithdrawalChargeReportingError))
+
+        doRequest(validWithdrawalJson) { res =>
+          status(res) mustBe FORBIDDEN
+          (contentAsJson(res) \ "code").as[String] mustBe "WITHDRAWAL_REPORTING_ERROR"
+          (contentAsJson(res) \ "message").as[String] mustBe "The withdrawal charge does not equal 25% of the withdrawal amount"
+        }
+      }
+
+      "given a ReportWithdrawalChargeAlreadySuperseded from the service layer" in {
+        when(mockService.reportWithdrawalCharge(any(), any(), any())(any())).
+          thenReturn(Future.successful(ReportWithdrawalChargeAlreadySuperseded))
+
+        doRequest(validWithdrawalJson) { res =>
+          status(res) mustBe FORBIDDEN
+          (contentAsJson(res) \ "code").as[String] mustBe "WITHDRAWAL_CHARGE_ALREADY_SUPERSEDED"
+          (contentAsJson(res) \ "message").as[String] mustBe "This withdrawal charge has already been superseded"
+        }
+      }
+
+      "given a ReportWithdrawalChargeSupersedeAmountMismatch from the service layer" in {
+        when(mockService.reportWithdrawalCharge(any(), any(), any())(any())).
+          thenReturn(Future.successful(ReportWithdrawalChargeSupersedeAmountMismatch))
+
+        doRequest(validWithdrawalJson) { res =>
+          status(res) mustBe FORBIDDEN
+          (contentAsJson(res) \ "code").as[String] mustBe "SUPERSEDED_WITHDRAWAL_CHARGE_ID_AMOUNT_MISMATCH"
+          (contentAsJson(res) \ "message").as[String] mustBe "originalTransactionId and the originalWithdrawalChargeAmount do not match the information in the original request"
+        }
+      }
+
+      "given a ReportWithdrawalChargeSupersedeOutcomeError from the service layer" in {
+        when(mockService.reportWithdrawalCharge(any(), any(), any())(any())).
+          thenReturn(Future.successful(ReportWithdrawalChargeSupersedeOutcomeError))
+
+        doRequest(validWithdrawalJson) { res =>
+          status(res) mustBe FORBIDDEN
+          (contentAsJson(res) \ "code").as[String] mustBe "SUPERSEDED_WITHDRAWAL_CHARGE_OUTCOME_ERROR"
+          (contentAsJson(res) \ "message").as[String] mustBe "The calculation from your superseded withdrawal charge is incorrect"
+        }
+      }
+
+      "the claimPeriodEndDate is more than 6 years and 14 days in the past" in {
+        val now = new DateTime("2050-01-20")
+
+        when(mockDateTimeService.now()).thenReturn(now)
+
+        val testEndDate = now.minusYears(6).withDayOfMonth(5)
+        val testStartDate = testEndDate.minusMonths(1).plusDays(1)
+
+        val validWithdrawalCharge = Json.parse(validWithdrawalJson).as[SupersededWithdrawalChargeRequest]
+        val request = validWithdrawalCharge.copy(claimPeriodStartDate = testStartDate, claimPeriodEndDate = testEndDate)
+        val requestJson = Json.toJson(request).toString()
+
+        doRequest(requestJson) { res =>
+          status(res) mustBe FORBIDDEN
+
+          val json = contentAsJson(res)
+
+          (json \ "code").as[String] mustBe ErrorWithdrawalTimescalesExceeded.errorCode
+          (json \ "message").as[String] mustBe ErrorWithdrawalTimescalesExceeded.message
+        }
+      }
+
+    }
+
     "return with status 404 not found" when {
 
       "given a ReportWithdrawalChargeAccountNotFound from the service layer" in {
@@ -109,6 +211,21 @@ class WithdrawalControllerSpec extends PlaySpec
           status(res) mustBe NOT_FOUND
           (contentAsJson(res) \ "code").as[String] mustBe ErrorAccountNotFound.errorCode
           (contentAsJson(res) \ "message").as[String] mustBe ErrorAccountNotFound.message
+        }
+      }
+
+    }
+
+    "return with status 409 conflict" when {
+
+      "given a ReportWithdrawalChargeAlreadyExists from the service layer" in {
+        when(mockService.reportWithdrawalCharge(any(), any(), any())(any())).
+          thenReturn(Future.successful(ReportWithdrawalChargeAlreadyExists))
+
+        doRequest(validWithdrawalJson) { res =>
+          status(res) mustBe CONFLICT
+          (contentAsJson(res) \ "code").as[String] mustBe ErrorWithdrawalExists.errorCode
+          (contentAsJson(res) \ "message").as[String] mustBe ErrorWithdrawalExists.message
         }
       }
 

@@ -150,6 +150,18 @@ case object ErrorBonusHelpToBuyNotApplicable extends ErrorResponse(403, "HELP_TO
 
 case object ErrorNoSubscriptions extends ErrorResponse(403, "ACCOUNT_ERROR_NO_SUBSCRIPTIONS_THIS_TAX_YEAR", "A bonus payment is not possible because the account has no subscriptions for that tax year")
 
+case object ErrorWithdrawalExists extends ErrorResponse(409, "WITHDRAWAL_CHARGE_ALREADY_EXISTS", "A withdrawal charge with these details has already been requested for this investor")
+
+case object ErrorWithdrawalReportingError extends ErrorResponse(403, "WITHDRAWAL_REPORTING_ERROR", "The withdrawal charge does not equal 25% of the withdrawal amount")
+
+case object ErrorWithdrawalAlreadySuperseded extends ErrorResponse(403, "WITHDRAWAL_CHARGE_ALREADY_SUPERSEDED", "This withdrawal charge has already been superseded")
+
+case object ErrorWithdrawalSupersededAmountMismatch extends ErrorResponse(403, "SUPERSEDED_WITHDRAWAL_CHARGE_ID_AMOUNT_MISMATCH", "originalTransactionId and the originalWithdrawalChargeAmount do not match the information in the original request")
+
+case object ErrorWithdrawalSupersededOutcomeError extends ErrorResponse(403, "SUPERSEDED_WITHDRAWAL_CHARGE_OUTCOME_ERROR", "The calculation from your superseded withdrawal charge is incorrect")
+
+case object ErrorWithdrawalTimescalesExceeded extends ErrorResponse(403, "WITHDRAWAL_CHARGE_TIMESCALES_EXCEEDED", "The timescale for reporting a withdrawal charge has passed. The claim period lasts for 6 years and 14 days")
+
 object ErrorInvestorAlreadyExists {
 
   def apply(investorId: String) = {

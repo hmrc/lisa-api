@@ -18,9 +18,94 @@ package uk.gov.hmrc.lisaapi.models
 
 import org.joda.time.DateTime
 import play.api.libs.functional.syntax._
-import play.api.libs.json.{JsPath, Json, Reads, Writes}
+import play.api.libs.json.{JsPath, Reads, Writes}
 
-sealed trait ReportWithdrawalChargeRequest extends Product
+sealed trait WithdrawalSupersede extends Product
+
+case class WithdrawalIncrease(
+                               automaticRecoveryAmount: Amount,
+                               originalTransactionId: String,
+                               originalWithdrawalChargeAmount: Amount,
+                               transactionResult: Amount
+                             ) extends WithdrawalSupersede
+
+case class WithdrawalDecrease(
+                               originalTransactionId: String,
+                               originalWithdrawalChargeAmount: Amount,
+                               transactionResult: Amount
+                             ) extends WithdrawalSupersede
+
+object WithdrawalSupersede {
+
+  val withdrawalIncreaseReads: Reads[WithdrawalIncrease] = (
+    (JsPath \ "automaticRecoveryAmount").read(JsonReads.nonNegativeAmount) and
+    (JsPath \ "originalTransactionId").read(JsonReads.transactionId) and
+    (JsPath \ "originalWithdrawalChargeAmount").read(JsonReads.nonNegativeAmount) and
+    (JsPath \ "transactionResult").read(JsonReads.amount) and
+    (JsPath \ "reason").read[String](Reads.pattern("Additional withdrawal".r, "error.formatting.reason"))
+  )((automaticRecoveryAmount, transactionId, transactionAmount, transactionResult, _) => WithdrawalIncrease(
+    automaticRecoveryAmount, transactionId, transactionAmount, transactionResult
+  ))
+
+  val withdrawalDecreaseReads: Reads[WithdrawalDecrease] = (
+    (JsPath \ "originalTransactionId").read(JsonReads.transactionId) and
+    (JsPath \ "originalWithdrawalChargeAmount").read(JsonReads.nonNegativeAmount) and
+    (JsPath \ "transactionResult").read(JsonReads.amount) and
+    (JsPath \ "reason").read[String](Reads.pattern("Withdrawal reduction".r, "error.formatting.reason"))
+  )((transactionId, transactionAmount, transactionResult, _) => WithdrawalDecrease(
+    transactionId, transactionAmount, transactionResult
+  ))
+
+  implicit val supersedeReads: Reads[WithdrawalSupersede] = Reads[WithdrawalSupersede] { json =>
+    val reason = (json \ "reason").as[String]
+
+    reason match {
+      case "Additional withdrawal" => withdrawalIncreaseReads.reads(json)
+      case _ => withdrawalDecreaseReads.reads(json)
+    }
+  }
+
+  implicit val withdrawalIncreaseWrites: Writes[WithdrawalIncrease] = (
+    (JsPath \ "automaticRecoveryAmount").write[Amount] and
+    (JsPath \ "originalTransactionId").write[String] and
+    (JsPath \ "originalWithdrawalChargeAmount").write[Amount] and
+    (JsPath \ "transactionResult").write[Amount] and
+    (JsPath \ "reason").write[String]
+  ){
+    b: WithdrawalIncrease => (
+      b.automaticRecoveryAmount,
+      b.originalTransactionId,
+      b.originalWithdrawalChargeAmount,
+      b.transactionResult,
+      "Additional withdrawal"
+    )
+  }
+
+  implicit val withdrawalDecreaseWrites: Writes[WithdrawalDecrease] = (
+    (JsPath \ "originalTransactionId").write[String] and
+    (JsPath \ "originalWithdrawalChargeAmount").write[Amount] and
+    (JsPath \ "transactionResult").write[Amount] and
+    (JsPath \ "reason").write[String]
+  ){
+    b: WithdrawalDecrease => (
+      b.originalTransactionId,
+      b.originalWithdrawalChargeAmount,
+      b.transactionResult,
+      "Withdrawal reduction"
+    )
+  }
+
+  implicit val supersedeWrites: Writes[WithdrawalSupersede] = Writes[WithdrawalSupersede] {
+    case inc: WithdrawalIncrease => withdrawalIncreaseWrites.writes(inc)
+    case dec: WithdrawalDecrease => withdrawalDecreaseWrites.writes(dec)
+  }
+
+}
+
+sealed trait ReportWithdrawalChargeRequest extends Product {
+  val claimPeriodStartDate: DateTime
+  val claimPeriodEndDate: DateTime
+}
 
 case class RegularWithdrawalChargeRequest(
   claimPeriodStartDate: DateTime,
@@ -152,86 +237,4 @@ object ReportWithdrawalChargeRequest {
       case superseded: SupersededWithdrawalChargeRequest => supersededWithdrawalWrites.writes(superseded)
     }
   }
-}
-
-sealed trait WithdrawalSupersede
-
-case class WithdrawalIncrease(
-  automaticRecoveryAmount: Amount,
-  originalTransactionId: String,
-  originalWithdrawalChargeAmount: Amount,
-  transactionResult: Amount
-) extends WithdrawalSupersede
-
-case class WithdrawalDecrease(
-  originalTransactionId: String,
-  originalWithdrawalChargeAmount: Amount,
-  transactionResult: Amount
-) extends WithdrawalSupersede
-
-object WithdrawalSupersede {
-
-  val withdrawalIncreaseReads: Reads[WithdrawalIncrease] = (
-    (JsPath \ "automaticRecoveryAmount").read(JsonReads.nonNegativeAmount) and
-    (JsPath \ "originalTransactionId").read(JsonReads.transactionId) and
-    (JsPath \ "originalWithdrawalChargeAmount").read(JsonReads.nonNegativeAmount) and
-    (JsPath \ "transactionResult").read(JsonReads.amount) and
-    (JsPath \ "reason").read[String](Reads.pattern("Additional withdrawal".r, "error.formatting.reason"))
-  )((automaticRecoveryAmount, transactionId, transactionAmount, transactionResult, _) => WithdrawalIncrease(
-    automaticRecoveryAmount, transactionId, transactionAmount, transactionResult
-  ))
-
-  val withdrawalDecreaseReads: Reads[WithdrawalDecrease] = (
-    (JsPath \ "originalTransactionId").read(JsonReads.transactionId) and
-    (JsPath \ "originalWithdrawalChargeAmount").read(JsonReads.nonNegativeAmount) and
-    (JsPath \ "transactionResult").read(JsonReads.amount) and
-    (JsPath \ "reason").read[String](Reads.pattern("Withdrawal reduction".r, "error.formatting.reason"))
-  )((transactionId, transactionAmount, transactionResult, _) => WithdrawalDecrease(
-    transactionId, transactionAmount, transactionResult
-  ))
-
-  implicit val supersedeReads: Reads[WithdrawalSupersede] = Reads[WithdrawalSupersede] { json =>
-    val reason = (json \ "reason").as[String]
-
-    reason match {
-      case "Additional withdrawal" => withdrawalIncreaseReads.reads(json)
-      case _ => withdrawalDecreaseReads.reads(json)
-    }
-  }
-
-  implicit val withdrawalIncreaseWrites: Writes[WithdrawalIncrease] = (
-    (JsPath \ "automaticRecoveryAmount").write[Amount] and
-    (JsPath \ "originalTransactionId").write[String] and
-    (JsPath \ "originalBonusDueForPeriod").write[Amount] and
-    (JsPath \ "transactionResult").write[Amount] and
-    (JsPath \ "reason").write[String]
-  ){
-    b: WithdrawalIncrease => (
-      b.automaticRecoveryAmount,
-      b.originalTransactionId,
-      b.originalWithdrawalChargeAmount,
-      b.transactionResult,
-      "Additional withdrawal"
-    )
-  }
-
-  implicit val withdrawalDecreaseWrites: Writes[WithdrawalDecrease] = (
-    (JsPath \ "originalTransactionId").write[String] and
-    (JsPath \ "originalBonusDueForPeriod").write[Amount] and
-    (JsPath \ "transactionResult").write[Amount] and
-    (JsPath \ "reason").write[String]
-  ){
-    b: WithdrawalDecrease => (
-      b.originalTransactionId,
-      b.originalWithdrawalChargeAmount,
-      b.transactionResult,
-      "Withdrawal reduction"
-    )
-  }
-
-  implicit val supersedeWrites: Writes[WithdrawalSupersede] = Writes[WithdrawalSupersede] {
-    case inc: WithdrawalIncrease => withdrawalIncreaseWrites.writes(inc)
-    case dec: WithdrawalDecrease => withdrawalDecreaseWrites.writes(dec)
-  }
-
 }
