@@ -259,6 +259,25 @@ trait DesConnector extends ServicesConfig {
     })
   }
 
+
+  /**
+    * Attempts to report a withdrawal charge
+    *
+    * @return A tuple of the http status code and a des response
+    */
+  def reportWithdrawalCharge(lisaManager: String, accountId: String, request: ReportWithdrawalChargeRequest)
+                            (implicit hc: HeaderCarrier): Future[DesResponse] = {
+
+    val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/withdrawal"
+    Logger.debug("Posting withdrawal request to des: " + uri)
+    val result = httpPost.POST[ReportWithdrawalChargeRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
+
+    result.map(res => {
+      Logger.debug("Withdrawal request returned status: " + res.status)
+      parseDesResponse[DesTransactionResponse](res)
+    })
+  }
+
   /**
     * Attempts to details on a transaction from ETMP
     */
