@@ -30,9 +30,10 @@ import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
-import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountAlreadyClosed, ErrorAccountAlreadyVoided, ErrorAccountNotFound, ErrorInternalServerError, ErrorWithdrawalExists, ErrorWithdrawalTimescalesExceeded, WithdrawalController}
+import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountAlreadyClosed, ErrorAccountAlreadyVoided, ErrorAccountNotFound, ErrorInternalServerError, ErrorValidation, ErrorWithdrawalExists, ErrorWithdrawalTimescalesExceeded, WithdrawalController}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, CurrentDateService, WithdrawalService}
+import uk.gov.hmrc.lisaapi.utils.WithdrawalChargeValidator
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -54,9 +55,11 @@ class WithdrawalControllerSpec extends PlaySpec
   override def beforeEach() {
     reset(mockAuditService)
     reset(mockDateTimeService)
+    reset(mockValidator)
 
     when(mockAuthCon.authorise[Option[String]](any(),any())(any(), any())).thenReturn(Future(Some("1234")))
     when(mockDateTimeService.now()).thenReturn(new DateTime("2018-01-01"))
+    when(mockValidator.validate(any())).thenReturn(Nil)
   }
 
   "the POST bonus payment endpoint" must {
@@ -199,6 +202,37 @@ class WithdrawalControllerSpec extends PlaySpec
         }
       }
 
+      "the json request fails business validation" in {
+        val errors = List(
+          ErrorValidation(
+            DATE_ERROR,
+            "The claimPeriodStartDate must be the 6th day of the month",
+            Some("/claimPeriodStartDate")
+          ),
+          ErrorValidation(
+            DATE_ERROR,
+            "The claimPeriodEndDate must be the 5th day of the month which occurs after the claimPeriodStartDate",
+            Some("/claimPeriodEndDate")
+          )
+        )
+
+        when(mockValidator.validate(any())).thenReturn(errors)
+
+        val validWithdrawalCharge = Json.parse(validWithdrawalJson).as[SupersededWithdrawalChargeRequest]
+        val requestJson = Json.toJson(validWithdrawalCharge).toString()
+
+        doRequest(requestJson) { res =>
+          status(res) mustBe FORBIDDEN
+
+          val json = contentAsJson(res)
+
+          (json \ "code").as[String] mustBe "FORBIDDEN"
+
+          (json \ "errors" \ 0 \ "path").as[String] mustBe "/claimPeriodStartDate"
+          (json \ "errors" \ 1 \ "path").as[String] mustBe "/claimPeriodEndDate"
+        }
+      }
+
     }
 
     "return with status 404 not found" when {
@@ -272,12 +306,14 @@ class WithdrawalControllerSpec extends PlaySpec
   val mockAuditService: AuditService = mock[AuditService]
   val mockAuthCon: LisaAuthConnector = mock[LisaAuthConnector]
   val mockDateTimeService: CurrentDateService = mock[CurrentDateService]
+  val mockValidator: WithdrawalChargeValidator = mock[WithdrawalChargeValidator]
 
   val SUT = new WithdrawalController {
     override val service: WithdrawalService = mockService
     override val auditService: AuditService = mockAuditService
     override val authConnector: LisaAuthConnector = mockAuthCon
     override val dateTimeService: CurrentDateService = mockDateTimeService
+    override val validator: WithdrawalChargeValidator = mockValidator
   }
 
 }

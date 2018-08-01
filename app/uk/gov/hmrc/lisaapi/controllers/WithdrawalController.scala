@@ -25,6 +25,7 @@ import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, CurrentDateService, WithdrawalService}
 import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
+import uk.gov.hmrc.lisaapi.utils.WithdrawalChargeValidator
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -33,6 +34,7 @@ class WithdrawalController extends LisaController with LisaConstants {
 
   val service: WithdrawalService = WithdrawalService
   val auditService: AuditService = AuditService
+  val validator: WithdrawalChargeValidator = WithdrawalChargeValidator
   val dateTimeService: CurrentDateService = CurrentDateService
 
   def reportWithdrawalCharge(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async {
@@ -42,20 +44,22 @@ class WithdrawalController extends LisaController with LisaConstants {
       withValidLMRN(lisaManager) { () =>
         withValidAccountId(accountId) { () =>
           withValidJson[ReportWithdrawalChargeRequest](req =>
-            withValidClaimPeriod(req)(lisaManager, accountId) { () =>
-              service.reportWithdrawalCharge(lisaManager, accountId, req) map { res =>
-                Logger.debug("reportWithdrawalCharge: The response is " + res.toString)
+            withValidData(req)(lisaManager, accountId) { () =>
+              withValidClaimPeriod(req)(lisaManager, accountId) { () =>
+                service.reportWithdrawalCharge(lisaManager, accountId, req) map { res =>
+                  Logger.debug("reportWithdrawalCharge: The response is " + res.toString)
 
-                res match {
-                  case successResponse: ReportWithdrawalChargeSuccessResponse =>
-                    handleSuccess(lisaManager, accountId, req, successResponse)
-                  case errorResponse: ReportWithdrawalChargeErrorResponse =>
-                    handleFailure(lisaManager, accountId, req, errorResponse)
+                  res match {
+                    case successResponse: ReportWithdrawalChargeSuccessResponse =>
+                      handleSuccess(lisaManager, accountId, req, successResponse)
+                    case errorResponse: ReportWithdrawalChargeErrorResponse =>
+                      handleFailure(lisaManager, accountId, req, errorResponse)
+                  }
+                } recover {
+                  case e: Exception =>
+                    Logger.error(s"reportWithdrawalCharge: An error occurred due to ${e.getMessage}, returning internal server error")
+                    handleError(lisaManager, accountId, req)
                 }
-              } recover {
-                case e: Exception =>
-                  Logger.error(s"reportWithdrawalCharge: An error occurred due to ${e.getMessage}, returning internal server error")
-                  handleError(lisaManager, accountId, req)
               }
             },
             lisaManager = lisaManager
@@ -82,6 +86,24 @@ class WithdrawalController extends LisaController with LisaConstants {
       LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.WITHDRAWAL_CHARGE)
 
       Future.successful(Forbidden(Json.toJson(ErrorWithdrawalTimescalesExceeded)))
+    }
+  }
+
+  private def withValidData(data: ReportWithdrawalChargeRequest)
+                           (lisaManager: String, accountId: String)
+                           (callback: () => Future[Result])
+                           (implicit hc: HeaderCarrier, startTime: Long) = {
+    val errors = validator.validate(data)
+
+    if (errors.isEmpty) {
+      callback()
+    }
+    else {
+      auditFailure(lisaManager, accountId, data, "FORBIDDEN")
+
+      LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.WITHDRAWAL_CHARGE)
+
+      Future.successful(Forbidden(Json.toJson(ErrorForbidden(errors.toList))))
     }
   }
 

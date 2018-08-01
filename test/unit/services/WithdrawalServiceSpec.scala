@@ -23,6 +23,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
+import uk.gov.hmrc.lisaapi.models
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesTransactionResponse}
 import uk.gov.hmrc.lisaapi.services.WithdrawalService
@@ -51,15 +52,6 @@ class WithdrawalServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
         doRequest { response =>
           response mustBe ReportWithdrawalChargeLateResponse("AB123456")
-        }
-      }
-
-      "given a successful superseded response from the DES connector" in {
-        when(mockDesConnector.reportWithdrawalCharge(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesTransactionResponse("AB123456", "Superseded")))
-
-        doRequest { response =>
-          response mustBe ReportWithdrawalChargeSupersededResponse("AB123456")
         }
       }
 
@@ -178,19 +170,13 @@ class WithdrawalServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSui
   }
 
   private def doRequest(callback: (ReportWithdrawalChargeResponse) => Unit) = {
-    val request = SupersededWithdrawalChargeRequest(
+    val request = models.RegularWithdrawalChargeRequest(
       new DateTime("2017-12-06"),
       new DateTime("2018-01-05"),
       1000.00,
       250.00,
       500.00,
-      true,
-      WithdrawalIncrease(
-        250.00,
-        "2345678901",
-        250.00,
-        250.00
-      )
+      true
     )
 
     val response = Await.result(SUT.reportWithdrawalCharge("Z019283", "192837", request)(HeaderCarrier()), Duration.Inf)
