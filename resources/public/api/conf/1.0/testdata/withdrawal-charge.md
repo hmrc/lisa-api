@@ -487,52 +487,12 @@
         </tr>
         <tr>
             <td>
-                <p>The timescale for reporting a withdrawal charge has passed. The claim period lasts for 6 years and 14 days</p>
-                <p class="code--block">
-                    <strong>lisaManagerReferenceNumber:</strong><br>
-                    <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
-                    <br>
-                    <strong>accountId:</strong><br>6000000403
-                </p>
-            </td>
-            <td>
-<pre class="code--block">
-{
-  "claimPeriodStartDate": "2017-12-06",
-  "claimPeriodEndDate": "2018-01-05",
-  "withdrawalAmount": 2000.00,
-  "withdrawalChargeAmount": 500.00,
-  "withdrawalChargeAmountYTD": 750.00,
-  "fundsDeductedDuringWithdrawal": true,
-  "withdrawalReason": "Superseded withdrawal",
-  "supersede": {
-    "originalTransactionId": "2345678901",
-    "originalWithdrawalChargeAmount": 250.00,
-    "transactionResult": 250.00,
-    "reason": "Additional withdrawal",
-    "automaticRecoveryAmount": 250.00
-  }
-}
-</pre>
-            </td>
-            <td>
-                <p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
-<pre class="code--block">
-{
-  "code": "WITHDRAWAL_CHARGE_TIMESCALES_EXCEEDED",
-  "message": "The timescale for reporting a withdrawal charge has passed. The claim period lasts for 6 years and 14 days"
-}
-</pre>
-            </td>
-        </tr>
-        <tr>
-            <td>
                 <p>The withdrawal charge does not equal 25% of the withdrawal amount</p>
                 <p class="code--block">
                     <strong>lisaManagerReferenceNumber:</strong><br>
                     <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
                     <br>
-                    <strong>accountId:</strong><br>7000000403
+                    <strong>accountId:</strong><br>6000000403
                 </p>
             </td>
             <td>

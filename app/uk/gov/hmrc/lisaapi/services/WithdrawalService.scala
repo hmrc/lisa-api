@@ -37,10 +37,16 @@ trait WithdrawalService {
       case successResponse: DesTransactionResponse => {
         Logger.debug("Matched ReportWithdrawalChargeSuccessResponse and the message is " + successResponse.message)
 
-        successResponse.message match {
-          case "Late" => ReportWithdrawalChargeLateResponse(successResponse.transactionID)
-          case "Superseded" => ReportWithdrawalChargeSupersededResponse(successResponse.transactionID)
-          case _ => ReportWithdrawalChargeOnTimeResponse(successResponse.transactionID)
+        request match {
+          case _: RegularWithdrawalChargeRequest => {
+            successResponse.message match {
+              case "Late" => ReportWithdrawalChargeLateResponse(successResponse.transactionID)
+              case _ => ReportWithdrawalChargeOnTimeResponse(successResponse.transactionID)
+            }
+          }
+          case _: SupersededWithdrawalChargeRequest => {
+            ReportWithdrawalChargeSupersededResponse(successResponse.transactionID)
+          }
         }
       }
       case failureResponse: DesFailureResponse => {
