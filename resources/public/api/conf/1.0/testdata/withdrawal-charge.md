@@ -327,7 +327,7 @@
 <pre class="code--block">
 {
   "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED",
-  "message": "This LISA account is already closed"
+  "message": "The LISA account is already closed"
 }
 </pre>
             </td>
@@ -360,7 +360,7 @@
 <pre class="code--block">
 {
   "code": "INVESTOR_ACCOUNT_ALREADY_VOID",
-  "message": "This LISA account is already void"
+  "message": "The LISA account is already void"
 }
 </pre>
             </td>
