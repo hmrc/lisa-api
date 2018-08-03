@@ -230,10 +230,15 @@ class BonusPaymentController extends LisaController with LisaConstants {
 
         Forbidden(Json.toJson(ErrorBonusClaimError))
       case RequestBonusPaymentAccountClosed =>
-        auditFailure(lisaManager, accountId, req, ErrorAccountAlreadyClosedOrVoid.errorCode)
+        auditFailure(lisaManager, accountId, req, ErrorAccountAlreadyClosed.errorCode)
         LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.BONUS_PAYMENT)
 
-        Forbidden(Json.toJson(ErrorAccountAlreadyClosedOrVoid))
+        Forbidden(Json.toJson(ErrorAccountAlreadyClosed))
+      case RequestBonusPaymentAccountVoid =>
+        auditFailure(lisaManager, accountId, req, ErrorAccountAlreadyVoided.errorCode)
+        LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.BONUS_PAYMENT)
+
+        Forbidden(Json.toJson(ErrorAccountAlreadyVoided))
       case RequestBonusPaymentSupersededAmountMismatch =>
         auditFailure(lisaManager, accountId, req, ErrorBonusSupersededAmountMismatch.errorCode)
         LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.BONUS_PAYMENT)
@@ -307,8 +312,12 @@ class BonusPaymentController extends LisaController with LisaConstants {
   }
 
   private def createAuditData(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest): Map[String, String] = {
-    req.toStringMap ++ Map(ZREF -> lisaManager,
-      "accountId" -> accountId)
+    val result = req.toStringMap ++ Map(ZREF -> lisaManager, "accountId" -> accountId)
+
+    req.supersede.fold(result) {
+      case _: AdditionalBonus => result ++ Map("reason" -> "Additional bonus")
+      case _: BonusRecovery => result ++ Map("reason" -> "Bonus recovery")
+    }
   }
 
   private def getEndpointUrl(lisaManager: String, accountId: String): String = {

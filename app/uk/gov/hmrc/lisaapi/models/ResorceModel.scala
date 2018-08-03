@@ -144,7 +144,7 @@ object InboundPayments {
   )(unlift(InboundPayments.unapply))
 }
 
-sealed trait Supersede
+sealed trait Supersede extends Product
 
 case class BonusRecovery(
   automaticRecoveryAmount: Amount,
@@ -190,9 +190,9 @@ object Supersede {
   }
 
   implicit val bonusRecoveryWrites: Writes[BonusRecovery] = (
-    (JsPath \ "automaticRecoveryAmount").write[Amount] and
-    (JsPath \ "originalTransactionId").write[String] and
-    (JsPath \ "originalBonusDueForPeriod").write[Amount] and
+    (JsPath \ "automaticRecoveryamount").write[Amount] and
+    (JsPath \ "transactionId").write[String] and
+    (JsPath \ "transactionAmount").write[Amount] and
     (JsPath \ "transactionResult").write[Amount] and
     (JsPath \ "reason").write[String]
   ){
@@ -206,8 +206,8 @@ object Supersede {
   }
 
   implicit val additionalBonusWrites: Writes[AdditionalBonus] = (
-    (JsPath \ "originalTransactionId").write[String] and
-    (JsPath \ "originalBonusDueForPeriod").write[Amount] and
+    (JsPath \ "transactionId").write[String] and
+    (JsPath \ "transactionAmount").write[Amount] and
     (JsPath \ "transactionResult").write[Amount] and
     (JsPath \ "reason").write[String]
   ){
@@ -215,7 +215,7 @@ object Supersede {
       b.originalTransactionId,
       b.originalBonusDueForPeriod,
       b.transactionResult,
-      "Additional bonus"
+      "Additional Bonus"
     )
   }
 

@@ -208,10 +208,20 @@ class BonusPaymentControllerSpec extends PlaySpec
 
         doRequest(validBonusPaymentJson)  { res =>
           status(res) mustBe FORBIDDEN
-          (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID"
-          (contentAsJson(res) \ "message").as[String] mustBe "This LISA account has already been closed or been made void by HMRC"
+          (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CLOSED"
+          (contentAsJson(res) \ "message").as[String] mustBe "The LISA account is already closed"
         }
+      }
 
+      "given a RequestBonusPaymentAccountVoid response from the service layer" in {
+        when(mockService.requestBonusPayment(any(), any(),any())(any())).thenReturn(
+          Future.successful(RequestBonusPaymentAccountVoid))
+
+        doRequest(validBonusPaymentJson)  { res =>
+          status(res) mustBe FORBIDDEN
+          (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_VOID"
+          (contentAsJson(res) \ "message").as[String] mustBe "The LISA account is already void"
+        }
       }
 
       "given a RequestBonusPaymentSupersededAmountMismatch response from the service layer" in {
@@ -352,6 +362,7 @@ class BonusPaymentControllerSpec extends PlaySpec
           val htb = json \ "htbTransfer"
           val inboundPayments = json \ "inboundPayments"
           val bonuses = json \ "bonuses"
+          val supersede = json \ "supersede"
 
           verify(mockAuditService).audit(
             auditType = MatcherEquals("bonusPaymentRequested"),
@@ -372,7 +383,12 @@ class BonusPaymentControllerSpec extends PlaySpec
               "bonusDueForPeriod" -> (bonuses \ "bonusDueForPeriod").as[Amount].toString,
               "bonusPaidYTD" -> (bonuses \ "bonusPaidYTD").as[Amount].toString,
               "totalBonusDueYTD" -> (bonuses \ "totalBonusDueYTD").as[Amount].toString,
-              "claimReason" -> (bonuses \ "claimReason").as[String]
+              "claimReason" -> (bonuses \ "claimReason").as[String],
+              "automaticRecoveryAmount" -> (supersede \ "automaticRecoveryAmount").as[Amount].toString,
+              "originalTransactionId" -> (supersede \ "originalTransactionId").as[String],
+              "originalBonusDueForPeriod" -> (supersede \ "originalBonusDueForPeriod").as[Amount].toString,
+              "transactionResult" -> (supersede \ "transactionResult").as[Amount].toString,
+              "reason" -> (supersede \ "reason").as[String]
             ))
           )(any())
         }
@@ -457,6 +473,7 @@ class BonusPaymentControllerSpec extends PlaySpec
           val htb = json \ "htbTransfer"
           val inboundPayments = json \ "inboundPayments"
           val bonuses = json \ "bonuses"
+          val supersede = json \ "supersede"
 
           verify(mockAuditService).audit(
             auditType = MatcherEquals("bonusPaymentNotRequested"),
@@ -476,7 +493,12 @@ class BonusPaymentControllerSpec extends PlaySpec
               "bonusPaidYTD" -> (bonuses \ "bonusPaidYTD").as[Amount].toString,
               "totalBonusDueYTD" -> (bonuses \ "totalBonusDueYTD").as[Amount].toString,
               "claimReason" -> (bonuses \ "claimReason").as[String],
-              "reasonNotRequested" -> "LIFE_EVENT_NOT_PROVIDED"
+              "reasonNotRequested" -> "LIFE_EVENT_NOT_PROVIDED",
+              "automaticRecoveryAmount" -> (supersede \ "automaticRecoveryAmount").as[Amount].toString,
+              "originalTransactionId" -> (supersede \ "originalTransactionId").as[String],
+              "originalBonusDueForPeriod" -> (supersede \ "originalBonusDueForPeriod").as[Amount].toString,
+              "transactionResult" -> (supersede \ "transactionResult").as[Amount].toString,
+              "reason" -> (supersede \ "reason").as[String]
             )
             ))(any())
         }
