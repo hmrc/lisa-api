@@ -1206,6 +1206,82 @@ class DesConnectorSpec extends PlaySpec
 
   }
 
+  "Report withdrawal endpoint" must {
+
+    "return a populated DesTransactionResponse" when {
+      "the DES response has a json body that is in the correct format" in {
+        when(mockHttpPost.POST[ReportWithdrawalChargeRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = CREATED,
+                responseJson = Some(Json.parse(s"""{"transactionID": "87654321","message": "On Time"}"""))
+              )
+            )
+          )
+
+        doReportWithdrawalRequest { response =>
+          response mustBe DesTransactionResponse("87654321","On Time")
+        }
+      }
+    }
+
+    "return the default DesFailureResponse" when {
+      "the DES response has no json body" in {
+        when(mockHttpPost.POST[ReportWithdrawalChargeRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = SERVICE_UNAVAILABLE,
+                responseJson = None
+              )
+            )
+          )
+
+        doReportWithdrawalRequest { response =>
+          response mustBe DesFailureResponse()
+        }
+      }
+
+      "the DES response has a json body that is in an incorrect format" in {
+        when(mockHttpPost.POST[ReportWithdrawalChargeRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = CREATED,
+                responseJson = Some(Json.parse("""[1,2,3]"""))
+              )
+            )
+          )
+
+        doReportWithdrawalRequest { response =>
+          response mustBe DesFailureResponse()
+        }
+      }
+    }
+
+    "return a specific DesFailureResponse" when {
+
+      "a specific failure is returned" in {
+        when(mockHttpPost.POST[ReportWithdrawalChargeRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = NOT_FOUND,
+                responseJson = Some(Json.parse(s"""{"code": "LIFE_EVENT_DOES_NOT_EXIST","reason": "The lifeEventId does not match with HMRC’s records."}"""))
+              )
+            )
+          )
+
+        doReportWithdrawalRequest { response =>
+          response mustBe DesFailureResponse("LIFE_EVENT_DOES_NOT_EXIST", "The lifeEventId does not match with HMRC’s records.")
+        }
+      }
+
+    }
+
+  }
+
   val validBonusPaymentResponseJson = Source.fromInputStream(getClass().getResourceAsStream("/json/request.valid.bonus-payment-response.json")).mkString
 
   private def doCreateInvestorRequest(callback: (DesResponse) => Unit) = {
@@ -1298,6 +1374,27 @@ class DesConnectorSpec extends PlaySpec
 
   private def  doRetrieveAccountRequest(callback: (DesResponse) => Unit) = {
     val response = Await.result(SUT.getAccountInformation("Z123456", "123456"), Duration.Inf)
+
+    callback(response)
+  }
+
+  private def doReportWithdrawalRequest(callback: (DesResponse) => Unit) = {
+    val request = SupersededWithdrawalChargeRequest(
+      new DateTime("2017-12-06"),
+      new DateTime("2018-01-05"),
+      1000.00,
+      250.00,
+      500.00,
+      true,
+      WithdrawalIncrease(
+        250.00,
+        "2345678901",
+        250.00,
+        250.00
+      )
+    )
+
+    val response = Await.result(SUT.reportWithdrawalCharge("Z123456", "ABC12345", request), Duration.Inf)
 
     callback(response)
   }
