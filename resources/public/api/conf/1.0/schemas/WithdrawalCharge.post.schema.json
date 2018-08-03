@@ -29,7 +29,7 @@
 			"type": "number"
 		},
 		"fundsDeductedDuringWithdrawal": {
-			"description": "This confirms if the investor was charged and funds were deducted at the time of withdrawal.",
+			"description": "This confirms if the investor was charged and funds were deducted at the time of the withdrawal.",
 			"type": "boolean"
 		},
 		"withdrawalReason": {
