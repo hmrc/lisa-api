@@ -224,6 +224,41 @@ object Supersede {
     case ab: AdditionalBonus => additionalBonusWrites.writes(ab)
   }
 
+  val getBonusRecoveryWrites: Writes[BonusRecovery] = (
+    (JsPath \ "automaticRecoveryAmount").write[Amount] and
+    (JsPath \ "originalTransactionId").write[String] and
+    (JsPath \ "originalBonusDueForPeriod").write[Amount] and
+    (JsPath \ "transactionResult").write[Amount] and
+    (JsPath \ "reason").write[String]
+  ){
+    b: BonusRecovery => (
+      b.automaticRecoveryAmount,
+      b.originalTransactionId,
+      b.originalBonusDueForPeriod,
+      b.transactionResult,
+      "Bonus recovery"
+    )
+  }
+
+  val getAdditionalBonusWrites: Writes[AdditionalBonus] = (
+    (JsPath \ "originalTransactionId").write[String] and
+    (JsPath \ "originalBonusDueForPeriod").write[Amount] and
+    (JsPath \ "transactionResult").write[Amount] and
+    (JsPath \ "reason").write[String]
+  ){
+    b: AdditionalBonus => (
+      b.originalTransactionId,
+      b.originalBonusDueForPeriod,
+      b.transactionResult,
+      "Additional bonus"
+    )
+  }
+
+  val getSupersedeWrites: Writes[Supersede] = Writes[Supersede] {
+    case br: BonusRecovery => getBonusRecoveryWrites.writes(br)
+    case ab: AdditionalBonus => getAdditionalBonusWrites.writes(ab)
+  }
+
 }
 
 case class LifeEvent(accountID: AccountId,
