@@ -664,7 +664,6 @@ class BonusPaymentControllerSpec extends PlaySpec
     callback(res)
   }
 
-
   def doGetBonusPaymentTransactionRequest(callback: (Future[Result]) => Unit) {
     val res = SUT.getBonusPayment(lisaManager, accountId, transactionId).apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
     callback(res)

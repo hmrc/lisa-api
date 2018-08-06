@@ -51,6 +51,7 @@ trait LisaMetricKeys  {
   val REINSTATE = "REINSTATE_ACCOUNT"
   val EVENT = "LIFE_EVENT"
   val BONUS_PAYMENT = "BONUS_PAYMENT"
+  val WITHDRAWAL_CHARGE = "WITHDRAWAL_CHARGE"
   val UPDATE_SUBSCRIPTION = "UPDATE_SUBSCRIPTION"
   val TRANSACTION = "TRANSACTION"
 
@@ -62,7 +63,8 @@ trait LisaMetricKeys  {
     "events" -> EVENT,
     "discover" -> DISCOVER,
     "payments" -> TRANSACTION,
-    "update-subscription" -> UPDATE_SUBSCRIPTION
+    "update-subscription" -> UPDATE_SUBSCRIPTION,
+    "withdrawal-charge" -> WITHDRAWAL_CHARGE
   )
 
   def lisaMetric(status:Int, name:String):String =  s"${name}_${status}"
