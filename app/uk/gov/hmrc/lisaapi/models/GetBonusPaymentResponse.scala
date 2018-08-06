@@ -59,7 +59,7 @@ object GetBonusPaymentSuccessResponse {
     (JsPath \ "inboundPayments").write[InboundPayments] and
     (JsPath \ "bonuses").write[Bonuses] and
     (JsPath \ "supersededBy").writeNullable[String] and
-    (JsPath \ "supersede").writeNullable[Supersede]
+    (JsPath \ "supersede").writeNullable[Supersede](Supersede.getSupersedeWrites)
   ){
     req: GetBonusPaymentSuccessResponse => (
       req.lifeEventId,
