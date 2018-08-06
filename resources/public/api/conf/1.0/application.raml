@@ -910,6 +910,18 @@ types:
                                     "code": "WITHDRAWAL_CHARGE_ALREADY_EXISTS",
                                     "message": "A withdrawal charge with these details has already been requested for this investor"
                                   }
+                  /{transactionId}:
+                    uriParameters:
+                      transactionId:
+                        type: transactionIdtype
+                        description: The ID for the transaction.
+                        example: "1234567890"
+                    get:
+                      displayName: "[sandbox only] Get details of a withdrawal charge"
+                      description: Use an investor’s transaction ID to get a request for a withdrawal charge that has been submitted to HMRC.
+                      is: [headers.acceptHeader, headers.contentHeader]
+                      (annotations.scope): "read:lisa"
+                      securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
                 /transactions:
                   description: !include documentation/LISATransaction
                   post:
