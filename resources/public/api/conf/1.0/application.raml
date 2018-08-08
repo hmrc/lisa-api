@@ -917,11 +917,69 @@ types:
                         description: The ID for the transaction.
                         example: "1234567890"
                     get:
-                      displayName: "[sandbox only] Get details of a withdrawal charge"
+                      displayName: "[sandbox-only] Get details of a withdrawal charge"
                       description: Use an investor’s transaction ID to get a request for a withdrawal charge that has been submitted to HMRC.
                       is: [headers.acceptHeader, headers.contentHeader]
                       (annotations.scope): "read:lisa"
                       securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
+                      (annotations.sandboxData): !include testdata/withdrawal-charge-get.md
+                      responses:
+                        200:
+                          body:
+                            application/json:
+                              type: !include schemas/WithdrawalCharge.get.schema.json
+                              examples:
+                                example: !include examples/WithdrawalCharge.post.json
+                        400:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                InvalidLmrn:
+                                  description: lisaManagerReferenceNumber in the URL is in the wrong format
+                                  value: |
+                                    {
+                                      "code" : "BAD_REQUEST",
+                                      "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
+                                    }
+                                InvalidAccountId:
+                                  description: accountId in the URL is in the wrong format
+                                  value: |
+                                    {
+                                      "code" : "BAD_REQUEST",
+                                      "message" : "accountId in the URL is in the wrong format"
+                                    }
+                        401:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                notOpenStatus:
+                                  description: lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
+                                  value: |
+                                    {
+                                      "code" : "UNAUTHORIZED",
+                                      "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
+                                    }
+                        404:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                noTransaction:
+                                  description: The transactionId does not match HMRC’s records
+                                  value: |
+                                    {
+                                      "code" : "WITHDRAWAL_CHARGE_TRANSACTION_NOT_FOUND",
+                                      "message" : "The transactionId does not match HMRC’s records"
+                                    }
+                                accountIdNOTFound:
+                                  description: The accountId does not match HMRC’s records
+                                  value: |
+                                    {
+                                      "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
+                                      "message": "The accountId does not match HMRC’s records"
+                                    }
                 /transactions:
                   description: !include documentation/LISATransaction
                   post:
