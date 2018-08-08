@@ -25,9 +25,9 @@
 {
   "claimPeriodStartDate": "2017-12-06",
   "claimPeriodEndDate": "2018-01-05",
-  "withdrawalAmount": 1000.00,
-  "withdrawalChargeAmount": 250.00,
-  "withdrawalChargeAmountYTD": 500.00,
+  "withdrawalAmount": 1000,
+  "withdrawalChargeAmount": 250,
+  "withdrawalChargeAmountYTD": 500,
   "fundsDeductedDuringWithdrawal": true,
   "withdrawalReason": "Regular withdrawal",
   "supersededById": "2345678903"
@@ -52,9 +52,9 @@
 {
   "claimPeriodStartDate": "2017-12-06",
   "claimPeriodEndDate": "2018-01-05",
-  "withdrawalAmount": 1000.00,
-  "withdrawalChargeAmount": 250.00,
-  "withdrawalChargeAmountYTD": 500.00,
+  "withdrawalAmount": 1000,
+  "withdrawalChargeAmount": 250,
+  "withdrawalChargeAmountYTD": 500,
   "fundsDeductedDuringWithdrawal": true,
   "withdrawalReason": "Regular withdrawal"
 }
@@ -78,17 +78,17 @@
 {
   "claimPeriodStartDate": "2017-12-06",
   "claimPeriodEndDate": "2018-01-05",
-  "withdrawalAmount": 2000.00,
-  "withdrawalChargeAmount": 500.00,
-  "withdrawalChargeAmountYTD": 750.00,
+  "withdrawalAmount": 2000,
+  "withdrawalChargeAmount": 500,
+  "withdrawalChargeAmountYTD": 750,
   "fundsDeductedDuringWithdrawal": true,
   "withdrawalReason": "Superseded withdrawal",
   "supersede": {
     "originalTransactionId": "2345678901",
-    "originalWithdrawalChargeAmount": 250.00,
-    "transactionResult": 250.00,
+    "originalWithdrawalChargeAmount": 250,
+    "transactionResult": 250,
     "reason": "Additional withdrawal",
-    "automaticRecoveryAmount": 250.00
+    "automaticRecoveryAmount": 250
   }
 }
 </pre>
