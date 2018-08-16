@@ -22,7 +22,7 @@ import org.mockito.Mockito._
 import org.scalatest._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.libs.json.Json
+import play.api.libs.json.{JsError, Json}
 import play.api.mvc.{AnyContentAsJson, Result}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
@@ -208,8 +208,19 @@ class BonusPaymentControllerSpec extends PlaySpec
 
         doRequest(validBonusPaymentJson)  { res =>
           status(res) mustBe FORBIDDEN
-          (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CLOSED"
-          (contentAsJson(res) \ "message").as[String] mustBe "The LISA account is already closed"
+          (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID"
+          (contentAsJson(res) \ "message").as[String] mustBe "This LISA account has already been closed or been made void by HMRC"
+        }
+      }
+
+      "given a RequestBonusPaymentAccountCancelled response from the service layer" in {
+        when(mockService.requestBonusPayment(any(), any(),any())(any())).thenReturn(
+          Future.successful(RequestBonusPaymentAccountCancelled))
+
+        doRequest(validBonusPaymentJson)  { res =>
+          status(res) mustBe FORBIDDEN
+          (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID"
+          (contentAsJson(res) \ "message").as[String] mustBe "This LISA account has already been closed or been made void by HMRC"
         }
       }
 
@@ -219,8 +230,8 @@ class BonusPaymentControllerSpec extends PlaySpec
 
         doRequest(validBonusPaymentJson)  { res =>
           status(res) mustBe FORBIDDEN
-          (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_VOID"
-          (contentAsJson(res) \ "message").as[String] mustBe "The LISA account is already void"
+          (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID"
+          (contentAsJson(res) \ "message").as[String] mustBe "This LISA account has already been closed or been made void by HMRC"
         }
       }
 
@@ -292,23 +303,25 @@ class BonusPaymentControllerSpec extends PlaySpec
 
       "given a RequestBonusPaymentClaimAlreadyExists response from the service layer" in {
         when(mockService.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(RequestBonusPaymentClaimAlreadyExists))
+          thenReturn(Future.successful(RequestBonusPaymentClaimAlreadyExists(transactionId)))
 
         doRequest(validBonusPaymentJson) { res =>
           status(res) mustBe CONFLICT
           (contentAsJson(res) \ "code").as[String] mustBe "BONUS_CLAIM_ALREADY_EXISTS"
           (contentAsJson(res) \ "message").as[String] mustBe "The investor’s bonus payment has already been requested"
+          (contentAsJson(res) \ "transactionId").as[String] mustBe transactionId
         }
       }
 
       "given a RequestBonusPaymentAlreadySuperseded response from the service layer" in {
         when(mockService.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(RequestBonusPaymentAlreadySuperseded))
+          thenReturn(Future.successful(RequestBonusPaymentAlreadySuperseded(transactionId)))
 
         doRequest(validBonusPaymentJson) { res =>
           status(res) mustBe CONFLICT
           (contentAsJson(res) \ "code").as[String] mustBe "BONUS_CLAIM_ALREADY_SUPERSEDED"
           (contentAsJson(res) \ "message").as[String] mustBe "This bonus claim has already been superseded"
+          (contentAsJson(res) \ "transactionId").as[String] mustBe transactionId
         }
       }
 
@@ -633,7 +646,7 @@ class BonusPaymentControllerSpec extends PlaySpec
       })
     }
 
-    "return 404 transcation not found" in {
+    "return 404 transaction not found" in {
       when(mockService.getBonusPayment(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusPaymentTransactionNotFoundResponse))
       doGetBonusPaymentTransactionRequest(res => {
         status(res) mustBe (NOT_FOUND)

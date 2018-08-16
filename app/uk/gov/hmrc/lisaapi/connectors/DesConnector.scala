@@ -203,6 +203,7 @@ trait DesConnector extends ServicesConfig {
       Logger.debug("Update first subscription date request returned status: " + res.status)
       res.status match {
         case 200 => parseDesResponse[DesUpdateSubscriptionSuccessResponse](res)
+        case 409 => parseDesResponse[DesTransactionExistResponse](res)
         case _ => parseDesResponse[DesFailureResponse](res)
       }
 

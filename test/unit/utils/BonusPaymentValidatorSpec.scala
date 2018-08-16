@@ -23,7 +23,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 import uk.gov.hmrc.lisaapi.controllers.ErrorValidation
-import uk.gov.hmrc.lisaapi.models.RequestBonusPaymentRequest
+import uk.gov.hmrc.lisaapi.models.{Bonuses, RequestBonusPaymentRequest}
 import uk.gov.hmrc.lisaapi.services.CurrentDateService
 import uk.gov.hmrc.lisaapi.utils.BonusPaymentValidator
 
@@ -355,6 +355,28 @@ class BonusPaymentValidatorSpec extends PlaySpec
             errorCode = "INVALID_DATE",
             message = "The periodEndDate cannot be before 6 April 2017",
             path = Some("/periodEndDate")
+          )
+        )
+      }
+
+    }
+
+  }
+
+  "supersede" should {
+
+    "return an error" when {
+
+      "it is not populated and the claimReason is 'Superseding bonus claim'" in {
+        val request = validBonusPayment.copy(supersede = None, bonuses = Bonuses(10f, 10f, Some(10f), "Superseding bonus claim"))
+
+        val errors = SUT.validate(request)
+
+        errors mustBe List(
+          ErrorValidation(
+            errorCode = "MISSING_FIELD",
+            message = "This field is required",
+            path = Some("/supersede")
           )
         )
       }
