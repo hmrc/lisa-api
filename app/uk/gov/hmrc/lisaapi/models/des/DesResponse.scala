@@ -28,7 +28,7 @@ case class DesAccountResponse(accountID: String) extends DesResponse
 case class DesLifeEventResponse(lifeEventID: String) extends DesResponse
 case class DesLifeEventRetrievalResponse(lifeEventID: LifeEventId, eventType: LifeEventType, eventDate: DateTime) extends DesResponse
 case class DesCreateInvestorResponse(investorID: String) extends DesResponse
-case class DesTransactionResponse(transactionID: String, message: String) extends DesResponse
+case class DesTransactionResponse(transactionID: String, message: Option[String]) extends DesResponse
 case class DesFailureResponse(code: String = "INTERNAL_SERVER_ERROR", reason: String = "Internal Server Error") extends DesResponse
 case class DesLifeEventExistResponse(code: String, reason: String, lifeEventID: String) extends DesResponse
 case class DesTransactionExistResponse(code: String, reason: String, transactionID: String) extends DesResponse

@@ -553,7 +553,7 @@ class DesConnectorSpec extends PlaySpec
           )
 
         doRequestBonusPaymentRequest { response =>
-          response mustBe DesTransactionResponse("87654321","On Time")
+          response mustBe DesTransactionResponse("87654321", Some("On Time"))
         }
       }
     }
@@ -1239,7 +1239,7 @@ class DesConnectorSpec extends PlaySpec
           )
 
         doReportWithdrawalRequest { response =>
-          response mustBe DesTransactionResponse("87654321","On Time")
+          response mustBe DesTransactionResponse("87654321", Some("On Time"))
         }
       }
     }

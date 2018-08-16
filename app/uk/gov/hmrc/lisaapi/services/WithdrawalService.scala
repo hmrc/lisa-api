@@ -40,7 +40,7 @@ trait WithdrawalService {
         request match {
           case _: RegularWithdrawalChargeRequest => {
             successResponse.message match {
-              case "Late" => ReportWithdrawalChargeLateResponse(successResponse.transactionID)
+              case Some("Late") => ReportWithdrawalChargeLateResponse(successResponse.transactionID)
               case _ => ReportWithdrawalChargeOnTimeResponse(successResponse.transactionID)
             }
           }

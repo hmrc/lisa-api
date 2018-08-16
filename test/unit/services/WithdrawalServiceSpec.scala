@@ -39,7 +39,7 @@ class WithdrawalServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
       "given a successful on time response from the DES connector" in {
         when(mockDesConnector.reportWithdrawalCharge(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesTransactionResponse("AB123456", "On Time")))
+          thenReturn(Future.successful(DesTransactionResponse("AB123456", Some("On Time"))))
 
         doRequest { response =>
           response mustBe ReportWithdrawalChargeOnTimeResponse("AB123456")
@@ -48,7 +48,7 @@ class WithdrawalServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
       "given a successful late notification response from the DES connector" in {
         when(mockDesConnector.reportWithdrawalCharge(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesTransactionResponse("AB123456", "Late")))
+          thenReturn(Future.successful(DesTransactionResponse("AB123456", Some("Late"))))
 
         doRequest { response =>
           response mustBe ReportWithdrawalChargeLateResponse("AB123456")

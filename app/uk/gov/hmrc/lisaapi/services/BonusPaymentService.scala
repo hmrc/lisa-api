@@ -37,10 +37,14 @@ trait BonusPaymentService {
       case successResponse: DesTransactionResponse => {
         Logger.debug("Matched RequestBonusPaymentSuccessResponse and the message is " + successResponse.message)
 
-        successResponse.message match {
-          case "Late" => RequestBonusPaymentLateResponse(successResponse.transactionID)
-          case "Superseded" => RequestBonusPaymentSupersededResponse(successResponse.transactionID)
-          case _ => RequestBonusPaymentOnTimeResponse(successResponse.transactionID)
+        if (request.bonuses.claimReason == "Superseding bonus claim") {
+          RequestBonusPaymentSupersededResponse(successResponse.transactionID)
+        }
+        else {
+          successResponse.message match {
+            case Some("Late") => RequestBonusPaymentLateResponse(successResponse.transactionID)
+            case _ => RequestBonusPaymentOnTimeResponse(successResponse.transactionID)
+          }
         }
       }
       case conflictResponse: DesTransactionExistResponse => {
