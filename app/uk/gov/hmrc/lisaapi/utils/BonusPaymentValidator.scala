@@ -180,19 +180,8 @@ trait BonusPaymentValidator extends LisaConstants {
 
   private val supersedeExistsIfSupersedingClaimReason: (BonusPaymentValidationRequest) => BonusPaymentValidationRequest =
     (req: BonusPaymentValidationRequest) => {
-
-      println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-      println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-      println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-      println("Check occurred")
-
       (req.data.bonuses.claimReason, req.data.supersede) match {
         case ("Superseding bonus claim", None) => {
-          println("Error occurred")
-          println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-          println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-          println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-
           req.copy(errors = req.errors :+ ErrorValidation(
             errorCode = MISSING_ERROR,
             message = "This field is required",
@@ -200,8 +189,6 @@ trait BonusPaymentValidator extends LisaConstants {
           ))
         }
         case _ => {
-          println(req.data.supersede.toString)
-
           req
         }
       }
