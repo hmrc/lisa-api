@@ -240,7 +240,10 @@ trait DesConnector extends ServicesConfig {
 
     result.map(res => {
       Logger.debug("Bonus Payment request returned status: " + res.status)
-      parseDesResponse[DesTransactionResponse](res)
+      res.status match {
+        case 409 => parseDesResponse[DesTransactionExistResponse](res)
+        case _ => parseDesResponse[DesTransactionResponse](res)
+      }
     })
   }
 
@@ -271,8 +274,6 @@ trait DesConnector extends ServicesConfig {
 
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/withdrawal"
     Logger.debug("Posting withdrawal request to des: " + uri)
-
-    Logger.warn(s">>>>>>>>>>>>>>>>>>>>>>>>>>>>> POSTING: ${Json.toJson(request)}")
 
     val result = httpPost.POST[ReportWithdrawalChargeRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
 
