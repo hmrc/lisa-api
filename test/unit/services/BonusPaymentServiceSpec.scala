@@ -38,7 +38,7 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
 
       "given a successful on time response from the DES connector" in {
         when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesTransactionResponse("AB123456", "On Time")))
+          thenReturn(Future.successful(DesTransactionResponse("AB123456", Some("On Time"))))
 
         doRequest { response =>
           response mustBe RequestBonusPaymentOnTimeResponse("AB123456")
@@ -47,7 +47,7 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
 
       "given a successful late notification response from the DES connector" in {
         when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesTransactionResponse("AB123456", "Late")))
+          thenReturn(Future.successful(DesTransactionResponse("AB123456", Some("Late"))))
 
         doRequest { response =>
           response mustBe RequestBonusPaymentLateResponse("AB123456")
