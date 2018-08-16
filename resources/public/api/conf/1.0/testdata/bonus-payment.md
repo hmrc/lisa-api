@@ -1022,7 +1022,8 @@
 <pre class ="code--block">
 {
   "code": "BONUS_CLAIM_ALREADY_EXISTS",
-  "message": "The investor’s bonus payment has already been requested"
+  "message": "The investor’s bonus payment has already been requested",
+  "transactionId": "0123456789"
 }
 </pre>
             </td>
@@ -1069,7 +1070,8 @@
 <pre class ="code--block">
 {
   "code": "BONUS_CLAIM_ALREADY_SUPERSEDED",
-  "message": "This bonus claim has already been superseded"
+  "message": "This bonus claim has already been superseded",
+  "transactionId": "0000456789"
 }
 </pre>
             </td>
