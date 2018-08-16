@@ -23,7 +23,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models.{RequestBonusPaymentResponse, _}
-import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesGetBonusPaymentResponse, DesTransactionResponse}
+import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesGetBonusPaymentResponse, DesTransactionExistResponse, DesTransactionResponse}
 import uk.gov.hmrc.lisaapi.services.BonusPaymentService
 
 import scala.concurrent.duration.Duration
@@ -57,12 +57,34 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
     }
 
     "return a account closed response" when {
-      "given the code INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID from the DES connector" in {
+      "given the code INVESTOR_ACCOUNT_ALREADY_CLOSED from the DES connector" in {
         when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID", "x")))
+          thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_CLOSED", "x")))
 
         doRequest { response =>
           response mustBe RequestBonusPaymentAccountClosed
+        }
+      }
+    }
+
+    "return a account cancelled response" when {
+      "given the code INVESTOR_ACCOUNT_ALREADY_CANCELLED from the DES connector" in {
+        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_CANCELLED", "x")))
+
+        doRequest { response =>
+          response mustBe RequestBonusPaymentAccountCancelled
+        }
+      }
+    }
+
+    "return a account void response" when {
+      "given the code INVESTOR_ACCOUNT_ALREADY_VOID from the DES connector" in {
+        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_VOID", "x")))
+
+        doRequest { response =>
+          response mustBe RequestBonusPaymentAccountVoid
         }
       }
     }
@@ -103,18 +125,18 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
     "return a bonus claim already exists response" when {
       "given the code BONUS_CLAIM_ALREADY_EXISTS from the DES connector" in {
         when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("BONUS_CLAIM_ALREADY_EXISTS", "xxxxx")))
+          thenReturn(Future.successful(DesTransactionExistResponse("BONUS_CLAIM_ALREADY_EXISTS", "xxxxx", "987654")))
 
         doRequest { response =>
-          response mustBe RequestBonusPaymentClaimAlreadyExists
+          response mustBe RequestBonusPaymentClaimAlreadyExists("987654")
         }
       }
     }
 
     "return a superseded bonus request amount mismatch response" when {
-      "given the code SUPERSEDED_BONUS_CLAIM_AMOUNT_MISMATCH from the DES connector" in {
+      "given the code SUPERSEDING_TRANSACTION_ID_AMOUNT_MISMATCH from the DES connector" in {
         when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("SUPERSEDED_BONUS_CLAIM_AMOUNT_MISMATCH", "xxxxx")))
+          thenReturn(Future.successful(DesFailureResponse("SUPERSEDING_TRANSACTION_ID_AMOUNT_MISMATCH", "xxxxx")))
 
         doRequest { response =>
           response mustBe RequestBonusPaymentSupersededAmountMismatch
@@ -123,9 +145,9 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
     }
 
     "return a superseded bonus request outcome error response" when {
-      "given the code SUPERSEDED_BONUS_REQUEST_OUTCOME_ERROR from the DES connector" in {
+      "given the code SUPERSEDING_TRANSACTION_OUTCOME_ERROR from the DES connector" in {
         when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("SUPERSEDED_BONUS_REQUEST_OUTCOME_ERROR", "xxxxx")))
+          thenReturn(Future.successful(DesFailureResponse("SUPERSEDING_TRANSACTION_OUTCOME_ERROR", "xxxxx")))
 
         doRequest { response =>
           response mustBe RequestBonusPaymentSupersededOutcomeError
@@ -134,18 +156,18 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
     }
 
     "return a already superseded response" when {
-      "given the code BONUS_CLAIM_ALREADY_SUPERSEDED from the DES connector" in {
+      "given the code SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED from the DES connector" in {
         when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("BONUS_CLAIM_ALREADY_SUPERSEDED", "xxxxx")))
+          thenReturn(Future.successful(DesTransactionExistResponse("SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED", "xxxxx", "12345")))
 
         doRequest { response =>
-          response mustBe RequestBonusPaymentAlreadySuperseded
+          response mustBe RequestBonusPaymentAlreadySuperseded("12345")
         }
       }
     }
 
     "return a no subscriptions response" when {
-      "given the code BONUS_CLAIM_ALREADY_SUPERSEDED from the DES connector" in {
+      "given the code ACCOUNT_ERROR_NO_SUBSCRIPTIONS_THIS_TAX_YEAR from the DES connector" in {
         when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(DesFailureResponse("ACCOUNT_ERROR_NO_SUBSCRIPTIONS_THIS_TAX_YEAR", "xxxxx")))
 
