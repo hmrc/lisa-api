@@ -321,8 +321,12 @@ class BonusPaymentController extends LisaController with LisaConstants {
   }
 
   private def createAuditData(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest): Map[String, String] = {
-    req.toStringMap ++ Map(ZREF -> lisaManager,
-      "accountId" -> accountId)
+    val result = req.toStringMap ++ Map(ZREF -> lisaManager, "accountId" -> accountId)
+
+    req.supersede.fold(result) {
+      case _: AdditionalBonus => result ++ Map("reason" -> "Additional bonus")
+      case _: BonusRecovery => result ++ Map("reason" -> "Bonus recovery")
+    }
   }
 
   private def getEndpointUrl(lisaManager: String, accountId: String): String = {

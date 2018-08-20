@@ -49,7 +49,7 @@ object RequestBonusPaymentRequest {
     (JsPath \ "htbTransfer").writeNullable[HelpToBuyTransfer] and
     (JsPath \ "inboundPayments").write[InboundPayments] and
     (JsPath \ "bonuses").write[Bonuses] and
-    (JsPath \ "supersede").writeNullable[Supersede]
+    (JsPath \ "supersededDetail").writeNullable[Supersede]
   ){
     req: RequestBonusPaymentRequest => (
       req.lifeEventId,
