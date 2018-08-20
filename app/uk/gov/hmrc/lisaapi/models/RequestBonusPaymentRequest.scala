@@ -30,7 +30,6 @@ case class RequestBonusPaymentRequest(
   supersede: Option[Supersede] = None
 )
 
-// TODO: Tie supersede data with a bonus claim reason of 'Superseding bonus claim'
 object RequestBonusPaymentRequest {
   implicit val requestBonusPaymentReads: Reads[RequestBonusPaymentRequest] = (
     (JsPath \ "lifeEventId").readNullable(JsonReads.lifeEventId) and
@@ -50,7 +49,7 @@ object RequestBonusPaymentRequest {
     (JsPath \ "htbTransfer").writeNullable[HelpToBuyTransfer] and
     (JsPath \ "inboundPayments").write[InboundPayments] and
     (JsPath \ "bonuses").write[Bonuses] and
-    (JsPath \ "supersede").writeNullable[Supersede]
+    (JsPath \ "supersededDetail").writeNullable[Supersede]
   ){
     req: RequestBonusPaymentRequest => (
       req.lifeEventId,

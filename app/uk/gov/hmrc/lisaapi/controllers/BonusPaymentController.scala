@@ -234,6 +234,16 @@ class BonusPaymentController extends LisaController with LisaConstants {
         LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.BONUS_PAYMENT)
 
         Forbidden(Json.toJson(ErrorAccountAlreadyClosedOrVoid))
+      case RequestBonusPaymentAccountCancelled =>
+        auditFailure(lisaManager, accountId, req, ErrorAccountAlreadyClosedOrVoid.errorCode)
+        LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.BONUS_PAYMENT)
+
+        Forbidden(Json.toJson(ErrorAccountAlreadyClosedOrVoid))
+      case RequestBonusPaymentAccountVoid =>
+        auditFailure(lisaManager, accountId, req, ErrorAccountAlreadyClosedOrVoid.errorCode)
+        LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.BONUS_PAYMENT)
+
+        Forbidden(Json.toJson(ErrorAccountAlreadyClosedOrVoid))
       case RequestBonusPaymentSupersededAmountMismatch =>
         auditFailure(lisaManager, accountId, req, ErrorBonusSupersededAmountMismatch.errorCode)
         LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.BONUS_PAYMENT)
@@ -259,16 +269,20 @@ class BonusPaymentController extends LisaController with LisaConstants {
         LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.BONUS_PAYMENT)
 
         NotFound(Json.toJson(ErrorLifeEventIdNotFound))
-      case RequestBonusPaymentClaimAlreadyExists =>
-        auditFailure(lisaManager, accountId, req, ErrorBonusClaimAlreadyExists.errorCode)
+      case e: RequestBonusPaymentClaimAlreadyExists =>
+        val error = ErrorBonusClaimAlreadyExists(e.transactionId)
+
+        auditFailure(lisaManager, accountId, req, error.errorCode)
         LisaMetrics.incrementMetrics(startTime, CONFLICT, LisaMetricKeys.BONUS_PAYMENT)
 
-        Conflict(Json.toJson(ErrorBonusClaimAlreadyExists))
-      case RequestBonusPaymentAlreadySuperseded =>
-        auditFailure(lisaManager, accountId, req, ErrorBonusClaimAlreadySuperseded.errorCode)
+        Conflict(Json.toJson(error))
+      case e: RequestBonusPaymentAlreadySuperseded =>
+        val error = ErrorBonusClaimAlreadySuperseded(e.transactionId)
+
+        auditFailure(lisaManager, accountId, req, error.errorCode)
         LisaMetrics.incrementMetrics(startTime, CONFLICT, LisaMetricKeys.BONUS_PAYMENT)
 
-        Conflict(Json.toJson(ErrorBonusClaimAlreadySuperseded))
+        Conflict(Json.toJson(error))
       case _ =>
         auditFailure(lisaManager, accountId, req, ErrorInternalServerError.errorCode)
         LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.BONUS_PAYMENT)
@@ -307,8 +321,12 @@ class BonusPaymentController extends LisaController with LisaConstants {
   }
 
   private def createAuditData(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest): Map[String, String] = {
-    req.toStringMap ++ Map(ZREF -> lisaManager,
-      "accountId" -> accountId)
+    val result = req.toStringMap ++ Map(ZREF -> lisaManager, "accountId" -> accountId)
+
+    req.supersede.fold(result) {
+      case _: AdditionalBonus => result ++ Map("reason" -> "Additional bonus")
+      case _: BonusRecovery => result ++ Map("reason" -> "Bonus recovery")
+    }
   }
 
   private def getEndpointUrl(lisaManager: String, accountId: String): String = {

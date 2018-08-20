@@ -45,7 +45,8 @@ trait BonusPaymentValidator extends LisaConstants {
       periodEndDateIsFifthOfMonthAfterPeriodStartDate andThen
       periodStartDateIsNotInFuture andThen
       periodStartDateIsNotBeforeFirstValidDate andThen
-      periodEndDateIsNotBeforeFirstValidDate
+      periodEndDateIsNotBeforeFirstValidDate andThen
+      supersedeExistsIfSupersedingClaimReason
     ).apply(BonusPaymentValidationRequest(data)).errors
   }
 
@@ -176,6 +177,22 @@ trait BonusPaymentValidator extends LisaConstants {
       req
     }
   }
+
+  private val supersedeExistsIfSupersedingClaimReason: (BonusPaymentValidationRequest) => BonusPaymentValidationRequest =
+    (req: BonusPaymentValidationRequest) => {
+      (req.data.bonuses.claimReason, req.data.supersede) match {
+        case ("Superseding bonus claim", None) => {
+          req.copy(errors = req.errors :+ ErrorValidation(
+            errorCode = MISSING_ERROR,
+            message = "This field is required",
+            path = Some(s"/supersede")
+          ))
+        }
+        case _ => {
+          req
+        }
+      }
+    }
 
   private def getErrors(subsExists: Boolean, htbExists: Boolean, eitherGtZero: Boolean): Seq[ErrorValidation] = {
     val newErrs = new ListBuffer[ErrorValidation]()

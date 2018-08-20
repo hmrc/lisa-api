@@ -553,7 +553,25 @@ class DesConnectorSpec extends PlaySpec
           )
 
         doRequestBonusPaymentRequest { response =>
-          response mustBe DesTransactionResponse("87654321","On Time")
+          response mustBe DesTransactionResponse("87654321", Some("On Time"))
+        }
+      }
+    }
+
+    "return a populated DesTransactionExistResponse" when {
+      "the DES response returns a 409 with a json body that is in the correct format" in {
+        when(mockHttpPost.POST[RequestBonusPaymentRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = CONFLICT,
+                responseJson = Some(Json.parse(s"""{"code": "x", "reason": "xx", "transactionID": "87654321"}"""))
+              )
+            )
+          )
+
+        doRequestBonusPaymentRequest { response =>
+          response mustBe DesTransactionExistResponse(code = "x", reason = "xx", transactionID = "87654321")
         }
       }
     }
@@ -1221,7 +1239,7 @@ class DesConnectorSpec extends PlaySpec
           )
 
         doReportWithdrawalRequest { response =>
-          response mustBe DesTransactionResponse("87654321","On Time")
+          response mustBe DesTransactionResponse("87654321", Some("On Time"))
         }
       }
     }

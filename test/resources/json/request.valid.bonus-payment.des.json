@@ -23,10 +23,10 @@
     "claimReason": "Life Event"
   },
 
-  "supersede": {
+  "supersededDetail": {
   	"automaticRecoveryAmount": 100.00,
-  	"originalTransactionId": "234567890",
-  	"originalBonusDueForPeriod": 100.00,
+  	"transactionId": "234567890",
+  	"transactionAmount": 100.00,
   	"transactionResult": 200.00,
   	"reason": "Bonus recovery"
   }

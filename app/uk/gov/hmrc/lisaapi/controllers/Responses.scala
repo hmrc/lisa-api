@@ -46,6 +46,13 @@ case class ErrorResponseWithLifeEventId(
                                          lifeEventID: String
                                        )
 
+case class ErrorResponseWithTransactionId(
+                                         httpStatusCode: Int,
+                                         errorCode: String,
+                                         message: String,
+                                         transactionId: String
+                                       )
+
 case class ErrorResponseWithAccountId (
                                          override val httpStatusCode: Int,
                                          override val errorCode: String,
@@ -136,10 +143,6 @@ case object ErrorTransactionNotFound extends ErrorResponse(404, "BONUS_PAYMENT_T
 
 case object ErrorBonusClaimError extends ErrorResponse(403, "BONUS_CLAIM_ERROR", "The bonus amount given is above the maximum annual amount, or the qualifying deposits are above the maximum annual amount or the bonus claim does not equal the correct percentage of qualifying funds")
 
-case object ErrorBonusClaimAlreadyExists extends ErrorResponse(409, "BONUS_CLAIM_ALREADY_EXISTS", "The investor’s bonus payment has already been requested")
-
-case object ErrorBonusClaimAlreadySuperseded extends ErrorResponse(409, "BONUS_CLAIM_ALREADY_SUPERSEDED", "This bonus claim has already been superseded")
-
 case object ErrorBonusSupersededAmountMismatch extends ErrorResponse(403, "SUPERSEDED_BONUS_CLAIM_AMOUNT_MISMATCH", "originalTransactionId and the originalBonusDueForPeriod amount do not match the information in the original bonus request")
 
 case object ErrorBonusSupersededOutcomeError extends ErrorResponse(403, "SUPERSEDED_BONUS_REQUEST_OUTCOME_ERROR", "The calculation from your superseded bonus claim is incorrect")
@@ -186,6 +189,21 @@ object ErrorAccountAlreadyExists {
 
 }
 
+object ErrorBonusClaimAlreadyExists {
+
+  def apply(transactionId: String) = {
+    ErrorResponseWithTransactionId(409, "BONUS_CLAIM_ALREADY_EXISTS", "The investor’s bonus payment has already been requested", transactionId)
+  }
+
+}
+
+object ErrorBonusClaimAlreadySuperseded {
+
+  def apply(transactionId: String) = {
+    ErrorResponseWithTransactionId(409, "BONUS_CLAIM_ALREADY_SUPERSEDED", "This bonus claim has already been superseded", transactionId)
+  }
+
+}
 
 case object ErrorLifeEventNotProvided extends ErrorResponse(403, "LIFE_EVENT_NOT_PROVIDED", "lifeEventId is required when the claimReason is a life event")
 

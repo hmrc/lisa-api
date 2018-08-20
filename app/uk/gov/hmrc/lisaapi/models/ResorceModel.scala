@@ -144,7 +144,7 @@ object InboundPayments {
   )(unlift(InboundPayments.unapply))
 }
 
-sealed trait Supersede
+sealed trait Supersede extends Product
 
 case class BonusRecovery(
   automaticRecoveryAmount: Amount,
@@ -191,6 +191,41 @@ object Supersede {
 
   implicit val bonusRecoveryWrites: Writes[BonusRecovery] = (
     (JsPath \ "automaticRecoveryAmount").write[Amount] and
+    (JsPath \ "transactionId").write[String] and
+    (JsPath \ "transactionAmount").write[Amount] and
+    (JsPath \ "transactionResult").write[Amount] and
+    (JsPath \ "reason").write[String]
+  ){
+    b: BonusRecovery => (
+      b.automaticRecoveryAmount,
+      b.originalTransactionId,
+      b.originalBonusDueForPeriod,
+      b.transactionResult,
+      "Bonus recovery"
+    )
+  }
+
+  implicit val additionalBonusWrites: Writes[AdditionalBonus] = (
+    (JsPath \ "transactionId").write[String] and
+    (JsPath \ "transactionAmount").write[Amount] and
+    (JsPath \ "transactionResult").write[Amount] and
+    (JsPath \ "reason").write[String]
+  ){
+    b: AdditionalBonus => (
+      b.originalTransactionId,
+      b.originalBonusDueForPeriod,
+      b.transactionResult,
+      "Additional Bonus"
+    )
+  }
+
+  implicit val supersedeWrites: Writes[Supersede] = Writes[Supersede] {
+    case br: BonusRecovery => bonusRecoveryWrites.writes(br)
+    case ab: AdditionalBonus => additionalBonusWrites.writes(ab)
+  }
+
+  val getBonusRecoveryWrites: Writes[BonusRecovery] = (
+    (JsPath \ "automaticRecoveryAmount").write[Amount] and
     (JsPath \ "originalTransactionId").write[String] and
     (JsPath \ "originalBonusDueForPeriod").write[Amount] and
     (JsPath \ "transactionResult").write[Amount] and
@@ -205,7 +240,7 @@ object Supersede {
     )
   }
 
-  implicit val additionalBonusWrites: Writes[AdditionalBonus] = (
+  val getAdditionalBonusWrites: Writes[AdditionalBonus] = (
     (JsPath \ "originalTransactionId").write[String] and
     (JsPath \ "originalBonusDueForPeriod").write[Amount] and
     (JsPath \ "transactionResult").write[Amount] and
@@ -219,9 +254,9 @@ object Supersede {
     )
   }
 
-  implicit val supersedeWrites: Writes[Supersede] = Writes[Supersede] {
-    case br: BonusRecovery => bonusRecoveryWrites.writes(br)
-    case ab: AdditionalBonus => additionalBonusWrites.writes(ab)
+  val getSupersedeWrites: Writes[Supersede] = Writes[Supersede] {
+    case br: BonusRecovery => getBonusRecoveryWrites.writes(br)
+    case ab: AdditionalBonus => getAdditionalBonusWrites.writes(ab)
   }
 
 }
