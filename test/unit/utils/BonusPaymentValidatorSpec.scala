@@ -23,7 +23,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 import uk.gov.hmrc.lisaapi.controllers.ErrorValidation
-import uk.gov.hmrc.lisaapi.models.{Bonuses, RequestBonusPaymentRequest}
+import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.CurrentDateService
 import uk.gov.hmrc.lisaapi.utils.BonusPaymentValidator
 
@@ -38,7 +38,7 @@ class BonusPaymentValidatorSpec extends PlaySpec
     when(mockDateService.now()).thenReturn(DateTime.now)
   }
 
-  val validBonusPaymentJson = Source.fromInputStream(getClass().getResourceAsStream("/json/request.valid.bonus-payment.json")).mkString
+  val validBonusPaymentJson = Source.fromInputStream(getClass().getResourceAsStream("/json/request.valid.bonus-payment.additional-bonus.json")).mkString
   val validBonusPayment = Json.parse(validBonusPaymentJson).as[RequestBonusPaymentRequest]
 
   "newSubsForPeriod and htbTransferForPeriod" should {
@@ -365,6 +365,21 @@ class BonusPaymentValidatorSpec extends PlaySpec
 
   "supersede" should {
 
+    "return no errors" when {
+
+      "a bonus claim is superseded down to zero" in {
+        val request = validBonusPayment.copy(
+          inboundPayments = InboundPayments(None, 0, 0, 0),
+          bonuses = Bonuses(0, 0, None, "Superseded bonus claim"),
+          supersede = Some(BonusRecovery(100, "1", 100, -100)),
+          htbTransfer = None
+        )
+
+        SUT.validate(request) mustBe Nil
+      }
+
+    }
+
     "return an error" when {
 
       "it is not populated and the claimReason is 'Superseding bonus claim'" in {
@@ -388,14 +403,17 @@ class BonusPaymentValidatorSpec extends PlaySpec
   "the validate method" should {
 
     "return no errors" when {
+
       "everything is valid" in {
         val errors = SUT.validate(validBonusPayment)
 
         errors.size mustBe 0
       }
+
     }
 
     "return multiple errors" when {
+
       "validation fails multiple conditions" in {
         val ibp = validBonusPayment.inboundPayments.copy(newSubsForPeriod = Some(1), newSubsYTD = 0, totalSubsForPeriod = 0)
         val htb = validBonusPayment.htbTransfer.get.copy(htbTransferInForPeriod = 1, htbTransferTotalYTD = 0)
@@ -404,10 +422,11 @@ class BonusPaymentValidatorSpec extends PlaySpec
         val errors = SUT.validate(request)
 
         errors.size mustBe 3
-        errors(0).path mustBe Some("/inboundPayments/newSubsYTD")
-        errors(1).path mustBe Some("/htbTransfer/htbTransferTotalYTD")
+        errors(0).path mustBe Some("/htbTransfer/htbTransferTotalYTD")
+        errors(1).path mustBe Some("/inboundPayments/newSubsYTD")
         errors(2).path mustBe Some("/inboundPayments/totalSubsForPeriod")
       }
+
     }
 
   }
