@@ -95,34 +95,6 @@ class BonusPaymentValidatorSpec extends PlaySpec
 
     }
 
-    "return a different error" when {
-
-      "a bonus recovery has amounts below zero" in {
-        val request = validBonusPayment.copy(
-          inboundPayments = InboundPayments(Some(-1), 0, 0, 0),
-          bonuses = Bonuses(0, 0, None, "Superseded bonus claim"),
-          supersede = Some(BonusRecovery(100, "1", 100, -100)),
-          htbTransfer = Some(validBonusPayment.htbTransfer.get.copy(htbTransferInForPeriod = -1))
-        )
-
-        val errors = SUT.validate(request)
-
-        errors mustBe List(
-          ErrorValidation(
-            errorCode = "INVALID_MONETARY_AMOUNT",
-            message = "newSubsForPeriod cannot be less than 0",
-            path = Some("/inboundPayments/newSubsForPeriod")
-          ),
-          ErrorValidation(
-            errorCode = "INVALID_MONETARY_AMOUNT",
-            message = "htbTransferInForPeriod cannot be less than 0",
-            path = Some("/htbTransfer/htbTransferInForPeriod")
-          )
-        )
-      }
-
-    }
-
   }
 
   "newSubsYTD" should {
@@ -175,25 +147,6 @@ class BonusPaymentValidatorSpec extends PlaySpec
         errors(0).path mustBe Some("/inboundPayments/totalSubsForPeriod")
       }
 
-      "it is less than zero for a bonus recovery" in {
-        val request = validBonusPayment.copy(
-          inboundPayments = InboundPayments(None, 0, -1, 0),
-          bonuses = Bonuses(0, 0, None, "Superseded bonus claim"),
-          supersede = Some(BonusRecovery(100, "1", 100, -100)),
-          htbTransfer = None
-        )
-
-        val errors = SUT.validate(request)
-
-        errors mustBe List(
-          ErrorValidation(
-            errorCode = "INVALID_MONETARY_AMOUNT",
-            message = "totalSubsForPeriod cannot be less than 0",
-            path = Some("/inboundPayments/totalSubsForPeriod")
-          )
-        )
-      }
-
     }
 
   }
@@ -230,25 +183,6 @@ class BonusPaymentValidatorSpec extends PlaySpec
         errors(0).path mustBe Some("/bonuses/bonusDueForPeriod")
       }
 
-      "it is less than zero for a bonus recovery" in {
-        val request = validBonusPayment.copy(
-          inboundPayments = InboundPayments(None, 0, 0, 0),
-          bonuses = Bonuses(-0.01, 0, None, "Superseded bonus claim"),
-          supersede = Some(BonusRecovery(100, "1", 100, -100)),
-          htbTransfer = None
-        )
-
-        val errors = SUT.validate(request)
-
-        errors mustBe List(
-          ErrorValidation(
-            errorCode = "INVALID_MONETARY_AMOUNT",
-            message = "bonusDueForPeriod cannot be less than 0",
-            path = Some("/bonuses/bonusDueForPeriod")
-          )
-        )
-      }
-
     }
 
   }
@@ -265,25 +199,6 @@ class BonusPaymentValidatorSpec extends PlaySpec
 
         errors.size mustBe 1
         errors(0).path mustBe Some("/bonuses/totalBonusDueYTD")
-      }
-
-      "it is less than zero for a bonus recovery" in {
-        val request = validBonusPayment.copy(
-          inboundPayments = InboundPayments(None, 0, 0, 0),
-          bonuses = Bonuses(0, -0.01, None, "Superseded bonus claim"),
-          supersede = Some(BonusRecovery(100, "1", 100, -100)),
-          htbTransfer = None
-        )
-
-        val errors = SUT.validate(request)
-
-        errors mustBe List(
-          ErrorValidation(
-            errorCode = "INVALID_MONETARY_AMOUNT",
-            message = "totalBonusDueYTD cannot be less than 0",
-            path = Some("/bonuses/totalBonusDueYTD")
-          )
-        )
       }
 
     }
