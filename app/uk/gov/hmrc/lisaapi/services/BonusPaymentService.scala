@@ -37,7 +37,7 @@ trait BonusPaymentService {
       case successResponse: DesTransactionResponse => {
         Logger.debug("Matched RequestBonusPaymentSuccessResponse and the message is " + successResponse.message)
 
-        if (request.bonuses.claimReason == "Superseding bonus claim") {
+        if (request.bonuses.claimReason == "Superseded Bonus") {
           RequestBonusPaymentSupersededResponse(successResponse.transactionID)
         }
         else {
