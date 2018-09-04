@@ -34,6 +34,9 @@ package object models {
   type LisaManagerReferenceNumber = String
   type AccountClosureReason = String
   type BonusClaimReason = String
+  type BonusClaimSupersedeReason = String
+  type WithdrawalReason = String
+  type WithdrawalSupersedeReason = String
 
   private val MIN_AMOUNT = BigDecimal("-99999999999999.98")
   private val MAX_AMOUNT = BigDecimal("99999999999999.98")

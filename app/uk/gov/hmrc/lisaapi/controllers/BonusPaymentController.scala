@@ -24,7 +24,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.services.{AuditService, BonusPaymentService, CurrentDateService}
+import uk.gov.hmrc.lisaapi.services.{AuditService, BonusOrWithdrawalService, BonusPaymentService, CurrentDateService}
 import uk.gov.hmrc.lisaapi.utils.BonusPaymentValidator
 import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
 
@@ -33,7 +33,8 @@ import scala.concurrent.Future
 
 class BonusPaymentController extends LisaController with LisaConstants {
 
-  val service: BonusPaymentService = BonusPaymentService
+  val postService: BonusPaymentService = BonusPaymentService
+  val getService: BonusOrWithdrawalService = BonusOrWithdrawalService
   val auditService: AuditService = AuditService
   val validator: BonusPaymentValidator = BonusPaymentValidator
   val dateTimeService: CurrentDateService = CurrentDateService
@@ -52,7 +53,7 @@ class BonusPaymentController extends LisaController with LisaConstants {
                 withValidData(req)(lisaManager, accountId) { () =>
                   withValidClaimPeriod(req)(lisaManager, accountId) { () =>
                     withValidHtb(req)(lisaManager, accountId) { () =>
-                      service.requestBonusPayment(lisaManager, accountId, req) map { res =>
+                      postService.requestBonusPayment(lisaManager, accountId, req) map { res =>
                         Logger.debug("Entering Bonus Payment Controller and the response is " + res.toString)
 
                         res match {
@@ -89,20 +90,20 @@ class BonusPaymentController extends LisaController with LisaConstants {
 
   private def processGetBonusPayment(lisaManager:String, accountId:String, transactionId: String)
                                     (implicit hc: HeaderCarrier, startTime: Long) = {
-    service.getBonusPayment(lisaManager, accountId, transactionId).map {
-      case response: GetBonusPaymentSuccessResponse =>
+    getService.getBonusOrWithdrawal(lisaManager, accountId, transactionId).map {
+      case response: GetBonusResponse =>
         LisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.BONUS_PAYMENT)
         Ok(Json.toJson(response))
 
-      case GetBonusPaymentLmrnDoesNotExistResponse =>
-        LisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.BONUS_PAYMENT)
-        BadRequest(Json.toJson(ErrorBadRequestLmrn))
-
-      case GetBonusPaymentTransactionNotFoundResponse =>
+      case _: GetWithdrawalResponse =>
         LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.BONUS_PAYMENT)
         NotFound(Json.toJson(ErrorTransactionNotFound))
 
-      case GetBonusPaymentInvestorNotFoundResponse =>
+      case GetBonusOrWithdrawalTransactionNotFoundResponse =>
+        LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.BONUS_PAYMENT)
+        NotFound(Json.toJson(ErrorTransactionNotFound))
+
+      case GetBonusOrWithdrawalInvestorNotFoundResponse =>
         LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.BONUS_PAYMENT)
         NotFound(Json.toJson(ErrorAccountNotFound))
 
