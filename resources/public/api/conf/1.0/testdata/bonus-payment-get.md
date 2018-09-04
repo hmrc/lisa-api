@@ -104,7 +104,7 @@
     "bonusPaidYTD": 0,
     "bonusDueForPeriod": 1000,
     "totalBonusDueYTD": 1000,
-    "claimReason": "Superseding bonus claim"
+    "claimReason": "Superseded Bonus"
   },
   "supersede": {
     "automaticRecoveryAmount": 1000,
@@ -142,7 +142,7 @@
     "bonusPaidYTD": 0,
     "bonusDueForPeriod": 1000,
     "totalBonusDueYTD": 1000,
-    "claimReason": "Superseding bonus claim"
+    "claimReason": "Superseded Bonus"
   },
   "supersede": {
     "originalTransactionId": "0003456789",
