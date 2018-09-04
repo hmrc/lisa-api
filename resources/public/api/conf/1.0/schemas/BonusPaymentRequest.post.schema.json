@@ -124,7 +124,7 @@
       },
       "claimReasonType" : {
         "type" : "string",
-        "enum": ["Life Event", "Regular Bonus", "Superseding bonus claim"]
+        "enum": ["Life Event", "Regular Bonus", "Superseded Bonus"]
       },
       "chargeReasonType" : {
         "type" : "string",
