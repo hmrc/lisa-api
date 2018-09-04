@@ -30,29 +30,33 @@ trait TransactionService {
   def getTransaction(lisaManager: String, accountId: String, transactionId: String)
                      (implicit hc: HeaderCarrier): Future[GetTransactionResponse] = {
 
-    desConnector.getBonusPayment(lisaManager, accountId, transactionId) flatMap {
-      case bonus: DesGetBonusPaymentResponse => {
-        bonus.status match {
+    desConnector.getBonusOrWithdrawal(lisaManager, accountId, transactionId) flatMap {
+      case bonus: GetBonusResponse => {
+        bonus.paymentStatus match {
           case "Paid" => {
-            Logger.debug(s"Matched a ${bonus.status} bonus payment in ITMP")
+            Logger.debug(s"Matched a ${bonus.paymentStatus} bonus payment in ITMP")
 
             handleETMP(lisaManager, accountId, transactionId, bonus)
           }
           case "Pending" | "Void" | "Cancelled" => {
-            Logger.debug(s"Matched a ${bonus.status} bonus payment in ITMP")
+            Logger.debug(s"Matched a ${bonus.paymentStatus} bonus payment in ITMP")
 
             Future.successful(GetTransactionSuccessResponse(
               transactionId = transactionId,
               bonusDueForPeriod = Some(bonus.bonuses.bonusDueForPeriod),
-              paymentStatus = bonus.status
+              paymentStatus = bonus.paymentStatus
             ))
           }
           case _ => {
-            Logger.warn(s"ITMP returned an unexpected status: ${bonus.status}, returning an error")
+            Logger.warn(s"ITMP returned an unexpected status: ${bonus.paymentStatus}, returning an error")
 
             Future.successful(GetTransactionErrorResponse)
           }
         }
+      }
+      case withdrawal: GetWithdrawalResponse => {
+        // TODO: DO
+        Future.successful(GetTransactionErrorResponse)
       }
       case error: DesFailureResponse => {
         Logger.debug(s"Error from ITMP: ${error.code}")
@@ -71,7 +75,7 @@ trait TransactionService {
     }
   }
 
-  private def handleETMP(lisaManager: String, accountId: String, transactionId: String, bonusPayment: DesGetBonusPaymentResponse)
+  private def handleETMP(lisaManager: String, accountId: String, transactionId: String, bonusPayment: GetBonusResponse)
                         (implicit hc: HeaderCarrier): Future[GetTransactionResponse] = {
 
     val transaction: Future[DesResponse] = desConnector.getTransaction(lisaManager, accountId, transactionId)

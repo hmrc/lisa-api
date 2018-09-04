@@ -22,6 +22,13 @@ import play.api.libs.json.{JsPath, Reads, Writes}
 
 sealed trait WithdrawalSupersede extends Product
 
+case class WithdrawalSuperseded(
+  originalTransactionId: String,
+  originalWithdrawalChargeAmount: Amount,
+  transactionResult: Amount,
+  reason: String
+) extends WithdrawalSupersede
+
 case class WithdrawalIncrease(
                                automaticRecoveryAmount: Amount,
                                originalTransactionId: String,
@@ -95,9 +102,24 @@ object WithdrawalSupersede {
     )
   }
 
+  implicit val withdrawalSupersededWrites: Writes[WithdrawalSuperseded] = (
+    (JsPath \ "originalTransactionId").write[String] and
+    (JsPath \ "originalWithdrawalChargeAmount").write[Amount] and
+    (JsPath \ "transactionResult").write[Amount] and
+    (JsPath \ "reason").write[String]
+  ){
+    b: WithdrawalSuperseded => (
+      b.originalTransactionId,
+      b.originalWithdrawalChargeAmount,
+      b.transactionResult,
+      b.reason
+    )
+  }
+
   implicit val supersedeWrites: Writes[WithdrawalSupersede] = Writes[WithdrawalSupersede] {
     case inc: WithdrawalIncrease => withdrawalIncreaseWrites.writes(inc)
     case dec: WithdrawalDecrease => withdrawalDecreaseWrites.writes(dec)
+    case get: WithdrawalSuperseded => withdrawalSupersededWrites.writes(get)
   }
 
 }
