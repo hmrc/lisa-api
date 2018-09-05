@@ -229,8 +229,8 @@ object GetBonusOrWithdrawalResponse {
   }
 
   implicit val withdrawalWrites: Writes[GetWithdrawalResponse] = (
-      (JsPath \ "periodStartDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
-      (JsPath \ "periodEndDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
+      (JsPath \ "claimPeriodStartDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
+      (JsPath \ "claimPeriodEndDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
       (JsPath \ "automaticRecoveryAmount").writeNullable[Amount] and
       (JsPath \ "withdrawalAmount").write[Amount] and
       (JsPath \ "withdrawalChargeAmount").write[Amount] and

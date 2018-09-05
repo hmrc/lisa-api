@@ -141,6 +141,8 @@ case object ErrorInvalidLisaManager extends ErrorResponse(401,"UNAUTHORIZED", "l
 
 case object ErrorTransactionNotFound extends ErrorResponse(404, "BONUS_PAYMENT_TRANSACTION_NOT_FOUND", "transactionId does not match HMRC’s records")
 
+case object ErrorWithdrawalNotFound extends ErrorResponse(404, "WITHDRAWAL_CHARGE_TRANSACTION_NOT_FOUND", "transactionId does not match HMRC’s records")
+
 case object ErrorBonusClaimError extends ErrorResponse(403, "BONUS_CLAIM_ERROR", "The bonus amount given is above the maximum annual amount, or the qualifying deposits are above the maximum annual amount or the bonus claim does not equal the correct percentage of qualifying funds")
 
 case object ErrorBonusSupersededAmountMismatch extends ErrorResponse(403, "SUPERSEDED_BONUS_CLAIM_AMOUNT_MISMATCH", "originalTransactionId and the originalBonusDueForPeriod amount do not match the information in the original bonus request")
