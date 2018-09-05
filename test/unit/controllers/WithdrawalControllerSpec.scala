@@ -30,7 +30,7 @@ import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
-import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountAlreadyClosed, ErrorAccountAlreadyVoided, ErrorAccountNotFound, ErrorInternalServerError, ErrorTransactionNotFound, ErrorValidation, ErrorWithdrawalExists, ErrorWithdrawalTimescalesExceeded, WithdrawalController}
+import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountAlreadyClosed, ErrorAccountAlreadyVoided, ErrorAccountNotFound, ErrorInternalServerError, ErrorValidation, ErrorWithdrawalExists, ErrorWithdrawalNotFound, ErrorWithdrawalTimescalesExceeded, WithdrawalController}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, BonusOrWithdrawalService, CurrentDateService, WithdrawalService}
 import uk.gov.hmrc.lisaapi.utils.WithdrawalChargeValidator
@@ -316,8 +316,8 @@ class WithdrawalControllerSpec extends PlaySpec
       doGetRequest(res => {
         status(res) mustBe OK
         contentAsJson(res) mustBe Json.obj(
-          "periodStartDate" -> "2017-05-06",
-          "periodEndDate" -> "2017-06-05",
+          "claimPeriodStartDate" -> "2017-05-06",
+          "claimPeriodEndDate" -> "2017-06-05",
           "automaticRecoveryAmount" -> 250,
           "withdrawalAmount" -> 2000,
           "withdrawalChargeAmount" -> 500,
@@ -352,8 +352,8 @@ class WithdrawalControllerSpec extends PlaySpec
         doGetRequest(res => {
           status(res) mustBe (NOT_FOUND)
           val json = contentAsJson(res)
-          (json \ "code").as[String] mustBe ErrorTransactionNotFound.errorCode
-          (json \ "message").as[String] mustBe ErrorTransactionNotFound.message
+          (json \ "code").as[String] mustBe ErrorWithdrawalNotFound.errorCode
+          (json \ "message").as[String] mustBe ErrorWithdrawalNotFound.message
         })
       }
 
@@ -374,8 +374,8 @@ class WithdrawalControllerSpec extends PlaySpec
         doGetRequest(res => {
           status(res) mustBe (NOT_FOUND)
           val json = contentAsJson(res)
-          (json \ "code").as[String] mustBe ErrorTransactionNotFound.errorCode
-          (json \ "message").as[String] mustBe ErrorTransactionNotFound.message
+          (json \ "code").as[String] mustBe ErrorWithdrawalNotFound.errorCode
+          (json \ "message").as[String] mustBe ErrorWithdrawalNotFound.message
         })
       }
 

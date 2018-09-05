@@ -93,11 +93,11 @@ class WithdrawalController extends LisaController with LisaConstants {
 
       case _: GetBonusResponse =>
         LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.WITHDRAWAL_CHARGE)
-        NotFound(Json.toJson(ErrorTransactionNotFound))
+        NotFound(Json.toJson(ErrorWithdrawalNotFound))
 
       case GetBonusOrWithdrawalTransactionNotFoundResponse =>
         LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.WITHDRAWAL_CHARGE)
-        NotFound(Json.toJson(ErrorTransactionNotFound))
+        NotFound(Json.toJson(ErrorWithdrawalNotFound))
 
       case GetBonusOrWithdrawalInvestorNotFoundResponse =>
         LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.WITHDRAWAL_CHARGE)
