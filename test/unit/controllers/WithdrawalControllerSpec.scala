@@ -321,7 +321,7 @@ class WithdrawalControllerSpec extends PlaySpec
           "automaticRecoveryAmount" -> 250,
           "withdrawalAmount" -> 2000,
           "withdrawalChargeAmount" -> 500,
-          "withdrawalChargeAmountYtd" -> 500,
+          "withdrawalChargeAmountYTD" -> 500,
           "fundsDeductedDuringWithdrawal" -> true,
           "withdrawalReason" -> "Superseded withdrawal",
           "supersededBy" -> "1234567892",

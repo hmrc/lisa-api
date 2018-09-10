@@ -235,14 +235,14 @@ object ReportWithdrawalChargeRequest {
 
   implicit val supersededWithdrawalWrites: Writes[SupersededWithdrawalChargeRequest] = (
     (JsPath \ "claimPeriodStartDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
-      (JsPath \ "claimPeriodEndDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
-      (JsPath \ "withdrawalAmount").write[Amount] and
-      (JsPath \ "withdrawalChargeAmount").write[Amount] and
-      (JsPath \ "withdrawalChargeAmountYTD").write[Amount] and
-      (JsPath \ "fundsDeductedDuringWithdrawal").write[Boolean] and
-      (JsPath \ "withdrawalReason").write[String] and
-      (JsPath \ "supersede").write[WithdrawalSupersede]
-    ){req: SupersededWithdrawalChargeRequest => (
+    (JsPath \ "claimPeriodEndDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
+    (JsPath \ "withdrawalAmount").write[Amount] and
+    (JsPath \ "withdrawalChargeAmount").write[Amount] and
+    (JsPath \ "withdrawalChargeAmountYTD").write[Amount] and
+    (JsPath \ "fundsDeductedDuringWithdrawal").write[Boolean] and
+    (JsPath \ "withdrawalReason").write[String] and
+    (JsPath \ "supersede").write[WithdrawalSupersede]
+  ){req: SupersededWithdrawalChargeRequest => (
     req.claimPeriodStartDate,
     req.claimPeriodEndDate,
     req.withdrawalAmount,
