@@ -234,7 +234,7 @@ object GetBonusOrWithdrawalResponse {
       (JsPath \ "automaticRecoveryAmount").writeNullable[Amount] and
       (JsPath \ "withdrawalAmount").write[Amount] and
       (JsPath \ "withdrawalChargeAmount").write[Amount] and
-      (JsPath \ "withdrawalChargeAmountYtd").write[Amount] and
+      (JsPath \ "withdrawalChargeAmountYTD").write[Amount] and
       (JsPath \ "fundsDeductedDuringWithdrawal").write[Boolean] and
       (JsPath \ "withdrawalReason").write[WithdrawalReason] and
       (JsPath \ "supersededBy").writeNullable[TransactionId] and
