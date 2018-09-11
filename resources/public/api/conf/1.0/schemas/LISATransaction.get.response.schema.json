@@ -139,7 +139,7 @@
         "enum": [
           "Life Event",
           "Regular Bonus",
-          "Superseding bonus claim"
+          "Superseded Bonus"
         ]
       },
       "chargeReasonType": {

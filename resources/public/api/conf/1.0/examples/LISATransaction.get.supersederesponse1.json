@@ -10,7 +10,7 @@
   "bonuses": {
     "bonusDueForPeriod": 0,
     "totalBonusDueYTD": 0,
-    "claimReason": "Superseding bonus claim"
+    "claimReason": "Superseded Bonus"
   },
   "supersede" : {
     "automaticRecoveryAmount": 300,
