@@ -42,12 +42,12 @@ class WithdrawalChargeSpec extends PlaySpec {
     "withdrawalChargeAmountYTD" -> 500.00,
     "fundsDeductedDuringWithdrawal" -> true,
     "withdrawalReason" -> "Superseded withdrawal",
+    "automaticRecoveryAmount" -> 250.00,
     "supersede" -> Json.obj(
       "originalTransactionId" -> "2345678901",
       "originalWithdrawalChargeAmount" -> 250.00,
       "transactionResult" -> 250.00,
-      "reason" -> "Additional withdrawal",
-      "automaticRecoveryAmount" -> 250.00
+      "reason" -> "Additional withdrawal"
     )
   )
 
@@ -57,6 +57,7 @@ class WithdrawalChargeSpec extends PlaySpec {
       val result = Json.parse(validRegular.toString()).as[ReportWithdrawalChargeRequest]
 
       result mustBe RegularWithdrawalChargeRequest(
+        None,
         new DateTime("2017-12-06"),
         new DateTime("2018-01-05"),
         1000.00,
@@ -70,6 +71,7 @@ class WithdrawalChargeSpec extends PlaySpec {
       val result = Json.parse(validSupersede.toString()).as[ReportWithdrawalChargeRequest]
 
       result mustBe SupersededWithdrawalChargeRequest(
+        Some(250.00),
         new DateTime("2017-12-06"),
         new DateTime("2018-01-05"),
         1000.00,
@@ -77,7 +79,6 @@ class WithdrawalChargeSpec extends PlaySpec {
         500.00,
         true,
         WithdrawalIncrease(
-          250.00,
           "2345678901",
           250.00,
           250.00

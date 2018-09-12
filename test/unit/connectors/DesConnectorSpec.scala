@@ -780,9 +780,9 @@ class DesConnectorSpec extends PlaySpec
             lifeEventId = Some("1234567891"),
             periodStartDate = new DateTime("2017-04-06"),
             periodEndDate = new DateTime("2017-05-05"),
-            htbTransfer = Some(HelpToBuyTransfer(0f, 10f)),
-            inboundPayments = InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
-            bonuses = Bonuses(1000f, 1000f, Some(1000f), "Life Event"),
+            htbTransfer = Some(HelpToBuyTransfer(0, 10)),
+            inboundPayments = InboundPayments(Some(4000), 4000, 4000, 4000),
+            bonuses = Bonuses(1000, 1000, Some(1000), "Life Event"),
             creationDate = new DateTime("2017-05-05"),
             paymentStatus = "Paid",
             supersededBy = None,
@@ -1364,9 +1364,9 @@ class DesConnectorSpec extends PlaySpec
       lifeEventId = Some("1234567891"),
       periodStartDate = new DateTime("2017-04-06"),
       periodEndDate = new DateTime("2017-05-05"),
-      htbTransfer = Some(HelpToBuyTransfer(0f, 0f)),
-      inboundPayments = InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
-      bonuses = Bonuses(1000f, 1000f, None, "Life Event")
+      htbTransfer = Some(HelpToBuyTransfer(0, 0)),
+      inboundPayments = InboundPayments(Some(4000), 4000, 4000, 4000),
+      bonuses = Bonuses(1000, 1000, None, "Life Event")
     )
 
     val response = Await.result(SUT.requestBonusPayment("Z123456", "ABC12345", request), Duration.Inf)
@@ -1400,6 +1400,7 @@ class DesConnectorSpec extends PlaySpec
 
   private def doReportWithdrawalRequest(callback: (DesResponse) => Unit) = {
     val request = SupersededWithdrawalChargeRequest(
+      Some(250.00),
       new DateTime("2017-12-06"),
       new DateTime("2018-01-05"),
       1000.00,
@@ -1407,7 +1408,6 @@ class DesConnectorSpec extends PlaySpec
       500.00,
       true,
       WithdrawalIncrease(
-        250.00,
         "2345678901",
         250.00,
         250.00
