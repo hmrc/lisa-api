@@ -382,8 +382,8 @@ class BonusPaymentValidatorSpec extends PlaySpec
 
     "return an error" when {
 
-      "it is not populated and the claimReason is 'Superseding bonus claim'" in {
-        val request = validBonusPayment.copy(supersede = None, bonuses = Bonuses(10f, 10f, Some(10f), "Superseding bonus claim"))
+      "it is not populated and the claimReason is 'Superseded Bonus'" in {
+        val request = validBonusPayment.copy(supersede = None, bonuses = Bonuses(10f, 10f, Some(10f), "Superseded Bonus"))
 
         val errors = SUT.validate(request)
 
