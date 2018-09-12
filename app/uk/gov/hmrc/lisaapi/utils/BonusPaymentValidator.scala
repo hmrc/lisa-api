@@ -193,7 +193,7 @@ trait BonusPaymentValidator extends LisaConstants {
   private val supersedeExistsIfSupersedingClaimReason: (BonusPaymentValidationRequest) => BonusPaymentValidationRequest =
     (req: BonusPaymentValidationRequest) => {
       (req.data.bonuses.claimReason, req.data.supersede) match {
-        case ("Superseding bonus claim", None) => {
+        case ("Superseded Bonus", None) => {
           req.copy(errors = req.errors :+ ErrorValidation(
             errorCode = MISSING_ERROR,
             message = "This field is required",
