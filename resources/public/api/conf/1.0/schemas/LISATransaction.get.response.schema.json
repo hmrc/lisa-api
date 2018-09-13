@@ -76,7 +76,7 @@
           "type": "number"
         },
         "claimReason": {
-          "description": "The reason the bonus payment was claimed. \"Superseding bonus claim\" is valid in the sandbox environment only.",
+          "description": "The reason the bonus payment was claimed. \"Superseded Bonus\" is valid in the sandbox environment only.",
           "$ref": "#/definitions/claimReasonType"
         }
       },

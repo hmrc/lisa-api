@@ -17,11 +17,11 @@
             "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
 		},
 		"withdrawalAmount": {
-			"description": "This is the amount that the investor has withdrawn from the LISA account.",
+			"description": "This is the amount that the investor has withdrawn from the LISA account.  You can include a value up to 2 decimal places.",
 			"type": "number"
 		},
 		"withdrawalChargeAmount": {
-			"description": "This is the amount charged for the withdrawal.",
+			"description": "This is the amount charged for the withdrawal. You can include a value up to 2 decimal places.",
 			"type": "number"
 		},
 		"withdrawalChargeAmountYTD": {
@@ -46,13 +46,14 @@
 		},
 		"supersede": {
 			"type": "object",
+			"description": "Correct an existing withdrawal charge. You can request an additional charge, reduce a charge, or refund a charge.",
 			"properties": {
 				"originalTransactionId": {
 					"description": "The transactionId of the original withdrawal charge affected by the correction or recovery. This is used together with the originalWithdrawalChargeAmount to make sure the right charge is replaced.",
 					"$ref": "#/definitions/TransactionIDType"
 				},
 				"originalWithdrawalChargeAmount": {
-					"description": "This is how much was in the withdrawalChargeAmount in the original request.",
+					"description": "This is how much was in the withdrawalChargeAmount in the original request. You can include a value up to 2 decimal places.",
 					"type": "number"
 				},
 				"transactionResult": {
@@ -64,7 +65,8 @@
 					"type": "string",
 					"enum": [
 						"Additional withdrawal",
-						"Withdrawal reduction"
+						"Withdrawal reduction",
+						"Withdrawal refund"
 					]
 				}
 			},
