@@ -1,7 +1,7 @@
 {
   "creationDate": "2017-05-05",
-  "claimPeriodStart": "2017-04-06",
-  "claimPeriodEnd": "2017-05-05",
+  "periodStartDate": "2017-04-06",
+  "periodEndDate": "2017-05-05",
   "lifeEventId": "1234567891",
   "htbInAmountForPeriod": 0,
   "htbInAmountYtd": 10,

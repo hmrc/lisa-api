@@ -142,7 +142,7 @@ object DesResponse {
             claimReason match {
               case "LIFE_EVENT" => "Life Event"
               case "REGULAR_BONUS" => "Regular Bonus"
-              case "SUPERSEDING_BONUS_CLAIM" => "Superseded Bonus"
+              case "SUPERSEDED_BONUS" => "Superseded Bonus"
             }
           ),
           creationDate,

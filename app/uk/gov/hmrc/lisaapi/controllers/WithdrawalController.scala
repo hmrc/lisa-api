@@ -23,7 +23,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.services.{AuditService, CurrentDateService, WithdrawalService}
+import uk.gov.hmrc.lisaapi.services.{AuditService, BonusOrWithdrawalService, CurrentDateService, WithdrawalService}
 import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
 import uk.gov.hmrc.lisaapi.utils.WithdrawalChargeValidator
 
@@ -32,7 +32,8 @@ import scala.concurrent.Future
 
 class WithdrawalController extends LisaController with LisaConstants {
 
-  val service: WithdrawalService = WithdrawalService
+  val postService: WithdrawalService = WithdrawalService
+  val getService: BonusOrWithdrawalService = BonusOrWithdrawalService
   val auditService: AuditService = AuditService
   val validator: WithdrawalChargeValidator = WithdrawalChargeValidator
   val dateTimeService: CurrentDateService = CurrentDateService
@@ -46,7 +47,7 @@ class WithdrawalController extends LisaController with LisaConstants {
           withValidJson[ReportWithdrawalChargeRequest](req =>
             withValidData(req)(lisaManager, accountId) { () =>
               withValidClaimPeriod(req)(lisaManager, accountId) { () =>
-                service.reportWithdrawalCharge(lisaManager, accountId, req) map { res =>
+                postService.reportWithdrawalCharge(lisaManager, accountId, req) map { res =>
                   Logger.debug("reportWithdrawalCharge: The response is " + res.toString)
 
                   res match {
@@ -66,6 +67,46 @@ class WithdrawalController extends LisaController with LisaConstants {
           )
         }
       }
+  }
+
+  def getWithdrawalCharge(lisaManager: String, accountId: String, transactionId: String): Action[AnyContent] = {
+    validateAccept(acceptHeaderValidationRules).async { implicit request =>
+      implicit val startTime: Long = System.currentTimeMillis()
+      withValidLMRN(lisaManager) { () =>
+        withEnrolment(lisaManager) { (_) =>
+          withValidAccountId(accountId) { () =>
+            processGetWithdrawalCharge(lisaManager, accountId, transactionId)
+          }
+        }
+      }
+
+    }
+  }
+
+  private def processGetWithdrawalCharge(lisaManager:String, accountId:String, transactionId: String)
+                                        (implicit hc: HeaderCarrier, startTime: Long) = {
+
+    getService.getBonusOrWithdrawal(lisaManager, accountId, transactionId).map {
+      case response: GetWithdrawalResponse =>
+        LisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.WITHDRAWAL_CHARGE)
+        Ok(Json.toJson(response))
+
+      case _: GetBonusResponse =>
+        LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.WITHDRAWAL_CHARGE)
+        NotFound(Json.toJson(ErrorWithdrawalNotFound))
+
+      case GetBonusOrWithdrawalTransactionNotFoundResponse =>
+        LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.WITHDRAWAL_CHARGE)
+        NotFound(Json.toJson(ErrorWithdrawalNotFound))
+
+      case GetBonusOrWithdrawalInvestorNotFoundResponse =>
+        LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.WITHDRAWAL_CHARGE)
+        NotFound(Json.toJson(ErrorAccountNotFound))
+
+      case _ =>
+        LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.WITHDRAWAL_CHARGE)
+        InternalServerError(Json.toJson(ErrorInternalServerError))
+    }
   }
 
   private def withValidClaimPeriod(data: ReportWithdrawalChargeRequest)

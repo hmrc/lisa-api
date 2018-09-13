@@ -40,8 +40,8 @@ class TransactionServiceSpec extends PlaySpec
 
     "return a Pending transaction" when {
       "ITMP returns a Pending status" in {
-        when(mockDesConnector.getBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesGetBonusPaymentResponse(
+        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
+          thenReturn(Future.successful(GetBonusResponse(
             lifeEventId = None,
             periodStartDate = new DateTime("2001-01-01"),
             periodEndDate = new DateTime("2002-01-01"),
@@ -49,7 +49,7 @@ class TransactionServiceSpec extends PlaySpec
             inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
             bonuses = Bonuses(1.0, 1.0, None, "X"),
             creationDate = new DateTime("2000-01-01"),
-            status = "Pending")))
+            paymentStatus = "Pending")))
 
         val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
 
@@ -60,8 +60,8 @@ class TransactionServiceSpec extends PlaySpec
         )
       }
       "ITMP returns a Paid status and ETMP returns a Pending status" in {
-        when(mockDesConnector.getBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesGetBonusPaymentResponse(
+        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
+          thenReturn(Future.successful(GetBonusResponse(
             lifeEventId = None,
             periodStartDate = new DateTime("2001-01-01"),
             periodEndDate = new DateTime("2002-01-01"),
@@ -69,7 +69,7 @@ class TransactionServiceSpec extends PlaySpec
             inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
             bonuses = Bonuses(1.0, 1.0, None, "X"),
             creationDate = new DateTime("2000-01-01"),
-            status = "Paid")))
+            paymentStatus = "Paid")))
 
         when(mockDesConnector.getTransaction(any(), any(), any())(any())).
           thenReturn(Future.successful(DesGetTransactionPending(new DateTime("2000-01-01"))))
@@ -85,8 +85,8 @@ class TransactionServiceSpec extends PlaySpec
         )
       }
       "ITMP returns a Paid status and ETMP returns a Not Found error" in {
-        when(mockDesConnector.getBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesGetBonusPaymentResponse(
+        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
+          thenReturn(Future.successful(GetBonusResponse(
             lifeEventId = None,
             periodStartDate = new DateTime("2001-01-01"),
             periodEndDate = new DateTime("2002-01-01"),
@@ -94,7 +94,7 @@ class TransactionServiceSpec extends PlaySpec
             inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
             bonuses = Bonuses(1.0, 1.0, None, "X"),
             creationDate = new DateTime("2000-01-01"),
-            status = "Paid")))
+            paymentStatus = "Paid")))
 
         when(mockDesConnector.getTransaction(any(), any(), any())(any())).
           thenReturn(Future.successful(DesFailureResponse("NOT_FOUND")))
@@ -111,8 +111,8 @@ class TransactionServiceSpec extends PlaySpec
 
     "return a Cancelled transaction" when {
       "ITMP returns a Cancelled status" in {
-        when(mockDesConnector.getBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesGetBonusPaymentResponse(
+        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
+          thenReturn(Future.successful(GetBonusResponse(
             lifeEventId = None,
             periodStartDate = new DateTime("2001-01-01"),
             periodEndDate = new DateTime("2002-01-01"),
@@ -120,7 +120,7 @@ class TransactionServiceSpec extends PlaySpec
             inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
             bonuses = Bonuses(1.0, 1.0, None, "X"),
             creationDate = new DateTime("2000-01-01"),
-            status = "Cancelled")))
+            paymentStatus = "Cancelled")))
 
         val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
 
@@ -134,8 +134,8 @@ class TransactionServiceSpec extends PlaySpec
 
     "return a Paid transaction" when {
       "ITMP returns a Paid status and ETMP returns a Paid status" in {
-        when(mockDesConnector.getBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesGetBonusPaymentResponse(
+        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
+          thenReturn(Future.successful(GetBonusResponse(
             lifeEventId = None,
             periodStartDate = new DateTime("2001-01-01"),
             periodEndDate = new DateTime("2002-01-01"),
@@ -143,7 +143,7 @@ class TransactionServiceSpec extends PlaySpec
             inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
             bonuses = Bonuses(1.0, 1.0, None, "X"),
             creationDate = new DateTime("2000-01-01"),
-            status = "Paid")))
+            paymentStatus = "Paid")))
 
         when(mockDesConnector.getTransaction(any(), any(), any())(any())).
           thenReturn(Future.successful(DesGetTransactionPaid(
@@ -166,7 +166,7 @@ class TransactionServiceSpec extends PlaySpec
 
     "return a Transaction Not Found error" when {
       "ITMP returns a Transaction Not Found error" in {
-        when(mockDesConnector.getBonusPayment(any(), any(), any())(any())).
+        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
           thenReturn(Future.successful(DesFailureResponse("TRANSACTION_ID_NOT_FOUND")))
 
         val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
@@ -177,7 +177,7 @@ class TransactionServiceSpec extends PlaySpec
 
     "return a Account Not Found error" when {
       "ITMP returns a Account Not Found error" in {
-        when(mockDesConnector.getBonusPayment(any(), any(), any())(any())).
+        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
           thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNTID_NOT_FOUND")))
 
         val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
@@ -188,8 +188,8 @@ class TransactionServiceSpec extends PlaySpec
 
     "return a Generic error" when {
       "ITMP returns a status other than Pending, Paid, Void or Cancelled" in {
-        when(mockDesConnector.getBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesGetBonusPaymentResponse(
+        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
+          thenReturn(Future.successful(GetBonusResponse(
             lifeEventId = None,
             periodStartDate = new DateTime("2001-01-01"),
             periodEndDate = new DateTime("2002-01-01"),
@@ -197,7 +197,7 @@ class TransactionServiceSpec extends PlaySpec
             inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
             bonuses = Bonuses(1.0, 1.0, None, "X"),
             creationDate = new DateTime("2000-01-01"),
-            status = "Unknown")))
+            paymentStatus = "Unknown")))
 
         val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
 

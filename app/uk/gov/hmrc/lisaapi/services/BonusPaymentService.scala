@@ -77,45 +77,6 @@ trait BonusPaymentService {
     }
   }
 
-  def getBonusPayment(lisaManager: String, accountId: String, transactionId: String)
-                     (implicit hc: HeaderCarrier): Future[GetBonusPaymentResponse] = {
-
-
-    val response: Future[DesResponse] = desConnector.getBonusPayment(lisaManager, accountId, transactionId)
-
-    response map {
-      case successResponse: DesGetBonusPaymentResponse => {
-        Logger.debug("Matched DesGetBonusPaymentResponse")
-
-        GetBonusPaymentSuccessResponse(
-          successResponse.lifeEventId,
-          successResponse.periodStartDate,
-          successResponse.periodEndDate,
-          successResponse.htbTransfer,
-          successResponse.inboundPayments,
-          successResponse.bonuses,
-          successResponse.supersededBy,
-          successResponse.supersede
-        )
-      }
-
-      case failureResponse: DesFailureResponse => {
-        Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
-
-        failureResponse.code match {
-          case "TRANSACTION_ID_NOT_FOUND" => GetBonusPaymentTransactionNotFoundResponse
-          case "BAD_REQUEST" => GetBonusPaymentLmrnDoesNotExistResponse
-          case "INVESTOR_ACCOUNTID_NOT_FOUND" => GetBonusPaymentInvestorNotFoundResponse
-          case _ => {
-            Logger.warn(s"Get bonus payment returned error: ${failureResponse.code}")
-            GetBonusPaymentErrorResponse
-          }
-        }
-
-      }
-    }
-  }
-
 }
 
 object BonusPaymentService extends BonusPaymentService {

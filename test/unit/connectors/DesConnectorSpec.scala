@@ -776,7 +776,7 @@ class DesConnectorSpec extends PlaySpec
           )
 
         doRetrieveBonusPaymentRequest { response =>
-          response mustBe DesGetBonusPaymentResponse(
+          response mustBe GetBonusResponse(
             lifeEventId = Some("1234567891"),
             periodStartDate = new DateTime("2017-04-06"),
             periodEndDate = new DateTime("2017-05-05"),
@@ -784,7 +784,9 @@ class DesConnectorSpec extends PlaySpec
             inboundPayments = InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
             bonuses = Bonuses(1000f, 1000f, Some(1000f), "Life Event"),
             creationDate = new DateTime("2017-05-05"),
-            status = "Paid"
+            paymentStatus = "Paid",
+            supersededBy = None,
+            supersede = None
           )
         }
 
@@ -1373,7 +1375,7 @@ class DesConnectorSpec extends PlaySpec
   }
 
   private def doRetrieveBonusPaymentRequest(callback: (DesResponse) => Unit) = {
-    val response = Await.result(SUT.getBonusPayment("Z123456", "ABC12345", "123456"), Duration.Inf)
+    val response = Await.result(SUT.getBonusOrWithdrawal("Z123456", "ABC12345", "123456"), Duration.Inf)
 
     callback(response)
   }

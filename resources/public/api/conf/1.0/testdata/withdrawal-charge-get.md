@@ -25,12 +25,13 @@
 {
   "claimPeriodStartDate": "2017-12-06",
   "claimPeriodEndDate": "2018-01-05",
+  "automaticRecoveryAmount": 250,
   "withdrawalAmount": 1000,
   "withdrawalChargeAmount": 250,
   "withdrawalChargeAmountYTD": 500,
   "fundsDeductedDuringWithdrawal": true,
   "withdrawalReason": "Regular withdrawal",
-  "supersededById": "2345678903"
+  "supersededBy": "2345678903"
 }
 </pre>
             </td>
@@ -42,7 +43,7 @@
                     <strong>lisaManagerReferenceNumber:</strong><br>
                     <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
                     <br>
-                    <strong>accountId:</strong><br>1234567891
+                    <strong>accountId:</strong><br>1234567890
                     <br>
                     <strong>transactionId:</strong><br>2345678902
                 </p>
@@ -52,6 +53,7 @@
 {
   "claimPeriodStartDate": "2017-12-06",
   "claimPeriodEndDate": "2018-01-05",
+  "automaticRecoveryAmount": 250,
   "withdrawalAmount": 1000,
   "withdrawalChargeAmount": 250,
   "withdrawalChargeAmountYTD": 500,
@@ -78,6 +80,7 @@
 {
   "claimPeriodStartDate": "2017-12-06",
   "claimPeriodEndDate": "2018-01-05",
+  "automaticRecoveryAmount": 250,
   "withdrawalAmount": 2000,
   "withdrawalChargeAmount": 500,
   "withdrawalChargeAmountYTD": 750,
@@ -87,8 +90,7 @@
     "originalTransactionId": "2345678901",
     "originalWithdrawalChargeAmount": 250,
     "transactionResult": 250,
-    "reason": "Additional withdrawal",
-    "automaticRecoveryAmount": 250
+    "reason": "Additional withdrawal"
   }
 }
 </pre>
@@ -145,9 +147,9 @@
                     <strong>lisaManagerReferenceNumber:</strong><br>
                     <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
                     <br>
-                    <strong>accountId:</strong><br>0000000404
+                    <strong>accountId:</strong><br>1234567890
                     <br>
-                    <strong>transactionId:</strong><br>2345678901
+                    <strong>transactionId:</strong><br>1000000404
                 </p>
             </td>
             <td>
@@ -155,7 +157,7 @@
 <pre class="code--block">
 {
   "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
-  "message": "The accountId does not match HMRC’s records"
+  "message": "accountId does not match HMRC’s records"
 }
 </pre>
             </td>
@@ -167,9 +169,9 @@
                     <strong>lisaManagerReferenceNumber:</strong><br>
                     <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
                     <br>
-                    <strong>accountId:</strong><br>1000000404
+                    <strong>accountId:</strong><br>1234567890
                     <br>
-                    <strong>transactionId:</strong><br>2345678901
+                    <strong>transactionId:</strong><br>0000000404
                 </p>
             </td>
             <td>
@@ -177,7 +179,7 @@
 <pre class="code--block">
 {
   "code": "WITHDRAWAL_CHARGE_TRANSACTION_NOT_FOUND",
-  "message": "The transactionId does not match HMRC’s records"
+  "message": "transactionId does not match HMRC’s records"
 }
 </pre>
             </td>

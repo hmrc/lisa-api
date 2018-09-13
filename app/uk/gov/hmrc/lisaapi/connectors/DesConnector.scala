@@ -250,8 +250,8 @@ trait DesConnector extends ServicesConfig {
   /**
     * Attempts to get a submitted bonus payment's details from ITMP
     */
-  def getBonusPayment(lisaManager: String, accountId: String, transactionId: String)
-                     (implicit hc: HeaderCarrier): Future[DesResponse] = {
+  def getBonusOrWithdrawal(lisaManager: String, accountId: String, transactionId: String)
+                          (implicit hc: HeaderCarrier): Future[DesResponse] = {
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/transaction/$transactionId"
     Logger.debug("Getting the Bonus Payment transaction details from des: " + uri)
 
@@ -259,7 +259,7 @@ trait DesConnector extends ServicesConfig {
 
     result.map(res => {
       Logger.debug("Get Bonus Payment transaction details returned status: " + res.status)
-      parseDesResponse[DesGetBonusPaymentResponse](res)
+      parseDesResponse[GetBonusOrWithdrawalResponse](res)
     })
   }
 
