@@ -17,8 +17,8 @@
 package unit.connectors
 
 import org.joda.time.DateTime
-import org.mockito.Matchers._
-import org.mockito.Mockito.when
+import org.mockito.Matchers.{eq => matchersEquals, _}
+import org.mockito.Mockito.{verify, when}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
@@ -1228,6 +1228,22 @@ class DesConnectorSpec extends PlaySpec
 
   "Report withdrawal endpoint" must {
 
+    "uses the des writes when posting data" in {
+      when(mockHttpPost.POST[ReportWithdrawalChargeRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        .thenReturn(
+          Future.successful(
+            HttpResponse(
+              responseStatus = CREATED,
+              responseJson = Some(Json.parse(s"""{"transactionID": "87654321","message": "On Time"}"""))
+            )
+          )
+        )
+
+      doReportWithdrawalRequest { response =>
+        verify(mockHttpPost).POST(any(), any(), any())(matchersEquals(ReportWithdrawalChargeRequest.desReportWithdrawalChargeWrites), any(), any(), any())
+      }
+    }
+
     "return a populated DesTransactionResponse" when {
       "the DES response has a json body that is in the correct format" in {
         when(mockHttpPost.POST[ReportWithdrawalChargeRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
@@ -1392,7 +1408,7 @@ class DesConnectorSpec extends PlaySpec
     callback(response)
   }
 
-  private def  doRetrieveAccountRequest(callback: (DesResponse) => Unit) = {
+  private def doRetrieveAccountRequest(callback: (DesResponse) => Unit) = {
     val response = Await.result(SUT.getAccountInformation("Z123456", "123456"), Duration.Inf)
 
     callback(response)
