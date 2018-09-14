@@ -275,7 +275,7 @@ trait DesConnector extends ServicesConfig {
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/withdrawal"
     Logger.debug("Posting withdrawal request to des: " + uri)
 
-    val result = httpPost.POST[ReportWithdrawalChargeRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
+    val result = httpPost.POST[ReportWithdrawalChargeRequest, HttpResponse](uri, request)(ReportWithdrawalChargeRequest.desReportWithdrawalChargeWrites, httpReads, updateHeaderCarrier(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
 
     result.map(res => {
       Logger.debug("Withdrawal request returned status: " + res.status)
