@@ -17,8 +17,8 @@
 package unit.connectors
 
 import org.joda.time.DateTime
-import org.mockito.Matchers._
-import org.mockito.Mockito.when
+import org.mockito.Matchers.{eq => matchersEquals, _}
+import org.mockito.Mockito.{verify, when}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
@@ -780,9 +780,9 @@ class DesConnectorSpec extends PlaySpec
             lifeEventId = Some("1234567891"),
             periodStartDate = new DateTime("2017-04-06"),
             periodEndDate = new DateTime("2017-05-05"),
-            htbTransfer = Some(HelpToBuyTransfer(0f, 10f)),
-            inboundPayments = InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
-            bonuses = Bonuses(1000f, 1000f, Some(1000f), "Life Event"),
+            htbTransfer = Some(HelpToBuyTransfer(0, 10)),
+            inboundPayments = InboundPayments(Some(4000), 4000, 4000, 4000),
+            bonuses = Bonuses(1000, 1000, Some(1000), "Life Event"),
             creationDate = new DateTime("2017-05-05"),
             paymentStatus = "Paid",
             supersededBy = None,
@@ -1228,6 +1228,22 @@ class DesConnectorSpec extends PlaySpec
 
   "Report withdrawal endpoint" must {
 
+    "uses the des writes when posting data" in {
+      when(mockHttpPost.POST[ReportWithdrawalChargeRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        .thenReturn(
+          Future.successful(
+            HttpResponse(
+              responseStatus = CREATED,
+              responseJson = Some(Json.parse(s"""{"transactionID": "87654321","message": "On Time"}"""))
+            )
+          )
+        )
+
+      doReportWithdrawalRequest { response =>
+        verify(mockHttpPost).POST(any(), any(), any())(matchersEquals(ReportWithdrawalChargeRequest.desReportWithdrawalChargeWrites), any(), any(), any())
+      }
+    }
+
     "return a populated DesTransactionResponse" when {
       "the DES response has a json body that is in the correct format" in {
         when(mockHttpPost.POST[ReportWithdrawalChargeRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
@@ -1364,9 +1380,9 @@ class DesConnectorSpec extends PlaySpec
       lifeEventId = Some("1234567891"),
       periodStartDate = new DateTime("2017-04-06"),
       periodEndDate = new DateTime("2017-05-05"),
-      htbTransfer = Some(HelpToBuyTransfer(0f, 0f)),
-      inboundPayments = InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
-      bonuses = Bonuses(1000f, 1000f, None, "Life Event")
+      htbTransfer = Some(HelpToBuyTransfer(0, 0)),
+      inboundPayments = InboundPayments(Some(4000), 4000, 4000, 4000),
+      bonuses = Bonuses(1000, 1000, None, "Life Event")
     )
 
     val response = Await.result(SUT.requestBonusPayment("Z123456", "ABC12345", request), Duration.Inf)
@@ -1392,7 +1408,7 @@ class DesConnectorSpec extends PlaySpec
     callback(response)
   }
 
-  private def  doRetrieveAccountRequest(callback: (DesResponse) => Unit) = {
+  private def doRetrieveAccountRequest(callback: (DesResponse) => Unit) = {
     val response = Await.result(SUT.getAccountInformation("Z123456", "123456"), Duration.Inf)
 
     callback(response)
@@ -1400,6 +1416,7 @@ class DesConnectorSpec extends PlaySpec
 
   private def doReportWithdrawalRequest(callback: (DesResponse) => Unit) = {
     val request = SupersededWithdrawalChargeRequest(
+      Some(250.00),
       new DateTime("2017-12-06"),
       new DateTime("2018-01-05"),
       1000.00,
@@ -1407,7 +1424,6 @@ class DesConnectorSpec extends PlaySpec
       500.00,
       true,
       WithdrawalIncrease(
-        250.00,
         "2345678901",
         250.00,
         250.00

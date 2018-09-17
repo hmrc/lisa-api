@@ -79,17 +79,6 @@ class WithdrawalServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSui
       }
     }
 
-    "return a account closed response" when {
-      "given the code INVESTOR_ACCOUNT_ALREADY_CLOSED from the DES connector" in {
-        when(mockDesConnector.reportWithdrawalCharge(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_CLOSED", "xxxx")))
-
-        doRequest { response =>
-          response mustBe ReportWithdrawalChargeAccountClosed
-        }
-      }
-    }
-
     "return a account cancelled response" when {
       "given the code INVESTOR_ACCOUNT_ALREADY_CANCELLED from the DES connector" in {
         when(mockDesConnector.reportWithdrawalCharge(any(), any(), any())(any())).
@@ -171,6 +160,7 @@ class WithdrawalServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
   private def doRequest(callback: (ReportWithdrawalChargeResponse) => Unit) = {
     val request = models.RegularWithdrawalChargeRequest(
+      Some(250.00),
       new DateTime("2017-12-06"),
       new DateTime("2018-01-05"),
       1000.00,

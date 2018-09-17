@@ -29,7 +29,8 @@
   "withdrawalChargeAmount": 250.00,
   "withdrawalChargeAmountYTD": 500.00,
   "fundsDeductedDuringWithdrawal": true,
-  "withdrawalReason": "Regular withdrawal"
+  "withdrawalReason": "Regular withdrawal",
+  "automaticRecoveryAmount": 250.00
 }
 </pre>
             </td>
@@ -66,7 +67,8 @@
   "withdrawalChargeAmount": 250.00,
   "withdrawalChargeAmountYTD": 500.00,
   "fundsDeductedDuringWithdrawal": true,
-  "withdrawalReason": "Regular withdrawal"
+  "withdrawalReason": "Regular withdrawal",
+  "automaticRecoveryAmount": 250.00
 }
 </pre>
             </td>
@@ -104,12 +106,12 @@
   "withdrawalChargeAmountYTD": 750.00,
   "fundsDeductedDuringWithdrawal": true,
   "withdrawalReason": "Superseded withdrawal",
+  "automaticRecoveryAmount": 250.00,
   "supersede": {
     "originalTransactionId": "2345678901",
     "originalWithdrawalChargeAmount": 250.00,
     "transactionResult": 250.00,
-    "reason": "Additional withdrawal",
-    "automaticRecoveryAmount": 250.00
+    "reason": "Additional withdrawal"
   }
 }
 </pre>
@@ -146,7 +148,8 @@
   "withdrawalAmount": 1000.001,
   "withdrawalChargeAmountYTD": 500.00,
   "fundsDeductedDuringWithdrawal": true,
-  "withdrawalReason": "Regular withdrawal."
+  "withdrawalReason": "Regular withdrawal.",
+  "automaticRecoveryAmount": 250.00
 }
 </pre>
             </td>
@@ -206,7 +209,8 @@
   "withdrawalChargeAmount": 250.00,
   "withdrawalChargeAmountYTD": 500.00,
   "fundsDeductedDuringWithdrawal": true,
-  "withdrawalReason": "Regular withdrawal"
+  "withdrawalReason": "Regular withdrawal",
+  "automaticRecoveryAmount": 250.00
 }
 </pre>
             </td>
@@ -239,7 +243,8 @@
   "withdrawalChargeAmount": 250.00,
   "withdrawalChargeAmountYTD": 500.00,
   "fundsDeductedDuringWithdrawal": true,
-  "withdrawalReason": "Regular withdrawal"
+  "withdrawalReason": "Regular withdrawal",
+  "automaticRecoveryAmount": 250.00
 }
 </pre>
             </td>
@@ -273,7 +278,8 @@
   "withdrawalChargeAmount": 250.00,
   "withdrawalChargeAmountYTD": 500.00,
   "fundsDeductedDuringWithdrawal": true,
-  "withdrawalReason": "Regular withdrawal"
+  "withdrawalReason": "Regular withdrawal",
+  "automaticRecoveryAmount": 250.00
 }
 </pre>
             </td>
@@ -318,7 +324,8 @@
   "withdrawalChargeAmount": 250.00,
   "withdrawalChargeAmountYTD": 500.00,
   "fundsDeductedDuringWithdrawal": true,
-  "withdrawalReason": "Regular withdrawal"
+  "withdrawalReason": "Regular withdrawal",
+  "automaticRecoveryAmount": 250.00
 }
 </pre>
             </td>
@@ -326,8 +333,8 @@
                 <p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
 <pre class="code--block">
 {
-  "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED",
-  "message": "The LISA account is already closed"
+  "code": "INVESTOR_ACCOUNT_ALREADY_CANCELLED",
+  "message": "The LISA account is already cancelled"
 }
 </pre>
             </td>
@@ -351,7 +358,8 @@
   "withdrawalChargeAmount": 250.00,
   "withdrawalChargeAmountYTD": 500.00,
   "fundsDeductedDuringWithdrawal": true,
-  "withdrawalReason": "Regular withdrawal"
+  "withdrawalReason": "Regular withdrawal",
+  "automaticRecoveryAmount": 250.00
 }
 </pre>
             </td>
@@ -385,12 +393,12 @@
   "withdrawalChargeAmountYTD": 750.00,
   "fundsDeductedDuringWithdrawal": true,
   "withdrawalReason": "Superseded withdrawal",
+  "automaticRecoveryAmount": 250.00,
   "supersede": {
     "originalTransactionId": "2345678901",
     "originalWithdrawalChargeAmount": 250.00,
     "transactionResult": 250.00,
-    "reason": "Additional withdrawal",
-    "automaticRecoveryAmount": 250.00
+    "reason": "Additional withdrawal"
   }
 }
 </pre>
@@ -425,12 +433,12 @@
   "withdrawalChargeAmountYTD": 750.00,
   "fundsDeductedDuringWithdrawal": true,
   "withdrawalReason": "Superseded withdrawal",
+  "automaticRecoveryAmount": 250.00,
   "supersede": {
     "originalTransactionId": "2345678901",
     "originalWithdrawalChargeAmount": 250.00,
     "transactionResult": 250.00,
-    "reason": "Additional withdrawal",
-    "automaticRecoveryAmount": 250.00
+    "reason": "Additional withdrawal"
   }
 }
 </pre>
@@ -465,12 +473,12 @@
   "withdrawalChargeAmountYTD": 750.00,
   "fundsDeductedDuringWithdrawal": true,
   "withdrawalReason": "Superseded withdrawal",
+  "automaticRecoveryAmount": 250.00,
   "supersede": {
     "originalTransactionId": "2345678901",
     "originalWithdrawalChargeAmount": 250.00,
     "transactionResult": 250.00,
-    "reason": "Additional withdrawal",
-    "automaticRecoveryAmount": 250.00
+    "reason": "Additional withdrawal"
   }
 }
 </pre>
@@ -505,12 +513,12 @@
   "withdrawalChargeAmountYTD": 750.00,
   "fundsDeductedDuringWithdrawal": true,
   "withdrawalReason": "Superseded withdrawal",
+  "automaticRecoveryAmount": 250.00,
   "supersede": {
     "originalTransactionId": "2345678901",
     "originalWithdrawalChargeAmount": 250.00,
     "transactionResult": 250.00,
-    "reason": "Additional withdrawal",
-    "automaticRecoveryAmount": 250.00
+    "reason": "Additional withdrawal"
   }
 }
 </pre>
@@ -544,7 +552,8 @@
   "withdrawalChargeAmount": 250.00,
   "withdrawalChargeAmountYTD": 500.00,
   "fundsDeductedDuringWithdrawal": true,
-  "withdrawalReason": "Regular withdrawal"
+  "withdrawalReason": "Regular withdrawal",
+  "automaticRecoveryAmount": 250.00
 }
 </pre>
             </td>
@@ -580,7 +589,8 @@
   "withdrawalChargeAmount": 250.00,
   "withdrawalChargeAmountYTD": 500.00,
   "fundsDeductedDuringWithdrawal": true,
-  "withdrawalReason": "Regular withdrawal"
+  "withdrawalReason": "Regular withdrawal",
+  "automaticRecoveryAmount": 250.00
 }
 </pre>
             </td>
@@ -613,7 +623,8 @@
   "withdrawalChargeAmount": 250.00,
   "withdrawalChargeAmountYTD": 500.00,
   "fundsDeductedDuringWithdrawal": true,
-  "withdrawalReason": "Regular withdrawal"
+  "withdrawalReason": "Regular withdrawal",
+  "automaticRecoveryAmount": 250.00
 }
 </pre>
             </td>

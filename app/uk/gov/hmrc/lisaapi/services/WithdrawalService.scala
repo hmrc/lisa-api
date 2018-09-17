@@ -55,7 +55,6 @@ trait WithdrawalService {
         failureResponse.code match {
           case "INVESTOR_ACCOUNTID_NOT_FOUND" => ReportWithdrawalChargeAccountNotFound
           case "INVESTOR_ACCOUNT_ALREADY_VOID" => ReportWithdrawalChargeAccountVoid
-          case "INVESTOR_ACCOUNT_ALREADY_CLOSED" => ReportWithdrawalChargeAccountClosed
           case "INVESTOR_ACCOUNT_ALREADY_CANCELLED" => ReportWithdrawalChargeAccountCancelled
           case "WITHDRAWAL_CHARGE_ALREADY_EXISTS" => ReportWithdrawalChargeAlreadyExists
           case "WITHDRAWAL_REPORTING_ERROR" => ReportWithdrawalChargeReportingError

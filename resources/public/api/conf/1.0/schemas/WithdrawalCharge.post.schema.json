@@ -40,6 +40,10 @@
 				"Superseded withdrawal"
 			]
 		},
+		"automaticRecoveryAmount": {
+			"description": "This is the amount HMRC can collect from the LISA manager when there is an additional withdrawal charge. If there are no funds available, this value must be 0.",
+			"type": "number"
+		},
 		"supersede": {
 			"type": "object",
 			"description": "Correct an existing withdrawal charge. You can request an additional charge, reduce a charge, or refund a charge.",
@@ -64,10 +68,6 @@
 						"Withdrawal reduction",
 						"Withdrawal refund"
 					]
-				},
-				"automaticRecoveryAmount": {
-					"description": "This is the amount HMRC can collect from the LISA manager when there is an additional withdrawal charge. If there are no funds available, this value must be 0.  You can include a value up to 2 decimal places.",
-					"type": "number"
 				}
 			},
 			"required": [
