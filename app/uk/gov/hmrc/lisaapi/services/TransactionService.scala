@@ -27,36 +27,22 @@ import scala.concurrent.Future
 trait TransactionService {
   val desConnector: DesConnector
 
+  val statusPending = "Pending"
+  val statusPaid = "Paid"
+  val statusVoid = "Void"
+  val statusCancelled = "Cancelled"
+  val statusDue = "Due"
+  val statusCollected = "Collected"
+
   def getTransaction(lisaManager: String, accountId: String, transactionId: String)
                      (implicit hc: HeaderCarrier): Future[GetTransactionResponse] = {
 
     desConnector.getBonusOrWithdrawal(lisaManager, accountId, transactionId) flatMap {
       case bonus: GetBonusResponse => {
-        bonus.paymentStatus match {
-          case "Paid" => {
-            Logger.debug(s"Matched a ${bonus.paymentStatus} bonus payment in ITMP")
-
-            handleETMP(lisaManager, accountId, transactionId, bonus)
-          }
-          case "Pending" | "Void" | "Cancelled" => {
-            Logger.debug(s"Matched a ${bonus.paymentStatus} bonus payment in ITMP")
-
-            Future.successful(GetTransactionSuccessResponse(
-              transactionId = transactionId,
-              bonusDueForPeriod = Some(bonus.bonuses.bonusDueForPeriod),
-              paymentStatus = bonus.paymentStatus
-            ))
-          }
-          case _ => {
-            Logger.warn(s"ITMP returned an unexpected status: ${bonus.paymentStatus}, returning an error")
-
-            Future.successful(GetTransactionErrorResponse)
-          }
-        }
+        handleBonusResponse(lisaManager, accountId, transactionId, bonus)
       }
       case withdrawal: GetWithdrawalResponse => {
-        // TODO: DO
-        Future.successful(GetTransactionErrorResponse)
+        handleWithdrawalResponse(lisaManager, accountId, transactionId, withdrawal)
       }
       case error: DesFailureResponse => {
         Logger.debug(s"Error from ITMP: ${error.code}")
@@ -75,36 +61,118 @@ trait TransactionService {
     }
   }
 
-  private def handleETMP(lisaManager: String, accountId: String, transactionId: String, bonusPayment: GetBonusResponse)
-                        (implicit hc: HeaderCarrier): Future[GetTransactionResponse] = {
+  private def handleBonusResponse(lisaManager: String, accountId: String, transactionId: String, bonus: GetBonusResponse)
+                                 (implicit hc: HeaderCarrier): Future[GetTransactionResponse] = {
+    bonus.paymentStatus match {
+      case `statusPending` | `statusVoid` | `statusCancelled` => {
+        Logger.debug(s"Matched a ${bonus.paymentStatus} bonus payment in ITMP")
+
+        Future.successful(GetTransactionBonusSuccessResponse(
+          transactionId = transactionId,
+          bonusDueForPeriod = Some(bonus.bonuses.bonusDueForPeriod),
+          paymentStatus = bonus.paymentStatus
+        ))
+      }
+      case `statusPaid` => {
+        Logger.debug(s"Matched a ${bonus.paymentStatus} bonus payment in ITMP")
+
+        handlePaidBonus(lisaManager, accountId, transactionId, bonus)
+      }
+      case _ => {
+        Logger.warn(s"ITMP returned an unexpected status for a bonus claim: ${bonus.paymentStatus}, returning an error")
+
+        Future.successful(GetTransactionErrorResponse)
+      }
+    }
+  }
+
+  private def handleWithdrawalResponse(lisaManager: String, accountId: String, transactionId: String, withdrawal: GetWithdrawalResponse)
+                                      (implicit hc: HeaderCarrier): Future[GetTransactionResponse] = {
+    withdrawal.paymentStatus match {
+      case `statusDue` => {
+        Logger.debug(s"Matched a ${withdrawal.paymentStatus} withdrawal charge in ITMP")
+
+        Future.successful(GetTransactionWithdrawalSuccessResponse(
+          transactionId = transactionId,
+          paymentStatus = withdrawal.paymentStatus
+        ))
+      }
+      case `statusCollected` => {
+        handleCollectedWithdrawal(lisaManager, accountId, transactionId)
+      }
+      case _ => {
+        Logger.warn(s"ITMP returned an unexpected status for a withdrawal charge: ${withdrawal.paymentStatus}, returning an error")
+
+        Future.successful(GetTransactionErrorResponse)
+      }
+    }
+  }
+
+  private def handleCollectedWithdrawal(lisaManager: String, accountId: String, transactionId: String)
+                                       (implicit hc: HeaderCarrier): Future[GetTransactionResponse] = {
+
+    val transaction: Future[DesResponse] = desConnector.getTransaction(lisaManager, accountId, transactionId)
+
+    transaction map {
+      case collected: DesGetTransactionCollected => {
+        GetTransactionWithdrawalSuccessResponse(
+          transactionId = transactionId,
+          paymentStatus = statusCollected,
+          paymentDate = Some(collected.paymentDate),
+          paymentAmount = Some(collected.paymentAmount),
+          paymentReference = Some(collected.paymentReference)
+        )
+      }
+      case due: DesGetTransactionDue => {
+        GetTransactionWithdrawalSuccessResponse(
+          transactionId = transactionId,
+          paymentStatus = statusDue,
+          paymentDueDate = Some(due.paymentDueDate),
+          paymentAmount = None
+        )
+      }
+      case error: DesFailureResponse if error.code == "NOT_FOUND" => {
+        GetTransactionWithdrawalSuccessResponse(
+          transactionId = transactionId,
+          paymentStatus = statusDue
+        )
+      }
+      case _ => {
+        GetTransactionErrorResponse
+      }
+    }
+  }
+
+  private def handlePaidBonus(lisaManager: String, accountId: String, transactionId: String, bonusPayment: GetBonusResponse)
+                             (implicit hc: HeaderCarrier): Future[GetTransactionResponse] = {
 
     val transaction: Future[DesResponse] = desConnector.getTransaction(lisaManager, accountId, transactionId)
 
     transaction map {
       case paid: DesGetTransactionPaid => {
-        GetTransactionSuccessResponse(
+        GetTransactionBonusSuccessResponse(
           transactionId = transactionId,
           bonusDueForPeriod = Some(bonusPayment.bonuses.bonusDueForPeriod),
-          paymentStatus = "Paid",
+          paymentStatus = statusPaid,
           paymentDate = Some(paid.paymentDate),
           paymentAmount = Some(paid.paymentAmount),
           paymentReference = Some(paid.paymentReference)
         )
       }
       case pending: DesGetTransactionPending => {
-        GetTransactionSuccessResponse(
+        GetTransactionBonusSuccessResponse(
           transactionId = transactionId,
           bonusDueForPeriod = Some(bonusPayment.bonuses.bonusDueForPeriod),
-          paymentStatus = "Pending",
+          paymentStatus = statusPending,
           paymentDueDate = Some(pending.paymentDueDate),
           paymentAmount = None
         )
       }
       case error: DesFailureResponse if error.code == "NOT_FOUND" => {
-        GetTransactionSuccessResponse(
+        GetTransactionBonusSuccessResponse(
           transactionId = transactionId,
           bonusDueForPeriod = Some(bonusPayment.bonuses.bonusDueForPeriod),
-          paymentStatus = "Pending"
+          paymentStatus = statusPending
         )
       }
       case error: DesFailureResponse => {
