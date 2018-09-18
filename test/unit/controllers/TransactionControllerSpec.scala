@@ -55,7 +55,7 @@ class TransactionControllerSpec extends PlaySpec
 
     "return 200 ok" when {
       "data is returned from the service" in {
-        when(mockService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionSuccessResponse(
+        when(mockService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionBonusSuccessResponse(
           transactionId = transactionId,
           bonusDueForPeriod = Some(1.0),
           paymentStatus = "Cancelled"
