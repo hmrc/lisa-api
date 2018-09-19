@@ -13,6 +13,16 @@
       "items": {
         "type": "object",
         "properties": {
+          "transactionType": {
+            "description": "The type of transaction. This can be money owed to HMRC (Debt), or money paid out by HMRC (Payment).",
+            "type": "string",
+            "enum": ["Debt", "Payment"]
+          },
+          "status": {
+            "description": "The status of the transaction being requested.",
+            "type": "string",
+            "enum": ["Pending", "Paid", "Due", "Collected"]
+          },
           "paymentAmount": {
             "description": "Amount paid or due to be paid to the LISA provider.",
             "type": "number",
@@ -32,6 +42,8 @@
           }
         },
         "required": [
+          "transactionType",
+          "status",
           "paymentAmount"
         ],
         "additionalProperties": false
