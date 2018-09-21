@@ -65,8 +65,8 @@
             <td><p>HTTP status: <code class="code--slim">404 (Not Found)</code></p>
 <pre class="code--block">
 {
-  "code": "PAYMENT_NOT_FOUND",
-  "message": "No bonus payments have been made for this date range"
+  "code": "TRANSACTION_NOT_FOUND",
+  "message": "No payments or debts exist for this date range"
 }
 </pre>
             </td>
