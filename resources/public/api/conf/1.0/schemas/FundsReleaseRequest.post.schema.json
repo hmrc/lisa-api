@@ -1,0 +1,81 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"type": "object",
+	"properties":
+	{
+        "date" : {
+          "description": "TODO: Get content off of Emily",
+          "$ref": "#/definitions/ISO8601-Date"},
+        "withdrawalAmount" : {
+          "description": "This is the amount that the investor has requested to be released from the LISA account. You can include a value up to 2 decimal places.",
+          "$ref" : "number"},
+        "propertyName" : {
+          "description": "The property name or number. This is only required when making a new request for a release of funds and not when superseding an existing one.",
+          "$ref" : "#/definitions/propertyNameType"},
+        "propertyPostcode": {
+          "description": "TODO: TBC by Emily",
+          "$ref": "#/definitions/propertyPostcodeType"
+        },
+        "conveyancerID[TBC]": {
+          "description": "TODO: TBC by Emily",
+          "$ref": "#/definitions/conveyancerReferenceType"
+        },
+        "propertyPurchaseValue": {
+          "description": "TODO: TBC by Emily.",
+          "$ref": "number"
+        },
+        "supersede": {
+          "description": "Superseded details.",
+          "type": "object",
+          "properties": {
+            "lifeEventId": {
+              "description": "Life event id for the event that is being superseded.",
+              "$ref": "#/definitions/IDType"
+            },
+            "date": {
+              "description": "Life event date for the event that is being superseded.",
+              "$ref": "#/definitions/ISO8601-Date"
+            }
+          },
+          "required":
+          [
+            "lifeEventId" ,
+            "date"
+          ]
+        }
+	},
+	"required": [
+		"date",
+		"withdrawalAmount"
+    ],
+	"additionalProperties": false,
+	"definitions":
+	{
+      "ISO8601-Date": {
+        "id": "full-date",
+        "type": "string",
+        "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+        "example": "2017-05-06"
+      },
+      "propertyNameType": {
+        "type": "string",
+        "pattern": "^[a-zA-Z0-9 ]{1,60}$",
+        "example": "1"
+      },
+      "propertyPostcodeType": {
+        "type": "string",
+        "pattern": "TODO: SEE DES SPEC",
+        "example": "AANA ANN"
+      },
+      "conveyancerReferenceType": {
+        "type": "string",
+        "pattern": "^[a-zA-Z0-9 :-/]{1,20}$",
+        "example": "TODO: See trevor"
+      },
+      "IDType": {
+        "type": "string",
+        "pattern": "^\\d{10}$",
+        "example": "0987654321"
+      }
+	}
+}
