@@ -134,6 +134,8 @@ object GetBonusOrWithdrawalResponse {
         paymentStatus = paymentStatus match {
           case "PENDING" => TransactionPaymentStatus.PENDING
           case "PAID" => TransactionPaymentStatus.PAID
+          case "DUE" => TransactionPaymentStatus.DUE
+          case "COLLECTED" => TransactionPaymentStatus.COLLECTED
           case "VOID" => TransactionPaymentStatus.VOID
           case "CANCELLED" => TransactionPaymentStatus.CANCELLED
           case "SUPERSEDED" => TransactionPaymentStatus.SUPERSEDED
@@ -191,6 +193,8 @@ object GetBonusOrWithdrawalResponse {
           case _ => None
         },
         paymentStatus = paymentStatus match {
+          case "PENDING" => TransactionPaymentStatus.PENDING
+          case "PAID" => TransactionPaymentStatus.PAID
           case "DUE" => TransactionPaymentStatus.DUE
           case "COLLECTED" => TransactionPaymentStatus.COLLECTED
           case "VOID" => TransactionPaymentStatus.VOID
