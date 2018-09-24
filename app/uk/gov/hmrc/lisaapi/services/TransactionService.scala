@@ -27,13 +27,6 @@ import scala.concurrent.Future
 trait TransactionService {
   val desConnector: DesConnector
 
-  val statusPending = "Pending"
-  val statusPaid = "Paid"
-  val statusVoid = "Void"
-  val statusCancelled = "Cancelled"
-  val statusDue = "Due"
-  val statusCollected = "Collected"
-
   def getTransaction(lisaManager: String, accountId: String, transactionId: String)
                      (implicit hc: HeaderCarrier): Future[GetTransactionResponse] = {
 
@@ -64,7 +57,7 @@ trait TransactionService {
   private def handleBonusResponse(lisaManager: String, accountId: String, transactionId: String, bonus: GetBonusResponse)
                                  (implicit hc: HeaderCarrier): Future[GetTransactionResponse] = {
     bonus.paymentStatus match {
-      case `statusPending` | `statusVoid` | `statusCancelled` => {
+      case TransactionPaymentStatus.PENDING | TransactionPaymentStatus.VOID | TransactionPaymentStatus.CANCELLED => {
         Logger.debug(s"Matched a ${bonus.paymentStatus} bonus payment in ITMP")
 
         Future.successful(GetTransactionBonusSuccessResponse(
@@ -73,7 +66,7 @@ trait TransactionService {
           paymentStatus = bonus.paymentStatus
         ))
       }
-      case `statusPaid` => {
+      case TransactionPaymentStatus.PAID => {
         Logger.debug(s"Matched a ${bonus.paymentStatus} bonus payment in ITMP")
 
         handlePaidBonus(lisaManager, accountId, transactionId, bonus)
@@ -89,7 +82,7 @@ trait TransactionService {
   private def handleWithdrawalResponse(lisaManager: String, accountId: String, transactionId: String, withdrawal: GetWithdrawalResponse)
                                       (implicit hc: HeaderCarrier): Future[GetTransactionResponse] = {
     withdrawal.paymentStatus match {
-      case `statusDue` => {
+      case TransactionPaymentStatus.DUE | TransactionPaymentStatus.VOID | TransactionPaymentStatus.CANCELLED => {
         Logger.debug(s"Matched a ${withdrawal.paymentStatus} withdrawal charge in ITMP")
 
         Future.successful(GetTransactionWithdrawalSuccessResponse(
@@ -97,7 +90,7 @@ trait TransactionService {
           paymentStatus = withdrawal.paymentStatus
         ))
       }
-      case `statusCollected` => {
+      case TransactionPaymentStatus.COLLECTED => {
         handleCollectedWithdrawal(lisaManager, accountId, transactionId)
       }
       case _ => {
@@ -117,7 +110,7 @@ trait TransactionService {
       case collected: DesGetTransactionCollected => {
         GetTransactionWithdrawalSuccessResponse(
           transactionId = transactionId,
-          paymentStatus = statusCollected,
+          paymentStatus = TransactionPaymentStatus.COLLECTED,
           paymentDate = Some(collected.paymentDate),
           paymentAmount = Some(collected.paymentAmount),
           paymentReference = Some(collected.paymentReference)
@@ -126,7 +119,7 @@ trait TransactionService {
       case due: DesGetTransactionDue => {
         GetTransactionWithdrawalSuccessResponse(
           transactionId = transactionId,
-          paymentStatus = statusDue,
+          paymentStatus = TransactionPaymentStatus.DUE,
           paymentDueDate = Some(due.paymentDueDate),
           paymentAmount = None
         )
@@ -134,7 +127,7 @@ trait TransactionService {
       case error: DesFailureResponse if error.code == "NOT_FOUND" => {
         GetTransactionWithdrawalSuccessResponse(
           transactionId = transactionId,
-          paymentStatus = statusDue
+          paymentStatus = TransactionPaymentStatus.DUE
         )
       }
       case _ => {
@@ -153,7 +146,7 @@ trait TransactionService {
         GetTransactionBonusSuccessResponse(
           transactionId = transactionId,
           bonusDueForPeriod = Some(bonusPayment.bonuses.bonusDueForPeriod),
-          paymentStatus = statusPaid,
+          paymentStatus = TransactionPaymentStatus.PAID,
           paymentDate = Some(paid.paymentDate),
           paymentAmount = Some(paid.paymentAmount),
           paymentReference = Some(paid.paymentReference)
@@ -163,7 +156,7 @@ trait TransactionService {
         GetTransactionBonusSuccessResponse(
           transactionId = transactionId,
           bonusDueForPeriod = Some(bonusPayment.bonuses.bonusDueForPeriod),
-          paymentStatus = statusPending,
+          paymentStatus = TransactionPaymentStatus.PENDING,
           paymentDueDate = Some(pending.paymentDueDate),
           paymentAmount = None
         )
@@ -172,7 +165,7 @@ trait TransactionService {
         GetTransactionBonusSuccessResponse(
           transactionId = transactionId,
           bonusDueForPeriod = Some(bonusPayment.bonuses.bonusDueForPeriod),
-          paymentStatus = statusPending
+          paymentStatus = TransactionPaymentStatus.PENDING
         )
       }
       case error: DesFailureResponse => {

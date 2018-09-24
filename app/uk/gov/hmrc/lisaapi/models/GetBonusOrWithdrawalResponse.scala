@@ -132,10 +132,11 @@ object GetBonusOrWithdrawalResponse {
           case _ => None
         },
         paymentStatus = paymentStatus match {
-          case "PENDING" => "Pending"
-          case "PAID" => "Paid"
-          case "VOID" => "Void"
-          case "CANCELLED" => "Cancelled"
+          case "PENDING" => TransactionPaymentStatus.PENDING
+          case "PAID" => TransactionPaymentStatus.PAID
+          case "VOID" => TransactionPaymentStatus.VOID
+          case "CANCELLED" => TransactionPaymentStatus.CANCELLED
+          case "SUPERSEDED" => TransactionPaymentStatus.SUPERSEDED
         },
         creationDate = creationDate
       )
@@ -190,8 +191,11 @@ object GetBonusOrWithdrawalResponse {
           case _ => None
         },
         paymentStatus = paymentStatus match {
-          case "DUE" => "Due"
-          case "COLLECTED" => "Collected"
+          case "DUE" => TransactionPaymentStatus.DUE
+          case "COLLECTED" => TransactionPaymentStatus.COLLECTED
+          case "VOID" => TransactionPaymentStatus.VOID
+          case "CANCELLED" => TransactionPaymentStatus.CANCELLED
+          case "SUPERSEDED" => TransactionPaymentStatus.SUPERSEDED
         },
         creationDate = creationDate
       )
@@ -258,4 +262,19 @@ object GetBonusOrWithdrawalResponse {
     case w:GetWithdrawalResponse => withdrawalWrites.writes(w)
     case b:GetBonusResponse => bonusWrites.writes(b)
   }
+}
+
+object TransactionPaymentStatus {
+  // payment
+  val PENDING = "Pending"
+  val PAID = "Paid"
+
+  // debt
+  val DUE = "Due"
+  val COLLECTED = "Collected"
+
+  // common
+  val VOID = "Void"
+  val CANCELLED = "Cancelled"
+  val SUPERSEDED = "Superseded"
 }
