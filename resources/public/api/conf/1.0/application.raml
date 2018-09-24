@@ -1286,6 +1286,32 @@ types:
                                          "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
                                          "message": "The accountId does not match HMRC’s records"
                                        }
+              /property-purchase:
+                /funds-release:
+                  post:
+                    is: [headers.acceptHeader]
+                    displayName: "[sandbox-only] Request a release of funds"
+                    description: Tell HMRC that an investor has requested a release of funds. You can also correct a previous release of funds.
+                    (annotations.scope): "write:lisa"
+                    securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
+                    (annotations.sandboxData): !include testdata/funds-release.md
+                    body:
+                      application/json:
+                        type: !include schemas/FundsReleaseRequest.post.schema.json
+                        examples:
+                          example-1: !include examples/FundsReleaseRequest.post.json
+                          example-2: !include examples/FundsReleaseSuperseded.post.json
+                    responses:
+                      201:
+                        description: The LISA transaction resource has been created.
+                        body:
+                          application/json:
+                            type: !include schemas/BonusPaymentRequest.post.response.schema.json
+                            examples:
+                              example-1: !include examples/LISATransaction.post.response.json
+                              example-2: !include examples/LISATransaction.post.response.1.json
+                              example-3: !include examples/LISATransactionSupersede.post.response.json
+                      400:
             /payments:
               get:
                   is: [headers.acceptHeader]
