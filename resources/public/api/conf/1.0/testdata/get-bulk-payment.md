@@ -20,18 +20,35 @@
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
 <pre class="code--block">
 {
-  "lisaManagerReferenceNumber": "Z123456",
-  "payments": [
-    {
-      "paymentAmount": 10000,
-      "paymentDate": "2017-06-01",
-      "paymentReference": "1040000872"
-    },
-    {
-      "paymentAmount": 12000,
-      "dueDate": "2017-07-04"
-    }
-  ]
+    "lisaManagerReferenceNumber": "Z123456",
+    "payments": [
+        {
+            "transactionType": "Payment",
+            "status": "Paid",
+            "paymentAmount": 10000,
+            "paymentDate": "2017-06-01",
+            "paymentReference": "1040000872"
+        },
+        {
+            "transactionType": "Payment",
+            "status": "Pending",
+            "paymentAmount": 12000,
+            "dueDate": "2017-07-04"
+        },
+        {
+            "transactionType": "Debt",
+            "status": "Collected",
+            "paymentAmount": 1000,
+            "paymentDate": "2017-08-04",
+            "paymentReference": "1040000985"
+        },
+        {
+            "transactionType": "Debt",
+            "status": "Due",
+            "paymentAmount": 1100,
+            "dueDate": "2017-09-04"
+        }
+    ]
 }
 </pre>
             </td>
@@ -48,8 +65,8 @@
             <td><p>HTTP status: <code class="code--slim">404 (Not Found)</code></p>
 <pre class="code--block">
 {
-  "code": "PAYMENT_NOT_FOUND",
-  "message": "No bonus payments have been made for this date range"
+  "code": "TRANSACTION_NOT_FOUND",
+  "message": "No payments or debts exist for this date range"
 }
 </pre>
             </td>

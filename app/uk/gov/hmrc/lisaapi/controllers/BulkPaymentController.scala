@@ -48,7 +48,7 @@ class BulkPaymentController extends LisaController with LisaConstants {
               }
               case GetBulkPaymentNotFoundResponse => {
                 LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.TRANSACTION)
-                NotFound(Json.toJson(ErrorPaymentNotFound))
+                NotFound(Json.toJson(ErrorBulkTransactionNotFound))
               }
               case _ => {
                 LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.TRANSACTION)
