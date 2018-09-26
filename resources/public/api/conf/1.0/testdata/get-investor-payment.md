@@ -96,7 +96,7 @@
             <td><p>HTTP status: <code class="code--slim">404 (Not found)</code></p>
 <pre class="code--block">
 {
-  "code": "BONUS_PAYMENT_TRANSACTION_NOT_FOUND",
+  "code": "TRANSACTION_NOT_FOUND",
   "message": "transactionId does not match HMRC’s records"
 }
 </pre>
