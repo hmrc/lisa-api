@@ -1,6 +1,6 @@
 {
   "transactionId": "0123456789",
-  "bonusDueForPeriod": 1000,
+  "transactionType": "Payment",
   "paymentStatus": "Paid",
   "paymentDate": "2017-05-20",
   "paymentReference": "002630000993",

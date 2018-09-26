@@ -4,9 +4,12 @@
   "properties": {
     "transactionId" : {
       "description": "The transactionId for which the payment details have been requested.",
+      "$ref": "#/definitions/transactionId"
+    },
+    "transactionType" : {
+      "description": "Payment or debt.",
       "type" : "string",
-      "pattern": "^\\d{1,10}$",
-      "example": "7777777777"
+      "enum": ["Payment", "Debt"]
     },
     "paymentDate": {
       "description":"The date payment was made.",
@@ -23,7 +26,8 @@
         "Paid",
         "Pending",
         "Cancelled",
-        "Void"
+        "Void",
+        "Superseded"
       ],
       "example": "Paid"
     },
@@ -38,12 +42,10 @@
       "type" : "number",
       "example": "1000.00"
     },
-    "bonusDueForPeriod": {
-      "description": "Payment due for the period.",
-      "type" : "number",
-      "example": "700.00"
+    "supersededBy": {
+      "description": "superseded by",
+      "$ref": "#/definitions/transactionId"
     }
-
   },
   "required": [
      "transactionId",
@@ -56,6 +58,11 @@
 		"type": "string",
 		"pattern": "^\\d{4}-\\d{2}-\\d{2}$",
         "example": "2017-05-20"
-	  }
+	  },
+      "transactionId": {
+        "id": "transactionId",
+        "type": "string",
+        "pattern": "^\\d{1,10}$"
+      }
 	}
 }
