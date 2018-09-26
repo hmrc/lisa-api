@@ -57,7 +57,7 @@ class TransactionController extends LisaController with LisaConstants {
 
                 LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.TRANSACTION)
 
-                NotFound(Json.toJson(ErrorTransactionNotFound))
+                NotFound(Json.toJson(ErrorGenericTransactionNotFound))
               }
               case GetTransactionErrorResponse => {
                 Logger.debug("Matched an error")

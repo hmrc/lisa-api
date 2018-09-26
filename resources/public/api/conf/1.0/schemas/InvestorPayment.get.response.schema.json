@@ -7,7 +7,7 @@
       "$ref": "#/definitions/transactionId"
     },
     "transactionType" : {
-      "description": "Payment or debt.",
+      "description": "The type of transaction. This can be money owed to HMRC (Debt), or money paid out by HMRC (Payment).",
       "type" : "string",
       "enum": ["Payment", "Debt"]
     },
@@ -20,7 +20,7 @@
       "$ref": "#/definitions/ISO8601-Date"
     },
     "paymentStatus" : {
-      "description": "The status of the payment for a transaction.",
+      "description": "The status of the transaction being requested.",
       "type" : "string",
       "enum": [
         "Paid",
@@ -43,7 +43,7 @@
       "example": "1000.00"
     },
     "supersededBy": {
-      "description": "superseded by",
+      "description": "The ID of the transaction that supersedes the current one.",
       "$ref": "#/definitions/transactionId"
     }
   },
