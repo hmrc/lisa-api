@@ -55,9 +55,8 @@ class TransactionControllerSpec extends PlaySpec
 
     "return 200 ok" when {
       "data is returned from the service" in {
-        when(mockService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionBonusSuccessResponse(
+        when(mockService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionSuccessResponse(
           transactionId = transactionId,
-          bonusDueForPeriod = Some(1.0),
           paymentStatus = "Cancelled"
         )))
 
@@ -68,7 +67,6 @@ class TransactionControllerSpec extends PlaySpec
         val json = contentAsJson(res)
 
         (contentAsJson(res) \ "transactionId").as[String] mustBe transactionId
-        (contentAsJson(res) \ "bonusDueForPeriod").as[Amount] mustBe 1.0
         (contentAsJson(res) \ "paymentStatus").as[String] mustBe "Cancelled"
       }
     }

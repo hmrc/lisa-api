@@ -14,11 +14,11 @@
 <pre class="code--block">
 {
   "transactionId": "0123456789",
-  "bonusDueForPeriod": 1000,
+  "transactionType": "Payment",
   "paymentStatus": "Paid",
   "paymentDate": "2017-05-20",
-  "paymentReference": "002630000993",
-  "paymentAmount": 1000
+  "paymentAmount": 1000,
+  "paymentReference": "002630000993"
 }
 </pre>
             </td>
@@ -29,7 +29,6 @@
 <pre class="code--block">
 {
   "transactionId": "0000000200",
-  "bonusDueForPeriod": 1000,
   "paymentStatus": "Pending"
 }
 </pre>
@@ -41,7 +40,7 @@
 <pre class="code--block">
 {
   "transactionId": "3000000200",
-  "bonusDueForPeriod": 1000,
+  "transactionType": "Payment",
   "paymentStatus": "Pending",
   "paymentDueDate": "2017-06-20"
 }
@@ -54,7 +53,6 @@
 <pre class="code--block">
 {
   "transactionId": "1000000200",
-  "bonusDueForPeriod": 1000,
   "paymentStatus": "Cancelled",
 }
 </pre>
@@ -66,7 +64,6 @@
 <pre class="code--block">
 {
   "transactionId": "2000000200",
-  "bonusDueForPeriod": 1000,
   "paymentStatus": "Void"
 }
 </pre>

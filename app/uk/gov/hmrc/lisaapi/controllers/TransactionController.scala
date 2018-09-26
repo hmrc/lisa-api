@@ -21,7 +21,7 @@ import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
-import uk.gov.hmrc.lisaapi.models.{GetTransactionAccountNotFoundResponse, GetTransactionErrorResponse, GetTransactionBonusSuccessResponse, GetTransactionTransactionNotFoundResponse}
+import uk.gov.hmrc.lisaapi.models.{GetTransactionAccountNotFoundResponse, GetTransactionErrorResponse, GetTransactionSuccessResponse, GetTransactionTransactionNotFoundResponse}
 import uk.gov.hmrc.lisaapi.services.TransactionService
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -38,7 +38,7 @@ class TransactionController extends LisaController with LisaConstants {
         withEnrolment(lisaManager) { (_) =>
           withValidAccountId(accountId) { () =>
             service.getTransaction(lisaManager, accountId, transactionId) map {
-              case success: GetTransactionBonusSuccessResponse => {
+              case success: GetTransactionSuccessResponse => {
                 Logger.debug("Matched Valid Response")
 
                 LisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.TRANSACTION)
