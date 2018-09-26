@@ -9,7 +9,7 @@
     </thead>
     <tbody>
         <tr>
-            <td><p>Request for a paid transaction</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 0123456789</p></td>
+            <td><p>Request for a paid payment</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 0123456789</p></td>
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
 <pre class="code--block">
 {
@@ -24,7 +24,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request for a pending transaction</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 0000000200</p></td>
+            <td><p>Request for a pending transaction (payment or debt)</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 0000000200</p></td>
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
 <pre class="code--block">
 {
@@ -35,7 +35,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request for a pending transaction that has a due date</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 3000000200</p></td>
+            <td><p>Request for a pending payment with a due date</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 3000000200</p></td>
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
 <pre class="code--block">
 {
@@ -70,6 +70,46 @@
             </td>
         </tr>
         <tr>
+            <td><p>Request for a debt which is due to be collected</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 2345678902</p></td>
+            <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
+<pre class="code--block">
+{
+  "transactionId": "2345678902",
+  "transactionType": "Debt",
+  "paymentStatus": "Due",
+  "paymentDueDate": "2018-01-20"
+}
+</pre>
+            </td>
+        </tr>
+        <tr>
+            <td><p>Request for a debt which has been collected</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 2345678903</p></td>
+            <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
+<pre class="code--block">
+{
+  "transactionId": "2345678903",
+  "transactionType": "Debt",
+  "paymentStatus": "Collected",
+  "paymentDate": "2018-02-20",
+  "paymentAmount": 250,
+  "paymentReference": "002630000994"
+}
+</pre>
+            </td>
+        </tr>
+        <tr>
+            <td><p>Request for a transaction which was superseded before being paid</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 2345678901</p></td>
+            <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
+<pre class="code--block">
+{
+  "transactionId": "2345678901",
+  "paymentStatus": "Superseded",
+  "supersededBy": "2345678903"
+}
+</pre>
+            </td>
+        </tr>
+        <tr>
             <td><p>Request with a valid account ID and Transaction ID, but an invalid LISA Manager reference number</p><p class="code--block">lisaManagerReferenceNumber: 123456<br>accountId: 1234567890<br>transactionId: 0123456789</p></td>
             <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
 <pre class="code--block">
@@ -93,7 +133,7 @@
         </tr>
         <tr>
             <td><p>Request for a transaction that does not exist</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 0000000404</p></td>
-            <td><p>HTTP status: <code class="code--slim">404 (Not found)</code></p>
+            <td><p>HTTP status: <code class="code--slim">404 (Not Found)</code></p>
 <pre class="code--block">
 {
   "code": "TRANSACTION_NOT_FOUND",
@@ -104,7 +144,7 @@
         </tr>
         <tr>
             <td><p>Request for an account that does not exist</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>accountId: 1234567899<br>transactionId: 1000000404</p></td>
-            <td><p>HTTP status: <code class="code--slim">404 (Not found)</code></p>
+            <td><p>HTTP status: <code class="code--slim">404 (Not Found)</code></p>
 <pre class="code--block">
 {
   "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
