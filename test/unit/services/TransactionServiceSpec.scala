@@ -134,30 +134,6 @@ class TransactionServiceSpec extends PlaySpec
     }
 
     "return a Due transaction" when {
-      "ITMP returns a Due transaction" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
-          thenReturn(Future.successful(GetWithdrawalResponse(
-            new DateTime("2018-05-06"),
-            new DateTime("2018-06-05"),
-            Some(100),
-            100,
-            25,
-            0,
-            true,
-            "Regular withdrawal",
-            None,
-            None,
-            "Due",
-            new DateTime("2018-06-21")
-          )))
-
-        val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
-
-        result mustBe GetTransactionSuccessResponse(
-          transactionId = "12345",
-          paymentStatus = "Due"
-        )
-      }
       "ITMP returns a Collected status and ETMP returns a Due status" in {
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
           thenReturn(Future.successful(GetWithdrawalResponse(
