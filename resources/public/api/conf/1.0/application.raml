@@ -1301,18 +1301,117 @@ types:
                         type: !include schemas/FundsReleaseRequest.post.schema.json
                         examples:
                           example-1: !include examples/FundsReleaseRequest.post.json
-                          example-2: !include examples/FundsReleaseSuperseded.post.json
+                          example-2: !include examples/FundsReleaseSupersededRequest.post.json
                     responses:
                       201:
                         description: The LISA transaction resource has been created.
                         body:
                           application/json:
-                            type: !include schemas/BonusPaymentRequest.post.response.schema.json
+                            type: !include schemas/LifeEvent.post.response.schema.json
                             examples:
-                              example-1: !include examples/LISATransaction.post.response.json
-                              example-2: !include examples/LISATransaction.post.response.1.json
-                              example-3: !include examples/LISATransactionSupersede.post.response.json
+                              example-1: !include examples/LifeEvent.post.response.json
                       400:
+                        body:
+                          application/json:
+                            type: !include schemas/ErrorCodes.schema.json
+                            examples:
+                              InvalidLmrn:
+                                description: lisaManagerReferenceNumber in the URL is in the wrong format
+                                value: |
+                                  {
+                                    "code" : "BAD_REQUEST",
+                                    "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
+                                  }
+                              InvalidAccountId:
+                                description: accountId in the URL is in the wrong format
+                                value: |
+                                  {
+                                    "code" : "BAD_REQUEST",
+                                    "message" : "accountId in the URL is in the wrong format"
+                                  }
+                      401:
+                        body:
+                          application/json:
+                            type: !include schemas/ErrorCodes.schema.json
+                            examples:
+                              notOpenStatus:
+                                description: lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
+                                value: |
+                                  {
+                                    "code" : "UNAUTHORIZED",
+                                    "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
+                                  }
+                      403:
+                        body:
+                          application/json:
+                            type: !include schemas/ErrorCodes.schema.json
+                            examples:
+                              lifeEventExists:
+                                description: The investor’s life event has already been reported
+                                value: |
+                                  {
+                                    "code" : "LIFE_EVENT_ALREADY_EXISTS",
+                                    "message" : "The investor’s life event has already been reported"
+                                  }
+                              accountClosed:
+                                description: The LISA account has already been closed
+                                value: |
+                                  {
+                                    "code" : "INVESTOR_ACCOUNT_ALREADY_CLOSED",
+                                    "message" : "The LISA account has already been closed"
+                                  }
+                              accountVoid:
+                                description: The LISA account has already been voided
+                                value: |
+                                  {
+                                    "code" : "INVESTOR_ACCOUNT_ALREADY_VOID",
+                                    "message" : "The LISA account has already been voided"
+                                  }
+                              accountCancelled:
+                                description: The LISA account has already been cancelled
+                                value: |
+                                  {
+                                    "code" : "INVESTOR_ACCOUNT_ALREADY_CANCELLED",
+                                    "message" : "The LISA account has already been cancelled"
+                                  }
+                              complianceCheckNotOpenLongEnough:
+                                description: The account has not been open for long enough
+                                value: |
+                                  {
+                                    "code" : "COMPLIANCE_ERROR_ACCOUNT_NOT_OPEN_LONG_ENOUGH",
+                                    "message" : "The account has not been open for long enough"
+                                  }
+                              complianceCheckOtherPurchase:
+                                description: There is already another house purchase on record
+                                value: |
+                                  {
+                                    "code" : "COMPLIANCE_ERROR_OTHER_PURCHASE_ON_RECORD",
+                                    "message" : "There is already another house purchase on record"
+                                  }
+                      404:
+                        body:
+                          application/json:
+                            type: !include schemas/ErrorCodes.schema.json
+                            examples:
+                              accountNotFound:
+                                description: The accountId does not match with HMRC’s records
+                                value : |
+                                  {
+                                    "code" : "INVESTOR_ACCOUNTID_NOT_FOUND",
+                                    "message" : "The accountId does not match with HMRC’s records"
+                                  }
+                      409:
+                        body:
+                          application/json:
+                            type: !include schemas/ErrorCodes.schema.json
+                            examples:
+                              supersedingLifeEventExists:
+                                description: The investor’s life event has already been superseded
+                                value: |
+                                  {
+                                    "code" : "SUPERSEDED_LIFE_EVENT_ALREADY SUPERSEDED",
+                                    "message" : "The investor’s life event has already been superseded"
+                                  }
             /payments:
               get:
                   is: [headers.acceptHeader]
