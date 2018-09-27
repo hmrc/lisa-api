@@ -16,7 +16,7 @@
   "transactionId": "0123456789",
   "transactionType": "Payment",
   "paymentStatus": "Paid",
-  "paymentDate": "2017-05-20",
+  "paymentDate": "2017-06-20",
   "paymentAmount": 1000,
   "paymentReference": "002630000993"
 }

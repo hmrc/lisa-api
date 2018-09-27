@@ -26,7 +26,7 @@
           "paymentAmount": {
             "description": "Amount pending or paid to the LISA provider, or the amount due or collected from the LISA provider.",
             "type": "number",
-            "example": "23456.00"
+            "example": "23456"
           },
           "paymentReference": {
             "description": "Payment reference number. This will only be returned for paid payments and collected debts.",

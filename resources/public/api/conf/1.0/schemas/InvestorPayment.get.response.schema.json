@@ -25,6 +25,8 @@
       "enum": [
         "Paid",
         "Pending",
+        "Due",
+        "Collected",
         "Cancelled",
         "Void",
         "Superseded"
@@ -40,7 +42,7 @@
     "paymentAmount" : {
       "description": "The amount paid for the transaction.",
       "type" : "number",
-      "example": "1000.00"
+      "example": "1000"
     },
     "supersededBy": {
       "description": "The ID of the transaction that supersedes the current one.",
