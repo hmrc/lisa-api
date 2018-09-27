@@ -19,7 +19,7 @@
         },
         "propertyDetails": {
           "nameOrNumber": {
-            "description": "The property name or number. This is only required when making a new request for a release of funds and not when superseding an existing one.",
+            "description": "The property name or number. This is only required when making a new request for a fund release and not when superseding an existing one.",
             "type": "string",
             "pattern": "^[A-Za-z0-9 :/-]{1,60}$",
             "example": "1"
