@@ -838,11 +838,11 @@ types:
                                     "message" : "There is a problem with the request data"
                                   }
                               accountClosed:
-                                description: The LISA account is already closed
+                                description: The LISA account is already cancelled
                                 value: |
                                   {
-                                    "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED",
-                                    "message": "The LISA account is already closed"
+                                    "code": "INVESTOR_ACCOUNT_ALREADY_CANCELLED",
+                                    "message": "The LISA account is already cancelled"
                                   }
                               accountVoid:
                                 description: The LISA account is already void
@@ -1290,20 +1290,20 @@ types:
             /payments:
               get:
                   is: [headers.acceptHeader]
-                  displayName: Get a list of all bonus payments in a date range
-                  description: Get a list of all completed and due bonus payments from HMRC in a specific date range.
+                  displayName: Get a list of all payments and debts in a date range
+                  description: Get a list of all pending and paid payments from HMRC and due and collected debts owed to HMRC in a specific date range.
                   (annotations.scope): "read:lisa"
                   securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
                   (annotations.sandboxData): !include testdata/get-bulk-payment.md
                   queryParameters:
                     startDate:
                       type : ISO8601Date
-                      description: The start date of the date range for the payment request. This cannot be before 6 April 2017.
-                      example: "2017-05-20"
+                      description: The start date of the date range you want to search. This must be the 6th day of the month. This cannot be before 6 April 2017.
+                      example: "2017-05-06"
                     endDate:
                       type : ISO8601Date
-                      description: The end date of the date range for the payment request. This cannot be in the future, before the startDate, or more than a year after the startDate.
-                      example: "2017-05-20"
+                      description: The end date of the date range you want to search. This must be the 5th day of the month. This cannot be in the future, before the startDate, or more than a year after the startDate.
+                      example: "2017-06-05"
                   responses:
                       200:
                         body:
@@ -1398,10 +1398,10 @@ types:
                         body:
                           application/json:
                             examples:
-                              noPaymentsFound:
-                                description: No bonus payments have been made for this date range
+                              noTransactionsFound:
+                                description: No payments or debts exist for this date range
                                 value: |
                                   {
-                                    "code": "PAYMENT_NOT_FOUND",
-                                    "message": "No bonus payments have been made for this date range"
+                                    "code": "TRANSACTION_NOT_FOUND",
+                                    "message": "No payments or debts exist for this date range"
                                   }

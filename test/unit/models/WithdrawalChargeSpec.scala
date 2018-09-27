@@ -20,7 +20,7 @@ import org.joda.time.DateTime
 import org.scalatestplus.play.PlaySpec
 import play.api.data.validation.ValidationError
 import play.api.libs.json.{JsPath, Json}
-import uk.gov.hmrc.lisaapi.models.{RegularWithdrawalChargeRequest, ReportWithdrawalChargeRequest, SupersededWithdrawalChargeRequest, WithdrawalIncrease}
+import uk.gov.hmrc.lisaapi.models._
 
 class WithdrawalChargeSpec extends PlaySpec {
 
@@ -42,12 +42,12 @@ class WithdrawalChargeSpec extends PlaySpec {
     "withdrawalChargeAmountYTD" -> 500.00,
     "fundsDeductedDuringWithdrawal" -> true,
     "withdrawalReason" -> "Superseded withdrawal",
+    "automaticRecoveryAmount" -> 250.00,
     "supersede" -> Json.obj(
       "originalTransactionId" -> "2345678901",
       "originalWithdrawalChargeAmount" -> 250.00,
       "transactionResult" -> 250.00,
-      "reason" -> "Additional withdrawal",
-      "automaticRecoveryAmount" -> 250.00
+      "reason" -> "Additional withdrawal"
     )
   )
 
@@ -57,6 +57,7 @@ class WithdrawalChargeSpec extends PlaySpec {
       val result = Json.parse(validRegular.toString()).as[ReportWithdrawalChargeRequest]
 
       result mustBe RegularWithdrawalChargeRequest(
+        None,
         new DateTime("2017-12-06"),
         new DateTime("2018-01-05"),
         1000.00,
@@ -70,6 +71,7 @@ class WithdrawalChargeSpec extends PlaySpec {
       val result = Json.parse(validSupersede.toString()).as[ReportWithdrawalChargeRequest]
 
       result mustBe SupersededWithdrawalChargeRequest(
+        Some(250.00),
         new DateTime("2017-12-06"),
         new DateTime("2018-01-05"),
         1000.00,
@@ -77,12 +79,72 @@ class WithdrawalChargeSpec extends PlaySpec {
         500.00,
         true,
         WithdrawalIncrease(
-          250.00,
           "2345678901",
           250.00,
           250.00
         )
       )
+    }
+
+    "serialize for a withdrawal refund" in {
+      val json = validSupersede ++ Json.obj("supersede" -> Json.obj(
+        "originalTransactionId" -> "2345678901",
+        "originalWithdrawalChargeAmount" -> 250.00,
+        "transactionResult" -> 250.00,
+        "reason" -> "Withdrawal refund"
+      ))
+      val result = Json.parse(json.toString()).as[ReportWithdrawalChargeRequest]
+
+      result mustBe SupersededWithdrawalChargeRequest(
+        Some(250.00),
+        new DateTime("2017-12-06"),
+        new DateTime("2018-01-05"),
+        1000.00,
+        250.00,
+        500.00,
+        true,
+        WithdrawalRefund(
+          "2345678901",
+          250.00,
+          250.00
+        )
+      )
+    }
+
+    "deserialize with des appropriate enum values for withdrawalReason and superseded reason" when {
+      "using the des writes" in {
+        val result = Json.toJson(SupersededWithdrawalChargeRequest(
+          Some(250.00),
+          new DateTime("2017-12-06"),
+          new DateTime("2018-01-05"),
+          1000.00,
+          250.00,
+          500.00,
+          true,
+          WithdrawalRefund(
+            "2345678901",
+            250.00,
+            250.00
+          )
+        ))(ReportWithdrawalChargeRequest.desReportWithdrawalChargeWrites)
+
+        result mustBe Json.obj(
+          "claimPeriodStartDate" -> "2017-12-06",
+          "claimPeriodEndDate" -> "2018-01-05",
+          "withdrawalAmount" -> 1000.00,
+          "withdrawalChargeAmount" -> 250.00,
+          "withdrawalChargeAmountYTD" -> 500.00,
+          "fundsDeductedDuringWithdrawal" -> true,
+          "withdrawalReason" -> "Superseded Withdrawal Charge",
+          "automaticRecoveryAmount" -> 250.00,
+          "supersededDetail" -> Json.obj(
+            "transactionId" -> "2345678901",
+            "transactionAmount" -> 250.00,
+            "transactionResult" -> 250.00,
+            "reason" -> "Withdrawal Refund"
+          )
+        )
+      }
     }
 
     "error for an empty object" in {

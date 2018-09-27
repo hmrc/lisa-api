@@ -5,5 +5,6 @@
   "withdrawalChargeAmount": 250.00,
   "withdrawalChargeAmountYTD": 500.00,
   "fundsDeductedDuringWithdrawal": true,
-  "withdrawalReason": "Regular withdrawal"
+  "withdrawalReason": "Regular withdrawal",
+  "automaticRecoveryAmount": 250.00
 }

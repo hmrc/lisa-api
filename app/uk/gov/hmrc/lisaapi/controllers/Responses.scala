@@ -125,11 +125,13 @@ case object ErrorAccountAlreadyVoided extends ErrorResponse(403, "INVESTOR_ACCOU
 
 case object ErrorAccountAlreadyClosed extends ErrorResponse(403, "INVESTOR_ACCOUNT_ALREADY_CLOSED", "The LISA account is already closed")
 
+case object ErrorAccountAlreadyCancelled extends ErrorResponse(403, "INVESTOR_ACCOUNT_ALREADY_CANCELLED", "The LISA account is already cancelled")
+
 case object ErrorAccountAlreadyOpen extends ErrorResponse(403, "INVESTOR_ACCOUNT_ALREADY_OPEN", "You cannot reinstate this account because it is already open")
 
 case object ErrorAccountNotFound extends ErrorResponse(404, "INVESTOR_ACCOUNTID_NOT_FOUND", "The accountId does not match HMRC’s records")
 
-case object ErrorPaymentNotFound extends ErrorResponse(404, "PAYMENT_NOT_FOUND", "No bonus payments have been made for this date range")
+case object ErrorBulkTransactionNotFound extends ErrorResponse(404, "TRANSACTION_NOT_FOUND", "No payments or debts exist for this date range")
 
 case object ErrorTransferAccountDataNotProvided extends ErrorResponse(403, "TRANSFER_ACCOUNT_DATA_NOT_PROVIDED", "You must give a transferredFromAccountId, transferredFromLMRN and transferInDate when the creationReason is transferred")
 

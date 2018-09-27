@@ -30,7 +30,7 @@ import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
-import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountAlreadyClosed, ErrorAccountAlreadyVoided, ErrorAccountNotFound, ErrorInternalServerError, ErrorValidation, ErrorWithdrawalExists, ErrorWithdrawalNotFound, ErrorWithdrawalTimescalesExceeded, WithdrawalController}
+import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountAlreadyCancelled, ErrorAccountAlreadyVoided, ErrorAccountNotFound, ErrorInternalServerError, ErrorValidation, ErrorWithdrawalExists, ErrorWithdrawalNotFound, ErrorWithdrawalTimescalesExceeded, WithdrawalController}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, BonusOrWithdrawalService, CurrentDateService, WithdrawalService}
 import uk.gov.hmrc.lisaapi.utils.WithdrawalChargeValidator
@@ -105,12 +105,12 @@ class WithdrawalControllerSpec extends PlaySpec
 
       "given a ReportWithdrawalChargeAccountClosed from the service layer" in {
         when(mockPostService.reportWithdrawalCharge(any(), any(), any())(any())).
-          thenReturn(Future.successful(ReportWithdrawalChargeAccountClosed))
+          thenReturn(Future.successful(ReportWithdrawalChargeAccountCancelled))
 
         doRequest(validWithdrawalJson) { res =>
           status(res) mustBe FORBIDDEN
-          (contentAsJson(res) \ "code").as[String] mustBe ErrorAccountAlreadyClosed.errorCode
-          (contentAsJson(res) \ "message").as[String] mustBe ErrorAccountAlreadyClosed.message
+          (contentAsJson(res) \ "code").as[String] mustBe ErrorAccountAlreadyCancelled.errorCode
+          (contentAsJson(res) \ "message").as[String] mustBe ErrorAccountAlreadyCancelled.message
         }
       }
 
@@ -131,8 +131,8 @@ class WithdrawalControllerSpec extends PlaySpec
 
         doRequest(validWithdrawalJson) { res =>
           status(res) mustBe FORBIDDEN
-          (contentAsJson(res) \ "code").as[String] mustBe ErrorAccountAlreadyClosed.errorCode
-          (contentAsJson(res) \ "message").as[String] mustBe ErrorAccountAlreadyClosed.message
+          (contentAsJson(res) \ "code").as[String] mustBe ErrorAccountAlreadyCancelled.errorCode
+          (contentAsJson(res) \ "message").as[String] mustBe ErrorAccountAlreadyCancelled.message
         }
       }
 
@@ -362,9 +362,9 @@ class WithdrawalControllerSpec extends PlaySpec
           Some("1234567891"),
           new DateTime("2017-04-06"),
           new DateTime("2017-05-05"),
-          Some(HelpToBuyTransfer(0f, 10f)),
-          InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
-          Bonuses(1000f, 1000f, Some(1000f), "Life Event"),
+          Some(HelpToBuyTransfer(0, 10)),
+          InboundPayments(Some(4000), 4000, 4000, 4000),
+          Bonuses(1000, 1000, Some(1000), "Life Event"),
           Some("1234567892"),
           Some(BonusRecovery(100, "1234567890", 1100, -100)),
           "Paid",

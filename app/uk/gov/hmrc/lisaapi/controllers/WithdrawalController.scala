@@ -196,17 +196,11 @@ class WithdrawalController extends LisaController with LisaConstants {
     Logger.debug("Matched failure response")
 
     errorResponse match {
-      case ReportWithdrawalChargeAccountClosed => {
-        auditFailure(lisaManager, accountId, req, ErrorAccountAlreadyClosed.errorCode)
-        LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.WITHDRAWAL_CHARGE)
-
-        Forbidden(Json.toJson(ErrorAccountAlreadyClosed))
-      }
       case ReportWithdrawalChargeAccountCancelled => {
-        auditFailure(lisaManager, accountId, req, ErrorAccountAlreadyClosed.errorCode)
+        auditFailure(lisaManager, accountId, req, ErrorAccountAlreadyCancelled.errorCode)
         LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.WITHDRAWAL_CHARGE)
 
-        Forbidden(Json.toJson(ErrorAccountAlreadyClosed))
+        Forbidden(Json.toJson(ErrorAccountAlreadyCancelled))
       }
       case ReportWithdrawalChargeAccountVoid => {
         auditFailure(lisaManager, accountId, req, ErrorAccountAlreadyVoided.errorCode)
