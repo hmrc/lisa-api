@@ -1412,6 +1412,20 @@ types:
                                     "code" : "SUPERSEDED_LIFE_EVENT_ALREADY SUPERSEDED",
                                     "message" : "The investor’s life event has already been superseded"
                                   }
+                  /extension:
+                    post:
+                      is: [headers.acceptHeader]
+                      displayName: "[sandbox-only] Request an extension for a release of funds"
+                      description: Tell HMRC that an investor has requested an extension for a release of funds. You can also correct a previous extension.
+                      (annotations.scope): "write:lisa"
+                      securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
+                      (annotations.sandboxData): !include testdata/funds-release-extension.md
+                      body:
+                        application/json:
+                          type: !include schemas/FundsReleaseExtensionRequest.post.schema.json
+                          examples:
+                            example-1: !include examples/FundsReleaseExtensionRequest.post.json
+                            example-2: !include examples/FundsReleaseExtensionSupersededRequest.post.json
             /payments:
               get:
                   is: [headers.acceptHeader]
