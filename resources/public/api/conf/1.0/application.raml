@@ -1308,7 +1308,7 @@ types:
                           application/json:
                             type: !include schemas/LifeEvent.post.response.schema.json
                             examples:
-                              example-1: !include examples/LifeEvent.post.response.json
+                              lifeEventCreated: !include examples/LifeEvent.post.response.json
                       400:
                         body:
                           application/json:
@@ -1404,11 +1404,11 @@ types:
                           application/json:
                             type: !include schemas/ErrorCodes.schema.json
                             examples:
-                              supersedingLifeEventExists:
+                              supersedingLifeEventAlreadySuperseded:
                                 description: The investor’s life event has already been superseded
                                 value: |
                                   {
-                                    "code" : "SUPERSEDED_LIFE_EVENT_ALREADY SUPERSEDED",
+                                    "code" : "SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED",
                                     "message" : "The investor’s life event has already been superseded"
                                   }
                   /extension:
@@ -1418,13 +1418,100 @@ types:
                       description: Tell HMRC that an investor has requested an extension for a release of funds. You can also correct a previous extension.
                       (annotations.scope): "write:lisa"
                       securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
-                      (annotations.sandboxData): !include testdata/funds-release-extension.md
+                      (annotations.sandboxData): !include testdata/fund-release-extension.md
                       body:
                         application/json:
-                          type: !include schemas/FundsReleaseExtensionRequest.post.schema.json
+                          type: !include schemas/FundReleaseExtensionRequest.post.schema.json
                           examples:
-                            example-1: !include examples/FundsReleaseExtensionRequest.post.json
-                            example-2: !include examples/FundsReleaseExtensionSupersededRequest.post.json
+                            example-1: !include examples/FundReleaseExtensionRequest.post.json
+                            example-2: !include examples/FundReleaseExtensionSupersededRequest.post.json
+                      responses:
+                        201:
+                          description: The LISA transaction resource has been created.
+                          body:
+                            application/json:
+                              type: !include schemas/LifeEvent.post.response.schema.json
+                              examples:
+                                lifeEventCreated: !include examples/LifeEvent.post.response.json
+                        403:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                lifeEventExists:
+                                  description: The investor’s life event has already been reported
+                                  value: |
+                                    {
+                                      "code" : "LIFE_EVENT_ALREADY EXISTS",
+                                      "message" : "The investor’s life event has already been reported"
+                                    }
+                                extensionNotApproved:
+                                  description: TBC
+                                  value: |
+                                    {
+                                      "code" : "FIRST_EXTENSION_NOT_APPROVED",
+                                      "message" : "TBC"
+                                    }
+                                supersedingLifeEventMisMatchError:
+                                  description: TBC
+                                  value: |
+                                    {
+                                      "code" : "SUPERSEDING_LIFE_EVENT_MIS_MATCH_ERROR",
+                                      "message" : "TBC"
+                                    }
+                        404:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                accountNotFound:
+                                  description: The accountId does not match with HMRC’s records
+                                  value : |
+                                    {
+                                      "code" : "INVESTOR_ACCOUNTID_NOT_FOUND",
+                                      "message" : "The accountId does not match with HMRC’s records"
+                                    }
+                                fundReleaseNotFound:
+                                  description: TBC
+                                  value: |
+                                    {
+                                      "code" : "FUND_RELEASE_LIFE_EVENT_NOT_FOUND",
+                                      "message" : "TBC"
+                                    }
+                        409:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                fundReleaseLifeEventAlreadySuperseded:
+                                  description: TBC
+                                  value: |
+                                    {
+                                      "code" : "FUND_RELEASE_LIFE_EVENT_SUPERSEDED",
+                                      "message" : "TBC"
+                                    }
+                                firstExtensionAlreadyApproved:
+                                  description: TBC
+                                  value: |
+                                    {
+                                      "code" : "FIRST_EXTENSION_ALREADY_APPROVED",
+                                      "message" : "TBC"
+                                    }
+                                secondExtensionAlreadyApproved:
+                                  description: TBC
+                                  value: |
+                                    {
+                                      "code" : "SECOND_EXTENSION_ALREADY_APPROVED",
+                                      "message" : "TBC"
+                                    }
+                                supersedingLifeEventAlreadySuperseded:
+                                  description: The investor’s life event has already been superseded
+                                  value: |
+                                    {
+                                      "code" : "SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED",
+                                      "message" : "The investor’s life event has already been superseded"
+                                    }
+
             /payments:
               get:
                   is: [headers.acceptHeader]

@@ -5,35 +5,33 @@
 	{
         "eventDate" : {
           "description": "TODO: Get content off of Emily",
-          "$ref": "#/definitions/ISO8601-Date"
+          "$ref": "#/definitions/ISO8601-Date",
+          "example": "2017-05-10"
         },
-        "lifeEventType" : {
+        "eventType" : {
           "description": "TODO: TBC by Emily",
           "type" : "string",
           "enum": ["Purchase extension 1", "Purchase extension 2"]
         },
-        "conveyancerReference": {
-          "description": "TODO: TBC by Emily",
-          "type": "string",
-          "pattern": "^[a-zA-Z0-9 :/-]{1,20}$",
-          "example": "CR12345-6789"
-        },
         "purchaseFundReleaseLifeEventId": {
           "description": "Life event id for the release of funds that is to be extended.",
-          "$ref": "#/definitions/IDType"
+          "$ref": "#/definitions/IDType",
+          "example": "0987654321"
         },
         "supersededLifeEventId": {
           "description": "Life event id for the event that is being superseded.",
-          "$ref": "#/definitions/IDType"
+          "$ref": "#/definitions/IDType",
+          "example": "0987654322"
         },
         "supersededLifeEventDate": {
           "description": "Life event date for the event that is being superseded.",
-          "$ref": "#/definitions/ISO8601-Date"
+          "$ref": "#/definitions/ISO8601-Date",
+          "example": "2017-05-11"
         }
 	},
 	"required": [
 		"eventDate",
-		"withdrawalAmount"
+		"eventType"
     ],
 	"additionalProperties": false,
 	"definitions":
@@ -41,13 +39,11 @@
       "ISO8601-Date": {
         "id": "full-date",
         "type": "string",
-        "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
-        "example": "2017-05-06"
+        "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
       },
       "IDType": {
         "type": "string",
-        "pattern": "^\\d{10}$",
-        "example": "0987654321"
+        "pattern": "^\\d{10}$"
       }
 	}
 }
