@@ -1223,8 +1223,8 @@ types:
                                     }
                     /payments:
                       get:
-                         displayName: Get details about an investor’s bonus payment
-                         description: Use an investor’s transaction ID to get details about a bonus payment, including when the payment is due.
+                         displayName: Get the payment details for a bonus claim or withdrawal charge
+                         description: Use an investor’s transaction ID to get payment details for a bonus claim or withdrawal charge, including when the amount is due to be paid or collected.
                          is: [headers.acceptHeader, headers.contentHeader]
                          (annotations.scope): "read:lisa"
                          securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
@@ -1235,7 +1235,8 @@ types:
                                application/json:
                                  type: !include schemas/InvestorPayment.get.response.schema.json
                                  examples:
-                                   paid: !include examples/InvestorPayment.get.response.json
+                                   paid: !include examples/InvestorPayment.get.response.2.json
+                                   pending: !include examples/InvestorPayment.get.response.1.json
                            400:
                              body:
                                application/json:
@@ -1276,7 +1277,7 @@ types:
                                      description: The transactionId does not match HMRC’s records
                                      value: |
                                        {
-                                         "code" : "BONUS_PAYMENT_TRANSACTION_NOT_FOUND",
+                                         "code" : "TRANSACTION_NOT_FOUND",
                                          "message" : "The transactionId does not match HMRC’s records"
                                        }
                                    accountIdNOTFound:

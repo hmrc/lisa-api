@@ -27,6 +27,11 @@ case object GetBonusOrWithdrawalTransactionNotFoundResponse extends GetBonusOrWi
 case object GetBonusOrWithdrawalInvestorNotFoundResponse extends GetBonusOrWithdrawalResponse
 case object GetBonusOrWithdrawalErrorResponse extends GetBonusOrWithdrawalResponse
 
+trait GetBonusOrWithdrawalSuccessResponse extends GetBonusOrWithdrawalResponse {
+  val paymentStatus: String
+  val supersededBy: Option[TransactionId]
+}
+
 case class GetBonusResponse(
   lifeEventId: Option[LifeEventId],
   periodStartDate: DateTime,
@@ -38,7 +43,7 @@ case class GetBonusResponse(
   supersede: Option[Supersede] = None,
   paymentStatus: String,
   creationDate: DateTime
-) extends GetBonusOrWithdrawalResponse
+) extends GetBonusOrWithdrawalSuccessResponse
 
 case class GetWithdrawalResponse(
                                   periodStartDate: DateTime,
@@ -53,7 +58,7 @@ case class GetWithdrawalResponse(
                                   supersede: Option[WithdrawalSupersede] = None,
                                   paymentStatus: String,
                                   creationDate: DateTime
-) extends GetBonusOrWithdrawalResponse
+) extends GetBonusOrWithdrawalSuccessResponse
 
 object GetBonusOrWithdrawalResponse {
   implicit val bonusReads: Reads[GetBonusResponse] = (
@@ -131,12 +136,7 @@ object GetBonusOrWithdrawalResponse {
           )
           case _ => None
         },
-        paymentStatus = paymentStatus match {
-          case "PENDING" => "Pending"
-          case "PAID" => "Paid"
-          case "VOID" => "Void"
-          case "CANCELLED" => "Cancelled"
-        },
+        paymentStatus = getPaymentStatus(paymentStatus),
         creationDate = creationDate
       )
   )
@@ -148,7 +148,7 @@ object GetBonusOrWithdrawalResponse {
     (JsPath \ "withdrawalAmount").read[Amount] and
     (JsPath \ "withdrawalChargeAmount").read[Amount] and
     (JsPath \ "withdrawalChargeAmountYTD").read[Amount] and
-    (JsPath \ "fundsDeductedDuringWithdrawal").read[Boolean] and
+    (JsPath \ "fundsDeductedDuringWithdrawal").read[String] and
     (JsPath \ "withdrawalReason").read[WithdrawalReason] and
     (JsPath \ "supersededTransactionById").readNullable(JsonReads.transactionId) and
     (JsPath \ "supersededTransactionId").readNullable(JsonReads.transactionId) and
@@ -182,17 +182,17 @@ object GetBonusOrWithdrawalResponse {
         withdrawalAmount = withdrawalAmount,
         withdrawalChargeAmount = withdrawalChargeAmount,
         withdrawalChargeAmountYtd = withdrawalChargeAmountYTD,
-        fundsDeductedDuringWithdrawal = fundsDeductedDuringWithdrawal,
+        fundsDeductedDuringWithdrawal = fundsDeductedDuringWithdrawal match {
+          case "YES" => true
+          case "NO" => false
+        },
         withdrawalReason = withdrawalReason,
         supersededBy = supersededTransactionById,
         supersede = (supersededTransactionId, supersededTransactionAmount, supersededTransactionResult, supersededReason) match {
           case (Some(id), Some(amount), Some(result), Some(reason)) => Some(WithdrawalSuperseded(id, amount, result, reason))
           case _ => None
         },
-        paymentStatus = paymentStatus match {
-          case "DUE" => "Due"
-          case "COLLECTED" => "Collected"
-        },
+        paymentStatus = getPaymentStatus(paymentStatus),
         creationDate = creationDate
       )
   )
@@ -258,4 +258,35 @@ object GetBonusOrWithdrawalResponse {
     case w:GetWithdrawalResponse => withdrawalWrites.writes(w)
     case b:GetBonusResponse => bonusWrites.writes(b)
   }
+
+  private def getPaymentStatus(paymentStatus: String) = {
+    paymentStatus match {
+      case "PENDING" => TransactionPaymentStatus.PENDING
+      case "PAID" => TransactionPaymentStatus.PAID
+      case "COLLECTION_ACTION" => TransactionPaymentStatus.COLLECTED
+      case "VOID" => TransactionPaymentStatus.VOID
+      case "CANCELLED" => TransactionPaymentStatus.CANCELLED
+      case "SUPERSEDED" => TransactionPaymentStatus.SUPERSEDED
+    }
+  }
+}
+
+object TransactionPaymentType {
+  val PAYMENT = "Payment"
+  val DEBT = "Debt"
+}
+
+object TransactionPaymentStatus {
+  // payment
+  val PENDING = "Pending"
+  val PAID = "Paid"
+
+  // debt
+  val DUE = "Due"
+  val COLLECTED = "Collected"
+
+  // common
+  val VOID = "Void"
+  val CANCELLED = "Cancelled"
+  val SUPERSEDED = "Superseded"
 }
