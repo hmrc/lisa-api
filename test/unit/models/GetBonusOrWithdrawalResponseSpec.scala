@@ -171,7 +171,7 @@ class GetBonusOrWithdrawalResponseSpec extends PlaySpec {
               withdrawalChargeAmount = 250,
               withdrawalChargeAmountYtd = 250,
               fundsDeductedDuringWithdrawal = true,
-              withdrawalReason = "REGULAR_WITHDRAWAL_CHARGE",
+              withdrawalReason = "Regular withdrawal",
               paymentStatus = "Collected",
               supersededBy = Some("8888888888")
             )
@@ -202,14 +202,14 @@ class GetBonusOrWithdrawalResponseSpec extends PlaySpec {
               withdrawalChargeAmount = 250,
               withdrawalChargeAmountYtd = 250,
               fundsDeductedDuringWithdrawal = true,
-              withdrawalReason = "SUPERSEDED_WITHDRAWAL_CHARGE",
+              withdrawalReason = "Superseded withdrawal",
               paymentStatus = "Collected",
               supersededBy = Some("8888888888"),
               supersede = Some(WithdrawalSuperseded(
                 originalTransactionId = "0987654321",
                 originalWithdrawalChargeAmount = 500,
                 transactionResult = 125,
-                reason = "ADDITIONAL_WITHDRAWAL"
+                reason = "Additional withdrawal"
               ))
             )
           }
@@ -239,14 +239,14 @@ class GetBonusOrWithdrawalResponseSpec extends PlaySpec {
               withdrawalChargeAmount = 250,
               withdrawalChargeAmountYtd = 250,
               fundsDeductedDuringWithdrawal = true,
-              withdrawalReason = "SUPERSEDED_WITHDRAWAL_CHARGE",
+              withdrawalReason = "Superseded withdrawal",
               paymentStatus = "Collected",
               supersededBy = Some("8888888888"),
               supersede = Some(WithdrawalSuperseded(
                 originalTransactionId = "0987654321",
                 originalWithdrawalChargeAmount = 2000,
                 transactionResult = -1000,
-                reason = "WITHDRAWAL_REDUCTION"
+                reason = "Withdrawal reduction"
               ))
             )
           }
@@ -280,14 +280,14 @@ class GetBonusOrWithdrawalResponseSpec extends PlaySpec {
               withdrawalChargeAmount = 0,
               withdrawalChargeAmountYtd = 0,
               fundsDeductedDuringWithdrawal = true,
-              withdrawalReason = "SUPERSEDED_WITHDRAWAL_CHARGE",
+              withdrawalReason = "Superseded withdrawal",
               paymentStatus = "Collected",
               supersededBy = Some("8888888888"),
               supersede = Some(WithdrawalSuperseded(
                 originalTransactionId = "0987654321",
                 originalWithdrawalChargeAmount = 1000,
                 transactionResult = -1000,
-                reason = "WITHDRAWAL_REFUND"
+                reason = "Withdrawal refund"
               ))
             )
           }

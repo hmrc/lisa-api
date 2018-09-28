@@ -186,10 +186,17 @@ object GetBonusOrWithdrawalResponse {
           case "YES" => true
           case "NO" => false
         },
-        withdrawalReason = withdrawalReason,
+        withdrawalReason = withdrawalReason match {
+          case "REGULAR_WITHDRAWAL_CHARGE" => "Regular withdrawal"
+          case "SUPERSEDED_WITHDRAWAL_CHARGE" => "Superseded withdrawal"
+        },
         supersededBy = supersededTransactionById,
         supersede = (supersededTransactionId, supersededTransactionAmount, supersededTransactionResult, supersededReason) match {
-          case (Some(id), Some(amount), Some(result), Some(reason)) => Some(WithdrawalSuperseded(id, amount, result, reason))
+          case (Some(id), Some(amount), Some(result), Some(reason)) => Some(WithdrawalSuperseded(id, amount, result, reason match {
+            case "ADDITIONAL_WITHDRAWAL" => "Additional withdrawal"
+            case "WITHDRAWAL_REDUCTION" => "Withdrawal reduction"
+            case "WITHDRAWAL_REFUND" => "Withdrawal refund"
+          }))
           case _ => None
         },
         paymentStatus = getPaymentStatus(paymentStatus),
