@@ -63,8 +63,8 @@ case class GetWithdrawalResponse(
 object GetBonusOrWithdrawalResponse {
   implicit val bonusReads: Reads[GetBonusResponse] = (
     (JsPath \ "lifeEventId").readNullable(JsonReads.lifeEventId) and
-    (JsPath \ "periodStartDate").read(JsonReads.isoDate).map(new DateTime(_)) and
-    (JsPath \ "periodEndDate").read(JsonReads.isoDate).map(new DateTime(_)) and
+    (JsPath \ "claimPeriodStart").read(JsonReads.isoDate).map(new DateTime(_)) and
+    (JsPath \ "claimPeriodEnd").read(JsonReads.isoDate).map(new DateTime(_)) and
     (JsPath \ "htbInAmountForPeriod").readNullable[Amount] and
     (JsPath \ "htbInAmountYtd").readNullable[Amount] and
     (JsPath \ "newSubsInPeriod").readNullable[Amount] and
@@ -75,12 +75,12 @@ object GetBonusOrWithdrawalResponse {
     (JsPath \ "bonusDueYtd").read[Amount] and
     (JsPath \ "bonusPaidYtd").readNullable[Amount] and
     (JsPath \ "claimReason").read[BonusClaimReason] and
-    (JsPath \ "supersededTransactionById").readNullable(JsonReads.transactionId) and
+    (JsPath \ "transactionSupersededById").readNullable(JsonReads.transactionId) and
     (JsPath \ "supersededTransactionId").readNullable(JsonReads.transactionId) and
     (JsPath \ "supersededTransactionAmount").readNullable[Amount] and
     (JsPath \ "supersededTransactionResult").readNullable[Amount] and
     (JsPath \ "supersededReason").readNullable[BonusClaimSupersedeReason] and
-    (JsPath \ "automaticRecoveryamount").readNullable[Amount] and
+    (JsPath \ "automaticRecoveryAmount").readNullable[Amount] and
     (JsPath \ "paymentStatus").read[String] and
     (JsPath \ "creationDate").read(JsonReads.isoDate).map(new DateTime(_))
   )(
@@ -128,10 +128,10 @@ object GetBonusOrWithdrawalResponse {
         ),
         supersededBy = supersededTransactionById,
         supersede = (supersededTransactionId, supersededTransactionAmount, supersededTransactionResult, supersededReason, automaticRecoveryAmount) match {
-          case (Some(id), Some(amount), Some(result), Some("Bonus Recovery"), Some(recovery)) => Some(
+          case (Some(id), Some(amount), Some(result), Some("BONUS_RECOVERY"), Some(recovery)) => Some(
             BonusRecovery(recovery, id, amount, result)
           )
-          case (Some(id), Some(amount), Some(result), Some("Additional Bonus"), _) => Some(
+          case (Some(id), Some(amount), Some(result), Some("ADDITIONAL_BONUS"), _) => Some(
             AdditionalBonus(id, amount, result)
           )
           case _ => None
@@ -142,15 +142,15 @@ object GetBonusOrWithdrawalResponse {
   )
 
   implicit val withdrawalReads: Reads[GetWithdrawalResponse] = (
-    (JsPath \ "periodStartDate").read(JsonReads.isoDate).map(new DateTime(_)) and
-    (JsPath \ "periodEndDate").read(JsonReads.isoDate).map(new DateTime(_)) and
-    (JsPath \ "automaticRecoveryamount").readNullable[Amount] and
+    (JsPath \ "claimPeriodStart").read(JsonReads.isoDate).map(new DateTime(_)) and
+    (JsPath \ "claimPeriodEnd").read(JsonReads.isoDate).map(new DateTime(_)) and
+    (JsPath \ "automaticRecoveryAmount").readNullable[Amount] and
     (JsPath \ "withdrawalAmount").read[Amount] and
     (JsPath \ "withdrawalChargeAmount").read[Amount] and
-    (JsPath \ "withdrawalChargeAmountYTD").read[Amount] and
+    (JsPath \ "withdrawalChargeAmountYtd").read[Amount] and
     (JsPath \ "fundsDeductedDuringWithdrawal").read[String] and
     (JsPath \ "withdrawalReason").read[WithdrawalReason] and
-    (JsPath \ "supersededTransactionById").readNullable(JsonReads.transactionId) and
+    (JsPath \ "transactionSupersededById").readNullable(JsonReads.transactionId) and
     (JsPath \ "supersededTransactionId").readNullable(JsonReads.transactionId) and
     (JsPath \ "supersededTransactionAmount").readNullable[Amount] and
     (JsPath \ "supersededTransactionResult").readNullable[Amount] and

@@ -761,7 +761,7 @@ class DesConnectorSpec extends PlaySpec
 
     }
 
-    "return a DesGetBonusPaymentResponse" when {
+    "return a GetBonusResponse" when {
 
       "DES returns successfully" in {
 
