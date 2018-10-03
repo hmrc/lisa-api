@@ -1,6 +1,8 @@
 {
   "eventDate": "2017-05-10",
   "eventType": "Purchase extension 1",
-  "supersededLifeEventDate": "2017-05-11",
-  "supersededLifeEventId": "0987654322"
+  "supersede": {
+    "originalEventDate": "2017-05-11",
+    "originalExtensionId": "0987654322"
+  }
 }

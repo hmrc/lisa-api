@@ -4,7 +4,6 @@
   "conveyancerReference": "CR12345-6789",
   "propertyDetails": {
     "nameOrNumber": "1",
-    "postalCode": "AA11 1AA",
-    "purchaseValue": 150000.00
+    "postalCode": "AA11 1AA"
   }
 }
