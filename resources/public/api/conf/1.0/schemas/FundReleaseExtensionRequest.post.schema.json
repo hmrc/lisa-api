@@ -3,31 +3,37 @@
 	"type": "object",
 	"properties":
 	{
-        "eventDate" : {
-          "description": "TODO: Get content off of Emily",
-          "$ref": "#/definitions/ISO8601-Date",
-          "example": "2017-05-10"
-        },
-        "eventType" : {
-          "description": "TODO: TBC by Emily",
-          "type" : "string",
-          "enum": ["Purchase extension 1", "Purchase extension 2"]
-        },
-        "purchaseFundReleaseLifeEventId": {
-          "description": "Life event id for the release of funds that is to be extended.",
-          "$ref": "#/definitions/IDType",
-          "example": "0987654321"
-        },
-        "supersededLifeEventId": {
-          "description": "Life event id for the event that is being superseded.",
-          "$ref": "#/definitions/IDType",
-          "example": "0987654322"
-        },
-        "supersededLifeEventDate": {
-          "description": "Life event date for the event that is being superseded.",
-          "$ref": "#/definitions/ISO8601-Date",
-          "example": "2017-05-11"
-        }
+		"eventDate" : {
+		  "description": "The date the extension is requested. This cannot be in the future.",
+		  "$ref": "#/definitions/ISO8601-Date",
+		  "example": "2017-05-10"
+		},
+		"eventType" : {
+		  "description": "The type of extension.",
+		  "type" : "string",
+		  "enum": ["Purchase extension 1", "Purchase extension 2"]
+		},
+		"supersede": {
+			"type": "object",
+			"description": "Correct an existing extension.",
+			"properties": {
+				"originalExtensionId": {
+		      "description": "The ID of the extension affected by the correction.",
+		      "$ref": "#/definitions/IDType",
+		      "example": "0987654322"
+		    },
+		    "originalEventDate": {
+		      "description": "The eventDate of the extension affected by the correction.",
+		      "$ref": "#/definitions/ISO8601-Date",
+		      "example": "2017-05-11"
+		    }
+			},
+			"required": [
+				"originalExtensionId",
+				"originalEventDate"
+			],
+			"additionalProperties": false
+		}
 	},
 	"required": [
 		"eventDate",

@@ -1,6 +1,8 @@
 {
   "eventDate": "2017-05-05",
   "withdrawalAmount": 4000.00,
-  "supersededLifeEventDate": "2017-05-10",
-  "supersededLifeEventId": "1234567892"
+  "supersede": {
+    "originalFundReleaseId": "1234567892",
+    "originalEventDate": "2017-05-10"
+  }
 }

@@ -1,0 +1,9 @@
+{
+  "eventDate": "2017-05-10",
+  "propertyPurchaseResult": "Purchase completed",
+  "propertyPurchaseValue": 250000,
+  "supersede": {
+    "originalPurchaseOutcomeId": "1234567890",
+    "originalEventDate": "2017-05-10"
+  }
+}
