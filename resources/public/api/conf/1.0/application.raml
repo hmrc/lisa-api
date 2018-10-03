@@ -896,191 +896,185 @@ types:
                                     "code" : "SUPERSEDED_FUND_RELEASE_ALREADY_SUPERSEDED",
                                     "message" : "This fund release has already been superseded"
                                   }
-                  /{fundReleaseId}:
-                    uriParameters:
-                      fundReleaseId:
-                        type: IDtype
-                        description: The reference number you get when you report a fund release.
-                        example: "1234567890"
-                    /extension:
-                      post:
-                        is: [headers.acceptHeader]
-                        displayName: "[sandbox-only] Request a property purchase extension"
-                        description: Request an extension to your request to release funds to buy a property.
-                        (annotations.scope): "write:lisa"
-                        securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
-                        (annotations.sandboxData): !include testdata/fund-release-extension.md
-                        body:
-                          application/json:
-                            type: !include schemas/FundReleaseExtensionRequest.post.schema.json
-                            examples:
-                              example-1: !include examples/FundReleaseExtensionRequest.post.json
-                              example-2: !include examples/FundReleaseExtensionSupersededRequest.post.json
-                        responses:
-                          201:
-                            description: The LISA transaction resource has been created.
-                            body:
-                              application/json:
-                                type: !include schemas/Extension.post.response.schema.json
-                                examples:
-                                  lifeEventCreated: !include examples/Extension.post.response.json
-                          403:
-                            body:
-                              application/json:
-                                type: !include schemas/ErrorCodes.schema.json
-                                examples:
-                                  lifeEventExists:
-                                    description: The investor’s purchase extension has already been reported
-                                    value: |
-                                      {
-                                        "code" : "EXTENSION_ALREADY_EXISTS",
-                                        "message" : "The investor’s purchase extension has already been reported"
-                                      }
-                                  extensionNotApproved:
-                                    description: A first extension has not been approved
-                                    value: |
-                                      {
-                                        "code" : "FIRST_EXTENSION_NOT_APPROVED",
-                                        "message" : "A first extension has not been approved"
-                                      }
-                                  supersedingLifeEventMisMatchError:
-                                    description: The extension has already been superseded
-                                    value: |
-                                      {
-                                        "code" : "SUPERSEDED_EXTENSION_MISMATCH_ERROR",
-                                        "message" : "The extension has already been superseded"
-                                      }
-                          404:
-                            body:
-                              application/json:
-                                type: !include schemas/ErrorCodes.schema.json
-                                examples:
-                                  accountNotFound:
-                                    description: The accountId does not match with HMRC’s records
-                                    value : |
-                                      {
-                                        "code" : "INVESTOR_ACCOUNTID_NOT_FOUND",
-                                        "message" : "The accountId does not match with HMRC’s records"
-                                      }
-                                  fundReleaseNotFound:
-                                    description: The fundReleaseId does not match with HMRC’s records
-                                    value : |
-                                      {
-                                        "code" : "FUND_RELEASE_NOT_FOUND",
-                                        "message" : "The fundReleaseId does not match with HMRC’s records"
-                                      }
-                          409:
-                            body:
-                              application/json:
-                                type: !include schemas/ErrorCodes.schema.json
-                                examples:
-                                  fundReleaseLifeEventAlreadySuperseded:
-                                    description: This fund release has already been superseded
-                                    value: |
-                                      {
-                                        "code" : "FUND_RELEASE_SUPERSEDED",
-                                        "message" : "This fund release has already been superseded"
-                                      }
-                                  firstExtensionAlreadyApproved:
-                                    description: A first extension has already been approved
-                                    value: |
-                                      {
-                                        "code" : "FIRST_EXTENSION_ALREADY_APPROVED",
-                                        "message" : "A first extension has already been approved"
-                                      }
-                                  secondExtensionAlreadyApproved:
-                                    description: A second extension has already been approved
-                                    value: |
-                                      {
-                                        "code" : "SECOND_EXTENSION_ALREADY_APPROVED",
-                                        "message" : "A second extension has already been approved"
-                                      }
-                                  supersedingLifeEventAlreadySuperseded:
-                                    description: This extension has already been superseded
-                                    value: |
-                                      {
-                                        "code" : "SUPERSEDED_EXTENSION_ALREADY_SUPERSEDED",
-                                        "message" : "This extension has already been superseded"
-                                      }
-                    /outcome:
-                      post:
-                        is: [headers.acceptHeader]
-                        displayName: "[sandbox-only] Report the outcome of a property purchase"
-                        description: Report to HMRC if a property purchase was completed or failed.
-                        (annotations.scope): "write:lisa"
-                        securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
-                        (annotations.sandboxData): !include testdata/fund-release-extension.md
-                        body:
-                          application/json:
-                            type: !include schemas/FundReleaseOutcome.post.schema.json
-                            examples:
-                              example-1: !include examples/FundReleaseOutcomeRequest.post.json
-                              example-2: !include examples/FundReleaseOutcomeSupersededRequest.post.json
-                        responses:
-                          201:
-                            description: The LISA transaction resource has been created.
-                            body:
-                              application/json:
-                                type: !include schemas/PurchaseOutcome.post.response.schema.json
-                                examples:
-                                  lifeEventCreated: !include examples/PurchaseOutcome.post.response.json
-                          403:
-                            body:
-                              application/json:
-                                type: !include schemas/ErrorCodes.schema.json
-                                examples:
-                                  lifeEventExists:
-                                    description: The investor’s purchase outcome has already been reported
-                                    value: |
-                                      {
-                                        "code" : "PURCHASE_OUTCOME_ALREADY_EXISTS",
-                                        "message" : "The investor’s purchase outcome has already been reported"
-                                      }
-                          404:
-                            body:
-                              application/json:
-                                type: !include schemas/ErrorCodes.schema.json
-                                examples:
-                                  accountNotFound:
-                                    description: The accountId does not match with HMRC’s records
-                                    value : |
-                                      {
-                                        "code" : "INVESTOR_ACCOUNTID_NOT_FOUND",
-                                        "message" : "The accountId does not match with HMRC’s records"
-                                      }
-                                  fundReleaseNotFound:
-                                    description: The fundReleaseId does not match with HMRC’s records
-                                    value: |
-                                      {
-                                        "code" : "FUND_RELEASE_NOT_FOUND",
-                                        "message" : "The fundReleaseId does not match with HMRC’s records"
-                                      }
-                                  mismatchError:
-                                    description: originalPurchaseOutcomeId and the originalEventDate do not match the information in the original request
-                                    value: |
-                                      {
-                                        "code": "SUPERSEDED_PURCHASE_OUTCOME_MISMATCH_ERROR",
-                                        "message": "originalPurchaseOutcomeId and the originalEventDate do not match the information in the original request"
-                                      }
-                          409:
-                            body:
-                              application/json:
-                                type: !include schemas/ErrorCodes.schema.json
-                                examples:
-                                  fundReleaseLifeEventAlreadySuperseded:
-                                    description: This fund release has already been superseded
-                                    value: |
-                                      {
-                                        "code" : "FUND_RELEASE_SUPERSEDED",
-                                        "message" : "This fund release has already been superseded"
-                                      }
-                                  supersedingLifeEventAlreadySuperseded:
-                                    description: This purchase outcome has already been superseded
-                                    value: |
-                                      {
-                                        "code" : "SUPERSEDED_PURCHASE_OUTCOME_ALREADY_SUPERSEDED",
-                                        "message" : "This purchase outcome has already been superseded"
-                                      }
+                  /extension:
+                    post:
+                      is: [headers.acceptHeader]
+                      displayName: "[sandbox-only] Request a property purchase extension"
+                      description: Request an extension to your request to release funds to buy a property.
+                      (annotations.scope): "write:lisa"
+                      securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
+                      (annotations.sandboxData): !include testdata/fund-release-extension.md
+                      body:
+                        application/json:
+                          type: !include schemas/FundReleaseExtensionRequest.post.schema.json
+                          examples:
+                            example-1: !include examples/FundReleaseExtensionRequest.post.json
+                            example-2: !include examples/FundReleaseExtensionSupersededRequest.post.json
+                      responses:
+                        201:
+                          description: The LISA transaction resource has been created.
+                          body:
+                            application/json:
+                              type: !include schemas/Extension.post.response.schema.json
+                              examples:
+                                lifeEventCreated: !include examples/Extension.post.response.json
+                        403:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                lifeEventExists:
+                                  description: The investor’s purchase extension has already been reported
+                                  value: |
+                                    {
+                                      "code" : "EXTENSION_ALREADY_EXISTS",
+                                      "message" : "The investor’s purchase extension has already been reported"
+                                    }
+                                extensionNotApproved:
+                                  description: A first extension has not been approved
+                                  value: |
+                                    {
+                                      "code" : "FIRST_EXTENSION_NOT_APPROVED",
+                                      "message" : "A first extension has not been approved"
+                                    }
+                                supersedingLifeEventMisMatchError:
+                                  description: The extension has already been superseded
+                                  value: |
+                                    {
+                                      "code" : "SUPERSEDED_EXTENSION_MISMATCH_ERROR",
+                                      "message" : "The extension has already been superseded"
+                                    }
+                        404:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                accountNotFound:
+                                  description: The accountId does not match with HMRC’s records
+                                  value : |
+                                    {
+                                      "code" : "INVESTOR_ACCOUNTID_NOT_FOUND",
+                                      "message" : "The accountId does not match with HMRC’s records"
+                                    }
+                                fundReleaseNotFound:
+                                  description: The fundReleaseId does not match with HMRC’s records
+                                  value : |
+                                    {
+                                      "code" : "FUND_RELEASE_NOT_FOUND",
+                                      "message" : "The fundReleaseId does not match with HMRC’s records"
+                                    }
+                        409:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                fundReleaseLifeEventAlreadySuperseded:
+                                  description: This fund release has already been superseded
+                                  value: |
+                                    {
+                                      "code" : "FUND_RELEASE_SUPERSEDED",
+                                      "message" : "This fund release has already been superseded"
+                                    }
+                                firstExtensionAlreadyApproved:
+                                  description: A first extension has already been approved
+                                  value: |
+                                    {
+                                      "code" : "FIRST_EXTENSION_ALREADY_APPROVED",
+                                      "message" : "A first extension has already been approved"
+                                    }
+                                secondExtensionAlreadyApproved:
+                                  description: A second extension has already been approved
+                                  value: |
+                                    {
+                                      "code" : "SECOND_EXTENSION_ALREADY_APPROVED",
+                                      "message" : "A second extension has already been approved"
+                                    }
+                                supersedingLifeEventAlreadySuperseded:
+                                  description: This extension has already been superseded
+                                  value: |
+                                    {
+                                      "code" : "SUPERSEDED_EXTENSION_ALREADY_SUPERSEDED",
+                                      "message" : "This extension has already been superseded"
+                                    }
+                  /outcome:
+                    post:
+                      is: [headers.acceptHeader]
+                      displayName: "[sandbox-only] Report the outcome of a property purchase"
+                      description: Report to HMRC if a property purchase was completed or failed.
+                      (annotations.scope): "write:lisa"
+                      securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
+                      (annotations.sandboxData): !include testdata/fund-release-extension.md
+                      body:
+                        application/json:
+                          type: !include schemas/FundReleaseOutcome.post.schema.json
+                          examples:
+                            example-1: !include examples/FundReleaseOutcomeRequest.post.json
+                            example-2: !include examples/FundReleaseOutcomeSupersededRequest.post.json
+                      responses:
+                        201:
+                          description: The LISA transaction resource has been created.
+                          body:
+                            application/json:
+                              type: !include schemas/PurchaseOutcome.post.response.schema.json
+                              examples:
+                                lifeEventCreated: !include examples/PurchaseOutcome.post.response.json
+                        403:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                lifeEventExists:
+                                  description: The investor’s purchase outcome has already been reported
+                                  value: |
+                                    {
+                                      "code" : "PURCHASE_OUTCOME_ALREADY_EXISTS",
+                                      "message" : "The investor’s purchase outcome has already been reported"
+                                    }
+                        404:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                accountNotFound:
+                                  description: The accountId does not match with HMRC’s records
+                                  value : |
+                                    {
+                                      "code" : "INVESTOR_ACCOUNTID_NOT_FOUND",
+                                      "message" : "The accountId does not match with HMRC’s records"
+                                    }
+                                fundReleaseNotFound:
+                                  description: The fundReleaseId does not match with HMRC’s records
+                                  value: |
+                                    {
+                                      "code" : "FUND_RELEASE_NOT_FOUND",
+                                      "message" : "The fundReleaseId does not match with HMRC’s records"
+                                    }
+                                mismatchError:
+                                  description: originalPurchaseOutcomeId and the originalEventDate do not match the information in the original request
+                                  value: |
+                                    {
+                                      "code": "SUPERSEDED_PURCHASE_OUTCOME_MISMATCH_ERROR",
+                                      "message": "originalPurchaseOutcomeId and the originalEventDate do not match the information in the original request"
+                                    }
+                        409:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                fundReleaseLifeEventAlreadySuperseded:
+                                  description: This fund release has already been superseded
+                                  value: |
+                                    {
+                                      "code" : "FUND_RELEASE_SUPERSEDED",
+                                      "message" : "This fund release has already been superseded"
+                                    }
+                                supersedingLifeEventAlreadySuperseded:
+                                  description: This purchase outcome has already been superseded
+                                  value: |
+                                    {
+                                      "code" : "SUPERSEDED_PURCHASE_OUTCOME_ALREADY_SUPERSEDED",
+                                      "message" : "This purchase outcome has already been superseded"
+                                    }
                 /withdrawal-charges:
                   post:
                     is: [headers.acceptHeader, headers.contentHeader]
