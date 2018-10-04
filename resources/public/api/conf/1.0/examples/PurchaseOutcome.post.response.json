@@ -1,0 +1,8 @@
+{
+  "data": {
+    "purchaseOutcomeId": "1234567891",
+    "message": "Purchase outcome created"
+  },
+  "success": true,
+  "status": 201
+}
