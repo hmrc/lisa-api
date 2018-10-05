@@ -346,6 +346,38 @@
                                                                                                    </tr>
                                                                                                    <tr>
                                                                                                    <td>
+                                                                                                       <p>Create fund release containing supersede details</p>
+                                                                                                       <p class="code--block">
+                                                                                                       <strong>lisaManagerReferenceNumber:</strong><br>
+                                                                                                       <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+                                                                                                   <br>
+                                                                                                       <strong>accountId:</strong><br>4030000004
+                                                                                                       </p>
+                                                                                                       </td>
+                                                                                                       <td>
+                                                                                                       <pre class="code--block">
+{
+    "eventDate": "2017-05-10",
+    "withdrawalAmount": 4000.00,
+    "supersede": {
+                   "originalFundReleaseId": "3456789000",
+                   "originalEventDate": "2017-05-10"
+      }
+}                                    
+                                                                                                   </pre>
+                                                                                                   </td>
+                                                                                                   <td>
+                                                                                                       <p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
+                                                                                                       <pre class="code--block">
+{
+  "code" : "SUPERSEDED_FUND_RELEASE_DATA_PROVIDED",
+  "message" : "Superseded fund release data provided"
+}                                                                                
+                                                                                                    </pre>
+                                                                                                    </td>
+                                                                                                    </tr>
+                                                                                                    <tr>
+                                                                                                    <td>
                                                                                                        <p>Account ID does not exist</p>
                                                                                                        <p class="code--block">
                                                                                                        <strong>lisaManagerReferenceNumber:</strong><br>
