@@ -35,7 +35,7 @@
   "success": true,
   "data": {
     "message": "Extension created",
-    "extensionId": "2222222222"
+    "extensionId": "6789000001"
   }
 }
 </pre>
@@ -57,7 +57,7 @@
   "eventType": "Purchase extension 1",
   "supersede": {
     "originalEventDate": "2017-05-10",
-    "originalExtensionId": "2222222222"
+    "originalExtensionId": "6789000001"
   }
 }
 </pre>
@@ -69,7 +69,7 @@
   "success": true,
   "data": {
     "message": "Extension created",
-    "extensionId": "3333333333"
+    "extensionId": "6789000002"
   }
 }
 </pre>
@@ -100,7 +100,7 @@
   "success": true,
   "data": {
     "message": "Extension created",
-    "extensionId": "4444444444"
+    "extensionId": "6789000003"
   }
 }
 </pre>
@@ -122,7 +122,7 @@
   "eventType": "Purchase extension 2",
   "supersede": {
     "originalEventDate": "2017-08-10",
-    "originalExtensionId": "4444444444"
+    "originalExtensionId": "6789000003"
   }
 }
 </pre>
@@ -134,7 +134,7 @@
   "success": true,
   "data": {
     "message": "Extension created",
-    "extensionId": "5555555555"
+    "extensionId": "6789000004"
   }
 }
 </pre>
@@ -280,7 +280,7 @@
   "eventType": "Purchase extension 1",
   "supersede": {
     "originalEventDate": "2017-05-10",
-    "originalExtensionId": "2222222222"
+    "originalExtensionId": "6789000001"
   }
 }
 </pre>
@@ -294,10 +294,6 @@
 </pre>
             </td>
         </tr>
-        
-        
-        
-        
         <tr>
             <td>
                 <p>Account not found</p>
@@ -352,9 +348,6 @@
 </pre>
             </td>
         </tr>
-        
-        
-        
         <tr>
             <td>
                 <p>Fund release has been superseded</p>
@@ -425,7 +418,7 @@
   "eventType": "Purchase extension 1",
   "supersede": {
     "originalEventDate": "2017-05-10",
-    "originalExtensionId": "2222222222"
+    "originalExtensionId": "6789000001"
   }
 }
 </pre>
@@ -455,7 +448,7 @@
   "eventType": "Purchase extension 1",
   "supersede": {
     "originalEventDate": "2017-05-10",
-    "originalExtensionId": "2222222222"
+    "originalExtensionId": "6789000001"
   }
 }
 </pre>
