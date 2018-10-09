@@ -43,7 +43,7 @@ class WithdrawalChargeValidatorSpec extends PlaySpec
 
   "claimPeriodStartDate" should {
 
-    "validate correctly" when {
+    "pass validation" when {
 
       "the current date is the sixth and they're submitting for today" in {
         val today = new DateTime("2017-04-06")
@@ -117,7 +117,7 @@ class WithdrawalChargeValidatorSpec extends PlaySpec
 
   "claimPeriodEndDate" should {
 
-    "validate correctly" when {
+    "pass validation" when {
 
       "the end date crosses into another year" in {
         val periodStartDate = new DateTime("2017-12-06")
@@ -191,6 +191,56 @@ class WithdrawalChargeValidatorSpec extends PlaySpec
             errorCode = "INVALID_DATE",
             message = "The claimPeriodEndDate cannot be before 6 April 2017",
             path = Some("/claimPeriodEndDate")
+          )
+        )
+      }
+
+    }
+
+  }
+
+  "withdrawalAmount" should {
+
+    "pass validation" when {
+
+      "it is zero" in {
+        val request = validWithdrawal.copy(automaticRecoveryAmount = Some(0))
+
+        val errors = SUT.validate(request)
+
+        errors mustBe List()
+      }
+
+      "it is less than the withdrawalChargeAmount" in {
+        val request = validWithdrawal.copy(automaticRecoveryAmount = Some(validWithdrawal.withdrawalChargeAmount - 0.01))
+
+        val errors = SUT.validate(request)
+
+        errors mustBe List()
+      }
+
+      "it is equal to the withdrawalChargeAmount" in {
+        val request = validWithdrawal.copy(automaticRecoveryAmount = Some(validWithdrawal.withdrawalChargeAmount))
+
+        val errors = SUT.validate(request)
+
+        errors mustBe List()
+      }
+
+    }
+
+    "return an error" when {
+
+      "it is greater than the withdrawalChargeAmount" in {
+        val request = validWithdrawal.copy(automaticRecoveryAmount = Some(validWithdrawal.withdrawalChargeAmount + 0.01))
+
+        val errors = SUT.validate(request)
+
+        errors mustBe List(
+          ErrorValidation(
+            errorCode = "INVALID_MONETARY_AMOUNT",
+            message = "automaticRecoveryAmount cannot be more than withdrawalChargeAmount",
+            path = Some("/automaticRecoveryAmount")
           )
         )
       }

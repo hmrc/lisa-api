@@ -279,7 +279,7 @@
   "withdrawalChargeAmountYTD": 500.00,
   "fundsDeductedDuringWithdrawal": true,
   "withdrawalReason": "Regular withdrawal",
-  "automaticRecoveryAmount": 250.00
+  "automaticRecoveryAmount": 251.00
 }
 </pre>
             </td>
@@ -287,20 +287,25 @@
                 <p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
 <pre class="code--block">
 {
-  "code": "FORBIDDEN",
-  "message": "There is a problem with the request data",
-  "errors": [
-    {
-      "code": "INVALID_DATE",
-      "message": "The claimPeriodStartDate must be the 6th day of the month",
-      "path": "/claimPeriodStartDate"
-    },
-    {
-      "code": "INVALID_DATE",
-      "message": "The claimPeriodEndDate must be the 5th day of the month which occurs after the claimPeriodStartDate",
-      "path": "/claimPeriodEndDate"
-    }
-  ]
+    "code": "FORBIDDEN",
+    "message": "There is a problem with the request data",
+    "errors": [
+        {
+            "code": "INVALID_DATE",
+            "message": "The claimPeriodStartDate must be the 6th day of the month",
+            "path": "/claimPeriodStartDate"
+        },
+        {
+            "code": "INVALID_DATE",
+            "message": "The claimPeriodEndDate must be the 5th day of the month which occurs after the claimPeriodStartDate",
+            "path": "/claimPeriodEndDate"
+        },
+        {
+            "code": "INVALID_MONETARY_AMOUNT",
+            "message": "automaticRecoveryAmount cannot be more than withdrawalChargeAmount",
+            "path": "/automaticRecoveryAmount"
+        }
+    ]
 }
 </pre>
             </td>
