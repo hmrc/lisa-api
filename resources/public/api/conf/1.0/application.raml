@@ -1001,7 +1001,7 @@ types:
                       description: Report to HMRC if a property purchase was completed or failed.
                       (annotations.scope): "write:lisa"
                       securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
-                      (annotations.sandboxData): !include testdata/fund-release-extension.md
+                      (annotations.sandboxData): !include testdata/fund-release-outcome.md
                       body:
                         application/json:
                           type: !include schemas/FundReleaseOutcome.post.schema.json
@@ -1021,13 +1021,20 @@ types:
                             application/json:
                               type: !include schemas/ErrorCodes.schema.json
                               examples:
-                                lifeEventExists:
-                                  description: The investor’s purchase outcome has already been reported
-                                  value: |
-                                    {
-                                      "code" : "PURCHASE_OUTCOME_ALREADY_EXISTS",
-                                      "message" : "The investor’s purchase outcome has already been reported"
-                                    }
+                                mismatchError:
+                                   description: originalPurchaseOutcomeId and the originalEventDate do not match the information in the original request
+                                   value: |
+                                      {
+                                        "code": "SUPERSEDED_PURCHASE_OUTCOME_MISMATCH_ERROR",
+                                        "message": "originalPurchaseOutcomeId and the originalEventDate do not match the information in the original request"
+                                      }
+                                fundReleaseNotFound:
+                                   description: The fundReleaseId does not match with HMRC’s records
+                                   value: |
+                                      {
+                                         "code" : "FUND_RELEASE_NOT_FOUND",
+                                         "message" : "The fundReleaseId does not match with HMRC’s records"
+                                      }
                         404:
                           body:
                             application/json:
@@ -1039,20 +1046,6 @@ types:
                                     {
                                       "code" : "INVESTOR_ACCOUNTID_NOT_FOUND",
                                       "message" : "The accountId does not match with HMRC’s records"
-                                    }
-                                fundReleaseNotFound:
-                                  description: The fundReleaseId does not match with HMRC’s records
-                                  value: |
-                                    {
-                                      "code" : "FUND_RELEASE_NOT_FOUND",
-                                      "message" : "The fundReleaseId does not match with HMRC’s records"
-                                    }
-                                mismatchError:
-                                  description: originalPurchaseOutcomeId and the originalEventDate do not match the information in the original request
-                                  value: |
-                                    {
-                                      "code": "SUPERSEDED_PURCHASE_OUTCOME_MISMATCH_ERROR",
-                                      "message": "originalPurchaseOutcomeId and the originalEventDate do not match the information in the original request"
                                     }
                         409:
                           body:
@@ -1072,6 +1065,13 @@ types:
                                     {
                                       "code" : "SUPERSEDED_PURCHASE_OUTCOME_ALREADY_SUPERSEDED",
                                       "message" : "This purchase outcome has already been superseded"
+                                    }
+                                lifeEventExists:
+                                  description: The investor’s purchase outcome has already been reported
+                                  value: |
+                                    {
+                                       "code" : "PURCHASE_OUTCOME_ALREADY_EXISTS",
+                                       "message" : "The investor’s purchase outcome has already been reported"
                                     }
                 /withdrawal-charges:
                   post:
