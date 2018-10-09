@@ -821,19 +821,10 @@ types:
                           application/json:
                             type: !include schemas/ErrorCodes.schema.json
                             examples:
-                              lifeEventExists:
-                                description: The investor’s fund release has already been reported
-                                value: |
-                                  {
-                                    "code" : "FUND_RELEASE_ALREADY_EXISTS",
-                                    "message" : "The investor’s fund release has already been reported"
-                                  }
                               accountClosed:
                                 description: The LISA account has already been closed
                                 value: |
                                   {
-
-
                                     "code" : "INVESTOR_ACCOUNT_ALREADY_CLOSED",
                                     "message" : "The LISA account has already been closed"
                                   }
@@ -896,6 +887,13 @@ types:
                                     "code" : "SUPERSEDED_FUND_RELEASE_ALREADY_SUPERSEDED",
                                     "message" : "This fund release has already been superseded"
                                   }
+                              lifeEventExists:
+                                 description: The investor’s fund release has already been reported
+                                 value: |
+                                   {
+                                     "code" : "FUND_RELEASE_ALREADY_EXISTS",
+                                     "message" : "The investor’s fund release has already been reported"
+                                   }
                   /extension:
                     post:
                       is: [headers.acceptHeader]
