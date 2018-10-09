@@ -863,13 +863,6 @@ types:
                                     "code" : "SUPERSEDED_FUND_RELEASE_MISMATCH_ERROR",
                                     "message" : "originalFundReleaseId and the originalEventDate do not match the information in the original request"
                                   }
-                              SupersededFundReleaseDataProvided:
-                                description: You must only give an originalFundReleaseId and originalEventDate when the fund release reason is supersede
-                                value: |
-                                  {
-                                    "code" : "SUPERSEDED_FUND_RELEASE_DATA_PROVIDED",
-                                    "message" : "Superseded fund release data provided"
-                                  }
                       404:
                         body:
                           application/json:

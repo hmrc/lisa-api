@@ -58,7 +58,7 @@
                        <td>
         <pre class="code--block">
  {
-   "eventDate": "2017-06-05",
+   "eventDate": "2017-05-05",
    "withdrawalAmount": 4000.00,
    "supersede": {
                "originalFundReleaseId": "3456789000",
@@ -75,7 +75,7 @@
   "success": true,
   "data": {
          "message": "Fund release superseded",
-         "transactionId": "3456789001"
+         "fundReleaseId": "3456789001"
    }
 }        
         </pre>
@@ -258,12 +258,12 @@
                                                                                                  <td>
                                                                                             <pre class="code--block"> 
  {
-   "eventDate": "2017-05-10",
+   "eventDate": "2017-12-10",
    "withdrawalAmount": 4000.00,
-   "conveyancerReference": "CR12345-6789",
+   "conveyancerReference": "CR12345-678900",
    "propertyDetails": {
          "nameOrNumber": "1",
-         "postalCode": "AA11 1AA",
+         "postalCode": "AA11 2AA",
     }
  }   
                                                                                             </pre>
@@ -285,7 +285,7 @@
                                                                                                   <strong>lisaManagerReferenceNumber:</strong><br>
                                                                                                   <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
                                                                                                    <br>
-                                                                                                    <strong>accountId:</strong><br>4030000002
+                                                                                                    <strong>accountId:</strong><br>1234567890
                                                                                                    </p>
                                                                                                    </td>
                                                                                                    <td>
@@ -295,7 +295,7 @@
    "withdrawalAmount": 4000.00,
    "conveyancerReference": "CR12345-6789",
    "propertyDetails": {
-          "nameOrNumber": "1",
+          "nameOrNumber": "39",
           "postalCode": "AA11 1AA",
      }
  }   
@@ -305,8 +305,8 @@
                                                                                                      <p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
                                                                                                      <pre class="code--block">
  {
-    "code": "COMPLIANCE_ERROR_ACCOUNT_NOT_OPEN_LONG_ENOUGH",
-    "message": "The account has not been open for long enough"
+    "code": "COMPLIANCE_ERROR_OTHER_PURCHASE_ON_RECORD",
+    "message": "Another property purchase is already recorded"
  }                                               
                                                                                                </pre>
                                                                                                </td>
@@ -318,19 +318,18 @@
                                                                                                   <strong>lisaManagerReferenceNumber:</strong><br>
                                                                                                   <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
                                                                                                <br>
-                                                                                                  <strong>accountId:</strong><br>4030000003
+                                                                                                  <strong>accountId:</strong><br>1234567890
                                                                                                   </p>
                                                                                                   </td>
                                                                                                   <td>
                                                                                                   <pre class="code--block">
  {
-    "eventDate": "2017-05-10",
-    "withdrawalAmount": 4000.00,
-    "conveyancerReference": "CR12345-6789",
-    "propertyDetails": {
-           "nameOrNumber": "1",
-           "postalCode": "AA11 1AA",
-      }
+    "eventDate": "2017-05-05",
+    "withdrawalAmount": 5000.00,
+    "supersede": {
+                "originalFundReleaseId": "3456789000",
+                "originalEventDate": "2017-05-05"
+     }
   }     
                                                                                                 </pre>
                                                                                                 </td>
@@ -344,38 +343,6 @@
                                                                                                    </pre>
                                                                                                    </td>
                                                                                                    </tr>
-                                                                                                   <tr>
-                                                                                                   <td>
-                                                                                                       <p>Create fund release containing supersede details</p>
-                                                                                                       <p class="code--block">
-                                                                                                       <strong>lisaManagerReferenceNumber:</strong><br>
-                                                                                                       <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
-                                                                                                   <br>
-                                                                                                       <strong>accountId:</strong><br>4030000004
-                                                                                                       </p>
-                                                                                                       </td>
-                                                                                                       <td>
-                                                                                                       <pre class="code--block">
-{
-    "eventDate": "2017-05-10",
-    "withdrawalAmount": 4000.00,
-    "supersede": {
-                   "originalFundReleaseId": "3456789000",
-                   "originalEventDate": "2017-05-10"
-      }
-}                                    
-                                                                                                   </pre>
-                                                                                                   </td>
-                                                                                                   <td>
-                                                                                                       <p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
-                                                                                                       <pre class="code--block">
-{
-  "code" : "SUPERSEDED_FUND_RELEASE_DATA_PROVIDED",
-  "message" : "Superseded fund release data provided"
-}                                                                                
-                                                                                                    </pre>
-                                                                                                    </td>
-                                                                                                    </tr>
                                                                                                     <tr>
                                                                                                     <td>
                                                                                                        <p>Account ID does not exist</p>
@@ -421,15 +388,14 @@
                                                                                               </td>
                                                                                                    <td>
                                                                                                        <pre class="code--block">
-{
-    "eventDate": "2017-05-10",
+ {
+    "eventDate": "2017-05-05",
     "withdrawalAmount": 4000.00,
-    "conveyancerReference": "CR12345-6789",
-    "propertyDetails": {
-           "nameOrNumber": "1",
-           "postalCode": "AA11 1AA",
-      }
- }        
+    "supersede": {
+                "originalFundReleaseId": "3456789000",
+                "originalEventDate": "2017-05-10"
+     }
+  }       
                                                                                                 </pre>
                                                                                                 </td>
                                                                                                      <td>
@@ -449,7 +415,7 @@
                                                                                         <strong>lisaManagerReferenceNumber:</strong><br>
                                                                                         <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
                                                                                         <br>
-                                                                                        <strong>accountId:</strong><br>1234567890
+                                                                                        <strong>accountId:</strong><br>1234567409
                                                                                         </p>
                                                                                         </td>
                                                                                         <td>
