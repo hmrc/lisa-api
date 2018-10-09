@@ -20,26 +20,26 @@
                </td>
          <td>
              <pre class="code--block">
- {
-   "fundReleaseId": "3456789000",
-   "eventDate": "2017-05-10",
-   "propertyPurchaseResult": "Purchase completed",
-   "propertyPurchaseValue": 250000
- }             
-             </pre>
+{
+  "fundReleaseId": "3456789000",
+  "eventDate": "2017-05-10",
+  "propertyPurchaseResult": "Purchase completed",
+  "propertyPurchaseValue": 250000
+}             
+</pre>
           </td>
           <td>
               <p>HTTP status: <code class="code--slim">201 (Created)</code></p>
                 <pre class="code--block">
- {
-   "status": 201,
-   "success": true,
-   "data": {
-      "purchaseOutcomeId": "5678900001",
-      "message": "Purchase outcome created"
-     }
- }               
-                        </pre>         
+{
+  "status": 201,
+  "success": true,
+  "data": {
+    "purchaseOutcomeId": "5678900001",
+    "message": "Purchase outcome created"
+  }
+}               
+</pre>         
                     </td>
                 </tr>
                 <tr>
@@ -49,22 +49,22 @@
                             <strong>lisaManagerReferenceNumber:</strong><br>
                             <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
                                <br>
-                                   <strong>accountId:</strong><br>1234567890
+                                   <strong>accountId:</strong><br>1234567891
                            </p>
                        </td>
                        <td>
         <pre class="code--block">
- {
-   "fundReleaseId": "3456789000",
-   "eventDate": "2017-05-05",
-   "propertyPurchaseResult": "Purchase completed",
-   "propertyPurchaseValue": 250000,
-   "supersede": {
-     "originalPurchaseOutcomeId": "5678900001",
-     "originalEventDate": "2017-05-10"
-   }
- }                
-        </pre>
+{
+  "fundReleaseId": "3456789000",
+  "eventDate": "2017-05-05",
+  "propertyPurchaseResult": "Purchase completed",
+  "propertyPurchaseValue": 250000,
+  "supersede": {
+    "originalPurchaseOutcomeId": "5678900001",
+    "originalEventDate": "2017-05-10"
+  }
+}                
+</pre>
                      </td>
                      <td>
                          <p>HTTP status: <code class="code--slim">201 (Created)</code></p>
@@ -73,11 +73,11 @@
   "status": 201,
   "success": true,
   "data": {
-         "purchaseOutcomeId": "5678900002",
-         "message": "Purchase outcome superseded"
-   }
+    "purchaseOutcomeId": "5678900002",
+    "message": "Purchase outcome superseded"
+  }
 }        
-        </pre>
+</pre>
                             </td>
                         </tr>
                         <tr>
@@ -92,22 +92,22 @@
                                     </td>
                                     <td>
         <pre class="code--block">
- {
-    "fundReleaseId": "3456789000",
-    "eventDate": "2017-05-10",
-    "propertyPurchaseResult": "Purchase completed",
-    "propertyPurchaseValue": 250000
-  }       
-        </pre>
+{
+  "fundReleaseId": "3456789000",
+  "eventDate": "2017-05-10",
+  "propertyPurchaseResult": "Purchase completed",
+  "propertyPurchaseValue": 250000
+}       
+</pre>
                                     </td>
                                     <td>
                                         <p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
         <pre class="code--block">
-  {
-     "code": "BAD_REQUEST",
-     "message": "lisaManagerReferenceNumber in the URL is in the wrong format"
-  }
-        </pre>
+{
+  "code": "BAD_REQUEST",
+  "message": "lisaManagerReferenceNumber in the URL is in the wrong format"
+}
+</pre>
                                     </td>
                                     </tr>
                                     <tr>
@@ -122,22 +122,22 @@
                                                 </td>
                                                 <td>
                                     <pre class="code--block">
- {
-    "fundReleaseId": "3456789000",
-    "eventDate": "2017-05-10",
-    "propertyPurchaseResult": "Purchase completed",
-    "propertyPurchaseValue": 250000
-  }                                   
-                                    </pre>
+{
+  "fundReleaseId": "3456789000",
+  "eventDate": "2017-05-10",
+  "propertyPurchaseResult": "Purchase completed",
+  "propertyPurchaseValue": 250000
+}                                   
+</pre>
                                                 </td>
                                                 <td>
                                                     <p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
                                     <pre class="code--block">
- {
-    "code": "BAD_REQUEST",
-    "message": "accountId in the URL is in the wrong format"
- }                                  
-                                            </pre>
+{
+  "code": "BAD_REQUEST",
+  "message": "accountId in the URL is in the wrong format"
+}                                  
+</pre>
                                             </td>
                                             </tr>                                            
                                                                                                <tr>
@@ -147,31 +147,31 @@
                                                                                                   <strong>lisaManagerReferenceNumber:</strong><br>
                                                                                                   <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
                                                                                                <br>
-                                                                                                  <strong>accountId:</strong><br>1234567890
+                                                                                                  <strong>accountId:</strong><br>4030000014
                                                                                                   </p>
                                                                                                   </td>
                                                                                                   <td>
                                                                                                   <pre class="code--block">
- {
-   "fundReleaseId": "3456789000",
-   "eventDate": "2017-05-10",
-   "propertyPurchaseResult": "Purchase completed",
-   "propertyPurchaseValue": 250000,
-   "supersede": {
-     "originalPurchaseOutcomeId": "5678900000",
-     "originalEventDate": "2017-07-21"
-   }
- }    
-                                                                                                </pre>
+{
+  "fundReleaseId": "3456789000",
+  "eventDate": "2017-05-05",
+  "propertyPurchaseResult": "Purchase completed",
+  "propertyPurchaseValue": 250000,
+  "supersede": {
+    "originalPurchaseOutcomeId": "5678900000",
+    "originalEventDate": "2017-05-10"
+  }
+}    
+</pre>
                                                                                                 </td>
                                                                                                 <td>
                                                                                                     <p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
                                                                                                     <pre class="code--block">
 {
-    "code": "SUPERSEDED_PURCHASE_OUTCOME_MISMATCH_ERROR",
-    "message": "originalPurchaseOutcomeId and the originalEventDate do not match the information in the original request"
+  "code": "SUPERSEDED_PURCHASE_OUTCOME_MISMATCH_ERROR",
+  "message": "originalPurchaseOutcomeId and the originalEventDate do not match the information in the original request"
 }  
-                                                                                                   </pre>
+</pre>
                                                                                                    </td>
                                                                                                    </tr>
                                                                                                    <tr>
@@ -181,18 +181,18 @@
                                                                                                        <strong>lisaManagerReferenceNumber:</strong><br>
                                                                                                        <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
                                                                                                    <br>
-                                                                                                       <strong>accountId:</strong><br>4030000002
+                                                                                                       <strong>accountId:</strong><br>4030000015
                                                                                                        </p>
                                                                                                        </td>
                                                                                                        <td>
                                                                                                        <pre class="code--block">
 {
-  "fundReleaseId": "3456789403",
+  "fundReleaseId": "3456789000",
   "eventDate": "2017-05-10",
   "propertyPurchaseResult": "Purchase completed",
   "propertyPurchaseValue": 250000
 }                                    
-                                                                                                   </pre>
+</pre>
                                                                                                    </td>
                                                                                                    <td>
                                                                                                        <p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
@@ -201,7 +201,7 @@
   "code" : "FUND_RELEASE_NOT_FOUND",
   "message" : "The fundReleaseId does not match with HMRC’s records"
 }                                                                                
-                                                                                                    </pre>
+</pre>
                                                                                                     </td>
                                                                                                     </tr>
                                                                                                           <tr>
@@ -211,7 +211,7 @@
                                                                                                             <strong>lisaManagerReferenceNumber:</strong><br>
                                                                                                             <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
                                                                                                         <br>
-                                                                                                            <strong>accountId:</strong><br>4040000001
+                                                                                                            <strong>accountId:</strong><br>2000000404
                                                                                                             </p>
                                                                                                             </td>
                                                                                                                 <td>
@@ -222,7 +222,7 @@
   "propertyPurchaseResult": "Purchase completed",
   "propertyPurchaseValue": 250000
 }  
-                                                                                                       </pre>
+</pre>
                                                                                                        </td>
                                                                                                             <td>
                                                                                                                 <p>HTTP status: <code class="code--slim">404 (Not found)</code></p>
@@ -231,7 +231,7 @@
   "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
   "message": "The accountId does not match with HMRC’s records"
 }                                               
-                                                                                                       </pre>
+</pre>
                                                                                                        </td>
                                                                                                        </tr>
                                                                                               <tr>
@@ -241,31 +241,31 @@
                                                                                                   <strong>lisaManagerReferenceNumber:</strong><br>
                                                                                                   <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
                                                                                               <br>
-                                                                                              <strong>accountId:</strong><br>4090000001
+                                                                                              <strong>accountId:</strong><br>3000000409
                                                                                               </p>
                                                                                               </td>
                                                                                                    <td>
                                                                                                        <pre class="code--block">
 {
-   "fundReleaseId": "3456789000",
-   "eventDate": "2017-05-10",
-   "propertyPurchaseResult": "Purchase completed",
-   "propertyPurchaseValue": 250000,
-   "supersede": {
-     "originalPurchaseOutcomeId": "5678900001",
-     "originalEventDate": "2017-05-05"
-   }
- }       
-                                                                                                </pre>
+  "fundReleaseId": "3456789000",
+  "eventDate": "2017-05-05",
+  "propertyPurchaseResult": "Purchase completed",
+  "propertyPurchaseValue": 250000,
+  "supersede": {
+    "originalPurchaseOutcomeId": "5678900001",
+    "originalEventDate": "2017-05-10"
+  }
+}       
+</pre>
                                                                                                 </td>
                                                                                                      <td>
                                                                                                          <p>HTTP status: <code class="code--slim">409 (Conflict)</code></p>
                                                                                                          <pre class="code--block">
 {
-    "code": "SUPERSEDED_PURCHASE_OUTCOME_ALREADY_SUPERSEDED",
-    "message": "This purchase outcome has already been superseded"
+  "code": "SUPERSEDED_PURCHASE_OUTCOME_ALREADY_SUPERSEDED",
+  "message": "This purchase outcome has already been superseded"
 }                        
-                                                                                 </pre>
+</pre>
                                                                                  </td>
                                                                                  </tr>
                                                                                  <tr>
@@ -275,18 +275,18 @@
                                                                                         <strong>lisaManagerReferenceNumber:</strong><br>
                                                                                         <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
                                                                                         <br>
-                                                                                        <strong>accountId:</strong><br>4090000002
+                                                                                        <strong>accountId:</strong><br>4000000409
                                                                                         </p>
                                                                                         </td>
                                                                                         <td>
                                                                                             <pre class="code--block">
 {
-   "fundReleaseId": "3456789000",
-   "eventDate": "2017-05-10",
-   "propertyPurchaseResult": "Purchase completed",
-   "propertyPurchaseValue": 250000
- }                                                     
-                                                                                         </pre>
+  "fundReleaseId": "3456789000",
+  "eventDate": "2017-05-10",
+  "propertyPurchaseResult": "Purchase completed",
+  "propertyPurchaseValue": 250000
+}                                                     
+</pre>
                                                                                          </td>
                                                                                          <td>
                                                                                              <p>HTTP status: <code class="code--slim">409 (Conflict)</code></p>
@@ -295,7 +295,7 @@
   "code": "PURCHASE_OUTCOME_ALREADY_EXISTS",
   "message": "The investor’s purchase outcome has already been reported"
 }                                               
-                                                                                        </pre>
+</pre>
                                                                                         </td>
                                                                                         </tr> 
                                                                                         <tr>
@@ -305,22 +305,22 @@
                                                                                             <strong>lisaManagerReferenceNumber:</strong><br>
                                                                                             <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
                                                                                             <br>
-                                                                                            <strong>accountId:</strong><br>4090000003
+                                                                                            <strong>accountId:</strong><br>5000000409
                                                                                             </p>
                                                                                             </td>
                                                                                             <td>
                                                                                                 <pre class="code--block">
 {
-   "fundReleaseId": "3456789000",
-   "eventDate": "2017-05-05",
-   "propertyPurchaseResult": "Purchase completed",
-   "propertyPurchaseValue": 250000,
-   "supersede": {
-     "originalPurchaseOutcomeId": "5678900002",
-     "originalEventDate": "2017-05-10"
-   }
- }                                                     
-                                                                                          </pre>
+  "fundReleaseId": "3456789000",
+  "eventDate": "2017-05-05",
+  "propertyPurchaseResult": "Purchase completed",
+  "propertyPurchaseValue": 250000,
+  "supersede": {
+    "originalPurchaseOutcomeId": "5678900001",
+    "originalEventDate": "2017-05-10"
+  }
+}
+</pre>
                                                                                           </td>
                                                                                               <td>
                                                                                                  <p>HTTP status: <code class="code--slim">409 (Conflict)</code></p>
@@ -329,7 +329,7 @@
   "code": "FUND_RELEASE_SUPERSEDED",
   "message": "This fund release has already been superseded"
 }                                               
-                                                                                         </pre>
+</pre>
                                                                                          </td>
                                                                                          </tr> 
     </thead>

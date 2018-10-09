@@ -29,7 +29,7 @@
     "postalCode": "AA11 1AA",
   }
 }               
-             </pre>
+</pre>
           </td>
           <td>
               <p>HTTP status: <code class="code--slim">201 (Created)</code></p>
@@ -42,7 +42,7 @@
     "fundReleaseId": "3456789000"
   }
 }               
-                        </pre>         
+</pre>         
                     </td>
                 </tr>
                 <tr>
@@ -65,7 +65,7 @@
     "originalEventDate": "2017-05-10"
   }
 }                
-        </pre>
+</pre>
                      </td>
                      <td>
                          <p>HTTP status: <code class="code--slim">201 (Created)</code></p>
@@ -78,7 +78,7 @@
     "fundReleaseId": "3456789001"
   }
 }        
-        </pre>
+</pre>
                             </td>
                         </tr>
                         <tr>
@@ -102,7 +102,7 @@
     "postalCode": "AA11 1AA",
   }
 }       
-        </pre>
+</pre>
                                     </td>
                                     <td>
                                         <p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
@@ -111,7 +111,7 @@
   "code": "BAD_REQUEST",
   "message": "lisaManagerReferenceNumber in the URL is in the wrong format"
 }
-        </pre>
+</pre>
                                     </td>
                                     </tr>
                                     <tr>
@@ -135,7 +135,7 @@
     "postalCode": "AA11 1AA",
   }
 }                                   
-                                    </pre>
+</pre>
                                                 </td>
                                                 <td>
                                                     <p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
@@ -144,7 +144,7 @@
   "code": "BAD_REQUEST",
   "message": "accountId in the URL is in the wrong format"
 }                                  
-                                    </pre>
+</pre>
                                                 </td>
                                             </tr>                                            
                                              <tr>
@@ -168,7 +168,7 @@
     "postalCode": "AA11 1AA",
   }
 }                                                   
-                                                       </pre>
+</pre>
                                                              </td>
                                                                  <td>
                                                                      <p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
@@ -177,7 +177,7 @@
   "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED",
   "message": "The LISA account has already been closed"
 }                                               
-                                                     </pre>
+</pre>
                                                                  </td>
                                                              </tr>                                        
                                                              <tr>
@@ -200,7 +200,8 @@
     "nameOrNumber": "1",
     "postalCode": "AA11 1AA",
   }
-}                                                                 </pre>
+}                                                                 
+</pre>
                                                                    </td>
                                                                         <td>
                                                                             <p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
@@ -209,7 +210,7 @@
   "code": "INVESTOR_ACCOUNT_ALREADY_VOID",
   "message": "The LISA account has already been voided"
 }                                               
-                                                                    </pre>
+</pre>
                                                                     </td>
                                                                     </tr>   
                                                                     <tr>
@@ -233,7 +234,7 @@
     "postalCode": "AA11 1AA",
   }
 }   
-                                                                                </pre>
+</pre>
                                                                                 </td>
                                                                                 <td>
                                                                                    <p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
@@ -242,7 +243,7 @@
   "code": "INVESTOR_ACCOUNT_ALREADY_CANCELLED",
   "message": "The LISA account has already been cancelled"
 }                                               
-                                                                                 </pre>
+</pre>
                                                                                  </td>
                                                                                  </tr>   
                                                                                      <tr>
@@ -266,7 +267,7 @@
     "postalCode": "AA11 1AA",
   }
 }   
-                                                                                            </pre>
+</pre>
                                                                                             </td>
                                                                                             <td>
                                                                                                 <p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
@@ -275,7 +276,7 @@
   "code": "COMPLIANCE_ERROR_ACCOUNT_NOT_OPEN_LONG_ENOUGH",
   "message": "The account has not been open for long enough"
 }                                               
-                                                                                             </pre>
+</pre>
                                                                                              </td>
                                                                                              </tr>
                                                                                               <tr>
@@ -295,11 +296,11 @@
   "withdrawalAmount": 4000.00,
   "conveyancerReference": "CR12345-6789",
   "propertyDetails": {
-    "nameOrNumber": "39",
+    "nameOrNumber": "1",
     "postalCode": "AA11 1AA",
   }
 }   
-                                                                                                </pre>
+</pre>
                                                                                                 </td>
                                                                                                 <td>
                                                                                                      <p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
@@ -308,7 +309,7 @@
   "code": "COMPLIANCE_ERROR_OTHER_PURCHASE_ON_RECORD",
   "message": "Another property purchase is already recorded"
 }                                               
-                                                                                               </pre>
+</pre>
                                                                                                </td>
                                                                                                </tr> 
                                                                                                <tr>
@@ -331,7 +332,7 @@
     "originalEventDate": "2017-05-05"
   }
 }     
-                                                                                                </pre>
+</pre>
                                                                                                 </td>
                                                                                                 <td>
                                                                                                     <p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
@@ -340,7 +341,7 @@
   "code": "SUPERSEDED_FUND_RELEASE_MISMATCH_ERROR",
   "message": "originalFundReleaseId and the originalEventDate do not match the information in the original request"
 }  
-                                                                                                   </pre>
+</pre>
                                                                                                    </td>
                                                                                                    </tr>
                                                                                                     <tr>
@@ -364,7 +365,7 @@
     "postalCode": "AA11 1AA",
   }
 }          
-                                                                                               </pre>
+</pre>
                                                                                                </td>
                                                                                                <td>
                                                                                                    <p>HTTP status: <code class="code--slim">404 (Not Found)</code></p>
@@ -373,7 +374,7 @@
   "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
   "message": "The accountId does not match with HMRC’s records"
 }    
-                                                                                              </pre>
+</pre>
                                                                                               </td>
                                                                                               </tr>  
                                                                                               <tr>
@@ -396,7 +397,7 @@
     "originalEventDate": "2017-05-10"
   }
 }       
-                                                                                                </pre>
+</pre>
                                                                                                 </td>
                                                                                                      <td>
                                                                                                          <p>HTTP status: <code class="code--slim">409 (Conflict)</code></p>
@@ -405,7 +406,7 @@
   "code": "SUPERSEDED_FUND_RELEASE_ALREADY_SUPERSEDED",
   "message": "This fund release has already been superseded"
 }                        
-                                                                                 </pre>
+</pre>
                                                                                  </td>
                                                                                  </tr>
                                                                                  <tr>
@@ -429,7 +430,7 @@
     "postalCode": "AA11 1AA",
   }
 }                                                   
-                                                                                         </pre>
+</pre>
                                                                                          </td>
                                                                                          <td>
                                                                                              <p>HTTP status: <code class="code--slim">409 (Conflict)</code></p>
@@ -438,7 +439,7 @@
   "code": "FUND_RELEASE_ALREADY_EXISTS",
   "message": "The investor’s fund release has already been reported"
 }                                               
-                                                                                        </pre>
+</pre>
                                                                                         </td>
                                                                                         </tr> 
     </thead>
