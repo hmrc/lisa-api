@@ -56,7 +56,7 @@
         <pre class="code--block">
  {
    "fundReleaseId": "3456789000",
-   "eventDate": "2017-06-10",
+   "eventDate": "2017-05-05",
    "propertyPurchaseResult": "Purchase completed",
    "propertyPurchaseValue": 250000,
    "supersede": {
@@ -147,18 +147,18 @@
                                                                                                   <strong>lisaManagerReferenceNumber:</strong><br>
                                                                                                   <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
                                                                                                <br>
-                                                                                                  <strong>accountId:</strong><br>4030000003
+                                                                                                  <strong>accountId:</strong><br>1234567890
                                                                                                   </p>
                                                                                                   </td>
                                                                                                   <td>
                                                                                                   <pre class="code--block">
  {
    "fundReleaseId": "3456789000",
-   "eventDate": "2017-06-10",
+   "eventDate": "2017-05-10",
    "propertyPurchaseResult": "Purchase completed",
    "propertyPurchaseValue": 250000,
    "supersede": {
-     "originalPurchaseOutcomeId": "5678900001",
+     "originalPurchaseOutcomeId": "5678900000",
      "originalEventDate": "2017-07-21"
    }
  }    
@@ -181,7 +181,7 @@
                                                                                                        <strong>lisaManagerReferenceNumber:</strong><br>
                                                                                                        <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
                                                                                                    <br>
-                                                                                                       <strong>accountId:</strong><br>4030000005
+                                                                                                       <strong>accountId:</strong><br>4030000002
                                                                                                        </p>
                                                                                                        </td>
                                                                                                        <td>
@@ -204,38 +204,6 @@
                                                                                                     </pre>
                                                                                                     </td>
                                                                                                     </tr>
-                                                                                                    <tr>
-                                                                                                        <td>
-                                                                                                            <p>Superseded fund release not found</p>
-                                                                                                            <p class="code--block">
-                                                                                                            <strong>lisaManagerReferenceNumber:</strong><br>
-                                                                                                            <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>                                                                                                                                                                                                                                                                <br>
-                                                                                                   <strong>accountId:</strong><br>4030000006                                                                                                                                                                          </p>     
-                                                                                                   </td>
-                                                                                                        <td>
-                                                                                                            <pre class="code--block">
-{
-  "fundReleaseId": "3456780403",
-  "eventDate": "2017-05-10",
-  "propertyPurchaseResult": "Purchase completed",
-  "propertyPurchaseValue": 250000,
-  "supersede": {
-    "originalPurchaseOutcomeId": "3456789000",
-    "originalEventDate": "2017-05-10"
-  }
-}                                                                                                    
-                                                                                                       </pre>
-                                                                                                       </td>
-                                                                                                            <td>
-                                                                                                            <p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
-                                                                                                            <pre class="code--block">
-{
-  "code" : "SUPERSEDED_FUND_RELEASE_NOT_FOUND",
-  "message" : "The superseded fundReleaseId does not match with HMRC’s records"
-}                                                                                                        
-                                                                                                        </pre>
-                                                                                                        </td>
-                                                                                                        </tr>
                                                                                                           <tr>
                                                                                                         <td>
                                                                                                             <p>Investor account not found</p>
@@ -243,7 +211,7 @@
                                                                                                             <strong>lisaManagerReferenceNumber:</strong><br>
                                                                                                             <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
                                                                                                         <br>
-                                                                                                            <strong>accountId:</strong><br>0000000404
+                                                                                                            <strong>accountId:</strong><br>4040000001
                                                                                                             </p>
                                                                                                             </td>
                                                                                                                 <td>
@@ -285,7 +253,7 @@
    "propertyPurchaseValue": 250000,
    "supersede": {
      "originalPurchaseOutcomeId": "5678900001",
-     "originalEventDate": "2017-05-10"
+     "originalEventDate": "2017-05-05"
    }
  }       
                                                                                                 </pre>
@@ -317,7 +285,7 @@
    "eventDate": "2017-05-10",
    "propertyPurchaseResult": "Purchase completed",
    "propertyPurchaseValue": 250000
- }                                                    
+ }                                                     
                                                                                          </pre>
                                                                                          </td>
                                                                                          <td>
@@ -337,14 +305,14 @@
                                                                                             <strong>lisaManagerReferenceNumber:</strong><br>
                                                                                             <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
                                                                                             <br>
-                                                                                            <strong>accountId:</strong><br>1234567890
+                                                                                            <strong>accountId:</strong><br>4090000003
                                                                                             </p>
                                                                                             </td>
                                                                                             <td>
                                                                                                 <pre class="code--block">
 {
    "fundReleaseId": "3456789000",
-   "eventDate": "2017-05-10",
+   "eventDate": "2017-05-05",
    "propertyPurchaseResult": "Purchase completed",
    "propertyPurchaseValue": 250000,
    "supersede": {
