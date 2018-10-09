@@ -202,6 +202,8 @@ object WithdrawalSupersede {
 sealed trait ReportWithdrawalChargeRequest extends Product {
   val claimPeriodStartDate: DateTime
   val claimPeriodEndDate: DateTime
+  val automaticRecoveryAmount: Option[Amount]
+  val withdrawalChargeAmount: Amount
 }
 
 case class RegularWithdrawalChargeRequest(

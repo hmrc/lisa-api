@@ -33,7 +33,8 @@ trait WithdrawalChargeValidator extends LisaConstants {
       periodEndDateIsFifthOfMonthAfterPeriodStartDate andThen
       periodStartDateIsNotInFuture andThen
       periodStartDateIsNotBeforeFirstValidDate andThen
-      periodEndDateIsNotBeforeFirstValidDate
+      periodEndDateIsNotBeforeFirstValidDate andThen
+      automaticRecoveryAmountLteWithdrawalChargeAmount
     ).apply(WithdrawalChargeValidationRequest(data)).errors
   }
 
@@ -99,6 +100,21 @@ trait WithdrawalChargeValidator extends LisaConstants {
       req
     }
   }
+
+  private val automaticRecoveryAmountLteWithdrawalChargeAmount: (WithdrawalChargeValidationRequest) => WithdrawalChargeValidationRequest =
+    (req: WithdrawalChargeValidationRequest) => {
+
+      req.data.automaticRecoveryAmount match {
+        case Some(amount) if amount > req.data.withdrawalChargeAmount => {
+          req.copy(errors = req.errors :+ ErrorValidation(
+            errorCode = MONETARY_ERROR,
+            message = "automaticRecoveryAmount cannot be more than withdrawalChargeAmount",
+            path = Some("/automaticRecoveryAmount")
+          ))
+        }
+        case _ => req
+      }
+    }
 
 }
 
