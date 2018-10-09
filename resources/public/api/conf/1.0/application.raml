@@ -936,11 +936,11 @@ types:
                                       "message" : "A first extension has not been approved"
                                     }
                                 supersedingLifeEventMisMatchError:
-                                  description: The extension has already been superseded
+                                  description: originalExtensionId and the originalEventDate do not match the information in the original request
                                   value: |
                                     {
                                       "code" : "SUPERSEDED_EXTENSION_MISMATCH_ERROR",
-                                      "message" : "The extension has already been superseded"
+                                      "message" : "originalExtensionId and the originalEventDate do not match the information in the original request"
                                     }
                         404:
                           body:
