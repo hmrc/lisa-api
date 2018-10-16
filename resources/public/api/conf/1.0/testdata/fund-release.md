@@ -26,9 +26,9 @@
   "conveyancerReference": "CR12345-6789",
   "propertyDetails": {
     "nameOrNumber": "1",
-    "postalCode": "AA11 1AA",
+    "postalCode": "AA11 1AA"
   }
-}               
+}
 </pre>
           </td>
           <td>
@@ -41,7 +41,7 @@
     "message": "Fund release created",
     "fundReleaseId": "3456789000"
   }
-}               
+}
 </pre>         
                     </td>
                 </tr>
@@ -52,7 +52,7 @@
                             <strong>lisaManagerReferenceNumber:</strong><br>
                             <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
                                <br>
-                                   <strong>accountId:</strong><br>1234567891
+                                   <strong>accountId:</strong><br>1234567890
                            </p>
                        </td>
                        <td>
@@ -64,7 +64,7 @@
     "originalFundReleaseId": "3456789000",
     "originalEventDate": "2017-05-10"
   }
-}                
+}
 </pre>
                      </td>
                      <td>
@@ -77,7 +77,7 @@
     "message": "Fund release superseded",
     "fundReleaseId": "3456789001"
   }
-}        
+}
 </pre>
                             </td>
                         </tr>
@@ -99,9 +99,9 @@
   "conveyancerReference": "CR12345-6789",
   "propertyDetails": {
     "nameOrNumber": "1",
-    "postalCode": "AA11 1AA",
+    "postalCode": "AA11 1AA"
   }
-}       
+}
 </pre>
                                     </td>
                                     <td>
@@ -132,9 +132,9 @@
   "conveyancerReference": "CR12345-6789",
   "propertyDetails": {
     "nameOrNumber": "1",
-    "postalCode": "AA11 1AA",
+    "postalCode": "AA11 1AA"
   }
-}                                   
+}
 </pre>
                                                 </td>
                                                 <td>
@@ -143,20 +143,20 @@
 {
   "code": "BAD_REQUEST",
   "message": "accountId in the URL is in the wrong format"
-}                                  
+}
 </pre>
                                                 </td>
                                             </tr>                                            
                                              <tr>
-                                                                <td>
-                                                                    <p>This LISA account is already closed</p>
-                                                                    <p class="code--block">
-                                                                        <strong>lisaManagerReferenceNumber:</strong><br>
-                                                                        <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
-                                                                        <br>
-                                                                        <strong>accountId:</strong><br>4030000008
-                                                                    </p>
-                                                                </td>
+                                                <td>
+                                                    <p>This LISA account is already closed</p>
+                                                    <p class="code--block">
+                                                        <strong>lisaManagerReferenceNumber:</strong><br>
+                                                        <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+                                                        <br>
+                                                        <strong>accountId:</strong><br>1000000403
+                                                    </p>
+                                                </td>
  <td>
                                                      <pre class="code--block">
 {
@@ -165,9 +165,9 @@
   "conveyancerReference": "CR12345-6789",
   "propertyDetails": {
     "nameOrNumber": "1",
-    "postalCode": "AA11 1AA",
+    "postalCode": "AA11 1AA"
   }
-}                                                   
+}
 </pre>
                                                              </td>
                                                                  <td>
@@ -175,8 +175,8 @@
                                                      <pre class="code--block">
 {
   "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED",
-  "message": "The LISA account has already been closed"
-}                                               
+  "message": "The LISA account is already closed"
+}
 </pre>
                                                                  </td>
                                                              </tr>                                        
@@ -187,7 +187,7 @@
                                                                     <strong>lisaManagerReferenceNumber:</strong><br>
                                                                     <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
                                                                      <br>
-                                                                     <strong>accountId:</strong><br>4030000009
+                                                                     <strong>accountId:</strong><br>3000000403
                                                                      </p>
                                                                      </td>
                                                                      <td>
@@ -198,7 +198,7 @@
   "conveyancerReference": "CR12345-6789",
   "propertyDetails": {
     "nameOrNumber": "1",
-    "postalCode": "AA11 1AA",
+    "postalCode": "AA11 1AA"
   }
 }                                                                 
 </pre>
@@ -208,8 +208,8 @@
                                                                             <pre class="code--block">
 {
   "code": "INVESTOR_ACCOUNT_ALREADY_VOID",
-  "message": "The LISA account has already been voided"
-}                                               
+  "message": "The LISA account is already void"
+}
 </pre>
                                                                     </td>
                                                                     </tr>   
@@ -220,7 +220,7 @@
                                                                         <strong>lisaManagerReferenceNumber:</strong><br>
                                                                         <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
                                                                           <br>
-                                                                              <strong>accountId:</strong><br>4030000010
+                                                                              <strong>accountId:</strong><br>2000000403
                                                                               </p>
                                                                               </td>
                                                                               <td>
@@ -231,9 +231,9 @@
   "conveyancerReference": "CR12345-6789",
   "propertyDetails": {
     "nameOrNumber": "1",
-    "postalCode": "AA11 1AA",
+    "postalCode": "AA11 1AA"
   }
-}   
+}
 </pre>
                                                                                 </td>
                                                                                 <td>
@@ -241,8 +241,8 @@
                                                                                    <pre class="code--block">
 {
   "code": "INVESTOR_ACCOUNT_ALREADY_CANCELLED",
-  "message": "The LISA account has already been cancelled"
-}                                               
+  "message": "The LISA account is already cancelled"
+}
 </pre>
                                                                                  </td>
                                                                                  </tr>   
@@ -253,7 +253,7 @@
                                                                                             <strong>lisaManagerReferenceNumber:</strong><br>
                                                                                             <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
                                                                                             <br>
-                                                                                            <strong>accountId:</strong><br>4030000011
+                                                                                            <strong>accountId:</strong><br>4000000403
                                                                                             </p>
                                                                                             </td>
                                                                                                  <td>
@@ -264,9 +264,9 @@
   "conveyancerReference": "CR12345-6789",
   "propertyDetails": {
     "nameOrNumber": "1",
-    "postalCode": "AA11 1AA",
+    "postalCode": "AA11 1AA"
   }
-}   
+}
 </pre>
                                                                                             </td>
                                                                                             <td>
@@ -275,7 +275,7 @@
 {
   "code": "COMPLIANCE_ERROR_ACCOUNT_NOT_OPEN_LONG_ENOUGH",
   "message": "The account has not been open for long enough"
-}                                               
+}
 </pre>
                                                                                              </td>
                                                                                              </tr>
@@ -286,7 +286,7 @@
                                                                                                   <strong>lisaManagerReferenceNumber:</strong><br>
                                                                                                   <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
                                                                                                    <br>
-                                                                                                    <strong>accountId:</strong><br>4030000012
+                                                                                                    <strong>accountId:</strong><br>6000000403
                                                                                                    </p>
                                                                                                    </td>
                                                                                                    <td>
@@ -297,9 +297,9 @@
   "conveyancerReference": "CR12345-6789",
   "propertyDetails": {
     "nameOrNumber": "1",
-    "postalCode": "AA11 1AA",
+    "postalCode": "AA11 1AA"
   }
-}   
+}
 </pre>
                                                                                                 </td>
                                                                                                 <td>
@@ -308,7 +308,7 @@
 {
   "code": "COMPLIANCE_ERROR_OTHER_PURCHASE_ON_RECORD",
   "message": "Another property purchase is already recorded"
-}                                               
+}
 </pre>
                                                                                                </td>
                                                                                                </tr> 
@@ -319,7 +319,7 @@
                                                                                                   <strong>lisaManagerReferenceNumber:</strong><br>
                                                                                                   <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
                                                                                                <br>
-                                                                                                  <strong>accountId:</strong><br>4030000013
+                                                                                                  <strong>accountId:</strong><br>5000000403
                                                                                                   </p>
                                                                                                   </td>
                                                                                                   <td>
@@ -331,7 +331,7 @@
     "originalFundReleaseId": "3456789000",
     "originalEventDate": "2017-05-05"
   }
-}     
+}
 </pre>
                                                                                                 </td>
                                                                                                 <td>
@@ -340,7 +340,7 @@
 {
   "code": "SUPERSEDED_FUND_RELEASE_MISMATCH_ERROR",
   "message": "originalFundReleaseId and the originalEventDate do not match the information in the original request"
-}  
+}
 </pre>
                                                                                                    </td>
                                                                                                    </tr>
@@ -351,7 +351,7 @@
                                                                                                        <strong>lisaManagerReferenceNumber:</strong><br>
                                                                                                        <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
                                                                                                    <br>
-                                                                                                       <strong>accountId:</strong><br>1000000404
+                                                                                                       <strong>accountId:</strong><br>0000000404
                                                                                                        </p>
                                                                                                        </td>
                                                                                                        <td>
@@ -362,9 +362,9 @@
   "conveyancerReference": "CR12345-6789",
   "propertyDetails": {
     "nameOrNumber": "1",
-    "postalCode": "AA11 1AA",
+    "postalCode": "AA11 1AA"
   }
-}          
+}
 </pre>
                                                                                                </td>
                                                                                                <td>
@@ -372,8 +372,8 @@
                                                                                                    <pre class="code--block">
 {
   "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
-  "message": "The accountId does not match with HMRC’s records"
-}    
+  "message": "The accountId does not match HMRC’s records"
+}
 </pre>
                                                                                               </td>
                                                                                               </tr>  
@@ -396,7 +396,7 @@
     "originalFundReleaseId": "3456789000",
     "originalEventDate": "2017-05-10"
   }
-}       
+}
 </pre>
                                                                                                 </td>
                                                                                                      <td>
@@ -405,7 +405,7 @@
 {
   "code": "SUPERSEDED_FUND_RELEASE_ALREADY_SUPERSEDED",
   "message": "This fund release has already been superseded"
-}                        
+}
 </pre>
                                                                                  </td>
                                                                                  </tr>
@@ -416,7 +416,7 @@
                                                                                         <strong>lisaManagerReferenceNumber:</strong><br>
                                                                                         <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
                                                                                         <br>
-                                                                                        <strong>accountId:</strong><br>2000000409
+                                                                                        <strong>accountId:</strong><br>0000000409
                                                                                         </p>
                                                                                         </td>
                                                                                         <td>
@@ -429,7 +429,7 @@
     "nameOrNumber": "1",
     "postalCode": "AA11 1AA",
   }
-}                                                   
+}
 </pre>
                                                                                          </td>
                                                                                          <td>
@@ -438,10 +438,10 @@
 {
   "code": "FUND_RELEASE_ALREADY_EXISTS",
   "message": "The investor’s fund release has already been reported"
-}                                               
+}
 </pre>
                                                                                         </td>
                                                                                         </tr> 
     </thead>
     </tbody>
-    </table>
+</table>

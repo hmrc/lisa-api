@@ -54,6 +54,7 @@ trait LisaMetricKeys  {
   val WITHDRAWAL_CHARGE = "WITHDRAWAL_CHARGE"
   val UPDATE_SUBSCRIPTION = "UPDATE_SUBSCRIPTION"
   val TRANSACTION = "TRANSACTION"
+  val PROPERTY_PURCHASE = "PROPERTY_PURCHASE"
 
   val keys = Map(
     "investors" -> INVESTOR,
@@ -64,7 +65,8 @@ trait LisaMetricKeys  {
     "discover" -> DISCOVER,
     "payments" -> TRANSACTION,
     "update-subscription" -> UPDATE_SUBSCRIPTION,
-    "withdrawal-charge" -> WITHDRAWAL_CHARGE
+    "withdrawal-charge" -> WITHDRAWAL_CHARGE,
+    "property-purchase" -> PROPERTY_PURCHASE
   )
 
   def lisaMetric(status:Int, name:String):String =  s"${name}_${status}"
