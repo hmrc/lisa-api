@@ -51,8 +51,8 @@ class LifeEventServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuit
 
     "return a Already Exists response" when {
       "given DesFailureResponse and status 409" in {
-        when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(DesLifeEventExistResponse("LIFE_EVENT_ALREADY_EXISTS","The life Event Already Exists", "1234567890")))
-        doRequest(response => response mustBe ReportLifeEventAlreadyExistsResponse("1234567890"))
+        when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("LIFE_EVENT_ALREADY_EXISTS","The life Event Already Exists")))
+        doRequest(response => response mustBe ReportLifeEventAlreadyExistsResponse)
       }
     }
 

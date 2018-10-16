@@ -1,0 +1,8 @@
+{
+  "data": {
+    "fundReleaseId": "3456789001",
+    "message": "Fund release superseded"
+  },
+  "success": true,
+  "status": 201
+}

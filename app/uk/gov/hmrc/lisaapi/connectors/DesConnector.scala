@@ -190,6 +190,28 @@ trait DesConnector extends ServicesConfig {
   }
 
   /**
+    * Attempts to request a Fund Release for a property purchase
+    */
+  def requestFundRelease(lisaManager: String, accountId: String, request: RequestFundReleaseRequest)
+                        (implicit hc: HeaderCarrier): Future[DesResponse] = {
+
+    val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/life-event"
+    Logger.debug("Posting Fund Release request to des: " + uri)
+    val result = httpPost.POST[RequestFundReleaseRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
+
+    result.map(res => {
+      Logger.debug("Fund Release request returned status: " + res.status)
+      res.status match {
+        case 409 => {
+          parseDesResponse[DesLifeEventExistResponse](res)
+        }
+        case _ => parseDesResponse[DesLifeEventResponse](res)
+      }
+
+    })
+  }
+
+  /**
     * Attempts to update the first subscription date
     */
   def updateFirstSubDate(lisaManager: String, accountId: String, request: UpdateSubscriptionRequest)

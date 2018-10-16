@@ -34,7 +34,7 @@ object FundReleaseSupersedeDetails {
   implicit val formats = Json.format[FundReleaseSupersedeDetails]
 }
 
-trait RequestFundReleaseRequest {
+trait RequestFundReleaseRequest extends Product {
   val eventDate: DateTime
   val withdrawalAmount: Amount
 }
@@ -44,7 +44,7 @@ case class InitialFundReleaseRequest(eventDate: DateTime, withdrawalAmount: Amou
 case class SupersedeFundReleaseRequest(eventDate: DateTime, withdrawalAmount: Amount, supersede: FundReleaseSupersedeDetails) extends RequestFundReleaseRequest
 
 object RequestFundReleaseRequest {
-  implicit val dateReads: Reads[DateTime] = Reads.jodaDateReads("yyyy-MM-dd")
+  implicit val dateReads: Reads[DateTime] = JsonReads.notFutureDate
   implicit val dateWrites: Writes[DateTime] = Writes.jodaDateWrites("yyyy-MM-dd")
 
   val initialReads = Json.reads[InitialFundReleaseRequest]

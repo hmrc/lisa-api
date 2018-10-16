@@ -15,7 +15,8 @@
           "description": "A human-readable explanation for the result of the API call.",
           "type": "string",
           "enum": [
-            "Fund release created"
+            "Fund release created",
+            "Fund release superseded"
           ]
         }
       },
