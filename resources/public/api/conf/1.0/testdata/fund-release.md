@@ -427,7 +427,7 @@
   "conveyancerReference": "CR12345-6789",
   "propertyDetails": {
     "nameOrNumber": "1",
-    "postalCode": "AA11 1AA",
+    "postalCode": "AA11 1AA"
   }
 }
 </pre>
