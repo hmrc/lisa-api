@@ -1,7 +1,4 @@
 import sbt._
-import uk.gov.hmrc.SbtAutoBuildPlugin
-import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin
-import uk.gov.hmrc.versioning.SbtGitVersioning
 
 object MicroServiceBuild extends Build with MicroService {
 
@@ -11,8 +8,8 @@ object MicroServiceBuild extends Build with MicroService {
 }
 
 private object AppDependencies {
-  import play.sbt.PlayImport._
   import play.core.PlayVersion
+  import play.sbt.PlayImport._
 
   private val microserviceBootstrapVersion = "6.13.0"
   private val domainVersion = "5.0.0"
@@ -52,23 +49,5 @@ private object AppDependencies {
     }.test
   }
 
-  object IntegrationTest {
-    def apply() = new TestDependencies {
-      override lazy val scope: String = "it"
-
-      override lazy val test = Seq(
-        "org.scalatest" %% "scalatest" % scalaTestVersion % scope,
-        "org.pegdown" % "pegdown" % pegdownVersion % scope,
-        "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
-        "org.mockito" % "mockito-core" % "1.9.0" % scope,
-        "org.scalaj" %% "scalaj-http" % "1.1.5" % scope,
-        "com.github.tomakehurst" % "wiremock" % "1.57" % scope,
-        "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1"  % scope,
-        "info.cukes" %% "cucumber-scala" % "1.2.4" % scope,
-        "info.cukes" % "cucumber-junit" % "1.2.4" % scope
-      )
-    }.test
-  }
-
-  def apply() = compile ++ Test() ++ IntegrationTest()
+  def apply() = compile ++ Test()
 }
