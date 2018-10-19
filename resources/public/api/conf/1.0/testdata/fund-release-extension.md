@@ -24,7 +24,7 @@
 {
   "fundReleaseId": "3456789001",
   "eventDate": "2017-05-10",
-  "eventType": "Purchase extension 1"
+  "eventType": "Extension one"
 }
 </pre>
             </td>
@@ -54,7 +54,7 @@
 <pre class="code--block">
 {
   "eventDate": "2017-05-11",
-  "eventType": "Purchase extension 1",
+  "eventType": "Extension one",
   "supersede": {
     "originalEventDate": "2017-05-10",
     "originalExtensionId": "6789000001"
@@ -89,7 +89,7 @@
 {
   "fundReleaseId": "3456789001",
   "eventDate": "2017-08-10",
-  "eventType": "Purchase extension 2"
+  "eventType": "Extension two"
 }
 </pre>
             </td>
@@ -119,7 +119,7 @@
 <pre class="code--block">
 {
   "eventDate": "2017-08-11",
-  "eventType": "Purchase extension 2",
+  "eventType": "Extension two",
   "supersede": {
     "originalEventDate": "2017-08-10",
     "originalExtensionId": "6789000003"
@@ -154,7 +154,7 @@
 {
   "fundReleaseId": "3456789001",
   "eventDate": "2017-05-10",
-  "eventType": "Purchase extension 1"
+  "eventType": "Extension one"
 }
 </pre>
             </td>
@@ -180,7 +180,7 @@
 <pre class="code--block">
 {
   "eventDate": "10-05-2017",
-  "eventType": "Purchase extension one"
+  "eventType": "Extension 1"
 }
 </pre>
             </td>
@@ -224,7 +224,7 @@
 {
   "fundReleaseId": "3456789001",
   "eventDate": "2017-05-10",
-  "eventType": "Purchase extension 1"
+  "eventType": "Extension one"
 }
 </pre>
             </td>
@@ -251,7 +251,7 @@
 {
   "fundReleaseId": "3456789001",
   "eventDate": "2017-08-10",
-  "eventType": "Purchase extension 2"
+  "eventType": "Extension one"
 }
 </pre>
             </td>
@@ -277,7 +277,7 @@
 <pre class="code--block">
 {
   "eventDate": "2017-05-11",
-  "eventType": "Purchase extension 1",
+  "eventType": "Extension one",
   "supersede": {
     "originalEventDate": "2017-05-10",
     "originalExtensionId": "6789000001"
@@ -308,7 +308,7 @@
 {
   "fundReleaseId": "3456789001",
   "eventDate": "2017-05-10",
-  "eventType": "Purchase extension 1"
+  "eventType": "Extension one"
 }
 </pre>
             </td>
@@ -335,7 +335,7 @@
 {
   "fundReleaseId": "3456789001",
   "eventDate": "2017-05-10",
-  "eventType": "Purchase extension 1"
+  "eventType": "Extension one"
 }
 </pre>
             </td>
@@ -362,7 +362,7 @@
 {
   "fundReleaseId": "3456789001",
   "eventDate": "2017-05-10",
-  "eventType": "Purchase extension 1"
+  "eventType": "Extension one"
 }
 </pre>
             </td>
@@ -389,7 +389,7 @@
 {
   "fundReleaseId": "3456789001",
   "eventDate": "2017-05-10",
-  "eventType": "Purchase extension 1"
+  "eventType": "Extension one"
 }
 </pre>
             </td>
@@ -415,7 +415,7 @@
 <pre class="code--block">
 {
   "eventDate": "2017-05-11",
-  "eventType": "Purchase extension 1",
+  "eventType": "Extension one",
   "supersede": {
     "originalEventDate": "2017-05-10",
     "originalExtensionId": "6789000001"
@@ -445,7 +445,7 @@
 <pre class="code--block">
 {
   "eventDate": "2017-05-11",
-  "eventType": "Purchase extension 1",
+  "eventType": "Extension one",
   "supersede": {
     "originalEventDate": "2017-05-10",
     "originalExtensionId": "6789000001"

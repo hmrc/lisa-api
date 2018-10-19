@@ -16,7 +16,7 @@
 		"eventType" : {
 		  "description": "The type of extension.",
 		  "type" : "string",
-		  "enum": ["Purchase extension 1", "Purchase extension 2"]
+		  "enum": ["Extension one", "Extension two"]
 		},
 		"supersede": {
 			"type": "object",
