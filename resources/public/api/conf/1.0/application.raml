@@ -784,7 +784,8 @@ types:
                           application/json:
                             type: !include schemas/FundRelease.post.response.schema.json
                             examples:
-                              lifeEventCreated: !include examples/FundRelease.post.response.json
+                              lifeEventCreated: !include examples/FundRelease.post.response.1.json
+                              lifeEventSuperseded: !include examples/FundRelease.post.response.2.json
                       400:
                         body:
                           application/json:
@@ -822,25 +823,25 @@ types:
                             type: !include schemas/ErrorCodes.schema.json
                             examples:
                               accountClosed:
-                                description: The LISA account has already been closed
+                                description: The LISA account is already closed
                                 value: |
                                   {
                                     "code" : "INVESTOR_ACCOUNT_ALREADY_CLOSED",
-                                    "message" : "The LISA account has already been closed"
+                                    "message" : "The LISA account is already closed"
                                   }
                               accountVoid:
-                                description: The LISA account has already been voided
+                                description: The LISA account is already void
                                 value: |
                                   {
                                     "code" : "INVESTOR_ACCOUNT_ALREADY_VOID",
-                                    "message" : "The LISA account has already been voided"
+                                    "message" : "The LISA account is already void"
                                   }
                               accountCancelled:
-                                description: The LISA account has already been cancelled
+                                description: The LISA account is already cancelled
                                 value: |
                                   {
                                     "code" : "INVESTOR_ACCOUNT_ALREADY_CANCELLED",
-                                    "message" : "The LISA account has already been cancelled"
+                                    "message" : "The LISA account is already cancelled"
                                   }
                               complianceCheckNotOpenLongEnough:
                                 description: The account has not been open for long enough
@@ -869,11 +870,11 @@ types:
                             type: !include schemas/ErrorCodes.schema.json
                             examples:
                               accountNotFound:
-                                description: The accountId does not match with HMRC’s records
+                                description: The accountId does not match HMRC’s records
                                 value : |
                                   {
                                     "code" : "INVESTOR_ACCOUNTID_NOT_FOUND",
-                                    "message" : "The accountId does not match with HMRC’s records"
+                                    "message" : "The accountId does not match HMRC’s records"
                                   }
                       409:
                         body:
@@ -888,11 +889,11 @@ types:
                                     "message" : "This fund release has already been superseded"
                                   }
                               lifeEventExists:
-                                 description: The investor’s fund release has already been reported
+                                 description: The investor’s fund release has already been requested
                                  value: |
                                    {
                                      "code" : "FUND_RELEASE_ALREADY_EXISTS",
-                                     "message" : "The investor’s fund release has already been reported"
+                                     "message" : "The investor’s fund release has already been requested"
                                    }
                   /extension:
                     post:
