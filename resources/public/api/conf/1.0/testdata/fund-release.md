@@ -437,7 +437,7 @@
                                                                                              <pre class="code--block">
 {
   "code": "FUND_RELEASE_ALREADY_EXISTS",
-  "message": "The investor’s fund release has already been reported"
+  "message": "The investor’s fund release has already been requested"
 }
 </pre>
                                                                                         </td>

@@ -24,7 +24,7 @@
 				"nameOrNumber": {
 					"description": "The name or number of the property that you are requesting funds to buy.",
 					"type": "string",
-					"pattern": "^[A-Za-z0-9 :/-]{1,60}$",
+					"pattern": "^[A-Za-z0-9 :/-]{1,35}$",
 					"example": "Flat A"
 				},
 				"postalCode": {

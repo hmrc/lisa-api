@@ -297,7 +297,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
       doRequest(fundReleaseJson){res =>
         status(res) mustBe CONFLICT
         (contentAsJson(res) \ "code").as[String] mustBe "FUND_RELEASE_ALREADY_EXISTS"
-        (contentAsJson(res) \ "message").as[String] mustBe "The investor’s fund release has already been reported"
+        (contentAsJson(res) \ "message").as[String] mustBe "The investor’s fund release has already been requested"
       }
     }
 
