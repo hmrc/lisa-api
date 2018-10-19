@@ -180,7 +180,7 @@ case object ErrorWithdrawalTimescalesExceeded extends ErrorResponse(403, "WITHDR
 case object ErrorAccountNotOpenLongEnough extends ErrorResponse(403, "COMPLIANCE_ERROR_ACCOUNT_NOT_OPEN_LONG_ENOUGH", "The account has not been open for long enough")
 case object ErrorFundReleaseOtherPropertyOnRecord extends ErrorResponse(403, "COMPLIANCE_ERROR_OTHER_PURCHASE_ON_RECORD", "Another property purchase is already recorded")
 case object ErrorFundReleaseMismatch extends ErrorResponse(403, "SUPERSEDED_FUND_RELEASE_MISMATCH_ERROR", "originalFundReleaseId and the originalEventDate do not match the information in the original request")
-case object ErrorFundReleaseAlreadyExists extends ErrorResponse(409, "FUND_RELEASE_ALREADY_EXISTS", "The investor’s fund release has already been reported")
+case object ErrorFundReleaseAlreadyExists extends ErrorResponse(409, "FUND_RELEASE_ALREADY_EXISTS", "The investor’s fund release has already been requested")
 case object ErrorFundReleaseAlreadySuperseded extends ErrorResponse(409, "SUPERSEDED_FUND_RELEASE_ALREADY_SUPERSEDED", "This fund release has already been superseded")
 
 case object ErrorLifeEventAlreadyExists extends ErrorResponse(409, "LIFE_EVENT_ALREADY_EXISTS", "The investor’s life event has already been reported")

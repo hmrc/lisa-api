@@ -823,25 +823,25 @@ types:
                             type: !include schemas/ErrorCodes.schema.json
                             examples:
                               accountClosed:
-                                description: The LISA account has already been closed
+                                description: The LISA account is already closed
                                 value: |
                                   {
                                     "code" : "INVESTOR_ACCOUNT_ALREADY_CLOSED",
-                                    "message" : "The LISA account has already been closed"
+                                    "message" : "The LISA account is already closed"
                                   }
                               accountVoid:
-                                description: The LISA account has already been voided
+                                description: The LISA account is already void
                                 value: |
                                   {
                                     "code" : "INVESTOR_ACCOUNT_ALREADY_VOID",
-                                    "message" : "The LISA account has already been voided"
+                                    "message" : "The LISA account is already void"
                                   }
                               accountCancelled:
-                                description: The LISA account has already been cancelled
+                                description: The LISA account is already cancelled
                                 value: |
                                   {
                                     "code" : "INVESTOR_ACCOUNT_ALREADY_CANCELLED",
-                                    "message" : "The LISA account has already been cancelled"
+                                    "message" : "The LISA account is already cancelled"
                                   }
                               complianceCheckNotOpenLongEnough:
                                 description: The account has not been open for long enough
@@ -889,11 +889,11 @@ types:
                                     "message" : "This fund release has already been superseded"
                                   }
                               lifeEventExists:
-                                 description: The investor’s fund release has already been reported
+                                 description: The investor’s fund release has already been requested
                                  value: |
                                    {
                                      "code" : "FUND_RELEASE_ALREADY_EXISTS",
-                                     "message" : "The investor’s fund release has already been reported"
+                                     "message" : "The investor’s fund release has already been requested"
                                    }
                   /extension:
                     post:
