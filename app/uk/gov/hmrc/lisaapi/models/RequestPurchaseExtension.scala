@@ -32,7 +32,6 @@ case class RequestExtensionSupersedeDetails(originalEventDate: DateTime, origina
 object RequestPurchaseExtension {
   implicit val dateReads: Reads[DateTime] = JsonReads.notFutureDate
   implicit val dateWrites: Writes[DateTime] = Writes.jodaDateWrites("yyyy-MM-dd")
-  //
 
   implicit val supersedeDetailReads: Reads[RequestExtensionSupersedeDetails] = (
     (JsPath \ "originalEventDate").read(JsonReads.notFutureDate) and
