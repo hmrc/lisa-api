@@ -30,33 +30,74 @@ trait PropertyPurchaseService {
 
   // scalastyle:off cyclomatic.complexity
   def requestFundRelease(lisaManager: String, accountId: String, request: RequestFundReleaseRequest)
-                        (implicit hc: HeaderCarrier): Future[RequestFundReleaseResponse] = {
+                        (implicit hc: HeaderCarrier): Future[PropertyPurchaseResponse] = {
+
+    Logger.debug("Request fund release")
 
     val response = desConnector.requestFundRelease(lisaManager, accountId, request)
 
     response map {
       case successResponse: DesLifeEventResponse => {
-        Logger.debug("Matched DesLifeEventResponse")
+        Logger.debug("Request fund release - matched DesLifeEventResponse")
 
-        RequestFundReleaseSuccessResponse(successResponse.lifeEventID)
+        PropertyPurchaseSuccessResponse(successResponse.lifeEventID)
       }
       case failureResponse: DesFailureResponse => {
-        Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
+        Logger.debug("Request fund release - matched DesFailureResponse and the code is " + failureResponse.code)
 
         failureResponse.code match {
-          case "INVESTOR_ACCOUNT_ALREADY_CLOSED" => RequestFundReleaseAccountClosedResponse
-          case "INVESTOR_ACCOUNT_ALREADY_CANCELLED" => RequestFundReleaseAccountCancelledResponse
-          case "INVESTOR_ACCOUNT_ALREADY_VOID" => RequestFundReleaseAccountVoidResponse
-          case "INVESTOR_ACCOUNTID_NOT_FOUND" => RequestFundReleaseAccountNotFoundResponse
-          case "LIFE_EVENT_ALREADY_EXISTS" => RequestFundReleaseLifeEventAlreadyExistsResponse
-          case "SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED" => RequestFundReleaseLifeEventAlreadySupersededResponse
-          case "SUPERSEDING_LIFE_EVENT_MISMATCH" => RequestFundReleaseMismatchResponse
-          case "COMPLIANCE_ERROR_ACCOUNT_NOT_OPEN_LONG_ENOUGH" => RequestFundReleaseAccountNotOpenLongEnoughResponse
-          case "COMPLIANCE_ERROR_OTHER_PURCHASE_ON_RECORD" => RequestFundReleaseOtherPurchaseOnRecordResponse
+          case "INVESTOR_ACCOUNT_ALREADY_CLOSED" => PropertyPurchaseAccountClosedResponse
+          case "INVESTOR_ACCOUNT_ALREADY_CANCELLED" => PropertyPurchaseAccountCancelledResponse
+          case "INVESTOR_ACCOUNT_ALREADY_VOID" => PropertyPurchaseAccountVoidResponse
+          case "INVESTOR_ACCOUNTID_NOT_FOUND" => PropertyPurchaseAccountNotFoundResponse
+          case "LIFE_EVENT_ALREADY_EXISTS" => PropertyPurchaseLifeEventAlreadyExistsResponse
+          case "SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED" => PropertyPurchaseLifeEventAlreadySupersededResponse
+          case "SUPERSEDING_LIFE_EVENT_MISMATCH" => PropertyPurchaseMismatchResponse
+          case "COMPLIANCE_ERROR_ACCOUNT_NOT_OPEN_LONG_ENOUGH" => PropertyPurchaseAccountNotOpenLongEnoughResponse
+          case "COMPLIANCE_ERROR_OTHER_PURCHASE_ON_RECORD" => PropertyPurchaseOtherPurchaseOnRecordResponse
           case _ => {
-            Logger.warn(s"Report life event returned error: ${failureResponse.code}")
+            Logger.warn(s"Request fund release returned error: ${failureResponse.code}")
 
-            RequestFundReleaseErrorResponse
+            PropertyPurchaseErrorResponse
+          }
+        }
+      }
+    }
+  }
+
+  // scalastyle:off cyclomatic.complexity
+  def requestPurchaseExtension(lisaManager: String, accountId: String, request: RequestPurchaseExtension)
+                              (implicit hc: HeaderCarrier): Future[PropertyPurchaseResponse] = {
+
+    Logger.debug("Request purchase extension")
+
+    val response = desConnector.requestPurchaseExtension(lisaManager, accountId, request)
+
+    response map {
+      case successResponse: DesLifeEventResponse => {
+        Logger.debug("Request purchase extension - matched DesLifeEventResponse")
+
+        PropertyPurchaseSuccessResponse(successResponse.lifeEventID)
+      }
+      case failureResponse: DesFailureResponse => {
+        Logger.debug("Request purchase extension - matched DesFailureResponse and the code is " + failureResponse.code)
+
+        failureResponse.code match {
+          case "INVESTOR_ACCOUNT_ALREADY_CLOSED" => PropertyPurchaseAccountClosedResponse
+          case "INVESTOR_ACCOUNT_ALREADY_CANCELLED" => PropertyPurchaseAccountCancelledResponse
+          case "INVESTOR_ACCOUNT_ALREADY_VOID" => PropertyPurchaseAccountVoidResponse
+          case "INVESTOR_ACCOUNTID_NOT_FOUND" => PropertyPurchaseAccountNotFoundResponse
+          case "LIFE_EVENT_ALREADY_EXISTS" => PropertyPurchaseLifeEventAlreadyExistsResponse
+          case "SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED" => PropertyPurchaseLifeEventAlreadySupersededResponse
+          case "SUPERSEDING_LIFE_EVENT_MISMATCH" => PropertyPurchaseMismatchResponse
+          case "PURCHASE_EXTENSION_1_LIFE_EVENT_ALREADY_APPROVED" => PropertyPurchaseExtensionOneAlreadyApprovedResponse
+          case "PURCHASE_EXTENSION_2_LIFE_EVENT_ALREADY_APPROVED" => PropertyPurchaseExtensionTwoAlreadyApprovedResponse
+          case "PURCHASE_EXTENSION_1_LIFE_EVENT_NOT_YET_APPROVED" => PropertyPurchaseExtensionOneNotYetApprovedResponse
+          case "FUND_RELEASE_LIFE_EVENT_ID_NOT_FOUND" => PropertyPurchaseFundReleaseNotFoundResponse
+          case _ => {
+            Logger.warn(s"Request purchase extension returned error: ${failureResponse.code}")
+
+            PropertyPurchaseErrorResponse
           }
         }
       }

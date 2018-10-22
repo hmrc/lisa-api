@@ -23,6 +23,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
+import uk.gov.hmrc.lisaapi.models
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesLifeEventResponse}
 import uk.gov.hmrc.lisaapi.services.PropertyPurchaseService
@@ -38,7 +39,7 @@ class PropertyPurchaseServiceSpec extends PlaySpec with MockitoSugar with OneApp
       "given a success response from the DES connector" in {
         when(mockDesConnector.requestFundRelease(any(), any(),any())(any())).thenReturn(Future.successful(DesLifeEventResponse("AB123456")))
 
-        doRequest{response => response mustBe RequestFundReleaseSuccessResponse("AB123456")}
+        doFundReleaseRequest{ response => response mustBe PropertyPurchaseSuccessResponse("AB123456")}
       }
     }
 
@@ -46,7 +47,7 @@ class PropertyPurchaseServiceSpec extends PlaySpec with MockitoSugar with OneApp
       "given a account closed response from the DES connector" in {
         when(mockDesConnector.requestFundRelease(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_CLOSED","")))
 
-        doRequest{response => response mustBe RequestFundReleaseAccountClosedResponse}
+        doFundReleaseRequest{ response => response mustBe PropertyPurchaseAccountClosedResponse}
       }
     }
 
@@ -54,7 +55,7 @@ class PropertyPurchaseServiceSpec extends PlaySpec with MockitoSugar with OneApp
       "given a account cancelled response from the DES connector" in {
         when(mockDesConnector.requestFundRelease(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_CANCELLED","")))
 
-        doRequest{response => response mustBe RequestFundReleaseAccountCancelledResponse}
+        doFundReleaseRequest{ response => response mustBe PropertyPurchaseAccountCancelledResponse}
       }
     }
 
@@ -62,7 +63,7 @@ class PropertyPurchaseServiceSpec extends PlaySpec with MockitoSugar with OneApp
       "given a account void response from the DES connector" in {
         when(mockDesConnector.requestFundRelease(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_VOID","")))
 
-        doRequest{response => response mustBe RequestFundReleaseAccountVoidResponse}
+        doFundReleaseRequest{ response => response mustBe PropertyPurchaseAccountVoidResponse}
       }
     }
 
@@ -70,7 +71,7 @@ class PropertyPurchaseServiceSpec extends PlaySpec with MockitoSugar with OneApp
       "given a account void response from the DES connector" in {
         when(mockDesConnector.requestFundRelease(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNTID_NOT_FOUND","")))
 
-        doRequest{response => response mustBe RequestFundReleaseAccountNotFoundResponse}
+        doFundReleaseRequest{ response => response mustBe PropertyPurchaseAccountNotFoundResponse}
       }
     }
 
@@ -78,7 +79,7 @@ class PropertyPurchaseServiceSpec extends PlaySpec with MockitoSugar with OneApp
       "given a life event already exists response from the DES connector" in {
         when(mockDesConnector.requestFundRelease(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("LIFE_EVENT_ALREADY_EXISTS","")))
 
-        doRequest{response => response mustBe RequestFundReleaseLifeEventAlreadyExistsResponse}
+        doFundReleaseRequest{ response => response mustBe PropertyPurchaseLifeEventAlreadyExistsResponse}
       }
     }
 
@@ -86,7 +87,7 @@ class PropertyPurchaseServiceSpec extends PlaySpec with MockitoSugar with OneApp
       "given a already superseded response from the DES connector" in {
         when(mockDesConnector.requestFundRelease(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED","")))
 
-        doRequest{response => response mustBe RequestFundReleaseLifeEventAlreadySupersededResponse}
+        doFundReleaseRequest{ response => response mustBe PropertyPurchaseLifeEventAlreadySupersededResponse}
       }
     }
 
@@ -94,7 +95,7 @@ class PropertyPurchaseServiceSpec extends PlaySpec with MockitoSugar with OneApp
       "given a mismatch response from the DES connector" in {
         when(mockDesConnector.requestFundRelease(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("SUPERSEDING_LIFE_EVENT_MISMATCH","")))
 
-        doRequest{response => response mustBe RequestFundReleaseMismatchResponse}
+        doFundReleaseRequest{ response => response mustBe PropertyPurchaseMismatchResponse}
       }
     }
 
@@ -102,7 +103,7 @@ class PropertyPurchaseServiceSpec extends PlaySpec with MockitoSugar with OneApp
       "given a not open long enough response from the DES connector" in {
         when(mockDesConnector.requestFundRelease(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("COMPLIANCE_ERROR_ACCOUNT_NOT_OPEN_LONG_ENOUGH","")))
 
-        doRequest{response => response mustBe RequestFundReleaseAccountNotOpenLongEnoughResponse}
+        doFundReleaseRequest{ response => response mustBe PropertyPurchaseAccountNotOpenLongEnoughResponse}
       }
     }
 
@@ -110,27 +111,146 @@ class PropertyPurchaseServiceSpec extends PlaySpec with MockitoSugar with OneApp
       "given a other purchase on record response from the DES connector" in {
         when(mockDesConnector.requestFundRelease(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("COMPLIANCE_ERROR_OTHER_PURCHASE_ON_RECORD","")))
 
-        doRequest{response => response mustBe RequestFundReleaseOtherPurchaseOnRecordResponse}
+        doFundReleaseRequest{ response => response mustBe PropertyPurchaseOtherPurchaseOnRecordResponse}
       }
     }
 
-    "return a Internal Server Error response" when {
+    "return internal server error" when {
       "given a INTERNAL_SERVER_ERROR error code from the DES connector" in {
         when(mockDesConnector.requestFundRelease(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("INTERNAL_SERVER_ERROR","Internal Error")))
-        doRequest(response => response mustBe RequestFundReleaseErrorResponse)
+        doFundReleaseRequest(response => response mustBe PropertyPurchaseErrorResponse)
       }
 
       "given a invalid error code response from the DES connector" in {
         when(mockDesConnector.requestFundRelease(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("INVALID","Invalid Code")))
-        doRequest(response => response mustBe RequestFundReleaseErrorResponse)
+        doFundReleaseRequest(response => response mustBe PropertyPurchaseErrorResponse)
       }
     }
 
   }
 
-  private def doRequest(callback: (RequestFundReleaseResponse) => Unit): Unit = {
+  "Request a purchase extension" must {
+
+    "return a success response" when {
+      "given a success response from the DES connector" in {
+        when(mockDesConnector.requestPurchaseExtension(any(), any(),any())(any())).thenReturn(Future.successful(DesLifeEventResponse("AB123456")))
+
+        doExtensionRequest{ response => response mustBe PropertyPurchaseSuccessResponse("AB123456")}
+      }
+    }
+
+    "return account closed" when {
+      "given a account closed response from the DES connector" in {
+        when(mockDesConnector.requestPurchaseExtension(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_CLOSED","")))
+
+        doExtensionRequest{ response => response mustBe PropertyPurchaseAccountClosedResponse}
+      }
+    }
+
+    "return account cancelled" when {
+      "given a account cancelled response from the DES connector" in {
+        when(mockDesConnector.requestPurchaseExtension(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_CANCELLED","")))
+
+        doExtensionRequest{ response => response mustBe PropertyPurchaseAccountCancelledResponse}
+      }
+    }
+
+    "return account void" when {
+      "given a account void response from the DES connector" in {
+        when(mockDesConnector.requestPurchaseExtension(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_VOID","")))
+
+        doExtensionRequest{ response => response mustBe PropertyPurchaseAccountVoidResponse}
+      }
+    }
+
+    "return account not found" when {
+      "given a account void response from the DES connector" in {
+        when(mockDesConnector.requestPurchaseExtension(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNTID_NOT_FOUND","")))
+
+        doExtensionRequest{ response => response mustBe PropertyPurchaseAccountNotFoundResponse}
+      }
+    }
+
+    "return life event already exists" when {
+      "given a life event already exists response from the DES connector" in {
+        when(mockDesConnector.requestPurchaseExtension(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("LIFE_EVENT_ALREADY_EXISTS","")))
+
+        doExtensionRequest{ response => response mustBe PropertyPurchaseLifeEventAlreadyExistsResponse}
+      }
+    }
+
+    "return already superseded" when {
+      "given a already superseded response from the DES connector" in {
+        when(mockDesConnector.requestPurchaseExtension(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED","")))
+
+        doExtensionRequest{ response => response mustBe PropertyPurchaseLifeEventAlreadySupersededResponse}
+      }
+    }
+
+    "return mismatch error" when {
+      "given a mismatch response from the DES connector" in {
+        when(mockDesConnector.requestPurchaseExtension(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("SUPERSEDING_LIFE_EVENT_MISMATCH","")))
+
+        doExtensionRequest{ response => response mustBe PropertyPurchaseMismatchResponse}
+      }
+    }
+
+    "return extension one already approved error" when {
+      "given a extension one already approved response from the DES connector" in {
+        when(mockDesConnector.requestPurchaseExtension(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("PURCHASE_EXTENSION_1_LIFE_EVENT_ALREADY_APPROVED","")))
+
+        doExtensionRequest{ response => response mustBe PropertyPurchaseExtensionOneAlreadyApprovedResponse}
+      }
+    }
+
+    "return extension two already approved error" when {
+      "given a extension two already approved response from the DES connector" in {
+        when(mockDesConnector.requestPurchaseExtension(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("PURCHASE_EXTENSION_2_LIFE_EVENT_ALREADY_APPROVED","")))
+
+        doExtensionRequest{ response => response mustBe PropertyPurchaseExtensionTwoAlreadyApprovedResponse}
+      }
+    }
+
+    "return extension one not yet approved error" when {
+      "given a extension one not yet approved response from the DES connector" in {
+        when(mockDesConnector.requestPurchaseExtension(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("PURCHASE_EXTENSION_1_LIFE_EVENT_NOT_YET_APPROVED","")))
+
+        doExtensionRequest{ response => response mustBe PropertyPurchaseExtensionOneNotYetApprovedResponse}
+      }
+    }
+
+    "return fund release not found error" when {
+      "given a fund release not found response from the DES connector" in {
+        when(mockDesConnector.requestPurchaseExtension(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("FUND_RELEASE_LIFE_EVENT_ID_NOT_FOUND","")))
+
+        doExtensionRequest{ response => response mustBe PropertyPurchaseFundReleaseNotFoundResponse}
+      }
+    }
+
+    "return internal server error" when {
+      "given a INTERNAL_SERVER_ERROR error code from the DES connector" in {
+        when(mockDesConnector.requestPurchaseExtension(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("INTERNAL_SERVER_ERROR","Internal Error")))
+        doExtensionRequest(response => response mustBe PropertyPurchaseErrorResponse)
+      }
+
+      "given a invalid error code response from the DES connector" in {
+        when(mockDesConnector.requestPurchaseExtension(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("INVALID","Invalid Code")))
+        doExtensionRequest(response => response mustBe PropertyPurchaseErrorResponse)
+      }
+    }
+
+  }
+
+  private def doFundReleaseRequest(callback: (PropertyPurchaseResponse) => Unit): Unit = {
     val request = InitialFundReleaseRequest(new DateTime("2018-01-01"), 10000, "CR12345", FundReleasePropertyDetails("1", "AA1 1AA"))
     val response = Await.result(SUT.requestFundRelease("Z019283", "192837", request)(HeaderCarrier()), Duration.Inf)
+
+    callback(response)
+  }
+
+  private def doExtensionRequest(callback: (PropertyPurchaseResponse) => Unit): Unit = {
+    val request = RequestStandardPurchaseExtension("1234567890", new DateTime("2018-01-01"), "Extension one")
+    val response = Await.result(SUT.requestPurchaseExtension("Z019283", "192837", request)(HeaderCarrier()), Duration.Inf)
 
     callback(response)
   }

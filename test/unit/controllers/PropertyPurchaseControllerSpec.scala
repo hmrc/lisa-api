@@ -80,7 +80,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
 
     "audit fundReleaseReported" when {
       "a initial fund release request has been successful" in {
-        when(mockService.requestFundRelease(any(), any(), any())(any())).thenReturn(Future.successful(RequestFundReleaseSuccessResponse("1928374")))
+        when(mockService.requestFundRelease(any(), any(), any())(any())).thenReturn(Future.successful(PropertyPurchaseSuccessResponse("1928374")))
         doRequest(fundReleaseJson) { res =>
           await(res)
           verify(mockAuditService).audit(
@@ -99,7 +99,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
         }
       }
       "a superseded fund release request has been successful" in {
-        when(mockService.requestFundRelease(any(), any(), any())(any())).thenReturn(Future.successful(RequestFundReleaseSuccessResponse("1928374")))
+        when(mockService.requestFundRelease(any(), any(), any())(any())).thenReturn(Future.successful(PropertyPurchaseSuccessResponse("1928374")))
         doRequest(supersededFundReleaseJson) { res =>
           await(res)
           verify(mockAuditService).audit(
@@ -121,7 +121,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
     "audit fundReleaseNotReported" when {
       "the request results in a RequestFundReleaseErrorResponse" in {
         when(mockService.requestFundRelease(any(), any(), any())(any()))
-          .thenReturn(Future.successful(RequestFundReleaseErrorResponse))
+          .thenReturn(Future.successful(PropertyPurchaseErrorResponse))
 
         doRequest(fundReleaseJson) { res =>
           await(res)
@@ -142,7 +142,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
         }
       }
       "given a eventDate prior to 6 April 2017" in {
-        when(mockService.requestFundRelease(any(), any(), any())(any())).thenReturn(Future.successful(RequestFundReleaseSuccessResponse("1928374")))
+        when(mockService.requestFundRelease(any(), any(), any())(any())).thenReturn(Future.successful(PropertyPurchaseSuccessResponse("1928374")))
 
         doRequest(fundReleaseJson.replace("2017-05-10", "2017-04-05")) { res =>
           await(res)
@@ -166,7 +166,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
 
     "return with 201 created" when {
       "a initial fund release is successful" in {
-        when(mockService.requestFundRelease(any(), any(), any())(any())).thenReturn(Future.successful(RequestFundReleaseSuccessResponse("1928374")))
+        when(mockService.requestFundRelease(any(), any(), any())(any())).thenReturn(Future.successful(PropertyPurchaseSuccessResponse("1928374")))
         doRequest(fundReleaseJson) { res =>
           status(res) mustBe CREATED
           (contentAsJson(res) \ "data" \ "fundReleaseId").as[String] mustBe "1928374"
@@ -174,7 +174,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
         }
       }
       "a superseded fund release is successful" in {
-        when(mockService.requestFundRelease(any(), any(), any())(any())).thenReturn(Future.successful(RequestFundReleaseSuccessResponse("1928374")))
+        when(mockService.requestFundRelease(any(), any(), any())(any())).thenReturn(Future.successful(PropertyPurchaseSuccessResponse("1928374")))
         doRequest(supersededFundReleaseJson) { res =>
           status(res) mustBe CREATED
           (contentAsJson(res) \ "data" \ "fundReleaseId").as[String] mustBe "1928374"
@@ -216,7 +216,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
 
     "return with 403 forbidden and a code of FORBIDDEN" when {
       "given a eventDate prior to 6 April 2017" in {
-        when(mockService.requestFundRelease(any(), any(), any())(any())).thenReturn(Future.successful(RequestFundReleaseSuccessResponse("1928374")))
+        when(mockService.requestFundRelease(any(), any(), any())(any())).thenReturn(Future.successful(PropertyPurchaseSuccessResponse("1928374")))
 
         doRequest(fundReleaseJson.replace("2017-05-10", "2017-04-05")) { res =>
           status(res) mustBe FORBIDDEN
@@ -230,7 +230,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
     }
 
     "return with 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_CLOSED" in {
-      when(mockService.requestFundRelease(any(), any(),any())(any())).thenReturn(Future.successful(RequestFundReleaseAccountClosedResponse))
+      when(mockService.requestFundRelease(any(), any(),any())(any())).thenReturn(Future.successful(PropertyPurchaseAccountClosedResponse))
       doRequest(fundReleaseJson){res =>
         status(res) mustBe FORBIDDEN
         (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CLOSED"
@@ -239,7 +239,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
     }
 
     "return with 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_CANCELLED" in {
-      when(mockService.requestFundRelease(any(), any(),any())(any())).thenReturn(Future.successful(RequestFundReleaseAccountCancelledResponse))
+      when(mockService.requestFundRelease(any(), any(),any())(any())).thenReturn(Future.successful(PropertyPurchaseAccountCancelledResponse))
       doRequest(fundReleaseJson){res =>
         status(res) mustBe FORBIDDEN
         (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CANCELLED"
@@ -248,7 +248,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
     }
 
     "return with 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_VOID" in {
-      when(mockService.requestFundRelease(any(), any(),any())(any())).thenReturn(Future.successful(RequestFundReleaseAccountVoidResponse))
+      when(mockService.requestFundRelease(any(), any(),any())(any())).thenReturn(Future.successful(PropertyPurchaseAccountVoidResponse))
       doRequest(fundReleaseJson){res =>
         status(res) mustBe FORBIDDEN
         (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_VOID"
@@ -257,7 +257,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
     }
 
     "return with 403 forbidden and a code of SUPERSEDED_FUND_RELEASE_MISMATCH_ERROR" in {
-      when(mockService.requestFundRelease(any(), any(),any())(any())).thenReturn(Future.successful(RequestFundReleaseMismatchResponse))
+      when(mockService.requestFundRelease(any(), any(),any())(any())).thenReturn(Future.successful(PropertyPurchaseMismatchResponse))
       doRequest(fundReleaseJson){res =>
         status(res) mustBe FORBIDDEN
         (contentAsJson(res) \ "code").as[String] mustBe "SUPERSEDED_FUND_RELEASE_MISMATCH_ERROR"
@@ -266,7 +266,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
     }
 
     "return with 403 forbidden and a code of COMPLIANCE_ERROR_ACCOUNT_NOT_OPEN_LONG_ENOUGH" in {
-      when(mockService.requestFundRelease(any(), any(),any())(any())).thenReturn(Future.successful(RequestFundReleaseAccountNotOpenLongEnoughResponse))
+      when(mockService.requestFundRelease(any(), any(),any())(any())).thenReturn(Future.successful(PropertyPurchaseAccountNotOpenLongEnoughResponse))
       doRequest(fundReleaseJson){res =>
         status(res) mustBe FORBIDDEN
         (contentAsJson(res) \ "code").as[String] mustBe "COMPLIANCE_ERROR_ACCOUNT_NOT_OPEN_LONG_ENOUGH"
@@ -275,7 +275,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
     }
 
     "return with 403 forbidden and a code of COMPLIANCE_ERROR_OTHER_PURCHASE_ON_RECORD" in {
-      when(mockService.requestFundRelease(any(), any(),any())(any())).thenReturn(Future.successful(RequestFundReleaseOtherPurchaseOnRecordResponse))
+      when(mockService.requestFundRelease(any(), any(),any())(any())).thenReturn(Future.successful(PropertyPurchaseOtherPurchaseOnRecordResponse))
       doRequest(fundReleaseJson){res =>
         status(res) mustBe FORBIDDEN
         (contentAsJson(res) \ "code").as[String] mustBe "COMPLIANCE_ERROR_OTHER_PURCHASE_ON_RECORD"
@@ -284,7 +284,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
     }
 
     "return with 404 not found and a code of INVESTOR_ACCOUNTID_NOT_FOUND" in {
-      when(mockService.requestFundRelease(any(), any(),any())(any())).thenReturn(Future.successful(RequestFundReleaseAccountNotFoundResponse))
+      when(mockService.requestFundRelease(any(), any(),any())(any())).thenReturn(Future.successful(PropertyPurchaseAccountNotFoundResponse))
       doRequest(fundReleaseJson){res =>
         status(res) mustBe NOT_FOUND
         (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNTID_NOT_FOUND"
@@ -293,7 +293,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
     }
 
     "return with 409 conflict and a code of FUND_RELEASE_ALREADY_EXISTS" in {
-      when(mockService.requestFundRelease(any(), any(),any())(any())).thenReturn(Future.successful(RequestFundReleaseLifeEventAlreadyExistsResponse))
+      when(mockService.requestFundRelease(any(), any(),any())(any())).thenReturn(Future.successful(PropertyPurchaseLifeEventAlreadyExistsResponse))
       doRequest(fundReleaseJson){res =>
         status(res) mustBe CONFLICT
         (contentAsJson(res) \ "code").as[String] mustBe "FUND_RELEASE_ALREADY_EXISTS"
@@ -302,7 +302,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
     }
 
     "return with 409 conflict and a code of SUPERSEDED_FUND_RELEASE_ALREADY_SUPERSEDED" in {
-      when(mockService.requestFundRelease(any(), any(),any())(any())).thenReturn(Future.successful(RequestFundReleaseLifeEventAlreadySupersededResponse))
+      when(mockService.requestFundRelease(any(), any(),any())(any())).thenReturn(Future.successful(PropertyPurchaseLifeEventAlreadySupersededResponse))
       doRequest(fundReleaseJson){res =>
         status(res) mustBe CONFLICT
         (contentAsJson(res) \ "code").as[String] mustBe "SUPERSEDED_FUND_RELEASE_ALREADY_SUPERSEDED"
@@ -311,7 +311,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
     }
 
     "return with 500 internal server error and a code of INTERNAL_SERVER_ERROR" in {
-      when(mockService.requestFundRelease(any(), any(),any())(any())).thenReturn(Future.successful(RequestFundReleaseErrorResponse))
+      when(mockService.requestFundRelease(any(), any(),any())(any())).thenReturn(Future.successful(PropertyPurchaseErrorResponse))
       doRequest(fundReleaseJson){res =>
         status(res) mustBe INTERNAL_SERVER_ERROR
         (contentAsJson(res) \ "code").as[String] mustBe "INTERNAL_SERVER_ERROR"

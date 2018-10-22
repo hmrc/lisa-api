@@ -46,7 +46,7 @@ class PropertyPurchaseController extends LisaController with LisaConstants {
             req =>
               withValidDates(lisaManager, accountId, req) { () =>
                 service.requestFundRelease(lisaManager, accountId, req) map {
-                  case res: RequestFundReleaseSuccessResponse => {
+                  case res: PropertyPurchaseSuccessResponse => {
                     Logger.debug("Fund release successful")
                     doAudit(lisaManager, accountId, req, true)
                     LisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.PROPERTY_PURCHASE)
@@ -56,55 +56,55 @@ class PropertyPurchaseController extends LisaController with LisaConstants {
                     }
                     Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
                   }
-                  case RequestFundReleaseAccountClosedResponse => {
+                  case PropertyPurchaseAccountClosedResponse => {
                     Logger.debug("Fund release account closed")
                     doAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorAccountAlreadyClosed.errorCode))
                     LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
                     Forbidden(Json.toJson(ErrorAccountAlreadyClosed))
                   }
-                  case RequestFundReleaseAccountCancelledResponse => {
+                  case PropertyPurchaseAccountCancelledResponse => {
                     Logger.debug("Fund release account cancelled")
                     doAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorAccountAlreadyCancelled.errorCode))
                     LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
                     Forbidden(Json.toJson(ErrorAccountAlreadyCancelled))
                   }
-                  case RequestFundReleaseAccountVoidResponse => {
+                  case PropertyPurchaseAccountVoidResponse => {
                     Logger.debug("Fund release account voided")
                     doAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorAccountAlreadyVoided.errorCode))
                     LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
                     Forbidden(Json.toJson(ErrorAccountAlreadyVoided))
                   }
-                  case RequestFundReleaseMismatchResponse => {
+                  case PropertyPurchaseMismatchResponse => {
                     Logger.debug("Fund release mismatch")
                     doAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorFundReleaseMismatch.errorCode))
                     LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
                     Forbidden(Json.toJson(ErrorFundReleaseMismatch))
                   }
-                  case RequestFundReleaseAccountNotOpenLongEnoughResponse => {
+                  case PropertyPurchaseAccountNotOpenLongEnoughResponse => {
                     Logger.debug("Fund release account not open long enough")
                     doAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorAccountNotOpenLongEnough.errorCode))
                     LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
                     Forbidden(Json.toJson(ErrorAccountNotOpenLongEnough))
                   }
-                  case RequestFundReleaseOtherPurchaseOnRecordResponse => {
+                  case PropertyPurchaseOtherPurchaseOnRecordResponse => {
                     Logger.debug("Fund release other purchase on record")
                     doAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorFundReleaseOtherPropertyOnRecord.errorCode))
                     LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
                     Forbidden(Json.toJson(ErrorFundReleaseOtherPropertyOnRecord))
                   }
-                  case RequestFundReleaseAccountNotFoundResponse => {
+                  case PropertyPurchaseAccountNotFoundResponse => {
                     Logger.debug("Fund release account not found")
                     doAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorAccountNotFound.errorCode))
                     LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.PROPERTY_PURCHASE)
                     NotFound(Json.toJson(ErrorAccountNotFound))
                   }
-                  case RequestFundReleaseLifeEventAlreadyExistsResponse => {
+                  case PropertyPurchaseLifeEventAlreadyExistsResponse => {
                     Logger.debug("Fund release already exists")
                     doAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorFundReleaseAlreadyExists.errorCode))
                     LisaMetrics.incrementMetrics(startTime, CONFLICT, LisaMetricKeys.PROPERTY_PURCHASE)
                     Conflict(Json.toJson(ErrorFundReleaseAlreadyExists))
                   }
-                  case RequestFundReleaseLifeEventAlreadySupersededResponse => {
+                  case PropertyPurchaseLifeEventAlreadySupersededResponse => {
                     Logger.debug("Fund release already superseded")
                     doAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorFundReleaseAlreadySuperseded.errorCode))
                     LisaMetrics.incrementMetrics(startTime, CONFLICT, LisaMetricKeys.PROPERTY_PURCHASE)
