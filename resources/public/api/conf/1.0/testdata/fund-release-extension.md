@@ -68,7 +68,7 @@
   "status": 201,
   "success": true,
   "data": {
-    "message": "Extension created",
+    "message": "Extension superseded",
     "extensionId": "6789000002"
   }
 }
@@ -133,7 +133,7 @@
   "status": 201,
   "success": true,
   "data": {
-    "message": "Extension created",
+    "message": "Extension superseded",
     "extensionId": "6789000004"
   }
 }
@@ -401,7 +401,7 @@
 <pre class="code--block">
 {
   "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
-  "message": "The accountId does not match with HMRC’s records"
+  "message": "The accountId does not match HMRC’s records"
 }
 </pre>
             </td>
