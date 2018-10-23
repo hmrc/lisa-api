@@ -20,43 +20,32 @@ import org.joda.time.DateTime
 import org.scalatestplus.play.PlaySpec
 import play.api.data.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
-import uk.gov.hmrc.lisaapi.models.{Bonuses, HelpToBuyTransfer, InboundPayments, RequestBonusPaymentRequest}
+import uk.gov.hmrc.lisaapi.models._
 
 import scala.io.Source
 
 class RequestBonusPaymentRequestSpec extends PlaySpec {
 
   val validBonusPaymentJson = Source.fromInputStream(getClass().getResourceAsStream("/json/request.valid.bonus-payment.json")).mkString
+  val validBonusPayment = RequestBonusPaymentRequest(
+    lifeEventId = Some("1234567891"),
+    periodStartDate = new DateTime("2017-04-06"),
+    periodEndDate = new DateTime("2017-05-05"),
+    htbTransfer = Some(HelpToBuyTransfer(10f, 10f)),
+    inboundPayments = InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
+    bonuses = Bonuses(1000f, 1000f, Some(1000f), "Life Event")
+  )
 
   "Bonus Payment Request" must {
 
     "serialize from json" in {
       val res = Json.parse(validBonusPaymentJson).validate[RequestBonusPaymentRequest]
 
-      res match {
-        case JsError(errors) => fail(s"Failed to serialize. Errors: ${errors.toString()}")
-        case JsSuccess(data, path) => {
-          data.lifeEventId mustBe Some("1234567891")
-          data.periodStartDate mustBe new DateTime("2017-04-06")
-          data.periodEndDate mustBe new DateTime("2017-05-05")
-          data.htbTransfer mustBe Some(HelpToBuyTransfer(0f, 10f))
-          data.inboundPayments mustBe InboundPayments(Some(4000f), 4000f, 4000f, 4000f)
-          data.bonuses mustBe Bonuses(1000f, 1000f, Some(1000f), "Life Event")
-        }
-      }
+      res mustBe JsSuccess(validBonusPayment)
     }
 
     "deserialize to json" in {
-      val data = RequestBonusPaymentRequest(
-        lifeEventId = Some("1234567891"),
-        periodStartDate = new DateTime("2017-04-06"),
-        periodEndDate = new DateTime("2017-05-05"),
-        htbTransfer = Some(HelpToBuyTransfer(0f, 10f)),
-        inboundPayments = InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
-        bonuses = Bonuses(1000f, 1000f, Some(1000f), "Life Event")
-      )
-
-      val json = Json.toJson[RequestBonusPaymentRequest](data)
+      val json = Json.toJson[RequestBonusPaymentRequest](validBonusPayment)
 
       json mustBe Json.parse(validBonusPaymentJson)
     }
@@ -75,6 +64,7 @@ class RequestBonusPaymentRequestSpec extends PlaySpec {
         case _ => fail()
       }
     }
+
   }
 
 }

@@ -83,7 +83,7 @@ object LisaInvestor {
   implicit val format = Json.format[LisaInvestor]
 }
 
-case class LisaAccount(investorID:ID,
+case class LisaAccount(investorID: ID,
                        accountID: AccountId,
                        lisaManagerReferenceNumber:ReferenceNumber,
                        creationReason:CreationReason,
@@ -142,6 +142,88 @@ object InboundPayments {
     (JsPath \ "totalSubsForPeriod").write[Amount] and
     (JsPath \ "totalSubsYTD").write[Amount]
   )(unlift(InboundPayments.unapply))
+}
+
+sealed trait Supersede
+
+case class BonusRecovery(
+  automaticRecoveryAmount: Amount,
+  originalTransactionId: String,
+  originalBonusDueForPeriod: Amount,
+  transactionResult: Amount
+) extends Supersede
+
+case class AdditionalBonus(
+  originalTransactionId: String,
+  originalBonusDueForPeriod: Amount,
+  transactionResult: Amount
+) extends Supersede
+
+object Supersede {
+
+  val bonusRecoveryReads: Reads[BonusRecovery] = (
+    (JsPath \ "automaticRecoveryAmount").read(JsonReads.nonNegativeAmount) and
+    (JsPath \ "originalTransactionId").read(JsonReads.transactionId) and
+    (JsPath \ "originalBonusDueForPeriod").read(JsonReads.nonNegativeAmount) and
+    (JsPath \ "transactionResult").read(JsonReads.amount) and
+    (JsPath \ "reason").read[String](Reads.pattern("Bonus recovery".r, "error.formatting.reason"))
+  )((automaticRecoveryAmount, transactionId, transactionAmount, transactionResult, _) => BonusRecovery(
+    automaticRecoveryAmount, transactionId, transactionAmount, transactionResult
+  ))
+
+  val additionalBonusReads: Reads[AdditionalBonus] = (
+    (JsPath \ "originalTransactionId").read(JsonReads.transactionId) and
+    (JsPath \ "originalBonusDueForPeriod").read(JsonReads.nonNegativeAmount) and
+    (JsPath \ "transactionResult").read(JsonReads.amount) and
+    (JsPath \ "reason").read[String](Reads.pattern("Additional bonus".r, "error.formatting.reason"))
+  )((transactionId, transactionAmount, transactionResult, _) => AdditionalBonus(
+    transactionId, transactionAmount, transactionResult
+  ))
+
+  implicit val supersedeReads: Reads[Supersede] = Reads[Supersede] { json =>
+    val reason = (json \ "reason").as[String]
+
+    reason match {
+      case "Bonus recovery" => bonusRecoveryReads.reads(json)
+      case _ => additionalBonusReads.reads(json)
+    }
+  }
+
+  implicit val bonusRecoveryWrites: Writes[BonusRecovery] = (
+    (JsPath \ "automaticRecoveryAmount").write[Amount] and
+    (JsPath \ "originalTransactionId").write[String] and
+    (JsPath \ "originalBonusDueForPeriod").write[Amount] and
+    (JsPath \ "transactionResult").write[Amount] and
+    (JsPath \ "reason").write[String]
+  ){
+    b: BonusRecovery => (
+      b.automaticRecoveryAmount,
+      b.originalTransactionId,
+      b.originalBonusDueForPeriod,
+      b.transactionResult,
+      "Bonus recovery"
+    )
+  }
+
+  implicit val additionalBonusWrites: Writes[AdditionalBonus] = (
+    (JsPath \ "originalTransactionId").write[String] and
+    (JsPath \ "originalBonusDueForPeriod").write[Amount] and
+    (JsPath \ "transactionResult").write[Amount] and
+    (JsPath \ "reason").write[String]
+  ){
+    b: AdditionalBonus => (
+      b.originalTransactionId,
+      b.originalBonusDueForPeriod,
+      b.transactionResult,
+      "Additional bonus"
+    )
+  }
+
+  implicit val supersedeWrites: Writes[Supersede] = Writes[Supersede] {
+    case br: BonusRecovery => bonusRecoveryWrites.writes(br)
+    case ab: AdditionalBonus => additionalBonusWrites.writes(ab)
+  }
+
 }
 
 case class LifeEvent(accountID: AccountId,

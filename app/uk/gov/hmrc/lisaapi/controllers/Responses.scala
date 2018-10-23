@@ -138,6 +138,30 @@ case object ErrorBonusClaimError extends ErrorResponse(403, "BONUS_CLAIM_ERROR",
 
 case object ErrorBonusClaimAlreadyExists extends ErrorResponse(409, "BONUS_CLAIM_ALREADY_EXISTS", "The investor’s bonus payment has already been requested")
 
+case object ErrorBonusClaimAlreadySuperseded extends ErrorResponse(409, "BONUS_CLAIM_ALREADY_SUPERSEDED", "This bonus claim has already been superseded")
+
+case object ErrorBonusSupersededAmountMismatch extends ErrorResponse(403, "SUPERSEDED_BONUS_CLAIM_AMOUNT_MISMATCH", "originalTransactionId and the originalBonusDueForPeriod amount do not match the information in the original bonus request")
+
+case object ErrorBonusSupersededOutcomeError extends ErrorResponse(403, "SUPERSEDED_BONUS_REQUEST_OUTCOME_ERROR", "The calculation from your superseded bonus claim is incorrect")
+
+case object ErrorBonusClaimTimescaleExceeded extends ErrorResponse(403, "BONUS_CLAIM_TIMESCALES_EXCEEDED", "The timescale for claiming a bonus has passed. The claim period lasts for 6 years and 14 days")
+
+case object ErrorBonusHelpToBuyNotApplicable extends ErrorResponse(403, "HELP_TO_BUY_NOT_APPLICABLE", "Help to Buy is not applicable on this account")
+
+case object ErrorNoSubscriptions extends ErrorResponse(403, "ACCOUNT_ERROR_NO_SUBSCRIPTIONS_THIS_TAX_YEAR", "A bonus payment is not possible because the account has no subscriptions for that tax year")
+
+case object ErrorWithdrawalExists extends ErrorResponse(409, "WITHDRAWAL_CHARGE_ALREADY_EXISTS", "A withdrawal charge with these details has already been requested for this investor")
+
+case object ErrorWithdrawalReportingError extends ErrorResponse(403, "WITHDRAWAL_REPORTING_ERROR", "The withdrawal charge does not equal 25% of the withdrawal amount")
+
+case object ErrorWithdrawalAlreadySuperseded extends ErrorResponse(403, "WITHDRAWAL_CHARGE_ALREADY_SUPERSEDED", "This withdrawal charge has already been superseded")
+
+case object ErrorWithdrawalSupersededAmountMismatch extends ErrorResponse(403, "SUPERSEDED_WITHDRAWAL_CHARGE_ID_AMOUNT_MISMATCH", "originalTransactionId and the originalWithdrawalChargeAmount do not match the information in the original request")
+
+case object ErrorWithdrawalSupersededOutcomeError extends ErrorResponse(403, "SUPERSEDED_WITHDRAWAL_CHARGE_OUTCOME_ERROR", "The calculation from your superseded withdrawal charge is incorrect")
+
+case object ErrorWithdrawalTimescalesExceeded extends ErrorResponse(403, "WITHDRAWAL_CHARGE_TIMESCALES_EXCEEDED", "The timescale for reporting a withdrawal charge has passed. The claim period lasts for 6 years and 14 days")
+
 object ErrorInvestorAlreadyExists {
 
   def apply(investorId: String) = {

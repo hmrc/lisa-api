@@ -60,7 +60,7 @@
           "bonusDueForPeriod" :{"description": "The total bonus payment amount due for the claim period. You can include an amount up to 2 decimal places. The bonusDueForPeriod must always be greater than 0.", "type" : "number"},
           "totalBonusDueYTD" :{"description": "The total bonus payment amount due for the tax year to date. You can include an amount up to 2 decimal places. The totalBonusDueYTD must always be greater than 0.", "type" : "number"},
           "bonusPaidYTD" :{"description": "The total bonus payment that has already been claimed and paid in the tax year to date. You can include an amount up to 2 decimal places.", "type" : "number"},
-          "claimReason" : {"description": "The reason the bonus payment was claimed.", "$ref": "#/definitions/claimReasonType"}
+          "claimReason" : {"description": "The reason the bonus payment was claimed. \"Superseding bonus claim\" is valid in the sandbox environment only.", "$ref": "#/definitions/claimReasonType"}
         },
         "required":
         [
@@ -69,8 +69,27 @@
           "claimReason"
         ]
 
+      },
+      "supersede":
+      {
+        "description": "[sandbox-only] Correct an existing bonus claim with an additional bonus or a recovery of an overpaid amount.",
+        "type": "object",
+        "properties":
+        {
+          "automaticRecoveryAmount":{"description": "[sandbox-only] This is the amount HMRC can collect from the LISA manager in bonus recovery cases. If there are no funds available, this value must be 0.", "type" : "number"},
+          "originalTransactionId" :{"description": "[sandbox-only] The transactionId of the original bonus affected by the correction or recovery. This is used together with the originalBonusDueForPeriod to make sure the right bonus transaction is replaced.", "$ref": "#/definitions/TransactionIDType"},
+          "originalBonusDueForPeriod" :{"description": "[sandbox-only] This is how much was in the bonusDueForPeriod in the original bonus request.", "type" : "number"},
+          "transactionResult" :{"description": "[sandbox-only] The amount to be added to or recovered from the original bonus.", "type" : "number"},
+          "reason" : {"description": "[sandbox-only] Confirm whether an additional bonus amount is due or funds need to be recovered.", "$ref": "#/definitions/supersededReasonType"}
+        },
+        "required":
+        [
+          "originalTransactionId" ,
+          "originalBonusDueForPeriod",
+          "transactionResult",
+          "reason"
+        ]
       }
-
 	},
 	"required": [
 		"periodStartDate",
@@ -93,18 +112,27 @@
         "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
         "example": "2017-06-05"
       },
-		"IDType": {
-			"type": "string",
-			"pattern": "^\\d{10}$",
-          "example": "0987654321"
-		},
+      "IDType": {
+          "type": "string",
+          "pattern": "^\\d{10}$",
+        "example": "0987654321"
+      },
+      "TransactionIDType": {
+        "type": "string",
+        "pattern": "^\\d{1,10}$",
+        "example": "1234567890"
+      },
       "claimReasonType" : {
         "type" : "string",
-        "enum": ["Life Event", "Regular Bonus"]
+        "enum": ["Life Event", "Regular Bonus", "Superseding bonus claim"]
       },
       "chargeReasonType" : {
         "type" : "string",
         "enum": ["Unauthorised withdrawal", "Others TBD"]
+      },
+      "supersededReasonType" : {
+        "type" : "string",
+        "enum": ["Bonus recovery", "Additional bonus"]
       }
 	}
 }

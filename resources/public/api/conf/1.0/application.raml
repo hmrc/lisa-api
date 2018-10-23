@@ -50,8 +50,8 @@ types:
                example: "Z1234"
             get:
               is: [headers.acceptHeader]
-              displayName: Discover available endpoints
-              description: This allows a LISA provider to discover all the available endpoints.
+              displayName: Get a list of all available endpoints
+              description: Use a LISA manager reference to get a list of all available endpoints.
               (annotations.scope): "read:lisa"
               securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
               (annotations.sandboxData): !include testdata/discover-endpoints.md
@@ -103,6 +103,7 @@ types:
                       body:
                         application/json:
                           example: !include examples/LISAInvestor.post.response.json
+                          type: !include schemas/LISAInvestor.post.response.schema.json
 
                     400:
                       body:
@@ -172,20 +173,21 @@ types:
                       application/json:
                         type: !include schemas/LISAAccount.post.schema.json
                         examples:
-                          example-1: !include examples/LISAAccount.post1.json
-                          example-2: !include examples/LISAAccount.post.json
+                          example-1: !include examples/LISAAccount.post.json
+                          example-2: !include examples/LISAAccount.post1.json
                     responses:
                       201:
                         headers:
                           Location:
                             description: Relative URI to the created LISA account resource
                             type: string
-                            example: /lifetime-isa/manager/Z876543/accounts/acc654321
+                            example: /lifetime-isa/manager/Z123456/accounts/1234567890
                         body:
                           application/json:
+                            type: !include schemas/LISAAccount.post.response.schema.json
                             examples:
-                              example-1: !include examples/LISAAccount.post.response1.json
-                              example-2: !include examples/LISAAccount.post.response.json
+                              example-1: !include examples/LISAAccount.post.response.json
+                              example-2: !include examples/LISAAccount.post.response1.json
                       400:
                         body:
                           application/json:
@@ -307,6 +309,7 @@ types:
                       description: The account is reinstated successfully.
                       body:
                         application/json:
+                            type: !include schemas/LISAAccount.reinstate.post.response.schema.json
                             example: !include examples/LISAAccount.reinstate.post.response.json
                     400:
                       body:
@@ -401,8 +404,8 @@ types:
                       be unique when used in combination with lisaManagerReferenceNumber. Any special characters should be URL encoded.
                     example: "ABC12345"
                 get:
-                    displayName: Retrieve account details
-                    description: Retrieve account details by accountId
+                    displayName: Get account details
+                    description: Use an account ID to get account details.
                     is: [headers.acceptHeader, headers.contentHeader]
                     (annotations.scope): "read:lisa"
                     securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
@@ -411,8 +414,10 @@ types:
                       200:
                         body:
                           application/json:
-                            example: !include examples/LISAAccount.get.json
                             type: !include schemas/LISAAccount.get.schema.json
+                            examples:
+                                example-1: !include examples/LISAAccount.get.json
+                                example-2: !include examples/LISAAccount.get1.json
                       400:
                         body:
                           application/json:
@@ -475,7 +480,8 @@ types:
                         description: The account is updated successfully.
                         body:
                           application/json:
-                              example: !include examples/LISAAccount.put.response.json
+                              type: !include schemas/LISAAccount.close.post.response.schema.json
+                              example: !include examples/LISAAccount.close.response.json
                       400:
                         body:
                           application/json:
@@ -563,7 +569,7 @@ types:
                   post:
                     is: [headers.acceptHeader, headers.contentHeader]
                     displayName: Modify date of first subscription of a LISA account
-                    description: Modify the date when the first deposit was paid after a LISA account was created
+                    description: Modify the date when the first deposit was paid after a LISA account was created.
                     (annotations.scope): "write:lisa"
                     securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
                     (annotations.sandboxData): !include testdata/subscription-update.md
@@ -577,6 +583,7 @@ types:
                         description: The first Subscription is updated successfully.
                         body:
                           application/json:
+                            type: !include schemas/LISAAccount.updateSubscription.post.response.schema.json
                             examples:
                               example-1: !include examples/LISAAccount.subscription.response.json
                               example-2: !include examples/LISAAccount.update.voided.subscription.response.json
@@ -673,6 +680,7 @@ types:
 
                         body:
                           application/json:
+                              type: !include schemas/LifeEvent.post.response.schema.json
                               example: !include examples/LifeEvent.post.response.json
                       400:
                         body:
@@ -755,32 +763,178 @@ types:
                                     "code" : "LIFE_EVENT_ALREADY_EXISTS",
                                     "message" : "The investor’s life event has already been reported"
                               }
+                /withdrawal-charges:
+                  post:
+                    is: [headers.acceptHeader, headers.contentHeader]
+                    displayName: "[sandbox-only] Report a withdrawal charge"
+                    description: Tell HMRC that an investor has taken money out of a LISA account without an associated life event. You can also correct a previous withdrawal charge.
+                    (annotations.scope): "write:lisa"
+                    securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
+                    (annotations.sandboxData): !include testdata/withdrawal-charge.md
+                    body:
+                      application/json:
+                        type: !include schemas/WithdrawalCharge.post.schema.json
+                        examples:
+                          example-1: !include examples/WithdrawalCharge.post.json
+                          example-2: !include examples/WithdrawalChargeSupersede.post.json
+                    responses:
+                      201:
+                        description: The LISA transaction resource has been created.
+                        body:
+                          application/json:
+                            type: !include schemas/WithdrawalCharge.post.response.schema.json
+                            examples:
+                              example-1: !include examples/WithdrawalCharge.post.response.json
+                              example-2: !include examples/WithdrawalChargeLate.post.response.json
+                              example-3: !include examples/WithdrawalChargeSupersede.post.response.json
+                      400:
+                        body:
+                          application/json:
+                            type: !include schemas/ErrorCodes.schema.json
+                            examples:
+                              badRequest:
+                                description: Bad Request
+                                value: |
+                                  {
+                                    "code" : "BAD_REQUEST",
+                                    "message" : "Bad Request"
+                                  }
+                              InvalidLmrn:
+                                description: lisaManagerReferenceNumber in the URL is in the wrong format
+                                value: |
+                                  {
+                                    "code" : "BAD_REQUEST",
+                                    "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
+                                  }
+                              InvalidAccountId:
+                                description: accountId in the URL is in the wrong format
+                                value: |
+                                  {
+                                    "code" : "BAD_REQUEST",
+                                    "message" : "accountId in the URL is in the wrong format"
+                                  }
+                      401:
+                        body:
+                          application/json:
+                            type: !include schemas/ErrorCodes.schema.json
+                            examples:
+                              notOpenStatus:
+                                description: lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
+                                value: |
+                                  {
+                                    "code" : "UNAUTHORIZED",
+                                    "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
+                                  }
+                      403:
+                        body:
+                          application/json:
+                            type: !include schemas/ErrorCodes.schema.json
+                            examples:
+                              forbidden:
+                                description: There is a problem with the request data
+                                value: |
+                                  {
+                                    "code" : "FORBIDDEN",
+                                    "message" : "There is a problem with the request data"
+                                  }
+                              accountClosed:
+                                description: The LISA account is already closed
+                                value: |
+                                  {
+                                    "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED",
+                                    "message": "The LISA account is already closed"
+                                  }
+                              accountVoid:
+                                description: The LISA account is already void
+                                value: |
+                                  {
+                                    "code": "INVESTOR_ACCOUNT_ALREADY_VOID",
+                                    "message": "The LISA account is already void"
+                                  }
+                              supersededMismatch:
+                                description: originalTransactionId and the originalWithdrawalChargeAmount do not match the information in the original request
+                                value: |
+                                  {
+                                    "code": "SUPERSEDED_WITHDRAWAL_CHARGE_ID_AMOUNT_MISMATCH",
+                                    "message": "originalTransactionId and the originalWithdrawalChargeAmount do not match the information in the original request"
+                                  }
+                              alreadySuperseded:
+                                description: This withdrawal charge has already been superseded
+                                value: |
+                                  {
+                                    "code": "WITHDRAWAL_CHARGE_ALREADY_SUPERSEDED",
+                                    "message": "This withdrawal charge has already been superseded"
+                                  }
+                              supersededOutcomeError:
+                                description: The calculation from your superseded withdrawal charge is incorrect
+                                value: |
+                                  {
+                                    "code": "SUPERSEDED_WITHDRAWAL_CHARGE_OUTCOME_ERROR",
+                                    "message": "The calculation from your superseded withdrawal charge is incorrect"
+                                  }
+                              timescalesExceeded:
+                                description: The timescale for reporting a withdrawal charge has passed. The claim period lasts for 6 years and 14 days
+                                value: |
+                                  {
+                                    "code": "WITHDRAWAL_CHARGE_TIMESCALES_EXCEEDED",
+                                    "message": "The timescale for reporting a withdrawal charge has passed. The claim period lasts for 6 years and 14 days"
+                                  }
+                              reportingError:
+                                description: "The withdrawal charge does not equal 25% of the withdrawal amount"
+                                value: |
+                                  {
+                                    "code": "WITHDRAWAL_REPORTING_ERROR",
+                                    "message": "The withdrawal charge does not equal 25% of the withdrawal amount"
+                                  }
+                      404:
+                        body:
+                          application/json:
+                            type: !include schemas/ErrorCodes.schema.json
+                            examples:
+                              accountIdNOTFound:
+                                description: The accountId does not match HMRC’s records
+                                value: |
+                                  {
+                                    "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
+                                    "message": "The accountId does not match HMRC’s records"
+                                  }
+                      409:
+                        body:
+                          application/json:
+                            type: !include schemas/ErrorCodes.schema.json
+                            examples:
+                              withdrawalChargeExists:
+                                description: A withdrawal charge with these details has already been requested for this investor
+                                value: |
+                                  {
+                                    "code": "WITHDRAWAL_CHARGE_ALREADY_EXISTS",
+                                    "message": "A withdrawal charge with these details has already been requested for this investor"
+                                  }
                 /transactions:
                   description: !include documentation/LISATransaction
                   post:
                     is: [headers.acceptHeader, headers.contentHeader]
                     displayName: Request a bonus payment
-                    description: Request a bonus payment from HMRC and provide a reason for the request.
+                    description: Request a bonus payment from HMRC and provide a reason for the request. You can also correct a bonus claim during or after the claim reporting period. You can repay any overpaid amounts to HMRC and receive additional payments from corrected claims.
                     (annotations.scope): "write:lisa"
                     securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
                     (annotations.sandboxData): !include testdata/bonus-payment.md
                     body:
                       application/json:
                         type: !include schemas/BonusPaymentRequest.post.schema.json
-                        example: !include examples/BonusPaymentRequest.post.json
+                        examples:
+                          example-1: !include examples/BonusPaymentRequest.post.json
+                          example-2: !include examples/BonusPaymentsuperseded.post.json
                     responses:
                       201:
                         description: The LISA transaction resource has been created.
-                        headers:
-                          Location:
-                            description: Relative URI to the created bonus payment resource
-                            type: string
-                            example: /lifetime-isa/manager/Z876543/accounts/acc654321/transactions/7777777777
                         body:
                           application/json:
+                            type: !include schemas/BonusPaymentRequest.post.response.schema.json
                             examples:
                               example-1: !include examples/LISATransaction.post.response.json
                               example-2: !include examples/LISATransaction.post.response.1.json
+                              example-3: !include examples/LISATransactionSupersede.post.response.json
                       400:
                         body:
                           application/json:
@@ -852,6 +1006,41 @@ types:
                                     "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID",
                                     "message": "This LISA account has already been closed or been made void by HMRC"
                                   }
+                              helpToBuyNotApplicable:
+                                description: "[sandbox-only] Help to Buy is not applicable on this account"
+                                value: |
+                                  {
+                                    "code": "HELP_TO_BUY_NOT_APPLICABLE",
+                                    "message": "Help to Buy is not applicable on this account"
+                                  }
+                              bonusClaimTimescalesExceeded:
+                                description: "[sandbox-only] The timescale for claiming a bonus has passed. The claim period lasts for 6 years and 14 days"
+                                value: |
+                                  {
+                                    "code": "BONUS_CLAIM_TIMESCALES_EXCEEDED",
+                                    "message": "The timescale for claiming a bonus has passed. The claim period lasts for 6 years and 14 days"
+                                  }
+                              supersededBonusClaimAmountMismatch:
+                                description: "[sandbox-only] originalTransactionId and the originalBonusDueForPeriod amount do not match the information in the original bonus request"
+                                value: |
+                                  {
+                                    "code": "SUPERSEDED_BONUS_CLAIM_AMOUNT_MISMATCH",
+                                    "message": "originalTransactionId and the originalBonusDueForPeriod amount do not match the information in the original bonus request"
+                                  }
+                              supersededBonusRequestOutcomeError:
+                                description: "[sandbox-only] The calculation from your superseded bonus claim is incorrect"
+                                value: |
+                                  {
+                                    "code": "SUPERSEDED_BONUS_REQUEST_OUTCOME_ERROR",
+                                    "message": "The calculation from your superseded bonus claim is incorrect"
+                                  }
+                              noSubscriptionsError:
+                                description: "[sandbox-only] A bonus payment is not possible because the account has no subscriptions for that tax year"
+                                value: |
+                                  {
+                                    "code": "ACCOUNT_ERROR_NO_SUBSCRIPTIONS_THIS_TAX_YEAR",
+                                    "message": "A bonus payment is not possible because the account has no subscriptions for that tax year"
+                                  }
                       404:
                         body:
                           application/json:
@@ -883,6 +1072,13 @@ types:
                                       "code" : "BONUS_CLAIM_ALREADY_EXISTS",
                                       "message" : "The investor’s bonus payment has already been requested"
                                     }
+                                bonusClaimAlreadySuperseded:
+                                  description: "[sandbox-only] This bonus claim has already been superseded"
+                                  value: |
+                                    {
+                                      "code" : "BONUS_CLAIM_ALREADY_SUPERSEDED",
+                                      "message" : "This bonus claim has already been superseded"
+                                    }
                   /{transactionId}:
                     uriParameters:
                       transactionId:
@@ -890,8 +1086,8 @@ types:
                         description: The ID for the transaction.
                         example: "1234567890"
                     get:
-                      displayName: Retrieve bonus payment submitted
-                      description: Retrieve bonus payment submitted earlier by transactionID
+                      displayName: Get details of a bonus request
+                      description: Use an investor’s transaction ID to get a request for a bonus payment that has been submitted to HMRC.
                       is: [headers.acceptHeader, headers.contentHeader]
                       (annotations.scope): "read:lisa"
                       securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
@@ -904,6 +1100,7 @@ types:
                               examples:
                                 withHtb: !include examples/LISATransaction.get.response.json
                                 withoutHtb: !include examples/LISATransaction.get.response.1.json
+                                supersede: !include examples/LISATransaction.get.supersederesponse1.json
                         400:
                           body:
                             application/json:
@@ -956,8 +1153,8 @@ types:
                                     }
                     /payments:
                       get:
-                         displayName: Retrieve payment details for an investor’s transaction ID
-                         description: Retrieve payment details for an investor’s transaction ID.
+                         displayName: Get details about an investor’s bonus payment
+                         description: Use an investor’s transaction ID to get details about a bonus payment, including when the payment is due.
                          is: [headers.acceptHeader, headers.contentHeader]
                          (annotations.scope): "read:lisa"
                          securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
@@ -1022,8 +1219,8 @@ types:
             /payments:
               get:
                   is: [headers.acceptHeader]
-                  displayName: Retrieve payment details
-                  description: This allows a LISA provider to retrieve payments made by HMRC in a specific date range.
+                  displayName: Get a list of all bonus payments in a date range
+                  description: Get a list of all completed and due bonus payments from HMRC in a specific date range.
                   (annotations.scope): "read:lisa"
                   securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
                   (annotations.sandboxData): !include testdata/get-bulk-payment.md

@@ -26,7 +26,7 @@ import uk.gov.hmrc.lisaapi.models._
 class JsonSpec extends PlaySpec {
 
   val property = "property"
-  val currencyFormatError = "error.formatting.currency"
+  val currencyFormatError = "error.formatting.currencyNegativeDisallowed"
 
   implicit val testMonetaryReads: Reads[TestMonetaryClass] = (JsPath \ property).read[Amount](JsonReads.nonNegativeAmount).map(TestMonetaryClass.apply)
   implicit val testMonetaryWrites: Writes[TestMonetaryClass] = (JsPath \ property).write[Amount].contramap[TestMonetaryClass](_.property)

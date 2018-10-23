@@ -35,17 +35,21 @@ case class GetBonusPaymentSuccessResponse(
                                            periodEndDate: DateTime,
                                            htbTransfer: Option[HelpToBuyTransfer],
                                            inboundPayments: InboundPayments,
-                                           bonuses: Bonuses) extends GetBonusPaymentResponse
+                                           bonuses: Bonuses,
+                                           supersededBy: Option[TransactionId] = None,
+                                           supersede: Option[Supersede] = None) extends GetBonusPaymentResponse
 
 object GetBonusPaymentSuccessResponse {
-    implicit val getBonusPaymentReads: Reads[GetBonusPaymentSuccessResponse] = (
+  implicit val getBonusPaymentReads: Reads[GetBonusPaymentSuccessResponse] = (
     (JsPath \ "lifeEventId").readNullable(JsonReads.lifeEventId) and
     (JsPath \ "periodStartDate").read(JsonReads.isoDate).map(new DateTime(_)) and
     (JsPath \ "periodEndDate").read(JsonReads.isoDate).map(new DateTime(_)) and
     (JsPath \ "htbTransfer").readNullable[HelpToBuyTransfer] and
     (JsPath \ "inboundPayments").read[InboundPayments] and
-    (JsPath \ "bonuses").read[Bonuses]
-    )(GetBonusPaymentSuccessResponse.apply _)
+    (JsPath \ "bonuses").read[Bonuses] and
+    (JsPath \ "supersededBy").readNullable(JsonReads.transactionId) and
+    (JsPath \ "supersede").readNullable[Supersede]
+  )(GetBonusPaymentSuccessResponse.apply _)
 
   implicit val getBonusPaymentWrites: Writes[GetBonusPaymentSuccessResponse] = (
     (JsPath \ "lifeEventId").writeNullable[String] and
@@ -53,7 +57,20 @@ object GetBonusPaymentSuccessResponse {
     (JsPath \ "periodEndDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
     (JsPath \ "htbTransfer").writeNullable[HelpToBuyTransfer] and
     (JsPath \ "inboundPayments").write[InboundPayments] and
-    (JsPath \ "bonuses").write[Bonuses]
-    ){req: GetBonusPaymentSuccessResponse => (req.lifeEventId, req.periodStartDate, req.periodEndDate, req.htbTransfer, req.inboundPayments, req.bonuses)}
+    (JsPath \ "bonuses").write[Bonuses] and
+    (JsPath \ "supersededBy").writeNullable[String] and
+    (JsPath \ "supersede").writeNullable[Supersede]
+  ){
+    req: GetBonusPaymentSuccessResponse => (
+      req.lifeEventId,
+      req.periodStartDate,
+      req.periodEndDate,
+      req.htbTransfer,
+      req.inboundPayments,
+      req.bonuses,
+      req.supersededBy,
+      req.supersede
+    )
+  }
 }
 

@@ -1,25 +1,20 @@
 {
-  "lifeEventId" : "1234567891",
-  "periodStartDate" : "2017-04-06",
-  "periodEndDate" : "2017-05-05",
-
-  "htbTransfer" : {
-    "htbTransferInForPeriod" : 0.00,
-    "htbTransferTotalYTD" : 0.00
+  "lifeEventId": "1234567891",
+  "periodStartDate": "2017-04-06",
+  "periodEndDate": "2017-05-05",
+  "htbTransfer": {
+    "htbTransferInForPeriod": 0,
+    "htbTransferTotalYTD": 0
   },
-
-  "inboundPayments"   :
-  {
-    "newSubsForPeriod" : 4000.00,
-    "newSubsYTD" : 4000.00,
-    "totalSubsForPeriod" : 4000.00,
-    "totalSubsYTD" : 4000.00
+  "inboundPayments": {
+    "newSubsForPeriod": 4000,
+    "newSubsYTD": 4000,
+    "totalSubsForPeriod": 4000,
+    "totalSubsYTD": 4000
   },
-
-  "bonuses"   :
-  {
-    "bonusDueForPeriod" : 1000.00,
-    "totalBonusDueYTD" : 1000.00,
-    "claimReason" : "Life Event"
+  "bonuses": {
+    "bonusDueForPeriod": 1000,
+    "totalBonusDueYTD": 1000,
+    "claimReason": "Life Event"
   }
 }
