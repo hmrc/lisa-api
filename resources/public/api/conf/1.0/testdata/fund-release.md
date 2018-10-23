@@ -13,7 +13,7 @@
                   <p>Fund release created</p>
                   <p class="code--block">
                   <strong>lisaManagerReferenceNumber:</strong><br>
-                  <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+                  <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
                    <br>
                         <strong>accountId:</strong><br>1234567890
                   </p>
@@ -50,7 +50,7 @@
                          <p>Fund release superseded</p>
                          <p class="code--block">
                             <strong>lisaManagerReferenceNumber:</strong><br>
-                            <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+                            <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
                                <br>
                                    <strong>accountId:</strong><br>1234567890
                            </p>
@@ -119,7 +119,7 @@
                                                     <p>Invalid Account ID</p>
                                                     <p class="code--block">
                                                         <strong>lisaManagerReferenceNumber:</strong><br>
-                                                        <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+                                                        <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
                                                         <br>
                                                         <strong>accountId:</strong><br>1234%3D5678
                                                     </p>
@@ -152,7 +152,7 @@
                                                     <p>This LISA account is already closed</p>
                                                     <p class="code--block">
                                                         <strong>lisaManagerReferenceNumber:</strong><br>
-                                                        <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+                                                        <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
                                                         <br>
                                                         <strong>accountId:</strong><br>1000000403
                                                     </p>
@@ -185,7 +185,7 @@
                                                                     <p>This LISA account is already void</p>
                                                                     <p class="code--block">
                                                                     <strong>lisaManagerReferenceNumber:</strong><br>
-                                                                    <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+                                                                    <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
                                                                      <br>
                                                                      <strong>accountId:</strong><br>3000000403
                                                                      </p>
@@ -218,7 +218,7 @@
                                                                         <p>This LISA account is already cancelled</p>
                                                                         <p class="code--block">
                                                                         <strong>lisaManagerReferenceNumber:</strong><br>
-                                                                        <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+                                                                        <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
                                                                           <br>
                                                                               <strong>accountId:</strong><br>2000000403
                                                                               </p>
@@ -251,7 +251,7 @@
                                                                                             <p>Account not open long enough</p>
                                                                                             <p class="code--block">
                                                                                             <strong>lisaManagerReferenceNumber:</strong><br>
-                                                                                            <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+                                                                                            <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
                                                                                             <br>
                                                                                             <strong>accountId:</strong><br>4000000403
                                                                                             </p>
@@ -284,7 +284,7 @@
                                                                                                   <p>Other purchase on record</p>
                                                                                                   <p class="code--block">
                                                                                                   <strong>lisaManagerReferenceNumber:</strong><br>
-                                                                                                  <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+                                                                                                  <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
                                                                                                    <br>
                                                                                                     <strong>accountId:</strong><br>6000000403
                                                                                                    </p>
@@ -317,7 +317,7 @@
                                                                                                   <p>Superseded fund release mismatch error</p>
                                                                                                   <p class="code--block">
                                                                                                   <strong>lisaManagerReferenceNumber:</strong><br>
-                                                                                                  <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+                                                                                                  <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
                                                                                                <br>
                                                                                                   <strong>accountId:</strong><br>5000000403
                                                                                                   </p>
@@ -349,7 +349,7 @@
                                                                                                        <p>Account ID does not exist</p>
                                                                                                        <p class="code--block">
                                                                                                        <strong>lisaManagerReferenceNumber:</strong><br>
-                                                                                                       <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+                                                                                                       <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
                                                                                                    <br>
                                                                                                        <strong>accountId:</strong><br>0000000404
                                                                                                        </p>
@@ -382,7 +382,7 @@
                                                                                                   <p>Superseded fund release account already superseded</p>
                                                                                                   <p class="code--block">
                                                                                                   <strong>lisaManagerReferenceNumber:</strong><br>
-                                                                                                  <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+                                                                                                  <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
                                                                                               <br>
                                                                                               <strong>accountId:</strong><br>1000000409
                                                                                               </p>
@@ -414,7 +414,7 @@
                                                                                         <p>Fund Release Already Exists</p>
                                                                                         <p class="code--block">
                                                                                         <strong>lisaManagerReferenceNumber:</strong><br>
-                                                                                        <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+                                                                                        <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
                                                                                         <br>
                                                                                         <strong>accountId:</strong><br>0000000409
                                                                                         </p>

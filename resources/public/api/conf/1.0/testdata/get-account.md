@@ -12,7 +12,7 @@
       <td>
         <p>Request with a valid LISA Manager reference number and account ID (open account)</p>
         <p class="code--block">
-          lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+          lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
           accountId: 1234567890
         </p>
       </td>
@@ -34,7 +34,7 @@
       <td>
         <p>Request with a valid LISA Manager reference number and account ID (transferred account)</p>
         <p class="code--block">
-          lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+          lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
           accountId: 1234567891
         </p>
       </td>
@@ -61,7 +61,7 @@
       <td>
         <p>Request with a valid LISA Manager reference number and account ID (voided account)</p>
         <p class="code--block">
-          lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+          lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
           accountId: 1000000200
         </p>
       </td>
@@ -83,7 +83,7 @@
       <td>
         <p>Request with a valid LISA Manager reference number and account ID (closed account)</p>
         <p class="code--block">
-          lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+          lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
           accountId: 2000000200
         </p>
       </td>
@@ -125,7 +125,7 @@
       <td>
         <p>Request with a valid LISA Manager reference number, but an invalid account ID</p>
         <p class="code--block">
-          lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+          lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
           accountId: 1234%3D5678
         </p>
       </td>
@@ -143,7 +143,7 @@
         <td>
             <p>Request containing an account ID that does not exist</p>
             <p class="code--block">
-                lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+                lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
                 accountId: 0000000404
             </p>
         </td>
@@ -161,7 +161,7 @@
       <td>
         <p>Request with an invalid 'Accept' header</p>
         <p class="code--block">
-          lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a>
+          lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a>
           <br>accountId: 1234567890<br>
           <br>
           Accept: application/vnd.hmrc.1.0

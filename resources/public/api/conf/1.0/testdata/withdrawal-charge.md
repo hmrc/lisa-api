@@ -15,7 +15,7 @@
                 <p>Unauthorised withdrawal transaction created</p>
                 <p class="code--block">
                     <strong>lisaManagerReferenceNumber:</strong><br>
-                    <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+                    <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
                     <br>
                     <strong>accountId:</strong><br>1234567890
                 </p>
@@ -53,7 +53,7 @@
                 <p>Unauthorised withdrawal transaction created - late notification</p>
                 <p class="code--block">
                     <strong>lisaManagerReferenceNumber:</strong><br>
-                    <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+                    <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
                     <br>
                     <strong>accountId:</strong><br>1234567891
                 </p>
@@ -91,7 +91,7 @@
                 <p>Unauthorised withdrawal transaction superseded</p>
                 <p class="code--block">
                     <strong>lisaManagerReferenceNumber:</strong><br>
-                    <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+                    <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
                     <br>
                     <strong>accountId:</strong><br>1234567890
                 </p>
@@ -135,7 +135,7 @@
                 <p>Invalid and/or missing data</p>
                 <p class="code--block">
                     <strong>lisaManagerReferenceNumber:</strong><br>
-                    <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+                    <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
                     <br>
                     <strong>accountId:</strong><br>1234567890
                 </p>
@@ -229,7 +229,7 @@
                 <p>Invalid Account ID</p>
                 <p class="code--block">
                     <strong>lisaManagerReferenceNumber:</strong><br>
-                    <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+                    <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
                     <br>
                     <strong>accountId:</strong><br>1234%3D5678
                 </p>
@@ -264,7 +264,7 @@
                 <p>Invalid monetary amounts and/or invalid dates</p>
                 <p class="code--block">
                     <strong>lisaManagerReferenceNumber:</strong><br>
-                    <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+                    <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
                     <br>
                     <strong>accountId:</strong><br>1234567890
                 </p>
@@ -315,7 +315,7 @@
                 <p>This LISA account is already closed</p>
                 <p class="code--block">
                     <strong>lisaManagerReferenceNumber:</strong><br>
-                    <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+                    <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
                     <br>
                     <strong>accountId:</strong><br>1000000403
                 </p>
@@ -349,7 +349,7 @@
                 <p>This LISA account is already void</p>
                 <p class="code--block">
                     <strong>lisaManagerReferenceNumber:</strong><br>
-                    <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+                    <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
                     <br>
                     <strong>accountId:</strong><br>2000000403
                 </p>
@@ -383,7 +383,7 @@
                 <p>A superseded withdrawal report cannot be matched to the original</p>
                 <p class="code--block">
                     <strong>lisaManagerReferenceNumber:</strong><br>
-                    <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+                    <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
                     <br>
                     <strong>accountId:</strong><br>3000000403
                 </p>
@@ -423,7 +423,7 @@
                 <p>The withdrawal charge has already been superseded</p>
                 <p class="code--block">
                     <strong>lisaManagerReferenceNumber:</strong><br>
-                    <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+                    <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
                     <br>
                     <strong>accountId:</strong><br>4000000403
                 </p>
@@ -463,7 +463,7 @@
                 <p>The calculation from your superseded withdrawal charge is incorrect</p>
                 <p class="code--block">
                     <strong>lisaManagerReferenceNumber:</strong><br>
-                    <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+                    <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
                     <br>
                     <strong>accountId:</strong><br>5000000403
                 </p>
@@ -503,7 +503,7 @@
                 <p>The withdrawal charge does not equal 25% of the withdrawal amount</p>
                 <p class="code--block">
                     <strong>lisaManagerReferenceNumber:</strong><br>
-                    <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+                    <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
                     <br>
                     <strong>accountId:</strong><br>6000000403
                 </p>
@@ -543,7 +543,7 @@
                 <p>Account ID does not exist</p>
                 <p class="code--block">
                     <strong>lisaManagerReferenceNumber:</strong><br>
-                    <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+                    <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
                     <br>
                     <strong>accountId:</strong><br>0000000404
                 </p>
@@ -577,7 +577,7 @@
                 <p>The accept header is invalid</p>
                 <p class="code--block">
                     <strong>lisaManagerReferenceNumber:</strong><br>
-                    <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+                    <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
                     <br>
                     <strong>accountId:</strong><br>1234567890
                     <br>
@@ -614,7 +614,7 @@
                 <p>Withdrawl charge has already been reported</p>
                 <p class="code--block">
                     <strong>lisaManagerReferenceNumber:</strong><br>
-                    <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+                    <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
                     <br>
                     <strong>accountId:</strong><br>0000000409
                 </p>
