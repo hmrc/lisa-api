@@ -44,7 +44,7 @@ object RequestPurchaseExtension {
     (JsPath \ "eventType").read(Reads.pattern("^(Extension one|Extension two)$".r, "error.formatting.extensionType"))
   )(RequestStandardPurchaseExtension.apply _)
 
-  implicit val standardWrites: Writes[RequestStandardPurchaseExtension] = (
+  val standardWrites: Writes[RequestStandardPurchaseExtension] = (
     (JsPath \ "eventType").write[String] and
     (JsPath \ "eventDate").write[DateTime] and
     (JsPath \ "fundsReleaseLifeEventID").write[String]
@@ -60,7 +60,7 @@ object RequestPurchaseExtension {
     (JsPath \ "supersede").read[RequestExtensionSupersedeDetails]
   )(RequestSupersededPurchaseExtension.apply _)
 
-  implicit val supersededWrites: Writes[RequestSupersededPurchaseExtension] = (
+  val supersededWrites: Writes[RequestSupersededPurchaseExtension] = (
     (JsPath \ "eventType").write[String] and
     (JsPath \ "eventDate").write[DateTime] and
     (JsPath \ "supersededLifeEventDate").write[DateTime] and

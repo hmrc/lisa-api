@@ -86,14 +86,15 @@ trait PropertyPurchaseService {
           case "INVESTOR_ACCOUNT_ALREADY_CLOSED" => PropertyPurchaseAccountClosedResponse
           case "INVESTOR_ACCOUNT_ALREADY_CANCELLED" => PropertyPurchaseAccountCancelledResponse
           case "INVESTOR_ACCOUNT_ALREADY_VOID" => PropertyPurchaseAccountVoidResponse
-          case "INVESTOR_ACCOUNTID_NOT_FOUND" => PropertyPurchaseAccountNotFoundResponse
-          case "LIFE_EVENT_ALREADY_EXISTS" => PropertyPurchaseLifeEventAlreadyExistsResponse
-          case "SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED" => PropertyPurchaseLifeEventAlreadySupersededResponse
+          case "PURCHASE_EXTENSION_1_LIFE_EVENT_NOT_YET_APPROVED" => PropertyPurchaseExtensionOneNotYetApprovedResponse
           case "SUPERSEDING_LIFE_EVENT_MISMATCH" => PropertyPurchaseMismatchResponse
+          case "INVESTOR_ACCOUNTID_NOT_FOUND" => PropertyPurchaseAccountNotFoundResponse
+          case "FUND_RELEASE_LIFE_EVENT_ID_NOT_FOUND" => PropertyPurchaseFundReleaseNotFoundResponse
+          case "LIFE_EVENT_ALREADY_EXISTS" => PropertyPurchaseLifeEventAlreadyExistsResponse
+          case "FUND_RELEASE_LIFE_EVENT_ID_SUPERSEDED" => PropertyPurchaseFundReleaseSupersededResponse
           case "PURCHASE_EXTENSION_1_LIFE_EVENT_ALREADY_APPROVED" => PropertyPurchaseExtensionOneAlreadyApprovedResponse
           case "PURCHASE_EXTENSION_2_LIFE_EVENT_ALREADY_APPROVED" => PropertyPurchaseExtensionTwoAlreadyApprovedResponse
-          case "PURCHASE_EXTENSION_1_LIFE_EVENT_NOT_YET_APPROVED" => PropertyPurchaseExtensionOneNotYetApprovedResponse
-          case "FUND_RELEASE_LIFE_EVENT_ID_NOT_FOUND" => PropertyPurchaseFundReleaseNotFoundResponse
+          case "SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED" => PropertyPurchaseLifeEventAlreadySupersededResponse
           case _ => {
             Logger.warn(s"Request purchase extension returned error: ${failureResponse.code}")
 

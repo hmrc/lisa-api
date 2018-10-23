@@ -922,12 +922,26 @@ types:
                             application/json:
                               type: !include schemas/ErrorCodes.schema.json
                               examples:
-                                lifeEventExists:
-                                  description: The investor’s purchase extension has already been reported
+                                accountClosed:
+                                  description: The LISA account has already been closed
                                   value: |
                                     {
-                                      "code" : "EXTENSION_ALREADY_EXISTS",
-                                      "message" : "The investor’s purchase extension has already been reported"
+                                      "code" : "INVESTOR_ACCOUNT_ALREADY_CLOSED",
+                                      "message" : "The LISA account has already been closed"
+                                    }
+                                accountCancelled:
+                                  description: The LISA account has already been cancelled
+                                  value: |
+                                    {
+                                      "code" : "INVESTOR_ACCOUNT_ALREADY_CANCELLED",
+                                      "message" : "The LISA account has already been cancelled"
+                                    }
+                                accountVoid:
+                                  description: The LISA account has already been voided
+                                  value: |
+                                    {
+                                      "code" : "INVESTOR_ACCOUNT_ALREADY_VOID",
+                                      "message" : "The LISA account has already been voided"
                                     }
                                 extensionNotApproved:
                                   description: A first extension has not been approved
@@ -967,6 +981,13 @@ types:
                             application/json:
                               type: !include schemas/ErrorCodes.schema.json
                               examples:
+                                lifeEventExists:
+                                  description: The investor’s purchase extension has already been reported
+                                  value: |
+                                    {
+                                      "code" : "EXTENSION_ALREADY_EXISTS",
+                                      "message" : "The investor’s purchase extension has already been reported"
+                                    }
                                 fundReleaseLifeEventAlreadySuperseded:
                                   description: This fund release has already been superseded
                                   value: |

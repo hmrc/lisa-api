@@ -227,6 +227,14 @@ class PropertyPurchaseServiceSpec extends PlaySpec with MockitoSugar with OneApp
       }
     }
 
+    "return fund release superseded error" when {
+      "given a fund release not found response from the DES connector" in {
+        when(mockDesConnector.requestPurchaseExtension(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("FUND_RELEASE_LIFE_EVENT_ID_SUPERSEDED","")))
+
+        doExtensionRequest{ response => response mustBe PropertyPurchaseFundReleaseSupersededResponse}
+      }
+    }
+
     "return internal server error" when {
       "given a INTERNAL_SERVER_ERROR error code from the DES connector" in {
         when(mockDesConnector.requestPurchaseExtension(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("INTERNAL_SERVER_ERROR","Internal Error")))
