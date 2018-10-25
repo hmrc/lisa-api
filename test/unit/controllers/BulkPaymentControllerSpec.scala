@@ -171,7 +171,7 @@ class BulkPaymentControllerSpec extends PlaySpec
       }
     }
 
-    "return 404 PAYMENT_NOT_FOUND" when {
+    "return 404 TRANSACTION_NOT_FOUND" when {
       "the service returns a GetBulkPaymentNotFoundResponse" in {
         when(mockService.getBulkPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(GetBulkPaymentNotFoundResponse))
@@ -183,8 +183,8 @@ class BulkPaymentControllerSpec extends PlaySpec
 
         val json = contentAsJson(result)
 
-        (json \ "code").as[String] mustBe "PAYMENT_NOT_FOUND"
-        (json \ "message").as[String] mustBe "No bonus payments have been made for this date range"
+        (json \ "code").as[String] mustBe "TRANSACTION_NOT_FOUND"
+        (json \ "message").as[String] mustBe "No payments or debts exist for this date range"
       }
     }
 

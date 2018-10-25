@@ -1,0 +1,8 @@
+{
+  "eventDate": "2017-05-05",
+  "withdrawalAmount": 5000.00,
+  "supersede": {
+    "originalFundReleaseId": "3456789000",
+    "originalEventDate": "2017-05-10"
+  }
+}

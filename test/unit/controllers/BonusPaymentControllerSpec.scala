@@ -22,7 +22,7 @@ import org.mockito.Mockito._
 import org.scalatest._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.libs.json.Json
+import play.api.libs.json.{JsError, Json}
 import play.api.mvc.{AnyContentAsJson, Result}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
@@ -32,7 +32,7 @@ import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
 import uk.gov.hmrc.lisaapi.controllers.{BonusPaymentController, ErrorAccountNotFound, ErrorBadRequestLmrn, ErrorTransactionNotFound, ErrorValidation}
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.services.{AuditService, BonusPaymentService, CurrentDateService}
+import uk.gov.hmrc.lisaapi.services.{AuditService, BonusOrWithdrawalService, BonusPaymentService, CurrentDateService}
 import uk.gov.hmrc.lisaapi.utils.BonusPaymentValidator
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -70,7 +70,7 @@ class BonusPaymentControllerSpec extends PlaySpec
     "return with status 201 created" when {
 
       "given a RequestBonusPaymentOnTimeResponse from the service layer" in {
-        when(mockService.requestBonusPayment(any(), any(), any())(any())).
+        when(mockPostService.requestBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(RequestBonusPaymentOnTimeResponse("1928374")))
 
         doRequest(validBonusPaymentJson) { res =>
@@ -81,7 +81,7 @@ class BonusPaymentControllerSpec extends PlaySpec
       }
 
       "given a RequestBonusPaymentLateResponse from the service layer" in {
-        when(mockService.requestBonusPayment(any(), any(), any())(any())).
+        when(mockPostService.requestBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(RequestBonusPaymentLateResponse("1928374")))
 
         doRequest(validBonusPaymentJson) { res =>
@@ -190,7 +190,7 @@ class BonusPaymentControllerSpec extends PlaySpec
       }
 
       "given a RequestBonusPaymentBonusClaimError response from the service layer" in {
-        when(mockService.requestBonusPayment(any(), any(), any())(any())).
+        when(mockPostService.requestBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(RequestBonusPaymentBonusClaimError))
 
         doRequest(validBonusPaymentJson) { res =>
@@ -203,7 +203,7 @@ class BonusPaymentControllerSpec extends PlaySpec
       }
 
       "given a RequestBonusPaymentAccountClosed response from the service layer" in {
-        when(mockService.requestBonusPayment(any(), any(),any())(any())).thenReturn(
+        when(mockPostService.requestBonusPayment(any(), any(),any())(any())).thenReturn(
           Future.successful(RequestBonusPaymentAccountClosed))
 
         doRequest(validBonusPaymentJson)  { res =>
@@ -211,11 +211,32 @@ class BonusPaymentControllerSpec extends PlaySpec
           (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID"
           (contentAsJson(res) \ "message").as[String] mustBe "This LISA account has already been closed or been made void by HMRC"
         }
+      }
 
+      "given a RequestBonusPaymentAccountCancelled response from the service layer" in {
+        when(mockPostService.requestBonusPayment(any(), any(),any())(any())).thenReturn(
+          Future.successful(RequestBonusPaymentAccountCancelled))
+
+        doRequest(validBonusPaymentJson)  { res =>
+          status(res) mustBe FORBIDDEN
+          (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID"
+          (contentAsJson(res) \ "message").as[String] mustBe "This LISA account has already been closed or been made void by HMRC"
+        }
+      }
+
+      "given a RequestBonusPaymentAccountVoid response from the service layer" in {
+        when(mockPostService.requestBonusPayment(any(), any(),any())(any())).thenReturn(
+          Future.successful(RequestBonusPaymentAccountVoid))
+
+        doRequest(validBonusPaymentJson)  { res =>
+          status(res) mustBe FORBIDDEN
+          (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID"
+          (contentAsJson(res) \ "message").as[String] mustBe "This LISA account has already been closed or been made void by HMRC"
+        }
       }
 
       "given a RequestBonusPaymentSupersededAmountMismatch response from the service layer" in {
-        when(mockService.requestBonusPayment(any(), any(),any())(any())).thenReturn(
+        when(mockPostService.requestBonusPayment(any(), any(),any())(any())).thenReturn(
           Future.successful(RequestBonusPaymentSupersededAmountMismatch))
 
         doRequest(validBonusPaymentJson)  { res =>
@@ -227,7 +248,7 @@ class BonusPaymentControllerSpec extends PlaySpec
       }
 
       "given a RequestBonusPaymentSupersededOutcomeError response from the service layer" in {
-        when(mockService.requestBonusPayment(any(), any(),any())(any())).thenReturn(
+        when(mockPostService.requestBonusPayment(any(), any(),any())(any())).thenReturn(
           Future.successful(RequestBonusPaymentSupersededOutcomeError))
 
         doRequest(validBonusPaymentJson)  { res =>
@@ -239,7 +260,7 @@ class BonusPaymentControllerSpec extends PlaySpec
       }
 
       "given a RequestBonusPaymentNoSubscriptions response from the service layer" in {
-        when(mockService.requestBonusPayment(any(), any(),any())(any())).thenReturn(
+        when(mockPostService.requestBonusPayment(any(), any(),any())(any())).thenReturn(
           Future.successful(RequestBonusPaymentNoSubscriptions))
 
         doRequest(validBonusPaymentJson)  { res =>
@@ -255,7 +276,7 @@ class BonusPaymentControllerSpec extends PlaySpec
     "return with status 404 not found" when {
 
       "given a RequestBonusPaymentAccountNotFound response from the service layer" in {
-        when(mockService.requestBonusPayment(any(), any(), any())(any())).
+        when(mockPostService.requestBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(RequestBonusPaymentAccountNotFound))
 
         doRequest(validBonusPaymentJson) { res =>
@@ -266,7 +287,7 @@ class BonusPaymentControllerSpec extends PlaySpec
       }
 
       "given a RequestBonusPaymentLifeEventNotFound response from the service layer" in {
-        when(mockService.requestBonusPayment(any(), any(), any())(any())).
+        when(mockPostService.requestBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(RequestBonusPaymentLifeEventNotFound))
 
         doRequest(validBonusPaymentJson) { res =>
@@ -281,24 +302,26 @@ class BonusPaymentControllerSpec extends PlaySpec
     "return with status 409 conflict" when {
 
       "given a RequestBonusPaymentClaimAlreadyExists response from the service layer" in {
-        when(mockService.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(RequestBonusPaymentClaimAlreadyExists))
+        when(mockPostService.requestBonusPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(RequestBonusPaymentClaimAlreadyExists(transactionId)))
 
         doRequest(validBonusPaymentJson) { res =>
           status(res) mustBe CONFLICT
           (contentAsJson(res) \ "code").as[String] mustBe "BONUS_CLAIM_ALREADY_EXISTS"
           (contentAsJson(res) \ "message").as[String] mustBe "The investor’s bonus payment has already been requested"
+          (contentAsJson(res) \ "transactionId").as[String] mustBe transactionId
         }
       }
 
       "given a RequestBonusPaymentAlreadySuperseded response from the service layer" in {
-        when(mockService.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(RequestBonusPaymentAlreadySuperseded))
+        when(mockPostService.requestBonusPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(RequestBonusPaymentAlreadySuperseded(transactionId)))
 
         doRequest(validBonusPaymentJson) { res =>
           status(res) mustBe CONFLICT
           (contentAsJson(res) \ "code").as[String] mustBe "BONUS_CLAIM_ALREADY_SUPERSEDED"
           (contentAsJson(res) \ "message").as[String] mustBe "This bonus claim has already been superseded"
+          (contentAsJson(res) \ "transactionId").as[String] mustBe transactionId
         }
       }
 
@@ -307,11 +330,11 @@ class BonusPaymentControllerSpec extends PlaySpec
     "return with status 500 internal server error" when {
 
       "an exception gets thrown" in {
-        when(mockService.requestBonusPayment(any(), any(), any())(any())).
+        when(mockPostService.requestBonusPayment(any(), any(), any())(any())).
           thenThrow(new RuntimeException("Test"))
 
         doRequest(validBonusPaymentJson) { res =>
-          reset(mockService) // removes the thenThrow
+          reset(mockPostService) // removes the thenThrow
 
           status(res) mustBe (INTERNAL_SERVER_ERROR)
           (contentAsJson(res) \ "code").as[String] mustBe ("INTERNAL_SERVER_ERROR")
@@ -319,7 +342,7 @@ class BonusPaymentControllerSpec extends PlaySpec
       }
 
       "an unexpected result comes back from the service" in {
-        when(mockService.requestBonusPayment(any(), any(), any())(any())).
+        when(mockPostService.requestBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(TestBonusPaymentResponse))
 
         doRequest(validBonusPaymentJson) { res =>
@@ -329,7 +352,7 @@ class BonusPaymentControllerSpec extends PlaySpec
       }
 
       "given a RequestBonusPaymentError response from the service layer" in {
-        when(mockService.requestBonusPayment(any(), any(), any())(any())).
+        when(mockPostService.requestBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(RequestBonusPaymentError))
 
         doRequest(validBonusPaymentJson) { res =>
@@ -343,7 +366,7 @@ class BonusPaymentControllerSpec extends PlaySpec
     "audit bonusPaymentRequested" when {
 
       "given a success response from the service layer and all optional fields" in {
-        when(mockService.requestBonusPayment(any(), any(), any())(any())).
+        when(mockPostService.requestBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(RequestBonusPaymentOnTimeResponse("1928374")))
 
         doSyncRequest(validBonusPaymentJson) { res =>
@@ -352,6 +375,7 @@ class BonusPaymentControllerSpec extends PlaySpec
           val htb = json \ "htbTransfer"
           val inboundPayments = json \ "inboundPayments"
           val bonuses = json \ "bonuses"
+          val supersede = json \ "supersede"
 
           verify(mockAuditService).audit(
             auditType = MatcherEquals("bonusPaymentRequested"),
@@ -372,14 +396,19 @@ class BonusPaymentControllerSpec extends PlaySpec
               "bonusDueForPeriod" -> (bonuses \ "bonusDueForPeriod").as[Amount].toString,
               "bonusPaidYTD" -> (bonuses \ "bonusPaidYTD").as[Amount].toString,
               "totalBonusDueYTD" -> (bonuses \ "totalBonusDueYTD").as[Amount].toString,
-              "claimReason" -> (bonuses \ "claimReason").as[String]
+              "claimReason" -> (bonuses \ "claimReason").as[String],
+              "automaticRecoveryAmount" -> (supersede \ "automaticRecoveryAmount").as[Amount].toString,
+              "originalTransactionId" -> (supersede \ "originalTransactionId").as[String],
+              "originalBonusDueForPeriod" -> (supersede \ "originalBonusDueForPeriod").as[Amount].toString,
+              "transactionResult" -> (supersede \ "transactionResult").as[Amount].toString,
+              "reason" -> (supersede \ "reason").as[String]
             ))
           )(any())
         }
       }
 
       "given a success response from the service layer and no optional fields" in {
-        when(mockService.requestBonusPayment(any(), any(), any())(any())).
+        when(mockPostService.requestBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(RequestBonusPaymentLateResponse("1928374")))
 
         doSyncRequest(validBonusPaymentMinimumFieldsJson) { res =>
@@ -414,7 +443,7 @@ class BonusPaymentControllerSpec extends PlaySpec
     "audit bonusPaymentNotRequested" when {
 
       "given an error response from the service layer" in {
-        when(mockService.requestBonusPayment(any(), any(), any())(any())).
+        when(mockPostService.requestBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(RequestBonusPaymentLifeEventNotFound))
 
         doSyncRequest(validBonusPaymentMinimumFieldsJson) { res =>
@@ -445,18 +474,19 @@ class BonusPaymentControllerSpec extends PlaySpec
       }
 
       "the bonus claim reason is life event and no life event id is provided" in {
-        when(mockService.requestBonusPayment(any(), any(), any())(any())).
+        when(mockPostService.requestBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.failed(new RuntimeException("Test")))
 
         val invalidJson = validBonusPaymentJson.replace("\"lifeEventId\": \"1234567891\",", "")
 
         doSyncRequest(invalidJson) { res =>
-          reset(mockService) // removes the thenThrow
+          reset(mockPostService) // removes the thenThrow
 
           val json = Json.parse(invalidJson)
           val htb = json \ "htbTransfer"
           val inboundPayments = json \ "inboundPayments"
           val bonuses = json \ "bonuses"
+          val supersede = json \ "supersede"
 
           verify(mockAuditService).audit(
             auditType = MatcherEquals("bonusPaymentNotRequested"),
@@ -476,7 +506,12 @@ class BonusPaymentControllerSpec extends PlaySpec
               "bonusPaidYTD" -> (bonuses \ "bonusPaidYTD").as[Amount].toString,
               "totalBonusDueYTD" -> (bonuses \ "totalBonusDueYTD").as[Amount].toString,
               "claimReason" -> (bonuses \ "claimReason").as[String],
-              "reasonNotRequested" -> "LIFE_EVENT_NOT_PROVIDED"
+              "reasonNotRequested" -> "LIFE_EVENT_NOT_PROVIDED",
+              "automaticRecoveryAmount" -> (supersede \ "automaticRecoveryAmount").as[Amount].toString,
+              "originalTransactionId" -> (supersede \ "originalTransactionId").as[String],
+              "originalBonusDueForPeriod" -> (supersede \ "originalBonusDueForPeriod").as[Amount].toString,
+              "transactionResult" -> (supersede \ "transactionResult").as[Amount].toString,
+              "reason" -> (supersede \ "reason").as[String]
             )
             ))(any())
         }
@@ -501,7 +536,7 @@ class BonusPaymentControllerSpec extends PlaySpec
         val request = Json.parse(validBonusPaymentJson).as[RequestBonusPaymentRequest]
         val json = Json.toJson(request)
 
-        reset(mockService)
+        reset(mockPostService)
 
         doSyncRequest(json.toString()) { _ =>
           val inboundPayments = json \ "inboundPayments"
@@ -534,11 +569,11 @@ class BonusPaymentControllerSpec extends PlaySpec
       }
 
       "an error occurs" in {
-        when(mockService.requestBonusPayment(any(), any(), any())(any())).
+        when(mockPostService.requestBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.failed(new RuntimeException("Test")))
 
         doSyncRequest(validBonusPaymentMinimumFieldsJson) { _ =>
-          reset(mockService) // removes the thenThrow
+          reset(mockPostService) // removes the thenThrow
 
           val json = Json.parse(validBonusPaymentMinimumFieldsJson)
           val inboundPayments = json \ "inboundPayments"
@@ -572,37 +607,55 @@ class BonusPaymentControllerSpec extends PlaySpec
   "the GET bonus payment endpoint" must {
 
     "return 200 success response" in {
-      when(mockService.getBonusPayment(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusPaymentSuccessResponse(
+      when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusResponse(
         Some("1234567891"),
         new DateTime("2017-04-06"),
         new DateTime("2017-05-05"),
         Some(HelpToBuyTransfer(0f, 10f)),
         InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
-        Bonuses(1000f, 1000f, Some(1000f), "Life Event"))))
+        Bonuses(1000f, 1000f, Some(1000f), "Life Event"),
+        Some("1234567892"),
+        Some(BonusRecovery(100, "1234567890", 1100, -100)),
+        "Paid",
+        new DateTime("2017-05-20"))
+      ))
 
       doGetBonusPaymentTransactionRequest(res => {
         status(res) mustBe OK
-        contentAsJson(res) mustBe Json.toJson (GetBonusPaymentSuccessResponse(Some("1234567891"),
-          new DateTime("2017-04-06"),
-          new DateTime("2017-05-05"),
-          Some(HelpToBuyTransfer(0f, 10f)),
-          InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
-          Bonuses(1000f, 1000f, Some(1000f), "Life Event")))
+        contentAsJson(res) mustBe Json.obj(
+          "lifeEventId" -> "1234567891",
+          "periodStartDate" -> "2017-04-06",
+          "periodEndDate" -> "2017-05-05",
+          "htbTransfer" -> Json.obj(
+            "htbTransferInForPeriod" -> 0,
+            "htbTransferTotalYTD" -> 10
+          ),
+          "inboundPayments" -> Json.obj(
+            "newSubsForPeriod" -> 4000,
+              "newSubsYTD" -> 4000,
+              "totalSubsForPeriod" -> 4000,
+              "totalSubsYTD" -> 4000
+          ),
+          "bonuses" -> Json.obj(
+            "bonusDueForPeriod" -> 1000,
+            "totalBonusDueYTD" -> 1000,
+            "bonusPaidYTD" -> 1000,
+            "claimReason" -> "Life Event"
+          ),
+          "supersede" -> Json.obj(
+            "automaticRecoveryAmount" -> 100,
+            "originalTransactionId" -> "1234567890",
+            "originalBonusDueForPeriod" -> 1100,
+            "transactionResult" -> -100,
+            "reason" -> "Bonus recovery"
+          ),
+          "supersededBy" -> "1234567892"
+        )
       })
     }
 
-    "return 400 when an invalid lmrn is being sent" in {
-      when(mockService.getBonusPayment(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusPaymentLmrnDoesNotExistResponse))
-
-      doGetBonusPaymentTransactionRequest { res =>
-        status(res) mustBe (BAD_REQUEST)
-        val json = contentAsJson(res)
-        (json \ "code").as[String] mustBe ErrorBadRequestLmrn.errorCode
-        (json \ "message").as[String] mustBe ErrorBadRequestLmrn.message
-      }
-    }
     "return 404 status invalid lisa account (investor id not found)" in {
-      when(mockService.getBonusPayment(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusPaymentInvestorNotFoundResponse))
+      when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusOrWithdrawalInvestorNotFoundResponse))
       doGetBonusPaymentTransactionRequest(res => {
         status(res) mustBe (NOT_FOUND)
         val json = contentAsJson(res)
@@ -611,21 +664,50 @@ class BonusPaymentControllerSpec extends PlaySpec
       })
     }
 
-    "return 404 transcation not found" in {
-      when(mockService.getBonusPayment(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusPaymentTransactionNotFoundResponse))
-      doGetBonusPaymentTransactionRequest(res => {
-        status(res) mustBe (NOT_FOUND)
-        val json = contentAsJson(res)
-        (json \ "code").as[String] mustBe ErrorTransactionNotFound.errorCode
-        (json \ "message").as[String] mustBe ErrorTransactionNotFound.message
-      })
+    "return 404 transaction not found" when {
+
+      "given a transaction not found error from the connector" in {
+        when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusOrWithdrawalTransactionNotFoundResponse))
+        doGetBonusPaymentTransactionRequest(res => {
+          status(res) mustBe (NOT_FOUND)
+          val json = contentAsJson(res)
+          (json \ "code").as[String] mustBe ErrorTransactionNotFound.errorCode
+          (json \ "message").as[String] mustBe ErrorTransactionNotFound.message
+        })
+      }
+
+      "given a withdrawal charge transaction from the connector" in {
+        when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetWithdrawalResponse(
+          new DateTime("2017-05-06"),
+          new DateTime("2017-06-05"),
+          None,
+          1000,
+          250,
+          250,
+          true,
+          "",
+          None,
+          None,
+          "Collected",
+          new DateTime("2017-06-19")
+        )))
+        doGetBonusPaymentTransactionRequest(res => {
+          status(res) mustBe (NOT_FOUND)
+          val json = contentAsJson(res)
+          (json \ "code").as[String] mustBe ErrorTransactionNotFound.errorCode
+          (json \ "message").as[String] mustBe ErrorTransactionNotFound.message
+        })
+      }
+
     }
+
     "return an internal server error response" in {
-      when(mockService.getBonusPayment(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusPaymentErrorResponse))
+      when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusOrWithdrawalErrorResponse))
       doGetBonusPaymentTransactionRequest(res => {
         (contentAsJson(res) \ "code").as[String] mustBe "INTERNAL_SERVER_ERROR"
       })
     }
+
   }
 
   def doRequest(jsonString: String, lmrn: String = lisaManager)(callback: (Future[Result]) =>  Unit): Unit = {
@@ -647,14 +729,16 @@ class BonusPaymentControllerSpec extends PlaySpec
     callback(res)
   }
 
-  val mockService: BonusPaymentService = mock[BonusPaymentService]
+  val mockPostService: BonusPaymentService = mock[BonusPaymentService]
+  val mockGetService: BonusOrWithdrawalService = mock[BonusOrWithdrawalService]
   val mockAuditService: AuditService = mock[AuditService]
   val mockAuthCon: LisaAuthConnector = mock[LisaAuthConnector]
   val mockDateTimeService: CurrentDateService = mock[CurrentDateService]
   val mockValidator: BonusPaymentValidator = mock[BonusPaymentValidator]
 
   val SUT = new BonusPaymentController {
-    override val service: BonusPaymentService = mockService
+    override val postService: BonusPaymentService = mockPostService
+    override val getService: BonusOrWithdrawalService = mockGetService
     override val auditService: AuditService = mockAuditService
     override val authConnector: LisaAuthConnector = mockAuthCon
     override val validator: BonusPaymentValidator = mockValidator

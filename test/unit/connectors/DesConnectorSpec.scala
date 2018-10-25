@@ -17,8 +17,8 @@
 package unit.connectors
 
 import org.joda.time.DateTime
-import org.mockito.Matchers._
-import org.mockito.Mockito.when
+import org.mockito.Matchers.{eq => matchersEquals, _}
+import org.mockito.Mockito.{verify, when}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
@@ -31,6 +31,7 @@ import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
 import scala.io.Source
 import uk.gov.hmrc.http._
+import uk.gov.hmrc.lisaapi.models
 
 class DesConnectorSpec extends PlaySpec
   with MockitoSugar
@@ -538,6 +539,78 @@ class DesConnectorSpec extends PlaySpec
 
   }
 
+  "Request Fund Release endpoint" must {
+
+    "return a DesSuccessResponse" when {
+      "the DES response has a json body that is in the correct format" in {
+        when(mockHttpPost.POST[RequestFundReleaseRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = CREATED,
+                responseJson = Some(Json.parse(s"""{"lifeEventID": "87654321"}"""))
+              )
+            )
+          )
+
+        doRequestFundReleaseRequest { response =>
+          response must be(DesLifeEventResponse("87654321"))
+        }
+      }
+    }
+
+    "return a DesFailureResponse" when {
+      "the DES response has no json body" in {
+        when(mockHttpPost.POST[RequestFundReleaseRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = SERVICE_UNAVAILABLE,
+                responseJson = None
+              )
+            )
+          )
+
+        doRequestFundReleaseRequest { response =>
+          response must be(DesFailureResponse())
+        }
+      }
+
+      "the DES response has a json body that is in an incorrect format" in {
+        when(mockHttpPost.POST[RequestFundReleaseRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = OK,
+                responseJson = Some(Json.parse(s"""{"lifeEvent": "87654321"}"""))
+              )
+            )
+          )
+
+        doRequestFundReleaseRequest { response =>
+          response must be(DesFailureResponse())
+        }
+      }
+
+      "the DES response is an error response" in {
+        when(mockHttpPost.POST[RequestFundReleaseRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = FORBIDDEN,
+                responseJson = Some(Json.parse(s"""{"code": "INVESTOR_ACCOUNTID_NOT_FOUND", "reason": "Account not found."}"""))
+              )
+            )
+          )
+
+        doRequestFundReleaseRequest { response =>
+          response must be(DesFailureResponse("INVESTOR_ACCOUNTID_NOT_FOUND", "Account not found."))
+        }
+      }
+    }
+
+  }
+
   "Request Bonus Payment endpoint" must {
 
     "return a populated DesTransactionResponse" when {
@@ -553,7 +626,25 @@ class DesConnectorSpec extends PlaySpec
           )
 
         doRequestBonusPaymentRequest { response =>
-          response mustBe DesTransactionResponse("87654321","On Time")
+          response mustBe DesTransactionResponse("87654321", Some("On Time"))
+        }
+      }
+    }
+
+    "return a populated DesTransactionExistResponse" when {
+      "the DES response returns a 409 with a json body that is in the correct format" in {
+        when(mockHttpPost.POST[RequestBonusPaymentRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = CONFLICT,
+                responseJson = Some(Json.parse(s"""{"code": "x", "reason": "xx", "transactionID": "87654321"}"""))
+              )
+            )
+          )
+
+        doRequestBonusPaymentRequest { response =>
+          response mustBe DesTransactionExistResponse(code = "x", reason = "xx", transactionID = "87654321")
         }
       }
     }
@@ -743,7 +834,7 @@ class DesConnectorSpec extends PlaySpec
 
     }
 
-    "return a DesGetBonusPaymentResponse" when {
+    "return a GetBonusResponse" when {
 
       "DES returns successfully" in {
 
@@ -758,15 +849,17 @@ class DesConnectorSpec extends PlaySpec
           )
 
         doRetrieveBonusPaymentRequest { response =>
-          response mustBe DesGetBonusPaymentResponse(
+          response mustBe GetBonusResponse(
             lifeEventId = Some("1234567891"),
             periodStartDate = new DateTime("2017-04-06"),
             periodEndDate = new DateTime("2017-05-05"),
-            htbTransfer = Some(HelpToBuyTransfer(0f, 10f)),
-            inboundPayments = InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
-            bonuses = Bonuses(1000f, 1000f, Some(1000f), "Life Event"),
+            htbTransfer = Some(HelpToBuyTransfer(0, 10)),
+            inboundPayments = InboundPayments(Some(4000), 4000, 4000, 4000),
+            bonuses = Bonuses(1000, 1000, Some(1000), "Life Event"),
             creationDate = new DateTime("2017-05-05"),
-            status = "Paid"
+            paymentStatus = "Paid",
+            supersededBy = None,
+            supersede = None
           )
         }
 
@@ -1208,6 +1301,22 @@ class DesConnectorSpec extends PlaySpec
 
   "Report withdrawal endpoint" must {
 
+    "uses the des writes when posting data" in {
+      when(mockHttpPost.POST[ReportWithdrawalChargeRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        .thenReturn(
+          Future.successful(
+            HttpResponse(
+              responseStatus = CREATED,
+              responseJson = Some(Json.parse(s"""{"transactionID": "87654321","message": "On Time"}"""))
+            )
+          )
+        )
+
+      doReportWithdrawalRequest { response =>
+        verify(mockHttpPost).POST(any(), any(), any())(matchersEquals(ReportWithdrawalChargeRequest.desReportWithdrawalChargeWrites), any(), any(), any())
+      }
+    }
+
     "return a populated DesTransactionResponse" when {
       "the DES response has a json body that is in the correct format" in {
         when(mockHttpPost.POST[ReportWithdrawalChargeRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
@@ -1221,7 +1330,7 @@ class DesConnectorSpec extends PlaySpec
           )
 
         doReportWithdrawalRequest { response =>
-          response mustBe DesTransactionResponse("87654321","On Time")
+          response mustBe DesTransactionResponse("87654321", Some("On Time"))
         }
       }
     }
@@ -1333,6 +1442,13 @@ class DesConnectorSpec extends PlaySpec
     callback(response)
   }
 
+  private def doRequestFundReleaseRequest(callback: (DesResponse) => Unit) = {
+    val request = InitialFundReleaseRequest(new DateTime("2018-01-01"), 10000, "CR00000001", FundReleasePropertyDetails("1", "AA1 1AA"))
+    val response = Await.result(SUT.requestFundRelease("Z123456", "ABC12345", request), Duration.Inf)
+
+    callback(response)
+  }
+
   private def doRetrieveLifeEventRequest(callback: (DesResponse) => Unit) = {
     val response = Await.result(SUT.getLifeEvent("Z123456", "ABC12345", "123456"), Duration.Inf)
 
@@ -1344,9 +1460,9 @@ class DesConnectorSpec extends PlaySpec
       lifeEventId = Some("1234567891"),
       periodStartDate = new DateTime("2017-04-06"),
       periodEndDate = new DateTime("2017-05-05"),
-      htbTransfer = Some(HelpToBuyTransfer(0f, 0f)),
-      inboundPayments = InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
-      bonuses = Bonuses(1000f, 1000f, None, "Life Event")
+      htbTransfer = Some(HelpToBuyTransfer(0, 0)),
+      inboundPayments = InboundPayments(Some(4000), 4000, 4000, 4000),
+      bonuses = Bonuses(1000, 1000, None, "Life Event")
     )
 
     val response = Await.result(SUT.requestBonusPayment("Z123456", "ABC12345", request), Duration.Inf)
@@ -1355,7 +1471,7 @@ class DesConnectorSpec extends PlaySpec
   }
 
   private def doRetrieveBonusPaymentRequest(callback: (DesResponse) => Unit) = {
-    val response = Await.result(SUT.getBonusPayment("Z123456", "ABC12345", "123456"), Duration.Inf)
+    val response = Await.result(SUT.getBonusOrWithdrawal("Z123456", "ABC12345", "123456"), Duration.Inf)
 
     callback(response)
   }
@@ -1372,7 +1488,7 @@ class DesConnectorSpec extends PlaySpec
     callback(response)
   }
 
-  private def  doRetrieveAccountRequest(callback: (DesResponse) => Unit) = {
+  private def doRetrieveAccountRequest(callback: (DesResponse) => Unit) = {
     val response = Await.result(SUT.getAccountInformation("Z123456", "123456"), Duration.Inf)
 
     callback(response)
@@ -1380,6 +1496,7 @@ class DesConnectorSpec extends PlaySpec
 
   private def doReportWithdrawalRequest(callback: (DesResponse) => Unit) = {
     val request = SupersededWithdrawalChargeRequest(
+      Some(250.00),
       new DateTime("2017-12-06"),
       new DateTime("2018-01-05"),
       1000.00,
@@ -1387,7 +1504,6 @@ class DesConnectorSpec extends PlaySpec
       500.00,
       true,
       WithdrawalIncrease(
-        250.00,
         "2345678901",
         250.00,
         250.00

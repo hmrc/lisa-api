@@ -190,6 +190,28 @@ trait DesConnector extends ServicesConfig {
   }
 
   /**
+    * Attempts to request a Fund Release for a property purchase
+    */
+  def requestFundRelease(lisaManager: String, accountId: String, request: RequestFundReleaseRequest)
+                        (implicit hc: HeaderCarrier): Future[DesResponse] = {
+
+    val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/life-event"
+    Logger.debug("Posting Fund Release request to des: " + uri)
+    val result = httpPost.POST[RequestFundReleaseRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
+
+    result.map(res => {
+      Logger.debug("Fund Release request returned status: " + res.status)
+      res.status match {
+        case 409 => {
+          parseDesResponse[DesLifeEventExistResponse](res)
+        }
+        case _ => parseDesResponse[DesLifeEventResponse](res)
+      }
+
+    })
+  }
+
+  /**
     * Attempts to update the first subscription date
     */
   def updateFirstSubDate(lisaManager: String, accountId: String, request: UpdateSubscriptionRequest)
@@ -203,6 +225,7 @@ trait DesConnector extends ServicesConfig {
       Logger.debug("Update first subscription date request returned status: " + res.status)
       res.status match {
         case 200 => parseDesResponse[DesUpdateSubscriptionSuccessResponse](res)
+        case 409 => parseDesResponse[DesTransactionExistResponse](res)
         case _ => parseDesResponse[DesFailureResponse](res)
       }
 
@@ -239,15 +262,18 @@ trait DesConnector extends ServicesConfig {
 
     result.map(res => {
       Logger.debug("Bonus Payment request returned status: " + res.status)
-      parseDesResponse[DesTransactionResponse](res)
+      res.status match {
+        case 409 => parseDesResponse[DesTransactionExistResponse](res)
+        case _ => parseDesResponse[DesTransactionResponse](res)
+      }
     })
   }
 
   /**
     * Attempts to get a submitted bonus payment's details from ITMP
     */
-  def getBonusPayment(lisaManager: String, accountId: String, transactionId: String)
-                     (implicit hc: HeaderCarrier): Future[DesResponse] = {
+  def getBonusOrWithdrawal(lisaManager: String, accountId: String, transactionId: String)
+                          (implicit hc: HeaderCarrier): Future[DesResponse] = {
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/transaction/$transactionId"
     Logger.debug("Getting the Bonus Payment transaction details from des: " + uri)
 
@@ -255,7 +281,7 @@ trait DesConnector extends ServicesConfig {
 
     result.map(res => {
       Logger.debug("Get Bonus Payment transaction details returned status: " + res.status)
-      parseDesResponse[DesGetBonusPaymentResponse](res)
+      parseDesResponse[GetBonusOrWithdrawalResponse](res)
     })
   }
 
@@ -271,9 +297,7 @@ trait DesConnector extends ServicesConfig {
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/withdrawal"
     Logger.debug("Posting withdrawal request to des: " + uri)
 
-    Logger.warn(s">>>>>>>>>>>>>>>>>>>>>>>>>>>>> POSTING: ${Json.toJson(request)}")
-
-    val result = httpPost.POST[ReportWithdrawalChargeRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
+    val result = httpPost.POST[ReportWithdrawalChargeRequest, HttpResponse](uri, request)(ReportWithdrawalChargeRequest.desReportWithdrawalChargeWrites, httpReads, updateHeaderCarrier(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
 
     result.map(res => {
       Logger.debug("Withdrawal request returned status: " + res.status)

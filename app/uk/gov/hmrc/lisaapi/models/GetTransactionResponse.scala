@@ -26,24 +26,26 @@ case object GetTransactionErrorResponse extends GetTransactionResponse
 case object GetTransactionTransactionNotFoundResponse extends GetTransactionResponse
 case object GetTransactionAccountNotFoundResponse extends GetTransactionResponse
 
-case class GetTransactionSuccessResponse(transactionId: String,
+case class GetTransactionSuccessResponse(transactionId: TransactionId,
+                                         transactionType: Option[String] = None,
                                          paymentStatus: String,
-                                         bonusDueForPeriod: Option[Amount] = None,
                                          paymentDate: Option[DateTime] = None,
                                          paymentDueDate: Option[DateTime] = None,
                                          paymentAmount: Option[Amount] = None,
-                                         paymentReference: Option[String] = None) extends GetTransactionResponse
+                                         paymentReference: Option[String] = None,
+                                         supersededBy: Option[TransactionId] = None) extends GetTransactionResponse
 
 object GetTransactionResponse {
   val dateFormat = "yyyy-MM-dd"
 
-  implicit val successWrites: Writes[GetTransactionSuccessResponse] = (
-    (JsPath \ "transactionId").write[String] and
+  implicit val bonusSuccessWrites: Writes[GetTransactionSuccessResponse] = (
+    (JsPath \ "transactionId").write[TransactionId] and
+    (JsPath \ "transactionType").writeNullable[String] and
     (JsPath \ "paymentStatus").write[String] and
-    (JsPath \ "bonusDueForPeriod").writeNullable[Amount] and
     (JsPath \ "paymentDate").writeNullable[String].contramap[Option[DateTime]](d => d.map(v => v.toString(dateFormat))) and
     (JsPath \ "paymentDueDate").writeNullable[String].contramap[Option[DateTime]](d => d.map(v => v.toString(dateFormat))) and
     (JsPath \ "paymentAmount").writeNullable[Amount] and
-    (JsPath \ "paymentReference").writeNullable[String]
+    (JsPath \ "paymentReference").writeNullable[String] and
+    (JsPath \ "supersededBy").writeNullable[TransactionId]
   )(unlift(GetTransactionSuccessResponse.unapply))
 }

@@ -39,14 +39,11 @@ trait LifeEventService {
         ReportLifeEventSuccessResponse(successResponse.lifeEventID)
       }
 
-      case existsResponse: DesLifeEventExistResponse => {
-        Logger.debug("Matched DesLifeEventAlreadyExistResponse")
-        ReportLifeEventAlreadyExistsResponse(existsResponse.lifeEventID)
-      }
       case failureResponse: DesFailureResponse => {
         Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
 
         failureResponse.code match {
+          case "LIFE_EVENT_ALREADY_EXISTS" => ReportLifeEventAlreadyExistsResponse
           case "LIFE_EVENT_INAPPROPRIATE" => ReportLifeEventInappropriateResponse
           case "INVESTOR_ACCOUNTID_NOT_FOUND" => ReportLifeEventAccountNotFoundResponse
           case "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID" => ReportLifeEventAccountClosedResponse

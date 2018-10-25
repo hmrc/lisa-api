@@ -1,0 +1,102 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"type": "object",
+	"properties": {
+		"claimPeriodStartDate": {
+			"description": "This is the start date of the claim period for the withdrawal charge. It must be the sixth day of the month. You cannot enter a date in the future.",
+            "example": "2018-01-06",
+            "id": "full-date",
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+		},
+		"claimPeriodEndDate": {
+			"description": "This is the end date of the claim period for the withdrawal charge. It must be the fifth day of the month. It has to be the month after the claimPeriodStartDate.",
+            "example": "2018-02-05",
+            "id": "full-date",
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+		},
+		"automaticRecoveryAmount": {
+			"description": "This is the amount HMRC can collect from the LISA manager when there is a withdrawal charge. If there are no funds available, this value must be 0.",
+			"type": "number"
+		},
+		"withdrawalAmount": {
+			"description": "This is the amount that the investor has withdrawn from the LISA account.",
+			"type": "number"
+		},
+		"withdrawalChargeAmount": {
+			"description": "This is the amount charged for the withdrawal.",
+			"type": "number"
+		},
+		"withdrawalChargeAmountYTD": {
+			"description": "This is the total value of withdrawal charges reported to HMRC for the current tax year to date.",
+			"type": "number"
+		},
+		"fundsDeductedDuringWithdrawal": {
+			"description": "This confirms if the investor was charged and funds were deducted at the time of the withdrawal.",
+			"type": "boolean"
+		},
+		"withdrawalReason": {
+			"description": "This is used by HMRC to decide how the withdrawal charge is processed.",
+			"type": "string",
+			"enum": [
+				"Regular withdrawal",
+				"Superseded withdrawal"
+			]
+		},
+		"supersededBy": {
+			"description": "The ID of the transaction that supersedes the current one.",
+			"$ref": "#/definitions/TransactionIDType"
+		},
+		"supersede": {
+			"type": "object",
+			"description": "Correct an existing withdrawal charge. You can request an additional charge, reduce a charge, or refund a charge.",
+			"properties": {
+				"originalTransactionId": {
+					"description": "The transactionId of the original withdrawal charge affected by the correction or recovery. This is used together with the originalWithdrawalChargeAmount to make sure the right charge is replaced.",
+					"$ref": "#/definitions/TransactionIDType"
+				},
+				"originalWithdrawalChargeAmount": {
+					"description": "This is how much was in the withdrawalChargeAmount in the original request.",
+					"type": "number"
+				},
+				"transactionResult": {
+					"description": "The amount to be added to or recovered from the original withdrawal charge.",
+					"type": "number"
+				},
+				"reason": {
+					"description": "Confirm whether an additional charge is due or whether the investor is owed some money.",
+					"type": "string",
+					"enum": [
+						"Additional withdrawal",
+						"Withdrawal reduction",
+						"Withdrawal refund"
+					]
+				}
+			},
+			"required": [
+				"originalTransactionId",
+				"originalWithdrawalChargeAmount",
+				"transactionResult",
+				"reason"
+			]
+		}
+	},
+	"required": [
+		"claimPeriodStartDate",
+		"claimPeriodEndDate",
+		"withdrawalAmount",
+		"withdrawalChargeAmount",
+		"withdrawalChargeAmountYTD",
+		"fundsDeductedDuringWithdrawal",
+		"withdrawalReason"
+	],
+	"additionalProperties": false,
+	"definitions": {
+		"TransactionIDType": {
+			"type": "string",
+			"pattern": "^\\d{1,10}$",
+			"example": "1234567890"
+		}
+	}
+}

@@ -46,6 +46,13 @@ case class ErrorResponseWithLifeEventId(
                                          lifeEventID: String
                                        )
 
+case class ErrorResponseWithTransactionId(
+                                         httpStatusCode: Int,
+                                         errorCode: String,
+                                         message: String,
+                                         transactionId: String
+                                       )
+
 case class ErrorResponseWithAccountId (
                                          override val httpStatusCode: Int,
                                          override val errorCode: String,
@@ -118,11 +125,13 @@ case object ErrorAccountAlreadyVoided extends ErrorResponse(403, "INVESTOR_ACCOU
 
 case object ErrorAccountAlreadyClosed extends ErrorResponse(403, "INVESTOR_ACCOUNT_ALREADY_CLOSED", "The LISA account is already closed")
 
+case object ErrorAccountAlreadyCancelled extends ErrorResponse(403, "INVESTOR_ACCOUNT_ALREADY_CANCELLED", "The LISA account is already cancelled")
+
 case object ErrorAccountAlreadyOpen extends ErrorResponse(403, "INVESTOR_ACCOUNT_ALREADY_OPEN", "You cannot reinstate this account because it is already open")
 
 case object ErrorAccountNotFound extends ErrorResponse(404, "INVESTOR_ACCOUNTID_NOT_FOUND", "The accountId does not match HMRC’s records")
 
-case object ErrorPaymentNotFound extends ErrorResponse(404, "PAYMENT_NOT_FOUND", "No bonus payments have been made for this date range")
+case object ErrorBulkTransactionNotFound extends ErrorResponse(404, "TRANSACTION_NOT_FOUND", "No payments or debts exist for this date range")
 
 case object ErrorTransferAccountDataNotProvided extends ErrorResponse(403, "TRANSFER_ACCOUNT_DATA_NOT_PROVIDED", "You must give a transferredFromAccountId, transferredFromLMRN and transferInDate when the creationReason is transferred")
 
@@ -134,11 +143,11 @@ case object ErrorInvalidLisaManager extends ErrorResponse(401,"UNAUTHORIZED", "l
 
 case object ErrorTransactionNotFound extends ErrorResponse(404, "BONUS_PAYMENT_TRANSACTION_NOT_FOUND", "transactionId does not match HMRC’s records")
 
+case object ErrorGenericTransactionNotFound extends ErrorResponse(404, "TRANSACTION_NOT_FOUND", "transactionId does not match HMRC’s records")
+
+case object ErrorWithdrawalNotFound extends ErrorResponse(404, "WITHDRAWAL_CHARGE_TRANSACTION_NOT_FOUND", "transactionId does not match HMRC’s records")
+
 case object ErrorBonusClaimError extends ErrorResponse(403, "BONUS_CLAIM_ERROR", "The bonus amount given is above the maximum annual amount, or the qualifying deposits are above the maximum annual amount or the bonus claim does not equal the correct percentage of qualifying funds")
-
-case object ErrorBonusClaimAlreadyExists extends ErrorResponse(409, "BONUS_CLAIM_ALREADY_EXISTS", "The investor’s bonus payment has already been requested")
-
-case object ErrorBonusClaimAlreadySuperseded extends ErrorResponse(409, "BONUS_CLAIM_ALREADY_SUPERSEDED", "This bonus claim has already been superseded")
 
 case object ErrorBonusSupersededAmountMismatch extends ErrorResponse(403, "SUPERSEDED_BONUS_CLAIM_AMOUNT_MISMATCH", "originalTransactionId and the originalBonusDueForPeriod amount do not match the information in the original bonus request")
 
@@ -162,18 +171,24 @@ case object ErrorWithdrawalSupersededOutcomeError extends ErrorResponse(403, "SU
 
 case object ErrorWithdrawalTimescalesExceeded extends ErrorResponse(403, "WITHDRAWAL_CHARGE_TIMESCALES_EXCEEDED", "The timescale for reporting a withdrawal charge has passed. The claim period lasts for 6 years and 14 days")
 
+
+
+
+
+
+
+case object ErrorAccountNotOpenLongEnough extends ErrorResponse(403, "COMPLIANCE_ERROR_ACCOUNT_NOT_OPEN_LONG_ENOUGH", "The account has not been open for long enough")
+case object ErrorFundReleaseOtherPropertyOnRecord extends ErrorResponse(403, "COMPLIANCE_ERROR_OTHER_PURCHASE_ON_RECORD", "Another property purchase is already recorded")
+case object ErrorFundReleaseMismatch extends ErrorResponse(403, "SUPERSEDED_FUND_RELEASE_MISMATCH_ERROR", "originalFundReleaseId and the originalEventDate do not match the information in the original request")
+case object ErrorFundReleaseAlreadyExists extends ErrorResponse(409, "FUND_RELEASE_ALREADY_EXISTS", "The investor’s fund release has already been requested")
+case object ErrorFundReleaseAlreadySuperseded extends ErrorResponse(409, "SUPERSEDED_FUND_RELEASE_ALREADY_SUPERSEDED", "This fund release has already been superseded")
+
+case object ErrorLifeEventAlreadyExists extends ErrorResponse(409, "LIFE_EVENT_ALREADY_EXISTS", "The investor’s life event has already been reported")
+
 object ErrorInvestorAlreadyExists {
 
   def apply(investorId: String) = {
     ErrorResponseWithId(409, "INVESTOR_ALREADY_EXISTS", "The investor already has a record with HMRC", investorId)
-  }
-
-}
-
-object ErrorLifeEventAlreadyExists {
-
-  def apply(lifeEventID: String) = {
-    ErrorResponseWithLifeEventId(409, "LIFE_EVENT_ALREADY_EXISTS", "The investor’s life event has already been reported", lifeEventID)
   }
 
 }
@@ -186,6 +201,21 @@ object ErrorAccountAlreadyExists {
 
 }
 
+object ErrorBonusClaimAlreadyExists {
+
+  def apply(transactionId: String) = {
+    ErrorResponseWithTransactionId(409, "BONUS_CLAIM_ALREADY_EXISTS", "The investor’s bonus payment has already been requested", transactionId)
+  }
+
+}
+
+object ErrorBonusClaimAlreadySuperseded {
+
+  def apply(transactionId: String) = {
+    ErrorResponseWithTransactionId(409, "BONUS_CLAIM_ALREADY_SUPERSEDED", "This bonus claim has already been superseded", transactionId)
+  }
+
+}
 
 case object ErrorLifeEventNotProvided extends ErrorResponse(403, "LIFE_EVENT_NOT_PROVIDED", "lifeEventId is required when the claimReason is a life event")
 

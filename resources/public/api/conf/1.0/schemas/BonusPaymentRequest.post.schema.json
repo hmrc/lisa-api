@@ -20,7 +20,7 @@
 			"properties":
 			{
 				"htbTransferInForPeriod" :{
-                  "description": "The total amount of Help to Buy funds in the account during the claim period. You can include an amount up to 2 decimal places. You must enter a number greater than 0 in either newSubsForPeriod or htbTransferInForPeriod. Both fields cannot be 0. If there is a number in htbTransferInForPeriod, then the number in htbTransferTotalYTD must be greater than 0.",
+                  "description": "The total amount of Help to Buy funds in the account during the claim period. You can include an amount up to 2 decimal places.",
                   "type" : "number"},
 			    "htbTransferTotalYTD" :{
                   "description": "The total amount of Help to Buy funds in the account in the tax year to date. You can include an amount up to 2 decimal places. If there is a number in htbTransferInForPeriod, then the number in htbTransferTotalYTD must be greater than 0.",
@@ -39,9 +39,9 @@
 			"type" : "object",
 			"properties":
 			{
-			  "newSubsForPeriod" :{"description": "The total value of new qualifying deposits paid in to the account during the claim period. You can include an amount up to 2 decimal places. You must enter a number greater than 0 in either newSubsForPeriod or htbTransferInForPeriod. Both fields can’t be 0. If there is a number in newSubsForPeriod, then the number in newSubsYTD must be greater than 0.", "type" : "number"},
+			  "newSubsForPeriod" :{"description": "The total value of new qualifying deposits paid in to the account during the claim period. You can include an amount up to 2 decimal places.", "type" : "number"},
 			  "newSubsYTD" :{"description": "The total value of new qualifying deposits paid in to the account during the tax year to date. You can include an amount up to 2 decimal places. If there is a number in newSubsForPeriod, then the number in newSubsYTD must be greater than 0.", "type" : "number"},
-			  "totalSubsForPeriod" :{"description": "The total amount in the account during the claim period that qualifies for a bonus payment. You can include an amount up to 2 decimal places. The totalSubsForPeriod must always be greater than 0.", "type" : "number"},
+			  "totalSubsForPeriod" :{"description": "The total amount in the account during the claim period that qualifies for a bonus payment. You can include an amount up to 2 decimal places. The totalSubsForPeriod must always be greater than 0 except when bonusDueForPeriod is 0.", "type" : "number"},
 			  "totalSubsYTD" :{"description": "The total amount in the account during the tax year to date that qualifies for a bonus payment. You can include an amount up to 2 decimal places. The totalSubsYTD must be the same as or more than totalSubsForPeriod.", "type" : "number"}
 			},
 		  "required":
@@ -57,10 +57,10 @@
         "type": "object",
         "properties" :
         {
-          "bonusDueForPeriod" :{"description": "The total bonus payment amount due for the claim period. You can include an amount up to 2 decimal places. The bonusDueForPeriod must always be greater than 0.", "type" : "number"},
-          "totalBonusDueYTD" :{"description": "The total bonus payment amount due for the tax year to date. You can include an amount up to 2 decimal places. The totalBonusDueYTD must always be greater than 0.", "type" : "number"},
+          "bonusDueForPeriod" :{"description": "The total bonus payment amount due for the claim period. You can include an amount up to 2 decimal places. If you supersede this claim and the supersededReason is ‘bonus recovery’, then the bonusDueForPeriod can be 0. If not, it must always be greater than 0.", "type" : "number"},
+          "totalBonusDueYTD" :{"description": "The total bonus payment amount due for the tax year to date. You can include an amount up to 2 decimal places. This cannot be less than bonusDueForPeriod.", "type" : "number"},
           "bonusPaidYTD" :{"description": "The total bonus payment that has already been claimed and paid in the tax year to date. You can include an amount up to 2 decimal places.", "type" : "number"},
-          "claimReason" : {"description": "The reason the bonus payment was claimed. \"Superseding bonus claim\" is valid in the sandbox environment only.", "$ref": "#/definitions/claimReasonType"}
+          "claimReason" : {"description": "The reason the bonus payment was claimed. \"Superseded Bonus\" is valid in the sandbox environment only.", "$ref": "#/definitions/claimReasonType"}
         },
         "required":
         [
@@ -124,7 +124,7 @@
       },
       "claimReasonType" : {
         "type" : "string",
-        "enum": ["Life Event", "Regular Bonus", "Superseding bonus claim"]
+        "enum": ["Life Event", "Regular Bonus", "Superseded Bonus"]
       },
       "chargeReasonType" : {
         "type" : "string",

@@ -1,0 +1,82 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"type": "object",
+	"properties":
+	{
+        "eventDate": {
+			"description": "This is the date of the request to release funds. This cannot be in the future.",
+			"$ref": "#/definitions/ISO8601-Date"
+        },
+        "withdrawalAmount": {
+			"description": "This is the amount that the investor has withdrawn from the LISA account. You can include a value up to 2 decimal places.",
+			"type" : "number"
+        },
+        "conveyancerReference": {
+			"description": "This is the reference for the conveyancer involved with the property purchase. ",
+			"type": "string",
+			"pattern": "^[a-zA-Z0-9 :/-]{1,20}$",
+			"example": "CR12345-6789"
+        },
+        "propertyDetails": {
+			"type": "object",
+			"description": "The details of the property that you are requesting funds to buy.",
+			"properties": {
+				"nameOrNumber": {
+					"description": "The name or number of the property that you are requesting funds to buy.",
+					"type": "string",
+					"pattern": "^[A-Za-z0-9 :/-]{1,35}$",
+					"example": "Flat A"
+				},
+				"postalCode": {
+					"description": "The postcode of the property that you are requesting funds to buy.",
+					"type": "string",
+					"pattern": "^[A-Za-z0-9 ]{1,8}$",
+					"example": "AA1 1AA"
+				}
+			},
+			"required": [
+				"nameOrNumber",
+				"postalCode"
+			],
+			"additionalProperties": false
+        },
+		"supersede": {
+			"type": "object",
+			"description": "Correct an existing fund release with a new eventDate and withdrawalAmount.",
+			"properties": {
+				"originalFundReleaseId": {
+					"description": "The ID of the fund release affected by the correction.",
+					"$ref": "#/definitions/IDType"
+				},
+				"originalEventDate": {
+					"description": "The eventDate of the fund release affected by the correction.",
+					"$ref": "#/definitions/ISO8601-Date"
+				}
+			},
+			"required": [
+				"originalFundReleaseId",
+				"originalEventDate"
+			],
+			"additionalProperties": false
+		}
+	},
+	"required": [
+		"eventDate",
+		"withdrawalAmount"
+	],
+	"additionalProperties": false,
+	"definitions":
+	{
+		"ISO8601-Date": {
+			"id": "full-date",
+			"type": "string",
+			"pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+			"example": "2017-05-06"
+		},
+		"IDType": {
+			"type": "string",
+			"pattern": "^\\d{10}$",
+			"example": "0987654321"
+		}
+	}
+}

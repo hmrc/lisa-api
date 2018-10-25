@@ -34,6 +34,9 @@ package object models {
   type LisaManagerReferenceNumber = String
   type AccountClosureReason = String
   type BonusClaimReason = String
+  type BonusClaimSupersedeReason = String
+  type WithdrawalReason = String
+  type WithdrawalSupersedeReason = String
 
   private val MIN_AMOUNT = BigDecimal("-99999999999999.98")
   private val MAX_AMOUNT = BigDecimal("99999999999999.98")
@@ -74,7 +77,7 @@ package object models {
       "^(All funds withdrawn|Cancellation)$".r,
       "error.formatting.accountClosureReason")
     val bonusClaimReason: Reads[BonusClaimReason] = Reads.pattern(
-      "^(Life Event|Regular Bonus|Superseding bonus claim)$".r,
+      "^(Life Event|Regular Bonus|Superseded Bonus)$".r,
       "error.formatting.claimReason"
     )
 

@@ -1,0 +1,8 @@
+{
+  "eventDate": "2017-05-11",
+  "eventType": "Purchase extension 1",
+  "supersede": {
+    "originalEventDate": "2017-05-10",
+    "originalExtensionId": "6789000001"
+  }
+}

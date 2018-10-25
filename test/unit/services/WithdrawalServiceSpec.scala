@@ -39,7 +39,7 @@ class WithdrawalServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
       "given a successful on time response from the DES connector" in {
         when(mockDesConnector.reportWithdrawalCharge(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesTransactionResponse("AB123456", "On Time")))
+          thenReturn(Future.successful(DesTransactionResponse("AB123456", Some("On Time"))))
 
         doRequest { response =>
           response mustBe ReportWithdrawalChargeOnTimeResponse("AB123456")
@@ -48,7 +48,7 @@ class WithdrawalServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
       "given a successful late notification response from the DES connector" in {
         when(mockDesConnector.reportWithdrawalCharge(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesTransactionResponse("AB123456", "Late")))
+          thenReturn(Future.successful(DesTransactionResponse("AB123456", Some("Late"))))
 
         doRequest { response =>
           response mustBe ReportWithdrawalChargeLateResponse("AB123456")
@@ -75,17 +75,6 @@ class WithdrawalServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
         doRequest { response =>
           response mustBe ReportWithdrawalChargeAccountVoid
-        }
-      }
-    }
-
-    "return a account closed response" when {
-      "given the code INVESTOR_ACCOUNT_ALREADY_CLOSED from the DES connector" in {
-        when(mockDesConnector.reportWithdrawalCharge(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_CLOSED", "xxxx")))
-
-        doRequest { response =>
-          response mustBe ReportWithdrawalChargeAccountClosed
         }
       }
     }
@@ -171,6 +160,7 @@ class WithdrawalServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
   private def doRequest(callback: (ReportWithdrawalChargeResponse) => Unit) = {
     val request = models.RegularWithdrawalChargeRequest(
+      Some(250.00),
       new DateTime("2017-12-06"),
       new DateTime("2018-01-05"),
       1000.00,

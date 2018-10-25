@@ -763,6 +763,317 @@ types:
                                     "code" : "LIFE_EVENT_ALREADY_EXISTS",
                                     "message" : "The investor’s life event has already been reported"
                               }
+                /property-purchase:
+                  post:
+                    is: [headers.acceptHeader]
+                    displayName: "[sandbox-only] Request the release of funds to buy a property"
+                    description: Request the release of LISA funds to buy a property. You can also correct a request by changing the withdrawal amount or property purchase date. When you make a correction, you cannot change the property details or the conveyancer reference number.
+                    (annotations.scope): "write:lisa"
+                    securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
+                    (annotations.sandboxData): !include testdata/fund-release.md
+                    body:
+                      application/json:
+                        type: !include schemas/FundReleaseRequest.post.schema.json
+                        examples:
+                          example-1: !include examples/FundReleaseRequest.post.json
+                          example-2: !include examples/FundReleaseSupersededRequest.post.json
+                    responses:
+                      201:
+                        description: The LISA transaction resource has been created.
+                        body:
+                          application/json:
+                            type: !include schemas/FundRelease.post.response.schema.json
+                            examples:
+                              lifeEventCreated: !include examples/FundRelease.post.response.1.json
+                              lifeEventSuperseded: !include examples/FundRelease.post.response.2.json
+                      400:
+                        body:
+                          application/json:
+                            type: !include schemas/ErrorCodes.schema.json
+                            examples:
+                              InvalidLmrn:
+                                description: lisaManagerReferenceNumber in the URL is in the wrong format
+                                value: |
+                                  {
+                                    "code" : "BAD_REQUEST",
+                                    "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
+                                  }
+                              InvalidAccountId:
+                                description: accountId in the URL is in the wrong format
+                                value: |
+                                  {
+                                    "code" : "BAD_REQUEST",
+                                    "message" : "accountId in the URL is in the wrong format"
+                                  }
+                      401:
+                        body:
+                          application/json:
+                            type: !include schemas/ErrorCodes.schema.json
+                            examples:
+                              notOpenStatus:
+                                description: lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
+                                value: |
+                                  {
+                                    "code" : "UNAUTHORIZED",
+                                    "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
+                                  }
+                      403:
+                        body:
+                          application/json:
+                            type: !include schemas/ErrorCodes.schema.json
+                            examples:
+                              accountClosed:
+                                description: The LISA account is already closed
+                                value: |
+                                  {
+                                    "code" : "INVESTOR_ACCOUNT_ALREADY_CLOSED",
+                                    "message" : "The LISA account is already closed"
+                                  }
+                              accountVoid:
+                                description: The LISA account is already void
+                                value: |
+                                  {
+                                    "code" : "INVESTOR_ACCOUNT_ALREADY_VOID",
+                                    "message" : "The LISA account is already void"
+                                  }
+                              accountCancelled:
+                                description: The LISA account is already cancelled
+                                value: |
+                                  {
+                                    "code" : "INVESTOR_ACCOUNT_ALREADY_CANCELLED",
+                                    "message" : "The LISA account is already cancelled"
+                                  }
+                              complianceCheckNotOpenLongEnough:
+                                description: The account has not been open for long enough
+                                value: |
+                                  {
+                                    "code" : "COMPLIANCE_ERROR_ACCOUNT_NOT_OPEN_LONG_ENOUGH",
+                                    "message" : "The account has not been open for long enough"
+                                  }
+                              complianceCheckOtherPurchase:
+                                description: Another property purchase is already recorded
+                                value: |
+                                  {
+                                    "code" : "COMPLIANCE_ERROR_OTHER_PURCHASE_ON_RECORD",
+                                    "message" : "Another property purchase is already recorded"
+                                  }
+                              supersedingLifeEventMisMatchError:
+                                description: originalFundReleaseId and the originalEventDate do not match the information in the original request
+                                value: |
+                                  {
+                                    "code" : "SUPERSEDED_FUND_RELEASE_MISMATCH_ERROR",
+                                    "message" : "originalFundReleaseId and the originalEventDate do not match the information in the original request"
+                                  }
+                      404:
+                        body:
+                          application/json:
+                            type: !include schemas/ErrorCodes.schema.json
+                            examples:
+                              accountNotFound:
+                                description: The accountId does not match HMRC’s records
+                                value : |
+                                  {
+                                    "code" : "INVESTOR_ACCOUNTID_NOT_FOUND",
+                                    "message" : "The accountId does not match HMRC’s records"
+                                  }
+                      409:
+                        body:
+                          application/json:
+                            type: !include schemas/ErrorCodes.schema.json
+                            examples:
+                              supersedingLifeEventAlreadySuperseded:
+                                description: This fund release has already been superseded
+                                value: |
+                                  {
+                                    "code" : "SUPERSEDED_FUND_RELEASE_ALREADY_SUPERSEDED",
+                                    "message" : "This fund release has already been superseded"
+                                  }
+                              lifeEventExists:
+                                 description: The investor’s fund release has already been requested
+                                 value: |
+                                   {
+                                     "code" : "FUND_RELEASE_ALREADY_EXISTS",
+                                     "message" : "The investor’s fund release has already been requested"
+                                   }
+                  /extension:
+                    post:
+                      is: [headers.acceptHeader]
+                      displayName: "[sandbox-only] Request a property purchase extension"
+                      description: Request an extension to your request to release funds to buy a property.
+                      (annotations.scope): "write:lisa"
+                      securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
+                      (annotations.sandboxData): !include testdata/fund-release-extension.md
+                      body:
+                        application/json:
+                          type: !include schemas/FundReleaseExtensionRequest.post.schema.json
+                          examples:
+                            example-1: !include examples/FundReleaseExtensionRequest.post.json
+                            example-2: !include examples/FundReleaseExtensionSupersededRequest.post.json
+                      responses:
+                        201:
+                          description: The LISA transaction resource has been created.
+                          body:
+                            application/json:
+                              type: !include schemas/Extension.post.response.schema.json
+                              examples:
+                                lifeEventCreated: !include examples/Extension.post.response.json
+                        403:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                lifeEventExists:
+                                  description: The investor’s purchase extension has already been reported
+                                  value: |
+                                    {
+                                      "code" : "EXTENSION_ALREADY_EXISTS",
+                                      "message" : "The investor’s purchase extension has already been reported"
+                                    }
+                                extensionNotApproved:
+                                  description: A first extension has not been approved
+                                  value: |
+                                    {
+                                      "code" : "FIRST_EXTENSION_NOT_APPROVED",
+                                      "message" : "A first extension has not been approved"
+                                    }
+                                supersedingLifeEventMisMatchError:
+                                  description: originalExtensionId and the originalEventDate do not match the information in the original request
+                                  value: |
+                                    {
+                                      "code" : "SUPERSEDED_EXTENSION_MISMATCH_ERROR",
+                                      "message" : "originalExtensionId and the originalEventDate do not match the information in the original request"
+                                    }
+                        404:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                accountNotFound:
+                                  description: The accountId does not match with HMRC’s records
+                                  value : |
+                                    {
+                                      "code" : "INVESTOR_ACCOUNTID_NOT_FOUND",
+                                      "message" : "The accountId does not match with HMRC’s records"
+                                    }
+                                fundReleaseNotFound:
+                                  description: The fundReleaseId does not match with HMRC’s records
+                                  value : |
+                                    {
+                                      "code" : "FUND_RELEASE_NOT_FOUND",
+                                      "message" : "The fundReleaseId does not match with HMRC’s records"
+                                    }
+                        409:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                fundReleaseLifeEventAlreadySuperseded:
+                                  description: This fund release has already been superseded
+                                  value: |
+                                    {
+                                      "code" : "FUND_RELEASE_SUPERSEDED",
+                                      "message" : "This fund release has already been superseded"
+                                    }
+                                firstExtensionAlreadyApproved:
+                                  description: A first extension has already been approved
+                                  value: |
+                                    {
+                                      "code" : "FIRST_EXTENSION_ALREADY_APPROVED",
+                                      "message" : "A first extension has already been approved"
+                                    }
+                                secondExtensionAlreadyApproved:
+                                  description: A second extension has already been approved
+                                  value: |
+                                    {
+                                      "code" : "SECOND_EXTENSION_ALREADY_APPROVED",
+                                      "message" : "A second extension has already been approved"
+                                    }
+                                supersedingLifeEventAlreadySuperseded:
+                                  description: This extension has already been superseded
+                                  value: |
+                                    {
+                                      "code" : "SUPERSEDED_EXTENSION_ALREADY_SUPERSEDED",
+                                      "message" : "This extension has already been superseded"
+                                    }
+                  /outcome:
+                    post:
+                      is: [headers.acceptHeader]
+                      displayName: "[sandbox-only] Report the outcome of a property purchase"
+                      description: Report to HMRC if a property purchase was completed or failed.
+                      (annotations.scope): "write:lisa"
+                      securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
+                      (annotations.sandboxData): !include testdata/fund-release-outcome.md
+                      body:
+                        application/json:
+                          type: !include schemas/FundReleaseOutcome.post.schema.json
+                          examples:
+                            example-1: !include examples/FundReleaseOutcomeRequest.post.json
+                            example-2: !include examples/FundReleaseOutcomeSupersededRequest.post.json
+                      responses:
+                        201:
+                          description: The LISA transaction resource has been created.
+                          body:
+                            application/json:
+                              type: !include schemas/PurchaseOutcome.post.response.schema.json
+                              examples:
+                                lifeEventCreated: !include examples/PurchaseOutcome.post.response.json
+                        403:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                mismatchError:
+                                   description: originalPurchaseOutcomeId and the originalEventDate do not match the information in the original request
+                                   value: |
+                                      {
+                                        "code": "SUPERSEDED_PURCHASE_OUTCOME_MISMATCH_ERROR",
+                                        "message": "originalPurchaseOutcomeId and the originalEventDate do not match the information in the original request"
+                                      }
+                                fundReleaseNotFound:
+                                   description: The fundReleaseId does not match with HMRC’s records
+                                   value: |
+                                      {
+                                         "code" : "FUND_RELEASE_NOT_FOUND",
+                                         "message" : "The fundReleaseId does not match with HMRC’s records"
+                                      }
+                        404:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                accountNotFound:
+                                  description: The accountId does not match with HMRC’s records
+                                  value : |
+                                    {
+                                      "code" : "INVESTOR_ACCOUNTID_NOT_FOUND",
+                                      "message" : "The accountId does not match with HMRC’s records"
+                                    }
+                        409:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                fundReleaseLifeEventAlreadySuperseded:
+                                  description: This fund release has already been superseded
+                                  value: |
+                                    {
+                                      "code" : "FUND_RELEASE_SUPERSEDED",
+                                      "message" : "This fund release has already been superseded"
+                                    }
+                                supersedingLifeEventAlreadySuperseded:
+                                  description: This purchase outcome has already been superseded
+                                  value: |
+                                    {
+                                      "code" : "SUPERSEDED_PURCHASE_OUTCOME_ALREADY_SUPERSEDED",
+                                      "message" : "This purchase outcome has already been superseded"
+                                    }
+                                lifeEventExists:
+                                  description: The investor’s purchase outcome has already been reported
+                                  value: |
+                                    {
+                                       "code" : "PURCHASE_OUTCOME_ALREADY_EXISTS",
+                                       "message" : "The investor’s purchase outcome has already been reported"
+                                    }
                 /withdrawal-charges:
                   post:
                     is: [headers.acceptHeader, headers.contentHeader]
@@ -838,11 +1149,11 @@ types:
                                     "message" : "There is a problem with the request data"
                                   }
                               accountClosed:
-                                description: The LISA account is already closed
+                                description: The LISA account is already cancelled
                                 value: |
                                   {
-                                    "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED",
-                                    "message": "The LISA account is already closed"
+                                    "code": "INVESTOR_ACCOUNT_ALREADY_CANCELLED",
+                                    "message": "The LISA account is already cancelled"
                                   }
                               accountVoid:
                                 description: The LISA account is already void
@@ -910,6 +1221,76 @@ types:
                                     "code": "WITHDRAWAL_CHARGE_ALREADY_EXISTS",
                                     "message": "A withdrawal charge with these details has already been requested for this investor"
                                   }
+                  /{transactionId}:
+                    uriParameters:
+                      transactionId:
+                        type: transactionIdtype
+                        description: The ID for the transaction.
+                        example: "1234567890"
+                    get:
+                      displayName: "[sandbox-only] Get details of a withdrawal charge"
+                      description: Use an investor’s transaction ID to get a request for a withdrawal charge that has been submitted to HMRC.
+                      is: [headers.acceptHeader, headers.contentHeader]
+                      (annotations.scope): "read:lisa"
+                      securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
+                      (annotations.sandboxData): !include testdata/withdrawal-charge-get.md
+                      responses:
+                        200:
+                          body:
+                            application/json:
+                              type: !include schemas/WithdrawalCharge.get.schema.json
+                              examples:
+                                example: !include examples/WithdrawalCharge.get.json
+                        400:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                InvalidLmrn:
+                                  description: lisaManagerReferenceNumber in the URL is in the wrong format
+                                  value: |
+                                    {
+                                      "code" : "BAD_REQUEST",
+                                      "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
+                                    }
+                                InvalidAccountId:
+                                  description: accountId in the URL is in the wrong format
+                                  value: |
+                                    {
+                                      "code" : "BAD_REQUEST",
+                                      "message" : "accountId in the URL is in the wrong format"
+                                    }
+                        401:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                notOpenStatus:
+                                  description: lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
+                                  value: |
+                                    {
+                                      "code" : "UNAUTHORIZED",
+                                      "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
+                                    }
+                        404:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                noTransaction:
+                                  description: The transactionId does not match HMRC’s records
+                                  value: |
+                                    {
+                                      "code" : "WITHDRAWAL_CHARGE_TRANSACTION_NOT_FOUND",
+                                      "message" : "The transactionId does not match HMRC’s records"
+                                    }
+                                accountIdNOTFound:
+                                  description: The accountId does not match HMRC’s records
+                                  value: |
+                                    {
+                                      "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
+                                      "message": "The accountId does not match HMRC’s records"
+                                    }
                 /transactions:
                   description: !include documentation/LISATransaction
                   post:
@@ -1153,8 +1534,8 @@ types:
                                     }
                     /payments:
                       get:
-                         displayName: Get details about an investor’s bonus payment
-                         description: Use an investor’s transaction ID to get details about a bonus payment, including when the payment is due.
+                         displayName: Get the payment details for a bonus claim or withdrawal charge
+                         description: Use an investor’s transaction ID to get payment details for a bonus claim or withdrawal charge, including when the amount is due to be paid or collected.
                          is: [headers.acceptHeader, headers.contentHeader]
                          (annotations.scope): "read:lisa"
                          securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
@@ -1165,7 +1546,8 @@ types:
                                application/json:
                                  type: !include schemas/InvestorPayment.get.response.schema.json
                                  examples:
-                                   paid: !include examples/InvestorPayment.get.response.json
+                                   paid: !include examples/InvestorPayment.get.response.2.json
+                                   pending: !include examples/InvestorPayment.get.response.1.json
                            400:
                              body:
                                application/json:
@@ -1206,7 +1588,7 @@ types:
                                      description: The transactionId does not match HMRC’s records
                                      value: |
                                        {
-                                         "code" : "BONUS_PAYMENT_TRANSACTION_NOT_FOUND",
+                                         "code" : "TRANSACTION_NOT_FOUND",
                                          "message" : "The transactionId does not match HMRC’s records"
                                        }
                                    accountIdNOTFound:
@@ -1216,23 +1598,24 @@ types:
                                          "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
                                          "message": "The accountId does not match HMRC’s records"
                                        }
+
             /payments:
               get:
                   is: [headers.acceptHeader]
-                  displayName: Get a list of all bonus payments in a date range
-                  description: Get a list of all completed and due bonus payments from HMRC in a specific date range.
+                  displayName: Get a list of all payments and debts in a date range
+                  description: Get a list of all pending and paid payments from HMRC and due and collected debts owed to HMRC in a specific date range.
                   (annotations.scope): "read:lisa"
                   securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
                   (annotations.sandboxData): !include testdata/get-bulk-payment.md
                   queryParameters:
                     startDate:
                       type : ISO8601Date
-                      description: The start date of the date range for the payment request. This cannot be before 6 April 2017.
-                      example: "2017-05-20"
+                      description: The start date of the date range you want to search. This must be the 6th day of the month. This cannot be before 6 April 2017.
+                      example: "2017-05-06"
                     endDate:
                       type : ISO8601Date
-                      description: The end date of the date range for the payment request. This cannot be in the future, before the startDate, or more than a year after the startDate.
-                      example: "2017-05-20"
+                      description: The end date of the date range you want to search. This must be the 5th day of the month. This cannot be in the future, before the startDate, or more than a year after the startDate.
+                      example: "2017-06-05"
                   responses:
                       200:
                         body:
@@ -1327,10 +1710,10 @@ types:
                         body:
                           application/json:
                             examples:
-                              noPaymentsFound:
-                                description: No bonus payments have been made for this date range
+                              noTransactionsFound:
+                                description: No payments or debts exist for this date range
                                 value: |
                                   {
-                                    "code": "PAYMENT_NOT_FOUND",
-                                    "message": "No bonus payments have been made for this date range"
+                                    "code": "TRANSACTION_NOT_FOUND",
+                                    "message": "No payments or debts exist for this date range"
                                   }

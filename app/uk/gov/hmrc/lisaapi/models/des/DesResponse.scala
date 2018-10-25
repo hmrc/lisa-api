@@ -28,9 +28,10 @@ case class DesAccountResponse(accountID: String) extends DesResponse
 case class DesLifeEventResponse(lifeEventID: String) extends DesResponse
 case class DesLifeEventRetrievalResponse(lifeEventID: LifeEventId, eventType: LifeEventType, eventDate: DateTime) extends DesResponse
 case class DesCreateInvestorResponse(investorID: String) extends DesResponse
-case class DesTransactionResponse(transactionID: String, message: String) extends DesResponse
+case class DesTransactionResponse(transactionID: String, message: Option[String]) extends DesResponse
 case class DesFailureResponse(code: String = "INTERNAL_SERVER_ERROR", reason: String = "Internal Server Error") extends DesResponse
 case class DesLifeEventExistResponse(code: String, reason: String, lifeEventID: String) extends DesResponse
+case class DesTransactionExistResponse(code: String, reason: String, transactionID: String) extends DesResponse
 case object DesEmptySuccessResponse extends DesResponse
 case class DesUpdateSubscriptionSuccessResponse (code: String, reason: String)extends DesResponse
 case class DesReinstateAccountSuccessResponse (code: String, reason: String)extends DesResponse
@@ -71,6 +72,7 @@ object DesResponse {
   )(DesLifeEventRetrievalResponse.apply _)
 
   implicit val requestLifeEventAlreadyExistResponseFormats: OFormat[DesLifeEventExistResponse] = Json.format[DesLifeEventExistResponse]
+  implicit val requestTransactionAlreadyExistResponseFormats: OFormat[DesTransactionExistResponse] = Json.format[DesTransactionExistResponse]
 
   implicit val desGetBonusPaymentResponse: Reads[DesGetBonusPaymentResponse] = (
     (JsPath \ "lifeEventId").readNullable(JsonReads.lifeEventId) and
@@ -140,7 +142,7 @@ object DesResponse {
             claimReason match {
               case "LIFE_EVENT" => "Life Event"
               case "REGULAR_BONUS" => "Regular Bonus"
-              case "SUPERSEDING_BONUS_CLAIM" => "Superseding bonus claim"
+              case "SUPERSEDED_BONUS" => "Superseded Bonus"
             }
           ),
           creationDate,

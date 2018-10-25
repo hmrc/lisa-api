@@ -23,7 +23,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models.{RequestBonusPaymentResponse, _}
-import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesGetBonusPaymentResponse, DesTransactionResponse}
+import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesGetBonusPaymentResponse, DesTransactionExistResponse, DesTransactionResponse}
 import uk.gov.hmrc.lisaapi.services.BonusPaymentService
 
 import scala.concurrent.duration.Duration
@@ -38,7 +38,7 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
 
       "given a successful on time response from the DES connector" in {
         when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesTransactionResponse("AB123456", "On Time")))
+          thenReturn(Future.successful(DesTransactionResponse("AB123456", Some("On Time"))))
 
         doRequest { response =>
           response mustBe RequestBonusPaymentOnTimeResponse("AB123456")
@@ -47,7 +47,7 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
 
       "given a successful late notification response from the DES connector" in {
         when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesTransactionResponse("AB123456", "Late")))
+          thenReturn(Future.successful(DesTransactionResponse("AB123456", Some("Late"))))
 
         doRequest { response =>
           response mustBe RequestBonusPaymentLateResponse("AB123456")
@@ -57,12 +57,34 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
     }
 
     "return a account closed response" when {
-      "given the code INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID from the DES connector" in {
+      "given the code INVESTOR_ACCOUNT_ALREADY_CLOSED from the DES connector" in {
         when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID", "x")))
+          thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_CLOSED", "x")))
 
         doRequest { response =>
           response mustBe RequestBonusPaymentAccountClosed
+        }
+      }
+    }
+
+    "return a account cancelled response" when {
+      "given the code INVESTOR_ACCOUNT_ALREADY_CANCELLED from the DES connector" in {
+        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_CANCELLED", "x")))
+
+        doRequest { response =>
+          response mustBe RequestBonusPaymentAccountCancelled
+        }
+      }
+    }
+
+    "return a account void response" when {
+      "given the code INVESTOR_ACCOUNT_ALREADY_VOID from the DES connector" in {
+        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_VOID", "x")))
+
+        doRequest { response =>
+          response mustBe RequestBonusPaymentAccountVoid
         }
       }
     }
@@ -103,18 +125,18 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
     "return a bonus claim already exists response" when {
       "given the code BONUS_CLAIM_ALREADY_EXISTS from the DES connector" in {
         when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("BONUS_CLAIM_ALREADY_EXISTS", "xxxxx")))
+          thenReturn(Future.successful(DesTransactionExistResponse("BONUS_CLAIM_ALREADY_EXISTS", "xxxxx", "987654")))
 
         doRequest { response =>
-          response mustBe RequestBonusPaymentClaimAlreadyExists
+          response mustBe RequestBonusPaymentClaimAlreadyExists("987654")
         }
       }
     }
 
     "return a superseded bonus request amount mismatch response" when {
-      "given the code SUPERSEDED_BONUS_CLAIM_AMOUNT_MISMATCH from the DES connector" in {
+      "given the code SUPERSEDING_TRANSACTION_ID_AMOUNT_MISMATCH from the DES connector" in {
         when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("SUPERSEDED_BONUS_CLAIM_AMOUNT_MISMATCH", "xxxxx")))
+          thenReturn(Future.successful(DesFailureResponse("SUPERSEDING_TRANSACTION_ID_AMOUNT_MISMATCH", "xxxxx")))
 
         doRequest { response =>
           response mustBe RequestBonusPaymentSupersededAmountMismatch
@@ -123,9 +145,9 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
     }
 
     "return a superseded bonus request outcome error response" when {
-      "given the code SUPERSEDED_BONUS_REQUEST_OUTCOME_ERROR from the DES connector" in {
+      "given the code SUPERSEDING_TRANSACTION_OUTCOME_ERROR from the DES connector" in {
         when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("SUPERSEDED_BONUS_REQUEST_OUTCOME_ERROR", "xxxxx")))
+          thenReturn(Future.successful(DesFailureResponse("SUPERSEDING_TRANSACTION_OUTCOME_ERROR", "xxxxx")))
 
         doRequest { response =>
           response mustBe RequestBonusPaymentSupersededOutcomeError
@@ -134,18 +156,18 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
     }
 
     "return a already superseded response" when {
-      "given the code BONUS_CLAIM_ALREADY_SUPERSEDED from the DES connector" in {
+      "given the code SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED from the DES connector" in {
         when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("BONUS_CLAIM_ALREADY_SUPERSEDED", "xxxxx")))
+          thenReturn(Future.successful(DesTransactionExistResponse("SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED", "xxxxx", "12345")))
 
         doRequest { response =>
-          response mustBe RequestBonusPaymentAlreadySuperseded
+          response mustBe RequestBonusPaymentAlreadySuperseded("12345")
         }
       }
     }
 
     "return a no subscriptions response" when {
-      "given the code BONUS_CLAIM_ALREADY_SUPERSEDED from the DES connector" in {
+      "given the code ACCOUNT_ERROR_NO_SUBSCRIPTIONS_THIS_TAX_YEAR from the DES connector" in {
         when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(DesFailureResponse("ACCOUNT_ERROR_NO_SUBSCRIPTIONS_THIS_TAX_YEAR", "xxxxx")))
 
@@ -168,74 +190,6 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
 
   }
 
-  "GET bonus payment" must {
-
-    "return success" when {
-      "a valid response comes from DES" in {
-        val successResponse = DesGetBonusPaymentResponse(
-          Some("1234567891"),
-          new DateTime("2017-04-06"),
-          new DateTime("2017-05-05"),
-          Some(HelpToBuyTransfer(0f, 10f)),
-          InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
-          Bonuses(1000f, 1000f, Some(1000f), "Life Event"),
-          new DateTime("2017-05-05"),
-          "Paid")
-
-        when(mockDesConnector.getBonusPayment(any(), any(), any())(any()))
-          .thenReturn(Future.successful(successResponse))
-
-        dogetBonusPaymentRequest { response =>
-          response mustBe GetBonusPaymentSuccessResponse(successResponse.lifeEventId,
-            successResponse.periodStartDate,
-            successResponse.periodEndDate,
-            successResponse.htbTransfer,
-            successResponse.inboundPayments,
-            successResponse.bonuses)
-        }
-      }
-    }
-
-    "return appropriate failure" when {
-
-      "an invalid lisa account (investor id not found) (404) response comes from DES" in {
-        when(mockDesConnector.getBonusPayment(any(), any(), any())(any()))
-          .thenReturn(Future.successful(DesFailureResponse(code = "INVESTOR_ACCOUNTID_NOT_FOUND")))
-
-        dogetBonusPaymentRequest { response =>
-          response mustBe GetBonusPaymentInvestorNotFoundResponse
-        }
-      }
-
-      "an invalid payment transaction (404) response comes from DES" in {
-        when(mockDesConnector.getBonusPayment(any(), any(), any())(any()))
-          .thenReturn(Future.successful(DesFailureResponse(code = "TRANSACTION_ID_NOT_FOUND")))
-
-        dogetBonusPaymentRequest { response =>
-          response mustBe GetBonusPaymentTransactionNotFoundResponse
-        }
-      }
-
-      "a lisaManagerReferenceNumber does not exist (400) response comes from DES" in {
-        when(mockDesConnector.getBonusPayment(any(), any(), any())(any()))
-          .thenReturn(Future.successful(DesFailureResponse(code = "BAD_REQUEST")))
-
-        dogetBonusPaymentRequest { response =>
-          response mustBe GetBonusPaymentLmrnDoesNotExistResponse
-        }
-      }
-
-      "an unknown error response comes from DES" in {
-        when(mockDesConnector.getBonusPayment(any(), any(), any())(any()))
-          .thenReturn(Future.successful(DesFailureResponse(code = "INTERNAL_SERVER_ERROR")))
-
-        dogetBonusPaymentRequest { response =>
-          response mustBe GetBonusPaymentErrorResponse
-        }
-      }
-    }
-  }
-
   private def doRequest(callback: (RequestBonusPaymentResponse) => Unit) = {
     val request = RequestBonusPaymentRequest(
       lifeEventId = Some("1234567891"),
@@ -247,12 +201,6 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
     )
 
     val response = Await.result(SUT.requestBonusPayment("Z019283", "192837", request)(HeaderCarrier()), Duration.Inf)
-
-    callback(response)
-  }
-
-  private def dogetBonusPaymentRequest(callback: (GetBonusPaymentResponse) => Unit) = {
-    val response = Await.result(SUT.getBonusPayment("1234567890", "9876543210", "1234")(HeaderCarrier()), Duration.Inf)
 
     callback(response)
   }

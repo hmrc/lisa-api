@@ -1,0 +1,10 @@
+{
+  "fundReleaseId": "3456789000",
+  "eventDate": "2017-06-10",
+  "propertyPurchaseResult": "Purchase completed",
+  "propertyPurchaseValue": 250000,
+  "supersede": {
+    "originalPurchaseOutcomeId": "5678900001",
+    "originalEventDate": "2017-05-05"
+  }
+}

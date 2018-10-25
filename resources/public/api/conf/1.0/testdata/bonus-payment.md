@@ -174,7 +174,7 @@
     "bonusPaidYTD": 0.0,
     "bonusDueForPeriod": 1000.00,
     "totalBonusDueYTD": 1000.00,
-    "claimReason": "Superseding bonus claim"
+    "claimReason": "Superseded Bonus"
   },
   "supersede": {
     "automaticRecoveryAmount": 1000.00,
@@ -225,7 +225,7 @@
     "bonusPaidYTD": 0.0,
     "bonusDueForPeriod": 1000.00,
     "totalBonusDueYTD": 1000.00,
-    "claimReason": "Superseding bonus claim"
+    "claimReason": "Superseded Bonus"
   },
   "supersede": {
     "originalTransactionId": "0003456789",
@@ -619,7 +619,7 @@
         </tr>
         <tr>
             <td>
-              <p>Request for an account that has already been closed or voided</p>
+              <p>Request for an account that has already been closed</p>
               <p class="code--block">
                 <strong>lisaManagerReferenceNumber:</strong><br>
                 <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
@@ -656,12 +656,57 @@
             <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
 <pre class="code--block">
 {
-  "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID",
-  "message": "This LISA account has already been closed or been made void by HMRC"
+  "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED",
+  "message": "The LISA account is already closed"
 }
 </pre>
             </td>
        </tr>
+       <tr>
+           <td>
+             <p>Request for an account that has already been voided</p>
+             <p class="code--block">
+               <strong>lisaManagerReferenceNumber:</strong><br>
+               <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+               <br>
+               <strong>accountId:</strong><br>
+               1000000903
+             </p>
+           </td>
+           <td>
+<pre class="code--block">
+{
+ "lifeEventId": "1234567802",
+ "periodStartDate": "2017-04-06",
+ "periodEndDate": "2017-05-05",
+ "htbTransfer": {
+   "htbTransferInForPeriod": 0.00,
+   "htbTransferTotalYTD": 0.00
+ },
+ "inboundPayments": {
+   "newSubsForPeriod": 4000.00,
+   "newSubsYTD": 4000.00,
+   "totalSubsForPeriod": 40000.00,
+   "totalSubsYTD": 40000.00
+ },
+ "bonuses": {
+   "bonusPaidYTD": 0.0,
+   "bonusDueForPeriod": 10000.00,
+   "totalBonusDueYTD": 10000.00,
+   "claimReason": "Life Event"
+ }
+}
+</pre>
+           </td>
+           <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
+<pre class="code--block">
+{
+ "code": "INVESTOR_ACCOUNT_ALREADY_VOID",
+ "message": "The LISA account is already void"
+}
+</pre>
+           </td>
+      </tr>
        <tr>
             <td>
               <p>[sandbox-only] Request for a bonus claim after 5 April 2018 containing help to buy funds.</p>
@@ -732,7 +777,7 @@
     "bonusPaidYTD": 0.0,
     "bonusDueForPeriod": 10500.00,
     "totalBonusDueYTD": 10000.00,
-    "claimReason": "Superseding bonus claim"
+    "claimReason": "Superseded Bonus"
   },
   "supersede": {
     "automaticRecoveryAmount": 1000.00,
@@ -779,7 +824,7 @@
     "bonusPaidYTD": 0.0,
     "bonusDueForPeriod": 10500.00,
     "totalBonusDueYTD": 10000.00,
-    "claimReason": "Superseding bonus claim"
+    "claimReason": "Superseded Bonus"
   },
   "supersede": {
     "automaticRecoveryAmount": 1000.00,
@@ -826,12 +871,12 @@
     "bonusPaidYTD": 0.0,
     "bonusDueForPeriod": 10500.00,
     "totalBonusDueYTD": 10000.00,
-    "claimReason": "Superseding bonus claim"
+    "claimReason": "Superseded Bonus"
   },
   "supersede": {
     "automaticRecoveryAmount": 1000.00,
-    "originalTransactionId":": "1234567892",
-    "originalBonusDueForPeriod"": 2000.00,
+    "originalTransactionId": "1234567892",
+    "originalBonusDueForPeriod": 2000.00,
     "transactionResult": -1000.00,
     "reason": "Bonus recovery"
   }
@@ -977,7 +1022,8 @@
 <pre class ="code--block">
 {
   "code": "BONUS_CLAIM_ALREADY_EXISTS",
-  "message": "The investor’s bonus payment has already been requested"
+  "message": "The investor’s bonus payment has already been requested",
+  "transactionId": "0123456789"
 }
 </pre>
             </td>
@@ -1008,7 +1054,7 @@
     "bonusPaidYTD": 0.0,
     "bonusDueForPeriod": 10500.00,
     "totalBonusDueYTD": 10000.00,
-    "claimReason": "Superseding bonus claim"
+    "claimReason": "Superseded Bonus"
   },
   "supersede": {
     "automaticRecoveryAmount": 1000.00,
@@ -1024,7 +1070,8 @@
 <pre class ="code--block">
 {
   "code": "BONUS_CLAIM_ALREADY_SUPERSEDED",
-  "message": "This bonus claim has already been superseded"
+  "message": "This bonus claim has already been superseded",
+  "transactionId": "0000456789"
 }
 </pre>
             </td>

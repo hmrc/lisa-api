@@ -27,13 +27,15 @@ import scala.io.Source
 class RequestBonusPaymentRequestSpec extends PlaySpec {
 
   val validBonusPaymentJson = Source.fromInputStream(getClass().getResourceAsStream("/json/request.valid.bonus-payment.json")).mkString
+  val validBonusPaymentDesJson = Source.fromInputStream(getClass().getResourceAsStream("/json/request.valid.bonus-payment.des.json")).mkString
   val validBonusPayment = RequestBonusPaymentRequest(
     lifeEventId = Some("1234567891"),
     periodStartDate = new DateTime("2017-04-06"),
     periodEndDate = new DateTime("2017-05-05"),
     htbTransfer = Some(HelpToBuyTransfer(10f, 10f)),
     inboundPayments = InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
-    bonuses = Bonuses(1000f, 1000f, Some(1000f), "Life Event")
+    bonuses = Bonuses(1000f, 1000f, Some(1000f), "Life Event"),
+    supersede = Some(BonusRecovery(100.00f, "234567890", 100.00f, 200.00f))
   )
 
   "Bonus Payment Request" must {
@@ -47,7 +49,7 @@ class RequestBonusPaymentRequestSpec extends PlaySpec {
     "deserialize to json" in {
       val json = Json.toJson[RequestBonusPaymentRequest](validBonusPayment)
 
-      json mustBe Json.parse(validBonusPaymentJson)
+      json mustBe Json.parse(validBonusPaymentDesJson)
     }
 
     "catch an invalid life event id" in {

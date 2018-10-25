@@ -30,9 +30,9 @@ import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
-import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountAlreadyClosed, ErrorAccountAlreadyVoided, ErrorAccountNotFound, ErrorInternalServerError, ErrorValidation, ErrorWithdrawalExists, ErrorWithdrawalTimescalesExceeded, WithdrawalController}
+import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountAlreadyCancelled, ErrorAccountAlreadyVoided, ErrorAccountNotFound, ErrorInternalServerError, ErrorValidation, ErrorWithdrawalExists, ErrorWithdrawalNotFound, ErrorWithdrawalTimescalesExceeded, WithdrawalController}
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.services.{AuditService, CurrentDateService, WithdrawalService}
+import uk.gov.hmrc.lisaapi.services.{AuditService, BonusOrWithdrawalService, CurrentDateService, WithdrawalService}
 import uk.gov.hmrc.lisaapi.utils.WithdrawalChargeValidator
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -62,12 +62,12 @@ class WithdrawalControllerSpec extends PlaySpec
     when(mockValidator.validate(any())).thenReturn(Nil)
   }
 
-  "the POST bonus payment endpoint" must {
+  "the POST withdrawal charge endpoint" must {
 
     "return with status 201 created" when {
 
       "given a ReportWithdrawalChargeOnTimeResponse from the service layer" in {
-        when(mockService.reportWithdrawalCharge(any(), any(), any())(any())).
+        when(mockPostService.reportWithdrawalCharge(any(), any(), any())(any())).
           thenReturn(Future.successful(ReportWithdrawalChargeOnTimeResponse("1928374")))
 
         doRequest(validWithdrawalJson) { res =>
@@ -78,7 +78,7 @@ class WithdrawalControllerSpec extends PlaySpec
       }
 
       "given a ReportWithdrawalChargeLateResponse from the service layer" in {
-        when(mockService.reportWithdrawalCharge(any(), any(), any())(any())).
+        when(mockPostService.reportWithdrawalCharge(any(), any(), any())(any())).
           thenReturn(Future.successful(ReportWithdrawalChargeLateResponse("1928374")))
 
         doRequest(validWithdrawalJson) { res =>
@@ -89,7 +89,7 @@ class WithdrawalControllerSpec extends PlaySpec
       }
 
       "given a ReportWithdrawalChargeSupersededResponse from the service layer" in {
-        when(mockService.reportWithdrawalCharge(any(), any(), any())(any())).
+        when(mockPostService.reportWithdrawalCharge(any(), any(), any())(any())).
           thenReturn(Future.successful(ReportWithdrawalChargeSupersededResponse("1928374")))
 
         doRequest(validWithdrawalJson) { res =>
@@ -104,18 +104,18 @@ class WithdrawalControllerSpec extends PlaySpec
     "return with status 403 forbidden" when {
 
       "given a ReportWithdrawalChargeAccountClosed from the service layer" in {
-        when(mockService.reportWithdrawalCharge(any(), any(), any())(any())).
-          thenReturn(Future.successful(ReportWithdrawalChargeAccountClosed))
+        when(mockPostService.reportWithdrawalCharge(any(), any(), any())(any())).
+          thenReturn(Future.successful(ReportWithdrawalChargeAccountCancelled))
 
         doRequest(validWithdrawalJson) { res =>
           status(res) mustBe FORBIDDEN
-          (contentAsJson(res) \ "code").as[String] mustBe ErrorAccountAlreadyClosed.errorCode
-          (contentAsJson(res) \ "message").as[String] mustBe ErrorAccountAlreadyClosed.message
+          (contentAsJson(res) \ "code").as[String] mustBe ErrorAccountAlreadyCancelled.errorCode
+          (contentAsJson(res) \ "message").as[String] mustBe ErrorAccountAlreadyCancelled.message
         }
       }
 
       "given a ReportWithdrawalChargeAccountVoid from the service layer" in {
-        when(mockService.reportWithdrawalCharge(any(), any(), any())(any())).
+        when(mockPostService.reportWithdrawalCharge(any(), any(), any())(any())).
           thenReturn(Future.successful(ReportWithdrawalChargeAccountVoid))
 
         doRequest(validWithdrawalJson) { res =>
@@ -126,18 +126,18 @@ class WithdrawalControllerSpec extends PlaySpec
       }
 
       "given a ReportWithdrawalChargeAccountCancelled from the service layer" in {
-        when(mockService.reportWithdrawalCharge(any(), any(), any())(any())).
+        when(mockPostService.reportWithdrawalCharge(any(), any(), any())(any())).
           thenReturn(Future.successful(ReportWithdrawalChargeAccountCancelled))
 
         doRequest(validWithdrawalJson) { res =>
           status(res) mustBe FORBIDDEN
-          (contentAsJson(res) \ "code").as[String] mustBe ErrorAccountAlreadyClosed.errorCode
-          (contentAsJson(res) \ "message").as[String] mustBe ErrorAccountAlreadyClosed.message
+          (contentAsJson(res) \ "code").as[String] mustBe ErrorAccountAlreadyCancelled.errorCode
+          (contentAsJson(res) \ "message").as[String] mustBe ErrorAccountAlreadyCancelled.message
         }
       }
 
       "given a ReportWithdrawalChargeReportingError from the service layer" in {
-        when(mockService.reportWithdrawalCharge(any(), any(), any())(any())).
+        when(mockPostService.reportWithdrawalCharge(any(), any(), any())(any())).
           thenReturn(Future.successful(ReportWithdrawalChargeReportingError))
 
         doRequest(validWithdrawalJson) { res =>
@@ -148,7 +148,7 @@ class WithdrawalControllerSpec extends PlaySpec
       }
 
       "given a ReportWithdrawalChargeAlreadySuperseded from the service layer" in {
-        when(mockService.reportWithdrawalCharge(any(), any(), any())(any())).
+        when(mockPostService.reportWithdrawalCharge(any(), any(), any())(any())).
           thenReturn(Future.successful(ReportWithdrawalChargeAlreadySuperseded))
 
         doRequest(validWithdrawalJson) { res =>
@@ -159,7 +159,7 @@ class WithdrawalControllerSpec extends PlaySpec
       }
 
       "given a ReportWithdrawalChargeSupersedeAmountMismatch from the service layer" in {
-        when(mockService.reportWithdrawalCharge(any(), any(), any())(any())).
+        when(mockPostService.reportWithdrawalCharge(any(), any(), any())(any())).
           thenReturn(Future.successful(ReportWithdrawalChargeSupersedeAmountMismatch))
 
         doRequest(validWithdrawalJson) { res =>
@@ -170,7 +170,7 @@ class WithdrawalControllerSpec extends PlaySpec
       }
 
       "given a ReportWithdrawalChargeSupersedeOutcomeError from the service layer" in {
-        when(mockService.reportWithdrawalCharge(any(), any(), any())(any())).
+        when(mockPostService.reportWithdrawalCharge(any(), any(), any())(any())).
           thenReturn(Future.successful(ReportWithdrawalChargeSupersedeOutcomeError))
 
         doRequest(validWithdrawalJson) { res =>
@@ -238,7 +238,7 @@ class WithdrawalControllerSpec extends PlaySpec
     "return with status 404 not found" when {
 
       "given a ReportWithdrawalChargeAccountNotFound from the service layer" in {
-        when(mockService.reportWithdrawalCharge(any(), any(), any())(any())).
+        when(mockPostService.reportWithdrawalCharge(any(), any(), any())(any())).
           thenReturn(Future.successful(ReportWithdrawalChargeAccountNotFound))
 
         doRequest(validWithdrawalJson) { res =>
@@ -253,7 +253,7 @@ class WithdrawalControllerSpec extends PlaySpec
     "return with status 409 conflict" when {
 
       "given a ReportWithdrawalChargeAlreadyExists from the service layer" in {
-        when(mockService.reportWithdrawalCharge(any(), any(), any())(any())).
+        when(mockPostService.reportWithdrawalCharge(any(), any(), any())(any())).
           thenReturn(Future.successful(ReportWithdrawalChargeAlreadyExists))
 
         doRequest(validWithdrawalJson) { res =>
@@ -268,11 +268,11 @@ class WithdrawalControllerSpec extends PlaySpec
     "return with status 500 internal server error" when {
 
       "an exception gets thrown" in {
-        when(mockService.reportWithdrawalCharge(any(), any(), any())(any())).
+        when(mockPostService.reportWithdrawalCharge(any(), any(), any())(any())).
           thenThrow(new RuntimeException("Test"))
 
         doRequest(validWithdrawalJson) { res =>
-          reset(mockService) // removes the thenThrow
+          reset(mockPostService) // removes the thenThrow
 
           status(res) mustBe INTERNAL_SERVER_ERROR
           (contentAsJson(res) \ "code").as[String] mustBe ErrorInternalServerError.errorCode
@@ -281,7 +281,7 @@ class WithdrawalControllerSpec extends PlaySpec
       }
 
       "given a RequestWithdrawalChargeError from the service layer" in {
-        when(mockService.reportWithdrawalCharge(any(), any(), any())(any())).
+        when(mockPostService.reportWithdrawalCharge(any(), any(), any())(any())).
           thenReturn(Future.successful(ReportWithdrawalChargeError))
 
         doRequest(validWithdrawalJson) { res =>
@@ -295,6 +295,101 @@ class WithdrawalControllerSpec extends PlaySpec
 
   }
 
+  "the GET withdrawal charge endpoint" must {
+
+    "return 200 success response" in {
+      when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetWithdrawalResponse(
+        periodStartDate = new DateTime("2017-05-06"),
+        periodEndDate = new DateTime("2017-06-05"),
+        automaticRecoveryAmount = Some(250),
+        withdrawalAmount = 2000,
+        withdrawalChargeAmount = 500,
+        withdrawalChargeAmountYtd = 500,
+        fundsDeductedDuringWithdrawal = true,
+        withdrawalReason = "Superseded withdrawal",
+        supersededBy = Some("1234567892"),
+        supersede = Some(WithdrawalSuperseded("1234567890", 250, 250, "Additional withdrawal")),
+        paymentStatus = "Collected",
+        creationDate = new DateTime("2017-06-19")
+      )))
+
+      doGetRequest(res => {
+        status(res) mustBe OK
+        contentAsJson(res) mustBe Json.obj(
+          "claimPeriodStartDate" -> "2017-05-06",
+          "claimPeriodEndDate" -> "2017-06-05",
+          "automaticRecoveryAmount" -> 250,
+          "withdrawalAmount" -> 2000,
+          "withdrawalChargeAmount" -> 500,
+          "withdrawalChargeAmountYTD" -> 500,
+          "fundsDeductedDuringWithdrawal" -> true,
+          "withdrawalReason" -> "Superseded withdrawal",
+          "supersededBy" -> "1234567892",
+          "supersede" -> Json.obj(
+            "originalTransactionId" -> "1234567890",
+            "originalWithdrawalChargeAmount" -> 250,
+            "transactionResult" -> 250,
+            "reason" -> "Additional withdrawal"
+          )
+        )
+      })
+    }
+
+    "return 404 status invalid lisa account (investor id not found)" in {
+      when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusOrWithdrawalInvestorNotFoundResponse))
+      doGetRequest(res => {
+        status(res) mustBe (NOT_FOUND)
+        val json = contentAsJson(res)
+        (json \ "code").as[String] mustBe ErrorAccountNotFound.errorCode
+        (json \ "message").as[String] mustBe ErrorAccountNotFound.message
+      })
+    }
+
+    "return 404 transaction not found" when {
+
+      "given a transaction not found error from the connector" in {
+        when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusOrWithdrawalTransactionNotFoundResponse))
+        doGetRequest(res => {
+          status(res) mustBe (NOT_FOUND)
+          val json = contentAsJson(res)
+          (json \ "code").as[String] mustBe ErrorWithdrawalNotFound.errorCode
+          (json \ "message").as[String] mustBe ErrorWithdrawalNotFound.message
+        })
+      }
+
+      "given a withdrawal charge transaction from the connector" in {
+        when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusResponse(
+          Some("1234567891"),
+          new DateTime("2017-04-06"),
+          new DateTime("2017-05-05"),
+          Some(HelpToBuyTransfer(0, 10)),
+          InboundPayments(Some(4000), 4000, 4000, 4000),
+          Bonuses(1000, 1000, Some(1000), "Life Event"),
+          Some("1234567892"),
+          Some(BonusRecovery(100, "1234567890", 1100, -100)),
+          "Paid",
+          new DateTime("2017-05-20"))
+        ))
+
+        doGetRequest(res => {
+          status(res) mustBe (NOT_FOUND)
+          val json = contentAsJson(res)
+          (json \ "code").as[String] mustBe ErrorWithdrawalNotFound.errorCode
+          (json \ "message").as[String] mustBe ErrorWithdrawalNotFound.message
+        })
+      }
+
+    }
+
+    "return an internal server error response" in {
+      when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusOrWithdrawalErrorResponse))
+      doGetRequest(res => {
+        (contentAsJson(res) \ "code").as[String] mustBe "INTERNAL_SERVER_ERROR"
+      })
+    }
+
+  }
+
   def doRequest(jsonString: String, lmrn: String = lisaManager)(callback: (Future[Result]) =>  Unit): Unit = {
     val res = SUT.reportWithdrawalCharge(lmrn, accountId).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
       withBody(AnyContentAsJson(Json.parse(jsonString))))
@@ -302,14 +397,22 @@ class WithdrawalControllerSpec extends PlaySpec
     callback(res)
   }
 
-  val mockService: WithdrawalService = mock[WithdrawalService]
+  def doGetRequest(callback: (Future[Result]) =>  Unit): Unit = {
+    val res = SUT.getWithdrawalCharge(lisaManager, accountId, transactionId).apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
+
+    callback(res)
+  }
+
+  val mockPostService: WithdrawalService = mock[WithdrawalService]
+  val mockGetService: BonusOrWithdrawalService = mock[BonusOrWithdrawalService]
   val mockAuditService: AuditService = mock[AuditService]
   val mockAuthCon: LisaAuthConnector = mock[LisaAuthConnector]
   val mockDateTimeService: CurrentDateService = mock[CurrentDateService]
   val mockValidator: WithdrawalChargeValidator = mock[WithdrawalChargeValidator]
 
   val SUT = new WithdrawalController {
-    override val service: WithdrawalService = mockService
+    override val postService: WithdrawalService = mockPostService
+    override val getService: BonusOrWithdrawalService = mockGetService
     override val auditService: AuditService = mockAuditService
     override val authConnector: LisaAuthConnector = mockAuthCon
     override val dateTimeService: CurrentDateService = mockDateTimeService

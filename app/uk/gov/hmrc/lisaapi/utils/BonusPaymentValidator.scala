@@ -18,7 +18,7 @@ package uk.gov.hmrc.lisaapi.utils
 
 import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.controllers.ErrorValidation
-import uk.gov.hmrc.lisaapi.models.RequestBonusPaymentRequest
+import uk.gov.hmrc.lisaapi.models.{Amount, BonusRecovery, RequestBonusPaymentRequest}
 import uk.gov.hmrc.lisaapi.services.CurrentDateService
 
 import scala.collection.mutable.ListBuffer
@@ -34,32 +34,45 @@ trait BonusPaymentValidator extends LisaConstants {
 
   def validate(data: RequestBonusPaymentRequest): Seq[ErrorValidation] = {
     (
-      newSubsOrHtbTransferGtZero andThen
-      newSubsYTDGtZeroIfNewSubsForPeriodGtZero andThen
       htbTransferTotalYTDGtZeroIfHtbTransferInForPeriodGtZero andThen
-      totalSubsForPeriodGtZero andThen
       totalSubsYTDGteTotalSubsForPeriod andThen
+      newSubsYTDGtZeroIfNewSubsForPeriodGtZero andThen
+      newSubsOrHtbTransferGtZero andThen
+      totalSubsForPeriodGtZero andThen
       bonusDueForPeriodGtZero andThen
       totalBonusDueYTDGtZero andThen
       periodStartDateIsSixth andThen
       periodEndDateIsFifthOfMonthAfterPeriodStartDate andThen
       periodStartDateIsNotInFuture andThen
       periodStartDateIsNotBeforeFirstValidDate andThen
-      periodEndDateIsNotBeforeFirstValidDate
+      periodEndDateIsNotBeforeFirstValidDate andThen
+      supersedeExistsIfSupersedingClaimReason
     ).apply(BonusPaymentValidationRequest(data)).errors
   }
 
+  private def isBonusRecovery(data: RequestBonusPaymentRequest): Boolean = {
+    data.supersede match {
+      case Some(_: BonusRecovery) => true
+      case _ => false
+    }
+  }
+
   private val newSubsOrHtbTransferGtZero: (BonusPaymentValidationRequest) => BonusPaymentValidationRequest = (req: BonusPaymentValidationRequest) => {
-    val subsExists = req.data.inboundPayments.newSubsForPeriod.isDefined
-    val htbExists = req.data.htbTransfer.isDefined
+    if (isBonusRecovery(req.data)) {
+      req
+    }
+    else {
+      val subsExists = req.data.inboundPayments.newSubsForPeriod.isDefined
+      val htbExists = req.data.htbTransfer.isDefined
 
-    val subsGtZero = req.data.inboundPayments.newSubsForPeriod.isDefined && req.data.inboundPayments.newSubsForPeriod.get > 0
-    val htbGtZero = req.data.htbTransfer.isDefined && req.data.htbTransfer.get.htbTransferInForPeriod > 0
-    val eitherGtZero = subsGtZero || htbGtZero
+      val subsGtZero = req.data.inboundPayments.newSubsForPeriod.isDefined && req.data.inboundPayments.newSubsForPeriod.get > 0
+      val htbGtZero = req.data.htbTransfer.isDefined && req.data.htbTransfer.get.htbTransferInForPeriod > 0
+      val eitherGtZero = subsGtZero || htbGtZero
 
-    val newErrs = if (eitherGtZero) req.errors else getErrors(subsExists, htbExists, eitherGtZero)
+      val newErrs = if (eitherGtZero) req.errors else getErrors(subsExists, htbExists, eitherGtZero)
 
-    req.copy(errors = newErrs)
+      req.copy(errors = newErrs)
+    }
   }
 
   private val newSubsYTDGtZeroIfNewSubsForPeriodGtZero: PartialFunction[BonusPaymentValidationRequest, BonusPaymentValidationRequest] = {
@@ -85,7 +98,7 @@ trait BonusPaymentValidator extends LisaConstants {
   }
 
   private val totalSubsForPeriodGtZero: PartialFunction[BonusPaymentValidationRequest, BonusPaymentValidationRequest] = {
-    case req: BonusPaymentValidationRequest if (req.data.inboundPayments.totalSubsForPeriod <= 0) => {
+    case req: BonusPaymentValidationRequest if (req.data.inboundPayments.totalSubsForPeriod <= 0 && !isBonusRecovery(req.data)) => {
       req.copy(errors = req.errors :+ ErrorValidation(MONETARY_ERROR, "totalSubsForPeriod must be more than 0", Some(s"$inboundPayments/totalSubsForPeriod")))
     }
     case req: BonusPaymentValidationRequest => req
@@ -101,14 +114,14 @@ trait BonusPaymentValidator extends LisaConstants {
   }
 
   private val bonusDueForPeriodGtZero: PartialFunction[BonusPaymentValidationRequest, BonusPaymentValidationRequest] = {
-    case req: BonusPaymentValidationRequest if (req.data.bonuses.bonusDueForPeriod <= 0) => {
+    case req: BonusPaymentValidationRequest if (req.data.bonuses.bonusDueForPeriod <= 0 && !isBonusRecovery(req.data)) => {
       req.copy(errors = req.errors :+ ErrorValidation(MONETARY_ERROR, "bonusDueForPeriod must be more than 0", Some(s"$bonuses/bonusDueForPeriod")))
     }
     case req: BonusPaymentValidationRequest => req
   }
 
   private val totalBonusDueYTDGtZero: PartialFunction[BonusPaymentValidationRequest, BonusPaymentValidationRequest] = {
-    case req: BonusPaymentValidationRequest if (req.data.bonuses.totalBonusDueYTD <= 0) => {
+    case req: BonusPaymentValidationRequest if (req.data.bonuses.totalBonusDueYTD <= 0 && !isBonusRecovery(req.data)) => {
       req.copy(errors = req.errors :+ ErrorValidation(MONETARY_ERROR, "totalBonusDueYTD must be more than 0", Some(s"$bonuses/totalBonusDueYTD")))
     }
     case req: BonusPaymentValidationRequest => req
@@ -176,6 +189,22 @@ trait BonusPaymentValidator extends LisaConstants {
       req
     }
   }
+
+  private val supersedeExistsIfSupersedingClaimReason: (BonusPaymentValidationRequest) => BonusPaymentValidationRequest =
+    (req: BonusPaymentValidationRequest) => {
+      (req.data.bonuses.claimReason, req.data.supersede) match {
+        case ("Superseded Bonus", None) => {
+          req.copy(errors = req.errors :+ ErrorValidation(
+            errorCode = MISSING_ERROR,
+            message = "This field is required",
+            path = Some(s"/supersede")
+          ))
+        }
+        case _ => {
+          req
+        }
+      }
+    }
 
   private def getErrors(subsExists: Boolean, htbExists: Boolean, eitherGtZero: Boolean): Seq[ErrorValidation] = {
     val newErrs = new ListBuffer[ErrorValidation]()

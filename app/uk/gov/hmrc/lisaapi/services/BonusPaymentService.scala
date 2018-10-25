@@ -37,69 +37,42 @@ trait BonusPaymentService {
       case successResponse: DesTransactionResponse => {
         Logger.debug("Matched RequestBonusPaymentSuccessResponse and the message is " + successResponse.message)
 
-        successResponse.message match {
-          case "Late" => RequestBonusPaymentLateResponse(successResponse.transactionID)
-          case "Superseded" => RequestBonusPaymentSupersededResponse(successResponse.transactionID)
-          case _ => RequestBonusPaymentOnTimeResponse(successResponse.transactionID)
+        if (request.bonuses.claimReason == "Superseded Bonus") {
+          RequestBonusPaymentSupersededResponse(successResponse.transactionID)
+        }
+        else {
+          successResponse.message match {
+            case Some("Late") => RequestBonusPaymentLateResponse(successResponse.transactionID)
+            case _ => RequestBonusPaymentOnTimeResponse(successResponse.transactionID)
+          }
+        }
+      }
+      case conflictResponse: DesTransactionExistResponse => {
+        Logger.debug("Matched DesTransactionExistResponse and the code is " + conflictResponse.code)
+
+        conflictResponse.code match {
+          case "BONUS_CLAIM_ALREADY_EXISTS" => RequestBonusPaymentClaimAlreadyExists(conflictResponse.transactionID)
+          case "SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED" => RequestBonusPaymentAlreadySuperseded(conflictResponse.transactionID)
         }
       }
       case failureResponse: DesFailureResponse => {
         Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
 
         failureResponse.code match {
-          case "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID" => RequestBonusPaymentAccountClosed
+          case "INVESTOR_ACCOUNT_ALREADY_CLOSED" => RequestBonusPaymentAccountClosed
+          case "INVESTOR_ACCOUNT_ALREADY_CANCELLED" => RequestBonusPaymentAccountCancelled
+          case "INVESTOR_ACCOUNT_ALREADY_VOID" => RequestBonusPaymentAccountVoid
           case "LIFE_EVENT_NOT_FOUND" => RequestBonusPaymentLifeEventNotFound
           case "BONUS_CLAIM_ERROR" => RequestBonusPaymentBonusClaimError
           case "INVESTOR_ACCOUNTID_NOT_FOUND" => RequestBonusPaymentAccountNotFound
-          case "BONUS_CLAIM_ALREADY_EXISTS" => RequestBonusPaymentClaimAlreadyExists
-          case "SUPERSEDED_BONUS_CLAIM_AMOUNT_MISMATCH" => RequestBonusPaymentSupersededAmountMismatch
-          case "SUPERSEDED_BONUS_REQUEST_OUTCOME_ERROR" => RequestBonusPaymentSupersededOutcomeError
-          case "BONUS_CLAIM_ALREADY_SUPERSEDED" => RequestBonusPaymentAlreadySuperseded
+          case "SUPERSEDING_TRANSACTION_ID_AMOUNT_MISMATCH" => RequestBonusPaymentSupersededAmountMismatch
+          case "SUPERSEDING_TRANSACTION_OUTCOME_ERROR" => RequestBonusPaymentSupersededOutcomeError
           case "ACCOUNT_ERROR_NO_SUBSCRIPTIONS_THIS_TAX_YEAR" => RequestBonusPaymentNoSubscriptions
           case _ => {
             Logger.warn(s"Request bonus payment returned error: ${failureResponse.code}")
             RequestBonusPaymentError
           }
         }
-      }
-    }
-  }
-
-  def getBonusPayment(lisaManager: String, accountId: String, transactionId: String)
-                     (implicit hc: HeaderCarrier): Future[GetBonusPaymentResponse] = {
-
-
-    val response: Future[DesResponse] = desConnector.getBonusPayment(lisaManager, accountId, transactionId)
-
-    response map {
-      case successResponse: DesGetBonusPaymentResponse => {
-        Logger.debug("Matched DesGetBonusPaymentResponse")
-
-        GetBonusPaymentSuccessResponse(
-          successResponse.lifeEventId,
-          successResponse.periodStartDate,
-          successResponse.periodEndDate,
-          successResponse.htbTransfer,
-          successResponse.inboundPayments,
-          successResponse.bonuses,
-          successResponse.supersededBy,
-          successResponse.supersede
-        )
-      }
-
-      case failureResponse: DesFailureResponse => {
-        Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
-
-        failureResponse.code match {
-          case "TRANSACTION_ID_NOT_FOUND" => GetBonusPaymentTransactionNotFoundResponse
-          case "BAD_REQUEST" => GetBonusPaymentLmrnDoesNotExistResponse
-          case "INVESTOR_ACCOUNTID_NOT_FOUND" => GetBonusPaymentInvestorNotFoundResponse
-          case _ => {
-            Logger.warn(s"Get bonus payment returned error: ${failureResponse.code}")
-            GetBonusPaymentErrorResponse
-          }
-        }
-
       }
     }
   }

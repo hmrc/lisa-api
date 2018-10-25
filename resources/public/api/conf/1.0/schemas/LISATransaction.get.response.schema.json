@@ -76,7 +76,7 @@
           "type": "number"
         },
         "claimReason": {
-          "description": "The reason the bonus payment was claimed. \"Superseding bonus claim\" is valid in the sandbox environment only.",
+          "description": "The reason the bonus payment was claimed. \"Superseded Bonus\" is valid in the sandbox environment only.",
           "$ref": "#/definitions/claimReasonType"
         }
       },
@@ -86,7 +86,7 @@
         "claimReason"
       ]
     },
-    "supersededBy":{"description": "[sandbox-only] This is the transactionId given to the superseded bonus transaction.", "$ref": "#/definitions/TransactionIDType"},
+    "supersededBy":{"description": "[sandbox-only] The ID of the transaction that supersedes the current one.", "$ref": "#/definitions/TransactionIDType"},
     "supersede": {
       "description": "[sandbox-only] Correct an existing bonus claim with an additional bonus or a recovery of an overpaid amount.",
       "type": "object",
@@ -139,7 +139,7 @@
         "enum": [
           "Life Event",
           "Regular Bonus",
-          "Superseding bonus claim"
+          "Superseded Bonus"
         ]
       },
       "chargeReasonType": {

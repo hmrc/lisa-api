@@ -24,7 +24,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.services.{AuditService, BonusPaymentService, CurrentDateService}
+import uk.gov.hmrc.lisaapi.services.{AuditService, BonusOrWithdrawalService, BonusPaymentService, CurrentDateService}
 import uk.gov.hmrc.lisaapi.utils.BonusPaymentValidator
 import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
 
@@ -33,7 +33,8 @@ import scala.concurrent.Future
 
 class BonusPaymentController extends LisaController with LisaConstants {
 
-  val service: BonusPaymentService = BonusPaymentService
+  val postService: BonusPaymentService = BonusPaymentService
+  val getService: BonusOrWithdrawalService = BonusOrWithdrawalService
   val auditService: AuditService = AuditService
   val validator: BonusPaymentValidator = BonusPaymentValidator
   val dateTimeService: CurrentDateService = CurrentDateService
@@ -52,7 +53,7 @@ class BonusPaymentController extends LisaController with LisaConstants {
                 withValidData(req)(lisaManager, accountId) { () =>
                   withValidClaimPeriod(req)(lisaManager, accountId) { () =>
                     withValidHtb(req)(lisaManager, accountId) { () =>
-                      service.requestBonusPayment(lisaManager, accountId, req) map { res =>
+                      postService.requestBonusPayment(lisaManager, accountId, req) map { res =>
                         Logger.debug("Entering Bonus Payment Controller and the response is " + res.toString)
 
                         res match {
@@ -89,20 +90,20 @@ class BonusPaymentController extends LisaController with LisaConstants {
 
   private def processGetBonusPayment(lisaManager:String, accountId:String, transactionId: String)
                                     (implicit hc: HeaderCarrier, startTime: Long) = {
-    service.getBonusPayment(lisaManager, accountId, transactionId).map {
-      case response: GetBonusPaymentSuccessResponse =>
+    getService.getBonusOrWithdrawal(lisaManager, accountId, transactionId).map {
+      case response: GetBonusResponse =>
         LisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.BONUS_PAYMENT)
         Ok(Json.toJson(response))
 
-      case GetBonusPaymentLmrnDoesNotExistResponse =>
-        LisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.BONUS_PAYMENT)
-        BadRequest(Json.toJson(ErrorBadRequestLmrn))
-
-      case GetBonusPaymentTransactionNotFoundResponse =>
+      case _: GetWithdrawalResponse =>
         LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.BONUS_PAYMENT)
         NotFound(Json.toJson(ErrorTransactionNotFound))
 
-      case GetBonusPaymentInvestorNotFoundResponse =>
+      case GetBonusOrWithdrawalTransactionNotFoundResponse =>
+        LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.BONUS_PAYMENT)
+        NotFound(Json.toJson(ErrorTransactionNotFound))
+
+      case GetBonusOrWithdrawalInvestorNotFoundResponse =>
         LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.BONUS_PAYMENT)
         NotFound(Json.toJson(ErrorAccountNotFound))
 
@@ -234,6 +235,16 @@ class BonusPaymentController extends LisaController with LisaConstants {
         LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.BONUS_PAYMENT)
 
         Forbidden(Json.toJson(ErrorAccountAlreadyClosedOrVoid))
+      case RequestBonusPaymentAccountCancelled =>
+        auditFailure(lisaManager, accountId, req, ErrorAccountAlreadyClosedOrVoid.errorCode)
+        LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.BONUS_PAYMENT)
+
+        Forbidden(Json.toJson(ErrorAccountAlreadyClosedOrVoid))
+      case RequestBonusPaymentAccountVoid =>
+        auditFailure(lisaManager, accountId, req, ErrorAccountAlreadyClosedOrVoid.errorCode)
+        LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.BONUS_PAYMENT)
+
+        Forbidden(Json.toJson(ErrorAccountAlreadyClosedOrVoid))
       case RequestBonusPaymentSupersededAmountMismatch =>
         auditFailure(lisaManager, accountId, req, ErrorBonusSupersededAmountMismatch.errorCode)
         LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.BONUS_PAYMENT)
@@ -259,16 +270,20 @@ class BonusPaymentController extends LisaController with LisaConstants {
         LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.BONUS_PAYMENT)
 
         NotFound(Json.toJson(ErrorLifeEventIdNotFound))
-      case RequestBonusPaymentClaimAlreadyExists =>
-        auditFailure(lisaManager, accountId, req, ErrorBonusClaimAlreadyExists.errorCode)
+      case e: RequestBonusPaymentClaimAlreadyExists =>
+        val error = ErrorBonusClaimAlreadyExists(e.transactionId)
+
+        auditFailure(lisaManager, accountId, req, error.errorCode)
         LisaMetrics.incrementMetrics(startTime, CONFLICT, LisaMetricKeys.BONUS_PAYMENT)
 
-        Conflict(Json.toJson(ErrorBonusClaimAlreadyExists))
-      case RequestBonusPaymentAlreadySuperseded =>
-        auditFailure(lisaManager, accountId, req, ErrorBonusClaimAlreadySuperseded.errorCode)
+        Conflict(Json.toJson(error))
+      case e: RequestBonusPaymentAlreadySuperseded =>
+        val error = ErrorBonusClaimAlreadySuperseded(e.transactionId)
+
+        auditFailure(lisaManager, accountId, req, error.errorCode)
         LisaMetrics.incrementMetrics(startTime, CONFLICT, LisaMetricKeys.BONUS_PAYMENT)
 
-        Conflict(Json.toJson(ErrorBonusClaimAlreadySuperseded))
+        Conflict(Json.toJson(error))
       case _ =>
         auditFailure(lisaManager, accountId, req, ErrorInternalServerError.errorCode)
         LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.BONUS_PAYMENT)
@@ -307,8 +322,12 @@ class BonusPaymentController extends LisaController with LisaConstants {
   }
 
   private def createAuditData(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest): Map[String, String] = {
-    req.toStringMap ++ Map(ZREF -> lisaManager,
-      "accountId" -> accountId)
+    val result = req.toStringMap ++ Map(ZREF -> lisaManager, "accountId" -> accountId)
+
+    req.supersede.fold(result) {
+      case _: AdditionalBonus => result ++ Map("reason" -> "Additional bonus")
+      case _: BonusRecovery => result ++ Map("reason" -> "Bonus recovery")
+    }
   }
 
   private def getEndpointUrl(lisaManager: String, accountId: String): String = {
