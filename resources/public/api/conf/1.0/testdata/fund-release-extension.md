@@ -351,6 +351,60 @@
         </tr>
         <tr>
             <td>
+                <p>First extension already approved</p>
+                <p class="code--block">
+                    lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a>
+                    <br>
+                    accountId: 8000000403
+                </p>
+            </td>
+            <td>
+<pre class="code--block">
+{
+  "fundReleaseId": "3456789001",
+  "eventDate": "2017-05-10",
+  "eventType": "Extension one"
+}
+</pre>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
+<pre class="code--block">
+{
+  "code": "FIRST_EXTENSION_ALREADY_APPROVED",
+  "message": "A first extension has already been approved"
+}
+</pre>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <p>Second extension already approved</p>
+                <p class="code--block">
+                    lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a>
+                    <br>
+                    accountId: 9000000403
+                </p>
+            </td>
+            <td>
+<pre class="code--block">
+{
+  "fundReleaseId": "3456789001",
+  "eventDate": "2017-08-10",
+  "eventType": "Extension two"
+}
+</pre>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
+<pre class="code--block">
+{
+  "code": "SECOND_EXTENSION_ALREADY_APPROVED",
+  "message": "A second extension has already been approved"
+}
+</pre>
+            </td>
+        </tr>
+        <tr>
+            <td>
                 <p>Supersede details mismatch</p>
                 <p class="code--block">
                     lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a>
@@ -483,60 +537,6 @@
 {
   "code": "FUND_RELEASE_SUPERSEDED",
   "message": "This fund release has already been superseded"
-}
-</pre>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <p>First extension already approved</p>
-                <p class="code--block">
-                    lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a>
-                    <br>
-                    accountId: 3000000409
-                </p>
-            </td>
-            <td>
-<pre class="code--block">
-{
-  "fundReleaseId": "3456789001",
-  "eventDate": "2017-05-10",
-  "eventType": "Extension one"
-}
-</pre>
-            </td>
-            <td><p>HTTP status: <code class="code--slim">409 (Conflict)</code></p>
-<pre class="code--block">
-{
-  "code": "FIRST_EXTENSION_ALREADY_APPROVED",
-  "message": "A first extension has already been approved"
-}
-</pre>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <p>Second extension already approved</p>
-                <p class="code--block">
-                    lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a>
-                    <br>
-                    accountId: 4000000409
-                </p>
-            </td>
-            <td>
-<pre class="code--block">
-{
-  "fundReleaseId": "3456789001",
-  "eventDate": "2017-08-10",
-  "eventType": "Extension two"
-}
-</pre>
-            </td>
-            <td><p>HTTP status: <code class="code--slim">409 (Conflict)</code></p>
-<pre class="code--block">
-{
-  "code": "SECOND_EXTENSION_ALREADY_APPROVED",
-  "message": "A second extension has already been approved"
 }
 </pre>
             </td>

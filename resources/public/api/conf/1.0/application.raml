@@ -950,6 +950,20 @@ types:
                                       "code" : "FIRST_EXTENSION_NOT_APPROVED",
                                       "message" : "A first extension has not been approved"
                                     }
+                                firstExtensionAlreadyApproved:
+                                  description: A first extension has already been approved
+                                  value: |
+                                    {
+                                      "code" : "FIRST_EXTENSION_ALREADY_APPROVED",
+                                      "message" : "A first extension has already been approved"
+                                    }
+                                secondExtensionAlreadyApproved:
+                                  description: A second extension has already been approved
+                                  value: |
+                                    {
+                                      "code" : "SECOND_EXTENSION_ALREADY_APPROVED",
+                                      "message" : "A second extension has already been approved"
+                                    }
                                 supersedingLifeEventMisMatchError:
                                   description: originalExtensionId and the originalEventDate do not match the information in the original request
                                   value: |
@@ -994,20 +1008,6 @@ types:
                                     {
                                       "code" : "FUND_RELEASE_SUPERSEDED",
                                       "message" : "This fund release has already been superseded"
-                                    }
-                                firstExtensionAlreadyApproved:
-                                  description: A first extension has already been approved
-                                  value: |
-                                    {
-                                      "code" : "FIRST_EXTENSION_ALREADY_APPROVED",
-                                      "message" : "A first extension has already been approved"
-                                    }
-                                secondExtensionAlreadyApproved:
-                                  description: A second extension has already been approved
-                                  value: |
-                                    {
-                                      "code" : "SECOND_EXTENSION_ALREADY_APPROVED",
-                                      "message" : "A second extension has already been approved"
                                     }
                                 supersedingLifeEventAlreadySuperseded:
                                   description: This extension has already been superseded
