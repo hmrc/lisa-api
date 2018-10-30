@@ -208,6 +208,28 @@ trait DesConnector extends ServicesConfig {
   }
 
   /**
+    * Attempts to report the outcome of a property purchase
+    */
+  def reportPurchaseOutcome(lisaManager: String, accountId: String, request: RequestPurchaseOutcomeRequest)
+                           (implicit hc: HeaderCarrier): Future[DesResponse] = {
+
+    val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/life-event"
+    Logger.debug("Posting Property outcome request to des: " + uri)
+    val result = httpPost.POST[RequestPurchaseOutcomeRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
+
+    result.map(res => {
+      Logger.debug("Property outcome request returned status: " + res.status)
+      res.status match {
+        case 409 => {
+          parseDesResponse[DesLifeEventExistResponse](res)
+        }
+        case _ => parseDesResponse[DesLifeEventResponse](res)
+      }
+
+    })
+  }
+
+  /**
     * Attempts to update the first subscription date
     */
   def updateFirstSubDate(lisaManager: String, accountId: String, request: UpdateSubscriptionRequest)
