@@ -55,8 +55,6 @@ object PurchaseOutcomeSupersede {
 }
 
 object RequestPurchaseOutcomeRequest {
-  implicit val dateReads: Reads[DateTime] = JsonReads.notFutureDate
-  implicit val dateWrites: Writes[DateTime] = Writes.jodaDateWrites("yyyy-MM-dd")
 
   val initialReads: Reads[RequestPurchaseOutcomeStandardRequest] = (
     (JsPath \ "fundReleaseId").read(JsonReads.fundReleaseId) and
@@ -64,6 +62,21 @@ object RequestPurchaseOutcomeRequest {
     (JsPath \ "propertyPurchaseResult").read(JsonReads.propertyPurchaseResult) and
     (JsPath \ "propertyPurchaseValue").read(JsonReads.nonNegativeAmount)
   )(RequestPurchaseOutcomeStandardRequest.apply _)
+
+  val initialWrites: Writes[RequestPurchaseOutcomeStandardRequest] = (
+    (JsPath \ "eventType").write[String] and
+    (JsPath \ "eventDate").write[String] and
+    (JsPath \ "fundsReleaseLifeEventID").write[String] and
+    (JsPath \ "propertyDetails").write[JsObject]
+  ){req: RequestPurchaseOutcomeStandardRequest => (
+    "Purchase Result",
+    req.eventDate.toString("yyyy-MM-dd"),
+    req.fundReleaseId,
+    Json.obj(
+      "purchaseResult" -> req.propertyPurchaseResult,
+      "purchaseValue" -> req.propertyPurchaseValue
+    )
+  )}
 
   val supersedeReads: Reads[RequestPurchaseOutcomeSupersededRequest] = (
     (JsPath \ "fundReleaseId").read(JsonReads.fundReleaseId) and
@@ -73,8 +86,24 @@ object RequestPurchaseOutcomeRequest {
     (JsPath \ "supersede").read[PurchaseOutcomeSupersede]
   )(RequestPurchaseOutcomeSupersededRequest.apply _)
 
-  val initialWrites = Json.writes[RequestPurchaseOutcomeStandardRequest]
-  val supersedeWrites = Json.writes[RequestPurchaseOutcomeSupersededRequest]
+  val supersedeWrites: Writes[RequestPurchaseOutcomeSupersededRequest] = (
+    (JsPath \ "eventType").write[String] and
+    (JsPath \ "eventDate").write[String] and
+    (JsPath \ "fundsReleaseLifeEventID").write[String] and
+    (JsPath \ "propertyDetails").write[JsObject] and
+    (JsPath \ "supersededLifeEventID").write[String] and
+    (JsPath \ "supersededLifeEventDate").write[String]
+  ){req: RequestPurchaseOutcomeSupersededRequest => (
+    "Purchase Result",
+    req.eventDate.toString("yyyy-MM-dd"),
+    req.fundReleaseId,
+    Json.obj(
+      "purchaseResult" -> req.propertyPurchaseResult,
+      "purchaseValue" -> req.propertyPurchaseValue
+    ),
+    req.supersede.originalPurchaseOutcomeId,
+    req.supersede.originalEventDate.toString("yyyy-MM-dd")
+  )}
 
   implicit val reads: Reads[RequestPurchaseOutcomeRequest] = Reads[RequestPurchaseOutcomeRequest] { json =>
     val supersede = (json \ "supersede").asOpt[JsValue]

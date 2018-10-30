@@ -48,7 +48,7 @@ class RequestPurchaseOutcomeRequestSpec extends PlaySpec {
         propertyPurchaseValue = 250000
       )
 
-      Json.toJson[RequestPurchaseOutcomeRequest](input).toString() mustBe standardJson
+      Json.toJson[RequestPurchaseOutcomeRequest](input).toString() mustBe """{"eventType":"Purchase Result","eventDate":"2017-05-05","fundsReleaseLifeEventID":"3456789000","propertyDetails":{"purchaseResult":"Purchase completed","purchaseValue":250000}}"""
     }
 
     "validate the fundReleaseId" in {
@@ -113,7 +113,7 @@ class RequestPurchaseOutcomeRequestSpec extends PlaySpec {
         )
       )
 
-      Json.toJson[RequestPurchaseOutcomeRequest](input).toString() mustBe supersededJson
+      Json.toJson[RequestPurchaseOutcomeRequest](input).toString() mustBe """{"eventType":"Purchase Result","eventDate":"2017-06-10","fundsReleaseLifeEventID":"3456789000","propertyDetails":{"purchaseResult":"Purchase completed","purchaseValue":250000},"supersededLifeEventID":"5678900001","supersededLifeEventDate":"2017-05-05"}"""
     }
 
     "validate the fundReleaseId" in {
