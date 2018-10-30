@@ -56,8 +56,6 @@ trait DesConnector extends ServicesConfig {
 
   /**
     * Attempts to create a new LISA investor
-    *
-    * @return A tuple of the http status code and an (optional) data response
     */
   def createInvestor(lisaManager: String, request: CreateLisaInvestorRequest)
                     (implicit hc: HeaderCarrier): Future[DesResponse] = {
@@ -149,8 +147,6 @@ trait DesConnector extends ServicesConfig {
 
   /**
     * Attempts to close a LISA account
-    *
-    * @return A tuple of the http status code and an (optional) data response
     */
   def closeAccount(lisaManager: String, accountId: String, request: CloseLisaAccountRequest)
                   (implicit hc: HeaderCarrier): Future[DesResponse] = {
