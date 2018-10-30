@@ -509,7 +509,7 @@
 <pre class="code--block">
 {
   "code": "EXTENSION_ALREADY_EXISTS",
-  "message": "The investor’s purchase extension has already been reported"
+  "message": "The investor’s purchase extension has already been requested"
 }
 </pre>
             </td>

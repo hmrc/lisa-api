@@ -578,7 +578,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
       doExtensionRequest(extensionJson){ res =>
         status(res) mustBe CONFLICT
         (contentAsJson(res) \ "code").as[String] mustBe "EXTENSION_ALREADY_EXISTS"
-        (contentAsJson(res) \ "message").as[String] mustBe "The investor’s purchase extension has already been reported"
+        (contentAsJson(res) \ "message").as[String] mustBe "The investor’s purchase extension has already been requested"
       }
     }
 
