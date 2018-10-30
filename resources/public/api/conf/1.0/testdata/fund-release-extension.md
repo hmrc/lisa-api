@@ -482,7 +482,7 @@
 <pre class="code--block">
 {
   "code": "FUND_RELEASE_NOT_FOUND",
-  "message": "The fundReleaseId does not match with HMRC’s records"
+  "message": "The fundReleaseId does not match HMRC’s records"
 }
 </pre>
             </td>
