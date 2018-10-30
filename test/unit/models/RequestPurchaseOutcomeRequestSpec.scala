@@ -25,7 +25,6 @@ class RequestPurchaseOutcomeRequestSpec extends PlaySpec {
 
   val standardJson = """{"fundReleaseId":"3456789000","eventDate":"2017-05-05","propertyPurchaseResult":"Purchase completed","propertyPurchaseValue":250000}"""
   val supersededJson = """{"fundReleaseId":"3456789000","eventDate":"2017-06-10","propertyPurchaseResult":"Purchase completed","propertyPurchaseValue":250000,"supersede":{"originalPurchaseOutcomeId":"5678900001","originalEventDate":"2017-05-05"}}"""
-  val supersedeJson = """{"originalPurchaseOutcomeId":"5678900001","originalEventDate":"2017-05-05"}"""
 
   "RequestPurchaseOutcomeStandardRequest" must {
 
@@ -147,44 +146,22 @@ class RequestPurchaseOutcomeRequestSpec extends PlaySpec {
       Json.parse(json).validate[RequestPurchaseOutcomeRequest] mustBe JsError((JsPath \ "propertyPurchaseValue"), "error.formatting.currencyNegativeDisallowed")
     }
 
-  }
-
-  "PurchaseOutcomeSupersede" must {
-
-    "serialise from json" in {
-      val json = supersedeJson
-
-      Json.parse(json).as[PurchaseOutcomeSupersede] mustBe PurchaseOutcomeSupersede(
-        originalPurchaseOutcomeId = "5678900001",
-        originalEventDate = new DateTime("2017-05-05")
-      )
-    }
-
-    "serialise to json" in {
-      val input = PurchaseOutcomeSupersede(
-        originalPurchaseOutcomeId = "5678900001",
-        originalEventDate = new DateTime("2017-05-05")
-      )
-
-      Json.toJson[PurchaseOutcomeSupersede](input).toString() mustBe supersedeJson
-    }
-
     "validate the originalPurchaseOutcomeId" in {
-      val json = supersedeJson.replace("5678900001", "x")
+      val json = supersededJson.replace("5678900001", "x")
 
-      Json.parse(json).validate[PurchaseOutcomeSupersede] mustBe JsError((JsPath \ "originalPurchaseOutcomeId"), "error.formatting.fundReleaseId")
+      Json.parse(json).validate[RequestPurchaseOutcomeRequest] mustBe JsError((JsPath \ "supersede" \ "originalPurchaseOutcomeId"), "error.formatting.fundReleaseId")
     }
 
     "validate the originalEventDate" when {
       "the formatting is incorrect" in {
-        val json = supersedeJson.replace("2017-05-05", "2017-05")
+        val json = supersededJson.replace("2017-05-05", "2017-05")
 
-        Json.parse(json).validate[PurchaseOutcomeSupersede] mustBe JsError((JsPath \ "originalEventDate"), "error.formatting.date")
+        Json.parse(json).validate[RequestPurchaseOutcomeRequest] mustBe JsError((JsPath \ "supersede" \ "originalEventDate"), "error.formatting.date")
       }
       "the date is in the future" in {
-        val json = supersedeJson.replace("2017-05-05", "3000-01-01")
+        val json = supersededJson.replace("2017-05-05", "3000-01-01")
 
-        Json.parse(json).validate[PurchaseOutcomeSupersede] mustBe JsError((JsPath \ "originalEventDate"), "error.formatting.date")
+        Json.parse(json).validate[RequestPurchaseOutcomeRequest] mustBe JsError((JsPath \ "supersede" \ "originalEventDate"), "error.formatting.date")
       }
     }
 
