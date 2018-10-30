@@ -351,6 +351,60 @@
         </tr>
         <tr>
             <td>
+                <p>First extension already approved</p>
+                <p class="code--block">
+                    lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a>
+                    <br>
+                    accountId: 8000000403
+                </p>
+            </td>
+            <td>
+<pre class="code--block">
+{
+  "fundReleaseId": "3456789001",
+  "eventDate": "2017-05-10",
+  "eventType": "Extension one"
+}
+</pre>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
+<pre class="code--block">
+{
+  "code": "FIRST_EXTENSION_ALREADY_APPROVED",
+  "message": "A first extension has already been approved"
+}
+</pre>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <p>Second extension already approved</p>
+                <p class="code--block">
+                    lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a>
+                    <br>
+                    accountId: 9000000403
+                </p>
+            </td>
+            <td>
+<pre class="code--block">
+{
+  "fundReleaseId": "3456789001",
+  "eventDate": "2017-08-10",
+  "eventType": "Extension two"
+}
+</pre>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
+<pre class="code--block">
+{
+  "code": "SECOND_EXTENSION_ALREADY_APPROVED",
+  "message": "A second extension has already been approved"
+}
+</pre>
+            </td>
+        </tr>
+        <tr>
+            <td>
                 <p>Supersede details mismatch</p>
                 <p class="code--block">
                     lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a>
@@ -428,7 +482,7 @@
 <pre class="code--block">
 {
   "code": "FUND_RELEASE_NOT_FOUND",
-  "message": "The fundReleaseId does not match with HMRC’s records"
+  "message": "The fundReleaseId does not match HMRC’s records"
 }
 </pre>
             </td>
@@ -455,7 +509,7 @@
 <pre class="code--block">
 {
   "code": "EXTENSION_ALREADY_EXISTS",
-  "message": "The investor’s purchase extension has already been reported"
+  "message": "The investor’s purchase extension has already been requested"
 }
 </pre>
             </td>
@@ -483,60 +537,6 @@
 {
   "code": "FUND_RELEASE_SUPERSEDED",
   "message": "This fund release has already been superseded"
-}
-</pre>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <p>First extension already approved</p>
-                <p class="code--block">
-                    lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a>
-                    <br>
-                    accountId: 3000000409
-                </p>
-            </td>
-            <td>
-<pre class="code--block">
-{
-  "fundReleaseId": "3456789001",
-  "eventDate": "2017-05-10",
-  "eventType": "Extension one"
-}
-</pre>
-            </td>
-            <td><p>HTTP status: <code class="code--slim">409 (Conflict)</code></p>
-<pre class="code--block">
-{
-  "code": "FIRST_EXTENSION_ALREADY_APPROVED",
-  "message": "A first extension has already been approved"
-}
-</pre>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <p>Second extension already approved</p>
-                <p class="code--block">
-                    lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a>
-                    <br>
-                    accountId: 4000000409
-                </p>
-            </td>
-            <td>
-<pre class="code--block">
-{
-  "fundReleaseId": "3456789001",
-  "eventDate": "2017-08-10",
-  "eventType": "Extension two"
-}
-</pre>
-            </td>
-            <td><p>HTTP status: <code class="code--slim">409 (Conflict)</code></p>
-<pre class="code--block">
-{
-  "code": "SECOND_EXTENSION_ALREADY_APPROVED",
-  "message": "A second extension has already been approved"
 }
 </pre>
             </td>

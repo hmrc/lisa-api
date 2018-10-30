@@ -528,6 +528,24 @@ class PropertyPurchaseControllerSpec extends PlaySpec
       }
     }
 
+    "return with 403 forbidden and a code of FIRST_EXTENSION_ALREADY_APPROVED" in {
+      when(mockService.requestPurchaseExtension(any(), any(),any())(any())).thenReturn(Future.successful(PropertyPurchaseExtensionOneAlreadyApprovedResponse))
+      doExtensionRequest(extensionJson){ res =>
+        status(res) mustBe FORBIDDEN
+        (contentAsJson(res) \ "code").as[String] mustBe "FIRST_EXTENSION_ALREADY_APPROVED"
+        (contentAsJson(res) \ "message").as[String] mustBe "A first extension has already been approved"
+      }
+    }
+
+    "return with 403 forbidden and a code of SECOND_EXTENSION_ALREADY_APPROVED" in {
+      when(mockService.requestPurchaseExtension(any(), any(),any())(any())).thenReturn(Future.successful(PropertyPurchaseExtensionTwoAlreadyApprovedResponse))
+      doExtensionRequest(extensionJson){ res =>
+        status(res) mustBe FORBIDDEN
+        (contentAsJson(res) \ "code").as[String] mustBe "SECOND_EXTENSION_ALREADY_APPROVED"
+        (contentAsJson(res) \ "message").as[String] mustBe "A second extension has already been approved"
+      }
+    }
+
     "return with 403 forbidden and a code of SUPERSEDED_EXTENSION_MISMATCH_ERROR" in {
       when(mockService.requestPurchaseExtension(any(), any(),any())(any())).thenReturn(Future.successful(PropertyPurchaseMismatchResponse))
       doExtensionRequest(extensionJson){ res =>
@@ -551,7 +569,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
       doExtensionRequest(extensionJson){ res =>
         status(res) mustBe NOT_FOUND
         (contentAsJson(res) \ "code").as[String] mustBe "FUND_RELEASE_NOT_FOUND"
-        (contentAsJson(res) \ "message").as[String] mustBe "The fundReleaseId does not match with HMRC’s records"
+        (contentAsJson(res) \ "message").as[String] mustBe "The fundReleaseId does not match HMRC’s records"
       }
     }
 
@@ -560,7 +578,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
       doExtensionRequest(extensionJson){ res =>
         status(res) mustBe CONFLICT
         (contentAsJson(res) \ "code").as[String] mustBe "EXTENSION_ALREADY_EXISTS"
-        (contentAsJson(res) \ "message").as[String] mustBe "The investor’s purchase extension has already been reported"
+        (contentAsJson(res) \ "message").as[String] mustBe "The investor’s purchase extension has already been requested"
       }
     }
 
@@ -570,24 +588,6 @@ class PropertyPurchaseControllerSpec extends PlaySpec
         status(res) mustBe CONFLICT
         (contentAsJson(res) \ "code").as[String] mustBe "FUND_RELEASE_SUPERSEDED"
         (contentAsJson(res) \ "message").as[String] mustBe "This fund release has already been superseded"
-      }
-    }
-
-    "return with 409 conflict and a code of FIRST_EXTENSION_ALREADY_APPROVED" in {
-      when(mockService.requestPurchaseExtension(any(), any(),any())(any())).thenReturn(Future.successful(PropertyPurchaseExtensionOneAlreadyApprovedResponse))
-      doExtensionRequest(extensionJson){ res =>
-        status(res) mustBe CONFLICT
-        (contentAsJson(res) \ "code").as[String] mustBe "FIRST_EXTENSION_ALREADY_APPROVED"
-        (contentAsJson(res) \ "message").as[String] mustBe "A first extension has already been approved"
-      }
-    }
-
-    "return with 409 conflict and a code of SECOND_EXTENSION_ALREADY_APPROVED" in {
-      when(mockService.requestPurchaseExtension(any(), any(),any())(any())).thenReturn(Future.successful(PropertyPurchaseExtensionTwoAlreadyApprovedResponse))
-      doExtensionRequest(extensionJson){ res =>
-        status(res) mustBe CONFLICT
-        (contentAsJson(res) \ "code").as[String] mustBe "SECOND_EXTENSION_ALREADY_APPROVED"
-        (contentAsJson(res) \ "message").as[String] mustBe "A second extension has already been approved"
       }
     }
 

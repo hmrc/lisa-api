@@ -191,6 +191,18 @@ class PropertyPurchaseController extends LisaController with LisaConstants {
                     LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
                     Forbidden(Json.toJson(ErrorExtensionOneNotApproved))
                   }
+                  case PropertyPurchaseExtensionOneAlreadyApprovedResponse => {
+                    Logger.debug("Extension one already approved")
+                    doExtensionAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorExtensionOneAlreadyApproved.errorCode))
+                    LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
+                    Forbidden(Json.toJson(ErrorExtensionOneAlreadyApproved))
+                  }
+                  case PropertyPurchaseExtensionTwoAlreadyApprovedResponse => {
+                    Logger.debug("Extension two already approved")
+                    doExtensionAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorExtensionTwoAlreadyApproved.errorCode))
+                    LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
+                    Forbidden(Json.toJson(ErrorExtensionTwoAlreadyApproved))
+                  }
                   case PropertyPurchaseMismatchResponse => {
                     Logger.debug("Extension mismatch")
                     doExtensionAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorExtensionMismatch.errorCode))
@@ -220,18 +232,6 @@ class PropertyPurchaseController extends LisaController with LisaConstants {
                     doExtensionAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorExtensionFundReleaseSuperseded.errorCode))
                     LisaMetrics.incrementMetrics(startTime, CONFLICT, LisaMetricKeys.PROPERTY_PURCHASE)
                     Conflict(Json.toJson(ErrorExtensionFundReleaseSuperseded))
-                  }
-                  case PropertyPurchaseExtensionOneAlreadyApprovedResponse => {
-                    Logger.debug("Extension one already approved")
-                    doExtensionAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorExtensionOneAlreadyApproved.errorCode))
-                    LisaMetrics.incrementMetrics(startTime, CONFLICT, LisaMetricKeys.PROPERTY_PURCHASE)
-                    Conflict(Json.toJson(ErrorExtensionOneAlreadyApproved))
-                  }
-                  case PropertyPurchaseExtensionTwoAlreadyApprovedResponse => {
-                    Logger.debug("Extension two already approved")
-                    doExtensionAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorExtensionTwoAlreadyApproved.errorCode))
-                    LisaMetrics.incrementMetrics(startTime, CONFLICT, LisaMetricKeys.PROPERTY_PURCHASE)
-                    Conflict(Json.toJson(ErrorExtensionTwoAlreadyApproved))
                   }
                   case PropertyPurchaseLifeEventAlreadySupersededResponse => {
                     Logger.debug("Extension already superseded")
