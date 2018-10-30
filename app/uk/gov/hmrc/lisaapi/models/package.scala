@@ -37,6 +37,8 @@ package object models {
   type BonusClaimSupersedeReason = String
   type WithdrawalReason = String
   type WithdrawalSupersedeReason = String
+  type PropertyPurchaseResult = String
+  type FundReleaseId = String
 
   private val MIN_AMOUNT = BigDecimal("-99999999999999.98")
   private val MAX_AMOUNT = BigDecimal("99999999999999.98")
@@ -80,6 +82,11 @@ package object models {
       "^(Life Event|Regular Bonus|Superseded Bonus)$".r,
       "error.formatting.claimReason"
     )
+    val propertyPurchaseResult: Reads[PropertyPurchaseResult] = Reads.pattern(
+      "^(Purchase failed|Purchase completed)$".r,
+      "error.formatting.propertyPurchaseResult"
+    )
+    val fundReleaseId: Reads[FundReleaseId] = Reads.pattern("^\\d{10}$".r, "error.formatting.fundReleaseId")
 
     val isoDate: Reads[DateTime] = isoDateReads()
     val notFutureDate: Reads[DateTime] = isoDateReads(false)
