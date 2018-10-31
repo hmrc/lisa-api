@@ -229,7 +229,7 @@
                                                                                                                 <pre class="code--block">
 {
   "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
-  "message": "The accountId does not match with HMRC’s records"
+  "message": "The accountId does not match HMRC’s records"
 }                                               
 </pre>
                                                                                                        </td>

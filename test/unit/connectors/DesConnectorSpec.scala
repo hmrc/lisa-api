@@ -611,11 +611,11 @@ class DesConnectorSpec extends PlaySpec
 
   }
 
-  "Report Purchase outcome endpoint" must {
+  "Request Purchase extension endpoint" must {
 
     "return a DesSuccessResponse" when {
       "the DES response has a json body that is in the correct format" in {
-        when(mockHttpPost.POST[RequestPurchaseOutcomeRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockHttpPost.POST[RequestPurchaseExtension, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -625,7 +625,7 @@ class DesConnectorSpec extends PlaySpec
             )
           )
 
-        doReportPurchaseOutcomeRequest { response =>
+        doRequestPurchaseExtensionRequest { response =>
           response must be(DesLifeEventResponse("87654321"))
         }
       }
@@ -633,7 +633,7 @@ class DesConnectorSpec extends PlaySpec
 
     "return a DesFailureResponse" when {
       "the DES response has no json body" in {
-        when(mockHttpPost.POST[RequestPurchaseOutcomeRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockHttpPost.POST[RequestPurchaseExtension, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -643,13 +643,13 @@ class DesConnectorSpec extends PlaySpec
             )
           )
 
-        doReportPurchaseOutcomeRequest { response =>
+        doRequestPurchaseExtensionRequest { response =>
           response must be(DesFailureResponse())
         }
       }
 
       "the DES response has a json body that is in an incorrect format" in {
-        when(mockHttpPost.POST[RequestPurchaseOutcomeRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockHttpPost.POST[RequestPurchaseExtension, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -659,13 +659,13 @@ class DesConnectorSpec extends PlaySpec
             )
           )
 
-        doReportPurchaseOutcomeRequest { response =>
+        doRequestPurchaseExtensionRequest { response =>
           response must be(DesFailureResponse())
         }
       }
 
       "the DES response is an error response" in {
-        when(mockHttpPost.POST[RequestPurchaseOutcomeRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockHttpPost.POST[RequestPurchaseExtension, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -675,7 +675,7 @@ class DesConnectorSpec extends PlaySpec
             )
           )
 
-        doReportPurchaseOutcomeRequest { response =>
+        doRequestPurchaseExtensionRequest { response =>
           response must be(DesFailureResponse("INVESTOR_ACCOUNTID_NOT_FOUND", "Account not found."))
         }
       }
@@ -1521,15 +1521,9 @@ class DesConnectorSpec extends PlaySpec
     callback(response)
   }
 
-  private def doReportPurchaseOutcomeRequest(callback: (DesResponse) => Unit) = {
-    val request = RequestPurchaseOutcomeStandardRequest(
-      fundReleaseId = "3456789000",
-      eventDate = new DateTime("2017-05-05"),
-      propertyPurchaseResult = "Purchase completed",
-      propertyPurchaseValue = 250000
-    )
-
-    val response = Await.result(SUT.reportPurchaseOutcome("Z123456", "ABC12345", request), Duration.Inf)
+  private def doRequestPurchaseExtensionRequest(callback: (DesResponse) => Unit) = {
+    val request = RequestStandardPurchaseExtension("123457890", new DateTime("2018-01-01"), "Extension one")
+    val response = Await.result(SUT.requestPurchaseExtension("Z123456", "ABC12345", request), Duration.Inf)
 
     callback(response)
   }
