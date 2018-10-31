@@ -72,6 +72,8 @@ package object models {
     val accountId: Reads[AccountId] = Reads.pattern("^[a-zA-Z0-9 :/-]{1,20}$".r, "error.formatting.accountId")
     val transactionId: Reads[TransactionId] = Reads.pattern("^[0-9]{1,10}$".r, "error.formatting.transactionId")
     val lifeEventId: Reads[LifeEventId] = Reads.pattern("^\\d{10}$".r, "error.formatting.lifeEventId")
+    val fundReleaseId: Reads[LifeEventId] = Reads.pattern("^\\d{10}$".r, "error.formatting.fundReleaseId")
+    val extensionId: Reads[LifeEventId] = Reads.pattern("^\\d{10}$".r, "error.formatting.extensionId")
     val lifeEventType: Reads[LifeEventType] = Reads.pattern("^(LISA Investor Terminal Ill Health|LISA Investor Death)$".r, "error.formatting.lifeEventType")
     val accountClosureReason: Reads[AccountClosureReason] = Reads.pattern(
       "^(All funds withdrawn|Cancellation)$".r,

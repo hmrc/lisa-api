@@ -922,12 +922,26 @@ types:
                             application/json:
                               type: !include schemas/ErrorCodes.schema.json
                               examples:
-                                lifeEventExists:
-                                  description: The investor’s purchase extension has already been reported
+                                accountClosed:
+                                  description: The LISA account is already closed
                                   value: |
                                     {
-                                      "code" : "EXTENSION_ALREADY_EXISTS",
-                                      "message" : "The investor’s purchase extension has already been reported"
+                                      "code" : "INVESTOR_ACCOUNT_ALREADY_CLOSED",
+                                      "message" : "The LISA account is already closed"
+                                    }
+                                accountCancelled:
+                                  description: The LISA account is already cancelled
+                                  value: |
+                                    {
+                                      "code" : "INVESTOR_ACCOUNT_ALREADY_CANCELLED",
+                                      "message" : "The LISA account is already cancelled"
+                                    }
+                                accountVoid:
+                                  description: The LISA account is already void
+                                  value: |
+                                    {
+                                      "code" : "INVESTOR_ACCOUNT_ALREADY_VOID",
+                                      "message" : "The LISA account is already void"
                                     }
                                 extensionNotApproved:
                                   description: A first extension has not been approved
@@ -935,44 +949,6 @@ types:
                                     {
                                       "code" : "FIRST_EXTENSION_NOT_APPROVED",
                                       "message" : "A first extension has not been approved"
-                                    }
-                                supersedingLifeEventMisMatchError:
-                                  description: originalExtensionId and the originalEventDate do not match the information in the original request
-                                  value: |
-                                    {
-                                      "code" : "SUPERSEDED_EXTENSION_MISMATCH_ERROR",
-                                      "message" : "originalExtensionId and the originalEventDate do not match the information in the original request"
-                                    }
-                        404:
-                          body:
-                            application/json:
-                              type: !include schemas/ErrorCodes.schema.json
-                              examples:
-                                accountNotFound:
-                                  description: The accountId does not match with HMRC’s records
-                                  value : |
-                                    {
-                                      "code" : "INVESTOR_ACCOUNTID_NOT_FOUND",
-                                      "message" : "The accountId does not match with HMRC’s records"
-                                    }
-                                fundReleaseNotFound:
-                                  description: The fundReleaseId does not match with HMRC’s records
-                                  value : |
-                                    {
-                                      "code" : "FUND_RELEASE_NOT_FOUND",
-                                      "message" : "The fundReleaseId does not match with HMRC’s records"
-                                    }
-                        409:
-                          body:
-                            application/json:
-                              type: !include schemas/ErrorCodes.schema.json
-                              examples:
-                                fundReleaseLifeEventAlreadySuperseded:
-                                  description: This fund release has already been superseded
-                                  value: |
-                                    {
-                                      "code" : "FUND_RELEASE_SUPERSEDED",
-                                      "message" : "This fund release has already been superseded"
                                     }
                                 firstExtensionAlreadyApproved:
                                   description: A first extension has already been approved
@@ -987,6 +963,51 @@ types:
                                     {
                                       "code" : "SECOND_EXTENSION_ALREADY_APPROVED",
                                       "message" : "A second extension has already been approved"
+                                    }
+                                supersedingLifeEventMisMatchError:
+                                  description: originalExtensionId and the originalEventDate do not match the information in the original request
+                                  value: |
+                                    {
+                                      "code" : "SUPERSEDED_EXTENSION_MISMATCH_ERROR",
+                                      "message" : "originalExtensionId and the originalEventDate do not match the information in the original request"
+                                    }
+                        404:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                accountNotFound:
+                                  description: The accountId does not match HMRC’s records
+                                  value : |
+                                    {
+                                      "code" : "INVESTOR_ACCOUNTID_NOT_FOUND",
+                                      "message" : "The accountId does not match HMRC’s records"
+                                    }
+                                fundReleaseNotFound:
+                                  description: The fundReleaseId does not match HMRC’s records
+                                  value : |
+                                    {
+                                      "code" : "FUND_RELEASE_NOT_FOUND",
+                                      "message" : "The fundReleaseId does not match HMRC’s records"
+                                    }
+                        409:
+                          body:
+                            application/json:
+                              type: !include schemas/ErrorCodes.schema.json
+                              examples:
+                                lifeEventExists:
+                                  description: The investor’s purchase extension has already been requested
+                                  value: |
+                                    {
+                                      "code" : "EXTENSION_ALREADY_EXISTS",
+                                      "message" : "The investor’s purchase extension has already been requested"
+                                    }
+                                fundReleaseLifeEventAlreadySuperseded:
+                                  description: This fund release has already been superseded
+                                  value: |
+                                    {
+                                      "code" : "FUND_RELEASE_SUPERSEDED",
+                                      "message" : "This fund release has already been superseded"
                                     }
                                 supersedingLifeEventAlreadySuperseded:
                                   description: This extension has already been superseded
@@ -1030,11 +1051,11 @@ types:
                                         "message": "originalPurchaseOutcomeId and the originalEventDate do not match the information in the original request"
                                       }
                                 fundReleaseNotFound:
-                                   description: The fundReleaseId does not match with HMRC’s records
+                                   description: The fundReleaseId does not match HMRC’s records
                                    value: |
                                       {
                                          "code" : "FUND_RELEASE_NOT_FOUND",
-                                         "message" : "The fundReleaseId does not match with HMRC’s records"
+                                         "message" : "The fundReleaseId does not match HMRC’s records"
                                       }
                         404:
                           body:
