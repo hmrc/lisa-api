@@ -187,8 +187,8 @@ case object ErrorFundReleaseAlreadySuperseded extends ErrorResponse(409, "SUPERS
 
 case object ErrorExtensionOneNotApproved extends ErrorResponse(403, "FIRST_EXTENSION_NOT_APPROVED", "A first extension has not been approved")
 case object ErrorExtensionMismatch extends ErrorResponse(403, "SUPERSEDED_EXTENSION_MISMATCH_ERROR", "originalExtensionId and the originalEventDate do not match the information in the original request")
-case object ErrorExtensionFundReleaseNotFound extends ErrorResponse(404, "FUND_RELEASE_NOT_FOUND", "The fundReleaseId does not match with HMRC’s records")
-case object ErrorExtensionAlreadyExists extends ErrorResponse(409, "EXTENSION_ALREADY_EXISTS", "The investor’s purchase extension has already been reported")
+case object ErrorExtensionFundReleaseNotFound extends ErrorResponse(404, "FUND_RELEASE_NOT_FOUND", "The fundReleaseId does not match HMRC’s records")
+case object ErrorExtensionAlreadyExists extends ErrorResponse(409, "EXTENSION_ALREADY_EXISTS", "The investor’s purchase extension has already been requested")
 case object ErrorExtensionFundReleaseSuperseded extends ErrorResponse(409, "FUND_RELEASE_SUPERSEDED", "This fund release has already been superseded")
 case object ErrorExtensionOneAlreadyApproved extends ErrorResponse(409, "FIRST_EXTENSION_ALREADY_APPROVED", "A first extension has already been approved")
 case object ErrorExtensionTwoAlreadyApproved extends ErrorResponse(409, "SECOND_EXTENSION_ALREADY_APPROVED", "A second extension has already been approved")

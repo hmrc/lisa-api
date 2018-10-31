@@ -569,7 +569,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
       doExtensionRequest(extensionJson){ res =>
         status(res) mustBe NOT_FOUND
         (contentAsJson(res) \ "code").as[String] mustBe "FUND_RELEASE_NOT_FOUND"
-        (contentAsJson(res) \ "message").as[String] mustBe "The fundReleaseId does not match with HMRC’s records"
+        (contentAsJson(res) \ "message").as[String] mustBe "The fundReleaseId does not match HMRC’s records"
       }
     }
 
@@ -578,7 +578,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
       doExtensionRequest(extensionJson){ res =>
         status(res) mustBe CONFLICT
         (contentAsJson(res) \ "code").as[String] mustBe "EXTENSION_ALREADY_EXISTS"
-        (contentAsJson(res) \ "message").as[String] mustBe "The investor’s purchase extension has already been reported"
+        (contentAsJson(res) \ "message").as[String] mustBe "The investor’s purchase extension has already been requested"
       }
     }
 

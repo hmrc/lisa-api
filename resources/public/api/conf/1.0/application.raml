@@ -923,25 +923,25 @@ types:
                               type: !include schemas/ErrorCodes.schema.json
                               examples:
                                 accountClosed:
-                                  description: The LISA account has already been closed
+                                  description: The LISA account is already closed
                                   value: |
                                     {
                                       "code" : "INVESTOR_ACCOUNT_ALREADY_CLOSED",
-                                      "message" : "The LISA account has already been closed"
+                                      "message" : "The LISA account is already closed"
                                     }
                                 accountCancelled:
-                                  description: The LISA account has already been cancelled
+                                  description: The LISA account is already cancelled
                                   value: |
                                     {
                                       "code" : "INVESTOR_ACCOUNT_ALREADY_CANCELLED",
-                                      "message" : "The LISA account has already been cancelled"
+                                      "message" : "The LISA account is already cancelled"
                                     }
                                 accountVoid:
-                                  description: The LISA account has already been voided
+                                  description: The LISA account is already void
                                   value: |
                                     {
                                       "code" : "INVESTOR_ACCOUNT_ALREADY_VOID",
-                                      "message" : "The LISA account has already been voided"
+                                      "message" : "The LISA account is already void"
                                     }
                                 extensionNotApproved:
                                   description: A first extension has not been approved
@@ -984,11 +984,11 @@ types:
                                       "message" : "The accountId does not match HMRC’s records"
                                     }
                                 fundReleaseNotFound:
-                                  description: The fundReleaseId does not match with HMRC’s records
+                                  description: The fundReleaseId does not match HMRC’s records
                                   value : |
                                     {
                                       "code" : "FUND_RELEASE_NOT_FOUND",
-                                      "message" : "The fundReleaseId does not match with HMRC’s records"
+                                      "message" : "The fundReleaseId does not match HMRC’s records"
                                     }
                         409:
                           body:
@@ -996,11 +996,11 @@ types:
                               type: !include schemas/ErrorCodes.schema.json
                               examples:
                                 lifeEventExists:
-                                  description: The investor’s purchase extension has already been reported
+                                  description: The investor’s purchase extension has already been requested
                                   value: |
                                     {
                                       "code" : "EXTENSION_ALREADY_EXISTS",
-                                      "message" : "The investor’s purchase extension has already been reported"
+                                      "message" : "The investor’s purchase extension has already been requested"
                                     }
                                 fundReleaseLifeEventAlreadySuperseded:
                                   description: This fund release has already been superseded
@@ -1051,11 +1051,11 @@ types:
                                         "message": "originalPurchaseOutcomeId and the originalEventDate do not match the information in the original request"
                                       }
                                 fundReleaseNotFound:
-                                   description: The fundReleaseId does not match with HMRC’s records
+                                   description: The fundReleaseId does not match HMRC’s records
                                    value: |
                                       {
                                          "code" : "FUND_RELEASE_NOT_FOUND",
-                                         "message" : "The fundReleaseId does not match with HMRC’s records"
+                                         "message" : "The fundReleaseId does not match HMRC’s records"
                                       }
                         404:
                           body:
