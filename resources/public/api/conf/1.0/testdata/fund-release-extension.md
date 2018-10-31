@@ -14,7 +14,7 @@
             <td>
                 <p>First purchase extension</p>
                 <p class="code--block">
-                    lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a>
+                    lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a>
                     <br>
                     accountId: 1234567890
                 </p>
@@ -45,7 +45,7 @@
             <td>
                 <p>Superseded first purchase extension</p>
                 <p class="code--block">
-                    lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a>
+                    lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a>
                     <br>
                     accountId: 1234567890
                 </p>
@@ -79,7 +79,7 @@
             <td>
                 <p>Second purchase extension</p>
                 <p class="code--block">
-                    lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a>
+                    lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a>
                     <br>
                     accountId: 1234567890
                 </p>
@@ -110,7 +110,7 @@
             <td>
                 <p>Superseded second purchase extension</p>
                 <p class="code--block">
-                    lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a>
+                    lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a>
                     <br>
                     accountId: 1234567890
                 </p>
@@ -171,7 +171,7 @@
             <td>
                 <p>Request with a valid payload and an invalid account ID</p>
                 <p class="code--block">
-                    lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a>
+                    lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a>
                     <br>
                     accountId: 1234%3D5678
                 </p>
@@ -198,7 +198,7 @@
             <td>
                 <p>Request containing invalid and/or missing data</p>
                 <p class="code--block">
-                    lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a>
+                    lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a>
                     <br>
                     accountId: 1234567890
                 </p>
@@ -245,7 +245,7 @@
             <td>
                 <p>The LISA account is already closed</p>
                 <p class="code--block">
-                    lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a>
+                    lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a>
                     <br>
                     accountId: 1000000403
                 </p>
@@ -272,7 +272,7 @@
             <td>
                 <p>The LISA account is already cancelled</p>
                 <p class="code--block">
-                    lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a>
+                    lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a>
                     <br>
                     accountId: 2000000403
                 </p>
@@ -299,7 +299,7 @@
             <td>
                 <p>The LISA account is already void</p>
                 <p class="code--block">
-                    lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a>
+                    lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a>
                     <br>
                     accountId: 3000000403
                 </p>
@@ -326,7 +326,7 @@
             <td>
                 <p>A first extension has not been approved</p>
                 <p class="code--block">
-                    lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a>
+                    lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a>
                     <br>
                     accountId: 7000000403
                 </p>
@@ -353,7 +353,7 @@
             <td>
                 <p>First extension already approved</p>
                 <p class="code--block">
-                    lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a>
+                    lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a>
                     <br>
                     accountId: 8000000403
                 </p>
@@ -380,7 +380,7 @@
             <td>
                 <p>Second extension already approved</p>
                 <p class="code--block">
-                    lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a>
+                    lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a>
                     <br>
                     accountId: 9000000403
                 </p>
@@ -407,7 +407,7 @@
             <td>
                 <p>Supersede details mismatch</p>
                 <p class="code--block">
-                    lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a>
+                    lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a>
                     <br>
                     accountId: 5000000403
                 </p>
@@ -437,7 +437,7 @@
             <td>
                 <p>Account not found</p>
                 <p class="code--block">
-                    lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a>
+                    lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a>
                     <br>
                     accountId: 0000000404
                 </p>
@@ -464,7 +464,7 @@
             <td>
                 <p>Fund release not found</p>
                 <p class="code--block">
-                    lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a>
+                    lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a>
                     <br>
                     accountId: 1000000404
                 </p>
@@ -491,7 +491,7 @@
             <td>
                 <p>Extension already exists</p>
                 <p class="code--block">
-                    lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a>
+                    lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a>
                     <br>
                     accountId: 0000000409
                 </p>
@@ -518,7 +518,7 @@
             <td>
                 <p>Fund release has been superseded</p>
                 <p class="code--block">
-                    lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a>
+                    lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a>
                     <br>
                     accountId: 2000000409
                 </p>
@@ -545,7 +545,7 @@
             <td>
                 <p>Extension already superseded</p>
                 <p class="code--block">
-                    lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a>
+                    lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a>
                     <br>
                     accountId: 1000000409
                 </p>
