@@ -76,7 +76,7 @@ class LifeEventController extends LisaController with LisaConstants {
         LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.EVENT)
         Forbidden(Json.toJson(ErrorLifeEventInappropriate))
       }
-      case ReportLifeEventAccountClosedResponse => {
+      case ReportLifeEventAccountClosedOrVoidResponse => {
         Logger.debug("Account Closed or VOID")
         doAudit(lisaManager, accountId, req, false, lifeEventAuditData(ErrorAccountAlreadyClosedOrVoid.errorCode))
         LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.EVENT)

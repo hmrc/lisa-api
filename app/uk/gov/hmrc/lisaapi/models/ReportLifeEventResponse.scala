@@ -16,29 +16,29 @@
 
 package uk.gov.hmrc.lisaapi.models
 
-import org.joda.time.DateTime
-import play.api.libs.functional.syntax._
-import play.api.libs.json._
-
 trait ReportLifeEventResponse
 
+@deprecated("Still valid for v1, but replaced in v2 by separate closed, void, and cancelled responses.")
+case object ReportLifeEventAccountClosedOrVoidResponse extends ReportLifeEventResponse
+
 case class ReportLifeEventSuccessResponse(lifeEventId: String) extends ReportLifeEventResponse
-case object ReportLifeEventErrorResponse extends ReportLifeEventResponse
-
 case object ReportLifeEventInappropriateResponse extends ReportLifeEventResponse
-case object ReportLifeEventAccountClosedResponse extends ReportLifeEventResponse
-case object ReportLifeEventAccountVoidResponse extends ReportLifeEventResponse
-case object ReportLifeEventAccountCancelledResponse extends ReportLifeEventResponse
-case object ReportLifeEventAlreadyExistsResponse extends ReportLifeEventResponse
+
+case object ReportLifeEventAccountClosedResponse extends ReportLifeEventResponse // new
+case object ReportLifeEventAccountVoidResponse extends ReportLifeEventResponse // new
+case object ReportLifeEventAccountCancelledResponse extends ReportLifeEventResponse // new
+
 case object ReportLifeEventAccountNotFoundResponse extends ReportLifeEventResponse
+case object ReportLifeEventAlreadyExistsResponse extends ReportLifeEventResponse
 
+case object ReportLifeEventAlreadySupersededResponse extends ReportLifeEventResponse // new
+case object ReportLifeEventMismatchResponse extends ReportLifeEventResponse // new
+case object ReportLifeEventAccountNotOpenLongEnoughResponse extends ReportLifeEventResponse // new
+case object ReportLifeEventOtherPurchaseOnRecordResponse extends ReportLifeEventResponse // new
+case object ReportLifeEventFundReleaseSupersededResponse extends ReportLifeEventResponse // new
+case object ReportLifeEventFundReleaseNotFoundResponse extends ReportLifeEventResponse // new
+case object ReportLifeEventExtensionOneAlreadyApprovedResponse extends ReportLifeEventResponse // new
+case object ReportLifeEventExtensionTwoAlreadyApprovedResponse extends ReportLifeEventResponse // new
+case object ReportLifeEventExtensionOneNotYetApprovedResponse extends ReportLifeEventResponse // new
 
-case class RequestLifeEventSuccessResponse(lifeEventId: String, eventType: LifeEventType, eventDate: DateTime) extends ReportLifeEventResponse
-
-object RequestLifeEventSuccessResponse {
-  implicit val writes: Writes[RequestLifeEventSuccessResponse] = (
-    (JsPath \ "lifeEventId").write[String] and
-    (JsPath \ "eventType").write[String] and
-    (JsPath \ "eventDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd"))
-  ) (unlift(RequestLifeEventSuccessResponse.unapply))
-}
+case object ReportLifeEventErrorResponse extends ReportLifeEventResponse

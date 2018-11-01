@@ -246,7 +246,7 @@ class LifeEventControllerSpec extends PlaySpec
     }
 
     "return with 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID" in {
-      when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful((ReportLifeEventAccountClosedResponse)))
+      when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful((ReportLifeEventAccountClosedOrVoidResponse)))
       doReportLifeEventRequest(reportLifeEventJson){res =>
         status(res) mustBe (FORBIDDEN)
         (contentAsJson(res) \"code").as[String] mustBe ("INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID")
