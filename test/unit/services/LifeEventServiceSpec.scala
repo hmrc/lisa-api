@@ -91,8 +91,6 @@ class LifeEventServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuit
       }
     }
 
-    /* ********************************************* */
-
     "return ReportLifeEventAlreadySupersededResponse" when {
       "the error code is SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED" in {
         when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED","")))
@@ -155,9 +153,6 @@ class LifeEventServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuit
         doRequest(response => response mustBe ReportLifeEventExtensionOneNotYetApprovedResponse)
       }
     }
-
-
-    /* ********************************************* */
 
     "return ReportLifeEventErrorResponse" when {
       "the error code doesn't match any of the previous values" in {
