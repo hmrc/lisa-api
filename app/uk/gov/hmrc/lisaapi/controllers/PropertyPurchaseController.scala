@@ -134,7 +134,6 @@ class PropertyPurchaseController extends LisaController with LisaConstants {
       }
   }
 
-
   // scalastyle:off cyclomatic.complexity
   // scalastyle:off method.length
   def requestExtension(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async {

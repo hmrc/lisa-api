@@ -20,7 +20,7 @@ import org.joda.time.DateTime
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 
-trait RequestPurchaseOutcomeRequest
+trait RequestPurchaseOutcomeRequest extends ReportLifeEventRequestBase
 
 case class RequestPurchaseOutcomeStandardRequest (
   fundReleaseId: FundReleaseId,
@@ -114,7 +114,7 @@ object RequestPurchaseOutcomeRequest {
     }
   }
 
-  implicit val writes: Writes[RequestPurchaseOutcomeRequest] = Writes[RequestPurchaseOutcomeRequest] {
+  val desWrites: Writes[RequestPurchaseOutcomeRequest] = Writes[RequestPurchaseOutcomeRequest] {
     case s: RequestPurchaseOutcomeSupersededRequest => supersedeWrites.writes(s)
     case i: RequestPurchaseOutcomeStandardRequest => initialWrites.writes(i)
   }

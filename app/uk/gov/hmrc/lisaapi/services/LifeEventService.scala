@@ -29,7 +29,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 trait LifeEventService {
   val desConnector: DesConnector
 
-  def reportLifeEvent(lisaManager: String, accountId: String, request: ReportLifeEventRequest)(implicit hc: HeaderCarrier): Future[ReportLifeEventResponse] = {
+  def reportLifeEvent(lisaManager: String, accountId: String, request: ReportLifeEventRequestBase)(implicit hc: HeaderCarrier): Future[ReportLifeEventResponse] = {
     val response = desConnector.reportLifeEvent(lisaManager, accountId, request)
 
     response map {

@@ -166,12 +166,12 @@ trait DesConnector extends ServicesConfig {
   /**
     * Attempts to report a LISA Life Event
     */
-  def reportLifeEvent(lisaManager: String, accountId: String, request: ReportLifeEventRequest)
+  def reportLifeEvent(lisaManager: String, accountId: String, request: ReportLifeEventRequestBase)
                      (implicit hc: HeaderCarrier): Future[DesResponse] = {
 
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/life-event"
     Logger.debug("Posting Life Event request to des: " + uri)
-    val result = httpPost.POST[ReportLifeEventRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
+    val result = httpPost.POST[ReportLifeEventRequestBase, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
 
     result.map(res => {
       Logger.debug("Life Event request returned status: " + res.status)
