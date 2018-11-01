@@ -20,7 +20,7 @@ import org.joda.time.DateTime
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 
-abstract class RequestPurchaseExtension extends Product {
+abstract class RequestPurchaseExtension extends ReportLifeEventRequestBase {
   val eventDate: DateTime
   val eventType: LifeEventType
 }
@@ -81,7 +81,7 @@ object RequestPurchaseExtension {
     }
   }
 
-  implicit val traitWrites: Writes[RequestPurchaseExtension] = Writes[RequestPurchaseExtension] {
+  val desWrites: Writes[RequestPurchaseExtension] = Writes[RequestPurchaseExtension] {
     case std: RequestStandardPurchaseExtension => standardWrites.writes(std)
     case sup: RequestSupersededPurchaseExtension => supersededWrites.writes(sup)
   }

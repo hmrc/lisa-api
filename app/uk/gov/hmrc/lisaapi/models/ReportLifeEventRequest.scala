@@ -20,13 +20,15 @@ import org.joda.time.DateTime
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsPath, Reads, Writes}
 
-trait ReportLifeEventRequestBase
+trait ReportLifeEventRequestBase extends Product
 
 case class ReportLifeEventRequest(eventType: LifeEventType,  eventDate: DateTime) extends ReportLifeEventRequestBase
 
 object ReportLifeEventRequestBase {
   implicit val writes: Writes[ReportLifeEventRequestBase] = Writes[ReportLifeEventRequestBase] {
     case deathTerminalIllness: ReportLifeEventRequest => ReportLifeEventRequest.desWrites.writes(deathTerminalIllness)
+    case fundRelease: RequestFundReleaseRequest => RequestFundReleaseRequest.desWrites.writes(fundRelease)
+    case purchaseExtension: RequestPurchaseExtension => RequestPurchaseExtension.desWrites.writes(purchaseExtension)
     case purchaseOutcome: RequestPurchaseOutcomeRequest => RequestPurchaseOutcomeRequest.desWrites.writes(purchaseOutcome)
   }
 }
