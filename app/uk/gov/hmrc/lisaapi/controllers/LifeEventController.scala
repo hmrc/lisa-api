@@ -94,8 +94,8 @@ class LifeEventController extends LisaController with LisaConstants {
         LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.EVENT)
         NotFound(Json.toJson(ErrorAccountNotFound))
       }
-      case _ => {
-        Logger.debug("Matched Error")
+      case unexpected:ReportLifeEventResponse => {
+        Logger.debug(s"Matched an unexpected response: $unexpected, returning a 500 error")
         doAudit(lisaManager, accountId, req, false, lifeEventAuditData(ErrorInternalServerError.errorCode))
         LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.EVENT)
         InternalServerError(Json.toJson(ErrorInternalServerError))

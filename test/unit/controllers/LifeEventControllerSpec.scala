@@ -36,8 +36,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 
-case object ReportTest extends ReportLifeEventResponse
-
 class LifeEventControllerSpec extends PlaySpec
   with MockitoSugar
   with OneAppPerSuite
@@ -270,8 +268,8 @@ class LifeEventControllerSpec extends PlaySpec
       }
     }
 
-    "return with 500 internal server error when the wrong event is returned" in {
-      when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportTest))
+    "return with 500 internal server error when an unexpected response is returned" in {
+      when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventFundReleaseNotFoundResponse))
       doReportLifeEventRequest(reportLifeEventJson){res =>
         status(res) mustBe INTERNAL_SERVER_ERROR
         (contentAsJson(res) \ "code").as[String] mustBe "INTERNAL_SERVER_ERROR"
