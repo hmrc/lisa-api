@@ -40,35 +40,33 @@ trait LifeEventService {
       }
       case failureResponse: DesFailureResponse => {
         Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
-        handleFailureResponse(failureResponse)
+
+        errorResponses.getOrElse(failureResponse.code, {
+          Logger.warn(s"Report life event returned error: ${failureResponse.code}")
+          ReportLifeEventErrorResponse
+        })
       }
     }
   }
 
-  private def handleFailureResponse(failureResponse: DesFailureResponse): ReportLifeEventResponse = {
-    failureResponse.code match {
-      case "LIFE_EVENT_ALREADY_EXISTS" => ReportLifeEventAlreadyExistsResponse
-      case "LIFE_EVENT_INAPPROPRIATE" => ReportLifeEventInappropriateResponse
-      case "INVESTOR_ACCOUNTID_NOT_FOUND" => ReportLifeEventAccountNotFoundResponse
-      case "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID" => ReportLifeEventAccountClosedOrVoidResponse
-      case "INVESTOR_ACCOUNT_ALREADY_CLOSED" => ReportLifeEventAccountClosedResponse
-      case "INVESTOR_ACCOUNT_ALREADY_VOID" => ReportLifeEventAccountVoidResponse
-      case "INVESTOR_ACCOUNT_ALREADY_CANCELLED" => ReportLifeEventAccountCancelledResponse
-      case "SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED" => ReportLifeEventAlreadySupersededResponse
-      case "SUPERSEDING_LIFE_EVENT_MISMATCH" => ReportLifeEventMismatchResponse
-      case "COMPLIANCE_ERROR_ACCOUNT_NOT_OPEN_LONG_ENOUGH" => ReportLifeEventAccountNotOpenLongEnoughResponse
-      case "COMPLIANCE_ERROR_OTHER_PURCHASE_ON_RECORD" => ReportLifeEventOtherPurchaseOnRecordResponse
-      case "FUND_RELEASE_LIFE_EVENT_ID_SUPERSEDED" => ReportLifeEventFundReleaseSupersededResponse
-      case "FUND_RELEASE_LIFE_EVENT_ID_NOT_FOUND" => ReportLifeEventFundReleaseNotFoundResponse
-      case "PURCHASE_EXTENSION_1_LIFE_EVENT_ALREADY_APPROVED" => ReportLifeEventExtensionOneAlreadyApprovedResponse
-      case "PURCHASE_EXTENSION_2_LIFE_EVENT_ALREADY_APPROVED" => ReportLifeEventExtensionTwoAlreadyApprovedResponse
-      case "PURCHASE_EXTENSION_1_LIFE_EVENT_NOT_YET_APPROVED" => ReportLifeEventExtensionOneNotYetApprovedResponse
-      case _ => {
-        Logger.warn(s"Report life event returned error: ${failureResponse.code}")
-        ReportLifeEventErrorResponse
-      }
-    }
-  }
+  private val errorResponses = Map[String, ReportLifeEventResponse](
+    "LIFE_EVENT_ALREADY_EXISTS" -> ReportLifeEventAlreadyExistsResponse,
+    "LIFE_EVENT_INAPPROPRIATE" -> ReportLifeEventInappropriateResponse,
+    "INVESTOR_ACCOUNTID_NOT_FOUND" -> ReportLifeEventAccountNotFoundResponse,
+    "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID" -> ReportLifeEventAccountClosedOrVoidResponse,
+    "INVESTOR_ACCOUNT_ALREADY_CLOSED" -> ReportLifeEventAccountClosedResponse,
+    "INVESTOR_ACCOUNT_ALREADY_VOID" -> ReportLifeEventAccountVoidResponse,
+    "INVESTOR_ACCOUNT_ALREADY_CANCELLED" -> ReportLifeEventAccountCancelledResponse,
+    "SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED" -> ReportLifeEventAlreadySupersededResponse,
+    "SUPERSEDING_LIFE_EVENT_MISMATCH" -> ReportLifeEventMismatchResponse,
+    "COMPLIANCE_ERROR_ACCOUNT_NOT_OPEN_LONG_ENOUGH" -> ReportLifeEventAccountNotOpenLongEnoughResponse,
+    "COMPLIANCE_ERROR_OTHER_PURCHASE_ON_RECORD" -> ReportLifeEventOtherPurchaseOnRecordResponse,
+    "FUND_RELEASE_LIFE_EVENT_ID_SUPERSEDED" -> ReportLifeEventFundReleaseSupersededResponse,
+    "FUND_RELEASE_LIFE_EVENT_ID_NOT_FOUND" -> ReportLifeEventFundReleaseNotFoundResponse,
+    "PURCHASE_EXTENSION_1_LIFE_EVENT_ALREADY_APPROVED" -> ReportLifeEventExtensionOneAlreadyApprovedResponse,
+    "PURCHASE_EXTENSION_2_LIFE_EVENT_ALREADY_APPROVED" -> ReportLifeEventExtensionTwoAlreadyApprovedResponse,
+    "PURCHASE_EXTENSION_1_LIFE_EVENT_NOT_YET_APPROVED" -> ReportLifeEventExtensionOneNotYetApprovedResponse
+  )
 }
 
 object LifeEventService extends LifeEventService{
