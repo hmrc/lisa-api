@@ -17,8 +17,8 @@
 package uk.gov.hmrc.lisaapi.controllers
 
 import play.api.Logger
-import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent, Result}
+import play.api.libs.json.{JsValue, Json}
+import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
@@ -34,6 +34,18 @@ class PropertyPurchaseController extends LisaController with LisaConstants {
   val service: PropertyPurchaseService = PropertyPurchaseService
   val auditService: AuditService = AuditService
 
+  private def validDataIsProvided(req: Option[JsValue]) = {
+    req match {
+      case None => false
+      case Some(json) => {
+        (json \ "supersede").asOpt[JsValue].isDefined && (
+          (json \ "conveyancerReference").asOpt[JsValue].isDefined ||
+          (json \ "propertyDetails").asOpt[JsValue].isDefined
+        )
+      }
+    }
+  }
+
   // scalastyle:off cyclomatic.complexity
   // scalastyle:off method.length
   def requestFundRelease(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async {
@@ -43,8 +55,16 @@ class PropertyPurchaseController extends LisaController with LisaConstants {
       withValidLMRN(lisaManager) { () =>
         withValidAccountId(accountId) { () =>
           withValidJson[RequestFundReleaseRequest](
-            req =>
-              if (req.eventDate.isBefore(LISA_START_DATE)) {
+            req => {
+              if (validDataIsProvided(request.body.asJson)) {
+                Logger.debug("Fund release not reported - conveyancer and/or property details included on a supersede request")
+
+                doFundReleaseAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorInvalidDataProvided.errorCode))
+                LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
+
+                Future.successful(Forbidden(Json.toJson(ErrorInvalidDataProvided)))
+              }
+              else if (req.eventDate.isBefore(LISA_START_DATE)) {
                 Logger.debug("Fund release not reported - invalid event date")
 
                 doFundReleaseAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> "FORBIDDEN"))
@@ -61,8 +81,8 @@ class PropertyPurchaseController extends LisaController with LisaConstants {
                     doFundReleaseAudit(lisaManager, accountId, req, true)
                     LisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.PROPERTY_PURCHASE)
                     val data = req match {
-                      case _:InitialFundReleaseRequest => ApiResponseData(message = "Fund release created", fundReleaseId = Some(res.id))
-                      case _:SupersedeFundReleaseRequest => ApiResponseData(message = "Fund release superseded", fundReleaseId = Some(res.id))
+                      case _: InitialFundReleaseRequest => ApiResponseData(message = "Fund release created", fundReleaseId = Some(res.id))
+                      case _: SupersedeFundReleaseRequest => ApiResponseData(message = "Fund release superseded", fundReleaseId = Some(res.id))
                     }
                     Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
                   }
@@ -127,7 +147,8 @@ class PropertyPurchaseController extends LisaController with LisaConstants {
                     InternalServerError(Json.toJson(ErrorInternalServerError))
                   }
                 }
-              },
+              }
+            },
             lisaManager = lisaManager
           )
         }

@@ -864,6 +864,13 @@ types:
                                     "code" : "SUPERSEDED_FUND_RELEASE_MISMATCH_ERROR",
                                     "message" : "originalFundReleaseId and the originalEventDate do not match the information in the original request"
                                   }
+                              invalidDataProvided:
+                                description: You can only change eventDate or withdrawalAmount when superseding a property purchase fund release
+                                value: |
+                                  {
+                                    "code" : "INVALID_DATA_PROVIDED",
+                                    "message" : "You can only change eventDate or withdrawalAmount when superseding a property purchase fund release"
+                                  }
                       404:
                         body:
                           application/json:
