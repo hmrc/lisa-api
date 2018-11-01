@@ -775,7 +775,78 @@ class PropertyPurchaseControllerSpec extends PlaySpec
       }
     }
 
-    // TODO: Add all error scenarios for this endpoint
+    "return with 403 forbidden and a code of SUPERSEDED_PURCHASE_OUTCOME_MISMATCH_ERROR" in {
+      when(mockService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventMismatchResponse))
+      doOutcomeRequest(outcomeJson) { res =>
+        status(res) mustBe FORBIDDEN
+        (contentAsJson(res) \ "code").as[String] mustBe "SUPERSEDED_PURCHASE_OUTCOME_MISMATCH_ERROR"
+        (contentAsJson(res) \ "message").as[String] mustBe "originalPurchaseOutcomeId and the originalEventDate do not match the information in the original request"
+      }
+    }
+
+    "return with 404 not found and a code of FUND_RELEASE_NOT_FOUND" in {
+      when(mockService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventFundReleaseNotFoundResponse))
+      doOutcomeRequest(outcomeJson) { res =>
+        status(res) mustBe NOT_FOUND
+        (contentAsJson(res) \ "code").as[String] mustBe "FUND_RELEASE_NOT_FOUND"
+        (contentAsJson(res) \ "message").as[String] mustBe "The fundReleaseId does not match HMRC’s records"
+      }
+    }
+
+    "return with 404 not found and a code of INVESTOR_ACCOUNTID_NOT_FOUND" in {
+      when(mockService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventAccountNotFoundResponse))
+      doOutcomeRequest(outcomeJson) { res =>
+        status(res) mustBe NOT_FOUND
+        (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNTID_NOT_FOUND"
+        (contentAsJson(res) \ "message").as[String] mustBe "The accountId does not match HMRC’s records"
+      }
+    }
+
+    "return with 409 conflict and a code of FUND_RELEASE_SUPERSEDED" in {
+      when(mockService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventFundReleaseSupersededResponse))
+      doOutcomeRequest(outcomeJson) { res =>
+        status(res) mustBe CONFLICT
+        (contentAsJson(res) \ "code").as[String] mustBe "FUND_RELEASE_SUPERSEDED"
+        (contentAsJson(res) \ "message").as[String] mustBe "This fund release has already been superseded"
+      }
+    }
+
+    "return with 409 conflict and a code of SUPERSEDED_PURCHASE_OUTCOME_ALREADY_SUPERSEDED" in {
+      when(mockService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventAlreadySupersededResponse))
+      doOutcomeRequest(outcomeJson) { res =>
+        status(res) mustBe CONFLICT
+        (contentAsJson(res) \ "code").as[String] mustBe "SUPERSEDED_PURCHASE_OUTCOME_ALREADY_SUPERSEDED"
+        (contentAsJson(res) \ "message").as[String] mustBe "This purchase outcome has already been superseded"
+      }
+    }
+
+    "return with 409 conflict and a code of PURCHASE_OUTCOME_ALREADY_EXISTS" in {
+      when(mockService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventAlreadyExistsResponse))
+      doOutcomeRequest(outcomeJson) { res =>
+        status(res) mustBe CONFLICT
+        (contentAsJson(res) \ "code").as[String] mustBe "PURCHASE_OUTCOME_ALREADY_EXISTS"
+        (contentAsJson(res) \ "message").as[String] mustBe "The investor’s purchase outcome has already been reported"
+      }
+    }
+
+    "return with 500 internal server error and a code of INTERNAL_SERVER_ERROR" when {
+      "given a generic error response from the service layer" in {
+        when(mockService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventErrorResponse))
+        doOutcomeRequest(outcomeJson) { res =>
+          status(res) mustBe INTERNAL_SERVER_ERROR
+          (contentAsJson(res) \ "code").as[String] mustBe "INTERNAL_SERVER_ERROR"
+          (contentAsJson(res) \ "message").as[String] mustBe "Internal server error"
+        }
+      }
+      "given a unexpected error response from the service layer" in {
+        when(mockService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventOtherPurchaseOnRecordResponse))
+        doOutcomeRequest(outcomeJson) { res =>
+          status(res) mustBe INTERNAL_SERVER_ERROR
+          (contentAsJson(res) \ "code").as[String] mustBe "INTERNAL_SERVER_ERROR"
+          (contentAsJson(res) \ "message").as[String] mustBe "Internal server error"
+        }
+      }
+    }
 
   }
 

@@ -18,11 +18,11 @@ package uk.gov.hmrc.lisaapi.controllers
 
 import play.api.Logger
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent}
+import play.api.mvc.{Action, AnyContent, Result}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.lisaapi.LisaConstants
+import uk.gov.hmrc.lisaapi.{LisaConstants, controllers}
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
-import uk.gov.hmrc.lisaapi.models._
+import uk.gov.hmrc.lisaapi.models.{ReportLifeEventFundReleaseNotFoundResponse, _}
 import uk.gov.hmrc.lisaapi.services.{AuditService, LifeEventService}
 import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
 
@@ -216,9 +216,9 @@ class PropertyPurchaseController extends LisaController with LisaConstants {
                   }
                   case ReportLifeEventFundReleaseNotFoundResponse => {
                     Logger.debug("Extension fund release not found")
-                    doExtensionAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorExtensionFundReleaseNotFound.errorCode))
+                    doExtensionAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorFundReleaseNotFound.errorCode))
                     LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.PROPERTY_PURCHASE)
-                    NotFound(Json.toJson(ErrorExtensionFundReleaseNotFound))
+                    NotFound(Json.toJson(ErrorFundReleaseNotFound))
                   }
                   case ReportLifeEventAlreadyExistsResponse => {
                     Logger.debug("Extension already exists")
@@ -228,9 +228,9 @@ class PropertyPurchaseController extends LisaController with LisaConstants {
                   }
                   case ReportLifeEventFundReleaseSupersededResponse => {
                     Logger.debug("Extension fund release superseded")
-                    doExtensionAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorExtensionFundReleaseSuperseded.errorCode))
+                    doExtensionAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorFundReleaseSuperseded.errorCode))
                     LisaMetrics.incrementMetrics(startTime, CONFLICT, LisaMetricKeys.PROPERTY_PURCHASE)
-                    Conflict(Json.toJson(ErrorExtensionFundReleaseSuperseded))
+                    Conflict(Json.toJson(ErrorFundReleaseSuperseded))
                   }
                   case ReportLifeEventAlreadySupersededResponse => {
                     Logger.debug("Extension already superseded")
@@ -277,16 +277,21 @@ class PropertyPurchaseController extends LisaController with LisaConstants {
                     doOutcomeAudit(lisaManager, accountId, req, true)
                     LisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.PROPERTY_PURCHASE)
                     val data = req match {
-                      case _: RequestPurchaseOutcomeStandardRequest => ApiResponseData(message = "Purchase outcome created", extensionId = Some(res.lifeEventId))
-                      case _: RequestPurchaseOutcomeSupersededRequest => ApiResponseData(message = "Purchase outcome superseded", extensionId = Some(res.lifeEventId))
+                      case _: RequestPurchaseOutcomeStandardRequest => {
+                        ApiResponseData(message = "Purchase outcome created", extensionId = Some(res.lifeEventId))
+                      }
+                      case _: RequestPurchaseOutcomeSupersededRequest => {
+                        ApiResponseData(message = "Purchase outcome superseded", extensionId = Some(res.lifeEventId))
+                      }
                     }
                     Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
                   }
-                  case unexpected: ReportLifeEventResponse => {
-                    Logger.debug(s"Purchase outcome error: $unexpected")
-                    doOutcomeAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorInternalServerError.errorCode))
-                    LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.PROPERTY_PURCHASE)
-                    InternalServerError(Json.toJson(ErrorInternalServerError))
+                  case res: ReportLifeEventResponse => {
+                    val response = outcomeErrors.getOrElse(res, ErrorInternalServerError)
+                    Logger.debug(s"Purchase outcome received $res, responding with $response")
+                    doOutcomeAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> response.errorCode))
+                    LisaMetrics.incrementMetrics(startTime, response.httpStatusCode, LisaMetricKeys.PROPERTY_PURCHASE)
+                    Status(response.httpStatusCode)(Json.toJson(response))
                   }
                 }
               },
@@ -296,7 +301,20 @@ class PropertyPurchaseController extends LisaController with LisaConstants {
       }
   }
 
-  private def doFundReleaseAudit(lisaManager: String, accountId: String, req: RequestFundReleaseRequest, success: Boolean, extraData: Map[String, String] = Map())
+  private val outcomeErrors = Map[ReportLifeEventResponse, ErrorResponse] (
+    ReportLifeEventMismatchResponse -> ErrorOutcomeMismatch,
+    ReportLifeEventFundReleaseNotFoundResponse -> ErrorFundReleaseNotFound,
+    ReportLifeEventAccountNotFoundResponse -> ErrorAccountNotFound,
+    ReportLifeEventFundReleaseSupersededResponse -> ErrorFundReleaseSuperseded,
+    ReportLifeEventAlreadySupersededResponse -> ErrorOutcomeAlreadySuperseded,
+    ReportLifeEventAlreadyExistsResponse -> ErrorOutcomeAlreadyExists
+  )
+
+  private def doFundReleaseAudit(lisaManager: String,
+                                 accountId: String,
+                                 req: RequestFundReleaseRequest,
+                                 success: Boolean,
+                                 extraData: Map[String, String] = Map())
                                 (implicit hc: HeaderCarrier) = {
     auditService.audit(
       auditType = if (success) "fundReleaseReported" else "fundReleaseNotReported",
@@ -308,7 +326,11 @@ class PropertyPurchaseController extends LisaController with LisaConstants {
     )
   }
 
-  private def doExtensionAudit(lisaManager: String, accountId: String, req: RequestPurchaseExtension, success: Boolean, extraData: Map[String, String] = Map())
+  private def doExtensionAudit(lisaManager: String,
+                               accountId: String,
+                               req: RequestPurchaseExtension,
+                               success: Boolean,
+                               extraData: Map[String, String] = Map())
                                 (implicit hc: HeaderCarrier) = {
     auditService.audit(
       auditType = if (success) "extensionReported" else "extensionNotReported",
@@ -320,7 +342,11 @@ class PropertyPurchaseController extends LisaController with LisaConstants {
     )
   }
 
-  private def doOutcomeAudit(lisaManager: String, accountId: String, req: RequestPurchaseOutcomeRequest, success: Boolean, extraData: Map[String, String] = Map())
+  private def doOutcomeAudit(lisaManager: String,
+                             accountId: String,
+                             req: RequestPurchaseOutcomeRequest,
+                             success: Boolean,
+                             extraData: Map[String, String] = Map())
                             (implicit hc: HeaderCarrier) = {
     auditService.audit(
       auditType = if (success) "purchaseOutcomeReported" else "purchaseOutcomeNotReported",

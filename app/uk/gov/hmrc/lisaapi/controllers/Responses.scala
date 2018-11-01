@@ -187,14 +187,16 @@ case object ErrorFundReleaseAlreadySuperseded extends ErrorResponse(409, "SUPERS
 
 case object ErrorExtensionOneNotApproved extends ErrorResponse(403, "FIRST_EXTENSION_NOT_APPROVED", "A first extension has not been approved")
 case object ErrorExtensionMismatch extends ErrorResponse(403, "SUPERSEDED_EXTENSION_MISMATCH_ERROR", "originalExtensionId and the originalEventDate do not match the information in the original request")
-case object ErrorExtensionFundReleaseNotFound extends ErrorResponse(404, "FUND_RELEASE_NOT_FOUND", "The fundReleaseId does not match HMRC’s records")
+case object ErrorFundReleaseNotFound extends ErrorResponse(404, "FUND_RELEASE_NOT_FOUND", "The fundReleaseId does not match HMRC’s records")
 case object ErrorExtensionAlreadyExists extends ErrorResponse(409, "EXTENSION_ALREADY_EXISTS", "The investor’s purchase extension has already been requested")
-case object ErrorExtensionFundReleaseSuperseded extends ErrorResponse(409, "FUND_RELEASE_SUPERSEDED", "This fund release has already been superseded")
+case object ErrorFundReleaseSuperseded extends ErrorResponse(409, "FUND_RELEASE_SUPERSEDED", "This fund release has already been superseded")
 case object ErrorExtensionOneAlreadyApproved extends ErrorResponse(409, "FIRST_EXTENSION_ALREADY_APPROVED", "A first extension has already been approved")
 case object ErrorExtensionTwoAlreadyApproved extends ErrorResponse(409, "SECOND_EXTENSION_ALREADY_APPROVED", "A second extension has already been approved")
 case object ErrorExtensionAlreadySuperseded extends ErrorResponse(409, "SUPERSEDED_EXTENSION_ALREADY_SUPERSEDED", "This extension has already been superseded")
 
-
+case object ErrorOutcomeMismatch extends ErrorResponse(403, "SUPERSEDED_PURCHASE_OUTCOME_MISMATCH_ERROR", "originalPurchaseOutcomeId and the originalEventDate do not match the information in the original request")
+case object ErrorOutcomeAlreadyExists extends ErrorResponse(409, "PURCHASE_OUTCOME_ALREADY_EXISTS", "The investor’s purchase outcome has already been reported")
+case object ErrorOutcomeAlreadySuperseded extends ErrorResponse(409, "SUPERSEDED_PURCHASE_OUTCOME_ALREADY_SUPERSEDED", "This purchase outcome has already been superseded")
 
 object ErrorInvestorAlreadyExists {
 
