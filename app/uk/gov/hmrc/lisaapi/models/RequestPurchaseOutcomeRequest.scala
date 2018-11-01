@@ -20,7 +20,9 @@ import org.joda.time.DateTime
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 
-trait RequestPurchaseOutcomeRequest extends ReportLifeEventRequestBase
+trait RequestPurchaseOutcomeRequest extends ReportLifeEventRequestBase {
+  val eventDate: DateTime
+}
 
 case class RequestPurchaseOutcomeStandardRequest (
   fundReleaseId: FundReleaseId,

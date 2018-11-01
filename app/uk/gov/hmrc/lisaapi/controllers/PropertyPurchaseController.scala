@@ -252,6 +252,50 @@ class PropertyPurchaseController extends LisaController with LisaConstants {
       }
   }
 
+  def reportPurchaseOutcome(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async {
+    implicit request =>
+      implicit val startTime = System.currentTimeMillis()
+
+      withValidLMRN(lisaManager) { () =>
+        withValidAccountId(accountId) { () =>
+          withValidJson[RequestPurchaseOutcomeRequest](
+            req =>
+              if (req.eventDate.isBefore(LISA_START_DATE)) {
+                Logger.debug("Purchase outcome not reported - invalid event date")
+
+                doOutcomeAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> "FORBIDDEN"))
+                LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
+
+                Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
+                  ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("eventDate"), Some("/eventDate"))
+                )))))
+              }
+              else {
+                service.reportLifeEvent(lisaManager, accountId, req) map {
+                  case res: ReportLifeEventSuccessResponse => {
+                    Logger.debug("Purchase outcome successful")
+                    doOutcomeAudit(lisaManager, accountId, req, true)
+                    LisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.PROPERTY_PURCHASE)
+                    val data = req match {
+                      case _: RequestPurchaseOutcomeStandardRequest => ApiResponseData(message = "Purchase outcome created", extensionId = Some(res.lifeEventId))
+                      case _: RequestPurchaseOutcomeSupersededRequest => ApiResponseData(message = "Purchase outcome superseded", extensionId = Some(res.lifeEventId))
+                    }
+                    Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
+                  }
+                  case unexpected: ReportLifeEventResponse => {
+                    Logger.debug(s"Purchase outcome error: $unexpected")
+                    doOutcomeAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorInternalServerError.errorCode))
+                    LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.PROPERTY_PURCHASE)
+                    InternalServerError(Json.toJson(ErrorInternalServerError))
+                  }
+                }
+              },
+            lisaManager = lisaManager
+          )
+        }
+      }
+  }
+
   private def doFundReleaseAudit(lisaManager: String, accountId: String, req: RequestFundReleaseRequest, success: Boolean, extraData: Map[String, String] = Map())
                                 (implicit hc: HeaderCarrier) = {
     auditService.audit(
@@ -269,6 +313,18 @@ class PropertyPurchaseController extends LisaController with LisaConstants {
     auditService.audit(
       auditType = if (success) "extensionReported" else "extensionNotReported",
       path = s"/manager/$lisaManager/accounts/$accountId/property-purchase/extension",
+      auditData = req.toStringMap ++ Map(
+        "lisaManagerReferenceNumber" -> lisaManager,
+        "accountID" -> accountId
+      ) ++ extraData
+    )
+  }
+
+  private def doOutcomeAudit(lisaManager: String, accountId: String, req: RequestPurchaseOutcomeRequest, success: Boolean, extraData: Map[String, String] = Map())
+                            (implicit hc: HeaderCarrier) = {
+    auditService.audit(
+      auditType = if (success) "purchaseOutcomeReported" else "purchaseOutcomeNotReported",
+      path = s"/manager/$lisaManager/accounts/$accountId/property-purchase/outcome",
       auditData = req.toStringMap ++ Map(
         "lisaManagerReferenceNumber" -> lisaManager,
         "accountID" -> accountId

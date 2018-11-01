@@ -95,6 +95,28 @@ class PropertyPurchaseControllerSpec extends PlaySpec
 }
 """
 
+  val outcomeJson = """
+{
+  "fundReleaseId": "3456789000",
+  "eventDate": "2017-05-05",
+  "propertyPurchaseResult": "Purchase completed",
+  "propertyPurchaseValue": 250000
+}
+"""
+
+  val supersededOutcomeJson = """
+{
+  "fundReleaseId": "3456789000",
+  "eventDate": "2017-06-10",
+  "propertyPurchaseResult": "Purchase completed",
+  "propertyPurchaseValue": 250000,
+  "supersede": {
+    "originalPurchaseOutcomeId": "5678900001",
+    "originalEventDate": "2017-05-05"
+  }
+}
+"""
+
   "Request Fund Release" should {
 
     "audit fundReleaseReported" when {
@@ -138,7 +160,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
     }
 
     "audit fundReleaseNotReported" when {
-      "the request results in a PropertyPurchaseErrorResponse" in {
+      "the request results in a ReportLifeEventErrorResponse" in {
         when(mockService.reportLifeEvent(any(), any(), any())(any()))
           .thenReturn(Future.successful(ReportLifeEventErrorResponse))
 
@@ -381,7 +403,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
     }
 
     "audit extensionNotReported" when {
-      "the request results in a PropertyPurchaseErrorResponse" in {
+      "the request results in a ReportLifeEventErrorResponse" in {
         when(mockService.reportLifeEvent(any(), any(), any())(any()))
           .thenReturn(Future.successful(ReportLifeEventErrorResponse))
 
@@ -611,8 +633,154 @@ class PropertyPurchaseControllerSpec extends PlaySpec
 
   }
 
+  "Report Purchase Outcome" should {
+
+    "audit purchaseOutcomeReported" when {
+      "a initial purchase outcome request has been successful" in {
+        when(mockService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
+        doOutcomeRequest(outcomeJson) { res =>
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = matchersEquals("purchaseOutcomeReported"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/property-purchase/outcome"),
+            auditData = matchersEquals(Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountID" -> accountId,
+              "fundReleaseId" -> "3456789000",
+              "eventDate" -> "2017-05-05",
+              "propertyPurchaseResult" -> "Purchase completed",
+              "propertyPurchaseValue" -> "250000"
+            ))
+          )(any())
+        }
+      }
+      "a superseded purchase outcome request has been successful" in {
+        when(mockService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
+        doOutcomeRequest(supersededOutcomeJson) { res =>
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = matchersEquals("purchaseOutcomeReported"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/property-purchase/outcome"),
+            auditData = matchersEquals(Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountID" -> accountId,
+              "fundReleaseId" -> "3456789000",
+              "eventDate" -> "2017-06-10",
+              "propertyPurchaseResult" -> "Purchase completed",
+              "propertyPurchaseValue" -> "250000",
+              "originalPurchaseOutcomeId" -> "5678900001",
+              "originalEventDate" -> "2017-05-05"
+            ))
+          )(any())
+        }
+      }
+    }
+
+    "audit purchaseOutcomeNotReported" when {
+      "the request results in a ReportLifeEventErrorResponse" in {
+        when(mockService.reportLifeEvent(any(), any(), any())(any()))
+          .thenReturn(Future.successful(ReportLifeEventErrorResponse))
+
+        doOutcomeRequest(outcomeJson) { res =>
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = matchersEquals("purchaseOutcomeNotReported"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/property-purchase/outcome"),
+            auditData = matchersEquals(Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountID" -> accountId,
+              "fundReleaseId" -> "3456789000",
+              "eventDate" -> "2017-05-05",
+              "propertyPurchaseResult" -> "Purchase completed",
+              "propertyPurchaseValue" -> "250000",
+              "reasonNotReported" -> "INTERNAL_SERVER_ERROR"
+            ))
+          )(any())
+        }
+      }
+      "given a eventDate prior to 6 April 2017" in {
+        when(mockService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
+
+        doOutcomeRequest(outcomeJson.replace("2017-05-05", "2017-04-05")) { res =>
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = matchersEquals("purchaseOutcomeNotReported"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/property-purchase/outcome"),
+            auditData = matchersEquals(Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountID" -> accountId,
+              "fundReleaseId" -> "3456789000",
+              "eventDate" -> "2017-04-05",
+              "propertyPurchaseResult" -> "Purchase completed",
+              "propertyPurchaseValue" -> "250000",
+              "reasonNotReported" -> "FORBIDDEN"
+            ))
+          )(any())
+        }
+      }
+    }
+
+    "return with 201 created" when {
+      "a initial extension is successful" in {
+        when(mockService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
+        doOutcomeRequest(outcomeJson) { res =>
+          status(res) mustBe CREATED
+          (contentAsJson(res) \ "data" \ "extensionId").as[String] mustBe "1928374"
+          (contentAsJson(res) \ "data" \ "message").as[String] mustBe "Purchase outcome created"
+        }
+      }
+      "a superseded extension is successful" in {
+        when(mockService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
+        doOutcomeRequest(supersededOutcomeJson) { res =>
+          status(res) mustBe CREATED
+          (contentAsJson(res) \ "data" \ "extensionId").as[String] mustBe "1928374"
+          (contentAsJson(res) \ "data" \ "message").as[String] mustBe "Purchase outcome superseded"
+        }
+      }
+    }
+
+    "return with 400 bad request and a code of BAD_REQUEST" when {
+      "given a future eventDate" in {
+        val invalidJson = outcomeJson.replace("2017-05-05", DateTime.now.plusDays(1).toString("yyyy-MM-dd"))
+
+        doOutcomeRequest(invalidJson) { res =>
+          status(res) mustBe BAD_REQUEST
+
+          val json = contentAsJson(res)
+
+          (json \ "code").as[String] mustBe "BAD_REQUEST"
+          (json \ "errors" \ 0 \ "code").as[String] mustBe "INVALID_DATE"
+          (json \ "errors" \ 0 \ "path").as[String] mustBe "/eventDate"
+        }
+      }
+      "given an invalid lmrn in the url" in {
+        doOutcomeRequest(outcomeJson, "Z111") { res =>
+          status(res) mustBe BAD_REQUEST
+
+          val json = contentAsJson(res)
+
+          (json \ "code").as[String] mustBe ErrorBadRequestLmrn.errorCode
+          (json \ "message").as[String] mustBe ErrorBadRequestLmrn.message
+        }
+      }
+      "given an invalid accountId in the url" in {
+        doOutcomeRequest(outcomeJson, accId = "1=2!") { res =>
+          status(res) mustBe BAD_REQUEST
+
+          val json = contentAsJson(res)
+
+          (json \ "code").as[String] mustBe ErrorBadRequestAccountId.errorCode
+          (json \ "message").as[String] mustBe ErrorBadRequestAccountId.message
+        }
+      }
+    }
+
+    // TODO: Add all error scenarios for this endpoint
+
+  }
+
   def doFundReleaseRequest(jsonString: String, lmrn: String = lisaManager, accId: String = accountId)(callback: (Future[Result]) =>  Unit): Unit = {
-    val req = FakeRequest(Helpers.PUT, "/")
+    val req = FakeRequest(Helpers.POST, "/")
     val res = SUT.requestFundRelease(lmrn, accId).apply(req.withHeaders(acceptHeader).
       withBody(AnyContentAsJson(Json.parse(jsonString))))
 
@@ -620,8 +788,16 @@ class PropertyPurchaseControllerSpec extends PlaySpec
   }
 
   def doExtensionRequest(jsonString: String, lmrn: String = lisaManager, accId: String = accountId)(callback: (Future[Result]) =>  Unit): Unit = {
-    val req = FakeRequest(Helpers.PUT, "/")
+    val req = FakeRequest(Helpers.POST, "/")
     val res = SUT.requestExtension(lmrn, accId).apply(req.withHeaders(acceptHeader).
+      withBody(AnyContentAsJson(Json.parse(jsonString))))
+
+    callback(res)
+  }
+
+  def doOutcomeRequest(jsonString: String, lmrn: String = lisaManager, accId: String = accountId)(callback: (Future[Result]) =>  Unit): Unit = {
+    val req = FakeRequest(Helpers.POST, "/")
+    val res = SUT.reportPurchaseOutcome(lmrn, accId).apply(req.withHeaders(acceptHeader).
       withBody(AnyContentAsJson(Json.parse(jsonString))))
 
     callback(res)
