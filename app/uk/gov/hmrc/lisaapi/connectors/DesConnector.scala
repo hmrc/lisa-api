@@ -251,22 +251,6 @@ trait DesConnector extends ServicesConfig {
   }
 
   /**
-    * Attempts to get a LISA Life Event
-    */
-  def getLifeEvent(lisaManager: String, accountId: String, eventId: String)
-                  (implicit hc: HeaderCarrier): Future[DesResponse] = {
-
-    val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/life-event/$eventId"
-    Logger.debug("Posting Life Event request to des: " + uri)
-    val result = httpGet.GET(uri)(httpReads, updateHeaderCarrier(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
-
-    result.map(res => {
-      Logger.debug("Get Life Event request returned status: " + res.status)
-      parseDesResponse[DesLifeEventRetrievalResponse](res)
-    })
-  }
-
-  /**
     * Attempts to request a bonus payment
     *
     * @return A tuple of the http status code and a des response

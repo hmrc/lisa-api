@@ -19,7 +19,7 @@ package unit.models
 import org.joda.time.DateTime
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsSuccess, Json}
-import uk.gov.hmrc.lisaapi.models.ReportLifeEventRequest
+import uk.gov.hmrc.lisaapi.models.{ReportLifeEventRequest, ReportLifeEventRequestBase}
 
 class ReportLifeEventRequestSpec extends PlaySpec {
 
@@ -44,11 +44,10 @@ class ReportLifeEventRequestSpec extends PlaySpec {
     "deserialize to json" in {
       val request = ReportLifeEventRequest( "LISA Investor Terminal Ill Health", new DateTime("2017-01-01"))
 
-      val json = Json.toJson[ReportLifeEventRequest](request)
+      val json = Json.toJson[ReportLifeEventRequestBase](request)
 
       json mustBe Json.parse(validRequestJson)
     }
-
 
   }
 

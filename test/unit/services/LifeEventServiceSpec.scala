@@ -77,64 +77,9 @@ class LifeEventServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuit
 
   }
 
-  "Retrieve life event" must {
-
-    "return a Success response" when {
-      "given a success response from the DES connector" in {
-        when(mockDesConnector.getLifeEvent(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesLifeEventRetrievalResponse("AB123456", "X", new DateTime("2000-01-01"))))
-
-        doRetrieval{ _ mustBe RequestLifeEventSuccessResponse("AB123456", "X", new DateTime("2000-01-01")) }
-      }
-    }
-
-    "return a Not Found response" when {
-      "given DesFailureReponse and status 404" in {
-        when(mockDesConnector.getLifeEvent(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNTID_NOT_FOUND", "The accountID given does not match with HMRC’s records")))
-
-        doRetrieval{ _ mustBe ReportLifeEventAccountNotFoundResponse }
-      }
-    }
-
-    "return a life event Not Found response" when {
-      "given DesFailureReponse and status 404" in {
-        when(mockDesConnector.getLifeEvent(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("LIFE_EVENT_NOT_FOUND", "The lifeEventId given does not match with HMRC’s records")))
-
-        doRetrieval{ _ mustBe ReportLifeEventIdNotFoundResponse }
-      }
-    }
-
-
-    "return a Internal Server Error response" when {
-      "When INTERNAL_SERVER_ERROR sent" in {
-        when(mockDesConnector.getLifeEvent(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("INTERNAL_SERVER_ERROR", "Internal Error")))
-
-        doRetrieval{ _ mustBe ReportLifeEventErrorResponse }
-      }
-
-      "When Invalid Code Sent" in {
-        when(mockDesConnector.getLifeEvent(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("INVALID", "Invalid Code")))
-
-        doRetrieval{ _ mustBe ReportLifeEventErrorResponse }
-      }
-    }
-
-
-  }
-
   private def doRequest(callback: (ReportLifeEventResponse) => Unit): Unit = {
     val request = ReportLifeEventRequest("LISA Investor Terminal Ill Health", new DateTime("2017-04-06"))
     val response = Await.result(SUT.reportLifeEvent("Z019283", "192837", request)(HeaderCarrier()), Duration.Inf)
-
-    callback(response)
-  }
-
-  private def doRetrieval(callback: (ReportLifeEventResponse) => Unit): Unit = {
-    val response = Await.result(SUT.getLifeEvent("Z019283", "192837", "1234567890")(HeaderCarrier()), Duration.Inf)
 
     callback(response)
   }

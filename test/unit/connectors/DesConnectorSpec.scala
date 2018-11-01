@@ -777,93 +777,6 @@ class DesConnectorSpec extends PlaySpec
 
   }
 
-  "Retrieve Life Event endpoint" must {
-
-    "return a failure response" when {
-      "the DES response is a failure response" in {
-        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                responseStatus = OK,
-                responseJson = Some(Json.parse(
-                  """{
-                    | "code": "ERROR_CODE",
-                    | "reason" : "ERROR MESSAGE"
-                  }""".stripMargin))
-              )
-            )
-          )
-
-        doRetrieveLifeEventRequest { response =>
-          response must be(DesFailureResponse("ERROR_CODE", "ERROR MESSAGE"))
-        }
-      }
-      "the DES response has no json body" in {
-        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                responseStatus = SERVICE_UNAVAILABLE,
-                responseJson = None
-              )
-            )
-          )
-
-        doRetrieveLifeEventRequest { response =>
-          response must be(DesFailureResponse())
-        }
-      }
-      "the DES response is invalid" in {
-        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                responseStatus = OK,
-                responseJson = Some(Json.parse(
-                  """
-                    |{
-                    |  "lifeEventId" : "1234567890",
-                    |  "eventType" : "UNKNOWN"
-                    |}
-                  """.stripMargin))
-              )
-            )
-          )
-
-        doRetrieveLifeEventRequest { response =>
-          response must be(DesFailureResponse())
-        }
-      }
-    }
-
-    "return a success response" when {
-      "the DES response is a life event" in {
-        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                responseStatus = OK,
-                responseJson = Some(Json.parse(
-                  """
-                    |{
-                    |  "lifeEventID" : "1234567890",
-                    |  "eventType" : "LISA Investor Terminal Ill Health",
-                    |  "eventDate" : "2017-04-06"
-                    |}
-                  """.stripMargin))
-              )
-            )
-          )
-
-        doRetrieveLifeEventRequest { response =>
-          response must be(DesLifeEventRetrievalResponse("1234567890", "LISA Investor Terminal Ill Health", new DateTime("2017-04-06")))
-        }
-      }
-    }
-
-  }
-
   "Retrieve Bonus Payment endpoint" must {
 
     "return a DesFailureResponse" when {
@@ -1524,12 +1437,6 @@ class DesConnectorSpec extends PlaySpec
   private def doRequestPurchaseExtensionRequest(callback: (DesResponse) => Unit) = {
     val request = RequestStandardPurchaseExtension("123457890", new DateTime("2018-01-01"), "Extension one")
     val response = Await.result(SUT.requestPurchaseExtension("Z123456", "ABC12345", request), Duration.Inf)
-
-    callback(response)
-  }
-
-  private def doRetrieveLifeEventRequest(callback: (DesResponse) => Unit) = {
-    val response = Await.result(SUT.getLifeEvent("Z123456", "ABC12345", "123456"), Duration.Inf)
 
     callback(response)
   }

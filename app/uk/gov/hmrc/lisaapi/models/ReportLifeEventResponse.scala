@@ -24,11 +24,14 @@ trait ReportLifeEventResponse
 
 case class ReportLifeEventSuccessResponse(lifeEventId: String) extends ReportLifeEventResponse
 case object ReportLifeEventErrorResponse extends ReportLifeEventResponse
+
 case object ReportLifeEventInappropriateResponse extends ReportLifeEventResponse
-case object ReportLifeEventAccountNotFoundResponse extends ReportLifeEventResponse
-case object ReportLifeEventIdNotFoundResponse extends ReportLifeEventResponse
 case object ReportLifeEventAccountClosedResponse extends ReportLifeEventResponse
+case object ReportLifeEventAccountVoidResponse extends ReportLifeEventResponse
+case object ReportLifeEventAccountCancelledResponse extends ReportLifeEventResponse
 case object ReportLifeEventAlreadyExistsResponse extends ReportLifeEventResponse
+case object ReportLifeEventAccountNotFoundResponse extends ReportLifeEventResponse
+
 
 case class RequestLifeEventSuccessResponse(lifeEventId: String, eventType: LifeEventType, eventDate: DateTime) extends ReportLifeEventResponse
 

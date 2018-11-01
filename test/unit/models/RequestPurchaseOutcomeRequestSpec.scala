@@ -47,7 +47,7 @@ class RequestPurchaseOutcomeRequestSpec extends PlaySpec {
         propertyPurchaseValue = 250000
       )
 
-      Json.toJson[RequestPurchaseOutcomeRequest](input).toString() mustBe """{"eventType":"Purchase Result","eventDate":"2017-05-05","fundsReleaseLifeEventID":"3456789000","propertyDetails":{"purchaseResult":"Purchase completed","purchaseValue":250000}}"""
+      Json.toJson[ReportLifeEventRequestBase](input).toString() mustBe """{"eventType":"Purchase Result","eventDate":"2017-05-05","fundsReleaseLifeEventID":"3456789000","propertyDetails":{"purchaseResult":"Purchase completed","purchaseValue":250000}}"""
     }
 
     "validate the fundReleaseId" in {

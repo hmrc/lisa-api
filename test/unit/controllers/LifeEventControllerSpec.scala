@@ -280,47 +280,6 @@ class LifeEventControllerSpec extends PlaySpec
 
   }
 
-  "Get Life Event" should {
-
-    "return with 200 ok" in {
-      val successResponse = RequestLifeEventSuccessResponse(eventId, "LISA Investor Terminal Ill Health", new DateTime("2000-01-01"))
-      when(mockService.getLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(successResponse))
-      doGetLifeEventRequest{ res =>
-        status(res) mustBe OK
-        val json = contentAsJson(res)
-
-        (json \ "lifeEventId").as[String] mustBe eventId
-        (json \ "eventType").as[String] mustBe "LISA Investor Terminal Ill Health"
-        (json \ "eventDate").as[String] mustBe "2000-01-01"
-      }
-    }
-
-    "return with 404 not found and a code of INVESTOR_ACCOUNTID_NOT_FOUND" in {
-      when(mockService.getLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventAccountNotFoundResponse))
-      doGetLifeEventRequest{ res =>
-        status(res) mustBe NOT_FOUND
-        (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNTID_NOT_FOUND"
-      }
-    }
-
-    "return with 404 not found and a code of LIFE_EVENT_NOT_FOUND" in {
-      when(mockService.getLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventIdNotFoundResponse))
-      doGetLifeEventRequest{ res =>
-        status(res) mustBe NOT_FOUND
-        (contentAsJson(res) \ "code").as[String] mustBe "LIFE_EVENT_NOT_FOUND"
-      }
-    }
-
-    "return with 500 internal server error when the wrong event is returned" in {
-      when(mockService.getLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportTest))
-      doGetLifeEventRequest{ res =>
-        status(res) mustBe INTERNAL_SERVER_ERROR
-        (contentAsJson(res) \ "code").as[String] mustBe "INTERNAL_SERVER_ERROR"
-      }
-    }
-
-  }
-
   def doReportLifeEventRequest(jsonString: String, lmrn: String = lisaManager, accId: String = accountId)(callback: (Future[Result]) =>  Unit): Unit = {
     val req = FakeRequest(Helpers.PUT, "/")
     val res = SUT.reportLisaLifeEvent(lmrn, accId).apply(req.withHeaders(acceptHeader).
@@ -329,15 +288,9 @@ class LifeEventControllerSpec extends PlaySpec
     callback(res)
   }
 
-  def doGetLifeEventRequest(callback: (Future[Result]) => Unit): Unit = {
-    val res = SUT.getLifeEvent(lisaManager, accountId, eventId).apply(FakeRequest().withHeaders(acceptHeader))
-
-    callback(res)
-  }
-
   val mockService: LifeEventService = mock[LifeEventService]
   val mockAuditService: AuditService = mock[AuditService]
-  val mockAuthCon :LisaAuthConnector = mock[LisaAuthConnector]
+  val mockAuthCon: LisaAuthConnector = mock[LisaAuthConnector]
 
   val SUT = new LifeEventController {
     override val service: LifeEventService = mockService

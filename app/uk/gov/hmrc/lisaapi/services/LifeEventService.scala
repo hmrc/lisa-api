@@ -56,30 +56,6 @@ trait LifeEventService {
     }
   }
 
-  def getLifeEvent(lisaManager: String, accountId: String, eventId: String)(implicit hc: HeaderCarrier): Future[ReportLifeEventResponse] = {
-    val response = desConnector.getLifeEvent(lisaManager, accountId, eventId)
-
-    response map {
-      case successResponse: DesLifeEventRetrievalResponse => {
-        Logger.debug("Matched DesLifeEventRetrievalResponse")
-
-        RequestLifeEventSuccessResponse(successResponse.lifeEventID, successResponse.eventType, successResponse.eventDate)
-      }
-      case failureResponse: DesFailureResponse => {
-        Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
-
-        failureResponse.code match {
-          case "INVESTOR_ACCOUNTID_NOT_FOUND" => ReportLifeEventAccountNotFoundResponse
-          case "LIFE_EVENT_NOT_FOUND" => ReportLifeEventIdNotFoundResponse
-          case _ => {
-            Logger.warn(s"Get life event returned error: ${failureResponse.code}")
-            ReportLifeEventErrorResponse
-          }
-        }
-      }
-    }
-  }
-
 }
 
 object LifeEventService extends LifeEventService{
