@@ -161,6 +161,9 @@ types:
                                   "message" : "The investor already has a record with HMRC."
                                 }
             /accounts:
+              (annotations.group):
+                name: LISA accounts
+                description: ""
               description: !include documentation/LISAAccount
               post:
                     is: [headers.acceptHeader, headers.contentHeader]
@@ -657,6 +660,9 @@ types:
                                     "message": "The accountId does not match HMRC’s records"
                                   }
                 /events:
+                  (annotations.group):
+                    name: Life events
+                    description: ""
                   description: !include documentation/LifeEvent
                   post:
                     is: [headers.acceptHeader, headers.contentHeader]
@@ -764,6 +770,9 @@ types:
                                     "message" : "The investor’s life event has already been reported"
                               }
                 /property-purchase:
+                  (annotations.group):
+                    name: Property purchases
+                    description: ""
                   post:
                     is: [headers.acceptHeader]
                     displayName: "[sandbox-only] Request the release of funds to buy a property"
@@ -1096,6 +1105,9 @@ types:
                                        "message" : "The investor’s purchase outcome has already been reported"
                                     }
                 /withdrawal-charges:
+                  (annotations.group):
+                    name: Withdrawal charges
+                    description: ""
                   post:
                     is: [headers.acceptHeader, headers.contentHeader]
                     displayName: "[sandbox-only] Report a withdrawal charge"
@@ -1313,6 +1325,9 @@ types:
                                       "message": "The accountId does not match HMRC’s records"
                                     }
                 /transactions:
+                  (annotations.group):
+                    name: Bonus requests
+                    description: ""
                   description: !include documentation/LISATransaction
                   post:
                     is: [headers.acceptHeader, headers.contentHeader]
@@ -1554,6 +1569,9 @@ types:
                                       "message": "The accountId does not match HMRC’s records"
                                     }
                     /payments:
+                      (annotations.group):
+                         name: Payments and debts
+                         description: ""
                       get:
                          displayName: Get the payment details for a bonus claim or withdrawal charge
                          description: Use an investor’s transaction ID to get payment details for a bonus claim or withdrawal charge, including when the amount is due to be paid or collected.
