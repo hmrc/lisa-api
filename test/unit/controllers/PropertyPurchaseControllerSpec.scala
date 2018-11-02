@@ -22,7 +22,7 @@ import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.libs.json.Json
+import play.api.libs.json.{JsObject, Json}
 import play.api.mvc.{AnyContentAsJson, Result}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
@@ -321,6 +321,21 @@ class PropertyPurchaseControllerSpec extends PlaySpec
         status(res) mustBe FORBIDDEN
         (contentAsJson(res) \ "code").as[String] mustBe "COMPLIANCE_ERROR_OTHER_PURCHASE_ON_RECORD"
         (contentAsJson(res) \ "message").as[String] mustBe "Another property purchase is already recorded"
+      }
+    }
+
+    "return with 403 forbidden and a code of INVALID_DATA_PROVIDED" in {
+      val json = Json.parse(fundReleaseJson).as[JsObject] ++ Json.obj(
+        "supersede" -> Json.obj(
+          "originalFundReleaseId" -> "3456789000",
+          "originalEventDate" -> "2017-05-10"
+        )
+      )
+
+      doFundReleaseRequest(json.toString()){ res =>
+        status(res) mustBe FORBIDDEN
+        (contentAsJson(res) \ "code").as[String] mustBe "INVALID_DATA_PROVIDED"
+        (contentAsJson(res) \ "message").as[String] mustBe "You can only change eventDate or withdrawalAmount when superseding a property purchase fund release"
       }
     }
 
