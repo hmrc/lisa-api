@@ -46,14 +46,11 @@ case class PurchaseOutcomeSupersede (
 
 object PurchaseOutcomeSupersede {
   implicit val dateReads: Reads[DateTime] = JsonReads.notFutureDate
-  implicit val dateWrites: Writes[DateTime] = Writes.jodaDateWrites("yyyy-MM-dd")
 
   implicit val reads: Reads[PurchaseOutcomeSupersede] = (
     (JsPath \ "originalPurchaseOutcomeId").read(JsonReads.fundReleaseId) and
     (JsPath \ "originalEventDate").read(JsonReads.notFutureDate).map(new DateTime(_))
   )(PurchaseOutcomeSupersede.apply _)
-
-  implicit val writes = Json.writes[PurchaseOutcomeSupersede]
 }
 
 object RequestPurchaseOutcomeRequest {

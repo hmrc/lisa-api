@@ -42,7 +42,7 @@
     <tr>
       <td>
         <p>Purchase Outcome superseded</p>
-        <p class="code--block"> <strong>lisaManagerReferenceNumber:</strong><br /> <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br /> <br /> <strong>accountId:</strong><br />1234567891 </p>
+        <p class="code--block"> <strong>lisaManagerReferenceNumber:</strong><br /> <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br /> <br /> <strong>accountId:</strong><br />1234567890 </p>
       </td>
       <td>
         <pre class="code--block">
@@ -125,7 +125,7 @@
     <tr>
       <td>
         <p>Superseded purchase outcome mismatch error</p>
-        <p class="code--block"> <strong>lisaManagerReferenceNumber:</strong><br /> <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br /> <br /> <strong>accountId:</strong><br />4030000014 </p>
+        <p class="code--block"> <strong>lisaManagerReferenceNumber:</strong><br /> <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br /> <br /> <strong>accountId:</strong><br />5000000403 </p>
       </td>
       <td>
         <pre class="code--block">
@@ -154,7 +154,7 @@
     <tr>
       <td>
         <p>Fund release not found</p>
-        <p class="code--block"> <strong>lisaManagerReferenceNumber:</strong><br /> <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br /> <br /> <strong>accountId:</strong><br />4030000015 </p>
+        <p class="code--block"> <strong>lisaManagerReferenceNumber:</strong><br /> <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br /> <br /> <strong>accountId:</strong><br />1000000404 </p>
       </td>
       <td>
         <pre class="code--block">
@@ -167,7 +167,7 @@
 </pre>
       </td>
       <td>
-        <p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
+        <p>HTTP status: <code class="code--slim">404 (Not Found)</code></p>
         <pre class="code--block">
 {
   "code" : "FUND_RELEASE_NOT_FOUND",
@@ -179,7 +179,7 @@
     <tr>
       <td>
         <p>Investor account not found</p>
-        <p class="code--block"> <strong>lisaManagerReferenceNumber:</strong><br /> <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br /> <br /> <strong>accountId:</strong><br />2000000404 </p>
+        <p class="code--block"> <strong>lisaManagerReferenceNumber:</strong><br /> <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br /> <br /> <strong>accountId:</strong><br />0000000404 </p>
       </td>
       <td>
         <pre class="code--block"> 
@@ -204,7 +204,7 @@
     <tr>
       <td>
         <p>Superseded purchase outcome already superseded</p>
-        <p class="code--block"> <strong>lisaManagerReferenceNumber:</strong><br /> <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br /> <br /> <strong>accountId:</strong><br />3000000409 </p>
+        <p class="code--block"> <strong>lisaManagerReferenceNumber:</strong><br /> <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br /> <br /> <strong>accountId:</strong><br />1000000409 </p>
       </td>
       <td>
         <pre class="code--block">
@@ -233,7 +233,7 @@
     <tr>
       <td>
         <p>Purchase outcome already exists</p>
-        <p class="code--block"> <strong>lisaManagerReferenceNumber:</strong><br /> <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br /> <br /> <strong>accountId:</strong><br />4000000409 </p>
+        <p class="code--block"> <strong>lisaManagerReferenceNumber:</strong><br /> <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br /> <br /> <strong>accountId:</strong><br />0000000409 </p>
       </td>
       <td>
         <pre class="code--block">
@@ -258,7 +258,7 @@
     <tr>
       <td>
         <p>Fund release superseded</p>
-        <p class="code--block"> <strong>lisaManagerReferenceNumber:</strong><br /> <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br /> <br /> <strong>accountId:</strong><br />5000000409 </p>
+        <p class="code--block"> <strong>lisaManagerReferenceNumber:</strong><br /> <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br /> <br /> <strong>accountId:</strong><br />2000000409 </p>
       </td>
       <td>
         <pre class="code--block">
