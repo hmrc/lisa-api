@@ -740,7 +740,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
         when(mockService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
         doOutcomeRequest(outcomeJson) { res =>
           status(res) mustBe CREATED
-          (contentAsJson(res) \ "data" \ "extensionId").as[String] mustBe "1928374"
+          (contentAsJson(res) \ "data" \ "purchaseOutcomeId").as[String] mustBe "1928374"
           (contentAsJson(res) \ "data" \ "message").as[String] mustBe "Purchase outcome created"
         }
       }
@@ -748,7 +748,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
         when(mockService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
         doOutcomeRequest(supersededOutcomeJson) { res =>
           status(res) mustBe CREATED
-          (contentAsJson(res) \ "data" \ "extensionId").as[String] mustBe "1928374"
+          (contentAsJson(res) \ "data" \ "purchaseOutcomeId").as[String] mustBe "1928374"
           (contentAsJson(res) \ "data" \ "message").as[String] mustBe "Purchase outcome superseded"
         }
       }
