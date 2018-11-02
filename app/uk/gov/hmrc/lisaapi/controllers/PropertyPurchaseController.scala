@@ -34,20 +34,6 @@ class PropertyPurchaseController extends LisaController with LisaConstants {
   val service: LifeEventService = LifeEventService
   val auditService: AuditService = AuditService
 
-  private def validDataIsProvided(req: Option[JsValue]) = {
-    req match {
-      case None => false
-      case Some(json) => {
-        (json \ "supersede").asOpt[JsValue].isDefined && (
-          (json \ "conveyancerReference").asOpt[JsValue].isDefined ||
-          (json \ "propertyDetails").asOpt[JsValue].isDefined
-        )
-      }
-    }
-  }
-
-  // scalastyle:off cyclomatic.complexity
-  // scalastyle:off method.length
   def requestFundRelease(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async {
     implicit request =>
       implicit val startTime = System.currentTimeMillis()
@@ -56,20 +42,16 @@ class PropertyPurchaseController extends LisaController with LisaConstants {
         withValidAccountId(accountId) { () =>
           withValidJson[RequestFundReleaseRequest](
             req => {
-              if (validDataIsProvided(request.body.asJson)) {
+              if (conveyancerOrPropertyDetailsIncludedOnASupersedeRequest(request.body.asJson)) {
                 Logger.debug("Fund release not reported - conveyancer and/or property details included on a supersede request")
-
                 doFundReleaseAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorInvalidDataProvided.errorCode))
                 LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
-
                 Future.successful(Forbidden(Json.toJson(ErrorInvalidDataProvided)))
               }
               else if (req.eventDate.isBefore(LISA_START_DATE)) {
                 Logger.debug("Fund release not reported - invalid event date")
-
                 doFundReleaseAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> "FORBIDDEN"))
                 LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
-
                 Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
                   ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("eventDate"), Some("/eventDate"))
                 )))))
@@ -86,65 +68,12 @@ class PropertyPurchaseController extends LisaController with LisaConstants {
                     }
                     Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
                   }
-                  case ReportLifeEventAccountClosedResponse => {
-                    Logger.debug("Fund release account closed")
-                    doFundReleaseAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorAccountAlreadyClosed.errorCode))
-                    LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
-                    Forbidden(Json.toJson(ErrorAccountAlreadyClosed))
-                  }
-                  case ReportLifeEventAccountCancelledResponse => {
-                    Logger.debug("Fund release account cancelled")
-                    doFundReleaseAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorAccountAlreadyCancelled.errorCode))
-                    LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
-                    Forbidden(Json.toJson(ErrorAccountAlreadyCancelled))
-                  }
-                  case ReportLifeEventAccountVoidResponse => {
-                    Logger.debug("Fund release account voided")
-                    doFundReleaseAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorAccountAlreadyVoided.errorCode))
-                    LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
-                    Forbidden(Json.toJson(ErrorAccountAlreadyVoided))
-                  }
-                  case ReportLifeEventMismatchResponse => {
-                    Logger.debug("Fund release mismatch")
-                    doFundReleaseAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorFundReleaseMismatch.errorCode))
-                    LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
-                    Forbidden(Json.toJson(ErrorFundReleaseMismatch))
-                  }
-                  case ReportLifeEventAccountNotOpenLongEnoughResponse => {
-                    Logger.debug("Fund release account not open long enough")
-                    doFundReleaseAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorAccountNotOpenLongEnough.errorCode))
-                    LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
-                    Forbidden(Json.toJson(ErrorAccountNotOpenLongEnough))
-                  }
-                  case ReportLifeEventOtherPurchaseOnRecordResponse => {
-                    Logger.debug("Fund release other purchase on record")
-                    doFundReleaseAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorFundReleaseOtherPropertyOnRecord.errorCode))
-                    LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
-                    Forbidden(Json.toJson(ErrorFundReleaseOtherPropertyOnRecord))
-                  }
-                  case ReportLifeEventAccountNotFoundResponse => {
-                    Logger.debug("Fund release account not found")
-                    doFundReleaseAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorAccountNotFound.errorCode))
-                    LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.PROPERTY_PURCHASE)
-                    NotFound(Json.toJson(ErrorAccountNotFound))
-                  }
-                  case ReportLifeEventAlreadyExistsResponse => {
-                    Logger.debug("Fund release already exists")
-                    doFundReleaseAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorFundReleaseAlreadyExists.errorCode))
-                    LisaMetrics.incrementMetrics(startTime, CONFLICT, LisaMetricKeys.PROPERTY_PURCHASE)
-                    Conflict(Json.toJson(ErrorFundReleaseAlreadyExists))
-                  }
-                  case ReportLifeEventAlreadySupersededResponse => {
-                    Logger.debug("Fund release already superseded")
-                    doFundReleaseAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorFundReleaseAlreadySuperseded.errorCode))
-                    LisaMetrics.incrementMetrics(startTime, CONFLICT, LisaMetricKeys.PROPERTY_PURCHASE)
-                    Conflict(Json.toJson(ErrorFundReleaseAlreadySuperseded))
-                  }
-                  case unexpected:ReportLifeEventResponse => {
-                    Logger.debug(s"Fund release error: $unexpected")
-                    doFundReleaseAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorInternalServerError.errorCode))
-                    LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.PROPERTY_PURCHASE)
-                    InternalServerError(Json.toJson(ErrorInternalServerError))
+                  case res: ReportLifeEventResponse => {
+                    val response = fundReleaseErrors.getOrElse(res, ErrorInternalServerError)
+                    Logger.debug(s"Fund Release received $res, responding with $response")
+                    doFundReleaseAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> response.errorCode))
+                    LisaMetrics.incrementMetrics(startTime, response.httpStatusCode, LisaMetricKeys.PROPERTY_PURCHASE)
+                    Status(response.httpStatusCode)(Json.toJson(response))
                   }
                 }
               }
@@ -155,8 +84,6 @@ class PropertyPurchaseController extends LisaController with LisaConstants {
       }
   }
 
-  // scalastyle:off cyclomatic.complexity
-  // scalastyle:off method.length
   def requestExtension(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async {
     implicit request =>
       implicit val startTime = System.currentTimeMillis()
@@ -187,83 +114,12 @@ class PropertyPurchaseController extends LisaController with LisaConstants {
                     }
                     Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
                   }
-                  case ReportLifeEventAccountClosedResponse => {
-                    Logger.debug("Extension account closed")
-                    doExtensionAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorAccountAlreadyClosed.errorCode))
-                    LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
-                    Forbidden(Json.toJson(ErrorAccountAlreadyClosed))
-                  }
-                  case ReportLifeEventAccountCancelledResponse => {
-                    Logger.debug("Extension account cancelled")
-                    doExtensionAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorAccountAlreadyCancelled.errorCode))
-                    LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
-                    Forbidden(Json.toJson(ErrorAccountAlreadyCancelled))
-                  }
-                  case ReportLifeEventAccountVoidResponse => {
-                    Logger.debug("Extension account voided")
-                    doExtensionAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorAccountAlreadyVoided.errorCode))
-                    LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
-                    Forbidden(Json.toJson(ErrorAccountAlreadyVoided))
-                  }
-                  case ReportLifeEventExtensionOneNotYetApprovedResponse => {
-                    Logger.debug("Extension one not yet approved")
-                    doExtensionAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorExtensionOneNotApproved.errorCode))
-                    LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
-                    Forbidden(Json.toJson(ErrorExtensionOneNotApproved))
-                  }
-                  case ReportLifeEventExtensionOneAlreadyApprovedResponse => {
-                    Logger.debug("Extension one already approved")
-                    doExtensionAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorExtensionOneAlreadyApproved.errorCode))
-                    LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
-                    Forbidden(Json.toJson(ErrorExtensionOneAlreadyApproved))
-                  }
-                  case ReportLifeEventExtensionTwoAlreadyApprovedResponse => {
-                    Logger.debug("Extension two already approved")
-                    doExtensionAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorExtensionTwoAlreadyApproved.errorCode))
-                    LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
-                    Forbidden(Json.toJson(ErrorExtensionTwoAlreadyApproved))
-                  }
-                  case ReportLifeEventMismatchResponse => {
-                    Logger.debug("Extension mismatch")
-                    doExtensionAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorExtensionMismatch.errorCode))
-                    LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
-                    Forbidden(Json.toJson(ErrorExtensionMismatch))
-                  }
-                  case ReportLifeEventAccountNotFoundResponse => {
-                    Logger.debug("Extension account not found")
-                    doExtensionAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorAccountNotFound.errorCode))
-                    LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.PROPERTY_PURCHASE)
-                    NotFound(Json.toJson(ErrorAccountNotFound))
-                  }
-                  case ReportLifeEventFundReleaseNotFoundResponse => {
-                    Logger.debug("Extension fund release not found")
-                    doExtensionAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorFundReleaseNotFound.errorCode))
-                    LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.PROPERTY_PURCHASE)
-                    NotFound(Json.toJson(ErrorFundReleaseNotFound))
-                  }
-                  case ReportLifeEventAlreadyExistsResponse => {
-                    Logger.debug("Extension already exists")
-                    doExtensionAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorExtensionAlreadyExists.errorCode))
-                    LisaMetrics.incrementMetrics(startTime, CONFLICT, LisaMetricKeys.PROPERTY_PURCHASE)
-                    Conflict(Json.toJson(ErrorExtensionAlreadyExists))
-                  }
-                  case ReportLifeEventFundReleaseSupersededResponse => {
-                    Logger.debug("Extension fund release superseded")
-                    doExtensionAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorFundReleaseSuperseded.errorCode))
-                    LisaMetrics.incrementMetrics(startTime, CONFLICT, LisaMetricKeys.PROPERTY_PURCHASE)
-                    Conflict(Json.toJson(ErrorFundReleaseSuperseded))
-                  }
-                  case ReportLifeEventAlreadySupersededResponse => {
-                    Logger.debug("Extension already superseded")
-                    doExtensionAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorExtensionAlreadySuperseded.errorCode))
-                    LisaMetrics.incrementMetrics(startTime, CONFLICT, LisaMetricKeys.PROPERTY_PURCHASE)
-                    Conflict(Json.toJson(ErrorExtensionAlreadySuperseded))
-                  }
-                  case unexpected:ReportLifeEventResponse => {
-                    Logger.debug(s"Extension error: $unexpected")
-                    doExtensionAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorInternalServerError.errorCode))
-                    LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.PROPERTY_PURCHASE)
-                    InternalServerError(Json.toJson(ErrorInternalServerError))
+                  case res: ReportLifeEventResponse => {
+                    val response = extensionErrors.getOrElse(res, ErrorInternalServerError)
+                    Logger.debug(s"Extension received $res, responding with $response")
+                    doExtensionAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> response.errorCode))
+                    LisaMetrics.incrementMetrics(startTime, response.httpStatusCode, LisaMetricKeys.PROPERTY_PURCHASE)
+                    Status(response.httpStatusCode)(Json.toJson(response))
                   }
                 }
               },
@@ -322,6 +178,46 @@ class PropertyPurchaseController extends LisaController with LisaConstants {
       }
   }
 
+  private def conveyancerOrPropertyDetailsIncludedOnASupersedeRequest(req: Option[JsValue]) = {
+    req match {
+      case None => false
+      case Some(json) => {
+        val supersedeIsDefined = (json \ "supersede").asOpt[JsValue].isDefined
+        val conveyancerIsDefined = (json \ "conveyancerReference").asOpt[JsValue].isDefined
+        val propertyDetailsAreDefined = (json \ "propertyDetails").asOpt[JsValue].isDefined
+
+        (supersedeIsDefined && (conveyancerIsDefined || propertyDetailsAreDefined))
+      }
+    }
+  }
+
+  private val commonErrors = Map[ReportLifeEventResponse, ErrorResponse] (
+    ReportLifeEventAccountClosedResponse -> ErrorAccountAlreadyClosed,
+    ReportLifeEventAccountCancelledResponse -> ErrorAccountAlreadyCancelled,
+    ReportLifeEventAccountVoidResponse -> ErrorAccountAlreadyVoided,
+    ReportLifeEventAccountNotFoundResponse -> ErrorAccountNotFound
+  )
+
+  private val fundReleaseErrors = commonErrors ++ Map (
+    ReportLifeEventMismatchResponse -> ErrorFundReleaseMismatch,
+    ReportLifeEventAccountNotOpenLongEnoughResponse -> ErrorAccountNotOpenLongEnough,
+    ReportLifeEventOtherPurchaseOnRecordResponse -> ErrorFundReleaseOtherPropertyOnRecord,
+    ReportLifeEventAlreadyExistsResponse -> ErrorFundReleaseAlreadyExists,
+    ReportLifeEventAlreadySupersededResponse -> ErrorFundReleaseAlreadySuperseded
+  )
+
+  private val extensionErrors = commonErrors ++ Map (
+    ReportLifeEventExtensionOneNotYetApprovedResponse -> ErrorExtensionOneNotApproved,
+    ReportLifeEventExtensionOneAlreadyApprovedResponse -> ErrorExtensionOneAlreadyApproved,
+    ReportLifeEventExtensionTwoAlreadyApprovedResponse -> ErrorExtensionTwoAlreadyApproved,
+    ReportLifeEventMismatchResponse -> ErrorExtensionMismatch,
+    ReportLifeEventFundReleaseNotFoundResponse -> ErrorFundReleaseNotFound,
+    ReportLifeEventAlreadyExistsResponse -> ErrorExtensionAlreadyExists,
+    ReportLifeEventFundReleaseSupersededResponse -> ErrorFundReleaseSuperseded,
+    ReportLifeEventAlreadySupersededResponse -> ErrorExtensionAlreadySuperseded
+  )
+
+  // common errors not included as it should be possible to complete a purchase on a closed/cancelled/void account
   private val outcomeErrors = Map[ReportLifeEventResponse, ErrorResponse] (
     ReportLifeEventMismatchResponse -> ErrorOutcomeMismatch,
     ReportLifeEventFundReleaseNotFoundResponse -> ErrorFundReleaseNotFound,

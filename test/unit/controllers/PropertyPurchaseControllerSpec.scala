@@ -854,7 +854,8 @@ class PropertyPurchaseControllerSpec extends PlaySpec
         }
       }
       "given a unexpected error response from the service layer" in {
-        when(mockService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventOtherPurchaseOnRecordResponse))
+        // you shouldn't get an account closed error for a purchase completion request
+        when(mockService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventAccountClosedResponse))
         doOutcomeRequest(outcomeJson) { res =>
           status(res) mustBe INTERNAL_SERVER_ERROR
           (contentAsJson(res) \ "code").as[String] mustBe "INTERNAL_SERVER_ERROR"
