@@ -26,7 +26,8 @@ case class ApiResponseData(
   lifeEventId: Option[String] = None,
   transactionId: Option[String] = None,
   fundReleaseId: Option[String] = None,
-  extensionId: Option[String] = None
+  extensionId: Option[String] = None,
+  purchaseOutcomeId: Option[String] = None
 )
 
 object ApiResponseData {

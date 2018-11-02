@@ -155,10 +155,10 @@ class PropertyPurchaseController extends LisaController with LisaConstants {
                     LisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.PROPERTY_PURCHASE)
                     val data = req match {
                       case _: RequestPurchaseOutcomeStandardRequest => {
-                        ApiResponseData(message = "Purchase outcome created", extensionId = Some(res.lifeEventId))
+                        ApiResponseData(message = "Purchase outcome created", purchaseOutcomeId = Some(res.lifeEventId))
                       }
                       case _: RequestPurchaseOutcomeSupersededRequest => {
-                        ApiResponseData(message = "Purchase outcome superseded", extensionId = Some(res.lifeEventId))
+                        ApiResponseData(message = "Purchase outcome superseded", purchaseOutcomeId = Some(res.lifeEventId))
                       }
                     }
                     Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
