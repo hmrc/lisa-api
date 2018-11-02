@@ -16,6 +16,7 @@ POST      /manager/:id/accounts/:accountId/events                               
 #GET       /manager/:id/accounts/:accountId/events/:eventId                         @uk.gov.hmrc.lisaapi.controllers.LifeEventController.getLifeEvent(id: String, accountId: String, eventId: String)
 POST      /manager/:id/accounts/:accountId/property-purchase                        @uk.gov.hmrc.lisaapi.controllers.PropertyPurchaseController.requestFundRelease(id: String, accountId: String)
 POST      /manager/:id/accounts/:accountId/property-purchase/extension              @uk.gov.hmrc.lisaapi.controllers.PropertyPurchaseController.requestExtension(id: String, accountId: String)
+POST      /manager/:id/accounts/:accountId/property-purchase/outcome              @uk.gov.hmrc.lisaapi.controllers.PropertyPurchaseController.reportPurchaseOutcome(id: String, accountId: String)
 POST      /manager/:id/accounts/:accountId/withdrawal-charges                       @uk.gov.hmrc.lisaapi.controllers.WithdrawalController.reportWithdrawalCharge(id: String, accountId: String)
 GET       /manager/:id/accounts/:accountId/withdrawal-charges/:transactionId        @uk.gov.hmrc.lisaapi.controllers.WithdrawalController.getWithdrawalCharge(id: String, accountId: String, transactionId: String)
 POST      /manager/:id/accounts/:accountId/transactions                             @uk.gov.hmrc.lisaapi.controllers.BonusPaymentController.requestBonusPayment(id: String, accountId: String)

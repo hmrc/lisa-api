@@ -34,7 +34,7 @@ object FundReleaseSupersedeDetails {
   implicit val formats = Json.format[FundReleaseSupersedeDetails]
 }
 
-trait RequestFundReleaseRequest extends Product {
+trait RequestFundReleaseRequest extends ReportLifeEventRequestBase {
   val eventDate: DateTime
   val withdrawalAmount: Amount
 }
@@ -88,7 +88,7 @@ object RequestFundReleaseRequest {
     }
   }
 
-  implicit val traitWrites: Writes[RequestFundReleaseRequest] = Writes[RequestFundReleaseRequest] {
+  val desWrites: Writes[RequestFundReleaseRequest] = Writes[RequestFundReleaseRequest] {
     case s: SupersedeFundReleaseRequest => supersedeWrites.writes(s)
     case i: InitialFundReleaseRequest => initialWrites.writes(i)
   }

@@ -9,8 +9,7 @@
         "extensionId": {
           "description": "The extension’s ID reference number. You must store this ID as it is needed for other API calls.",
           "type": "string",
-          "pattern": "^\\d{10}$",
-          "example": "6789000001"
+          "pattern": "^\\d{10}$"
         },
         "message": {
           "description": "A human-readable explanation for the result of the API call.",

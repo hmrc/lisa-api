@@ -20,15 +20,26 @@ import org.joda.time.DateTime
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsPath, Reads, Writes}
 
-case class ReportLifeEventRequest(eventType: LifeEventType,  eventDate: DateTime)
+trait ReportLifeEventRequestBase extends Product
+
+case class ReportLifeEventRequest(eventType: LifeEventType,  eventDate: DateTime) extends ReportLifeEventRequestBase
+
+object ReportLifeEventRequestBase {
+  implicit val writes: Writes[ReportLifeEventRequestBase] = Writes[ReportLifeEventRequestBase] {
+    case deathTerminalIllness: ReportLifeEventRequest => ReportLifeEventRequest.desWrites.writes(deathTerminalIllness)
+    case fundRelease: RequestFundReleaseRequest => RequestFundReleaseRequest.desWrites.writes(fundRelease)
+    case purchaseExtension: RequestPurchaseExtension => RequestPurchaseExtension.desWrites.writes(purchaseExtension)
+    case purchaseOutcome: RequestPurchaseOutcomeRequest => RequestPurchaseOutcomeRequest.desWrites.writes(purchaseOutcome)
+  }
+}
 
 object ReportLifeEventRequest {
-  implicit val reportLifeEventRequestReads: Reads[ReportLifeEventRequest] = (
+  implicit val userReads: Reads[ReportLifeEventRequest] = (
     (JsPath \ "eventType").read(JsonReads.lifeEventType) and
     (JsPath \ "eventDate").read(JsonReads.notFutureDate).map(new DateTime(_))
   )(ReportLifeEventRequest.apply _)
 
-  implicit val reportLifeEventRequestWrites: Writes[ReportLifeEventRequest] = (
+  val desWrites: Writes[ReportLifeEventRequest] = (
     (JsPath \ "eventType").write[String] and
     (JsPath \ "eventDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd"))
   )(unlift(ReportLifeEventRequest.unapply))

@@ -351,7 +351,7 @@
                                                                                                        <strong>lisaManagerReferenceNumber:</strong><br>
                                                                                                        <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
                                                                                                        <br>
-                                                                                                       <strong>accountId:</strong><br>70000000403
+                                                                                                       <strong>accountId:</strong><br>1234567890
                                                                                                        </p>
                                                                                                        </td>
                                                                                                        <td>

@@ -56,8 +56,6 @@ trait DesConnector extends ServicesConfig {
 
   /**
     * Attempts to create a new LISA investor
-    *
-    * @return A tuple of the http status code and an (optional) data response
     */
   def createInvestor(lisaManager: String, request: CreateLisaInvestorRequest)
                     (implicit hc: HeaderCarrier): Future[DesResponse] = {
@@ -149,8 +147,6 @@ trait DesConnector extends ServicesConfig {
 
   /**
     * Attempts to close a LISA account
-    *
-    * @return A tuple of the http status code and an (optional) data response
     */
   def closeAccount(lisaManager: String, accountId: String, request: CloseLisaAccountRequest)
                   (implicit hc: HeaderCarrier): Future[DesResponse] = {
@@ -170,59 +166,15 @@ trait DesConnector extends ServicesConfig {
   /**
     * Attempts to report a LISA Life Event
     */
-  def reportLifeEvent(lisaManager: String, accountId: String, request: ReportLifeEventRequest)
+  def reportLifeEvent(lisaManager: String, accountId: String, request: ReportLifeEventRequestBase)
                      (implicit hc: HeaderCarrier): Future[DesResponse] = {
 
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/life-event"
     Logger.debug("Posting Life Event request to des: " + uri)
-    val result = httpPost.POST[ReportLifeEventRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
+    val result = httpPost.POST[ReportLifeEventRequestBase, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
 
     result.map(res => {
       Logger.debug("Life Event request returned status: " + res.status)
-      res.status match {
-        case 409 => {
-          parseDesResponse[DesLifeEventExistResponse](res)
-        }
-        case _ => parseDesResponse[DesLifeEventResponse](res)
-      }
-
-    })
-  }
-
-  /**
-    * Attempts to request a Fund Release for a property purchase
-    */
-  def requestFundRelease(lisaManager: String, accountId: String, request: RequestFundReleaseRequest)
-                        (implicit hc: HeaderCarrier): Future[DesResponse] = {
-
-    val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/life-event"
-    Logger.debug("Posting Fund Release request to des: " + uri)
-    val result = httpPost.POST[RequestFundReleaseRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
-
-    result.map(res => {
-      Logger.debug("Fund Release request returned status: " + res.status)
-      res.status match {
-        case 409 => {
-          parseDesResponse[DesLifeEventExistResponse](res)
-        }
-        case _ => parseDesResponse[DesLifeEventResponse](res)
-      }
-
-    })
-  }
-
-  /**
-    * Attempts to request an extension to a Fund Release for a property purchase
-    */
-  def requestPurchaseExtension(lisaManager: String, accountId: String, request: RequestPurchaseExtension)
-                              (implicit hc: HeaderCarrier): Future[DesResponse] = {
-
-    val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/life-event"
-    Logger.debug("Posting purchase extension request to des: " + uri)
-    val result = httpPost.POST[RequestPurchaseExtension, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
-
-    result.map(res => {
-      Logger.debug("Purchase extension request returned status: " + res.status)
       res.status match {
         case 409 => {
           parseDesResponse[DesLifeEventExistResponse](res)
@@ -251,22 +203,6 @@ trait DesConnector extends ServicesConfig {
         case _ => parseDesResponse[DesFailureResponse](res)
       }
 
-    })
-  }
-
-  /**
-    * Attempts to get a LISA Life Event
-    */
-  def getLifeEvent(lisaManager: String, accountId: String, eventId: String)
-                  (implicit hc: HeaderCarrier): Future[DesResponse] = {
-
-    val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/life-event/$eventId"
-    Logger.debug("Posting Life Event request to des: " + uri)
-    val result = httpGet.GET(uri)(httpReads, updateHeaderCarrier(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
-
-    result.map(res => {
-      Logger.debug("Get Life Event request returned status: " + res.status)
-      parseDesResponse[DesLifeEventRetrievalResponse](res)
     })
   }
 
