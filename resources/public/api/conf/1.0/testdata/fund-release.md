@@ -344,6 +344,43 @@
 </pre>
                                                                                                    </td>
                                                                                                    </tr>
+                                                                                                   <tr>
+                                                                                                   <td>
+                                                                                                       <p>Invalid Data Provided</p>
+                                                                                                       <p class="code--block">
+                                                                                                       <strong>lisaManagerReferenceNumber:</strong><br>
+                                                                                                       <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
+                                                                                                       <br>
+                                                                                                       <strong>accountId:</strong><br>70000000403
+                                                                                                       </p>
+                                                                                                       </td>
+                                                                                                       <td>
+<pre class="code--block">
+{
+  "eventDate": "2017-05-10",
+  "withdrawalAmount": 4000.00,
+  "conveyancerReference": "CR12345-6789",
+  "propertyDetails": {
+    "nameOrNumber": "1",
+    "postalCode": "AA11 1AA"
+  },
+  "supersede": {
+    "originalFundReleaseId": "3456789000",
+    "originalEventDate": "2017-05-05"
+  }
+}
+</pre>
+                                                                                                         </td>
+                                                                                                         <td>
+                                                                                                             <p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
+                                                                                                         <pre class="code--block">
+{
+  "code": "INVALID_DATA_PROVIDED",
+  "message": "You can only change eventDate or withdrawalAmount when superseding a property purchase fund release"
+}
+</pre>
+                                                                                                          </td>
+                                                                                                          </tr>  
                                                                                                     <tr>
                                                                                                     <td>
                                                                                                        <p>Account ID does not exist</p>
