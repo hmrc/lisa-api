@@ -97,7 +97,6 @@ object MicroserviceGlobal extends DefaultMicroserviceGlobal with RunMode with Mi
 
   override def onRouteRequest(request: RequestHeader): Option[Handler] = {
     val versionRegex = """application\/vnd.hmrc.(\d.\d)\+json""".r
-    hc.headers.collectFirst{ case ("Accept", versionRegex(ver)) => ver }
     val version = request.headers.get("Accept") collect { case versionRegex(version) => version }
     version match {
       case Some(VERSION_1) =>
