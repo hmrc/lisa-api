@@ -324,7 +324,7 @@
         </tr>
         <tr>
             <td>
-                <p>A first extension has not been approved</p>
+                <p>A first extension has not yet been approved</p>
                 <p class="code--block">
                     lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a>
                     <br>
@@ -344,7 +344,7 @@
 <pre class="code--block">
 {
   "code": "FIRST_EXTENSION_NOT_APPROVED",
-  "message": "A first extension has not been approved"
+  "message": "A first extension has not yet been approved"
 }
 </pre>
             </td>
