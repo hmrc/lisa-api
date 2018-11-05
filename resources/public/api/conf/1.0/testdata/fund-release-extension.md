@@ -344,7 +344,7 @@
 <pre class="code--block">
 {
   "code": "FIRST_EXTENSION_NOT_APPROVED",
-  "message": "A first extension has not been approved"
+  "message": "A first extension has not yet been approved"
 }
 </pre>
             </td>

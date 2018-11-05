@@ -561,7 +561,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
       doExtensionRequest(extensionJson){ res =>
         status(res) mustBe FORBIDDEN
         (contentAsJson(res) \ "code").as[String] mustBe "FIRST_EXTENSION_NOT_APPROVED"
-        (contentAsJson(res) \ "message").as[String] mustBe "A first extension has not been approved"
+        (contentAsJson(res) \ "message").as[String] mustBe "A first extension has not yet been approved"
       }
     }
 
