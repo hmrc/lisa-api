@@ -20,9 +20,10 @@ import play.api.Logger
 import play.api.data.validation.ValidationError
 import play.api.libs.json.Json.toJson
 import play.api.libs.json._
-import play.api.mvc.{Action, AnyContent, Request, Result}
+import play.api.mvc._
 import uk.gov.hmrc.auth.core.retrieve.Retrievals.internalId
 import uk.gov.hmrc.auth.core.{AuthorisationException, AuthorisedFunctions, Enrolment, InsufficientEnrolments}
+import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.utils.ErrorConverter
@@ -33,7 +34,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 
-trait LisaController extends BaseController with HeaderValidator with RunMode with AuthorisedFunctions {
+trait LisaController extends BaseController with LisaConstants with HeaderValidator with RunMode with AuthorisedFunctions {
 
   val authConnector: LisaAuthConnector = LisaAuthConnector
   lazy val errorConverter: ErrorConverter = ErrorConverter
@@ -128,6 +129,14 @@ trait LisaController extends BaseController with HeaderValidator with RunMode wi
 
   def todo(id: String,accountId:String,transactionId:String): Action[AnyContent] = Action.async { _ =>
     Future.successful(NotImplemented(Json.toJson(ErrorNotImplemented)))
+  }
+
+  def apiVersion(headers: Headers): String = {
+    headers.get("Accept").map{
+      acc => matchHeader(acc).map { res =>
+        res.group("version")
+      }.getOrElse(VERSION_1)
+    }.getOrElse(VERSION_1)
   }
 }
 
