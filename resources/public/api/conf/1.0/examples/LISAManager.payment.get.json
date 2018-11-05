@@ -1,0 +1,14 @@
+{
+  "lisaManagerReferenceNumber": "Z123456",
+  "payments": [
+    {
+      "paymentAmount": 10000,
+      "paymentDate": "2017-06-01",
+      "paymentReference": "1040000872"
+    },
+    {
+      "paymentAmount": 12000,
+      "dueDate": "2017-07-04"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "investorId" : "9876543210",
+  "accountId" :"8765432100",
+  "creationReason" : "Transferred",
+  "firstSubscriptionDate" : "2017-04-06",
+  "transferAccount": {
+    "transferredFromAccountId": "98123459898",
+    "transferredFromLMRN": "Z543333",
+    "transferInDate": "2017-04-06"
+  }
+}

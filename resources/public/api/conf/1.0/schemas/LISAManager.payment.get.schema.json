@@ -1,0 +1,64 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "lisaManagerReferenceNumber": {
+      "description": "The reference given to the LISA provider when they applied for approval from HMRC.",
+      "$ref": "#/definitions/LISAManagerReferenceNumberType"
+    },
+    "payments": {
+      "description": "Payments made by or due from HMRC in the specific date range.",
+      "type": "array",
+      "min": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "paymentAmount": {
+            "description": "Amount paid or due to be paid to the LISA provider.",
+            "type": "number",
+            "example": "23456.00"
+          },
+          "paymentReference": {
+            "description": "Payment reference number. Will be returned only for a paid payment.",
+            "$ref": "#/definitions/PaymentRefType"
+          },
+          "paymentDate": {
+            "description": "Date the payment was made. Will be returned only for a paid payment.",
+            "$ref": "#/definitions/ISO8601-Date"
+          },
+          "dueDate": {
+            "description": "Date the payment is due to be paid on. Will be returned only for a pending payment.",
+            "$ref": "#/definitions/ISO8601-Date"
+          }
+        },
+        "required": [
+          "paymentAmount"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "lisaManagerReferenceNumber",
+    "payments"
+  ],
+  "additionalProperties": false,
+  "definitions": {
+    "LISAManagerReferenceNumberType": {
+      "type": "string",
+      "pattern": "^Z([0-9]{4}|[0-9]{6})$",
+      "example": "Z1234"
+    },
+    "PaymentRefType": {
+      "type": "string",
+      "pattern": "^.{1,35}$",
+      "example": "1234567890"
+    },
+    "ISO8601-Date": {
+      "id": "full-date",
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+      "example": "2017-05-20"
+    }
+  }
+}

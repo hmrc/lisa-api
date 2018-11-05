@@ -1,0 +1,27 @@
+{
+  "hmrcTransactionId" : "1111111111",
+  "accountId" : "1234567890",
+  "LISAManagerReferenceNumber" : "Z543210",
+  "paymentReference" : "1234565432",
+
+  "transactionType" : "bonus",
+  "transactionTimestamp" : "2017-06-19T11:55Z",
+  "amount" : 2345.67,
+  "paymentForTransaction" : "3333333333",
+
+  "applicablePeriod" :
+  {
+    "startDate" : "2017-06-06",
+    "endDate" : "2017-07-05"
+  },
+
+  "_links" :
+  {
+    "self" : {"href" : "/lisa/manager/Z543210/hmrc-transactions/1111111111"},
+    "investor" : {"href" : "/lisa/investors/87654321"},
+    "account" : {"href" : "/lisa/manager/Z543210/accounts/1234567890"},
+    "manager" : {"href" : "/lisa/manager/Z543210"},
+    "payment" : {"href" : "/lisa/manager/Z543210/payments/1234565432"},
+    "lisaTransaction" : {"href" : "/lisa/manager/Z543210/accounts/1234567890/transactions/3333333333"}
+  }
+}
