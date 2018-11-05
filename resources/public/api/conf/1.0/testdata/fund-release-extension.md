@@ -324,7 +324,7 @@
         </tr>
         <tr>
             <td>
-                <p>A first extension has not been approved</p>
+                <p>A first extension has not yet been approved</p>
                 <p class="code--block">
                     lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a>
                     <br>
