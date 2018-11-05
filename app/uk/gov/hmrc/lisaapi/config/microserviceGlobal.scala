@@ -21,7 +21,7 @@ import net.ceedubs.ficus.Ficus._
 import play.api._
 import play.api.libs.json.Json
 import play.api.mvc.Results.{NotFound, Status}
-import play.api.mvc.{RequestHeader, Result}
+import play.api.mvc.{Handler, RequestHeader, Result}
 import uk.gov.hmrc.lisaapi.connectors.ServiceLocatorConnector
 import uk.gov.hmrc.play.config.{AppName, ControllerConfig, RunMode}
 import uk.gov.hmrc.play.microservice.bootstrap.DefaultMicroserviceGlobal
@@ -30,7 +30,8 @@ import uk.gov.hmrc.lisaapi.controllers._
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.microservice.filters.{ AuditFilter, LoggingFilter, MicroserviceFilterSupport }
+import uk.gov.hmrc.lisaapi.LisaConstants
+import uk.gov.hmrc.play.microservice.filters.{AuditFilter, LoggingFilter, MicroserviceFilterSupport}
 
 trait ServiceLocatorRegistration extends GlobalSettings with RunMode {
 
@@ -61,7 +62,7 @@ object MicroserviceLoggingFilter extends LoggingFilter with MicroserviceFilterSu
   override def controllerNeedsLogging(controllerName: String) = ControllerConfiguration.paramsForController(controllerName).needsLogging
 }
 
-object MicroserviceGlobal extends DefaultMicroserviceGlobal with RunMode with MicroserviceFilterSupport with ServiceLocatorRegistration {
+object MicroserviceGlobal extends DefaultMicroserviceGlobal with RunMode with MicroserviceFilterSupport with ServiceLocatorRegistration with LisaConstants {
   override val auditConnector = MicroserviceAuditConnector
 
   override def microserviceMetricsConfig(implicit app: Application): Option[Configuration] = app.configuration.getConfig(s"microservice.metrics")
@@ -93,5 +94,19 @@ object MicroserviceGlobal extends DefaultMicroserviceGlobal with RunMode with Mi
   }
 
   override def onHandlerNotFound(request: RequestHeader): Future[Result] = Future.successful(NotFound(Json.toJson(ErrorNotFound)))
+
+  override def onRouteRequest(request: RequestHeader): Option[Handler] = {
+    val versionRegex = """application\/vnd.hmrc.(\d.\d)\+json""".r
+    hc.headers.collectFirst{ case ("Accept", versionRegex(ver)) => ver }
+    val version = request.headers.get("Accept") collect { case versionRegex(version) => version }
+    version match {
+      case Some(VERSION_1) =>
+        v1.Routes.routes.lift(request)
+      case Some(VERSION_2) =>
+        v2.Routes.routes.lift(request)
+      case _ =>
+        super.onRouteRequest(request)
+    }
+  }
 
 }

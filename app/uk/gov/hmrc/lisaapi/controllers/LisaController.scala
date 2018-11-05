@@ -21,7 +21,6 @@ import play.api.data.validation.ValidationError
 import play.api.libs.json.Json.toJson
 import play.api.libs.json._
 import play.api.mvc.{Action, AnyContent, Request, Result}
-import uk.gov.hmrc.api.controllers.HeaderValidator
 import uk.gov.hmrc.auth.core.retrieve.Retrievals.internalId
 import uk.gov.hmrc.auth.core.{AuthorisationException, AuthorisedFunctions, Enrolment, InsufficientEnrolments}
 import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
