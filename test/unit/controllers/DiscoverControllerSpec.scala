@@ -26,7 +26,7 @@ import play.api.test.Helpers._
 import play.api.test._
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
-import uk.gov.hmrc.lisaapi.controllers.{DiscoverController, ErrorBadRequestLmrn}
+import uk.gov.hmrc.lisaapi.controllers.{DiscoverController, ErrorAcceptHeaderInvalid, ErrorBadRequestLmrn}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -78,6 +78,22 @@ class DiscoverControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSu
 
         (json \ "code").as[String] mustBe ErrorBadRequestLmrn.errorCode
         (json \ "message").as[String] mustBe ErrorBadRequestLmrn.message
+      }
+
+    }
+
+    "return with status 406 not acceptable" when {
+
+      "given an unsupported api version in the accept header" in {
+        val v99: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.99.0+json")
+        val res = SUT.discover("Z0192831").apply(FakeRequest(Helpers.GET, "/").withHeaders(v99))
+
+        status(res) mustBe NOT_ACCEPTABLE
+
+        val json = contentAsJson(res)
+
+        (json \ "code").as[String] mustBe ErrorAcceptHeaderInvalid.errorCode
+        (json \ "message").as[String] mustBe ErrorAcceptHeaderInvalid.message
       }
 
     }
