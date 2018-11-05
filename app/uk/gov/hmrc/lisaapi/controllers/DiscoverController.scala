@@ -40,7 +40,7 @@ class DiscoverController extends LisaController {
     }
   }
 
-  private def v1(lisaManagerReferenceNumber: String): String = s"""{
+  private val v1: String => String = (lisaManagerReferenceNumber: String) => s"""{
     "lisaManagerReferenceNumber": "$lisaManagerReferenceNumber",
     "_links":
     {
@@ -65,7 +65,7 @@ class DiscoverController extends LisaController {
     }
   }"""
 
-  private def v2(lisaManagerReferenceNumber: String): String = s"""{
+  private val v2: String => String = (lisaManagerReferenceNumber: String) => s"""{
     "lisaManagerReferenceNumber": "$lisaManagerReferenceNumber",
     "_links":
     {
