@@ -21,6 +21,7 @@ import play.api.data.validation.ValidationError
 import play.api.libs.json.Json.toJson
 import play.api.libs.json._
 import play.api.mvc._
+import uk.gov.hmrc.api.controllers.HeaderValidator
 import uk.gov.hmrc.auth.core.retrieve.Retrievals.internalId
 import uk.gov.hmrc.auth.core.{AuthorisationException, AuthorisedFunctions, Enrolment, InsufficientEnrolments}
 import uk.gov.hmrc.lisaapi.LisaConstants
@@ -36,6 +37,7 @@ import scala.util.{Failure, Success, Try}
 
 trait LisaController extends BaseController with LisaConstants with HeaderValidator with RunMode with AuthorisedFunctions {
 
+  override val validateVersion: String => Boolean = str => str == "1.0" || str == "2.0"
   val authConnector: LisaAuthConnector = LisaAuthConnector
   lazy val errorConverter: ErrorConverter = ErrorConverter
 

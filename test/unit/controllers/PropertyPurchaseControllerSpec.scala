@@ -41,7 +41,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
   with OneAppPerSuite
   with BeforeAndAfter {
 
-  val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
+  val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.2.0+json")
   val lisaManager = "Z019283"
   val accountId = "ABC/12345"
   val eventDate = "2017-04-06"
@@ -348,6 +348,16 @@ class PropertyPurchaseControllerSpec extends PlaySpec
       }
     }
 
+    "return with 406 not acceptable and a code of ACCEPT_HEADER_INVALID" when {
+      "attempting to use the v1 of the api" in {
+        doFundReleaseRequest(fundReleaseJson, header = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")) { res =>
+          status(res) mustBe NOT_ACCEPTABLE
+          (contentAsJson(res) \ "code").as[String] mustBe "ACCEPT_HEADER_INVALID"
+          (contentAsJson(res) \ "message").as[String] mustBe "The accept header is missing or invalid"
+        }
+      }
+    }
+
     "return with 409 conflict and a code of FUND_RELEASE_ALREADY_EXISTS" in {
       when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventAlreadyExistsResponse))
       doFundReleaseRequest(fundReleaseJson){ res =>
@@ -610,6 +620,16 @@ class PropertyPurchaseControllerSpec extends PlaySpec
       }
     }
 
+    "return with 406 not acceptable and a code of ACCEPT_HEADER_INVALID" when {
+      "attempting to use the v1 of the api" in {
+        doExtensionRequest(extensionJson, header = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")) { res =>
+          status(res) mustBe NOT_ACCEPTABLE
+          (contentAsJson(res) \ "code").as[String] mustBe "ACCEPT_HEADER_INVALID"
+          (contentAsJson(res) \ "message").as[String] mustBe "The accept header is missing or invalid"
+        }
+      }
+    }
+
     "return with 409 conflict and a code of EXTENSION_ALREADY_EXISTS" in {
       when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventAlreadyExistsResponse))
       doExtensionRequest(extensionJson){ res =>
@@ -808,6 +828,16 @@ class PropertyPurchaseControllerSpec extends PlaySpec
       }
     }
 
+    "return with 406 not acceptable and a code of ACCEPT_HEADER_INVALID" when {
+      "attempting to use the v1 of the api" in {
+        doOutcomeRequest(outcomeJson, header = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")) { res =>
+          status(res) mustBe NOT_ACCEPTABLE
+          (contentAsJson(res) \ "code").as[String] mustBe "ACCEPT_HEADER_INVALID"
+          (contentAsJson(res) \ "message").as[String] mustBe "The accept header is missing or invalid"
+        }
+      }
+    }
+
     "return with 404 not found and a code of INVESTOR_ACCOUNTID_NOT_FOUND" in {
       when(mockService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventAccountNotFoundResponse))
       doOutcomeRequest(outcomeJson) { res =>
@@ -866,25 +896,25 @@ class PropertyPurchaseControllerSpec extends PlaySpec
 
   }
 
-  def doFundReleaseRequest(jsonString: String, lmrn: String = lisaManager, accId: String = accountId)(callback: (Future[Result]) =>  Unit): Unit = {
+  def doFundReleaseRequest(jsonString: String, lmrn: String = lisaManager, accId: String = accountId, header: (String, String) = acceptHeader)(callback: (Future[Result]) =>  Unit): Unit = {
     val req = FakeRequest(Helpers.POST, "/")
-    val res = SUT.requestFundRelease(lmrn, accId).apply(req.withHeaders(acceptHeader).
+    val res = SUT.requestFundRelease(lmrn, accId).apply(req.withHeaders(header).
       withBody(AnyContentAsJson(Json.parse(jsonString))))
 
     callback(res)
   }
 
-  def doExtensionRequest(jsonString: String, lmrn: String = lisaManager, accId: String = accountId)(callback: (Future[Result]) =>  Unit): Unit = {
+  def doExtensionRequest(jsonString: String, lmrn: String = lisaManager, accId: String = accountId, header: (String, String) = acceptHeader)(callback: (Future[Result]) =>  Unit): Unit = {
     val req = FakeRequest(Helpers.POST, "/")
-    val res = SUT.requestExtension(lmrn, accId).apply(req.withHeaders(acceptHeader).
+    val res = SUT.requestExtension(lmrn, accId).apply(req.withHeaders(header).
       withBody(AnyContentAsJson(Json.parse(jsonString))))
 
     callback(res)
   }
 
-  def doOutcomeRequest(jsonString: String, lmrn: String = lisaManager, accId: String = accountId)(callback: (Future[Result]) =>  Unit): Unit = {
+  def doOutcomeRequest(jsonString: String, lmrn: String = lisaManager, accId: String = accountId, header: (String, String) = acceptHeader)(callback: (Future[Result]) =>  Unit): Unit = {
     val req = FakeRequest(Helpers.POST, "/")
-    val res = SUT.reportPurchaseOutcome(lmrn, accId).apply(req.withHeaders(acceptHeader).
+    val res = SUT.reportPurchaseOutcome(lmrn, accId).apply(req.withHeaders(header).
       withBody(AnyContentAsJson(Json.parse(jsonString))))
 
     callback(res)

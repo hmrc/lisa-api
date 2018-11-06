@@ -31,6 +31,7 @@ import scala.concurrent.Future
 
 class PropertyPurchaseController extends LisaController with LisaConstants {
 
+  override val validateVersion: String => Boolean = _ == "2.0"
   val service: LifeEventService = LifeEventService
   val auditService: AuditService = AuditService
 
