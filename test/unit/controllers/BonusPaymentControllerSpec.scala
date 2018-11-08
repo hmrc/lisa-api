@@ -47,7 +47,8 @@ class BonusPaymentControllerSpec extends PlaySpec
 
   case object TestBonusPaymentResponse extends RequestBonusPaymentResponse
 
-  val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
+  val acceptHeaderV1: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
+  val acceptHeaderV2: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.2.0+json")
   val lisaManager = "Z019283"
   val accountId = "ABC/12345"
   val transactionId = "1234567890"
@@ -606,52 +607,101 @@ class BonusPaymentControllerSpec extends PlaySpec
 
   "the GET bonus payment endpoint" must {
 
-    "return 200 success response" in {
-      when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusResponse(
-        Some("1234567891"),
-        new DateTime("2017-04-06"),
-        new DateTime("2017-05-05"),
-        Some(HelpToBuyTransfer(0f, 10f)),
-        InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
-        Bonuses(1000f, 1000f, Some(1000f), "Life Event"),
-        Some("1234567892"),
-        Some(BonusRecovery(100, "1234567890", 1100, -100)),
-        "Paid",
-        new DateTime("2017-05-20"))
-      ))
+    "return 200 success response with supersede data" when {
+      "given an api version of 2" in {
+        when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusResponse(
+          Some("1234567891"),
+          new DateTime("2017-04-06"),
+          new DateTime("2017-05-05"),
+          Some(HelpToBuyTransfer(0f, 10f)),
+          InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
+          Bonuses(1000f, 1000f, Some(1000f), "Life Event"),
+          Some("1234567892"),
+          Some(BonusRecovery(100, "1234567890", 1100, -100)),
+          "Paid",
+          new DateTime("2017-05-20"))
+        ))
 
-      doGetBonusPaymentTransactionRequest(res => {
-        status(res) mustBe OK
-        contentAsJson(res) mustBe Json.obj(
-          "lifeEventId" -> "1234567891",
-          "periodStartDate" -> "2017-04-06",
-          "periodEndDate" -> "2017-05-05",
-          "htbTransfer" -> Json.obj(
-            "htbTransferInForPeriod" -> 0,
-            "htbTransferTotalYTD" -> 10
-          ),
-          "inboundPayments" -> Json.obj(
-            "newSubsForPeriod" -> 4000,
-              "newSubsYTD" -> 4000,
-              "totalSubsForPeriod" -> 4000,
-              "totalSubsYTD" -> 4000
-          ),
-          "bonuses" -> Json.obj(
-            "bonusDueForPeriod" -> 1000,
-            "totalBonusDueYTD" -> 1000,
-            "bonusPaidYTD" -> 1000,
-            "claimReason" -> "Life Event"
-          ),
-          "supersede" -> Json.obj(
-            "automaticRecoveryAmount" -> 100,
-            "originalTransactionId" -> "1234567890",
-            "originalBonusDueForPeriod" -> 1100,
-            "transactionResult" -> -100,
-            "reason" -> "Bonus recovery"
-          ),
-          "supersededBy" -> "1234567892"
+        doGetBonusPaymentTransactionRequest(
+          res => {
+            status(res) mustBe OK
+            contentAsJson(res) mustBe Json.obj(
+              "lifeEventId" -> "1234567891",
+              "periodStartDate" -> "2017-04-06",
+              "periodEndDate" -> "2017-05-05",
+              "htbTransfer" -> Json.obj(
+                "htbTransferInForPeriod" -> 0,
+                "htbTransferTotalYTD" -> 10
+              ),
+              "inboundPayments" -> Json.obj(
+                "newSubsForPeriod" -> 4000,
+                "newSubsYTD" -> 4000,
+                "totalSubsForPeriod" -> 4000,
+                "totalSubsYTD" -> 4000
+              ),
+              "bonuses" -> Json.obj(
+                "bonusDueForPeriod" -> 1000,
+                "totalBonusDueYTD" -> 1000,
+                "bonusPaidYTD" -> 1000,
+                "claimReason" -> "Life Event"
+              ),
+              "supersede" -> Json.obj(
+                "automaticRecoveryAmount" -> 100,
+                "originalTransactionId" -> "1234567890",
+                "originalBonusDueForPeriod" -> 1100,
+                "transactionResult" -> -100,
+                "reason" -> "Bonus recovery"
+              ),
+              "supersededBy" -> "1234567892"
+            )
+          }
         )
-      })
+      }
+    }
+
+    "return 200 success response without supersede data" when {
+      "given an api version of 1" in {
+        when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusResponse(
+          Some("1234567891"),
+          new DateTime("2017-04-06"),
+          new DateTime("2017-05-05"),
+          Some(HelpToBuyTransfer(0f, 10f)),
+          InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
+          Bonuses(1000f, 1000f, Some(1000f), "Life Event"),
+          Some("1234567892"),
+          Some(BonusRecovery(100, "1234567890", 1100, -100)),
+          "Paid",
+          new DateTime("2017-05-20"))
+        ))
+
+        doGetBonusPaymentTransactionRequest(
+          res => {
+            status(res) mustBe OK
+            contentAsJson(res) mustBe Json.obj(
+              "lifeEventId" -> "1234567891",
+              "periodStartDate" -> "2017-04-06",
+              "periodEndDate" -> "2017-05-05",
+              "htbTransfer" -> Json.obj(
+                "htbTransferInForPeriod" -> 0,
+                "htbTransferTotalYTD" -> 10
+              ),
+              "inboundPayments" -> Json.obj(
+                "newSubsForPeriod" -> 4000,
+                "newSubsYTD" -> 4000,
+                "totalSubsForPeriod" -> 4000,
+                "totalSubsYTD" -> 4000
+              ),
+              "bonuses" -> Json.obj(
+                "bonusDueForPeriod" -> 1000,
+                "totalBonusDueYTD" -> 1000,
+                "bonusPaidYTD" -> 1000,
+                "claimReason" -> "Life Event"
+              )
+            )
+          },
+          acceptHeaderV1
+        )
+      }
     }
 
     "return 404 status invalid lisa account (investor id not found)" in {
@@ -711,21 +761,21 @@ class BonusPaymentControllerSpec extends PlaySpec
   }
 
   def doRequest(jsonString: String, lmrn: String = lisaManager)(callback: (Future[Result]) =>  Unit): Unit = {
-    val res = SUT.requestBonusPayment(lmrn, accountId).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
+    val res = SUT.requestBonusPayment(lmrn, accountId).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeaderV1).
       withBody(AnyContentAsJson(Json.parse(jsonString))))
 
     callback(res)
   }
 
   def doSyncRequest(jsonString: String)(callback: (Result) =>  Unit): Unit = {
-    val res = await(SUT.requestBonusPayment(lisaManager, accountId).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
+    val res = await(SUT.requestBonusPayment(lisaManager, accountId).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeaderV1).
       withBody(AnyContentAsJson(Json.parse(jsonString)))))
 
     callback(res)
   }
 
-  def doGetBonusPaymentTransactionRequest(callback: (Future[Result]) => Unit) {
-    val res = SUT.getBonusPayment(lisaManager, accountId, transactionId).apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
+  def doGetBonusPaymentTransactionRequest(callback: (Future[Result]) => Unit, header: (String, String) = acceptHeaderV2) {
+    val res = SUT.getBonusPayment(lisaManager, accountId, transactionId).apply(FakeRequest(Helpers.GET, "/").withHeaders(header))
     callback(res)
   }
 

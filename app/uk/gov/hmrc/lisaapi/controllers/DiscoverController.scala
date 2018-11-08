@@ -29,13 +29,13 @@ class DiscoverController extends LisaController {
 
     withValidLMRN(lisaManagerReferenceNumber) { () =>
       withEnrolment(lisaManagerReferenceNumber) { (_) =>
-        val result = apiVersion(request.headers) match {
-          case VERSION_1 => v1(lisaManagerReferenceNumber)
-          case VERSION_2 => v2(lisaManagerReferenceNumber)
+        val result = withApiVersion {
+          case Some(VERSION_1) => Ok(Json.parse(v1(lisaManagerReferenceNumber)))
+          case Some(VERSION_2) => Ok(Json.parse(v2(lisaManagerReferenceNumber)))
         }
 
         LisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.DISCOVER)
-        Future.successful(Ok(Json.parse(result)))
+        Future.successful(result)
       }
     }
   }

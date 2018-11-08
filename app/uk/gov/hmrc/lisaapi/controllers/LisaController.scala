@@ -24,14 +24,15 @@ import play.api.mvc._
 import uk.gov.hmrc.api.controllers.HeaderValidator
 import uk.gov.hmrc.auth.core.retrieve.Retrievals.internalId
 import uk.gov.hmrc.auth.core.{AuthorisationException, AuthorisedFunctions, Enrolment, InsufficientEnrolments}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.utils.ErrorConverter
 import uk.gov.hmrc.play.config.RunMode
+import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext._
 import uk.gov.hmrc.play.microservice.controller.BaseController
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 
@@ -133,12 +134,21 @@ trait LisaController extends BaseController with LisaConstants with HeaderValida
     Future.successful(NotImplemented(Json.toJson(ErrorNotImplemented)))
   }
 
-  def apiVersion(headers: Headers): String = {
-    headers.get("Accept").map{
-      acc => matchHeader(acc).map { res =>
-        res.group("version")
-      }.getOrElse(VERSION_1)
-    }.getOrElse(VERSION_1)
+  private[controllers] def withApiVersion(pf: PartialFunction[Option[String], Result])
+                                      (implicit request: Request[AnyContent]): Result = {
+    pf.orElse[Option[String], Result]{
+      case Some(_) =>
+        Logger.info("request header contains an unsupported api version")
+        NotFound(Json.toJson(ErrorNotFound))
+      case None =>
+        Logger.info("request header contains an incorrect or empty api version")
+        NotAcceptable(Json.toJson(ErrorAcceptHeaderInvalid))
+    }(getAPIVersionFromRequest)
+  }
+
+  private[controllers] def getAPIVersionFromRequest(implicit request: Request[AnyContent]): Option[String] = {
+    val reg = """application\/vnd\.hmrc\.(\d.\d)\+json""".r
+    request.headers.get(ACCEPT).flatMap(value => Option(value) collect { case reg(value) => value })
   }
 }
 

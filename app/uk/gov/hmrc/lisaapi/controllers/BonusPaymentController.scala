@@ -19,7 +19,7 @@ package uk.gov.hmrc.lisaapi.controllers
 import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent, Result}
+import play.api.mvc.{Action, AnyContent, Request, Result}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
@@ -27,8 +27,7 @@ import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, BonusOrWithdrawalService, BonusPaymentService, CurrentDateService}
 import uk.gov.hmrc.lisaapi.utils.BonusPaymentValidator
 import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
-
-import scala.concurrent.ExecutionContext.Implicits.global
+import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext._
 import scala.concurrent.Future
 
 class BonusPaymentController extends LisaController with LisaConstants {
@@ -89,11 +88,14 @@ class BonusPaymentController extends LisaController with LisaConstants {
     }
 
   private def processGetBonusPayment(lisaManager:String, accountId:String, transactionId: String)
-                                    (implicit hc: HeaderCarrier, startTime: Long) = {
+                                    (implicit hc: HeaderCarrier, startTime: Long, request: Request[AnyContent]) = {
     getService.getBonusOrWithdrawal(lisaManager, accountId, transactionId).map {
       case response: GetBonusResponse =>
         LisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.BONUS_PAYMENT)
-        Ok(Json.toJson(response))
+        withApiVersion {
+          case Some(VERSION_1) => Ok(Json.toJson(response.copy(supersede = None, supersededBy = None)))
+          case Some(VERSION_2) => Ok(Json.toJson(response))
+        }
 
       case _: GetWithdrawalResponse =>
         LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.BONUS_PAYMENT)
