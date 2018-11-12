@@ -230,7 +230,6 @@ class BonusPaymentController extends LisaController with LisaConstants {
     Created(Json.toJson(ApiResponse(data = Some(responseData), success = true, status = CREATED)))
   }
 
-  // scalastyle:off cyclomatic.complexity method.length
   private def handleFailure(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest, errorResponse: RequestBonusPaymentErrorResponse)
                            (implicit hc: HeaderCarrier, startTime: Long) = {
     Logger.debug("Matched failure response")
