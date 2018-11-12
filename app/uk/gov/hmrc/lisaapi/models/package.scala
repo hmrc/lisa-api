@@ -85,6 +85,10 @@ package object models {
       "^(Life Event|Regular Bonus|Superseded Bonus)$".r,
       "error.formatting.claimReason"
     )
+    val bonusClaimReasonV1: Reads[BonusClaimReason] = Reads.pattern(
+      "^(Life Event|Regular Bonus)$".r,
+      "error.formatting.claimReason"
+    )
     val propertyPurchaseResult: Reads[PropertyPurchaseResult] = Reads.pattern(
       "^(Purchase failed|Purchase completed)$".r,
       "error.formatting.propertyPurchaseResult"

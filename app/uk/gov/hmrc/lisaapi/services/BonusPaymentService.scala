@@ -59,6 +59,7 @@ trait BonusPaymentService {
         Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
 
         failureResponse.code match {
+          case "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID" => RequestBonusPaymentAccountClosedOrVoid
           case "INVESTOR_ACCOUNT_ALREADY_CLOSED" => RequestBonusPaymentAccountClosed
           case "INVESTOR_ACCOUNT_ALREADY_CANCELLED" => RequestBonusPaymentAccountCancelled
           case "INVESTOR_ACCOUNT_ALREADY_VOID" => RequestBonusPaymentAccountVoid

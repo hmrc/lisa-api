@@ -625,7 +625,7 @@
                 <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
                 <br>
                 <strong>accountId:</strong><br>
-                0000000903
+                1000000903
               </p>
             </td>
             <td>
@@ -670,7 +670,7 @@
                <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
                <br>
                <strong>accountId:</strong><br>
-               1000000903
+               2000000903
              </p>
            </td>
            <td>
@@ -707,7 +707,53 @@
 </pre>
            </td>
       </tr>
+      
        <tr>
+           <td>
+             <p>Request for an account that has already been cancelled</p>
+             <p class="code--block">
+               <strong>lisaManagerReferenceNumber:</strong><br>
+               <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
+               <br>
+               <strong>accountId:</strong><br>
+               3000000903
+             </p>
+           </td>
+           <td>
+<pre class="code--block">
+{
+ "lifeEventId": "1234567802",
+ "periodStartDate": "2017-04-06",
+ "periodEndDate": "2017-05-05",
+ "htbTransfer": {
+   "htbTransferInForPeriod": 0.00,
+   "htbTransferTotalYTD": 0.00
+ },
+ "inboundPayments": {
+   "newSubsForPeriod": 4000.00,
+   "newSubsYTD": 4000.00,
+   "totalSubsForPeriod": 40000.00,
+   "totalSubsYTD": 40000.00
+ },
+ "bonuses": {
+   "bonusPaidYTD": 0.0,
+   "bonusDueForPeriod": 10000.00,
+   "totalBonusDueYTD": 10000.00,
+   "claimReason": "Life Event"
+ }
+}
+</pre>
+           </td>
+           <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
+<pre class="code--block">
+{
+ "code": "INVESTOR_ACCOUNT_ALREADY_CANCELLED",
+ "message": "The LISA account is already cancelled"
+}
+</pre>
+           </td>
+      </tr>
+      <tr>
             <td>
               <p>[sandbox-only] Request for a bonus claim after 5 April 2018 containing help to buy funds.</p>
               <p class="code--block">

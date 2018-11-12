@@ -41,3 +41,6 @@ case object RequestBonusPaymentError extends RequestBonusPaymentErrorResponse
 
 case class RequestBonusPaymentClaimAlreadyExists(transactionId: TransactionId) extends RequestBonusPaymentErrorResponse
 case class RequestBonusPaymentAlreadySuperseded(transactionId: TransactionId) extends RequestBonusPaymentErrorResponse
+
+@deprecated("Removed in v2 of the API")
+case object RequestBonusPaymentAccountClosedOrVoid extends RequestBonusPaymentErrorResponse

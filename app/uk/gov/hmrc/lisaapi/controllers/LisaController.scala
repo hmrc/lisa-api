@@ -134,15 +134,15 @@ trait LisaController extends BaseController with LisaConstants with HeaderValida
     Future.successful(NotImplemented(Json.toJson(ErrorNotImplemented)))
   }
 
-  private[controllers] def withApiVersion(pf: PartialFunction[Option[String], Result])
-                                      (implicit request: Request[AnyContent]): Result = {
-    pf.orElse[Option[String], Result]{
+  private[controllers] def withApiVersion(pf: PartialFunction[Option[String], Future[Result]])
+                                      (implicit request: Request[AnyContent]): Future[Result] = {
+    pf.orElse[Option[String], Future[Result]]{
       case Some(_) =>
         Logger.info("request header contains an unsupported api version")
-        NotFound(Json.toJson(ErrorNotFound))
+        Future.successful(NotFound(Json.toJson(ErrorNotFound)))
       case None =>
         Logger.info("request header contains an incorrect or empty api version")
-        NotAcceptable(Json.toJson(ErrorAcceptHeaderInvalid))
+        Future.successful(NotAcceptable(Json.toJson(ErrorAcceptHeaderInvalid)))
     }(getAPIVersionFromRequest)
   }
 

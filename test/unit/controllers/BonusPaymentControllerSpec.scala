@@ -113,6 +113,21 @@ class BonusPaymentControllerSpec extends PlaySpec
         }
       }
 
+      "attempting a superseded claim on v1 of the api" in {
+        doRequest(validBonusPaymentJson.replace("Life Event", "Superseded Bonus"))(
+          res => {
+            status(res) mustBe BAD_REQUEST
+            val json = contentAsJson(res)
+            (json \ "code").as[String] mustBe "BAD_REQUEST"
+            (json \ "message").as[String] mustBe "Bad Request"
+            (json \ "errors" \ 0 \ "code").as[String] mustBe "INVALID_FORMAT"
+            (json \ "errors" \ 0 \ "message").as[String] mustBe "Invalid format has been used"
+            (json \ "errors" \ 0 \ "path").as[String] mustBe "/bonuses/claimReason"
+          },
+          acceptHeaderV1
+        )
+      }
+
     }
 
     "return with status 403 forbidden" when {
@@ -203,14 +218,25 @@ class BonusPaymentControllerSpec extends PlaySpec
         }
       }
 
+      "given a RequestBonusPaymentAccountClosedOrVoid response from the service layer" in {
+        when(mockPostService.requestBonusPayment(any(), any(),any())(any())).thenReturn(
+          Future.successful(RequestBonusPaymentAccountClosedOrVoid))
+
+        doRequest(validBonusPaymentJson)  { res =>
+          status(res) mustBe FORBIDDEN
+          (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID"
+          (contentAsJson(res) \ "message").as[String] mustBe "This LISA account has already been closed or been made void by HMRC"
+        }
+      }
+
       "given a RequestBonusPaymentAccountClosed response from the service layer" in {
         when(mockPostService.requestBonusPayment(any(), any(),any())(any())).thenReturn(
           Future.successful(RequestBonusPaymentAccountClosed))
 
         doRequest(validBonusPaymentJson)  { res =>
           status(res) mustBe FORBIDDEN
-          (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID"
-          (contentAsJson(res) \ "message").as[String] mustBe "This LISA account has already been closed or been made void by HMRC"
+          (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CLOSED"
+          (contentAsJson(res) \ "message").as[String] mustBe "The LISA account is already closed"
         }
       }
 
@@ -220,8 +246,8 @@ class BonusPaymentControllerSpec extends PlaySpec
 
         doRequest(validBonusPaymentJson)  { res =>
           status(res) mustBe FORBIDDEN
-          (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID"
-          (contentAsJson(res) \ "message").as[String] mustBe "This LISA account has already been closed or been made void by HMRC"
+          (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CANCELLED"
+          (contentAsJson(res) \ "message").as[String] mustBe "The LISA account is already cancelled"
         }
       }
 
@@ -231,8 +257,8 @@ class BonusPaymentControllerSpec extends PlaySpec
 
         doRequest(validBonusPaymentJson)  { res =>
           status(res) mustBe FORBIDDEN
-          (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID"
-          (contentAsJson(res) \ "message").as[String] mustBe "This LISA account has already been closed or been made void by HMRC"
+          (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_VOID"
+          (contentAsJson(res) \ "message").as[String] mustBe "The LISA account is already void"
         }
       }
 
@@ -366,45 +392,86 @@ class BonusPaymentControllerSpec extends PlaySpec
 
     "audit bonusPaymentRequested" when {
 
-      "given a success response from the service layer and all optional fields" in {
-        when(mockPostService.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(RequestBonusPaymentOnTimeResponse("1928374")))
+      "given a success response from the service layer and all optional fields" when {
+        "using v1 of the API" in {
+          when(mockPostService.requestBonusPayment(any(), any(), any())(any())).
+            thenReturn(Future.successful(RequestBonusPaymentOnTimeResponse("1928374")))
 
-        doSyncRequest(validBonusPaymentJson) { res =>
+          doSyncRequest(validBonusPaymentJson)(
+            _ => {
+              val json = Json.parse(validBonusPaymentJson)
+              val htb = json \ "htbTransfer"
+              val inboundPayments = json \ "inboundPayments"
+              val bonuses = json \ "bonuses"
 
-          val json = Json.parse(validBonusPaymentJson)
-          val htb = json \ "htbTransfer"
-          val inboundPayments = json \ "inboundPayments"
-          val bonuses = json \ "bonuses"
-          val supersede = json \ "supersede"
+              verify(mockAuditService).audit(
+                auditType = MatcherEquals("bonusPaymentRequested"),
+                path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions"),
+                auditData = MatcherEquals(Map(
+                  "lisaManagerReferenceNumber" -> lisaManager,
+                  "accountId" -> accountId,
+                  "lateNotification" -> "no",
+                  "lifeEventId" -> (json \ "lifeEventId").as[String],
+                  "periodStartDate" -> (json \ "periodStartDate").as[String],
+                  "periodEndDate" -> (json \ "periodEndDate").as[String],
+                  "htbTransferInForPeriod" -> (htb \ "htbTransferInForPeriod").as[Amount].toString,
+                  "htbTransferTotalYTD" -> (htb \ "htbTransferTotalYTD").as[Amount].toString,
+                  "newSubsForPeriod" -> (inboundPayments \ "newSubsForPeriod").as[Amount].toString,
+                  "newSubsYTD" -> (inboundPayments \ "newSubsYTD").as[Amount].toString,
+                  "totalSubsForPeriod" -> (inboundPayments \ "totalSubsForPeriod").as[Amount].toString,
+                  "totalSubsYTD" -> (inboundPayments \ "totalSubsYTD").as[Amount].toString,
+                  "bonusDueForPeriod" -> (bonuses \ "bonusDueForPeriod").as[Amount].toString,
+                  "bonusPaidYTD" -> (bonuses \ "bonusPaidYTD").as[Amount].toString,
+                  "totalBonusDueYTD" -> (bonuses \ "totalBonusDueYTD").as[Amount].toString,
+                  "claimReason" -> (bonuses \ "claimReason").as[String]
+                ))
+              )(any())
+            },
+            acceptHeaderV1
+          )
+        }
+        "using v2 of the API" in {
+          when(mockPostService.requestBonusPayment(any(), any(), any())(any())).
+            thenReturn(Future.successful(RequestBonusPaymentOnTimeResponse("1928374")))
 
-          verify(mockAuditService).audit(
-            auditType = MatcherEquals("bonusPaymentRequested"),
-            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions"),
-            auditData = MatcherEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "accountId" -> accountId,
-              "lateNotification" -> "no",
-              "lifeEventId" -> (json \ "lifeEventId").as[String],
-              "periodStartDate" -> (json \ "periodStartDate").as[String],
-              "periodEndDate" -> (json \ "periodEndDate").as[String],
-              "htbTransferInForPeriod" -> (htb \ "htbTransferInForPeriod").as[Amount].toString,
-              "htbTransferTotalYTD" -> (htb \ "htbTransferTotalYTD").as[Amount].toString,
-              "newSubsForPeriod" -> (inboundPayments \ "newSubsForPeriod").as[Amount].toString,
-              "newSubsYTD" -> (inboundPayments \ "newSubsYTD").as[Amount].toString,
-              "totalSubsForPeriod" -> (inboundPayments \ "totalSubsForPeriod").as[Amount].toString,
-              "totalSubsYTD" -> (inboundPayments \ "totalSubsYTD").as[Amount].toString,
-              "bonusDueForPeriod" -> (bonuses \ "bonusDueForPeriod").as[Amount].toString,
-              "bonusPaidYTD" -> (bonuses \ "bonusPaidYTD").as[Amount].toString,
-              "totalBonusDueYTD" -> (bonuses \ "totalBonusDueYTD").as[Amount].toString,
-              "claimReason" -> (bonuses \ "claimReason").as[String],
-              "automaticRecoveryAmount" -> (supersede \ "automaticRecoveryAmount").as[Amount].toString,
-              "originalTransactionId" -> (supersede \ "originalTransactionId").as[String],
-              "originalBonusDueForPeriod" -> (supersede \ "originalBonusDueForPeriod").as[Amount].toString,
-              "transactionResult" -> (supersede \ "transactionResult").as[Amount].toString,
-              "reason" -> (supersede \ "reason").as[String]
-            ))
-          )(any())
+          doSyncRequest(validBonusPaymentJson)(
+            _ => {
+              val json = Json.parse(validBonusPaymentJson)
+              val htb = json \ "htbTransfer"
+              val inboundPayments = json \ "inboundPayments"
+              val bonuses = json \ "bonuses"
+              val supersede = json \ "supersede"
+
+              verify(mockAuditService).audit(
+                auditType = MatcherEquals("bonusPaymentRequested"),
+                path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions"),
+                auditData = MatcherEquals(Map(
+                  "lisaManagerReferenceNumber" -> lisaManager,
+                  "accountId" -> accountId,
+                  "lateNotification" -> "no",
+                  "lifeEventId" -> (json \ "lifeEventId").as[String],
+                  "periodStartDate" -> (json \ "periodStartDate").as[String],
+                  "periodEndDate" -> (json \ "periodEndDate").as[String],
+                  "htbTransferInForPeriod" -> (htb \ "htbTransferInForPeriod").as[Amount].toString,
+                  "htbTransferTotalYTD" -> (htb \ "htbTransferTotalYTD").as[Amount].toString,
+                  "newSubsForPeriod" -> (inboundPayments \ "newSubsForPeriod").as[Amount].toString,
+                  "newSubsYTD" -> (inboundPayments \ "newSubsYTD").as[Amount].toString,
+                  "totalSubsForPeriod" -> (inboundPayments \ "totalSubsForPeriod").as[Amount].toString,
+                  "totalSubsYTD" -> (inboundPayments \ "totalSubsYTD").as[Amount].toString,
+                  "bonusDueForPeriod" -> (bonuses \ "bonusDueForPeriod").as[Amount].toString,
+                  "bonusPaidYTD" -> (bonuses \ "bonusPaidYTD").as[Amount].toString,
+                  "totalBonusDueYTD" -> (bonuses \ "totalBonusDueYTD").as[Amount].toString,
+                  "claimReason" -> (bonuses \ "claimReason").as[String],
+                  "automaticRecoveryAmount" -> (supersede \ "automaticRecoveryAmount").as[Amount].toString,
+                  "originalTransactionId" -> (supersede \ "originalTransactionId").as[String],
+                  "originalBonusDueForPeriod" -> (supersede \ "originalBonusDueForPeriod").as[Amount].toString,
+                  "transactionResult" -> (supersede \ "transactionResult").as[Amount].toString,
+                  "reason" -> (supersede \ "reason").as[String]
+                ))
+              )(any())
+            },
+            acceptHeaderV2
+          )
         }
       }
 
@@ -412,31 +479,33 @@ class BonusPaymentControllerSpec extends PlaySpec
         when(mockPostService.requestBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(RequestBonusPaymentLateResponse("1928374")))
 
-        doSyncRequest(validBonusPaymentMinimumFieldsJson) { res =>
+        doSyncRequest(validBonusPaymentMinimumFieldsJson)(
+          _ => {
+            val json = Json.parse(validBonusPaymentMinimumFieldsJson)
+            val inboundPayments = json \ "inboundPayments"
+            val bonuses = json \ "bonuses"
 
-          val json = Json.parse(validBonusPaymentMinimumFieldsJson)
-          val inboundPayments = json \ "inboundPayments"
-          val bonuses = json \ "bonuses"
-
-          verify(mockAuditService).audit(
-            auditType = MatcherEquals("bonusPaymentRequested"),
-            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions"),
-            auditData = MatcherEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "accountId" -> accountId,
-              "lateNotification" -> "yes",
-              "periodStartDate" -> (json \ "periodStartDate").as[String],
-              "periodEndDate" -> (json \ "periodEndDate").as[String],
-              "newSubsForPeriod" -> (inboundPayments \ "newSubsForPeriod").as[Amount].toString,
-              "newSubsYTD" -> (inboundPayments \ "newSubsYTD").as[Amount].toString,
-              "totalSubsForPeriod" -> (inboundPayments \ "totalSubsForPeriod").as[Amount].toString,
-              "totalSubsYTD" -> (inboundPayments \ "totalSubsYTD").as[Amount].toString,
-              "bonusDueForPeriod" -> (bonuses \ "bonusDueForPeriod").as[Amount].toString,
-              "totalBonusDueYTD" -> (bonuses \ "totalBonusDueYTD").as[Amount].toString,
-              "claimReason" -> (bonuses \ "claimReason").as[String]
-            )
-            ))(any())
-        }
+            verify(mockAuditService).audit(
+              auditType = MatcherEquals("bonusPaymentRequested"),
+              path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions"),
+              auditData = MatcherEquals(Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "accountId" -> accountId,
+                "lateNotification" -> "yes",
+                "periodStartDate" -> (json \ "periodStartDate").as[String],
+                "periodEndDate" -> (json \ "periodEndDate").as[String],
+                "newSubsForPeriod" -> (inboundPayments \ "newSubsForPeriod").as[Amount].toString,
+                "newSubsYTD" -> (inboundPayments \ "newSubsYTD").as[Amount].toString,
+                "totalSubsForPeriod" -> (inboundPayments \ "totalSubsForPeriod").as[Amount].toString,
+                "totalSubsYTD" -> (inboundPayments \ "totalSubsYTD").as[Amount].toString,
+                "bonusDueForPeriod" -> (bonuses \ "bonusDueForPeriod").as[Amount].toString,
+                "totalBonusDueYTD" -> (bonuses \ "totalBonusDueYTD").as[Amount].toString,
+                "claimReason" -> (bonuses \ "claimReason").as[String]
+              )
+              ))(any())
+          },
+          acceptHeaderV1
+        )
       }
 
     }
@@ -760,15 +829,15 @@ class BonusPaymentControllerSpec extends PlaySpec
 
   }
 
-  def doRequest(jsonString: String, lmrn: String = lisaManager)(callback: (Future[Result]) =>  Unit): Unit = {
-    val res = SUT.requestBonusPayment(lmrn, accountId).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeaderV1).
+  def doRequest(jsonString: String, lmrn: String = lisaManager)(callback: (Future[Result]) =>  Unit, header: (String, String) = acceptHeaderV2): Unit = {
+    val res = SUT.requestBonusPayment(lmrn, accountId).apply(FakeRequest(Helpers.PUT, "/").withHeaders(header).
       withBody(AnyContentAsJson(Json.parse(jsonString))))
 
     callback(res)
   }
 
-  def doSyncRequest(jsonString: String)(callback: (Result) =>  Unit): Unit = {
-    val res = await(SUT.requestBonusPayment(lisaManager, accountId).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeaderV1).
+  def doSyncRequest(jsonString: String)(callback: (Result) =>  Unit, header: (String, String) = acceptHeaderV2): Unit = {
+    val res = await(SUT.requestBonusPayment(lisaManager, accountId).apply(FakeRequest(Helpers.PUT, "/").withHeaders(header).
       withBody(AnyContentAsJson(Json.parse(jsonString)))))
 
     callback(res)

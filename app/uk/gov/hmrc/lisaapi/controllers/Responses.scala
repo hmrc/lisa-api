@@ -106,7 +106,7 @@ case object EmptyJson extends ErrorResponse(400, "BAD_REQUEST", "Can't parse emp
 
 case object ErrorInvestorNotFound extends ErrorResponse(403, "INVESTOR_NOT_FOUND", "The investor details given do not match with HMRC’s records")
 
-case object ErrorLifeEventIdNotFound extends ErrorResponse(403, "LIFE_EVENT_NOT_FOUND", "The lifeEventId does not match with HMRC’s records")
+case object ErrorLifeEventIdNotFound extends ErrorResponse(404, "LIFE_EVENT_NOT_FOUND", "The lifeEventId does not match with HMRC’s records")
 
 case object ErrorInvestorNotEligible extends ErrorResponse(403, "INVESTOR_ELIGIBILITY_CHECK_FAILED", "The investor is not eligible for a LISA account")
 
