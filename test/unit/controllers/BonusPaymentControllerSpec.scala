@@ -218,15 +218,18 @@ class BonusPaymentControllerSpec extends PlaySpec
         }
       }
 
-      "given a RequestBonusPaymentAccountClosedOrVoid response from the service layer" in {
+      "given a RequestBonusPaymentAccountClosedOrVoid response from the service layer for v1" in {
         when(mockPostService.requestBonusPayment(any(), any(),any())(any())).thenReturn(
           Future.successful(RequestBonusPaymentAccountClosedOrVoid))
 
-        doRequest(validBonusPaymentJson)  { res =>
-          status(res) mustBe FORBIDDEN
-          (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID"
-          (contentAsJson(res) \ "message").as[String] mustBe "This LISA account has already been closed or been made void by HMRC"
-        }
+        doRequest(validBonusPaymentJson)(
+          res => {
+            status(res) mustBe FORBIDDEN
+            (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID"
+            (contentAsJson(res) \ "message").as[String] mustBe "This LISA account has already been closed or been made void by HMRC"
+          },
+          acceptHeaderV1
+        )
       }
 
       "given a RequestBonusPaymentAccountClosed response from the service layer" in {
@@ -340,7 +343,7 @@ class BonusPaymentControllerSpec extends PlaySpec
         }
       }
 
-      "given a RequestBonusPaymentAlreadySuperseded response from the service layer" in {
+      "given a RequestBonusPaymentAlreadySuperseded response from the service layer for v2" in {
         when(mockPostService.requestBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(RequestBonusPaymentAlreadySuperseded(transactionId)))
 
@@ -356,15 +359,16 @@ class BonusPaymentControllerSpec extends PlaySpec
 
     "return with status 500 internal server error" when {
 
+      val internalServerError = Json.obj("code" -> "INTERNAL_SERVER_ERROR", "message" -> "Internal server error")
+
       "an exception gets thrown" in {
         when(mockPostService.requestBonusPayment(any(), any(), any())(any())).
           thenThrow(new RuntimeException("Test"))
 
         doRequest(validBonusPaymentJson) { res =>
           reset(mockPostService) // removes the thenThrow
-
-          status(res) mustBe (INTERNAL_SERVER_ERROR)
-          (contentAsJson(res) \ "code").as[String] mustBe ("INTERNAL_SERVER_ERROR")
+          status(res) mustBe INTERNAL_SERVER_ERROR
+          contentAsJson(res) mustBe internalServerError
         }
       }
 
@@ -373,8 +377,8 @@ class BonusPaymentControllerSpec extends PlaySpec
           thenReturn(Future.successful(TestBonusPaymentResponse))
 
         doRequest(validBonusPaymentJson) { res =>
-          status(res) mustBe (INTERNAL_SERVER_ERROR)
-          (contentAsJson(res) \ "code").as[String] mustBe ("INTERNAL_SERVER_ERROR")
+          status(res) mustBe INTERNAL_SERVER_ERROR
+          contentAsJson(res) mustBe internalServerError
         }
       }
 
@@ -383,9 +387,100 @@ class BonusPaymentControllerSpec extends PlaySpec
           thenReturn(Future.successful(RequestBonusPaymentError))
 
         doRequest(validBonusPaymentJson) { res =>
-          status(res) mustBe (INTERNAL_SERVER_ERROR)
-          (contentAsJson(res) \ "code").as[String] mustBe ("INTERNAL_SERVER_ERROR")
+          status(res) mustBe INTERNAL_SERVER_ERROR
+          contentAsJson(res) mustBe internalServerError
         }
+      }
+
+      "given a RequestBonusPaymentAccountClosed response from the service layer for v1" in {
+        when(mockPostService.requestBonusPayment(any(), any(),any())(any())).thenReturn(
+          Future.successful(RequestBonusPaymentAccountClosed))
+
+        doRequest(validBonusPaymentJson)(
+          res => {
+            status(res) mustBe INTERNAL_SERVER_ERROR
+            contentAsJson(res) mustBe internalServerError
+          },
+          acceptHeaderV1
+        )
+      }
+
+      "given a RequestBonusPaymentAccountCancelled response from the service layer for v1" in {
+        when(mockPostService.requestBonusPayment(any(), any(),any())(any())).thenReturn(
+          Future.successful(RequestBonusPaymentAccountCancelled))
+
+        doRequest(validBonusPaymentJson)(
+          res => {
+            status(res) mustBe INTERNAL_SERVER_ERROR
+            contentAsJson(res) mustBe internalServerError
+          },
+          acceptHeaderV1
+        )
+      }
+
+      "given a RequestBonusPaymentAccountVoid response from the service layer for v1" in {
+        when(mockPostService.requestBonusPayment(any(), any(),any())(any())).thenReturn(
+          Future.successful(RequestBonusPaymentAccountVoid))
+
+        doRequest(validBonusPaymentJson)(
+          res => {
+            status(res) mustBe INTERNAL_SERVER_ERROR
+            contentAsJson(res) mustBe internalServerError
+          },
+          acceptHeaderV1
+        )
+      }
+
+      "given a RequestBonusPaymentSupersededAmountMismatch response from the service layer for v1" in {
+        when(mockPostService.requestBonusPayment(any(), any(),any())(any())).thenReturn(
+          Future.successful(RequestBonusPaymentSupersededAmountMismatch))
+
+        doRequest(validBonusPaymentJson)(
+          res => {
+            status(res) mustBe INTERNAL_SERVER_ERROR
+            contentAsJson(res) mustBe internalServerError
+          },
+          acceptHeaderV1
+        )
+      }
+
+      "given a RequestBonusPaymentSupersededOutcomeError response from the service layer for v1" in {
+        when(mockPostService.requestBonusPayment(any(), any(),any())(any())).thenReturn(
+          Future.successful(RequestBonusPaymentSupersededOutcomeError))
+
+        doRequest(validBonusPaymentJson)(
+          res => {
+            status(res) mustBe INTERNAL_SERVER_ERROR
+            contentAsJson(res) mustBe internalServerError
+          },
+          acceptHeaderV1
+        )
+      }
+
+      "given a RequestBonusPaymentAlreadySuperseded response from the service layer for v1" in {
+        when(mockPostService.requestBonusPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(RequestBonusPaymentAlreadySuperseded(transactionId)))
+
+        doRequest(validBonusPaymentJson)(
+          res => {
+            status(res) mustBe INTERNAL_SERVER_ERROR
+            contentAsJson(res) mustBe internalServerError
+          },
+          acceptHeaderV1
+        )
+      }
+
+      "given a RequestBonusPaymentAccountClosedOrVoid response from the service layer for v2" in {
+        when(mockPostService.requestBonusPayment(any(), any(),any())(any())).thenReturn(
+          Future.successful(RequestBonusPaymentAccountClosedOrVoid))
+
+        doRequest(validBonusPaymentJson)(
+          res => {
+            status(res) mustBe INTERNAL_SERVER_ERROR
+            contentAsJson(res) mustBe internalServerError
+          },
+          acceptHeaderV2
+        )
       }
 
     }

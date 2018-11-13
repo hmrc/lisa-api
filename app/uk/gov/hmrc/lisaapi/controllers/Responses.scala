@@ -26,32 +26,32 @@ sealed abstract class ErrorResponse(
                          )
 
 sealed abstract class ErrorResponseWithErrors(
-                                     val httpStatusCode: Int,
-                                     val errorCode: String,
-                                     val message: String,
+                                     override val httpStatusCode: Int,
+                                     override val errorCode: String,
+                                     override val message: String,
                                      val errors: Option[List[ErrorValidation]] = None
-                                   )
+                                   ) extends ErrorResponse(httpStatusCode, errorCode, message)
 
 case class ErrorResponseWithId(
-                                httpStatusCode: Int,
-                                errorCode: String,
-                                message: String,
+                                override val httpStatusCode: Int,
+                                override val errorCode: String,
+                                override val message: String,
                                 id: String
-                              )
+                              ) extends ErrorResponse(httpStatusCode, errorCode, message)
 
 case class ErrorResponseWithLifeEventId(
-                                         httpStatusCode: Int,
-                                         errorCode: String,
-                                         message: String,
+                                         override val httpStatusCode: Int,
+                                         override val errorCode: String,
+                                         override val message: String,
                                          lifeEventID: String
-                                       )
+                                       ) extends ErrorResponse(httpStatusCode, errorCode, message)
 
 case class ErrorResponseWithTransactionId(
-                                         httpStatusCode: Int,
-                                         errorCode: String,
-                                         message: String,
+                                         override val httpStatusCode: Int,
+                                         override val errorCode: String,
+                                         override val message: String,
                                          transactionId: String
-                                       )
+                                       ) extends ErrorResponse(httpStatusCode, errorCode, message)
 
 case class ErrorResponseWithAccountId (
                                          override val httpStatusCode: Int,

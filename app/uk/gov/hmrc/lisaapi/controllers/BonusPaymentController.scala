@@ -44,12 +44,10 @@ class BonusPaymentController extends LisaController with LisaConstants {
       implicit val startTime = System.currentTimeMillis()
 
       withValidLMRN(lisaManager) { () =>
-        withEnrolment(lisaManager) { (_) =>
-          withValidAccountId(accountId) { () =>
-            withApiVersion {
-              case Some(VERSION_1) => processRequestBonusPayment(lisaManager, accountId, RequestBonusPaymentRequest.requestBonusPaymentReadsV1)
-              case Some(VERSION_2) => processRequestBonusPayment(lisaManager, accountId, RequestBonusPaymentRequest.requestBonusPaymentReads)
-            }
+        withValidAccountId(accountId) { () =>
+          withApiVersion {
+            case Some(VERSION_1) => processRequestBonusPayment(lisaManager, accountId, RequestBonusPaymentRequest.requestBonusPaymentReadsV1)
+            case Some(VERSION_2) => processRequestBonusPayment(lisaManager, accountId, RequestBonusPaymentRequest.requestBonusPaymentReadsV2)
           }
         }
       }
@@ -71,7 +69,7 @@ class BonusPaymentController extends LisaController with LisaConstants {
   private def processRequestBonusPayment(lisaManager: String, accountId: String, reads: Reads[RequestBonusPaymentRequest])
                                         (implicit request: Request[AnyContent], startTime: Long, hc: HeaderCarrier) = {
     withValidJson[RequestBonusPaymentRequest](
-      (req) => {
+      req => {
         withValidData(req)(lisaManager, accountId) { () =>
           postService.requestBonusPayment(lisaManager, accountId, req) map {
             case success: RequestBonusPaymentSuccessResponse => handleSuccess(lisaManager, accountId, req, success)
@@ -231,45 +229,45 @@ class BonusPaymentController extends LisaController with LisaConstants {
   }
 
   private def handleFailure(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest, errorResponse: RequestBonusPaymentErrorResponse)
-                           (implicit hc: HeaderCarrier, startTime: Long) = {
+                           (implicit hc: HeaderCarrier, request: Request[AnyContent], startTime: Long) = {
     Logger.debug("Matched failure response")
 
-    errorResponse match {
+    val response: ErrorResponse = errorResponse match {
       case e: RequestBonusPaymentClaimAlreadyExists =>
-        val error = ErrorBonusClaimAlreadyExists(e.transactionId)
-
-        auditFailure(lisaManager, accountId, req, error.errorCode)
-        LisaMetrics.incrementMetrics(startTime, CONFLICT, LisaMetricKeys.BONUS_PAYMENT)
-
-        Conflict(Json.toJson(error))
+        ErrorBonusClaimAlreadyExists(e.transactionId)
       case e: RequestBonusPaymentAlreadySuperseded =>
-        val error = ErrorBonusClaimAlreadySuperseded(e.transactionId)
-
-        auditFailure(lisaManager, accountId, req, error.errorCode)
-        LisaMetrics.incrementMetrics(startTime, CONFLICT, LisaMetricKeys.BONUS_PAYMENT)
-
-        Conflict(Json.toJson(error))
+        getAPIVersionFromRequest match {
+          case Some(VERSION_1) => ErrorInternalServerError
+          case Some(VERSION_2) => ErrorBonusClaimAlreadySuperseded(e.transactionId)
+        }
       case _ =>
-        val response = requestBonusErrors.getOrElse(errorResponse, ErrorInternalServerError)
-
-        auditFailure(lisaManager, accountId, req, response.errorCode)
-        LisaMetrics.incrementMetrics(startTime, response.httpStatusCode, LisaMetricKeys.BONUS_PAYMENT)
-
-        Status(response.httpStatusCode)(Json.toJson(response))
+        getAPIVersionFromRequest match {
+          case Some(VERSION_1) => requestBonusErrorsV1.getOrElse(errorResponse, ErrorInternalServerError)
+          case Some(VERSION_2) => requestBonusErrorsV2.getOrElse(errorResponse, ErrorInternalServerError)
+        }
     }
+    auditFailure(lisaManager, accountId, req, response.errorCode)
+    LisaMetrics.incrementMetrics(startTime, response.httpStatusCode, LisaMetricKeys.BONUS_PAYMENT)
+    Status(response.httpStatusCode)(Json.toJson(response))
   }
 
   private val requestBonusErrors = Map[RequestBonusPaymentErrorResponse, ErrorResponse](
     RequestBonusPaymentBonusClaimError -> ErrorBonusClaimError,
-    RequestBonusPaymentAccountClosedOrVoid -> ErrorAccountAlreadyClosedOrVoid,
+    RequestBonusPaymentNoSubscriptions -> ErrorNoSubscriptions,
+    RequestBonusPaymentAccountNotFound -> ErrorAccountNotFound,
+    RequestBonusPaymentLifeEventNotFound -> ErrorLifeEventIdNotFound
+  )
+
+  private val requestBonusErrorsV1 = requestBonusErrors ++ Map[RequestBonusPaymentErrorResponse, ErrorResponse](
+    RequestBonusPaymentAccountClosedOrVoid -> ErrorAccountAlreadyClosedOrVoid
+  )
+
+  private val requestBonusErrorsV2 = requestBonusErrors ++ Map[RequestBonusPaymentErrorResponse, ErrorResponse](
     RequestBonusPaymentAccountClosed -> ErrorAccountAlreadyClosed,
     RequestBonusPaymentAccountCancelled -> ErrorAccountAlreadyCancelled,
     RequestBonusPaymentAccountVoid -> ErrorAccountAlreadyVoided,
     RequestBonusPaymentSupersededAmountMismatch -> ErrorBonusSupersededAmountMismatch,
-    RequestBonusPaymentSupersededOutcomeError -> ErrorBonusSupersededOutcomeError,
-    RequestBonusPaymentNoSubscriptions -> ErrorNoSubscriptions,
-    RequestBonusPaymentAccountNotFound -> ErrorAccountNotFound,
-    RequestBonusPaymentLifeEventNotFound -> ErrorLifeEventIdNotFound
+    RequestBonusPaymentSupersededOutcomeError -> ErrorBonusSupersededOutcomeError
   )
 
   private def handleError(e: Exception, lisaManager: String, accountId: String, req: RequestBonusPaymentRequest)

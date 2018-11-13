@@ -97,11 +97,11 @@ case class TransferAccount(transferredFromAccountID:AccountId, transferredFromLM
 case class Bonuses(bonusDueForPeriod: Amount, totalBonusDueYTD: Amount, bonusPaidYTD: Option[Amount], claimReason: BonusClaimReason)
 
 object Bonuses {
-  implicit val bonusesReads: Reads[Bonuses] = (
+  implicit val bonusesReadsV2: Reads[Bonuses] = (
     (JsPath \ "bonusDueForPeriod").read[Amount](JsonReads.nonNegativeAmount) and
     (JsPath \ "totalBonusDueYTD").read[Amount](JsonReads.nonNegativeAmount) and
     (JsPath \ "bonusPaidYTD").readNullable[Amount](JsonReads.nonNegativeAmount) and
-    (JsPath \ "claimReason").read(JsonReads.bonusClaimReason)
+    (JsPath \ "claimReason").read(JsonReads.bonusClaimReasonV2)
   )(Bonuses.apply _)
 
   val bonusesReadsV1: Reads[Bonuses] = (
