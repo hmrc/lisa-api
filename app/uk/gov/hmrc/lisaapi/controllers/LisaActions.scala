@@ -24,7 +24,7 @@ import scala.concurrent.Future
 
 trait LisaActions {
 
-  def validateLMRNAction(lisaManager: String): ActionRefiner[Request, LMRNRequest] =
+  def validateLMRN(lisaManager: String): ActionRefiner[Request, LMRNRequest] =
     new ActionRefiner[Request, LMRNRequest] {
       override protected def refine[A](request: Request[A]) = Future.successful {
         if (lisaManager.matches("^Z([0-9]{4}|[0-9]{6})$")) {
@@ -35,7 +35,7 @@ trait LisaActions {
       }
     }
 
-  def validateAccountIdAction(accountId: String): ActionRefiner[LMRNRequest, LMRNWithAccountRequest] =
+  def validateAccountId(accountId: String): ActionRefiner[LMRNRequest, LMRNWithAccountRequest] =
     new ActionRefiner[LMRNRequest, LMRNWithAccountRequest] {
       override protected def refine[A](request: LMRNRequest[A]) = Future.successful {
         if (accountId.matches("^[a-zA-Z0-9 :/-]{1,20}$")) {

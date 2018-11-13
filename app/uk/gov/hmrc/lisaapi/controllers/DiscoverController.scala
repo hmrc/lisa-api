@@ -26,7 +26,7 @@ class DiscoverController extends LisaController {
 
   def discover(lisaManagerReferenceNumber: String): Action[AnyContent] =
     (validateHeader andThen
-      validateLMRNAction(lisaManagerReferenceNumber)).async { implicit request =>
+      validateLMRN(lisaManagerReferenceNumber)).async { implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
 
       withEnrolment(lisaManagerReferenceNumber) { (_) =>

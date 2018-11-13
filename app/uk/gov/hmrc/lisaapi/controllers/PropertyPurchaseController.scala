@@ -37,7 +37,7 @@ class PropertyPurchaseController extends LisaController with LisaConstants {
 
   def requestFundRelease(lisaManager: String, accountId: String): Action[AnyContent] = validateHeader().async {
     implicit request =>
-      implicit val startTime = System.currentTimeMillis()
+      implicit val startTime: Long = System.currentTimeMillis()
 
       withValidLMRN(lisaManager) { () =>
         withValidAccountId(accountId) { () =>
@@ -74,7 +74,7 @@ class PropertyPurchaseController extends LisaController with LisaConstants {
                     Logger.debug(s"Fund Release received $res, responding with $response")
                     doFundReleaseAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> response.errorCode))
                     LisaMetrics.incrementMetrics(startTime, response.httpStatusCode, LisaMetricKeys.PROPERTY_PURCHASE)
-                    Status(response.httpStatusCode)(Json.toJson(response))
+                    response.asResult
                   }
                 }
               }
@@ -87,7 +87,7 @@ class PropertyPurchaseController extends LisaController with LisaConstants {
 
   def requestExtension(lisaManager: String, accountId: String): Action[AnyContent] = validateHeader().async {
     implicit request =>
-      implicit val startTime = System.currentTimeMillis()
+      implicit val startTime: Long = System.currentTimeMillis()
 
       withValidLMRN(lisaManager) { () =>
         withValidAccountId(accountId) { () =>
@@ -132,7 +132,7 @@ class PropertyPurchaseController extends LisaController with LisaConstants {
 
   def reportPurchaseOutcome(lisaManager: String, accountId: String): Action[AnyContent] = validateHeader().async {
     implicit request =>
-      implicit val startTime = System.currentTimeMillis()
+      implicit val startTime: Long = System.currentTimeMillis()
 
       withValidLMRN(lisaManager) { () =>
         withValidAccountId(accountId) { () =>

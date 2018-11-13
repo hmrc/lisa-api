@@ -19,19 +19,20 @@ package uk.gov.hmrc.lisaapi.config
 import com.typesafe.config.Config
 import net.ceedubs.ficus.Ficus._
 import play.api._
+import play.api.http.Status._
 import play.api.libs.json.Json
 import play.api.mvc.Results.{NotFound, Status}
 import play.api.mvc.{Handler, RequestHeader, Result}
-import uk.gov.hmrc.lisaapi.connectors.ServiceLocatorConnector
-import uk.gov.hmrc.play.config.{AppName, ControllerConfig, RunMode}
-import uk.gov.hmrc.play.microservice.bootstrap.DefaultMicroserviceGlobal
-import uk.gov.hmrc.lisaapi.controllers._
-
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.LisaConstants
+import uk.gov.hmrc.lisaapi.connectors.ServiceLocatorConnector
+import uk.gov.hmrc.lisaapi.controllers._
+import uk.gov.hmrc.play.config.{AppName, ControllerConfig, RunMode}
+import uk.gov.hmrc.play.microservice.bootstrap.DefaultMicroserviceGlobal
 import uk.gov.hmrc.play.microservice.filters.{AuditFilter, LoggingFilter, MicroserviceFilterSupport}
+
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 trait ServiceLocatorRegistration extends GlobalSettings with RunMode {
 
@@ -42,7 +43,9 @@ trait ServiceLocatorRegistration extends GlobalSettings with RunMode {
   override def onStart(app: Application): Unit = {
     super.onStart(app)
     registrationEnabled match {
-      case true => {Logger.info("Starting Registration"); slConnector.register}
+      case true => {
+        Logger.info("Starting Registration"); slConnector.register
+      }
       case false => Logger.warn("Registration in Service Locator is disabled")
     }
   }
@@ -55,6 +58,7 @@ object ControllerConfiguration extends ControllerConfig {
 
 object MicroserviceAuditFilter extends AuditFilter with AppName with MicroserviceFilterSupport {
   override val auditConnector = MicroserviceAuditConnector
+
   override def controllerNeedsAuditing(controllerName: String) = ControllerConfiguration.paramsForController(controllerName).needsAuditing
 }
 
@@ -63,10 +67,8 @@ object MicroserviceLoggingFilter extends LoggingFilter with MicroserviceFilterSu
 }
 
 object MicroserviceGlobal extends DefaultMicroserviceGlobal with RunMode with MicroserviceFilterSupport with ServiceLocatorRegistration with LisaConstants {
+  override lazy val registrationEnabled = AppContext.registrationEnabled
   override val auditConnector = MicroserviceAuditConnector
-
-  override def microserviceMetricsConfig(implicit app: Application): Option[Configuration] = app.configuration.getConfig(s"microservice.metrics")
-
   override val loggingFilter = MicroserviceLoggingFilter
 
   override val microserviceAuditFilter = MicroserviceAuditFilter
@@ -77,14 +79,14 @@ object MicroserviceGlobal extends DefaultMicroserviceGlobal with RunMode with Mi
 
   override implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  override lazy val registrationEnabled = AppContext.registrationEnabled
+  override def microserviceMetricsConfig(implicit app: Application): Option[Configuration] = app.configuration.getConfig(s"microservice.metrics")
 
   override def onError(request: RequestHeader, ex: Throwable): Future[Result] = {
     super.onError(request, ex) map (res => {
       res.header.status
       match {
-        case 401 => Status(ErrorUnauthorized.httpStatusCode)(Json.toJson(ErrorUnauthorized))
-        case _ => Status(ErrorInternalServerError.httpStatusCode)(Json.toJson(ErrorInternalServerError))
+        case UNAUTHORIZED => ErrorUnauthorized.asResult
+        case _ => ErrorInternalServerError.asResult
       }
     })
   }

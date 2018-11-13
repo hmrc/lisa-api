@@ -37,7 +37,7 @@ class LifeEventController extends LisaController with LisaConstants {
 
   def reportLisaLifeEvent(lisaManager: String, accountId: String): Action[AnyContent] = validateHeader().async {
     implicit request =>
-      implicit val startTime = System.currentTimeMillis()
+      implicit val startTime: Long = System.currentTimeMillis()
 
       withValidLMRN(lisaManager) { () =>
         withValidAccountId(accountId) { () =>

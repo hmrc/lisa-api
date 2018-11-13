@@ -36,7 +36,7 @@ class InvestorController extends LisaController with LisaConstants  {
 
   def createLisaInvestor(lisaManager: String): Action[AnyContent] = validateHeader().async {
     implicit request =>
-      implicit val startTime = System.currentTimeMillis()
+      implicit val startTime: Long = System.currentTimeMillis()
       Logger.debug(s"LISA HTTP Request: ${request.uri} and method: ${request.method}")
 
       withValidLMRN(lisaManager) { () =>
