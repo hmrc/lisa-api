@@ -21,20 +21,18 @@ import org.mockito.Mockito.when
 import org.scalatest.BeforeAndAfter
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.libs.json.JsArray
 import play.api.test.Helpers._
 import play.api.test._
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
 import uk.gov.hmrc.lisaapi.controllers.{DiscoverController, ErrorAcceptHeaderInvalid, ErrorBadRequestLmrn}
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class DiscoverControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite with BeforeAndAfter {
 
   before {
-    when(mockAuthConnector.authorise[Option[String]](any(),any())(any(), any())).thenReturn(Future(Some("1234")))
+    when(mockAuthConnector.authorise[Option[String]](any(),any())(any(), any())).thenReturn(Future.successful(Some("1234")))
   }
 
   val v1: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")

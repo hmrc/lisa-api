@@ -24,10 +24,11 @@ import scala.concurrent.Future
 
 class DiscoverController extends LisaController {
 
-  def discover(lisaManagerReferenceNumber: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
-    implicit val startTime = System.currentTimeMillis()
+  def discover(lisaManagerReferenceNumber: String): Action[AnyContent] =
+    (validateHeader andThen
+      validateLMRNAction(lisaManagerReferenceNumber)).async { implicit request =>
+      implicit val startTime: Long = System.currentTimeMillis()
 
-    withValidLMRN(lisaManagerReferenceNumber) { () =>
       withEnrolment(lisaManagerReferenceNumber) { (_) =>
         val result = withApiVersion {
           case Some(VERSION_1) => Future.successful(Ok(Json.parse(v1(lisaManagerReferenceNumber))))
@@ -38,9 +39,9 @@ class DiscoverController extends LisaController {
         result
       }
     }
-  }
 
-  private val v1: String => String = (lisaManagerReferenceNumber: String) => s"""{
+  private val v1: String => String = (lisaManagerReferenceNumber: String) =>
+    s"""{
     "lisaManagerReferenceNumber": "$lisaManagerReferenceNumber",
     "_links":
     {
@@ -64,8 +65,8 @@ class DiscoverController extends LisaController {
       "bulk payment breakdown": {"href": "/lifetime-isa/manager/$lisaManagerReferenceNumber/accounts/{accountId}/transactions/{transactionId}/payments", "methods": ["GET"]}
     }
   }"""
-
-  private val v2: String => String = (lisaManagerReferenceNumber: String) => s"""{
+  private val v2: String => String = (lisaManagerReferenceNumber: String) =>
+    s"""{
     "lisaManagerReferenceNumber": "$lisaManagerReferenceNumber",
     "_links":
     {

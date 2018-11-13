@@ -36,9 +36,10 @@ import uk.gov.hmrc.play.microservice.controller.BaseController
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 
-trait LisaController extends BaseController with LisaConstants with HeaderValidator with RunMode with AuthorisedFunctions {
+trait LisaController extends BaseController with LisaConstants with RunMode with AuthorisedFunctions with APIVersioning with LisaActions {
 
   override val validateVersion: String => Boolean = str => str == "1.0" || str == "2.0"
+  override val validateContentType: String => Boolean = _ == "json"
   val authConnector: LisaAuthConnector = LisaAuthConnector
   lazy val errorConverter: ErrorConverter = ErrorConverter
 
@@ -132,23 +133,6 @@ trait LisaController extends BaseController with LisaConstants with HeaderValida
 
   def todo(id: String,accountId:String,transactionId:String): Action[AnyContent] = Action.async { _ =>
     Future.successful(NotImplemented(Json.toJson(ErrorNotImplemented)))
-  }
-
-  private[controllers] def withApiVersion(pf: PartialFunction[Option[String], Future[Result]])
-                                      (implicit request: Request[AnyContent]): Future[Result] = {
-    pf.orElse[Option[String], Future[Result]]{
-      case Some(_) =>
-        Logger.info("request header contains an unsupported api version")
-        Future.successful(NotFound(Json.toJson(ErrorNotFound)))
-      case None =>
-        Logger.info("request header contains an incorrect or empty api version")
-        Future.successful(NotAcceptable(Json.toJson(ErrorAcceptHeaderInvalid)))
-    }(getAPIVersionFromRequest)
-  }
-
-  private[controllers] def getAPIVersionFromRequest(implicit request: Request[AnyContent]): Option[String] = {
-    val reg = """application\/vnd\.hmrc\.(\d.\d)\+json""".r
-    request.headers.get(ACCEPT).flatMap(value => Option(value) collect { case reg(value) => value })
   }
 }
 

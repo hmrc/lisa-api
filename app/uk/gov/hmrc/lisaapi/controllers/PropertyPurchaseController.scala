@@ -35,7 +35,7 @@ class PropertyPurchaseController extends LisaController with LisaConstants {
   val service: LifeEventService = LifeEventService
   val auditService: AuditService = AuditService
 
-  def requestFundRelease(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async {
+  def requestFundRelease(lisaManager: String, accountId: String): Action[AnyContent] = validateHeader().async {
     implicit request =>
       implicit val startTime = System.currentTimeMillis()
 
@@ -85,7 +85,7 @@ class PropertyPurchaseController extends LisaController with LisaConstants {
       }
   }
 
-  def requestExtension(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async {
+  def requestExtension(lisaManager: String, accountId: String): Action[AnyContent] = validateHeader().async {
     implicit request =>
       implicit val startTime = System.currentTimeMillis()
 
@@ -130,7 +130,7 @@ class PropertyPurchaseController extends LisaController with LisaConstants {
       }
   }
 
-  def reportPurchaseOutcome(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async {
+  def reportPurchaseOutcome(lisaManager: String, accountId: String): Action[AnyContent] = validateHeader().async {
     implicit request =>
       implicit val startTime = System.currentTimeMillis()
 

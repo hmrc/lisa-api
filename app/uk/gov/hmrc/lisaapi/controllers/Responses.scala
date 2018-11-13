@@ -18,12 +18,17 @@ package uk.gov.hmrc.lisaapi.controllers
 
 import play.api.Logger
 import play.api.libs.json.Json
+import play.api.mvc.{Result, Results}
 
 sealed abstract class ErrorResponse(
                            val httpStatusCode: Int,
                            val errorCode: String,
                            val message: String
-                         )
+                         ) {
+  def asResult: Result = {
+    Results.Status(httpStatusCode)(Json.toJson(this))
+  }
+}
 
 sealed abstract class ErrorResponseWithErrors(
                                      override val httpStatusCode: Int,
@@ -93,6 +98,10 @@ case object ErrorNotFound extends ErrorResponse(404, "NOT_FOUND", "Resource was 
 case object ErrorGenericBadRequest extends ErrorResponse(400, "BAD_REQUEST", "Bad Request")
 
 case object ErrorAcceptHeaderInvalid extends ErrorResponse(406, "ACCEPT_HEADER_INVALID", "The accept header is missing or invalid")
+
+case object ErrorAcceptHeaderVersionInvalid extends ErrorResponse(406, "ACCEPT_HEADER_INVALID", "The accept header has an invalid version")
+
+case object ErrorAcceptHeaderContentInvalid extends ErrorResponse(406, "ACCEPT_HEADER_INVALID", "The accept header has an invalid content type")
 
 case object ErrorInternalServerError extends ErrorResponse(500, "INTERNAL_SERVER_ERROR", "Internal server error")
 

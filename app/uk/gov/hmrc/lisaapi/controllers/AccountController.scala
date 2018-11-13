@@ -38,7 +38,7 @@ class AccountController extends LisaController with LisaConstants {
 
   //region Create Or Transfer Account
 
-    def createOrTransferLisaAccount(lisaManager: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
+    def createOrTransferLisaAccount(lisaManager: String): Action[AnyContent] = validateHeader().async { implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
 
       withValidLMRN(lisaManager) { () =>
@@ -261,7 +261,7 @@ class AccountController extends LisaController with LisaConstants {
 
   //region Get Account
 
-    def getAccountDetails(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
+    def getAccountDetails(lisaManager: String, accountId: String): Action[AnyContent] = validateHeader().async { implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
       withValidLMRN(lisaManager) { () =>
         withEnrolment(lisaManager) { (_) =>
@@ -293,7 +293,7 @@ class AccountController extends LisaController with LisaConstants {
 
   //region Close Account
 
-    def closeLisaAccount(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
+    def closeLisaAccount(lisaManager: String, accountId: String): Action[AnyContent] = validateHeader().async { implicit request =>
       implicit val startTime = System.currentTimeMillis()
       withValidLMRN(lisaManager) { () =>
         withValidAccountId(accountId) { () =>

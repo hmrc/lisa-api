@@ -35,7 +35,7 @@ class LifeEventController extends LisaController with LisaConstants {
   val service: LifeEventService = LifeEventService
   val auditService: AuditService = AuditService
 
-  def reportLisaLifeEvent(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async {
+  def reportLisaLifeEvent(lisaManager: String, accountId: String): Action[AnyContent] = validateHeader().async {
     implicit request =>
       implicit val startTime = System.currentTimeMillis()
 

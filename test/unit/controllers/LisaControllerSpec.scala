@@ -106,18 +106,6 @@ class LisaControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite 
     }
   }
 
-  "acceptHeaderValidationRules" must {
-    "allow v1.0" in {
-      SUT.acceptHeaderValidationRules(Some("application/vnd.hmrc.1.0+json")) mustBe true
-    }
-    "allow v2.0" in {
-      SUT.acceptHeaderValidationRules(Some("application/vnd.hmrc.2.0+json")) mustBe true
-    }
-    "disallow v3.0" in {
-      SUT.acceptHeaderValidationRules(Some("application/vnd.hmrc.3.0+json")) mustBe false
-    }
-  }
-
   val mockService = mock[AccountService]
   val mockErrorConverter = mock[ErrorConverter]
   val mockAuthCon: LisaAuthConnector = mock[LisaAuthConnector]
@@ -125,7 +113,7 @@ class LisaControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite 
     override val service: AccountService = mockService
     override val authConnector = mockAuthCon
 
-    def testJsonValidator(): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
+    def testJsonValidator(): Action[AnyContent] = validateHeader().async { implicit request =>
       implicit val startTime = System.currentTimeMillis()
       withValidJson[TestType](_ =>
         Future.successful(PreconditionFailed) // we don't ever want this to return
@@ -133,7 +121,7 @@ class LisaControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite 
       )
     }
 
-    def testLMRNValidator(lmrn: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
+    def testLMRNValidator(lmrn: String): Action[AnyContent] = validateHeader().async { implicit request =>
       implicit val startTime = System.currentTimeMillis()
       withValidLMRN(lmrn) { () => Future.successful(Ok) }
     }

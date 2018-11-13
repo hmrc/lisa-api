@@ -39,9 +39,9 @@ class BonusPaymentController extends LisaController with LisaConstants {
   val validator: BonusPaymentValidator = BonusPaymentValidator
   val dateTimeService: CurrentDateService = CurrentDateService
 
-  def requestBonusPayment(lisaManager: String, accountId: String): Action[AnyContent] =
-    validateAccept(acceptHeaderValidationRules).async { implicit request =>
-      implicit val startTime = System.currentTimeMillis()
+  def requestBonusPayment(lisaManager: String, accountId: String): Action[AnyContent] = {
+    implicit val startTime: Long = System.currentTimeMillis()
+    validateHeader().async { implicit request =>
 
       withValidLMRN(lisaManager) { () =>
         withValidAccountId(accountId) { () =>
@@ -52,9 +52,10 @@ class BonusPaymentController extends LisaController with LisaConstants {
         }
       }
     }
+  }
 
   def getBonusPayment(lisaManager: String, accountId: String, transactionId: String): Action[AnyContent] =
-    validateAccept(acceptHeaderValidationRules).async { implicit request =>
+    validateHeader().async { implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
 
       withValidLMRN(lisaManager) { () =>
@@ -236,19 +237,19 @@ class BonusPaymentController extends LisaController with LisaConstants {
       case e: RequestBonusPaymentClaimAlreadyExists =>
         ErrorBonusClaimAlreadyExists(e.transactionId)
       case e: RequestBonusPaymentAlreadySuperseded =>
-        getAPIVersionFromRequest match {
+        getAPIVersionFromRequest(request) match {
           case Some(VERSION_1) => ErrorInternalServerError
           case Some(VERSION_2) => ErrorBonusClaimAlreadySuperseded(e.transactionId)
         }
       case _ =>
-        getAPIVersionFromRequest match {
+        getAPIVersionFromRequest(request) match {
           case Some(VERSION_1) => requestBonusErrorsV1.getOrElse(errorResponse, ErrorInternalServerError)
           case Some(VERSION_2) => requestBonusErrorsV2.getOrElse(errorResponse, ErrorInternalServerError)
         }
     }
     auditFailure(lisaManager, accountId, req, response.errorCode)
     LisaMetrics.incrementMetrics(startTime, response.httpStatusCode, LisaMetricKeys.BONUS_PAYMENT)
-    Status(response.httpStatusCode)(Json.toJson(response))
+    response.asResult
   }
 
   private val requestBonusErrors = Map[RequestBonusPaymentErrorResponse, ErrorResponse](

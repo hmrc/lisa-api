@@ -31,7 +31,7 @@ class TransactionController extends LisaController with LisaConstants {
   val service: TransactionService = TransactionService
 
   def getTransaction(lisaManager: String, accountId: String, transactionId: String): Action[AnyContent] =
-    validateAccept(acceptHeaderValidationRules).async { implicit request =>
+    validateHeader().async { implicit request =>
       implicit val startTime = System.currentTimeMillis()
 
       withValidLMRN(lisaManager) { () =>

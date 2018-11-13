@@ -34,7 +34,7 @@ class BulkPaymentController extends LisaController with LisaConstants {
   val service: BulkPaymentService = BulkPaymentService
 
   def getBulkPayment(lisaManager: String, startDate: String, endDate: String): Action[AnyContent] =
-    validateAccept(acceptHeaderValidationRules).async { implicit request =>
+    validateHeader().async { implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
       withValidLMRN(lisaManager) { () =>
         withEnrolment(lisaManager) { _ =>

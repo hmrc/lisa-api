@@ -38,7 +38,7 @@ class WithdrawalController extends LisaController with LisaConstants {
   val validator: WithdrawalChargeValidator = WithdrawalChargeValidator
   val dateTimeService: CurrentDateService = CurrentDateService
 
-  def reportWithdrawalCharge(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async {
+  def reportWithdrawalCharge(lisaManager: String, accountId: String): Action[AnyContent] = validateHeader().async {
     implicit request =>
       implicit val startTime = System.currentTimeMillis()
 
@@ -70,7 +70,7 @@ class WithdrawalController extends LisaController with LisaConstants {
   }
 
   def getWithdrawalCharge(lisaManager: String, accountId: String, transactionId: String): Action[AnyContent] = {
-    validateAccept(acceptHeaderValidationRules).async { implicit request =>
+    validateHeader().async { implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
       withValidLMRN(lisaManager) { () =>
         withEnrolment(lisaManager) { (_) =>
