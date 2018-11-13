@@ -359,9 +359,7 @@ class BonusPaymentControllerSpec extends PlaySpec
 
     "return with status 500 internal server error" when {
 
-      val internalServerError = Json.obj("code" -> "INTERNAL_SERVER_ERROR", "message" -> "Internal server error")
-
-      "an exception gets thrown" in {
+      "a exception gets thrown" in {
         when(mockPostService.requestBonusPayment(any(), any(), any())(any())).
           thenThrow(new RuntimeException("Test"))
 
@@ -372,7 +370,7 @@ class BonusPaymentControllerSpec extends PlaySpec
         }
       }
 
-      "an unexpected result comes back from the service" in {
+      "a unexpected result comes back from the service" in {
         when(mockPostService.requestBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(TestBonusPaymentResponse))
 
@@ -382,7 +380,7 @@ class BonusPaymentControllerSpec extends PlaySpec
         }
       }
 
-      "given a RequestBonusPaymentError response from the service layer" in {
+      "a RequestBonusPaymentError response is received" in {
         when(mockPostService.requestBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(RequestBonusPaymentError))
 
@@ -392,8 +390,8 @@ class BonusPaymentControllerSpec extends PlaySpec
         }
       }
 
-      "given a RequestBonusPaymentAccountClosed response from the service layer for v1" in {
-        when(mockPostService.requestBonusPayment(any(), any(),any())(any())).thenReturn(
+      "a RequestBonusPaymentAccountClosed response is received for version 1 of the api" in {
+        when(mockPostService.requestBonusPayment(any(), any(), any())(any())).thenReturn(
           Future.successful(RequestBonusPaymentAccountClosed))
 
         doRequest(validBonusPaymentJson)(
@@ -405,8 +403,8 @@ class BonusPaymentControllerSpec extends PlaySpec
         )
       }
 
-      "given a RequestBonusPaymentAccountCancelled response from the service layer for v1" in {
-        when(mockPostService.requestBonusPayment(any(), any(),any())(any())).thenReturn(
+      "a RequestBonusPaymentAccountCancelled response is received for version 1 of the api" in {
+        when(mockPostService.requestBonusPayment(any(), any(), any())(any())).thenReturn(
           Future.successful(RequestBonusPaymentAccountCancelled))
 
         doRequest(validBonusPaymentJson)(
@@ -418,8 +416,8 @@ class BonusPaymentControllerSpec extends PlaySpec
         )
       }
 
-      "given a RequestBonusPaymentAccountVoid response from the service layer for v1" in {
-        when(mockPostService.requestBonusPayment(any(), any(),any())(any())).thenReturn(
+      "a RequestBonusPaymentAccountVoid response is received for version 1 of the api" in {
+        when(mockPostService.requestBonusPayment(any(), any(), any())(any())).thenReturn(
           Future.successful(RequestBonusPaymentAccountVoid))
 
         doRequest(validBonusPaymentJson)(
@@ -431,8 +429,8 @@ class BonusPaymentControllerSpec extends PlaySpec
         )
       }
 
-      "given a RequestBonusPaymentSupersededAmountMismatch response from the service layer for v1" in {
-        when(mockPostService.requestBonusPayment(any(), any(),any())(any())).thenReturn(
+      "a RequestBonusPaymentSupersededAmountMismatch response is received for version 1 of the api" in {
+        when(mockPostService.requestBonusPayment(any(), any(), any())(any())).thenReturn(
           Future.successful(RequestBonusPaymentSupersededAmountMismatch))
 
         doRequest(validBonusPaymentJson)(
@@ -444,8 +442,8 @@ class BonusPaymentControllerSpec extends PlaySpec
         )
       }
 
-      "given a RequestBonusPaymentSupersededOutcomeError response from the service layer for v1" in {
-        when(mockPostService.requestBonusPayment(any(), any(),any())(any())).thenReturn(
+      "a RequestBonusPaymentSupersededOutcomeError response is received for version 1 of the api" in {
+        when(mockPostService.requestBonusPayment(any(), any(), any())(any())).thenReturn(
           Future.successful(RequestBonusPaymentSupersededOutcomeError))
 
         doRequest(validBonusPaymentJson)(
@@ -457,7 +455,7 @@ class BonusPaymentControllerSpec extends PlaySpec
         )
       }
 
-      "given a RequestBonusPaymentAlreadySuperseded response from the service layer for v1" in {
+      "a RequestBonusPaymentAlreadySuperseded response is received for version 1 of the api" in {
         when(mockPostService.requestBonusPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(RequestBonusPaymentAlreadySuperseded(transactionId)))
 
@@ -470,8 +468,8 @@ class BonusPaymentControllerSpec extends PlaySpec
         )
       }
 
-      "given a RequestBonusPaymentAccountClosedOrVoid response from the service layer for v2" in {
-        when(mockPostService.requestBonusPayment(any(), any(),any())(any())).thenReturn(
+      "a RequestBonusPaymentAccountClosedOrVoid response is received for version 2 of the api" in {
+        when(mockPostService.requestBonusPayment(any(), any(), any())(any())).thenReturn(
           Future.successful(RequestBonusPaymentAccountClosedOrVoid))
 
         doRequest(validBonusPaymentJson)(
@@ -918,11 +916,13 @@ class BonusPaymentControllerSpec extends PlaySpec
     "return an internal server error response" in {
       when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusOrWithdrawalErrorResponse))
       doGetBonusPaymentTransactionRequest(res => {
-        (contentAsJson(res) \ "code").as[String] mustBe "INTERNAL_SERVER_ERROR"
+        contentAsJson(res) mustBe internalServerError
       })
     }
 
   }
+
+  val internalServerError = Json.obj("code" -> "INTERNAL_SERVER_ERROR", "message" -> "Internal server error")
 
   def doRequest(jsonString: String, lmrn: String = lisaManager)(callback: (Future[Result]) =>  Unit, header: (String, String) = acceptHeaderV2): Unit = {
     val res = SUT.requestBonusPayment(lmrn, accountId).apply(FakeRequest(Helpers.PUT, "/").withHeaders(header).
