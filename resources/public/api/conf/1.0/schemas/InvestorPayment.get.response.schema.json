@@ -5,8 +5,7 @@
     "transactionId" : {
       "description": "The transactionId for which the payment details have been requested.",
       "type" : "string",
-      "pattern": "^\\d{1,10}$",
-      "example": "7777777777"
+      "pattern": "^\\d{1,10}$"
     },
     "paymentDate": {
       "description":"The date payment was made.",
@@ -17,7 +16,7 @@
       "$ref": "#/definitions/ISO8601-Date"
     },
     "paymentStatus" : {
-      "description": "The status of the payment for a transaction.",
+      "description": "The status of the transaction being requested.",
       "type" : "string",
       "enum": [
         "Paid",

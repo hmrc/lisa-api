@@ -7,7 +7,7 @@
       "$ref": "#/definitions/LISAManagerReferenceNumberType"
     },
     "payments": {
-      "description": "Payments made by or due from HMRC in the specific date range.",
+      "description": "Pending and paid payments from HMRC.",
       "type": "array",
       "min": 1,
       "items": {
