@@ -76,7 +76,7 @@
           "type": "number"
         },
         "claimReason": {
-          "description": "The reason the bonus payment was claimed. \"Superseded Bonus\" is valid in the sandbox environment only.",
+          "description": "The reason the bonus payment was claimed.",
           "$ref": "#/definitions/claimReasonType"
         }
       },
@@ -86,15 +86,15 @@
         "claimReason"
       ]
     },
-    "supersededBy":{"description": "[sandbox-only] The ID of the transaction that supersedes the current one.", "$ref": "#/definitions/TransactionIDType"},
+    "supersededBy":{"description": "The ID of the transaction that supersedes the current one.", "$ref": "#/definitions/TransactionIDType"},
     "supersede": {
-      "description": "[sandbox-only] Correct an existing bonus claim with an additional bonus or a recovery of an overpaid amount.",
+      "description": "Correct an existing bonus claim with an additional bonus or a recovery of an overpaid amount.",
       "type": "object",
       "properties": {
-        "originalTransactionId" :{"description": "[sandbox-only] The transactionId of the original bonus affected by the correction or recovery. This is used together with the originalBonusDueForPeriod to make sure the right bonus transaction is replaced.", "$ref": "#/definitions/TransactionIDType"},
-        "originalBonusDueForPeriod" :{"description": "[sandbox-only] This is how much was in the bonusDueForPeriod in the original bonus request.", "type" : "number"},
-        "transactionResult" :{"description": "[sandbox-only] The amount to be added to or recovered from the original bonus.", "type" : "number"},
-        "reason" : {"description": "[sandbox-only] Confirm whether an additional bonus amount is due or funds need to be recovered.", "$ref": "#/definitions/supersededReasonType"}
+        "originalTransactionId" :{"description": "The transactionId of the original bonus affected by the correction or recovery. This is used together with the originalBonusDueForPeriod to make sure the right bonus transaction is replaced.", "$ref": "#/definitions/TransactionIDType"},
+        "originalBonusDueForPeriod" :{"description": "This is how much was in the bonusDueForPeriod in the original bonus request.", "type" : "number"},
+        "transactionResult" :{"description": "The amount to be added to or recovered from the original bonus.", "type" : "number"},
+        "reason" : {"description": "Confirm whether an additional bonus amount is due or funds need to be recovered.", "$ref": "#/definitions/supersededReasonType"}
       },
       "required": [
         "originalTransactionId",

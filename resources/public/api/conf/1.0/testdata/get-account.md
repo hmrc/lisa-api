@@ -1,11 +1,9 @@
 <table>
-  <col width="25%">
-  <col width="35%">
   <col width="40%">
+  <col width="60%">
   <thead>
     <tr>
         <th>Scenario</th>
-        <th>Request Payload</th>
         <th>Response</th>
     </tr>
   </thead>
@@ -13,170 +11,170 @@
     <tr>
       <td>
         <p>Request with a valid LISA Manager reference number and account ID (open account)</p>
-        <p class ="code--block">
-          lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+        <p class="code--block">
+          lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
           accountId: 1234567890
         </p>
       </td>
-      <td></td>
       <td>
         <p>HTTP status: <code class="code--slim">200 (OK)</code></p>
-        <p class ="code--block"> {<br>
-                "accountId": "1234567890",<br>
-                "investorId": "9876543210",<br>
-                "creationReason": "New",<br>
-                "firstSubscriptionDate": "2017-04-06",<br>
-                "accountStatus": "OPEN",<br>
-                "subscriptionStatus": "ACTIVE"<br>
-            }
-        </p>
+<pre class="code--block">
+{
+  "investorId": "9876543210",
+  "creationReason": "New",
+  "accountId": "1234567890",
+  "firstSubscriptionDate": "2017-04-06",
+  "accountStatus": "OPEN",
+  "subscriptionStatus": "ACTIVE"
+}
+</pre>
       </td>
     </tr>
     <tr>
       <td>
         <p>Request with a valid LISA Manager reference number and account ID (transferred account)</p>
-        <p class ="code--block">
-          lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
-          accountId: 0000000200
+        <p class="code--block">
+          lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
+          accountId: 1234567891
         </p>
       </td>
-      <td></td>
       <td>
         <p>HTTP status: <code class="code--slim">200 (OK)</code></p>
-        <p class ="code--block"> {<br>
-                 "accountId": "0000000200",<br>
-                 "investorId": "9876543210",<br>
-                 "creationReason": "Transferred",<br>
-                 "firstSubscriptionDate": "2017-04-06",<br>
-                 "accountStatus": "OPEN",<br>
-                 "subscriptionStatus": "AVAILABLE",<br>
-                 "transferAccount": {<br>
-                     "transferredFromAccountId": "8765432102",<br>
-                     "transferredFromLMRN": "Z543333",<br>
-                     "transferInDate": "2017-04-06"<br>
-                 }<br>
-             }
-        </p>
+<pre class="code--block">
+{
+  "investorId": "9876543210",
+  "creationReason": "Transferred",
+  "accountId": "1234567891",
+  "firstSubscriptionDate": "2017-04-06",
+  "accountStatus": "OPEN",
+  "subscriptionStatus": "AVAILABLE",
+  "transferAccount": {
+    "transferredFromAccountId": "8765432100",
+    "transferredFromLMRN": "Z654321",
+    "transferInDate": "2017-04-06"
+  }
+}
+</pre>
       </td>
     </tr>
     <tr>
       <td>
         <p>Request with a valid LISA Manager reference number and account ID (voided account)</p>
-        <p class ="code--block">
-          lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+        <p class="code--block">
+          lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
           accountId: 1000000200
         </p>
       </td>
-      <td></td>
       <td>
         <p>HTTP status: <code class="code--slim">200 (OK)</code></p>
-        <p class ="code--block"> {<br>
-                 "accountId": "1000000200",<br>
-                 "investorId": "9876543210",<br>
-                 "creationReason": "New",<br>
-                 "firstSubscriptionDate": "2017-04-06",<br>
-                 "accountStatus": "VOID",<br>
-                 "subscriptionStatus": "VOID"<br>
-             }
-        </p>
+<pre class="code--block">
+{
+  "accountId": "1000000200",
+  "investorId": "9876543210",
+  "creationReason": "New",
+  "firstSubscriptionDate": "2017-04-06",
+  "accountStatus": "VOID",
+  "subscriptionStatus": "VOID"
+}
+</pre>
       </td>
     </tr>
     <tr>
       <td>
         <p>Request with a valid LISA Manager reference number and account ID (closed account)</p>
-        <p class ="code--block">
-          lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+        <p class="code--block">
+          lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
           accountId: 2000000200
         </p>
       </td>
-      <td></td>
       <td>
         <p>HTTP status: <code class="code--slim">200 (OK)</code></p>
-        <p class ="code--block"> {<br>
-                 "accountId": "2000000200",<br>
-                 "investorId": "9876543210",<br>
-                 "creationReason": "New",<br>
-                 "firstSubscriptionDate": "2017-04-06",<br>
-                 "accountStatus": "CLOSED",<br>
-                 "subscriptionStatus": "VOID",<br>
-                 "accountClosureReason": "All funds withdrawn",<br>
-                 "closureDate": "2017-10-25"<br>
-             }
-        </p>
+<pre class="code--block">
+{
+  "accountId": "2000000200",
+  "investorId": "9876543210",
+  "creationReason": "New",
+  "firstSubscriptionDate": "2017-04-06",
+  "accountStatus": "CLOSED",
+  "subscriptionStatus": "VOID",
+  "accountClosureReason": "All funds withdrawn",
+  "closureDate": "2017-10-25"
+}
+</pre>
       </td>
     </tr>
     <tr>
       <td>
         <p>Request with a valid account ID, but an invalid LISA Manager reference number</p>
-        <p class ="code--block">
+        <p class="code--block">
           lisaManagerReferenceNumber: 123456<br>
           accountId: 1234567890
         </p>
       </td>
-      <td></td>
       <td>
         <p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
-        <p class ="code--block"> {<br>
-          "code": "BAD_REQUEST",<br>
-          "message": "lisaManagerReferenceNumber in the URL is in the wrong format"<br>
-        }
-        </p>
+<pre class="code--block">
+{
+  "code": "BAD_REQUEST",
+  "message": "lisaManagerReferenceNumber in the URL is in the wrong format"
+}
+</pre>
       </td>
     </tr>
     <tr>
       <td>
         <p>Request with a valid LISA Manager reference number, but an invalid account ID</p>
-        <p class ="code--block">
-          lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+        <p class="code--block">
+          lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
           accountId: 1234%3D5678
         </p>
       </td>
-      <td></td>
       <td>
         <p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
-        <p class ="code--block"> {<br>
-          "code": "BAD_REQUEST",<br>
-          "message": "accountId in the URL is in the wrong format"<br>
-        }
-        </p>
+<pre class="code--block">
+{
+  "code": "BAD_REQUEST",
+  "message": "accountId in the URL is in the wrong format"
+}
+</pre>
       </td>
     </tr>
     <tr>
         <td>
             <p>Request containing an account ID that does not exist</p>
-            <p class ="code--block">
-                lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a><br>
+            <p class="code--block">
+                lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
                 accountId: 0000000404
             </p>
         </td>
-        <td></td>
         <td>
           <p>HTTP status: <code class="code--slim">404 (Not found)</code></p>
-          <p class ="code--block"> {<br>
-            "code": "INVESTOR_ACCOUNTID_NOT_FOUND",<br>
-            "message": "The accountId does not match HMRC’s records"<br>
-          }
-          </p>
+<pre class="code--block">
+{
+  "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
+  "message": "The accountId does not match HMRC’s records"
+}
+</pre>
         </td>
     </tr>
     <tr>
       <td>
         <p>Request with an invalid 'Accept' header</p>
-        <p class ="code--block">
-          lisaManagerReferenceNumber: <a href="https://test-developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing-the-api">Use your test user profile</a>
+        <p class="code--block">
+          lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a>
           <br>accountId: 1234567890<br>
           <br>
           Accept: application/vnd.hmrc.1.0
         </p>
       </td>
-      <td></td>
       <td>
         <p>HTTP status: <code class="code--slim">406 (Not Acceptable)</code></p>
-        <p class ="code--block"> {<br>
-          "code": "ACCEPT_HEADER_INVALID",<br>
-          "message": "The accept header is missing or invalid"<br>
-        }
-        </p>
+<pre class="code--block">
+{
+  "code": "ACCEPT_HEADER_INVALID",
+  "message": "The accept header is missing or invalid"
+}
+</pre>
       </td>
     </tr>
   </tbody>

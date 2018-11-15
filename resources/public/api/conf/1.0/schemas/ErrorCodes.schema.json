@@ -44,8 +44,9 @@
         "INVESTOR_ACCOUNT_ALREADY_OPEN",
         "NOT_FOUND",
         "BAD_REQUEST",
-        "FORBIDDEN"
-
+        "FORBIDDEN",
+        "HELP_TO_BUY_NOT_APPLICABLE",
+        "BONUS_CLAIM_TIMESCALES_EXCEEDED"
       ]
     }
   }

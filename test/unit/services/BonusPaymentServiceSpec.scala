@@ -123,12 +123,20 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
     }
 
     "return a bonus claim already exists response" when {
-      "given the code BONUS_CLAIM_ALREADY_EXISTS from the DES connector" in {
+      "given the code BONUS_CLAIM_ALREADY_EXISTS from the DES connector with a transactionId" in {
         when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesTransactionExistResponse("BONUS_CLAIM_ALREADY_EXISTS", "xxxxx", "987654")))
+          thenReturn(Future.successful(DesTransactionExistResponse("BONUS_CLAIM_ALREADY_EXISTS", "xxxxx", Some("987654"))))
 
         doRequest { response =>
-          response mustBe RequestBonusPaymentClaimAlreadyExists("987654")
+          response mustBe RequestBonusPaymentClaimAlreadyExists(Some("987654"))
+        }
+      }
+      "given the code BONUS_CLAIM_ALREADY_EXISTS from the DES connector without a transactionId" in {
+        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(DesTransactionExistResponse("BONUS_CLAIM_ALREADY_EXISTS", "xxxxx", None)))
+
+        doRequest { response =>
+          response mustBe RequestBonusPaymentClaimAlreadyExists(None)
         }
       }
     }
@@ -156,12 +164,20 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
     }
 
     "return a already superseded response" when {
-      "given the code SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED from the DES connector" in {
+      "given the code SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED from the DES connector with a transactionId" in {
         when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesTransactionExistResponse("SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED", "xxxxx", "12345")))
+          thenReturn(Future.successful(DesTransactionExistResponse("SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED", "xxxxx", Some("12345"))))
 
         doRequest { response =>
-          response mustBe RequestBonusPaymentAlreadySuperseded("12345")
+          response mustBe RequestBonusPaymentAlreadySuperseded(Some("12345"))
+        }
+      }
+      "given the code SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED from the DES connector without a transactionId" in {
+        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(DesTransactionExistResponse("SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED", "xxxxx", None)))
+
+        doRequest { response =>
+          response mustBe RequestBonusPaymentAlreadySuperseded(None)
         }
       }
     }

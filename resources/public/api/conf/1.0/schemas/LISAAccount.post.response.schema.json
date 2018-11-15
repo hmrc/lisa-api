@@ -6,22 +6,18 @@
       "description": "Response details.",
       "type": "object",
       "properties": {
-        "transactionId": {
-          "description": "The transaction’s ID reference number. You must store this ID as it is needed for other API calls.",
+        "accountId": {
+          "description": "The provider’s own unique reference number for the investor’s LISA account.",
           "type": "string",
-          "pattern": "^\\d{10}$"
+          "pattern": "^[a-zA-Z0-9 :/-]{1,20}$"
         },
         "message": {
           "description": "A human-readable explanation for the result of the API call.",
           "type": "string",
-          "enum": [
-            "Bonus transaction created",
-            "Bonus transaction created - late notification",
-            "Bonus transaction superseded"
-          ]
+          "enum": ["Account created", "Account transferred"]
         }
       },
-      "required": ["transactionId", "message"]
+      "required": ["accountId", "message"]
     },
     "success": {
       "description": "Whether the API call was successful or not. Always true.",

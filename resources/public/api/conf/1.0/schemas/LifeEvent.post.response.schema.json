@@ -6,8 +6,8 @@
       "description": "Response details.",
       "type": "object",
       "properties": {
-        "transactionId": {
-          "description": "The transaction’s ID reference number. You must store this ID as it is needed for other API calls.",
+        "lifeEventId": {
+          "description": "The life event’s ID reference number. You must store this ID as it is needed for other API calls.",
           "type": "string",
           "pattern": "^\\d{10}$"
         },
@@ -15,13 +15,11 @@
           "description": "A human-readable explanation for the result of the API call.",
           "type": "string",
           "enum": [
-            "Bonus transaction created",
-            "Bonus transaction created - late notification",
-            "Bonus transaction superseded"
+            "Life event created"
           ]
         }
       },
-      "required": ["transactionId", "message"]
+      "required": ["lifeEventId", "message"]
     },
     "success": {
       "description": "Whether the API call was successful or not. Always true.",

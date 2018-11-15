@@ -55,7 +55,7 @@ case class ErrorResponseWithTransactionId(
                                          override val httpStatusCode: Int,
                                          override val errorCode: String,
                                          override val message: String,
-                                         transactionId: String
+                                         transactionId: Option[String]
                                        ) extends ErrorResponse(httpStatusCode, errorCode, message)
 
 case class ErrorResponseWithAccountId (
@@ -226,7 +226,7 @@ object ErrorAccountAlreadyExists {
 
 object ErrorBonusClaimAlreadyExists {
 
-  def apply(transactionId: String) = {
+  def apply(transactionId: Option[String]) = {
     ErrorResponseWithTransactionId(409, "BONUS_CLAIM_ALREADY_EXISTS", "The investor’s bonus payment has already been requested", transactionId)
   }
 
@@ -234,7 +234,7 @@ object ErrorBonusClaimAlreadyExists {
 
 object ErrorBonusClaimAlreadySuperseded {
 
-  def apply(transactionId: String) = {
+  def apply(transactionId: Option[String]) = {
     ErrorResponseWithTransactionId(409, "BONUS_CLAIM_ALREADY_SUPERSEDED", "This bonus claim has already been superseded", transactionId)
   }
 

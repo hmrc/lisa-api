@@ -2,7 +2,7 @@
 ---
 
 title: Lifetime ISA
-version: 1.0
+version: 2.0
 protocols: [ HTTPS ]
 baseUri: http://api.service.hmrc.gov.uk
 
@@ -180,11 +180,6 @@ types:
                           example-2: !include examples/LISAAccount.post1.json
                     responses:
                       201:
-                        headers:
-                          Location:
-                            description: Relative URI to the created LISA account resource
-                            type: string
-                            example: /lifetime-isa/manager/Z123456/accounts/1234567890
                         body:
                           application/json:
                             type: !include schemas/LISAAccount.post.response.schema.json
@@ -678,12 +673,6 @@ types:
                     responses:
                       201:
                         description: The LifeEvent resource has been created.
-                        headers:
-                          Location:
-                            description: Relative URI to the created LISA life event
-                            type: string
-                            example: /lifetime-isa/manager/Z876543/accounts/acc654321/events/1234567890
-
                         body:
                           application/json:
                               type: !include schemas/LifeEvent.post.response.schema.json
@@ -775,7 +764,7 @@ types:
                     description: ""
                   post:
                     is: [headers.acceptHeader]
-                    displayName: "[sandbox-only] Request the release of funds to buy a property"
+                    displayName: "Request the release of funds to buy a property"
                     description: Request the release of LISA funds to buy a property. You can also correct a request by changing the withdrawal amount or property purchase date. When you make a correction, you cannot change the property details or the conveyancer reference number.
                     (annotations.scope): "write:lisa"
                     securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
@@ -914,7 +903,7 @@ types:
                   /extension:
                     post:
                       is: [headers.acceptHeader]
-                      displayName: "[sandbox-only] Request a property purchase extension"
+                      displayName: "Request a property purchase extension"
                       description: Request an extension to your request to release funds to buy a property.
                       (annotations.scope): "write:lisa"
                       securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
@@ -1035,7 +1024,7 @@ types:
                   /outcome:
                     post:
                       is: [headers.acceptHeader]
-                      displayName: "[sandbox-only] Report the outcome of a property purchase"
+                      displayName: "Report the outcome of a property purchase"
                       description: Report to HMRC if a property purchase was completed or failed.
                       (annotations.scope): "write:lisa"
                       securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
@@ -1118,7 +1107,7 @@ types:
                     description: ""
                   post:
                     is: [headers.acceptHeader, headers.contentHeader]
-                    displayName: "[sandbox-only] Report a withdrawal charge"
+                    displayName: "Report a withdrawal charge"
                     description: Tell HMRC that an investor has taken money out of a LISA account without an associated life event. You can also correct a previous withdrawal charge.
                     (annotations.scope): "write:lisa"
                     securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
@@ -1269,7 +1258,7 @@ types:
                         description: The ID for the transaction.
                         example: "1234567890"
                     get:
-                      displayName: "[sandbox-only] Get details of a withdrawal charge"
+                      displayName: "Get details of a withdrawal charge"
                       description: Use an investor’s transaction ID to get a request for a withdrawal charge that has been submitted to HMRC.
                       is: [headers.acceptHeader, headers.contentHeader]
                       (annotations.scope): "read:lisa"
@@ -1432,35 +1421,35 @@ types:
                                     "message": "This LISA account has already been closed or been made void by HMRC"
                                   }
                               helpToBuyNotApplicable:
-                                description: "[sandbox-only] Help to Buy is not applicable on this account"
+                                description: "Help to Buy is not applicable on this account"
                                 value: |
                                   {
                                     "code": "HELP_TO_BUY_NOT_APPLICABLE",
                                     "message": "Help to Buy is not applicable on this account"
                                   }
                               bonusClaimTimescalesExceeded:
-                                description: "[sandbox-only] The timescale for claiming a bonus has passed. The claim period lasts for 6 years and 14 days"
+                                description: "The timescale for claiming a bonus has passed. The claim period lasts for 6 years and 14 days"
                                 value: |
                                   {
                                     "code": "BONUS_CLAIM_TIMESCALES_EXCEEDED",
                                     "message": "The timescale for claiming a bonus has passed. The claim period lasts for 6 years and 14 days"
                                   }
                               supersededBonusClaimAmountMismatch:
-                                description: "[sandbox-only] originalTransactionId and the originalBonusDueForPeriod amount do not match the information in the original bonus request"
+                                description: "originalTransactionId and the originalBonusDueForPeriod amount do not match the information in the original bonus request"
                                 value: |
                                   {
                                     "code": "SUPERSEDED_BONUS_CLAIM_AMOUNT_MISMATCH",
                                     "message": "originalTransactionId and the originalBonusDueForPeriod amount do not match the information in the original bonus request"
                                   }
                               supersededBonusRequestOutcomeError:
-                                description: "[sandbox-only] The calculation from your superseded bonus claim is incorrect"
+                                description: "The calculation from your superseded bonus claim is incorrect"
                                 value: |
                                   {
                                     "code": "SUPERSEDED_BONUS_REQUEST_OUTCOME_ERROR",
                                     "message": "The calculation from your superseded bonus claim is incorrect"
                                   }
                               noSubscriptionsError:
-                                description: "[sandbox-only] A bonus payment is not possible because the account has no subscriptions for that tax year"
+                                description: "A bonus payment is not possible because the account has no subscriptions for that tax year"
                                 value: |
                                   {
                                     "code": "ACCOUNT_ERROR_NO_SUBSCRIPTIONS_THIS_TAX_YEAR",
@@ -1498,7 +1487,7 @@ types:
                                       "message" : "The investor’s bonus payment has already been requested"
                                     }
                                 bonusClaimAlreadySuperseded:
-                                  description: "[sandbox-only] This bonus claim has already been superseded"
+                                  description: "This bonus claim has already been superseded"
                                   value: |
                                     {
                                       "code" : "BONUS_CLAIM_ALREADY_SUPERSEDED",

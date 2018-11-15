@@ -6,22 +6,18 @@
       "description": "Response details.",
       "type": "object",
       "properties": {
-        "transactionId": {
-          "description": "The transaction’s ID reference number. You must store this ID as it is needed for other API calls.",
+        "investorId": {
+          "description": "The investor’s ID reference number.  You must store this ID as it is needed for other API calls.",
           "type": "string",
           "pattern": "^\\d{10}$"
         },
         "message": {
           "description": "A human-readable explanation for the result of the API call.",
           "type": "string",
-          "enum": [
-            "Bonus transaction created",
-            "Bonus transaction created - late notification",
-            "Bonus transaction superseded"
-          ]
+          "enum": ["Investor created"]
         }
       },
-      "required": ["transactionId", "message"]
+      "required": ["investorId", "message"]
     },
     "success": {
       "description": "Whether the API call was successful or not. Always true.",

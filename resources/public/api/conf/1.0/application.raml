@@ -50,8 +50,8 @@ types:
                example: "Z1234"
             get:
               is: [headers.acceptHeader]
-              displayName: Discover available endpoints
-              description: This allows a LISA provider to discover all the available endpoints.
+              displayName: Get a list of all available endpoints
+              description: Use a LISA manager reference to get a list of all available endpoints.
               (annotations.scope): "read:lisa"
               securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
               (annotations.sandboxData): !include testdata/discover-endpoints.md
@@ -103,6 +103,7 @@ types:
                       body:
                         application/json:
                           example: !include examples/LISAInvestor.post.response.json
+                          type: !include schemas/LISAInvestor.post.response.schema.json
 
                     400:
                       body:
@@ -160,6 +161,9 @@ types:
                                   "message" : "The investor already has a record with HMRC."
                                 }
             /accounts:
+              (annotations.group):
+                name: LISA accounts
+                description: ""
               description: !include documentation/LISAAccount
               post:
                     is: [headers.acceptHeader, headers.contentHeader]
@@ -176,16 +180,12 @@ types:
                           example-2: !include examples/LISAAccount.post.json
                     responses:
                       201:
-                        headers:
-                          Location:
-                            description: Relative URI to the created LISA account resource
-                            type: string
-                            example: /lifetime-isa/manager/Z876543/accounts/acc654321
                         body:
                           application/json:
+                            type: !include schemas/LISAAccount.post.response.schema.json
                             examples:
-                              example-1: !include examples/LISAAccount.post.response1.json
-                              example-2: !include examples/LISAAccount.post.response.json
+                              example-1: !include examples/LISAAccount.post.response.json
+                              example-2: !include examples/LISAAccount.post.response1.json
                       400:
                         body:
                           application/json:
@@ -307,6 +307,7 @@ types:
                       description: The account is reinstated successfully.
                       body:
                         application/json:
+                            type: !include schemas/LISAAccount.reinstate.post.response.schema.json
                             example: !include examples/LISAAccount.reinstate.post.response.json
                     400:
                       body:
@@ -401,8 +402,8 @@ types:
                       be unique when used in combination with lisaManagerReferenceNumber. Any special characters should be URL encoded.
                     example: "ABC12345"
                 get:
-                    displayName: Retrieve account details
-                    description: Retrieve account details by accountId
+                    displayName: Get account details
+                    description: Use an account ID to get account details.
                     is: [headers.acceptHeader, headers.contentHeader]
                     (annotations.scope): "read:lisa"
                     securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
@@ -411,8 +412,10 @@ types:
                       200:
                         body:
                           application/json:
-                            example: !include examples/LISAAccount.get.json
                             type: !include schemas/LISAAccount.get.schema.json
+                            examples:
+                                example-1: !include examples/LISAAccount.get.json
+                                example-2: !include examples/LISAAccount.get1.json
                       400:
                         body:
                           application/json:
@@ -475,7 +478,8 @@ types:
                         description: The account is updated successfully.
                         body:
                           application/json:
-                              example: !include examples/LISAAccount.put.response.json
+                              type: !include schemas/LISAAccount.close.post.response.schema.json
+                              example: !include examples/LISAAccount.close.response.json
                       400:
                         body:
                           application/json:
@@ -563,7 +567,7 @@ types:
                   post:
                     is: [headers.acceptHeader, headers.contentHeader]
                     displayName: Modify date of first subscription of a LISA account
-                    description: Modify the date when the first deposit was paid after a LISA account was created
+                    description: Modify the date when the first deposit was paid after a LISA account was created.
                     (annotations.scope): "write:lisa"
                     securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
                     (annotations.sandboxData): !include testdata/subscription-update.md
@@ -577,6 +581,7 @@ types:
                         description: The first Subscription is updated successfully.
                         body:
                           application/json:
+                            type: !include schemas/LISAAccount.updateSubscription.post.response.schema.json
                             examples:
                               example-1: !include examples/LISAAccount.subscription.response.json
                               example-2: !include examples/LISAAccount.update.voided.subscription.response.json
@@ -650,6 +655,9 @@ types:
                                     "message": "The accountId does not match HMRC’s records"
                                   }
                 /events:
+                  (annotations.group):
+                    name: Life events
+                    description: ""
                   description: !include documentation/LifeEvent
                   post:
                     is: [headers.acceptHeader, headers.contentHeader]
@@ -665,14 +673,9 @@ types:
                     responses:
                       201:
                         description: The LifeEvent resource has been created.
-                        headers:
-                          Location:
-                            description: Relative URI to the created LISA life event
-                            type: string
-                            example: /lifetime-isa/manager/Z876543/accounts/acc654321/events/1234567890
-
                         body:
                           application/json:
+                              type: !include schemas/LifeEvent.post.response.schema.json
                               example: !include examples/LifeEvent.post.response.json
                       400:
                         body:
@@ -756,6 +759,9 @@ types:
                                     "message" : "The investor’s life event has already been reported"
                               }
                 /transactions:
+                  (annotations.group):
+                    name: Bonus requests
+                    description: ""
                   description: !include documentation/LISATransaction
                   post:
                     is: [headers.acceptHeader, headers.contentHeader]
@@ -767,17 +773,15 @@ types:
                     body:
                       application/json:
                         type: !include schemas/BonusPaymentRequest.post.schema.json
-                        example: !include examples/BonusPaymentRequest.post.json
+                        examples:
+                            life-event: !include examples/BonusPaymentRequest.post.1.json
+                            regular-bonus: !include examples/BonusPaymentRequest.post.2.json
                     responses:
                       201:
                         description: The LISA transaction resource has been created.
-                        headers:
-                          Location:
-                            description: Relative URI to the created bonus payment resource
-                            type: string
-                            example: /lifetime-isa/manager/Z876543/accounts/acc654321/transactions/7777777777
                         body:
                           application/json:
+                            type: !include schemas/BonusPaymentRequest.post.response.schema.json
                             examples:
                               example-1: !include examples/LISATransaction.post.response.json
                               example-2: !include examples/LISATransaction.post.response.1.json
@@ -852,6 +856,20 @@ types:
                                     "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID",
                                     "message": "This LISA account has already been closed or been made void by HMRC"
                                   }
+                              helpToBuyNotApplicable:
+                                description: "Help to Buy is not applicable on this account"
+                                value: |
+                                  {
+                                    "code": "HELP_TO_BUY_NOT_APPLICABLE",
+                                    "message": "Help to Buy is not applicable on this account"
+                                  }
+                              bonusClaimTimescalesExceeded:
+                                description: "The timescale for claiming a bonus has passed. The claim period lasts for 6 years and 14 days"
+                                value: |
+                                  {
+                                    "code": "BONUS_CLAIM_TIMESCALES_EXCEEDED",
+                                    "message": "The timescale for claiming a bonus has passed. The claim period lasts for 6 years and 14 days"
+                                  }
                       404:
                         body:
                           application/json:
@@ -890,8 +908,8 @@ types:
                         description: The ID for the transaction.
                         example: "1234567890"
                     get:
-                      displayName: Retrieve bonus payment submitted
-                      description: Retrieve bonus payment submitted earlier by transactionID
+                      displayName: Get details of a bonus request
+                      description: Use an investor’s transaction ID to get a request for a bonus payment that has been submitted to HMRC.
                       is: [headers.acceptHeader, headers.contentHeader]
                       (annotations.scope): "read:lisa"
                       securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
@@ -955,9 +973,12 @@ types:
                                       "message": "The accountId does not match HMRC’s records"
                                     }
                     /payments:
+                      (annotations.group):
+                         name: Payments
+                         description: ""
                       get:
-                         displayName: Retrieve payment details for an investor’s transaction ID
-                         description: Retrieve payment details for an investor’s transaction ID.
+                         displayName: Get the payment details for a bonus claim
+                         description: Use an investor’s transaction ID to get payment details for a bonus claim.
                          is: [headers.acceptHeader, headers.contentHeader]
                          (annotations.scope): "read:lisa"
                          securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
@@ -1022,8 +1043,8 @@ types:
             /payments:
               get:
                   is: [headers.acceptHeader]
-                  displayName: Retrieve payment details
-                  description: This allows a LISA provider to retrieve payments made by HMRC in a specific date range.
+                  displayName: Get a list of all payments and debts in a date range
+                  description: Get a list of all pending and paid payments from HMRC in a specific date range.
                   (annotations.scope): "read:lisa"
                   securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
                   (annotations.sandboxData): !include testdata/get-bulk-payment.md

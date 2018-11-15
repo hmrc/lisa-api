@@ -60,7 +60,7 @@
           "bonusDueForPeriod" :{"description": "The total bonus payment amount due for the claim period. You can include an amount up to 2 decimal places. If you supersede this claim and the supersededReason is ‘bonus recovery’, then the bonusDueForPeriod can be 0. If not, it must always be greater than 0.", "type" : "number"},
           "totalBonusDueYTD" :{"description": "The total bonus payment amount due for the tax year to date. You can include an amount up to 2 decimal places. This cannot be less than bonusDueForPeriod.", "type" : "number"},
           "bonusPaidYTD" :{"description": "The total bonus payment that has already been claimed and paid in the tax year to date. You can include an amount up to 2 decimal places.", "type" : "number"},
-          "claimReason" : {"description": "The reason the bonus payment was claimed. \"Superseded Bonus\" is valid in the sandbox environment only.", "$ref": "#/definitions/claimReasonType"}
+          "claimReason" : {"description": "The reason the bonus payment was claimed.", "$ref": "#/definitions/claimReasonType"}
         },
         "required":
         [
@@ -72,15 +72,15 @@
       },
       "supersede":
       {
-        "description": "[sandbox-only] Correct an existing bonus claim with an additional bonus or a recovery of an overpaid amount.",
+        "description": "Correct an existing bonus claim with an additional bonus or a recovery of an overpaid amount.",
         "type": "object",
         "properties":
         {
-          "automaticRecoveryAmount":{"description": "[sandbox-only] This is the amount HMRC can collect from the LISA manager in bonus recovery cases. If there are no funds available, this value must be 0.", "type" : "number"},
-          "originalTransactionId" :{"description": "[sandbox-only] The transactionId of the original bonus affected by the correction or recovery. This is used together with the originalBonusDueForPeriod to make sure the right bonus transaction is replaced.", "$ref": "#/definitions/TransactionIDType"},
-          "originalBonusDueForPeriod" :{"description": "[sandbox-only] This is how much was in the bonusDueForPeriod in the original bonus request.", "type" : "number"},
-          "transactionResult" :{"description": "[sandbox-only] The amount to be added to or recovered from the original bonus.", "type" : "number"},
-          "reason" : {"description": "[sandbox-only] Confirm whether an additional bonus amount is due or funds need to be recovered.", "$ref": "#/definitions/supersededReasonType"}
+          "automaticRecoveryAmount":{"description": "This is the amount HMRC can collect from the LISA manager in bonus recovery cases. If there are no funds available, this value must be 0.", "type" : "number"},
+          "originalTransactionId" :{"description": "The transactionId of the original bonus affected by the correction or recovery. This is used together with the originalBonusDueForPeriod to make sure the right bonus transaction is replaced.", "$ref": "#/definitions/TransactionIDType"},
+          "originalBonusDueForPeriod" :{"description": "This is how much was in the bonusDueForPeriod in the original bonus request.", "type" : "number"},
+          "transactionResult" :{"description": "The amount to be added to or recovered from the original bonus.", "type" : "number"},
+          "reason" : {"description": "Confirm whether an additional bonus amount is due or funds need to be recovered.", "$ref": "#/definitions/supersededReasonType"}
         },
         "required":
         [

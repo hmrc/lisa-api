@@ -150,7 +150,7 @@
         </tr>
         <tr>
             <td>
-              <p>[sandbox-only] Superseded transaction - Bonus recovery</p>
+              <p>Superseded transaction - Bonus recovery</p>
               <p class="code--block">
                 <strong>lisaManagerReferenceNumber:</strong><br>
                 <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
@@ -201,7 +201,7 @@
         </tr>
         <tr>
             <td>
-              <p>[sandbox-only] Superseded transaction - Additional bonus</p>
+              <p>Superseded transaction - Additional bonus</p>
               <p class="code--block">
                 <strong>lisaManagerReferenceNumber:</strong><br>
                 <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
@@ -755,7 +755,7 @@
       </tr>
       <tr>
             <td>
-              <p>[sandbox-only] Request for a bonus claim after 5 April 2018 containing help to buy funds.</p>
+              <p>Request for a bonus claim after 5 April 2018 containing help to buy funds.</p>
               <p class="code--block">
                 <strong>lisaManagerReferenceNumber:</strong><br>
                 <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
@@ -799,7 +799,7 @@
         </tr>
         <tr>
             <td>
-              <p>[sandbox-only] Superseded transaction containing details which don't match an existing transaction</p>
+              <p>Superseded transaction containing details which don't match an existing transaction</p>
               <p class="code--block">
                 <strong>lisaManagerReferenceNumber:</strong><br>
                 <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
@@ -846,7 +846,7 @@
         </tr>
         <tr>
             <td>
-              <p>[sandbox-only] Superseded transaction with an outcome error</p>
+              <p>Superseded transaction with an outcome error</p>
               <p class="code--block">
                 <strong>lisaManagerReferenceNumber:</strong><br>
                 <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
@@ -893,7 +893,7 @@
         </tr>
         <tr>
             <td>
-              <p>[sandbox-only] A bonus claim for an account with no subscriptions in the given tax year</p>
+              <p>A bonus claim for an account with no subscriptions in the given tax year</p>
               <p class="code--block">
                 <strong>lisaManagerReferenceNumber:</strong><br>
                 <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
@@ -1076,7 +1076,7 @@
         </tr>
         <tr>
             <td>
-              <p>[sandbox-only] Request to supersede a transaction that has already been superseded</p>
+              <p>Request to supersede a transaction that has already been superseded</p>
               <p class="code--block">
                 <strong>lisaManagerReferenceNumber:</strong><br>
                 <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
@@ -1166,51 +1166,6 @@
 {
   "code": "ACCEPT_HEADER_INVALID",
   "message": "The accept header is missing or invalid"
-}
-</pre>
-            </td>
-        </tr>
-        <tr>
-            <td>
-              <p>Request with a valid payload, LISA Manager reference number and account ID</p>
-              <p class="code--block">
-                <strong>lisaManagerReferenceNumber:</strong><br>
-                <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
-                <br>
-                <strong>accountId:</strong><br>
-                0000000409
-              </p>
-            </td>
-            <td>
-<pre class="code--block">
-{
-  "lifeEventId": "1234567890",
-  "periodStartDate": "2017-04-06",
-  "periodEndDate": "2017-05-05",
-  "htbTransfer": {
-    "htbTransferInForPeriod": 0.00,
-    "htbTransferTotalYTD": 0.00
-  },
-  "inboundPayments": {
-    "newSubsForPeriod": 4000.00,
-    "newSubsYTD": 4000.00,
-    "totalSubsForPeriod": 40000.00,
-    "totalSubsYTD": 40000.00
-  },
-  "bonuses": {
-    "bonusPaidYTD": 0.0,
-    "bonusDueForPeriod": 10000.00,
-    "totalBonusDueYTD": 10000.00,
-    "claimReason": "Life Event"
-  }
-}
-</pre>
-            </td>
-            <td><p>HTTP status: <code class="code--slim">409 (Conflict)</code></p>
-<pre class ="code--block">
-{
-  "code": "BONUS_CLAIM_ALREADY_EXISTS",
-  "message": "The investor’s bonus payment has already been requested"
 }
 </pre>
             </td>

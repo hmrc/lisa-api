@@ -235,7 +235,10 @@ class BonusPaymentController extends LisaController with LisaConstants {
 
     val response: ErrorResponse = errorResponse match {
       case e: RequestBonusPaymentClaimAlreadyExists =>
-        ErrorBonusClaimAlreadyExists(e.transactionId)
+        getAPIVersionFromRequest(request) match {
+          case Some(VERSION_1) => ErrorBonusClaimAlreadyExists(None)
+          case Some(VERSION_2) => ErrorBonusClaimAlreadyExists(e.transactionId)
+        }
       case e: RequestBonusPaymentAlreadySuperseded =>
         getAPIVersionFromRequest(request) match {
           case Some(VERSION_1) => ErrorInternalServerError
