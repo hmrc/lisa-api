@@ -1413,12 +1413,26 @@ types:
                                     "code" : "BONUS_CLAIM_ERROR",
                                     "message" : "The bonus amount given is above the maximum annual amount, or the qualifying deposits are above the maximum annual amount or the bonus claim does not equal the correct percentage of qualifying funds"
                                   }
-                              accountClosedOrVoided:
-                                description: This LISA account has already been closed or been made void by HMRC
+                              accountClosed:
+                                description: The LISA account is already closed
                                 value: |
                                   {
-                                    "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID",
-                                    "message": "This LISA account has already been closed or been made void by HMRC"
+                                    "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED",
+                                    "message": "The LISA account is already closed"
+                                  }
+                              accountVoid:
+                                description: The LISA account is already void
+                                value: |
+                                  {
+                                    "code": "INVESTOR_ACCOUNT_ALREADY_VOID",
+                                    "message": "The LISA account is already void"
+                                  }
+                              accountCancelled:
+                                description: The LISA account is already cancelled
+                                value: |
+                                  {
+                                    "code": "INVESTOR_ACCOUNT_ALREADY_CANCELLED",
+                                    "message": "The LISA account is already cancelled"
                                   }
                               helpToBuyNotApplicable:
                                 description: "Help to Buy is not applicable on this account"
