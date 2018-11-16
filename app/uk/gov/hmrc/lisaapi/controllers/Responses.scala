@@ -150,9 +150,9 @@ case object ErrorLifeEventInappropriate extends ErrorResponse(403, "LIFE_EVENT_I
 
 case object ErrorInvalidLisaManager extends ErrorResponse(401,"UNAUTHORIZED", "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records")
 
-case object ErrorTransactionNotFound extends ErrorResponse(404, "BONUS_PAYMENT_TRANSACTION_NOT_FOUND", "transactionId does not match HMRC’s records")
+case object ErrorBonusPaymentTransactionNotFound extends ErrorResponse(404, "BONUS_PAYMENT_TRANSACTION_NOT_FOUND", "transactionId does not match HMRC’s records")
 
-case object ErrorGenericTransactionNotFound extends ErrorResponse(404, "TRANSACTION_NOT_FOUND", "transactionId does not match HMRC’s records")
+case object ErrorTransactionNotFound extends ErrorResponse(404, "TRANSACTION_NOT_FOUND", "transactionId does not match HMRC’s records")
 
 case object ErrorWithdrawalNotFound extends ErrorResponse(404, "WITHDRAWAL_CHARGE_TRANSACTION_NOT_FOUND", "transactionId does not match HMRC’s records")
 

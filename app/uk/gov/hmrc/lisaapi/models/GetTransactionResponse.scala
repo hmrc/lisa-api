@@ -33,7 +33,8 @@ case class GetTransactionSuccessResponse(transactionId: TransactionId,
                                          paymentDueDate: Option[DateTime] = None,
                                          paymentAmount: Option[Amount] = None,
                                          paymentReference: Option[String] = None,
-                                         supersededBy: Option[TransactionId] = None) extends GetTransactionResponse
+                                         supersededBy: Option[TransactionId] = None,
+                                         bonusDueForPeriod: Option[Amount] = None) extends GetTransactionResponse
 
 object GetTransactionResponse {
   val dateFormat = "yyyy-MM-dd"
@@ -46,6 +47,7 @@ object GetTransactionResponse {
     (JsPath \ "paymentDueDate").writeNullable[String].contramap[Option[DateTime]](d => d.map(v => v.toString(dateFormat))) and
     (JsPath \ "paymentAmount").writeNullable[Amount] and
     (JsPath \ "paymentReference").writeNullable[String] and
-    (JsPath \ "supersededBy").writeNullable[TransactionId]
+    (JsPath \ "supersededBy").writeNullable[TransactionId] and
+    (JsPath \ "bonusDueForPeriod").writeNullable[Amount]
   )(unlift(GetTransactionSuccessResponse.unapply))
 }

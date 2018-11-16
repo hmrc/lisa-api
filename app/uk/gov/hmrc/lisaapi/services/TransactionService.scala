@@ -63,7 +63,8 @@ trait TransactionService {
 
         Future.successful(GetTransactionSuccessResponse(
           transactionId = transactionId,
-          paymentStatus = itmpResponse.paymentStatus
+          paymentStatus = itmpResponse.paymentStatus,
+          bonusDueForPeriod = itmpResponse.getBonusDueForPeriod
         ))
       }
       case TransactionPaymentStatus.SUPERSEDED => {
@@ -75,7 +76,7 @@ trait TransactionService {
         ))
       }
       case TransactionPaymentStatus.PAID => {
-        handlePaidTransaction(lisaManager, accountId, transactionId)
+        handlePaidTransaction(lisaManager, accountId, transactionId, itmpResponse.getBonusDueForPeriod)
       }
       case TransactionPaymentStatus.COLLECTED => {
         handleCollectedTransaction(lisaManager, accountId, transactionId)
@@ -127,7 +128,7 @@ trait TransactionService {
     }
   }
 
-  private def handlePaidTransaction(lisaManager: String, accountId: String, transactionId: String)
+  private def handlePaidTransaction(lisaManager: String, accountId: String, transactionId: String, bonusDueForPeriod: Option[Amount])
                                    (implicit hc: HeaderCarrier): Future[GetTransactionResponse] = {
 
     val transaction: Future[DesResponse] = desConnector.getTransaction(lisaManager, accountId, transactionId)
@@ -140,7 +141,8 @@ trait TransactionService {
           paymentDate = Some(paid.paymentDate),
           paymentAmount = Some(paid.paymentAmount),
           paymentReference = Some(paid.paymentReference),
-          transactionType = Some(TransactionPaymentType.PAYMENT)
+          transactionType = Some(TransactionPaymentType.PAYMENT),
+          bonusDueForPeriod = bonusDueForPeriod
         )
       }
       case pending: DesGetTransactionPending => {
@@ -149,13 +151,15 @@ trait TransactionService {
           paymentStatus = TransactionPaymentStatus.PENDING,
           paymentDueDate = Some(pending.paymentDueDate),
           paymentAmount = None,
-          transactionType = Some(TransactionPaymentType.PAYMENT)
+          transactionType = Some(TransactionPaymentType.PAYMENT),
+          bonusDueForPeriod = bonusDueForPeriod
         )
       }
       case error: DesFailureResponse if error.code == "NOT_FOUND" => {
         GetTransactionSuccessResponse(
           transactionId = transactionId,
-          paymentStatus = TransactionPaymentStatus.PENDING
+          paymentStatus = TransactionPaymentStatus.PENDING,
+          bonusDueForPeriod = bonusDueForPeriod
         )
       }
       case error: DesFailureResponse => {

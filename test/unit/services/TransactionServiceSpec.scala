@@ -55,7 +55,8 @@ class TransactionServiceSpec extends PlaySpec
 
         result mustBe GetTransactionSuccessResponse(
           transactionId = "12345",
-          paymentStatus = "Pending"
+          paymentStatus = "Pending",
+          bonusDueForPeriod = Some(1.0)
         )
       }
       "ITMP returns a Paid status and ETMP returns a Pending status" in {
@@ -79,7 +80,8 @@ class TransactionServiceSpec extends PlaySpec
           transactionId = "12345",
           paymentStatus = "Pending",
           paymentDueDate = Some(new DateTime("2000-01-01")),
-          transactionType = Some("Payment")
+          transactionType = Some("Payment"),
+          bonusDueForPeriod = Some(1.0)
         )
       }
       "ITMP returns a Paid status and ETMP returns a Not Found error" in {
@@ -101,7 +103,8 @@ class TransactionServiceSpec extends PlaySpec
 
         result mustBe GetTransactionSuccessResponse(
           transactionId = "12345",
-          paymentStatus = "Pending"
+          paymentStatus = "Pending",
+          bonusDueForPeriod = Some(1.0)
         )
       }
       "ITMP returns a Collected status and ETMP returns a Not Found error" in {
@@ -182,7 +185,8 @@ class TransactionServiceSpec extends PlaySpec
 
         result mustBe GetTransactionSuccessResponse(
           transactionId = "12345",
-          paymentStatus = "Cancelled"
+          paymentStatus = "Cancelled",
+          bonusDueForPeriod = Some(1.0)
         )
       }
     }
@@ -204,7 +208,8 @@ class TransactionServiceSpec extends PlaySpec
 
         result mustBe GetTransactionSuccessResponse(
           transactionId = "12345",
-          paymentStatus = "Void"
+          paymentStatus = "Void",
+          bonusDueForPeriod = Some(1.0)
         )
       }
     }
@@ -260,7 +265,8 @@ class TransactionServiceSpec extends PlaySpec
           paymentDate = Some(new DateTime("2000-01-01")),
           paymentReference = Some("002630000993"),
           paymentAmount = Some(1.0),
-          transactionType = Some("Payment")
+          transactionType = Some("Payment"),
+          bonusDueForPeriod = Some(1.0)
         )
       }
     }

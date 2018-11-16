@@ -30,7 +30,7 @@ import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
-import uk.gov.hmrc.lisaapi.controllers.{BonusPaymentController, ErrorAccountNotFound, ErrorBadRequestLmrn, ErrorTransactionNotFound, ErrorValidation}
+import uk.gov.hmrc.lisaapi.controllers.{BonusPaymentController, ErrorAccountNotFound, ErrorBadRequestLmrn, ErrorBonusPaymentTransactionNotFound, ErrorValidation}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, BonusOrWithdrawalService, BonusPaymentService, CurrentDateService}
 import uk.gov.hmrc.lisaapi.utils.BonusPaymentValidator
@@ -898,8 +898,8 @@ class BonusPaymentControllerSpec extends PlaySpec
         doGetBonusPaymentTransactionRequest(res => {
           status(res) mustBe (NOT_FOUND)
           val json = contentAsJson(res)
-          (json \ "code").as[String] mustBe ErrorTransactionNotFound.errorCode
-          (json \ "message").as[String] mustBe ErrorTransactionNotFound.message
+          (json \ "code").as[String] mustBe ErrorBonusPaymentTransactionNotFound.errorCode
+          (json \ "message").as[String] mustBe ErrorBonusPaymentTransactionNotFound.message
         })
       }
 
@@ -921,8 +921,8 @@ class BonusPaymentControllerSpec extends PlaySpec
         doGetBonusPaymentTransactionRequest(res => {
           status(res) mustBe (NOT_FOUND)
           val json = contentAsJson(res)
-          (json \ "code").as[String] mustBe ErrorTransactionNotFound.errorCode
-          (json \ "message").as[String] mustBe ErrorTransactionNotFound.message
+          (json \ "code").as[String] mustBe ErrorBonusPaymentTransactionNotFound.errorCode
+          (json \ "message").as[String] mustBe ErrorBonusPaymentTransactionNotFound.message
         })
       }
 

@@ -30,6 +30,7 @@ case object GetBonusOrWithdrawalErrorResponse extends GetBonusOrWithdrawalRespon
 trait GetBonusOrWithdrawalSuccessResponse extends GetBonusOrWithdrawalResponse {
   val paymentStatus: String
   val supersededBy: Option[TransactionId]
+  def getBonusDueForPeriod : Option[Amount] = None
 }
 
 case class GetBonusResponse(
@@ -43,7 +44,9 @@ case class GetBonusResponse(
   supersede: Option[Supersede] = None,
   paymentStatus: String,
   creationDate: DateTime
-) extends GetBonusOrWithdrawalSuccessResponse
+) extends GetBonusOrWithdrawalSuccessResponse {
+  override def getBonusDueForPeriod: Option[Amount] = Some(bonuses.bonusDueForPeriod)
+}
 
 case class GetWithdrawalResponse(
                                   periodStartDate: DateTime,
