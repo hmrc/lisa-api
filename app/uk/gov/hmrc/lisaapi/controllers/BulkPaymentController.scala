@@ -46,27 +46,16 @@ class BulkPaymentController extends LisaController with LisaConstants {
               case s: GetBulkPaymentSuccessResponse => {
                 LisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.TRANSACTION)
                 withApiVersion {
-                  case Some(VERSION_1) => {
-                    val jsonTransformer = (__ \ 'payments).json.update(
-                      of[JsArray] map {
-                        case JsArray(arr) => JsArray(arr map {
-                          case JsObject(o) => JsObject(o - "transactionType" - "status")
-                        })
-                      }
-                    )
-
-                    val json = Json.toJson(s)
-                    val output = json.transform(jsonTransformer).get
-
-                    Future.successful(Ok(Json.toJson(output)))
-                  }
+                  case Some(VERSION_1) => Future.successful(transformV1Response(Json.toJson(s)))
                   case Some(VERSION_2) => Future.successful(Ok(Json.toJson(s)))
                 }
-
               }
               case GetBulkPaymentNotFoundResponse => {
                 LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.TRANSACTION)
-                Future.successful(NotFound(Json.toJson(ErrorBulkTransactionNotFound)))
+                withApiVersion {
+                  case Some(VERSION_1) => Future.successful(NotFound(Json.toJson(ErrorBulkTransactionNotFoundV1)))
+                  case Some(VERSION_2) => Future.successful(NotFound(Json.toJson(ErrorBulkTransactionNotFoundV2)))
+                }
               }
               case _ => {
                 LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.TRANSACTION)
@@ -77,6 +66,21 @@ class BulkPaymentController extends LisaController with LisaConstants {
         }
       }
     }
+
+  def transformV1Response(json: JsValue): Result = {
+    val jsonTransformer = (__ \ 'payments).json.update(
+      of[JsArray] map {
+        case JsArray(arr) => JsArray(arr map {
+          case JsObject(o) => JsObject(o - "transactionType" - "status")
+        })
+      }
+    )
+
+    json.transform(jsonTransformer).fold(
+      _ => InternalServerError(Json.toJson(ErrorInternalServerError)),
+      success => Ok(Json.toJson(success))
+    )
+  }
 
   private def withValidDates(startDate: String, endDate: String)
                             (success: (DateTime, DateTime) => Future[Result])

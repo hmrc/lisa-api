@@ -22,6 +22,7 @@ import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
@@ -38,7 +39,7 @@ class BulkPaymentControllerSpec extends PlaySpec
   with OneAppPerSuite
   with BeforeAndAfter {
 
-  val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
+  val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.2.0+json")
   val currentDate = new DateTime("2020-01-01")
   val validDate = "2018-01-01"
   val invalidDate = "01-01-2018"
@@ -203,6 +204,59 @@ class BulkPaymentControllerSpec extends PlaySpec
         (json \ "code").as[String] mustBe "INTERNAL_SERVER_ERROR"
         (json \ "message").as[String] mustBe "Internal server error"
       }
+    }
+
+  }
+
+  "transformV1Response" must {
+
+    "remove transactionType and status" in {
+      val input = Json.obj(
+        "lisaManagerReferenceNumber" -> "Z123456",
+        "payments" -> Json.arr(
+          Json.obj(
+            "transactionId" -> "1",
+            "transactionType" -> "Payment",
+            "status" -> "Paid"
+          ),
+          Json.obj(
+            "transactionId" -> "2",
+            "transactionType" -> "Payment",
+            "status" -> "Pending"
+          )
+        )
+      )
+
+      val expected = Json.obj(
+        "lisaManagerReferenceNumber" -> "Z123456",
+        "payments" -> Json.arr(
+          Json.obj(
+            "transactionId" -> "1"
+          ),
+          Json.obj(
+            "transactionId" -> "2"
+          )
+        )
+      )
+
+      val result = Future.successful(SUT.transformV1Response(input))
+
+      status(result) mustBe OK
+      contentAsJson(result) mustBe expected
+    }
+
+    "return an error if the transform fails" in {
+      val input = Json.obj(
+        "lisaManagerReferenceNumber" -> "Z123456",
+        "payments" -> "invalid"
+      )
+
+      val expected = Json.obj("code" -> "INTERNAL_SERVER_ERROR", "message" -> "Internal server error")
+
+      val result = Future.successful(SUT.transformV1Response(input))
+
+      status(result) mustBe INTERNAL_SERVER_ERROR
+      contentAsJson(result) mustBe expected
     }
 
   }
