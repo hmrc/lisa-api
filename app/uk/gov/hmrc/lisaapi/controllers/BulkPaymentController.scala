@@ -18,7 +18,8 @@ package uk.gov.hmrc.lisaapi.controllers
 
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
-import play.api.libs.json.Json
+import play.api.libs.json.Reads.of
+import play.api.libs.json._
 import play.api.mvc.{Action, AnyContent, Result}
 import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
@@ -41,18 +42,35 @@ class BulkPaymentController extends LisaController with LisaConstants {
           withValidDates(startDate, endDate) { (start, end) =>
             val response = service.getBulkPayment(lisaManager, start, end)
 
-            response map {
+            response flatMap {
               case s: GetBulkPaymentSuccessResponse => {
                 LisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.TRANSACTION)
-                Ok(Json.toJson(s))
+                withApiVersion {
+                  case Some(VERSION_1) => {
+                    val jsonTransformer = (__ \ 'payments).json.update(
+                      of[JsArray] map {
+                        case JsArray(arr) => JsArray(arr map {
+                          case JsObject(o) => JsObject(o - "transactionType" - "status")
+                        })
+                      }
+                    )
+
+                    val json = Json.toJson(s)
+                    val output = json.transform(jsonTransformer).get
+
+                    Future.successful(Ok(Json.toJson(output)))
+                  }
+                  case Some(VERSION_2) => Future.successful(Ok(Json.toJson(s)))
+                }
+
               }
               case GetBulkPaymentNotFoundResponse => {
                 LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.TRANSACTION)
-                NotFound(Json.toJson(ErrorBulkTransactionNotFound))
+                Future.successful(NotFound(Json.toJson(ErrorBulkTransactionNotFound)))
               }
               case _ => {
                 LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.TRANSACTION)
-                InternalServerError(Json.toJson(ErrorInternalServerError))
+                Future.successful(InternalServerError(Json.toJson(ErrorInternalServerError)))
               }
             }
           }

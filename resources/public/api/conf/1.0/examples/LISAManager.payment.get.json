@@ -9,6 +9,15 @@
     {
       "paymentAmount": 12000,
       "dueDate": "2017-07-04"
+    },
+    {
+      "paymentAmount": 1000,
+      "paymentDate": "2017-08-04",
+      "paymentReference": "1040000985"
+    },
+    {
+      "paymentAmount": 1100,
+      "dueDate": "2017-09-04"
     }
   ]
 }
