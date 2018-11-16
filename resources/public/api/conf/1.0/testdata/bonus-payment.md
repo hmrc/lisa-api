@@ -708,51 +708,6 @@
         </tr>
         <tr>
             <td>
-              <p>Request for a bonus claim that has already been requested</p>
-              <p class="code--block">
-                <strong>lisaManagerReferenceNumber:</strong><br>
-                <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
-                <br>
-                <strong>accountId:</strong><br>
-                0000000409
-              </p>
-            </td>
-            <td>
-<pre class="code--block">
-{
-  "lifeEventId": "1234567891",
-  "periodStartDate": "2017-04-06",
-  "periodEndDate": "2017-05-05",
-  "htbTransfer": {
-    "htbTransferInForPeriod": 0.00,
-    "htbTransferTotalYTD": 0.00
-  },
-  "inboundPayments": {
-    "newSubsForPeriod": 4000.00,
-    "newSubsYTD": 4000.00,
-    "totalSubsForPeriod": 40000.00,
-    "totalSubsYTD": 40000.00
-  },
-  "bonuses": {
-    "bonusPaidYTD": 0.0,
-    "bonusDueForPeriod": 10000.00,
-    "totalBonusDueYTD": 10000.00,
-    "claimReason": "Life Event"
-  }
-}
-</pre>
-            </td>
-            <td><p>HTTP status: <code class="code--slim">409 (Conflict)</code></p>
-<pre class ="code--block">
-{
-  "code": "BONUS_CLAIM_ALREADY_EXISTS",
-  "message": "The investor’s bonus payment has already been requested"
-}
-</pre>
-            </td>
-        </tr>
-        <tr>
-            <td>
               <p>Request with an invalid 'Accept' header</p>
               <p class="code--block">
                 <strong>lisaManagerReferenceNumber:</strong><br>

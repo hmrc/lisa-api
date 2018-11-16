@@ -31,12 +31,7 @@ package object controllers {
       case e:ErrorResponseWithErrors => Json.obj("code" -> e.errorCode, "message" -> e.message, "errors" -> e.errors)
       case e:ErrorResponseWithId => Json.obj("code" -> e.errorCode, "message" -> e.message, "id" -> e.id)
       case e:ErrorResponseWithLifeEventId => Json.obj("code" -> e.errorCode, "message" -> e.message, "lifeEventId" -> e.lifeEventID)
-      case e:ErrorResponseWithTransactionId => {
-        e.transactionId match {
-          case Some(transactionId) => Json.obj("code" -> e.errorCode, "message" -> e.message, "transactionId" -> transactionId)
-          case None => Json.obj("code" -> e.errorCode, "message" -> e.message)
-        }
-      }
+      case e:ErrorResponseWithTransactionId => Json.obj("code" -> e.errorCode, "message" -> e.message, "transactionId" -> e.transactionId)
       case _ => Json.obj ("code" -> e.errorCode, "message" -> e.message)
     }
   }

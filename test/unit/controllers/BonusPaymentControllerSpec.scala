@@ -331,41 +331,9 @@ class BonusPaymentControllerSpec extends PlaySpec
 
     "return with status 409 conflict" when {
 
-      "given a RequestBonusPaymentClaimAlreadyExists response from the service layer for api v1 with a transaction id" in {
-        when(mockPostService.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(RequestBonusPaymentClaimAlreadyExists(Some(transactionId))))
-
-        doRequest(validBonusPaymentJson)(
-          res => {
-            status(res) mustBe CONFLICT
-            val json = contentAsJson(res)
-            (json \ "code").as[String] mustBe "BONUS_CLAIM_ALREADY_EXISTS"
-            (json \ "message").as[String] mustBe "The investor’s bonus payment has already been requested"
-            (json \ "transactionId").asOpt[String] mustBe None
-          },
-          acceptHeaderV1
-        )
-      }
-
-      "given a RequestBonusPaymentClaimAlreadyExists response from the service layer for api v1 without a transaction id" in {
-        when(mockPostService.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(RequestBonusPaymentClaimAlreadyExists(None)))
-
-        doRequest(validBonusPaymentJson)(
-          res => {
-            status(res) mustBe CONFLICT
-            val json = contentAsJson(res)
-            (json \ "code").as[String] mustBe "BONUS_CLAIM_ALREADY_EXISTS"
-            (json \ "message").as[String] mustBe "The investor’s bonus payment has already been requested"
-            (json \ "transactionId").asOpt[String] mustBe None
-          },
-          acceptHeaderV1
-        )
-      }
-
       "given a RequestBonusPaymentClaimAlreadyExists response from the service layer for api v2" in {
         when(mockPostService.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(RequestBonusPaymentClaimAlreadyExists(Some(transactionId))))
+          thenReturn(Future.successful(RequestBonusPaymentClaimAlreadyExists(transactionId)))
 
         doRequest(validBonusPaymentJson) { res =>
           status(res) mustBe CONFLICT
@@ -378,7 +346,7 @@ class BonusPaymentControllerSpec extends PlaySpec
 
       "given a RequestBonusPaymentAlreadySuperseded response from the service layer for v2" in {
         when(mockPostService.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(RequestBonusPaymentAlreadySuperseded(Some(transactionId))))
+          thenReturn(Future.successful(RequestBonusPaymentAlreadySuperseded(transactionId)))
 
         doRequest(validBonusPaymentJson) { res =>
           status(res) mustBe CONFLICT
@@ -489,9 +457,22 @@ class BonusPaymentControllerSpec extends PlaySpec
         )
       }
 
+      "a RequestBonusPaymentClaimAlreadyExists response is received for version 1 of the api" in {
+        when(mockPostService.requestBonusPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(RequestBonusPaymentClaimAlreadyExists(transactionId)))
+
+        doRequest(validBonusPaymentJson)(
+          res => {
+            status(res) mustBe INTERNAL_SERVER_ERROR
+            contentAsJson(res) mustBe internalServerError
+          },
+          acceptHeaderV1
+        )
+      }
+
       "a RequestBonusPaymentAlreadySuperseded response is received for version 1 of the api" in {
         when(mockPostService.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(RequestBonusPaymentAlreadySuperseded(Some(transactionId))))
+          thenReturn(Future.successful(RequestBonusPaymentAlreadySuperseded(transactionId)))
 
         doRequest(validBonusPaymentJson)(
           res => {

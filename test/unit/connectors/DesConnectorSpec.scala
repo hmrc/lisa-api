@@ -572,22 +572,7 @@ class DesConnectorSpec extends PlaySpec
           )
 
         doRequestBonusPaymentRequest { response =>
-          response mustBe DesTransactionExistResponse(code = "x", reason = "xx", transactionID = Some("87654321"))
-        }
-      }
-      "the DES response returns a 409 with a json body that is in the correct format with no transaction id" in {
-        when(mockHttpPost.POST[RequestBonusPaymentRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                responseStatus = CONFLICT,
-                responseJson = Some(Json.parse(s"""{"code": "x", "reason": "xx"}"""))
-              )
-            )
-          )
-
-        doRequestBonusPaymentRequest { response =>
-          response mustBe DesTransactionExistResponse(code = "x", reason = "xx", transactionID = None)
+          response mustBe DesTransactionExistResponse(code = "x", reason = "xx", transactionID = "87654321")
         }
       }
     }

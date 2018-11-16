@@ -21,14 +21,14 @@ import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
+import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesTransactionExistResponse, DesTransactionResponse}
 import uk.gov.hmrc.lisaapi.models.{RequestBonusPaymentResponse, _}
-import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesGetBonusPaymentResponse, DesTransactionExistResponse, DesTransactionResponse}
 import uk.gov.hmrc.lisaapi.services.BonusPaymentService
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
-import uk.gov.hmrc.http.HeaderCarrier
 
 class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
 
@@ -123,20 +123,12 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
     }
 
     "return a bonus claim already exists response" when {
-      "given the code BONUS_CLAIM_ALREADY_EXISTS from the DES connector with a transactionId" in {
+      "given the code BONUS_CLAIM_ALREADY_EXISTS from the DES connector" in {
         when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesTransactionExistResponse("BONUS_CLAIM_ALREADY_EXISTS", "xxxxx", Some("987654"))))
+          thenReturn(Future.successful(DesTransactionExistResponse("BONUS_CLAIM_ALREADY_EXISTS", "xxxxx", "987654")))
 
         doRequest { response =>
-          response mustBe RequestBonusPaymentClaimAlreadyExists(Some("987654"))
-        }
-      }
-      "given the code BONUS_CLAIM_ALREADY_EXISTS from the DES connector without a transactionId" in {
-        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesTransactionExistResponse("BONUS_CLAIM_ALREADY_EXISTS", "xxxxx", None)))
-
-        doRequest { response =>
-          response mustBe RequestBonusPaymentClaimAlreadyExists(None)
+          response mustBe RequestBonusPaymentClaimAlreadyExists("987654")
         }
       }
     }
@@ -164,20 +156,12 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
     }
 
     "return a already superseded response" when {
-      "given the code SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED from the DES connector with a transactionId" in {
+      "given the code SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED from the DES connector" in {
         when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesTransactionExistResponse("SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED", "xxxxx", Some("12345"))))
+          thenReturn(Future.successful(DesTransactionExistResponse("SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED", "xxxxx", "12345")))
 
         doRequest { response =>
-          response mustBe RequestBonusPaymentAlreadySuperseded(Some("12345"))
-        }
-      }
-      "given the code SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED from the DES connector without a transactionId" in {
-        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesTransactionExistResponse("SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED", "xxxxx", None)))
-
-        doRequest { response =>
-          response mustBe RequestBonusPaymentAlreadySuperseded(None)
+          response mustBe RequestBonusPaymentAlreadySuperseded("12345")
         }
       }
     }
