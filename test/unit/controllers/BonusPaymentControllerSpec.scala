@@ -784,7 +784,7 @@ class BonusPaymentControllerSpec extends PlaySpec
 
   "the GET bonus payment endpoint" must {
 
-    "return 200 success response with supersede data" when {
+    "return 200 success response with all supersede data" when {
       "given an api version of 2" in {
         when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusResponse(
           Some("1234567891"),
@@ -836,8 +836,8 @@ class BonusPaymentControllerSpec extends PlaySpec
       }
     }
 
-    "return 200 success response without supersede data" when {
-      "given an api version of 1" in {
+    "return 200 success response without supersededBy data" when {
+      "given an api version of 1 for a request which has been superseded" in {
         when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusResponse(
           Some("1234567891"),
           new DateTime("2017-04-06"),
@@ -846,7 +846,7 @@ class BonusPaymentControllerSpec extends PlaySpec
           InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
           Bonuses(1000f, 1000f, Some(1000f), "Life Event"),
           Some("1234567892"),
-          Some(BonusRecovery(100, "1234567890", 1100, -100)),
+          None,
           "Paid",
           new DateTime("2017-05-20"))
         ))
@@ -928,11 +928,35 @@ class BonusPaymentControllerSpec extends PlaySpec
 
     }
 
-    "return an internal server error response" in {
-      when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusOrWithdrawalErrorResponse))
-      doGetBonusPaymentTransactionRequest(res => {
-        contentAsJson(res) mustBe internalServerError
-      })
+    "return an internal server error response" when {
+      "an error is returned from the service layer" in {
+        when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusOrWithdrawalErrorResponse))
+        doGetBonusPaymentTransactionRequest(res => {
+          contentAsJson(res) mustBe internalServerError
+        })
+      }
+      "given an api version of 1 for a request which supersedes another" in {
+        when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusResponse(
+          Some("1234567891"),
+          new DateTime("2017-04-06"),
+          new DateTime("2017-05-05"),
+          Some(HelpToBuyTransfer(0f, 10f)),
+          InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
+          Bonuses(1000f, 1000f, Some(1000f), "Superseded Bonus"),
+          Some("1234567892"),
+          Some(BonusRecovery(100, "1234567890", 1100, -100)),
+          "Paid",
+          new DateTime("2017-05-20"))
+        ))
+
+        doGetBonusPaymentTransactionRequest(
+          res => {
+            status(res) mustBe INTERNAL_SERVER_ERROR
+            contentAsJson(res) mustBe internalServerError
+          },
+          acceptHeaderV1
+        )
+      }
     }
 
   }

@@ -90,7 +90,15 @@ class BonusPaymentController extends LisaController with LisaConstants {
       case response: GetBonusResponse =>
         LisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.BONUS_PAYMENT)
         withApiVersion {
-          case Some(VERSION_1) => Future.successful(Ok(Json.toJson(response.copy(supersede = None, supersededBy = None))))
+          case Some(VERSION_1) => {
+            if (response.bonuses.claimReason == "Superseded Bonus") {
+              Logger.warn(s"API v1 received a superseded bonus claim. ID was $transactionId")
+              Future.successful(InternalServerError(Json.toJson(ErrorInternalServerError)))
+            }
+            else {
+              Future.successful(Ok(Json.toJson(response.copy(supersededBy = None))))
+            }
+          }
           case Some(VERSION_2) => Future.successful(Ok(Json.toJson(response)))
         }
 
