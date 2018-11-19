@@ -58,7 +58,7 @@
 <pre class="code--block">
 {
   "code": "TRANSACTION_NOT_FOUND",
-  "message": "No payments or debts exist for this date range"
+  "message": "No bonus payments have been made for this date range"
 }
 </pre>
             </td>
