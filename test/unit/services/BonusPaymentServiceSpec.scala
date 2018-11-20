@@ -54,6 +54,34 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
         }
       }
 
+      "given a successful superseded response from the DES connector" in {
+        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(DesTransactionResponse("AB123456", None)))
+
+        doRequest(
+          response => { response mustBe RequestBonusPaymentSupersededResponse("AB123456") },
+          Some(RequestBonusPaymentRequest(
+            lifeEventId = Some("1234567891"),
+            periodStartDate = new DateTime("2017-04-06"),
+            periodEndDate = new DateTime("2017-05-05"),
+            htbTransfer = Some(HelpToBuyTransfer(0f, 0f)),
+            inboundPayments = InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
+            bonuses = Bonuses(1000f, 1000f, None, "Superseded Bonus")
+          ))
+        )
+      }
+
+    }
+
+    "return a account closed or void response" when {
+      "given the code INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID from the DES connector" in {
+        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID", "x")))
+
+        doRequest { response =>
+          response mustBe RequestBonusPaymentAccountClosedOrVoid
+        }
+      }
     }
 
     "return a account closed response" when {
@@ -190,15 +218,20 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
 
   }
 
-  private def doRequest(callback: (RequestBonusPaymentResponse) => Unit) = {
-    val request = RequestBonusPaymentRequest(
-      lifeEventId = Some("1234567891"),
-      periodStartDate = new DateTime("2017-04-06"),
-      periodEndDate = new DateTime("2017-05-05"),
-      htbTransfer = Some(HelpToBuyTransfer(0f, 0f)),
-      inboundPayments = InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
-      bonuses = Bonuses(1000f, 1000f, None, "Life Event")
-    )
+  private def doRequest(callback: (RequestBonusPaymentResponse) => Unit, data: Option[RequestBonusPaymentRequest] = None) = {
+    val request = data match {
+      case Some(req) => req
+      case None => {
+        RequestBonusPaymentRequest(
+          lifeEventId = Some("1234567891"),
+          periodStartDate = new DateTime("2017-04-06"),
+          periodEndDate = new DateTime("2017-05-05"),
+          htbTransfer = Some(HelpToBuyTransfer(0f, 0f)),
+          inboundPayments = InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
+          bonuses = Bonuses(1000f, 1000f, None, "Life Event")
+        )
+      }
+    }
 
     val response = Await.result(SUT.requestBonusPayment("Z019283", "192837", request)(HeaderCarrier()), Duration.Inf)
 
@@ -209,4 +242,5 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
   object SUT extends BonusPaymentService {
     override val desConnector: DesConnector = mockDesConnector
   }
+
 }
