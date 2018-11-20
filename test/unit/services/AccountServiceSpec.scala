@@ -279,6 +279,19 @@ class AccountServiceSpec extends PlaySpec
 
     "return the type-appropriate response" when {
 
+      "given failureResponse for a Account Already Void Response" in {
+        when(mockDesConnector.closeAccount(any(), any(), any())(any()))
+          .thenReturn(
+            Future.successful(
+              DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_VOID")
+            )
+          )
+
+        doCloseRequest { response =>
+          response mustBe CloseLisaAccountAlreadyVoidResponse
+        }
+      }
+
       "given failureResponse for a Account Already Closed Response" in {
         when(mockDesConnector.closeAccount(any(), any(), any())(any()))
           .thenReturn(
@@ -339,6 +352,23 @@ class AccountServiceSpec extends PlaySpec
 
         doCloseRequest { response =>
           response mustBe CloseLisaAccountNotFoundResponse
+        }
+      }
+
+    }
+
+    "return a generic error response" when {
+
+      "given an unexpected error code" in {
+        when(mockDesConnector.closeAccount(any(), any(), any())(any()))
+          .thenReturn(
+            Future.successful(
+              DesFailureResponse("X")
+            )
+          )
+
+        doCloseRequest { response =>
+          response mustBe CloseLisaAccountErrorResponse
         }
       }
 

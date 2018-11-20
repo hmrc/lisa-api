@@ -92,6 +92,17 @@ class BonusPaymentControllerSpec extends PlaySpec
         }
       }
 
+      "given a RequestBonusPaymentSupersededResponse from the service layer" in {
+        when(mockPostService.requestBonusPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(RequestBonusPaymentSupersededResponse("1928374")))
+
+        doRequest(validBonusPaymentJson) { res =>
+          status(res) mustBe (CREATED)
+          (contentAsJson(res) \ "data" \ "transactionId").as[String] mustBe "1928374"
+          (contentAsJson(res) \ "data" \ "message").as[String] mustBe "Bonus transaction superseded"
+        }
+      }
+
     }
 
     "return with status 400 bad request" when {
