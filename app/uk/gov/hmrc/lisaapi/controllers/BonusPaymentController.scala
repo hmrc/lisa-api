@@ -102,11 +102,7 @@ class BonusPaymentController extends LisaController with LisaConstants {
           case Some(VERSION_2) => Future.successful(Ok(Json.toJson(response)))
         }
 
-      case _: GetWithdrawalResponse =>
-        LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.BONUS_PAYMENT)
-        Future.successful(NotFound(Json.toJson(ErrorBonusPaymentTransactionNotFound)))
-
-      case GetBonusOrWithdrawalTransactionNotFoundResponse =>
+      case _: GetWithdrawalResponse | GetBonusOrWithdrawalTransactionNotFoundResponse =>
         LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.BONUS_PAYMENT)
         Future.successful(NotFound(Json.toJson(ErrorBonusPaymentTransactionNotFound)))
 
