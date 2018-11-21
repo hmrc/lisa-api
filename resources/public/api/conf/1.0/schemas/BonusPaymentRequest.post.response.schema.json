@@ -12,12 +12,11 @@
           "pattern": "^\\d{10}$"
         },
         "message": {
-          "description": "A human-readable explanation for the result of the API call. \"Bonus transaction superseded\" is limited to the sandbox environment only.",
+          "description": "A human-readable explanation for the result of the API call.",
           "type": "string",
           "enum": [
             "Bonus transaction created",
-            "Bonus transaction created - late notification",
-            "Bonus transaction superseded"
+            "Bonus transaction created - late notification"
           ]
         }
       },

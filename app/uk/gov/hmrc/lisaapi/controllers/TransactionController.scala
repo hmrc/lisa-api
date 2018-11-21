@@ -25,46 +25,53 @@ import uk.gov.hmrc.lisaapi.models.{GetTransactionAccountNotFoundResponse, GetTra
 import uk.gov.hmrc.lisaapi.services.TransactionService
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class TransactionController extends LisaController with LisaConstants {
 
   val service: TransactionService = TransactionService
 
   def getTransaction(lisaManager: String, accountId: String, transactionId: String): Action[AnyContent] =
-    validateAccept(acceptHeaderValidationRules).async { implicit request =>
-      implicit val startTime = System.currentTimeMillis()
+    validateHeader().async { implicit request =>
+      implicit val startTime: Long = System.currentTimeMillis()
 
       withValidLMRN(lisaManager) { () =>
         withEnrolment(lisaManager) { (_) =>
           withValidAccountId(accountId) { () =>
-            service.getTransaction(lisaManager, accountId, transactionId) map {
+            service.getTransaction(lisaManager, accountId, transactionId) flatMap {
               case success: GetTransactionSuccessResponse => {
                 Logger.debug("Matched Valid Response")
 
                 LisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.TRANSACTION)
 
-                Ok(Json.toJson(success))
+                withApiVersion {
+                  case Some(VERSION_1) => Future.successful(Ok(Json.toJson(success.copy(transactionType = None, supersededBy = None))))
+                  case Some(VERSION_2) => Future.successful(Ok(Json.toJson(success.copy(bonusDueForPeriod = None))))
+                }
               }
               case GetTransactionAccountNotFoundResponse => {
                 Logger.debug("Matched Not Found Response")
 
                 LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.TRANSACTION)
 
-                NotFound(Json.toJson(ErrorAccountNotFound))
+                Future.successful(NotFound(Json.toJson(ErrorAccountNotFound)))
               }
               case GetTransactionTransactionNotFoundResponse => {
                 Logger.debug("Matched Not Found Response")
 
                 LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.TRANSACTION)
 
-                NotFound(Json.toJson(ErrorGenericTransactionNotFound))
+                withApiVersion {
+                  case Some(VERSION_1) => Future.successful(NotFound(Json.toJson(ErrorBonusPaymentTransactionNotFound)))
+                  case Some(VERSION_2) => Future.successful(NotFound(Json.toJson(ErrorTransactionNotFound)))
+                }
               }
               case GetTransactionErrorResponse => {
                 Logger.debug("Matched an error")
 
                 LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.TRANSACTION)
 
-                InternalServerError(Json.toJson(ErrorInternalServerError))
+                Future.successful(InternalServerError(Json.toJson(ErrorInternalServerError)))
               }
             }
           }

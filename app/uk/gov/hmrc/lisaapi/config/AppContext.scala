@@ -27,9 +27,11 @@ object AppContext extends ServicesConfig {
   lazy val registrationEnabled: Boolean = current.configuration.getBoolean(s"microservice.services.service-locator.enabled").getOrElse(false)
   lazy val apiContext = current.configuration.getString("api.context").getOrElse(throw new RuntimeException(s"Missing Key api.context"))
   lazy val baseUrl = current.configuration.getString(s"baseUrl").getOrElse(throw new RuntimeException(s"Missing Key baseUrl"))
-  lazy val apiStatus = current.configuration.getString("api.status").getOrElse(throw new RuntimeException(s"Missing Key api.status"))
+  lazy val v1apiStatus = current.configuration.getString("api.status").getOrElse(throw new RuntimeException(s"Missing Key api.status"))
+  lazy val v2apiStatus = current.configuration.getString("api.statusv2").getOrElse(throw new RuntimeException(s"Missing Key api.statusv2"))
   lazy val desAuthToken = current.configuration.getString("desauthtoken").getOrElse(throw new RuntimeException(s"Missing Key desauthtoken"))
   lazy val desUrlHeaderEnv: String =  current.configuration.getString("environment").getOrElse(throw new RuntimeException(s"Missing Key environment"))
   lazy val access = current.configuration.getConfig(s"api.access")
-  lazy val endpointsEnabled = current.configuration.getBoolean("api.endpointsEnabled").getOrElse(throw new RuntimeException(s"Missing key api.endpointsEnabled"))
+  lazy val v1endpointsEnabled = current.configuration.getBoolean("api.endpointsEnabled").getOrElse(throw new RuntimeException(s"Missing key api.endpointsEnabled"))
+  lazy val v2endpointsEnabled = current.configuration.getBoolean("api.endpointsEnabledv2").getOrElse(throw new RuntimeException(s"Missing key api.endpointsEnabledv2"))
 }

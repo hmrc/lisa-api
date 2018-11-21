@@ -20,22 +20,24 @@ import play.api.Logger
 import play.api.data.validation.ValidationError
 import play.api.libs.json.Json.toJson
 import play.api.libs.json._
-import play.api.mvc.{Action, AnyContent, Request, Result}
-import uk.gov.hmrc.api.controllers.HeaderValidator
+import play.api.mvc._
 import uk.gov.hmrc.auth.core.retrieve.Retrievals.internalId
 import uk.gov.hmrc.auth.core.{AuthorisationException, AuthorisedFunctions, Enrolment, InsufficientEnrolments}
+import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.utils.ErrorConverter
 import uk.gov.hmrc.play.config.RunMode
+import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext._
 import uk.gov.hmrc.play.microservice.controller.BaseController
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 
-trait LisaController extends BaseController with HeaderValidator with RunMode with AuthorisedFunctions {
+trait LisaController extends BaseController with LisaConstants with RunMode with AuthorisedFunctions with APIVersioning with LisaActions {
 
+  override val validateVersion: String => Boolean = str => str == "1.0" || str == "2.0"
+  override val validateContentType: String => Boolean = _ == "json"
   val authConnector: LisaAuthConnector = LisaAuthConnector
   lazy val errorConverter: ErrorConverter = ErrorConverter
 

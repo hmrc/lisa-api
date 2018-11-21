@@ -32,15 +32,16 @@ import scala.concurrent.Future
 
 class WithdrawalController extends LisaController with LisaConstants {
 
+  override val validateVersion: String => Boolean = _ == "2.0"
   val postService: WithdrawalService = WithdrawalService
   val getService: BonusOrWithdrawalService = BonusOrWithdrawalService
   val auditService: AuditService = AuditService
   val validator: WithdrawalChargeValidator = WithdrawalChargeValidator
   val dateTimeService: CurrentDateService = CurrentDateService
 
-  def reportWithdrawalCharge(lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async {
+  def reportWithdrawalCharge(lisaManager: String, accountId: String): Action[AnyContent] = validateHeader().async {
     implicit request =>
-      implicit val startTime = System.currentTimeMillis()
+      implicit val startTime: Long = System.currentTimeMillis()
 
       withValidLMRN(lisaManager) { () =>
         withValidAccountId(accountId) { () =>
@@ -70,7 +71,7 @@ class WithdrawalController extends LisaController with LisaConstants {
   }
 
   def getWithdrawalCharge(lisaManager: String, accountId: String, transactionId: String): Action[AnyContent] = {
-    validateAccept(acceptHeaderValidationRules).async { implicit request =>
+    validateHeader().async { implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
       withValidLMRN(lisaManager) { () =>
         withEnrolment(lisaManager) { (_) =>

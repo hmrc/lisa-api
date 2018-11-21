@@ -28,24 +28,12 @@ package object controllers {
   implicit val errorResponseWrites = new Writes[ErrorResponse] {
     def writes(e: ErrorResponse): JsValue = e match {
       case e:ErrorResponseWithAccountId => Json.obj("code" -> e.errorCode, "message" -> e.message, "accountId" -> e.accountId)
+      case e:ErrorResponseWithErrors => Json.obj("code" -> e.errorCode, "message" -> e.message, "errors" -> e.errors)
+      case e:ErrorResponseWithId => Json.obj("code" -> e.errorCode, "message" -> e.message, "id" -> e.id)
+      case e:ErrorResponseWithLifeEventId => Json.obj("code" -> e.errorCode, "message" -> e.message, "lifeEventId" -> e.lifeEventID)
+      case e:ErrorResponseWithTransactionId => Json.obj("code" -> e.errorCode, "message" -> e.message, "transactionId" -> e.transactionId)
       case _ => Json.obj ("code" -> e.errorCode, "message" -> e.message)
     }
-  }
-
-  implicit val errorResponseWithErrorsWrites = new Writes[ErrorResponseWithErrors] {
-    def writes(e: ErrorResponseWithErrors): JsValue = Json.obj("code" -> e.errorCode, "message" -> e.message, "errors" -> e.errors)
-  }
-
-  implicit val errorResponseWithIdWrites = new Writes[ErrorResponseWithId] {
-    def writes(e: ErrorResponseWithId): JsValue = Json.obj("code" -> e.errorCode, "message" -> e.message, "id" -> e.id)
-  }
-
-  implicit val errorResponseWithLifeEventIdWrites = new Writes[ErrorResponseWithLifeEventId] {
-    def writes(e: ErrorResponseWithLifeEventId): JsValue = Json.obj("code" -> e.errorCode, "message" -> e.message, "lifeEventId" -> e.lifeEventID)
-  }
-
-  implicit val errorResponseWithTransactionIdWrites = new Writes[ErrorResponseWithTransactionId] {
-    def writes(e: ErrorResponseWithTransactionId): JsValue = Json.obj("code" -> e.errorCode, "message" -> e.message, "transactionId" -> e.transactionId)
   }
 }
 
@@ -57,4 +45,6 @@ trait LisaConstants {
   val MONETARY_ERROR = "INVALID_MONETARY_AMOUNT"
   val LISA_START_DATE = new DateTime("2017-04-06")
   val LISA_START_DATE_ERROR = "The %s cannot be before 6 April 2017"
+  val VERSION_1 = "1.0"
+  val VERSION_2 = "2.0"
 }

@@ -45,7 +45,7 @@ class WithdrawalControllerSpec extends PlaySpec
   with BeforeAndAfterEach
   with LisaConstants {
 
-  val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
+  val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.2.0+json")
   val lisaManager = "Z019283"
   val accountId = "ABC/12345"
   val transactionId = "1234567890"
@@ -250,6 +250,18 @@ class WithdrawalControllerSpec extends PlaySpec
 
     }
 
+    "return with status 406 not acceptable" when {
+
+      "attempting to use the v1 of the api" in {
+        doRequest(validWithdrawalJson, header = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")) { res =>
+          status(res) mustBe NOT_ACCEPTABLE
+          (contentAsJson(res) \ "code").as[String] mustBe "ACCEPT_HEADER_INVALID"
+          (contentAsJson(res) \ "message").as[String] mustBe "The accept header has an invalid version for this endpoint"
+        }
+      }
+
+    }
+
     "return with status 409 conflict" when {
 
       "given a ReportWithdrawalChargeAlreadyExists from the service layer" in {
@@ -381,6 +393,21 @@ class WithdrawalControllerSpec extends PlaySpec
 
     }
 
+    "return with status 406 not acceptable" when {
+
+      "attempting to use the v1 of the api" in {
+        doGetRequest(
+          res => {
+            status(res) mustBe NOT_ACCEPTABLE
+            (contentAsJson(res) \ "code").as[String] mustBe "ACCEPT_HEADER_INVALID"
+            (contentAsJson(res) \ "message").as[String] mustBe "The accept header has an invalid version for this endpoint"
+          },
+          header = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
+        )
+      }
+
+    }
+
     "return an internal server error response" in {
       when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusOrWithdrawalErrorResponse))
       doGetRequest(res => {
@@ -390,15 +417,15 @@ class WithdrawalControllerSpec extends PlaySpec
 
   }
 
-  def doRequest(jsonString: String, lmrn: String = lisaManager)(callback: (Future[Result]) =>  Unit): Unit = {
-    val res = SUT.reportWithdrawalCharge(lmrn, accountId).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
+  def doRequest(jsonString: String, lmrn: String = lisaManager, header: (String, String) = acceptHeader)(callback: (Future[Result]) =>  Unit): Unit = {
+    val res = SUT.reportWithdrawalCharge(lmrn, accountId).apply(FakeRequest(Helpers.PUT, "/").withHeaders(header).
       withBody(AnyContentAsJson(Json.parse(jsonString))))
 
     callback(res)
   }
 
-  def doGetRequest(callback: (Future[Result]) =>  Unit): Unit = {
-    val res = SUT.getWithdrawalCharge(lisaManager, accountId, transactionId).apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
+  def doGetRequest(callback: (Future[Result]) =>  Unit, header: (String, String) = acceptHeader): Unit = {
+    val res = SUT.getWithdrawalCharge(lisaManager, accountId, transactionId).apply(FakeRequest(Helpers.GET, "/").withHeaders(header))
 
     callback(res)
   }
@@ -417,6 +444,7 @@ class WithdrawalControllerSpec extends PlaySpec
     override val authConnector: LisaAuthConnector = mockAuthCon
     override val dateTimeService: CurrentDateService = mockDateTimeService
     override val validator: WithdrawalChargeValidator = mockValidator
+    override lazy val v2endpointsEnabled = true
   }
 
 }

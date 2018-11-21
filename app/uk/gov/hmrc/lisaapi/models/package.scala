@@ -81,8 +81,12 @@ package object models {
     val accountClosureReason: Reads[AccountClosureReason] = Reads.pattern(
       "^(All funds withdrawn|Cancellation)$".r,
       "error.formatting.accountClosureReason")
-    val bonusClaimReason: Reads[BonusClaimReason] = Reads.pattern(
+    val bonusClaimReasonV2: Reads[BonusClaimReason] = Reads.pattern(
       "^(Life Event|Regular Bonus|Superseded Bonus)$".r,
+      "error.formatting.claimReason"
+    )
+    val bonusClaimReasonV1: Reads[BonusClaimReason] = Reads.pattern(
+      "^(Life Event|Regular Bonus)$".r,
       "error.formatting.claimReason"
     )
     val propertyPurchaseResult: Reads[PropertyPurchaseResult] = Reads.pattern(

@@ -16,7 +16,6 @@
 
 package unit.controllers
 
-import org.joda.time.DateTime
 import org.mockito.Matchers.{eq => matchersEquals, _}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
@@ -35,7 +34,6 @@ import uk.gov.hmrc.lisaapi.services.{AccountService, AuditService}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-
 class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite with BeforeAndAfterEach {
 
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
@@ -51,11 +49,11 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
   val invalidDate = "2015-04-05"
 
   val createAccountJson = s"""{
-                            |  "investorId" : "9876543210",
-                            |  "accountId" :"8765/432100",
-                            |  "creationReason" : "New",
-                            |  "firstSubscriptionDate" : "$validDate"
-                            |}""".stripMargin
+                             |  "investorId" : "9876543210",
+                             |  "accountId" :"8765/432100",
+                             |  "creationReason" : "New",
+                             |  "firstSubscriptionDate" : "$validDate"
+                             |}""".stripMargin
 
   val createAccountJsonWithTransfer = s"""{
                                         |  "investorId" : "9876543210",
@@ -96,7 +94,6 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
                                         |  "firstSubscriptionDate" : "$validDate"
                                         |}""".stripMargin
 
-  val closeAccountJson = s"""{"accountClosureReason" : "All funds withdrawn", "closureDate" : "$validDate"}"""
 
   "The Create / Transfer Account endpoint" must {
 
@@ -705,423 +702,6 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
   }
 
-  "The Get Account Details endpoint" must {
-
-    when(mockAuthCon.authorise[Option[String]](any(), any())(any(), any())).thenReturn(Future(Some("1234")))
-
-    "return the correct json" when {
-      "returning a valid open account response" in {
-        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(
-          GetLisaAccountSuccessResponse(
-            investorId = "9876543210",
-            accountId = "8765432100",
-            creationReason = "New",
-            firstSubscriptionDate = new DateTime(validDate),
-            accountStatus = "OPEN",
-            subscriptionStatus = "AVAILABLE",
-            accountClosureReason = None,
-            closureDate = None,
-            transferAccount = None
-          )
-        ))
-
-        doSyncGetAccountDetailsRequest(res => {
-          status(res) mustBe OK
-          val json = contentAsJson(res)
-
-          (json \ "investorId").as[String] mustBe "9876543210"
-          (json \ "accountId").as[String] mustBe "8765432100"
-          (json \ "creationReason").as[String] mustBe "New"
-          (json \ "firstSubscriptionDate").as[String] mustBe validDate
-          (json \ "accountStatus").as[String] mustBe "OPEN"
-          (json \ "subscriptionStatus").as[String] mustBe "AVAILABLE"
-          (json \ "accountClosureReason").asOpt[String] mustBe None
-          (json \ "closureDate").asOpt[String] mustBe None
-          (json \ "transferAccount").asOpt[JsObject] mustBe None
-        })
-      }
-      "returning a valid close account response" in {
-        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(
-          GetLisaAccountSuccessResponse(
-            investorId = "9876543210",
-            accountId = "8765432100",
-            creationReason = "New",
-            firstSubscriptionDate = new DateTime(validDate),
-            accountStatus = "CLOSED",
-            subscriptionStatus = "ACTIVE",
-            accountClosureReason = Some("All funds withdrawn"),
-            closureDate = Some(new DateTime(validDate)),
-            transferAccount = None)
-        ))
-
-        doSyncGetAccountDetailsRequest(res => {
-          status(res) mustBe OK
-
-          val json = contentAsJson(res)
-
-          (json \ "investorId").as[String] mustBe "9876543210"
-          (json \ "accountId").as[String] mustBe "8765432100"
-          (json \ "creationReason").as[String] mustBe "New"
-          (json \ "firstSubscriptionDate").as[String] mustBe validDate
-          (json \ "accountStatus").as[String] mustBe "CLOSED"
-          (json \ "subscriptionStatus").as[String] mustBe "ACTIVE"
-          (json \ "accountClosureReason").asOpt[String] mustBe Some("All funds withdrawn")
-          (json \ "closureDate").asOpt[String] mustBe Some(validDate)
-          (json \ "transferAccount").asOpt[JsObject] mustBe None
-        })
-      }
-      "returning a valid transfer account response" in {
-        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(
-          GetLisaAccountSuccessResponse(
-            investorId = "9876543210",
-            accountId = "8765432100",
-            creationReason = "Transferred",
-            firstSubscriptionDate = new DateTime(validDate),
-            accountStatus = "OPEN",
-            subscriptionStatus = "ACTIVE",
-            accountClosureReason = None,
-            closureDate = None,
-            transferAccount = Some(
-              GetLisaAccountTransferAccount(
-                "8765432102",
-                "Z543333",
-                new DateTime(validDate)
-              )
-            )
-          )
-        ))
-
-        doSyncGetAccountDetailsRequest(res => {
-          status(res) mustBe OK
-
-          val json = contentAsJson(res)
-
-          (json \ "investorId").as[String] mustBe "9876543210"
-          (json \ "accountId").as[String] mustBe "8765432100"
-          (json \ "creationReason").as[String] mustBe "Transferred"
-          (json \ "firstSubscriptionDate").as[String] mustBe validDate
-          (json \ "accountStatus").as[String] mustBe "OPEN"
-          (json \ "subscriptionStatus").as[String] mustBe "ACTIVE"
-          (json \ "accountClosureReason").asOpt[String] mustBe None
-          (json \ "closureDate").asOpt[String] mustBe None
-          (json \ "transferAccount" \ "transferredFromAccountId").as[String] mustBe "8765432102"
-          (json \ "transferAccount" \ "transferredFromLMRN").as[String] mustBe "Z543333"
-          (json \ "transferAccount" \ "transferInDate").as[String] mustBe validDate
-        })
-      }
-      "returning a valid void account response" in {
-        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(
-          GetLisaAccountSuccessResponse(
-            investorId = "9876543210",
-            accountId = "8765432100",
-            creationReason = "New",
-            firstSubscriptionDate = new DateTime(validDate),
-            accountStatus = "VOID",
-            subscriptionStatus = "ACTIVE",
-            accountClosureReason = None,
-            closureDate = None,
-            transferAccount = None
-          )
-        ))
-
-        doSyncGetAccountDetailsRequest(res => {
-          status(res) mustBe OK
-
-          val json = contentAsJson(res)
-
-          (json \ "investorId").as[String] mustBe "9876543210"
-          (json \ "accountId").as[String] mustBe "8765432100"
-          (json \ "creationReason").as[String] mustBe "New"
-          (json \ "firstSubscriptionDate").as[String] mustBe validDate
-          (json \ "accountStatus").as[String] mustBe "VOID"
-          (json \ "subscriptionStatus").as[String] mustBe "ACTIVE"
-          (json \ "accountClosureReason").asOpt[String] mustBe None
-          (json \ "closureDate").asOpt[String] mustBe None
-          (json \ "transferAccount").asOpt[JsObject] mustBe None
-        })
-      }
-      "returning a account not found response" in {
-        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountDoesNotExistResponse))
-        doSyncGetAccountDetailsRequest(res => {
-          (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNTID_NOT_FOUND"
-        })
-      }
-      "returning a internal server error response" in {
-        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountErrorResponse))
-        doSyncGetAccountDetailsRequest(res => {
-          (contentAsJson(res) \ "code").as[String] mustBe "INTERNAL_SERVER_ERROR"
-        })
-      }
-    }
-
-  }
-
-  "The Close Account endpoint" must {
-
-    when(mockAuthCon.authorise[Option[String]](any(),any())(any(), any())).thenReturn(Future(Some("1234")))
-
-    "audit an accountClosed event" when {
-      "return with status 200 ok" when {
-        "submitted a valid close account request" in {
-          when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountSuccessResponse(accountId)))
-
-          doSyncCloseRequest(closeAccountJson) { res =>
-            verify(mockAuditService).audit(
-              auditType = matchersEquals("accountClosed"),
-              path=matchersEquals(s"/manager/$lisaManager/accounts/$accountId/close-account"),
-              auditData = matchersEquals(Map(
-                "lisaManagerReferenceNumber" -> lisaManager,
-                "accountClosureReason" -> "All funds withdrawn",
-                "closureDate" -> validDate,
-                "accountId" -> accountId
-               )))(any())
-          }
-        }
-      }
-    }
-
-    "audit an accountNotClosed event" when {
-      "the json fails date validation" in {
-        doSyncCloseRequest(closeAccountJson.replace(validDate, invalidDate)) { res =>
-          verify(mockAuditService).audit(
-            auditType = matchersEquals("accountNotClosed"),
-            path=matchersEquals(s"/manager/$lisaManager/accounts/$accountId/close-account"),
-            auditData = matchersEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "accountClosureReason" -> "All funds withdrawn",
-              "closureDate" -> invalidDate,
-              "accountId" -> accountId,
-              "reasonNotClosed" -> "FORBIDDEN"
-            )))(any())
-        }
-      }
-      "the data service returns a CloseLisaAccountAlreadyVoidResponse" in {
-        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountAlreadyVoidResponse))
-
-        doSyncCloseRequest(closeAccountJson) { res =>
-          verify(mockAuditService).audit(
-            auditType = matchersEquals("accountNotClosed"),
-            path=matchersEquals(s"/manager/$lisaManager/accounts/$accountId/close-account"),
-            auditData = matchersEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "accountClosureReason" -> "All funds withdrawn",
-              "closureDate" -> s"$validDate",
-              "accountId" -> accountId,
-              "reasonNotClosed" -> "INVESTOR_ACCOUNT_ALREADY_VOID"
-            )))(any())
-        }
-      }
-      "the data service returns a CloseLisaAccountAlreadyClosedResponse" in {
-        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountAlreadyClosedResponse))
-
-        doSyncCloseRequest(closeAccountJson) { res =>
-          verify(mockAuditService).audit(
-            auditType = matchersEquals("accountNotClosed"),
-            path=matchersEquals(s"/manager/$lisaManager/accounts/$accountId/close-account"),
-            auditData = matchersEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "accountClosureReason" -> "All funds withdrawn",
-              "closureDate" -> s"$validDate",
-              "accountId" -> accountId,
-              "reasonNotClosed" -> "INVESTOR_ACCOUNT_ALREADY_CLOSED"
-            )))(any())
-        }
-      }
-      "the data service returns a CloseLisaAccountCancellationPeriodExceeded" in {
-        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountCancellationPeriodExceeded))
-
-        doSyncCloseRequest(closeAccountJson) { res =>
-          verify(mockAuditService).audit(
-            auditType = matchersEquals("accountNotClosed"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/close-account"),
-            auditData = matchersEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "accountClosureReason" -> "All funds withdrawn",
-              "closureDate" -> s"$validDate",
-              "accountId" -> accountId,
-              "reasonNotClosed" -> "CANCELLATION_PERIOD_EXCEEDED"
-            )))(any())
-        }
-      }
-      "the data service returns a CloseLisaAccountWithinCancellationPeriod" in {
-        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountWithinCancellationPeriod))
-
-        doSyncCloseRequest(closeAccountJson) { res =>
-          verify(mockAuditService).audit(
-            auditType = matchersEquals("accountNotClosed"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/close-account"),
-            auditData = matchersEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "accountClosureReason" -> "All funds withdrawn",
-              "closureDate" -> s"$validDate",
-              "accountId" -> accountId,
-              "reasonNotClosed" -> "ACCOUNT_WITHIN_CANCELLATION_PERIOD"
-            )))(any())
-        }
-      }
-      "the data service returns a CloseLisaAccountNotFoundResponse" in {
-        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountNotFoundResponse))
-
-        doSyncCloseRequest(closeAccountJson) { res =>
-          verify(mockAuditService).audit(
-            auditType = matchersEquals("accountNotClosed"),
-            path=matchersEquals(s"/manager/$lisaManager/accounts/$accountId/close-account"),
-            auditData = matchersEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "accountClosureReason" -> "All funds withdrawn",
-              "closureDate" -> s"$validDate",
-              "accountId" -> accountId,
-              "reasonNotClosed" -> "INVESTOR_ACCOUNTID_NOT_FOUND"
-            )))(any())
-
-        }
-      }
-      "the data service returns a CloseLisaAccountErrorResponse" in {
-        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountErrorResponse))
-
-        doSyncCloseRequest(closeAccountJson) { res =>
-          verify(mockAuditService).audit(
-            auditType = matchersEquals("accountNotClosed"),
-            path=matchersEquals(s"/manager/$lisaManager/accounts/$accountId/close-account"),
-            auditData = matchersEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "accountClosureReason" -> "All funds withdrawn",
-              "closureDate" -> s"$validDate",
-              "accountId" -> accountId,
-              "reasonNotClosed" -> "INTERNAL_SERVER_ERROR"
-            )))(any())
-
-        }
-      }
-    }
-
-    "return with status 200 ok" when {
-      "submitted a valid close account request" in {
-        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountSuccessResponse(accountId)))
-
-        doCloseRequest(closeAccountJson) { res =>
-          status(res) mustBe (OK)
-        }
-      }
-    }
-
-    "return with status 403 forbidden and a code of FORBIDDEN" when {
-      "given a closure date prior to 6 April 2017" in {
-        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountSuccessResponse(accountId)))
-
-        val json = closeAccountJson.replace(validDate, "2017-04-05")
-
-        doCloseRequest(json) { res =>
-          status(res) mustBe (FORBIDDEN)
-
-          val json = contentAsJson(res)
-
-          (json \ "code").as[String] mustBe "FORBIDDEN"
-          (json \ "errors" \ 0 \ "code").as[String] mustBe "INVALID_DATE"
-          (json \ "errors" \ 0 \ "message").as[String] mustBe "The closureDate cannot be before 6 April 2017"
-          (json \ "errors" \ 0 \ "path").as[String] mustBe "/closureDate"
-        }
-      }
-    }
-
-    "return with status 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_VOID" when {
-      "the data service returns a CloseLisaAccountAlreadyVoidResponse" in {
-        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountAlreadyVoidResponse))
-
-        doCloseRequest(closeAccountJson) { res =>
-          status(res) mustBe (FORBIDDEN)
-          (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ACCOUNT_ALREADY_VOID")
-        }
-      }
-    }
-
-    "return with status 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_CLOSED" when {
-      "the data service returns a CloseLisaAccountAlreadyClosedResponse" in {
-        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountAlreadyClosedResponse))
-
-        doCloseRequest(closeAccountJson) { res =>
-          status(res) mustBe (FORBIDDEN)
-          (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ACCOUNT_ALREADY_CLOSED")
-        }
-      }
-    }
-
-    "return with status 403 forbidden and a code of CANCELLATION_PERIOD_EXCEEDED" when {
-      "the data service returns a CloseLisaAccountAlreadyClosedResponse" in {
-        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountCancellationPeriodExceeded))
-
-        doCloseRequest(closeAccountJson) { res =>
-          status(res) mustBe (FORBIDDEN)
-          (contentAsJson(res) \ "code").as[String] mustBe ("CANCELLATION_PERIOD_EXCEEDED")
-        }
-      }
-    }
-
-    "return with status 403 forbidden and a code of ACCOUNT_WITHIN_CANCELLATION_PERIOD" when {
-      "the data service returns a CloseLisaAccountAlreadyClosedResponse" in {
-        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountWithinCancellationPeriod))
-
-        doCloseRequest(closeAccountJson) { res =>
-          status(res) mustBe (FORBIDDEN)
-          (contentAsJson(res) \ "code").as[String] mustBe ("ACCOUNT_WITHIN_CANCELLATION_PERIOD")
-        }
-      }
-    }
-
-    "return with status 404 forbidden and a code of INVESTOR_ACCOUNTID_NOT_FOUND" when {
-      "the data service returns a CloseLisaAccountNotFoundResponse" in {
-        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountNotFoundResponse))
-
-        doCloseRequest(closeAccountJson) { res =>
-          status(res) mustBe (NOT_FOUND)
-          (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ACCOUNTID_NOT_FOUND")
-        }
-      }
-    }
-
-    "return with status 400 bad request" when {
-      "submitted an invalid close account request" in {
-        doCloseRequest(closeAccountJson.replace("All funds withdrawn", "X")) { res =>
-          status(res) mustBe (BAD_REQUEST)
-        }
-      }
-      "submitted an invalid lmrn" in {
-        doCloseRequest(closeAccountJson, "Z12345") { res =>
-          status(res) mustBe (BAD_REQUEST)
-          val json = contentAsJson(res)
-          (json \ "code").as[String] mustBe ErrorBadRequestLmrn.errorCode
-          (json \ "message").as[String] mustBe ErrorBadRequestLmrn.message
-        }
-      }
-      "submitted an invalid accountId" in {
-        doCloseRequest(closeAccountJson, accId = "1=2!") { res =>
-          status(res) mustBe (BAD_REQUEST)
-          val json = contentAsJson(res)
-          (json \ "code").as[String] mustBe ErrorBadRequestAccountId.errorCode
-          (json \ "message").as[String] mustBe ErrorBadRequestAccountId.message
-        }
-      }
-    }
-
-    "return with status 500 internal server error" when {
-      "the data service returns an error" in {
-        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountErrorResponse))
-
-        doCloseRequest(closeAccountJson) { res =>
-          status(res) mustBe (INTERNAL_SERVER_ERROR)
-        }
-      }
-      "an exception is thrown" in {
-        when(mockService.closeAccount(any(), any(), any())(any())).thenThrow(new RuntimeException("Test"))
-
-        doCloseRequest(closeAccountJson) { res =>
-          status(res) mustBe (INTERNAL_SERVER_ERROR)
-        }
-      }
-    }
-
-  }
-
   def doCreateOrTransferRequest(jsonString: String, lmrn: String = lisaManager)(callback: (Future[Result]) => Unit) {
     val res = SUT.createOrTransferLisaAccount(lmrn).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
       withBody(AnyContentAsJson(Json.parse(jsonString))))
@@ -1136,31 +716,13 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
     callback(res)
   }
 
-  def doSyncGetAccountDetailsRequest(callback: (Future[Result]) => Unit) {
-    val res = SUT.getAccountDetails(lisaManager, accountId).apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
-    callback(res)
-  }
-
-  def doCloseRequest(jsonString: String, lmrn: String = lisaManager, accId: String = accountId)(callback: (Future[Result]) => Unit) {
-    val res = SUT.closeLisaAccount(lmrn, accId).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
-      withBody(AnyContentAsJson(Json.parse(jsonString))))
-
-    callback(res)
-  }
-
-  def doSyncCloseRequest(jsonString: String)(callback: Result => Unit) {
-    val res = await(SUT.closeLisaAccount(lisaManager, accountId).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
-      withBody(AnyContentAsJson(Json.parse(jsonString)))))
-
-    callback(res)
-  }
-
   val mockService: AccountService = mock[AccountService]
   val mockAuditService: AuditService = mock[AuditService]
   val SUT = new AccountController{
     override val service: AccountService = mockService
     override val auditService: AuditService = mockAuditService
     override val authConnector = mockAuthCon
+    override lazy val v2endpointsEnabled = true
   }
 
 }

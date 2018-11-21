@@ -36,8 +36,8 @@ class UpdateSubscriptionController extends LisaController with LisaConstants {
   val failureEvent: String = "firstSubscriptionDateNotUpdated"
   val failureReason: String = "reasonNotUpdated"
 
-  def updateSubscription (lisaManager: String, accountId: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
-    implicit val startTime = System.currentTimeMillis()
+  def updateSubscription (lisaManager: String, accountId: String): Action[AnyContent] = validateHeader().async { implicit request =>
+    implicit val startTime: Long = System.currentTimeMillis()
     withValidLMRN(lisaManager) { () =>
       withValidAccountId(accountId) { () =>
         withValidJson[UpdateSubscriptionRequest]( updateSubsRequest => {

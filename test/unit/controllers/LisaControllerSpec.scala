@@ -42,23 +42,23 @@ class LisaControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite 
 
   implicit val testTypeReads: Reads[TestType] = (
     (JsPath \ "prop1").read[Int].map[String](i => throw new RuntimeException("Deliberate Test Exception")) and
-      (JsPath \ "prop2").read[String]
-    ) (TestType.apply _)
+    (JsPath \ "prop2").read[String]
+  ) (TestType.apply _)
 
   "The withValidJson method" must {
 
-      "return with an Internal Server Error" when {
+    "return with an Internal Server Error" when {
 
-        "an exception is thrown by one of our Json reads" in {
-          when(mockAuthCon.authorise[Option[String]](any(),any())(any(),any())).thenReturn(Future(Some("1234")))
-          val jsonString = """{"prop1": 123, "prop2": "123"}"""
-          val res = SUT.testJsonValidator().apply(FakeRequest(Helpers.PUT, "/")
-            .withHeaders(acceptHeader)
-            .withBody(AnyContentAsJson(Json.parse(jsonString))))
+      "an exception is thrown by one of our Json reads" in {
+        when(mockAuthCon.authorise[Option[String]](any(), any())(any(), any())).thenReturn(Future(Some("1234")))
+        val jsonString = """{"prop1": 123, "prop2": "123"}"""
+        val res = SUT.testJsonValidator().apply(FakeRequest(Helpers.PUT, "/")
+          .withHeaders(acceptHeader)
+          .withBody(AnyContentAsJson(Json.parse(jsonString))))
 
-          status(res) mustBe INTERNAL_SERVER_ERROR
-        }
+        status(res) mustBe INTERNAL_SERVER_ERROR
       }
+    }
   }
 
   "The withValidLMRN method" must {
@@ -95,34 +95,35 @@ class LisaControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite 
     }
 
   }
+
   "The todo endpoint" must {
-              "return 501 not implemented" in {
-            val result = SUT.todo("Z1234", "ABCD1234","").apply(FakeRequest(Helpers.POST, "/").
-                                withHeaders(acceptHeader).withBody(AnyContentAsJson(Json.parse("{}"))))
+    "return 501 not implemented" in {
+      val result = SUT.todo("Z1234", "ABCD1234", "").apply(FakeRequest(Helpers.POST, "/").
+        withHeaders(acceptHeader).withBody(AnyContentAsJson(Json.parse("{}"))))
 
-            status(result) mustBe NOT_IMPLEMENTED
-            contentAsJson(result) mustBe Json.toJson(ErrorNotImplemented)
-          }
-
-        }
+      status(result) mustBe NOT_IMPLEMENTED
+      contentAsJson(result) mustBe Json.toJson(ErrorNotImplemented)
+    }
+  }
 
   val mockService = mock[AccountService]
   val mockErrorConverter = mock[ErrorConverter]
-  val mockAuthCon :LisaAuthConnector = mock[LisaAuthConnector]
+  val mockAuthCon: LisaAuthConnector = mock[LisaAuthConnector]
   val SUT = new AccountController {
     override val service: AccountService = mockService
     override val authConnector = mockAuthCon
-    def testJsonValidator(): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
-      implicit val startTime = System.currentTimeMillis()
-      withValidJson[TestType] ( _ =>
+
+    def testJsonValidator(): Action[AnyContent] = validateHeader().async { implicit request =>
+      implicit val startTime: Long = System.currentTimeMillis()
+      withValidJson[TestType](_ =>
         Future.successful(PreconditionFailed) // we don't ever want this to return
-        ,lisaManager = ""
+        , lisaManager = ""
       )
     }
 
-    def testLMRNValidator(lmrn: String): Action[AnyContent] = validateAccept(acceptHeaderValidationRules).async { implicit request =>
-      implicit val startTime = System.currentTimeMillis()
-      withValidLMRN(lmrn){() => Future.successful(Ok)}
+    def testLMRNValidator(lmrn: String): Action[AnyContent] = validateHeader().async { implicit request =>
+      implicit val startTime: Long = System.currentTimeMillis()
+      withValidLMRN(lmrn) { () => Future.successful(Ok) }
     }
   }
 

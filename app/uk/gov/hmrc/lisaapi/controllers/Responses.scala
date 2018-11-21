@@ -18,40 +18,45 @@ package uk.gov.hmrc.lisaapi.controllers
 
 import play.api.Logger
 import play.api.libs.json.Json
+import play.api.mvc.{Result, Results}
 
 sealed abstract class ErrorResponse(
                            val httpStatusCode: Int,
                            val errorCode: String,
                            val message: String
-                         )
+                         ) {
+  def asResult: Result = {
+    Results.Status(httpStatusCode)(Json.toJson(this))
+  }
+}
 
 sealed abstract class ErrorResponseWithErrors(
-                                     val httpStatusCode: Int,
-                                     val errorCode: String,
-                                     val message: String,
+                                     override val httpStatusCode: Int,
+                                     override val errorCode: String,
+                                     override val message: String,
                                      val errors: Option[List[ErrorValidation]] = None
-                                   )
+                                   ) extends ErrorResponse(httpStatusCode, errorCode, message)
 
 case class ErrorResponseWithId(
-                                httpStatusCode: Int,
-                                errorCode: String,
-                                message: String,
+                                override val httpStatusCode: Int,
+                                override val errorCode: String,
+                                override val message: String,
                                 id: String
-                              )
+                              ) extends ErrorResponse(httpStatusCode, errorCode, message)
 
 case class ErrorResponseWithLifeEventId(
-                                         httpStatusCode: Int,
-                                         errorCode: String,
-                                         message: String,
+                                         override val httpStatusCode: Int,
+                                         override val errorCode: String,
+                                         override val message: String,
                                          lifeEventID: String
-                                       )
+                                       ) extends ErrorResponse(httpStatusCode, errorCode, message)
 
 case class ErrorResponseWithTransactionId(
-                                         httpStatusCode: Int,
-                                         errorCode: String,
-                                         message: String,
+                                         override val httpStatusCode: Int,
+                                         override val errorCode: String,
+                                         override val message: String,
                                          transactionId: String
-                                       )
+                                       ) extends ErrorResponse(httpStatusCode, errorCode, message)
 
 case class ErrorResponseWithAccountId (
                                          override val httpStatusCode: Int,
@@ -94,6 +99,10 @@ case object ErrorGenericBadRequest extends ErrorResponse(400, "BAD_REQUEST", "Ba
 
 case object ErrorAcceptHeaderInvalid extends ErrorResponse(406, "ACCEPT_HEADER_INVALID", "The accept header is missing or invalid")
 
+case object ErrorAcceptHeaderVersionInvalid extends ErrorResponse(406, "ACCEPT_HEADER_INVALID", "The accept header has an invalid version for this endpoint")
+
+case object ErrorAcceptHeaderContentInvalid extends ErrorResponse(406, "ACCEPT_HEADER_INVALID", "The accept header has an invalid content type")
+
 case object ErrorInternalServerError extends ErrorResponse(500, "INTERNAL_SERVER_ERROR", "Internal server error")
 
 case object InvalidAuthorisationHeader extends ErrorResponse(403, "AUTH_HEADER_INVALID", "The value provided for Authorization header is invalid")
@@ -106,7 +115,7 @@ case object EmptyJson extends ErrorResponse(400, "BAD_REQUEST", "Can't parse emp
 
 case object ErrorInvestorNotFound extends ErrorResponse(403, "INVESTOR_NOT_FOUND", "The investor details given do not match with HMRC’s records")
 
-case object ErrorLifeEventIdNotFound extends ErrorResponse(403, "LIFE_EVENT_NOT_FOUND", "The lifeEventId does not match with HMRC’s records")
+case object ErrorLifeEventIdNotFound extends ErrorResponse(404, "LIFE_EVENT_NOT_FOUND", "The lifeEventId does not match with HMRC’s records")
 
 case object ErrorInvestorNotEligible extends ErrorResponse(403, "INVESTOR_ELIGIBILITY_CHECK_FAILED", "The investor is not eligible for a LISA account")
 
@@ -131,7 +140,9 @@ case object ErrorAccountAlreadyOpen extends ErrorResponse(403, "INVESTOR_ACCOUNT
 
 case object ErrorAccountNotFound extends ErrorResponse(404, "INVESTOR_ACCOUNTID_NOT_FOUND", "The accountId does not match HMRC’s records")
 
-case object ErrorBulkTransactionNotFound extends ErrorResponse(404, "TRANSACTION_NOT_FOUND", "No payments or debts exist for this date range")
+case object ErrorBulkTransactionNotFoundV1 extends ErrorResponse(404, "PAYMENT_NOT_FOUND", "No bonus payments have been made for this date range")
+
+case object ErrorBulkTransactionNotFoundV2 extends ErrorResponse(404, "TRANSACTION_NOT_FOUND", "No payments or debts exist for this date range")
 
 case object ErrorTransferAccountDataNotProvided extends ErrorResponse(403, "TRANSFER_ACCOUNT_DATA_NOT_PROVIDED", "You must give a transferredFromAccountId, transferredFromLMRN and transferInDate when the creationReason is transferred")
 
@@ -141,9 +152,9 @@ case object ErrorLifeEventInappropriate extends ErrorResponse(403, "LIFE_EVENT_I
 
 case object ErrorInvalidLisaManager extends ErrorResponse(401,"UNAUTHORIZED", "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records")
 
-case object ErrorTransactionNotFound extends ErrorResponse(404, "BONUS_PAYMENT_TRANSACTION_NOT_FOUND", "transactionId does not match HMRC’s records")
+case object ErrorBonusPaymentTransactionNotFound extends ErrorResponse(404, "BONUS_PAYMENT_TRANSACTION_NOT_FOUND", "transactionId does not match HMRC’s records")
 
-case object ErrorGenericTransactionNotFound extends ErrorResponse(404, "TRANSACTION_NOT_FOUND", "transactionId does not match HMRC’s records")
+case object ErrorTransactionNotFound extends ErrorResponse(404, "TRANSACTION_NOT_FOUND", "transactionId does not match HMRC’s records")
 
 case object ErrorWithdrawalNotFound extends ErrorResponse(404, "WITHDRAWAL_CHARGE_TRANSACTION_NOT_FOUND", "transactionId does not match HMRC’s records")
 

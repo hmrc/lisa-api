@@ -34,7 +34,7 @@ class ReinstateAccountController extends LisaController with LisaConstants {
   val auditService: AuditService = AuditService
 
   def reinstateAccount (lisaManager: String): Action[AnyContent] = Action.async{ implicit request =>
-    implicit val startTime = System.currentTimeMillis()
+    implicit val startTime: Long = System.currentTimeMillis()
     withValidLMRN(lisaManager) { () =>
       withValidJson[ReinstateLisaAccountRequest] (
         req => processReinstateAccount(lisaManager, req.accountId.toString),
@@ -47,43 +47,41 @@ class ReinstateAccountController extends LisaController with LisaConstants {
   private def processReinstateAccount(lisaManager: String, accountId: String)
                                      (implicit hc: HeaderCarrier, startTime: Long) = {
 
-    service.reinstateAccountService(lisaManager, accountId).map { result =>
-      result match {
-        case _: ReinstateLisaAccountSuccessResponse => {
-          auditService.audit(
-            auditType = "accountReinstated",
-            path = getReinstateEndpointUrl(lisaManager, accountId),
-            auditData = Map(ZREF -> lisaManager, "accountId" -> accountId)
-          )
-          LisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.REINSTATE)
-          val data = ApiResponseData(message = "This account has been reinstated", accountId = Some(accountId))
-          Ok(Json.toJson(ApiResponse(data = Some(data), success = true, status = OK)))
-        }
-        case ReinstateLisaAccountAlreadyClosedResponse =>
-          processReinstateFailure(
-            lisaManager,
-            accountId,
-            ErrorAccountAlreadyClosed,
-            FORBIDDEN,
-            Some("You cannot reinstate this account because it was closed with a closure reason of transferred out")
-          )
-        case ReinstateLisaAccountAlreadyCancelledResponse =>
-          processReinstateFailure(
-            lisaManager,
-            accountId,
-            ErrorAccountAlreadyClosed,
-            FORBIDDEN,
-            Some("You cannot reinstate this account because it was closed with a closure reason of cancellation")
-          )
-        case ReinstateLisaAccountAlreadyOpenResponse =>
-          processReinstateFailure(lisaManager, accountId, ErrorAccountAlreadyOpen, FORBIDDEN, None)
-        case ReinstateLisaAccountInvestorComplianceCheckFailedResponse =>
-          processReinstateFailure(lisaManager, accountId, ErrorInvestorComplianceCheckFailedReinstate, FORBIDDEN, None)
-        case ReinstateLisaAccountNotFoundResponse =>
-          processReinstateFailure(lisaManager, accountId, ErrorAccountNotFound, NOT_FOUND, None)
-        case ReinstateLisaAccountErrorResponse => {
-          processReinstateFailure(lisaManager, accountId, ErrorInternalServerError, INTERNAL_SERVER_ERROR, None)
-        }
+    service.reinstateAccountService(lisaManager, accountId).map {
+      case _: ReinstateLisaAccountSuccessResponse => {
+        auditService.audit(
+          auditType = "accountReinstated",
+          path = getReinstateEndpointUrl(lisaManager, accountId),
+          auditData = Map(ZREF -> lisaManager, "accountId" -> accountId)
+        )
+        LisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.REINSTATE)
+        val data = ApiResponseData(message = "This account has been reinstated", accountId = Some(accountId))
+        Ok(Json.toJson(ApiResponse(data = Some(data), success = true, status = OK)))
+      }
+      case ReinstateLisaAccountAlreadyClosedResponse =>
+        processReinstateFailure(
+          lisaManager,
+          accountId,
+          ErrorAccountAlreadyClosed,
+          FORBIDDEN,
+          Some("You cannot reinstate this account because it was closed with a closure reason of transferred out")
+        )
+      case ReinstateLisaAccountAlreadyCancelledResponse =>
+        processReinstateFailure(
+          lisaManager,
+          accountId,
+          ErrorAccountAlreadyClosed,
+          FORBIDDEN,
+          Some("You cannot reinstate this account because it was closed with a closure reason of cancellation")
+        )
+      case ReinstateLisaAccountAlreadyOpenResponse =>
+        processReinstateFailure(lisaManager, accountId, ErrorAccountAlreadyOpen, FORBIDDEN, None)
+      case ReinstateLisaAccountInvestorComplianceCheckFailedResponse =>
+        processReinstateFailure(lisaManager, accountId, ErrorInvestorComplianceCheckFailedReinstate, FORBIDDEN, None)
+      case ReinstateLisaAccountNotFoundResponse =>
+        processReinstateFailure(lisaManager, accountId, ErrorAccountNotFound, NOT_FOUND, None)
+      case ReinstateLisaAccountErrorResponse => {
+        processReinstateFailure(lisaManager, accountId, ErrorInternalServerError, INTERNAL_SERVER_ERROR, None)
       }
     } recover {
       case _:Exception  => {

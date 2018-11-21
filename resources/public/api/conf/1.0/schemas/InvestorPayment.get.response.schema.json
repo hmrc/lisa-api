@@ -4,12 +4,8 @@
   "properties": {
     "transactionId" : {
       "description": "The transactionId for which the payment details have been requested.",
-      "$ref": "#/definitions/transactionId"
-    },
-    "transactionType" : {
-      "description": "The type of transaction. This can be money owed to HMRC (Debt), or money paid out by HMRC (Payment).",
       "type" : "string",
-      "enum": ["Payment", "Debt"]
+      "pattern": "^\\d{1,10}$"
     },
     "paymentDate": {
       "description":"The date payment was made.",
@@ -25,11 +21,8 @@
       "enum": [
         "Paid",
         "Pending",
-        "Due",
-        "Collected",
         "Cancelled",
-        "Void",
-        "Superseded"
+        "Void"
       ],
       "example": "Paid"
     },
@@ -42,12 +35,14 @@
     "paymentAmount" : {
       "description": "The amount paid for the transaction.",
       "type" : "number",
-      "example": "1000"
+      "example": "1000.00"
     },
-    "supersededBy": {
-      "description": "The ID of the transaction that supersedes the current one.",
-      "$ref": "#/definitions/transactionId"
+    "bonusDueForPeriod": {
+      "description": "Payment due for the period.",
+      "type" : "number",
+      "example": "700.00"
     }
+
   },
   "required": [
      "transactionId",
@@ -60,11 +55,6 @@
 		"type": "string",
 		"pattern": "^\\d{4}-\\d{2}-\\d{2}$",
         "example": "2017-05-20"
-	  },
-      "transactionId": {
-        "id": "transactionId",
-        "type": "string",
-        "pattern": "^\\d{1,10}$"
-      }
+	  }
 	}
 }

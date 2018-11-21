@@ -270,6 +270,7 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
     override val service: UpdateSubscriptionService = mockService
     override val auditService: AuditService = mockAuditService
     override val authConnector = mockAuthCon
+    override lazy val v2endpointsEnabled = true
   }
 
 }

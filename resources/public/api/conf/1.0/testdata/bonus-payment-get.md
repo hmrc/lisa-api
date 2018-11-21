@@ -41,8 +41,7 @@
     "bonusDueForPeriod": 10000,
     "totalBonusDueYTD": 10000,
     "claimReason": "Life Event"
-  },
-  "supersededBy": "0000456789"
+  }
 }
 </pre>
 			</td>
@@ -73,82 +72,6 @@
     "bonusDueForPeriod": 10000,
     "totalBonusDueYTD": 10000,
     "claimReason": "Regular Bonus"
-  },
-  "supersededBy": "0000056789"
-}
-</pre>
-			</td>
-		</tr>
-		<tr>
-	    <td>
-		    	<p>[sandbox-only] Retrieve a superseded transaction (bonus recovery)</p>
-		    	<p class="code--block">
-		    		<strong>lisaManagerReferenceNumber:</strong> <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
-		    		<strong>accountId:</strong> 1234567890<br>
-		    		<strong>transactionId:</strong> 0000456789
-		    	</p>
-			</td>
-			<td>
-				<p>HTTP status: <code class="code--slim">200 (OK)</code></p>
-<pre class="code--block">
-{
-  "periodStartDate": "2017-04-06",
-  "periodEndDate": "2017-05-05",
-  "inboundPayments": {
-    "newSubsForPeriod": 4000,
-    "newSubsYTD": 4000,
-    "totalSubsForPeriod": 4000,
-    "totalSubsYTD": 4000
-  },
-  "bonuses": {
-    "bonusPaidYTD": 0,
-    "bonusDueForPeriod": 1000,
-    "totalBonusDueYTD": 1000,
-    "claimReason": "Superseded Bonus"
-  },
-  "supersede": {
-    "automaticRecoveryAmount": 1000,
-    "originalTransactionId": "0123456789",
-    "originalBonusDueForPeriod": 1000,
-    "transactionResult": -1000,
-    "reason": "Bonus recovery"
-  }
-}
-</pre>
-			</td>
-		</tr>
-		<tr>
-	    <td>
-		    	<p>[sandbox-only] Retrieve a superseded transaction (additional bonus)</p>
-		    	<p class="code--block">
-		    		<strong>lisaManagerReferenceNumber:</strong> <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
-		    		<strong>accountId:</strong> 1234567890<br>
-		    		<strong>transactionId:</strong> 0000056789
-		    	</p>
-			</td>
-			<td>
-				<p>HTTP status: <code class="code--slim">200 (OK)</code></p>
-<pre class="code--block">
-{
-  "periodStartDate": "2017-04-06",
-  "periodEndDate": "2017-05-05",
-  "inboundPayments": {
-    "newSubsForPeriod": 4000,
-    "newSubsYTD": 4000,
-    "totalSubsForPeriod": 4000,
-    "totalSubsYTD": 4000
-  },
-  "bonuses": {
-    "bonusPaidYTD": 0,
-    "bonusDueForPeriod": 1000,
-    "totalBonusDueYTD": 1000,
-    "claimReason": "Superseded Bonus"
-  },
-  "supersede": {
-    "originalTransactionId": "0003456789",
-    "originalBonusDueForPeriod": 4000,
-    "transactionResult": 4000,
-    "reason": "Additional bonus"
   }
 }
 </pre>

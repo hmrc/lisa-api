@@ -25,30 +25,41 @@ import play.api.test.Helpers._
 import play.api.test._
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
-import uk.gov.hmrc.lisaapi.controllers.{DiscoverController, ErrorBadRequestLmrn}
+import uk.gov.hmrc.lisaapi.controllers.{DiscoverController, ErrorAcceptHeaderInvalid, ErrorBadRequestLmrn}
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class DiscoverControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite with BeforeAndAfter {
 
   before {
-    when(mockAuthConnector.authorise[Option[String]](any(),any())(any(), any())).thenReturn(Future(Some("1234")))
+    when(mockAuthConnector.authorise[Option[String]](any(),any())(any(), any())).thenReturn(Future.successful(Some("1234")))
   }
 
-  val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
+  val v1: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
+  val v2: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.2.0+json")
 
   "The Discover available endpoints endpoint" must {
 
-    "return with status 200 ok and appropriate json" in {
-      val res = SUT.discover("Z019283").apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
+    "return with status 200 ok and appropriate json for v1" in {
+      val res = SUT.discover("Z019283").apply(FakeRequest(Helpers.GET, "/").withHeaders(v1))
 
       status(res) mustBe OK
-      (contentAsJson(res) \ "_links" \ "close account" \ "href").as[String] mustBe "/lifetime-isa/manager/Z019283/accounts/{accountId}/close-account"
+      val json = contentAsJson(res)
+      (json \ "_links" \ "close account" \ "href").as[String] mustBe "/lifetime-isa/manager/Z019283/accounts/{accountId}/close-account"
+      (json \ "_links" \ "property purchase fund release" \ "href").asOpt[String] mustBe None
+    }
+
+    "return with status 200 ok and appropriate json for v2" in {
+      val res = SUT.discover("Z019283").apply(FakeRequest(Helpers.GET, "/").withHeaders(v2))
+
+      status(res) mustBe OK
+      val json = contentAsJson(res)
+      (json \ "_links" \ "close account" \ "href").as[String] mustBe "/lifetime-isa/manager/Z019283/accounts/{accountId}/close-account"
+      (json \ "_links" \ "property purchase fund release" \ "href").asOpt[String] mustBe Some("/lifetime-isa/manager/Z019283/accounts/{accountId}/property-purchase")
     }
 
     "return the lisa manager reference number provided" in {
-      val res = SUT.discover("Z111111").apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
+      val res = SUT.discover("Z111111").apply(FakeRequest(Helpers.GET, "/").withHeaders(v1))
 
       status(res) mustBe OK
       (contentAsJson(res) \ "_links" \ "close account" \ "href").as[String] mustBe "/lifetime-isa/manager/Z111111/accounts/{accountId}/close-account"
@@ -57,7 +68,7 @@ class DiscoverControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSu
     "return with status 400 bad request" when {
 
       "given an invalid lmrn in the url" in {
-        val res = SUT.discover("Z0192831").apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
+        val res = SUT.discover("Z0192831").apply(FakeRequest(Helpers.GET, "/").withHeaders(v1))
 
         status(res) mustBe BAD_REQUEST
 
@@ -69,11 +80,28 @@ class DiscoverControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSu
 
     }
 
+    "return with status 406 not acceptable" when {
+
+      "given an unsupported api version in the accept header" in {
+        val v99: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.99.0+json")
+        val res = SUT.discover("Z0192831").apply(FakeRequest(Helpers.GET, "/").withHeaders(v99))
+
+        status(res) mustBe NOT_ACCEPTABLE
+
+        val json = contentAsJson(res)
+
+        (json \ "code").as[String] mustBe ErrorAcceptHeaderInvalid.errorCode
+        (json \ "message").as[String] mustBe ErrorAcceptHeaderInvalid.message
+      }
+
+    }
+
   }
 
   val mockAuthConnector:LisaAuthConnector = mock[LisaAuthConnector]
 
   val SUT = new DiscoverController {
     override val authConnector: LisaAuthConnector = mockAuthConnector
+    override lazy val v2endpointsEnabled = true
   }
 }

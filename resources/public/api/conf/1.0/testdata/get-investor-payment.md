@@ -9,27 +9,28 @@
     </thead>
     <tbody>
         <tr>
-            <td><p>Request for a paid payment</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 0123456789</p></td>
+            <td><p>Request for a paid transaction</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 0123456789</p></td>
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
 <pre class="code--block">
 {
   "transactionId": "0123456789",
-  "transactionType": "Payment",
   "paymentStatus": "Paid",
   "paymentDate": "2017-06-20",
   "paymentAmount": 1000,
-  "paymentReference": "002630000993"
+  "paymentReference": "002630000993",
+  "bonusDueForPeriod": 10000
 }
 </pre>
             </td>
         </tr>
         <tr>
-            <td><p>Request for a pending transaction (payment or debt)</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 0000000200</p></td>
+            <td><p>Request for a pending transaction</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 0000000200</p></td>
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
 <pre class="code--block">
 {
   "transactionId": "0000000200",
-  "paymentStatus": "Pending"
+  "paymentStatus": "Pending",
+  "bonusDueForPeriod": 1000
 }
 </pre>
             </td>
@@ -40,9 +41,9 @@
 <pre class="code--block">
 {
   "transactionId": "3000000200",
-  "transactionType": "Payment",
   "paymentStatus": "Pending",
-  "paymentDueDate": "2017-06-20"
+  "paymentDueDate": "2017-06-20",
+  "bonusDueForPeriod": 1000
 }
 </pre>
             </td>
@@ -54,6 +55,7 @@
 {
   "transactionId": "1000000200",
   "paymentStatus": "Cancelled",
+  "bonusDueForPeriod": 1000
 }
 </pre>
             </td>
@@ -64,47 +66,8 @@
 <pre class="code--block">
 {
   "transactionId": "2000000200",
-  "paymentStatus": "Void"
-}
-</pre>
-            </td>
-        </tr>
-        <tr>
-            <td><p>Request for a debt which is due to be collected</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 2345678902</p></td>
-            <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
-<pre class="code--block">
-{
-  "transactionId": "2345678902",
-  "transactionType": "Debt",
-  "paymentStatus": "Due",
-  "paymentDueDate": "2018-01-20"
-}
-</pre>
-            </td>
-        </tr>
-        <tr>
-            <td><p>Request for a debt which has been collected</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 2345678903</p></td>
-            <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
-<pre class="code--block">
-{
-  "transactionId": "2345678903",
-  "transactionType": "Debt",
-  "paymentStatus": "Collected",
-  "paymentDate": "2018-02-20",
-  "paymentAmount": 250,
-  "paymentReference": "002630000994"
-}
-</pre>
-            </td>
-        </tr>
-        <tr>
-            <td><p>Request for a transaction which was superseded before being paid</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 2345678901</p></td>
-            <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
-<pre class="code--block">
-{
-  "transactionId": "2345678901",
-  "paymentStatus": "Superseded",
-  "supersededBy": "2345678903"
+  "paymentStatus": "Void",
+  "bonusDueForPeriod": 1000
 }
 </pre>
             </td>
@@ -136,7 +99,7 @@
             <td><p>HTTP status: <code class="code--slim">404 (Not Found)</code></p>
 <pre class="code--block">
 {
-  "code": "TRANSACTION_NOT_FOUND",
+  "code": "BONUS_PAYMENT_TRANSACTION_NOT_FOUND",
   "message": "transactionId does not match HMRC’s records"
 }
 </pre>
