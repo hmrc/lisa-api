@@ -27,8 +27,8 @@ import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models.{GetLisaAccountDoesNotExistResponse, _}
 import uk.gov.hmrc.lisaapi.services.{AccountService, AuditService}
 import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
+import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext._
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class AccountController extends LisaController with LisaConstants {
@@ -36,7 +36,8 @@ class AccountController extends LisaController with LisaConstants {
   val service: AccountService = AccountService
   val auditService: AuditService = AuditService
 
-  //region Create Or Transfer Account
+  // create or transfer account
+  // get account
 
   def createOrTransferLisaAccount(lisaManager: String): Action[AnyContent] =
     (validateHeader() andThen validateLMRN(lisaManager)).async { implicit request =>
@@ -98,104 +99,6 @@ class AccountController extends LisaController with LisaConstants {
       }
     }
 
-  def closeLisaAccount(lisaManager: String, accountId: String): Action[AnyContent] =
-    (validateHeader() andThen validateLMRN(lisaManager) andThen validateAccountId(accountId)).async { implicit request =>
-      implicit val startTime: Long = System.currentTimeMillis()
-      withValidJson[CloseLisaAccountRequest](
-        closeRequest => processAccountClosure(lisaManager, accountId, closeRequest),
-        lisaManager = lisaManager
-      )
-    }
-
-  private def processAccountClosure(lisaManager: String, accountId: String, closeLisaAccountRequest: CloseLisaAccountRequest)
-                                   (implicit hc: HeaderCarrier, startTime: Long) = {
-    hasValidDatesForClosure(lisaManager, accountId, closeLisaAccountRequest) { () =>
-      service.closeAccount(lisaManager, accountId, closeLisaAccountRequest).map {
-        case CloseLisaAccountSuccessResponse(`accountId`) =>
-          auditService.audit(
-            auditType = "accountClosed",
-            path = getCloseEndpointUrl(lisaManager, accountId),
-            auditData = closeLisaAccountRequest.toStringMap ++ Map(ZREF -> lisaManager,
-              "accountId" -> accountId)
-          )
-
-          LisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.CLOSE)
-
-          val data = ApiResponseData(message = "LISA account closed", accountId = Some(accountId))
-
-          Ok(Json.toJson(ApiResponse(data = Some(data), success = true, status = OK)))
-        case CloseLisaAccountAlreadyVoidResponse =>
-          handleClosureFailure(lisaManager, accountId, closeLisaAccountRequest, ErrorAccountAlreadyVoided, FORBIDDEN)
-        case CloseLisaAccountAlreadyClosedResponse =>
-          handleClosureFailure(lisaManager, accountId, closeLisaAccountRequest, ErrorAccountAlreadyClosed, FORBIDDEN)
-        case CloseLisaAccountCancellationPeriodExceeded =>
-          handleClosureFailure(lisaManager, accountId, closeLisaAccountRequest, ErrorAccountCancellationPeriodExceeded, FORBIDDEN)
-        case CloseLisaAccountWithinCancellationPeriod =>
-          handleClosureFailure(lisaManager, accountId, closeLisaAccountRequest, ErrorAccountWithinCancellationPeriod, FORBIDDEN)
-        case CloseLisaAccountNotFoundResponse =>
-          handleClosureFailure(lisaManager, accountId, closeLisaAccountRequest, ErrorAccountNotFound, NOT_FOUND)
-        case CloseLisaAccountErrorResponse => {
-          handleClosureFailure(lisaManager, accountId, closeLisaAccountRequest, ErrorInternalServerError, INTERNAL_SERVER_ERROR)
-        }
-      } recover {
-        case e: Exception =>
-          Logger.error(s"AccountController: closeAccount: An error occurred due to ${e.getMessage} returning internal server error")
-          handleClosureFailure(lisaManager, accountId, closeLisaAccountRequest, ErrorInternalServerError, INTERNAL_SERVER_ERROR)
-      }
-    }
-  }
-
-  private def hasValidDatesForClosure(lisaManager: String, accountId: String, req: CloseLisaAccountRequest)
-                                     (success: () => Future[Result])
-                                     (implicit hc: HeaderCarrier, startTime: Long): Future[Result] = {
-
-    if (req.closureDate.isBefore(LISA_START_DATE)) {
-      auditService.audit(
-        auditType = "accountNotClosed",
-        path = getCloseEndpointUrl(lisaManager, accountId),
-        auditData = req.toStringMap ++ Map(ZREF -> lisaManager,
-          "accountId" -> accountId,
-          "reasonNotClosed" -> "FORBIDDEN")
-      )
-
-      LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.CLOSE)
-
-      Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
-        ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("closureDate"), Some("/closureDate"))
-      )))))
-    }
-    else {
-      success()
-    }
-  }
-
-  private def handleClosureFailure(lisaManager: String,
-                                   accountId: String,
-                                   requestData: Product,
-                                   e: ErrorResponse,
-                                   status: Int)
-                                  (implicit hc: HeaderCarrier, startTime: Long) = {
-    auditService.audit(
-      auditType = "accountNotClosed",
-      path = getCloseEndpointUrl(lisaManager, accountId),
-      auditData = requestData.toStringMap ++ Map(ZREF -> lisaManager,
-        "accountId" -> accountId,
-        "reasonNotClosed" -> e.errorCode)
-    )
-
-    LisaMetrics.incrementMetrics(startTime, status, LisaMetricKeys.CLOSE)
-
-    Status(status).apply(Json.toJson(e))
-  }
-
-  private def getCloseEndpointUrl(lisaManagerReferenceNumber: String, accountID: String): String = {
-    s"/manager/$lisaManagerReferenceNumber/accounts/$accountID/close-account"
-  }
-
-  //endregion
-
-  //region Get Account
-
   private def hasAccountTransferData(js: JsObject): Boolean = {
     js.keys.contains("transferAccount")
   }
@@ -239,10 +142,6 @@ class AccountController extends LisaController with LisaConstants {
       }
     }
   }
-
-  //endregion
-
-  //region Close Account
 
   private def processAccountTransfer(lisaManager: String, transferRequest: CreateLisaAccountTransferRequest)
                                     (implicit hc: HeaderCarrier, startTime: Long) = {
@@ -376,7 +275,5 @@ class AccountController extends LisaController with LisaConstants {
   private def getCreateOrTransferEndpointUrl(lisaManagerReferenceNumber: String): String = {
     s"/manager/$lisaManagerReferenceNumber/accounts"
   }
-
-  //endregion
 
 }

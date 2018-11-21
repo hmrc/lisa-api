@@ -9,7 +9,7 @@ GET       /manager/:id                                                          
 POST      /manager/:id/investors                                                    @uk.gov.hmrc.lisaapi.controllers.InvestorController.createLisaInvestor(id: String)
 POST      /manager/:id/accounts                                                     @uk.gov.hmrc.lisaapi.controllers.AccountController.createOrTransferLisaAccount(id: String)
 GET       /manager/:id/accounts/:accountId                                          @uk.gov.hmrc.lisaapi.controllers.AccountController.getAccountDetails(id: String, accountId: String)
-POST      /manager/:id/accounts/:accountId/close-account                            @uk.gov.hmrc.lisaapi.controllers.AccountController.closeLisaAccount(id: String, accountId: String)
+POST      /manager/:id/accounts/:accountId/close-account                            @uk.gov.hmrc.lisaapi.controllers.CloseAccountController.closeLisaAccount(id: String, accountId: String)
 POST      /manager/:id/accounts/reinstate-account                                   @uk.gov.hmrc.lisaapi.controllers.ReinstateAccountController.reinstateAccount(id: String)
 POST      /manager/:id/accounts/:accountId/update-subscription                      @uk.gov.hmrc.lisaapi.controllers.UpdateSubscriptionController.updateSubscription(id: String, accountId: String)
 POST      /manager/:id/accounts/:accountId/events                                   @uk.gov.hmrc.lisaapi.controllers.LifeEventController.reportLisaLifeEvent(id: String, accountId: String)
