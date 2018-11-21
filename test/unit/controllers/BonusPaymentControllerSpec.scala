@@ -1007,5 +1007,6 @@ class BonusPaymentControllerSpec extends PlaySpec
     override val authConnector: LisaAuthConnector = mockAuthCon
     override val validator: BonusPaymentValidator = mockValidator
     override val dateTimeService: CurrentDateService = mockDateTimeService
+    override lazy val v2endpointsEnabled = true
   }
 }

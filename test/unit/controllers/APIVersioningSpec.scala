@@ -19,8 +19,8 @@ package unit.controllers
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.http.HeaderNames.ACCEPT
-import play.api.mvc.{Request, Result, Results}
-import play.api.test.FakeRequest
+import play.api.mvc._
+import play.api.test.{FakeApplication, FakeRequest}
 import play.test.Helpers
 import uk.gov.hmrc.lisaapi.controllers.{APIVersioning, ErrorAcceptHeaderContentInvalid, ErrorAcceptHeaderInvalid, ErrorAcceptHeaderVersionInvalid}
 
@@ -75,11 +75,25 @@ class APIVersioningSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
       validateHeaderTest(request) mustBe ErrorAcceptHeaderInvalid.asResult
     }
 
+    "handle a v2 request when v2 endpoints are disabled" in {
+      val request = FakeRequest(Helpers.GET, "/").withHeaders((ACCEPT, "application/vnd.hmrc.2.0+json"))
+      val builder = APIVersioningImplV2Disabled.validateHeader()
+      val response = builder.invokeBlock[AnyContent](request, _ => Future.successful(Results.Ok))
+      Await.result(response, 100 millis) mustBe ErrorAcceptHeaderVersionInvalid.asResult
+    }
+
   }
 
   object APIVersioningImpl extends APIVersioning {
     override val validateVersion: String => Boolean = List("1.0", "2.0") contains _
     override val validateContentType: String => Boolean = _ == "json"
+    override lazy val v2endpointsEnabled: Boolean = true
+  }
+
+  object APIVersioningImplV2Disabled extends APIVersioning {
+    override val validateVersion: String => Boolean = List("1.0", "2.0") contains _
+    override val validateContentType: String => Boolean = _ == "json"
+    override lazy val v2endpointsEnabled: Boolean = false
   }
 
   def withApiVersionTest[A](request: Request[A]): Result = {

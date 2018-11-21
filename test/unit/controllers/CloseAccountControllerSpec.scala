@@ -337,6 +337,7 @@ class CloseAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppP
     override val service: AccountService = mockService
     override val auditService: AuditService = mockAuditService
     override val authConnector = mockAuthCon
+    override lazy val v2endpointsEnabled = true
   }
 
 }

@@ -294,6 +294,7 @@ class LifeEventControllerSpec extends PlaySpec
     override val service: LifeEventService = mockService
     override val auditService: AuditService = mockAuditService
     override val authConnector = mockAuthCon
+    override lazy val v2endpointsEnabled = true
   }
 
 }

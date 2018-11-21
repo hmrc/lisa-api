@@ -287,6 +287,7 @@ class ReinstateAccountControllerSpec extends PlaySpec with MockitoSugar with One
     override val service: ReinstateAccountService = mockService
     override val auditService: AuditService = mockAuditService
     override val authConnector = mockAuthCon
+    override lazy val v2endpointsEnabled = true
   }
 
 }

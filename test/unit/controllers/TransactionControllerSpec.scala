@@ -197,6 +197,7 @@ class TransactionControllerSpec extends PlaySpec
   val SUT = new TransactionController {
     override val service: TransactionService = mockService
     override val authConnector = mockAuthCon
+    override lazy val v2endpointsEnabled = true
   }
 
 }

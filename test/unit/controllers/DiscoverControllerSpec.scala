@@ -102,5 +102,6 @@ class DiscoverControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSu
 
   val SUT = new DiscoverController {
     override val authConnector: LisaAuthConnector = mockAuthConnector
+    override lazy val v2endpointsEnabled = true
   }
 }

@@ -271,5 +271,6 @@ class InvestorControllerSpec extends PlaySpec
     override val service: InvestorService = mockService
     override val auditService: AuditService = mockAuditService
     override val authConnector = mockAuthCon
+    override lazy val v2endpointsEnabled = true
   }
 }

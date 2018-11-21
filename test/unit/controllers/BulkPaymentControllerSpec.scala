@@ -22,9 +22,10 @@ import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import play.api.Play
 import play.api.libs.json.Json
 import play.api.test.Helpers._
-import play.api.test.{FakeRequest, Helpers}
+import play.api.test.{FakeApplication, FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
 import uk.gov.hmrc.lisaapi.controllers._
@@ -277,6 +278,7 @@ class BulkPaymentControllerSpec extends PlaySpec
     override val service: BulkPaymentService = mockService
     override val authConnector = mockAuthCon
     override val currentDateService = mockCurrentDateService
+    override lazy val v2endpointsEnabled = true
   }
 
 }

@@ -444,6 +444,7 @@ class WithdrawalControllerSpec extends PlaySpec
     override val authConnector: LisaAuthConnector = mockAuthCon
     override val dateTimeService: CurrentDateService = mockDateTimeService
     override val validator: WithdrawalChargeValidator = mockValidator
+    override lazy val v2endpointsEnabled = true
   }
 
 }

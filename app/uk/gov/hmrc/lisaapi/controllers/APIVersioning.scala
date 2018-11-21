@@ -19,6 +19,7 @@ package uk.gov.hmrc.lisaapi.controllers
 import play.api.Logger
 import play.api.http.HeaderNames.ACCEPT
 import play.api.mvc._
+import uk.gov.hmrc.lisaapi.config.AppContext
 
 import scala.concurrent.Future
 
@@ -26,10 +27,14 @@ trait APIVersioning {
 
   val validateVersion: String => Boolean
   val validateContentType: String => Boolean
+  lazy val v2endpointsEnabled: Boolean = AppContext.v2endpointsEnabled
 
   def validateHeader(): ActionBuilder[Request] = new ActionBuilder[Request] {
     override def invokeBlock[A](request: Request[A], block: Request[A] => Future[Result]) = {
       extractAcceptHeader(request) match {
+        case Some(AcceptHeader(version, _)) if version == "2.0" && !v2endpointsEnabled =>
+          Logger.info(s"Request accept header has invalid version: $version")
+          Future.successful(ErrorAcceptHeaderVersionInvalid.asResult)
         case Some(AcceptHeader(version, content)) if validateVersion(version) && validateContentType(content) =>
           block(request)
         case Some(AcceptHeader(version, _)) if !validateVersion(version) =>

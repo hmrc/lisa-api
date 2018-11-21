@@ -722,6 +722,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
     override val service: AccountService = mockService
     override val auditService: AuditService = mockAuditService
     override val authConnector = mockAuthCon
+    override lazy val v2endpointsEnabled = true
   }
 
 }
