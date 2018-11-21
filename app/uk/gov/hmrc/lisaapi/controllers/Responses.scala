@@ -99,7 +99,7 @@ case object ErrorGenericBadRequest extends ErrorResponse(400, "BAD_REQUEST", "Ba
 
 case object ErrorAcceptHeaderInvalid extends ErrorResponse(406, "ACCEPT_HEADER_INVALID", "The accept header is missing or invalid")
 
-case object ErrorAcceptHeaderVersionInvalid extends ErrorResponse(406, "ACCEPT_HEADER_INVALID", "The accept header has an invalid version")
+case object ErrorAcceptHeaderVersionInvalid extends ErrorResponse(406, "ACCEPT_HEADER_INVALID", "The accept header has an invalid version for this endpoint")
 
 case object ErrorAcceptHeaderContentInvalid extends ErrorResponse(406, "ACCEPT_HEADER_INVALID", "The accept header has an invalid content type")
 

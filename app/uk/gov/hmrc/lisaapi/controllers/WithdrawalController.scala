@@ -32,6 +32,7 @@ import scala.concurrent.Future
 
 class WithdrawalController extends LisaController with LisaConstants {
 
+  override val validateVersion: String => Boolean = _ == "2.0"
   val postService: WithdrawalService = WithdrawalService
   val getService: BonusOrWithdrawalService = BonusOrWithdrawalService
   val auditService: AuditService = AuditService

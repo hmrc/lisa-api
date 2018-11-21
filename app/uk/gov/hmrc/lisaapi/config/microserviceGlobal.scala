@@ -97,17 +97,4 @@ object MicroserviceGlobal extends DefaultMicroserviceGlobal with RunMode with Mi
 
   override def onHandlerNotFound(request: RequestHeader): Future[Result] = Future.successful(NotFound(Json.toJson(ErrorNotFound)))
 
-  override def onRouteRequest(request: RequestHeader): Option[Handler] = {
-    val versionRegex = """application\/vnd.hmrc.(\d.\d)\+json""".r
-    val version = request.headers.get("Accept") collect { case versionRegex(version) => version }
-    version match {
-      case Some(VERSION_1) =>
-        v1.Routes.routes.lift(request)
-      case Some(VERSION_2) =>
-        v2.Routes.routes.lift(request)
-      case _ =>
-        super.onRouteRequest(request)
-    }
-  }
-
 }

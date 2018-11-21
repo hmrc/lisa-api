@@ -353,7 +353,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
         doFundReleaseRequest(fundReleaseJson, header = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")) { res =>
           status(res) mustBe NOT_ACCEPTABLE
           (contentAsJson(res) \ "code").as[String] mustBe "ACCEPT_HEADER_INVALID"
-          (contentAsJson(res) \ "message").as[String] mustBe "The accept header has an invalid version"
+          (contentAsJson(res) \ "message").as[String] mustBe "The accept header has an invalid version for this endpoint"
         }
       }
     }
@@ -625,7 +625,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
         doExtensionRequest(extensionJson, header = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")) { res =>
           status(res) mustBe NOT_ACCEPTABLE
           (contentAsJson(res) \ "code").as[String] mustBe "ACCEPT_HEADER_INVALID"
-          (contentAsJson(res) \ "message").as[String] mustBe "The accept header has an invalid version"
+          (contentAsJson(res) \ "message").as[String] mustBe "The accept header has an invalid version for this endpoint"
         }
       }
     }
@@ -833,7 +833,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
         doOutcomeRequest(outcomeJson, header = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")) { res =>
           status(res) mustBe NOT_ACCEPTABLE
           (contentAsJson(res) \ "code").as[String] mustBe "ACCEPT_HEADER_INVALID"
-          (contentAsJson(res) \ "message").as[String] mustBe "The accept header has an invalid version"
+          (contentAsJson(res) \ "message").as[String] mustBe "The accept header has an invalid version for this endpoint"
         }
       }
     }
