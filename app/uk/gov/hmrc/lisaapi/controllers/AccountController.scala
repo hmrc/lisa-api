@@ -82,26 +82,21 @@ class AccountController extends LisaController with LisaConstants {
     (validateHeader() andThen validateLMRN(lisaManager) andThen validateAccountId(accountId)).async { implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
       withEnrolment(lisaManager) { (_) =>
-        processGetAccountDetails(lisaManager, accountId)
+        service.getAccount(lisaManager, accountId).map {
+          case response: GetLisaAccountSuccessResponse =>
+            LisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.ACCOUNT)
+            Ok(Json.toJson(response))
+
+          case GetLisaAccountDoesNotExistResponse =>
+            LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.ACCOUNT)
+            NotFound(Json.toJson(ErrorAccountNotFound))
+
+          case _ =>
+            LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.ACCOUNT)
+            InternalServerError(Json.toJson(ErrorInternalServerError))
+        }
       }
     }
-
-  private def processGetAccountDetails(lisaManager: String, accountId: String)
-                                      (implicit hc: HeaderCarrier, startTime: Long) = {
-    service.getAccount(lisaManager, accountId).map {
-      case response: GetLisaAccountSuccessResponse =>
-        LisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.ACCOUNT)
-        Ok(Json.toJson(response))
-
-      case GetLisaAccountDoesNotExistResponse =>
-        LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.ACCOUNT)
-        NotFound(Json.toJson(ErrorAccountNotFound))
-
-      case _ =>
-        LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.ACCOUNT)
-        InternalServerError(Json.toJson(ErrorInternalServerError))
-    }
-  }
 
   def closeLisaAccount(lisaManager: String, accountId: String): Action[AnyContent] =
     (validateHeader() andThen validateLMRN(lisaManager) andThen validateAccountId(accountId)).async { implicit request =>
