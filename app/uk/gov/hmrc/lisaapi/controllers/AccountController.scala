@@ -24,7 +24,7 @@ import play.api.mvc.{Action, AnyContent, Result}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
-import uk.gov.hmrc.lisaapi.models.{GetLisaAccountDoesNotExistResponse, _}
+import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AccountService, AuditService}
 import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
 import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext._
@@ -35,9 +35,6 @@ class AccountController extends LisaController with LisaConstants {
 
   val service: AccountService = AccountService
   val auditService: AuditService = AuditService
-
-  // create or transfer account
-  // get account
 
   def createOrTransferLisaAccount(lisaManager: String): Action[AnyContent] =
     (validateHeader() andThen validateLMRN(lisaManager)).async { implicit request =>
@@ -77,26 +74,6 @@ class AccountController extends LisaController with LisaConstants {
           }
         ), lisaManager = lisaManager
       )
-    }
-
-  def getAccountDetails(lisaManager: String, accountId: String): Action[AnyContent] =
-    (validateHeader() andThen validateLMRN(lisaManager) andThen validateAccountId(accountId)).async { implicit request =>
-      implicit val startTime: Long = System.currentTimeMillis()
-      withEnrolment(lisaManager) { (_) =>
-        service.getAccount(lisaManager, accountId).map {
-          case response: GetLisaAccountSuccessResponse =>
-            LisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.ACCOUNT)
-            Ok(Json.toJson(response))
-
-          case GetLisaAccountDoesNotExistResponse =>
-            LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.ACCOUNT)
-            NotFound(Json.toJson(ErrorAccountNotFound))
-
-          case _ =>
-            LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.ACCOUNT)
-            InternalServerError(Json.toJson(ErrorInternalServerError))
-        }
-      }
     }
 
   private def hasAccountTransferData(js: JsObject): Boolean = {
