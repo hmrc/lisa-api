@@ -98,7 +98,7 @@ class LisaControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite 
 
   "The todo endpoint" must {
     "return 501 not implemented" in {
-      val result = SUT.todo("Z1234", "ABCD1234", "").apply(FakeRequest(Helpers.POST, "/").
+      val result = SUT.todo("Z1234", "ABCD1234").apply(FakeRequest(Helpers.POST, "/").
         withHeaders(acceptHeader).withBody(AnyContentAsJson(Json.parse("{}"))))
 
       status(result) mustBe NOT_IMPLEMENTED

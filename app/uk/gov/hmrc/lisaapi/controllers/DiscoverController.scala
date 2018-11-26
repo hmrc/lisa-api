@@ -82,6 +82,7 @@ class DiscoverController extends LisaController {
       "life events": [
         {"href": "/lifetime-isa/manager/$lisaManagerReferenceNumber/accounts/{accountId}/events", "methods": ["POST"]}
       ],
+      "annual return": {"href": "/lifetime-isa/manager/$lisaManagerReferenceNumber/accounts/{accountId}/returns", "methods": ["POST"]},
       "bonus payments": [
         {"href": "/lifetime-isa/manager/$lisaManagerReferenceNumber/accounts/{accountId}/transactions", "methods": ["POST"]},
         {"href": "/lifetime-isa/manager/$lisaManagerReferenceNumber/accounts/{accountId}/transactions/{transactionId}", "methods": ["GET"]}

@@ -129,7 +129,7 @@ trait LisaController extends BaseController with LisaConstants with RunMode with
       Future.successful(InternalServerError(toJson(ErrorInternalServerError)))
   }
 
-  def todo(id: String,accountId:String,transactionId:String): Action[AnyContent] = Action.async { _ =>
+  def todo(id: String, accountId: String): Action[AnyContent] = Action.async { _ =>
     Future.successful(NotImplemented(Json.toJson(ErrorNotImplemented)))
   }
 }
