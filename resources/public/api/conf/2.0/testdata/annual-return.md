@@ -32,7 +32,7 @@
   "success": true,
   "data": {
     "message": "Life event created",
-    "lifeEventId": "6789000001"
+    "lifeEventId": "7890000001"
   }
 }
 </pre>
@@ -51,7 +51,7 @@
   "annualSubsCash": 0,
   "annualSubsStocksAndShares": 65,
   "supersede": {
-    "originalLifeEventId": "6789000001",
+    "originalLifeEventId": "7890000001",
     "originalEventDate": "2018-04-05"
   }
 }
@@ -226,8 +226,8 @@
   "annualSubsCash": 0,
   "annualSubsStocksAndShares": 65,
   "supersede": {
-    "originalLifeEventId": "1234567890",
-    "originalEventDate": "2018-01-01"
+    "originalLifeEventId": "7890000001",
+    "originalEventDate": "2018-04-04"
   }
 }
 </pre>
