@@ -1,0 +1,13 @@
+{
+  "eventDate": "2018-04-05",
+  "isaManagerName": "ISA Manager",
+  "taxYear": 2018,
+  "marketValueCash": 0,
+  "marketValueStocksAndShares": 65,
+  "annualSubsCash": 0,
+  "annualSubsStocksAndShares": 65,
+  "supersede": {
+    "originalLifeEventId": "6789000001",
+    "originalEventDate": "2018-04-05"
+  }
+}
