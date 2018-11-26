@@ -773,6 +773,12 @@ types:
                             initial-return: !include examples/AnnualReturn.post.json
                             supersede-return: !include examples/AnnualReturnSuperseded.post.json
                     responses:
+                      201:
+                        description: The LifeEvent resource has been created.
+                        body:
+                          application/json:
+                              type: !include schemas/AnnualReturn.post.response.schema.json
+                              example: !include examples/AnnualReturn.post.response.json
                       400:
                         body:
                           application/json:
