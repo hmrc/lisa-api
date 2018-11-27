@@ -22,13 +22,11 @@ import org.scalatest.BeforeAndAfter
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.data.validation.ValidationError
-import play.api.libs.json.{JsError, JsObject, JsPath, Json}
+import play.api.libs.json.{JsError, JsPath, Json}
 import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.controllers.ErrorValidation
 import uk.gov.hmrc.lisaapi.models.{AnnualReturn, AnnualReturnSupersede, AnnualReturnValidator}
 import uk.gov.hmrc.lisaapi.services.CurrentDateService
-
-import scala.collection.mutable
 
 class AnnualReturnSpec extends PlaySpec
   with LisaConstants
@@ -157,14 +155,14 @@ class AnnualReturnSpec extends PlaySpec
         ((JsPath \ "isaManagerName"), List(ValidationError("error.formatting.isaManagerName")))
       ))
     }
-    "ensure the taxYear must be less than 10000" in {
+    "ensure the taxYear is four figures - it must be less than 10000" in {
       val invalidJson = validJson ++ Json.obj("taxYear" -> 10000)
 
       invalidJson.validate[AnnualReturn] mustBe JsError(errors = List(
         ((JsPath \ "taxYear"), List(ValidationError("error.formatting.taxYear")))
       ))
     }
-    "ensure the taxYear must be more than 999" in {
+    "ensure the taxYear is four figures - it must be more than 999" in {
       val invalidJson = validJson ++ Json.obj("taxYear" -> 999)
 
       invalidJson.validate[AnnualReturn] mustBe JsError(errors = List(
@@ -257,6 +255,19 @@ class AnnualReturnSpec extends PlaySpec
       when(mockDateService.now()).thenReturn(DateTime.now)
     }
 
+    "return no errors for a valid return" in {
+      val req = AnnualReturn(
+        eventDate = new DateTime("2018-04-05"),
+        isaManagerName = "ISA Manager",
+        taxYear = 2018,
+        marketValueCash = 0,
+        marketValueStocksAndShares = 55,
+        annualSubsCash = 0,
+        annualSubsStocksAndShares = 55
+      )
+
+      SUT.validate(req) mustBe Nil
+    }
     "return an error for a taxYear before the start of lisa" in {
       val req = AnnualReturn(
         eventDate = new DateTime("2018-04-05"),
@@ -270,7 +281,6 @@ class AnnualReturnSpec extends PlaySpec
 
       SUT.validate(req) mustBe List(ErrorValidation(DATE_ERROR, "The taxYear cannot be before 2017", Some("/taxYear")))
     }
-
     "return an error for a taxYear after the current year" in {
       val req = AnnualReturn(
         eventDate = new DateTime("2018-04-05"),
@@ -284,7 +294,6 @@ class AnnualReturnSpec extends PlaySpec
 
       SUT.validate(req) mustBe List(ErrorValidation(DATE_ERROR, "The taxYear cannot be in the future", Some("/taxYear")))
     }
-
     "return an error if marketValueCash and marketValueStocksAndShares are specified" in {
       val req = AnnualReturn(
         eventDate = new DateTime("2018-04-05"),
@@ -301,7 +310,6 @@ class AnnualReturnSpec extends PlaySpec
         ErrorValidation(MONETARY_ERROR, cashAndStocksErrorMessage, Some("/marketValueStocksAndShares"))
       )
     }
-
     "return an error if annualSubsCash and annualSubsStocksAndShares are specified" in {
       val req = AnnualReturn(
         eventDate = new DateTime("2018-04-05"),
@@ -318,7 +326,6 @@ class AnnualReturnSpec extends PlaySpec
         ErrorValidation(MONETARY_ERROR, cashAndStocksErrorMessage, Some("/annualSubsStocksAndShares"))
       )
     }
-
     "return an error if a mix of cash and stocks and shares are specified" in {
       val req = AnnualReturn(
         eventDate = new DateTime("2018-04-05"),
