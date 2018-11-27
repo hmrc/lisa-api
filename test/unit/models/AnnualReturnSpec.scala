@@ -22,6 +22,8 @@ import play.api.data.validation.ValidationError
 import play.api.libs.json.{JsError, JsObject, JsPath, Json}
 import uk.gov.hmrc.lisaapi.models.{AnnualReturn, AnnualReturnSupersede}
 
+import scala.collection.mutable
+
 class AnnualReturnSpec extends PlaySpec {
 
   "AnnualReturnSupersede" must {
@@ -123,6 +125,69 @@ class AnnualReturnSpec extends PlaySpec {
       invalidJson.validate[AnnualReturn] mustBe JsError(errors = List(
         ((JsPath \ "eventDate"), List(ValidationError("error.formatting.date")))
       ))
+    }
+    "ensure the isaManagerName is less than 50 characters" in {
+      val tooLong = "123456789012345678901234567890123456789012345678901"
+      val invalidJson = validJson ++ Json.obj("isaManagerName" -> tooLong)
+
+      invalidJson.validate[AnnualReturn] mustBe JsError(errors = List(
+        ((JsPath \ "isaManagerName"), List(ValidationError("error.formatting.isaManagerName")))
+      ))
+    }
+    "ensure the isaManagerName doesn't have unexpected characters" in {
+      val invalidJson = validJson ++ Json.obj("isaManagerName" -> "?")
+
+      invalidJson.validate[AnnualReturn] mustBe JsError(errors = List(
+        ((JsPath \ "isaManagerName"), List(ValidationError("error.formatting.isaManagerName")))
+      ))
+    }
+    "ensure the isaManagerName isn't empty" in {
+      val invalidJson = validJson ++ Json.obj("isaManagerName" -> "")
+
+      invalidJson.validate[AnnualReturn] mustBe JsError(errors = List(
+        ((JsPath \ "isaManagerName"), List(ValidationError("error.formatting.isaManagerName")))
+      ))
+    }
+    "ensure the taxYear must be less than 10000" in {
+      val invalidJson = validJson ++ Json.obj("taxYear" -> 10000)
+
+      invalidJson.validate[AnnualReturn] mustBe JsError(errors = List(
+        ((JsPath \ "taxYear"), List(ValidationError("error.formatting.taxYear")))
+      ))
+    }
+    "ensure the taxYear must be more than 999" in {
+      val invalidJson = validJson ++ Json.obj("taxYear" -> 999)
+
+      invalidJson.validate[AnnualReturn] mustBe JsError(errors = List(
+        ((JsPath \ "taxYear"), List(ValidationError("error.formatting.taxYear")))
+      ))
+    }
+    "ensure all numeric fields are integers" in {
+      val invalidJson = validJson ++ Json.obj(
+        "taxYear" -> 2018.5,
+        "marketValueCash" -> 1.5,
+        "marketValueStocksAndShares" -> 1.5,
+        "annualSubsCash" -> 1.5,
+        "annualSubsStocksAndShares" -> 1.5
+      )
+
+      val expectedErrors = List(
+        ((JsPath \ "taxYear"), List(ValidationError("error.expected.int"))),
+        ((JsPath \ "marketValueCash"), List(ValidationError("error.expected.int"))),
+        ((JsPath \ "marketValueStocksAndShares"), List(ValidationError("error.expected.int"))),
+        ((JsPath \ "annualSubsCash"), List(ValidationError("error.expected.int"))),
+        ((JsPath \ "annualSubsStocksAndShares"), List(ValidationError("error.expected.int")))
+      )
+
+      val result = invalidJson.validate[AnnualReturn]
+
+      result.fold(
+        errors => {
+          expectedErrors.foreach( errors must contain(_) )
+          errors.length mustBe expectedErrors.length
+        },
+        _ => fail("Invalid json passed validation")
+      )
     }
     "require all fields except supersede" in {
       val expectedErrors = List(

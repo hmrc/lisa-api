@@ -17,7 +17,8 @@
 package uk.gov.hmrc.lisaapi.models
 
 import org.joda.time.DateTime
-import play.api.libs.json.{Json, Reads, Writes}
+import play.api.libs.functional.syntax._
+import play.api.libs.json.{JsPath, Json, Reads, Writes}
 
 case class AnnualReturnSupersede (
   originalLifeEventId: LifeEventId,
@@ -26,7 +27,7 @@ case class AnnualReturnSupersede (
 
 case class AnnualReturn (
   eventDate: DateTime,
-  isaManagerName: String,
+  isaManagerName: IsaManagerName,
   taxYear: Int,
   marketValueCash: Int,
   marketValueStocksAndShares: Int,
@@ -43,7 +44,18 @@ object AnnualReturnSupersede {
 }
 
 object AnnualReturn {
-  implicit val dateReads: Reads[DateTime] = JsonReads.notFutureDate
   implicit val dateWrites = Writes.jodaDateWrites("yyyy-MM-dd")
-  implicit val formats = Json.format[AnnualReturn]
+
+  implicit val reads: Reads[AnnualReturn] = (
+    (JsPath \ "eventDate").read(JsonReads.notFutureDate) and
+    (JsPath \ "isaManagerName").read(JsonReads.isaManagerName) and
+    (JsPath \ "taxYear").read(JsonReads.taxYearReads) and
+    (JsPath \ "marketValueCash").read[Int] and
+    (JsPath \ "marketValueStocksAndShares").read[Int] and
+    (JsPath \ "annualSubsCash").read[Int] and
+    (JsPath \ "annualSubsStocksAndShares").read[Int] and
+    (JsPath \ "supersede").readNullable[AnnualReturnSupersede]
+  )(AnnualReturn.apply _)
+
+  implicit val writes = Json.writes[AnnualReturn]
 }
