@@ -17,14 +17,23 @@
 package unit.models
 
 import org.joda.time.DateTime
+import org.mockito.Mockito.{reset, when}
+import org.scalatest.BeforeAndAfter
+import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.data.validation.ValidationError
 import play.api.libs.json.{JsError, JsObject, JsPath, Json}
-import uk.gov.hmrc.lisaapi.models.{AnnualReturn, AnnualReturnSupersede}
+import uk.gov.hmrc.lisaapi.LisaConstants
+import uk.gov.hmrc.lisaapi.controllers.ErrorValidation
+import uk.gov.hmrc.lisaapi.models.{AnnualReturn, AnnualReturnSupersede, AnnualReturnValidator}
+import uk.gov.hmrc.lisaapi.services.CurrentDateService
 
 import scala.collection.mutable
 
-class AnnualReturnSpec extends PlaySpec {
+class AnnualReturnSpec extends PlaySpec
+  with LisaConstants
+  with MockitoSugar
+  with BeforeAndAfter {
 
   "AnnualReturnSupersede" must {
 
@@ -189,6 +198,31 @@ class AnnualReturnSpec extends PlaySpec {
         _ => fail("Invalid json passed validation")
       )
     }
+    "ensure monetary figures are not negative" in {
+      val invalidJson = validJson ++ Json.obj(
+        "marketValueCash" -> -1,
+        "marketValueStocksAndShares" -> -1,
+        "annualSubsCash" -> -1,
+        "annualSubsStocksAndShares" -> -1
+      )
+
+      val expectedErrors = List(
+        ((JsPath \ "marketValueCash"), List(ValidationError("error.formatting.annualFigures"))),
+        ((JsPath \ "marketValueStocksAndShares"), List(ValidationError("error.formatting.annualFigures"))),
+        ((JsPath \ "annualSubsCash"), List(ValidationError("error.formatting.annualFigures"))),
+        ((JsPath \ "annualSubsStocksAndShares"), List(ValidationError("error.formatting.annualFigures")))
+      )
+
+      val result = invalidJson.validate[AnnualReturn]
+
+      result.fold(
+        errors => {
+          expectedErrors.foreach( errors must contain(_) )
+          errors.length mustBe expectedErrors.length
+        },
+        _ => fail("Invalid json passed validation")
+      )
+    }
     "require all fields except supersede" in {
       val expectedErrors = List(
         ((JsPath \ "eventDate"), List(ValidationError("error.path.missing"))),
@@ -209,6 +243,101 @@ class AnnualReturnSpec extends PlaySpec {
         },
         _ => fail("Invalid json passed validation")
       )
+    }
+
+  }
+
+  "AnnualReturnValidator" must {
+
+    val mockDateService: CurrentDateService = mock[CurrentDateService]
+    val cashAndStocksErrorMessage = "Only cash or stocks and shares values can be specified"
+
+    before {
+      reset(mockDateService)
+      when(mockDateService.now()).thenReturn(DateTime.now)
+    }
+
+    "return an error for a taxYear before the start of lisa" in {
+      val req = AnnualReturn(
+        eventDate = new DateTime("2018-04-05"),
+        isaManagerName = "ISA Manager",
+        taxYear = 2016,
+        marketValueCash = 0,
+        marketValueStocksAndShares = 55,
+        annualSubsCash = 0,
+        annualSubsStocksAndShares = 55
+      )
+
+      SUT.validate(req) mustBe List(ErrorValidation(DATE_ERROR, "The taxYear cannot be before 2017", Some("/taxYear")))
+    }
+
+    "return an error for a taxYear after the current year" in {
+      val req = AnnualReturn(
+        eventDate = new DateTime("2018-04-05"),
+        isaManagerName = "ISA Manager",
+        taxYear = DateTime.now.plusYears(1).getYear,
+        marketValueCash = 0,
+        marketValueStocksAndShares = 55,
+        annualSubsCash = 0,
+        annualSubsStocksAndShares = 55
+      )
+
+      SUT.validate(req) mustBe List(ErrorValidation(DATE_ERROR, "The taxYear cannot be in the future", Some("/taxYear")))
+    }
+
+    "return an error if marketValueCash and marketValueStocksAndShares are specified" in {
+      val req = AnnualReturn(
+        eventDate = new DateTime("2018-04-05"),
+        isaManagerName = "ISA Manager",
+        taxYear = 2018,
+        marketValueCash = 55,
+        marketValueStocksAndShares = 55,
+        annualSubsCash = 0,
+        annualSubsStocksAndShares = 0
+      )
+
+      SUT.validate(req) mustBe List(
+        ErrorValidation(MONETARY_ERROR, cashAndStocksErrorMessage, Some("/marketValueCash")),
+        ErrorValidation(MONETARY_ERROR, cashAndStocksErrorMessage, Some("/marketValueStocksAndShares"))
+      )
+    }
+
+    "return an error if annualSubsCash and annualSubsStocksAndShares are specified" in {
+      val req = AnnualReturn(
+        eventDate = new DateTime("2018-04-05"),
+        isaManagerName = "ISA Manager",
+        taxYear = 2018,
+        marketValueCash = 0,
+        marketValueStocksAndShares = 0,
+        annualSubsCash = 55,
+        annualSubsStocksAndShares = 55
+      )
+
+      SUT.validate(req) mustBe List(
+        ErrorValidation(MONETARY_ERROR, cashAndStocksErrorMessage, Some("/annualSubsCash")),
+        ErrorValidation(MONETARY_ERROR, cashAndStocksErrorMessage, Some("/annualSubsStocksAndShares"))
+      )
+    }
+
+    "return an error if a mix of cash and stocks and shares are specified" in {
+      val req = AnnualReturn(
+        eventDate = new DateTime("2018-04-05"),
+        isaManagerName = "ISA Manager",
+        taxYear = 2018,
+        marketValueCash = 55,
+        marketValueStocksAndShares = 0,
+        annualSubsCash = 0,
+        annualSubsStocksAndShares = 55
+      )
+
+      SUT.validate(req) mustBe List(
+        ErrorValidation(MONETARY_ERROR, cashAndStocksErrorMessage, Some("/marketValueCash")),
+        ErrorValidation(MONETARY_ERROR, cashAndStocksErrorMessage, Some("/annualSubsStocksAndShares"))
+      )
+    }
+
+    object SUT extends AnnualReturnValidator {
+      override val currentDateService: CurrentDateService = mockDateService
     }
 
   }

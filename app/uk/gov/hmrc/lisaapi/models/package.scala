@@ -97,6 +97,7 @@ package object models {
     )
     val isaManagerName: Reads[IsaManagerName] = Reads.pattern("^[a-zA-Z0-9 '/,&().-]{1,50}$".r, "error.formatting.isaManagerName")
     val taxYearReads: Reads[Int] = Reads.filter[Int](ValidationError("error.formatting.taxYear"))((p:Int) => p > 999 && p < 10000)
+    val annualFigures: Reads[Int] = Reads.filter[Int](ValidationError("error.formatting.annualFigures"))((p:Int) => p >= 0)
 
     val isoDate: Reads[DateTime] = isoDateReads()
     val notFutureDate: Reads[DateTime] = isoDateReads(false)

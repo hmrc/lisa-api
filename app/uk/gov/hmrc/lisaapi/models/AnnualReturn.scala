@@ -19,6 +19,11 @@ package uk.gov.hmrc.lisaapi.models
 import org.joda.time.DateTime
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsPath, Json, Reads, Writes}
+import uk.gov.hmrc.lisaapi.LisaConstants
+import uk.gov.hmrc.lisaapi.controllers.ErrorValidation
+import uk.gov.hmrc.lisaapi.services.CurrentDateService
+
+import scala.collection.mutable.ListBuffer
 
 case class AnnualReturnSupersede (
   originalLifeEventId: LifeEventId,
@@ -50,12 +55,97 @@ object AnnualReturn {
     (JsPath \ "eventDate").read(JsonReads.notFutureDate) and
     (JsPath \ "isaManagerName").read(JsonReads.isaManagerName) and
     (JsPath \ "taxYear").read(JsonReads.taxYearReads) and
-    (JsPath \ "marketValueCash").read[Int] and
-    (JsPath \ "marketValueStocksAndShares").read[Int] and
-    (JsPath \ "annualSubsCash").read[Int] and
-    (JsPath \ "annualSubsStocksAndShares").read[Int] and
+    (JsPath \ "marketValueCash").read(JsonReads.annualFigures) and
+    (JsPath \ "marketValueStocksAndShares").read(JsonReads.annualFigures) and
+    (JsPath \ "annualSubsCash").read(JsonReads.annualFigures) and
+    (JsPath \ "annualSubsStocksAndShares").read(JsonReads.annualFigures) and
     (JsPath \ "supersede").readNullable[AnnualReturnSupersede]
   )(AnnualReturn.apply _)
 
   implicit val writes = Json.writes[AnnualReturn]
+}
+
+trait AnnualReturnValidator extends LisaConstants {
+  val currentDateService: CurrentDateService
+
+  case class ValidationRequest(data: AnnualReturn, errors: Seq[ErrorValidation] = Nil)
+
+  def validate(req: AnnualReturn): Seq[ErrorValidation] = {
+    (
+      taxYearIsAfter2016 andThen
+      taxYearIsNotInFuture andThen
+      onlyCashOrStocksHaveBeenSpecified
+    ).apply(ValidationRequest(req)).errors
+  }
+
+  private val taxYearIsAfter2016: PartialFunction[ValidationRequest, ValidationRequest] = {
+    case req: ValidationRequest if req.data.taxYear < 2017 => {
+      req.copy(errors = req.errors :+ ErrorValidation(DATE_ERROR, "The taxYear cannot be before 2017", Some("/taxYear")))
+    }
+    case req: ValidationRequest => req
+  }
+
+  private val taxYearIsNotInFuture: PartialFunction[ValidationRequest, ValidationRequest] = {
+    case req: ValidationRequest if req.data.taxYear > currentDateService.now().getYear => {
+      req.copy(errors = req.errors :+ ErrorValidation(DATE_ERROR, "The taxYear cannot be in the future", Some("/taxYear")))
+    }
+    case req: ValidationRequest => req
+  }
+
+  private val onlyCashOrStocksHaveBeenSpecified: (ValidationRequest) => ValidationRequest = (req: ValidationRequest) => {
+    val cashValue = req.data.marketValueCash
+    val cashSubs = req.data.annualSubsCash
+    val stockValue = req.data.marketValueStocksAndShares
+    val stockSubs = req.data.annualSubsStocksAndShares
+
+    val cashHasBeenSpecified = cashValue > 0 || cashSubs > 0
+    val stocksHaveBeenSpecified = stockValue > 0 || stockSubs > 0
+
+    if (cashHasBeenSpecified && stocksHaveBeenSpecified) {
+      val newErrs = new ListBuffer[ErrorValidation]()
+      val errorMessage = "Only cash or stocks and shares values can be specified"
+
+      if (cashValue > 0) {
+        newErrs += ErrorValidation(
+          errorCode = MONETARY_ERROR,
+          message = errorMessage,
+          path = Some("/marketValueCash")
+        )
+      }
+
+      if (cashSubs > 0) {
+        newErrs += ErrorValidation(
+          errorCode = MONETARY_ERROR,
+          message = errorMessage,
+          path = Some("/annualSubsCash")
+        )
+      }
+
+      if (stockValue > 0) {
+        newErrs += ErrorValidation(
+          errorCode = MONETARY_ERROR,
+          message = errorMessage,
+          path = Some("/marketValueStocksAndShares")
+        )
+      }
+
+      if (stockSubs > 0) {
+        newErrs += ErrorValidation(
+          errorCode = MONETARY_ERROR,
+          message = errorMessage,
+          path = Some("/annualSubsStocksAndShares")
+        )
+      }
+
+      req.copy(errors = req.errors ++ newErrs)
+    }
+    else {
+      req
+    }
+  }
+
+}
+
+object AnnualReturnValidator extends AnnualReturnValidator {
+  val currentDateService: CurrentDateService = CurrentDateService
 }
