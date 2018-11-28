@@ -164,6 +164,104 @@
             </td>
         </tr>
         <tr>
+            <td><p>A mixture of Cash and Stocks and Shares in the same annual return</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
+            <td>
+<pre class="code--block">
+{
+  "eventDate": "2018-04-05",
+  "isaManagerName": "ISA Manager",
+  "taxYear": 2018,
+  "marketValueCash": 0,
+  "marketValueStocksAndShares": 55,
+  "annualSubsCash": 55,
+  "annualSubsStocksAndShares": 0
+}
+</pre>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
+<pre class="code--block">
+{
+  "code": "FORBIDDEN",
+  "message": "There is a problem with the request data",
+  "errors": [
+    {
+      "code": "INVALID_MONETARY_AMOUNT",
+      "message": "Only cash or stocks and shares values can be specified",
+      "path": "/annualSubsCash"
+    },
+    {
+      "code": "INVALID_MONETARY_AMOUNT",
+      "message": "Only cash or stocks and shares values can be specified",
+      "path": "/marketValueStocksAndShares"
+    }
+  ]
+}
+</pre>
+            </td>
+        </tr>
+        <tr>
+            <td><p>Tax year before 2017</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
+            <td>
+<pre class="code--block">
+{
+  "eventDate": "2018-04-05",
+  "isaManagerName": "ISA Manager",
+  "taxYear": 2016,
+  "marketValueCash": 0,
+  "marketValueStocksAndShares": 55,
+  "annualSubsCash": 0,
+  "annualSubsStocksAndShares": 55
+}
+</pre>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
+<pre class="code--block">
+{
+  "code": "FORBIDDEN",
+  "message": "There is a problem with the request data",
+  "errors": [
+    {
+      "code": "INVALID_DATE",
+      "message": "The taxYear cannot be before 2017",
+      "path": "/taxYear"
+    }
+  ]
+}
+</pre>
+            </td>
+        </tr>
+        <tr>
+            <td><p>Tax year in the future</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
+            <td>
+<pre class="code--block">
+{
+  "eventDate": "2018-04-05",
+  "isaManagerName": "ISA Manager",
+  "taxYear": 3000,
+  "marketValueCash": 0,
+  "marketValueStocksAndShares": 55,
+  "annualSubsCash": 0,
+  "annualSubsStocksAndShares": 55
+}
+</pre>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
+<pre class="code--block">
+{
+  "code": "FORBIDDEN",
+  "message": "There is a problem with the request data",
+  "errors": [
+    {
+      "code": "INVALID_DATE",
+      "message": "The taxYear cannot be in the future",
+      "path": "/taxYear"
+    }
+  ]
+}
+</pre>
+            </td>
+        </tr>
+        <tr>
             <td><p>Account cancelled</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>accountId: 2000000403</p></td>
             <td>
 <pre class="code--block">
