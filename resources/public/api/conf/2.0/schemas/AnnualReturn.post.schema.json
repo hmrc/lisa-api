@@ -3,49 +3,50 @@
   "type": "object",
   "properties": {
     "eventDate": {
-      "description": "The date the life event occurred. This cannot be in the future.",
+      "description": "The date the return of information is sent. This cannot be in the future.",
       "$ref": "#/definitions/ISO8601-Date"
     },
     "isaManagerName": {
       "type": "string",
-      "description": "The name of the ISA Manager",
+      "description": "The name of the ISA manager.",
       "maxLength": 50,
       "pattern": "^[a-zA-Z0-9 '/,&().-]{1,50}$"
     },
     "taxYear": {
       "type": "integer",
-      "description": "The tax year for the EOY return. Example 2017/18 TY is 2018",
+      "description": "The tax year for the return of information. Give the year that the tax year ends in. For example, for the 2017 to 2018 tax year give 2018.",
       "min": 2017,
       "pattern": "^[0-9]{4}$",
       "example": "2018"
     },
     "marketValueCash": {
       "$ref": "#/definitions/MarketValue",
-      "description": "The total value of the LISA account. Numeric up to 6 chars (can be zero). Values must be reported to the nearest whole pound and not reported to decimal places e.g. report 54.56 as 55."
+      "description": "The total value of the cash LISA account. Give the value to the nearest whole pound. Do not include decimal places. For example, send 54.56 as 55. If you give a value for marketValueCash, do not give a value for marketValueStocksAndShares."
     },
     "marketValueStocksAndShares": {
       "$ref": "#/definitions/MarketValue",
-      "description": "The total value of the LISA account. Numeric up to 6 chars (can be zero). Values must be reported to the nearest whole pound and not reported to decimal places e.g. report 54.56 as 55."
+      "description": "The total value of the stocks and shares LISA account. Give the value to the nearest whole pound. Do not include decimal places. For example, send 54.56 as 55. If you give a value for marketValueStocksAndShares, do not give a value for marketValueCash."
     },
     "annualSubsCash": {
       "$ref": "#/definitions/AnnualSubs",
-      "description": "Total value of cash subscriptions the investor deposited in to their cash LISA account in the financial year. Numeric up to 4 chars (can be zero). Values must be reported to the nearest whole pound and not reported to decimal places e.g. report 54.56 as 55. Both the annualSubsCash and annualSubsStocksAndShares data items cannot be greater than zero in the same payload. If annualSubsCash is greater than zero then annualSubsStocksAndShares must equal zero"
+      "description": "The total value of subscriptions that the investor deposited into their cash LISA account during the tax year. Give the value to the nearest whole pound. Do not include decimal places. For example, send 54.56 as 55. If you give a value for annualSubsCash, do not give a value for annualSubsStocksAndShares."
     },
     "annualSubsStocksAndShares": {
       "$ref": "#/definitions/AnnualSubs",
-      "description": "Total value of cash subscriptions the investor deposited in to their cash LISA account in the financial year. Numeric up to 4 chars (can be zero). Values must be reported to the nearest whole pound and not reported to decimal places e.g. report 54.56 as 55. Both the annualSubsCash and annualSubsStocksAndShares data items cannot be greater than zero in the same payload. If annualSubsStocksAndShares is greater than zero then annualSubsCashAndShares must equal zero"
+      "description": "The total value of subscriptions that the investor deposited into their stocks and shares LISA account during the tax year. Give the value to the nearest whole pound. Do not include decimal places. For example, send 54.56 as 55. If you give a value for annualSubsStocksAndShares, do not give a value for annualSubsCash."
     },
     "supersede": {
       "type": "object",
+      "description": "Correct an existing return of information.",
       "properties": {
         "originalLifeEventId": {
           "type": "string",
-          "description": "The lifeEventId of the life event to be superseded",
+          "description": "The lifeEventId of the original return of information affected by the correction. This is used together with the originalEventDate to make sure the right return of information is replaced.",
           "pattern": "^\\d{10}$"
         },
         "originalEventDate": {
           "$ref": "#/definitions/ISO8601-Date",
-          "description": "The eventDate of the life event to be superseded"
+          "description": "The eventDate of the original return of information affected by the correction."
         }
       },
       "required": ["originalLifeEventId", "originalEventDate"],

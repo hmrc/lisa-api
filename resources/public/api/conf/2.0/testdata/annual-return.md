@@ -11,7 +11,7 @@
     </thead>
     <tbody>
         <tr>
-            <td><p>Successful initial return</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
+            <td><p>Successfully sent an annual return of information</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
             <td>
 <pre class="code--block">
 {
@@ -39,7 +39,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Successful superseded return</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
+            <td><p>Successfully corrected an annual return of information</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
             <td>
 <pre class="code--block">
 {
@@ -71,7 +71,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Invalid LISA Manager reference number</p><p class="code--block">lisaManagerReferenceNumber: 123456<br>accountId: 1234567890</p></td>
+            <td><p>LISA manager reference number in the wrong format</p><p class="code--block">lisaManagerReferenceNumber: 123456<br>accountId: 1234567890</p></td>
                         <td>
 <pre class="code--block">
 {
@@ -95,7 +95,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Invalid account ID</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>accountId: 1234%3D5678</p></td>
+            <td><p>Account ID in the wrong format</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>accountId: 1234%3D5678</p></td>
             <td>
 <pre class="code--block">
 {
@@ -119,7 +119,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Invalid and/or missing data</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
+            <td><p>Wrong or missing data</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
             <td>
 <pre class="code--block">
 {
@@ -164,7 +164,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>A mixture of Cash and Stocks and Shares in the same annual return</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
+            <td><p>A mixture of cash and stocks and shares in the same annual return</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
             <td>
 <pre class="code--block">
 {
@@ -186,12 +186,12 @@
   "errors": [
     {
       "code": "INVALID_MONETARY_AMOUNT",
-      "message": "Only cash or stocks and shares values can be specified",
+      "message": "You can only give cash or stocks and shares values",
       "path": "/annualSubsCash"
     },
     {
       "code": "INVALID_MONETARY_AMOUNT",
-      "message": "Only cash or stocks and shares values can be specified",
+      "message": "You can only give cash or stocks and shares values",
       "path": "/marketValueStocksAndShares"
     }
   ]
@@ -311,7 +311,7 @@
         </tr>
         <tr>
             <td>
-                <p>Supersede details mismatch</p>
+                <p>Supersede details do not match the original return of information</p>
                 <p class="code--block">
                 lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a>
                 <br>
@@ -369,7 +369,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Invalid Accept header</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>accountId: 1234567890<br><br>Accept: application/vnd.hmrc.1.0</p></td>
+            <td><p>Accept header is missing or invalid</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>accountId: 1234567890<br><br>Accept: application/vnd.hmrc.1.0</p></td>
             <td>
 <pre class="code--block">
 {

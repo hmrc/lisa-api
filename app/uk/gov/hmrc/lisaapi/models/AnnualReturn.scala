@@ -138,7 +138,7 @@ trait AnnualReturnValidator extends LisaConstants {
 
     if (cashHasBeenSpecified && stocksHaveBeenSpecified) {
       val newErrs = new ListBuffer[ErrorValidation]()
-      val errorMessage = "Only cash or stocks and shares values can be specified"
+      val errorMessage = "You can only give cash or stocks and shares values"
 
       if (cashValue > 0) {
         newErrs += ErrorValidation(

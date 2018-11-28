@@ -248,7 +248,7 @@ class AnnualReturnSpec extends PlaySpec
   "AnnualReturnValidator" must {
 
     val mockDateService: CurrentDateService = mock[CurrentDateService]
-    val cashAndStocksErrorMessage = "Only cash or stocks and shares values can be specified"
+    val cashAndStocksErrorMessage = "You can only give cash or stocks and shares values"
 
     before {
       reset(mockDateService)
