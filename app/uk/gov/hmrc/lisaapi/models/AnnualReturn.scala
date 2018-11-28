@@ -62,9 +62,40 @@ object AnnualReturn {
     (JsPath \ "supersede").readNullable[AnnualReturnSupersede]
   )(AnnualReturn.apply _)
 
-  implicit val writes = Json.writes[AnnualReturn]
+  val desWrites: Writes[AnnualReturn] = (
+    (JsPath \ "eventType").write[String] and
+    (JsPath \ "eventDate").write[DateTime] and
+    (JsPath \ "taxYear").write[Int] and
+    (JsPath \ "isaManagerName").write[String] and
+    (JsPath \ "lisaMarketValueCash").write[Int] and
+    (JsPath \ "lisaMarketValueStocksAndShares").write[Int] and
+    (JsPath \ "lisaAnnualCashSubs").write[Int] and
+    (JsPath \ "lisaAnnualStocksAndSharesSubs").write[Int] and
+    (JsPath \ "supersededLifeEventDate").writeNullable[DateTime] and
+    (JsPath \ "supersededLifeEventID").writeNullable[LifeEventId]
+  ){req: AnnualReturn =>
+    val supersededLifeEventDate = req.supersede match {
+      case None => None
+      case Some(sup) => Some(sup.originalEventDate)
+    }
+    val supersededLifeEventID = req.supersede match {
+      case None => None
+      case Some(sup) => Some(sup.originalLifeEventId)
+    }
 
-  val desWrites = writes
+    (
+      "Statutory Submission",
+      req.eventDate,
+      req.taxYear,
+      req.isaManagerName,
+      req.marketValueCash,
+      req.marketValueStocksAndShares,
+      req.annualSubsCash,
+      req.annualSubsStocksAndShares,
+      supersededLifeEventDate,
+      supersededLifeEventID
+    )
+  }
 }
 
 trait AnnualReturnValidator extends LisaConstants {

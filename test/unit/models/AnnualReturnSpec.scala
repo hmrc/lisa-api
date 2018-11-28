@@ -106,19 +106,6 @@ class AnnualReturnSpec extends PlaySpec
 
       actual mustBe expected
     }
-    "deserialize to json" in {
-      val input = AnnualReturn(
-        eventDate = new DateTime("2018-04-05"),
-        isaManagerName = "ISA Manager",
-        taxYear = 2018,
-        marketValueCash = 0,
-        marketValueStocksAndShares = 55,
-        annualSubsCash = 0,
-        annualSubsStocksAndShares = 55
-      )
-
-      Json.toJson[AnnualReturn](input) mustBe validJson
-    }
     "not allow a future event date" in {
       val invalidJson = validJson ++ Json.obj("eventDate" -> "3018-05-01")
 
