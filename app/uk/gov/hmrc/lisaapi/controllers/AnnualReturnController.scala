@@ -16,15 +16,25 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
+import play.api.Logger
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent}
+import play.api.mvc.{Action, AnyContent, Result}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.LisaConstants
+import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
+import uk.gov.hmrc.lisaapi.models._
+import uk.gov.hmrc.lisaapi.services.{AuditService, LifeEventService}
+import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
+import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext._
 
 import scala.concurrent.Future
 
 class AnnualReturnController extends LisaController with LisaConstants {
 
   override val validateVersion: String => Boolean = _ == "2.0"
+  val service: LifeEventService = LifeEventService
+  val validator: AnnualReturnValidator = AnnualReturnValidator
+  val auditService: AuditService = AuditService
 
   def submitReturn(lisaManager: String, accountId: String): Action[AnyContent] = validateHeader().async {
     implicit request =>
@@ -32,9 +42,67 @@ class AnnualReturnController extends LisaController with LisaConstants {
 
       withValidLMRN(lisaManager) { () =>
         withValidAccountId(accountId) { () =>
-          Future.successful(NotImplemented(Json.toJson(ErrorNotImplemented)))
+          withValidJson[AnnualReturn]( req =>
+            withValidData(req)(lisaManager, accountId) { () =>
+              service.reportLifeEvent(lisaManager, accountId, req) map { res =>
+                Logger.debug("submitAnnualReturn: The response is " + res.toString)
+
+                res match {
+                  case success: ReportLifeEventSuccessResponse =>
+                    val message = if (req.supersede.isEmpty) "Life event created" else "Life event superseded"
+                    val data = ApiResponseData(message = message, lifeEventId = Some(success.lifeEventId))
+
+                    LisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.EVENT)
+                    Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
+                  case error: ReportLifeEventResponse =>
+                    val response = errors.getOrElse(error, ErrorInternalServerError).asResult
+
+                    LisaMetrics.incrementMetrics(startTime, response.header.status, LisaMetricKeys.EVENT)
+                    response
+                }
+              } recover {
+                case e: Exception =>
+                  Logger.error(s"submitAnnualReturn: An error occurred due to ${e.getMessage}, returning internal server error")
+
+                  LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.EVENT)
+                  InternalServerError(Json.toJson(ErrorInternalServerError))
+              }
+            },
+            lisaManager = lisaManager
+          )
         }
       }
+  }
+
+  private val errors = Map[ReportLifeEventResponse, ErrorResponse](
+    ReportLifeEventAccountNotFoundResponse -> ErrorAccountNotFound,
+    ReportLifeEventAccountVoidResponse -> ErrorAccountAlreadyVoided,
+    ReportLifeEventAccountCancelledResponse -> ErrorAccountAlreadyCancelled,
+    ReportLifeEventMismatchResponse -> ErrorLifeEventMismatch,
+    ReportLifeEventAlreadySupersededResponse -> ErrorLifeEventAlreadySuperseded,
+    ReportLifeEventAlreadyExistsResponse -> ErrorLifeEventAlreadyExists
+  )
+
+  private def withValidData(req: AnnualReturn)
+                           (lisaManager: String, accountId: String)
+                           (callback: () => Future[Result])
+                           (implicit hc: HeaderCarrier, startTime: Long) = {
+    val errors = validator.validate(req)
+
+    if (errors.isEmpty) {
+      callback()
+    }
+    else {
+      auditService.audit(
+        auditType = "lifeEventNotRequested",
+        path = s"/manager/$lisaManager/accounts/$accountId/returns",
+        auditData = req.toStringMap ++ Map(ZREF -> lisaManager, "accountId" -> accountId, "reasonNotRequested" -> "FORBIDDEN")
+      )
+
+      LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.WITHDRAWAL_CHARGE)
+
+      Future.successful(Forbidden(Json.toJson(ErrorForbidden(errors.toList))))
+    }
   }
 
 }

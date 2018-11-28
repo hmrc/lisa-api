@@ -39,7 +39,7 @@ case class AnnualReturn (
   annualSubsCash: Int,
   annualSubsStocksAndShares: Int,
   supersede: Option[AnnualReturnSupersede] = None
-)
+) extends ReportLifeEventRequestBase
 
 object AnnualReturnSupersede {
   implicit val dateReads: Reads[DateTime] = JsonReads.notFutureDate
@@ -63,6 +63,8 @@ object AnnualReturn {
   )(AnnualReturn.apply _)
 
   implicit val writes = Json.writes[AnnualReturn]
+
+  val desWrites = writes
 }
 
 trait AnnualReturnValidator extends LisaConstants {
