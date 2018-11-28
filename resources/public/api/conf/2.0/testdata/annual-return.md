@@ -64,7 +64,7 @@
   "success": true,
   "data": {
     "message": "Life event superseded",
-    "lifeEventId": "6789000002"
+    "lifeEventId": "7890000002"
   }
 }
 </pre>
@@ -139,6 +139,16 @@
   "message": "Bad Request",
   "errors": [
     {
+      "code": "INVALID_DATA_TYPE",
+      "message": "Invalid data type has been used",
+      "path": "/taxYear"
+    },
+    {
+      "code": "INVALID_DATA_TYPE",
+      "message": "Invalid data type has been used",
+      "path": "/marketValueStocksAndShares"
+    },
+    {
       "code": "INVALID_DATE",
       "message": "Date is invalid",
       "path": "/eventDate"
@@ -147,11 +157,6 @@
       "code": "MISSING_FIELD",
       "message": "This field is required",
       "path": "/isaManagerName"
-    },
-    {
-      "code": "INVALID_MONETARY_AMOUNT",
-      "message": "Must be an amount rounded up to the nearest whole number with no decimal places",
-      "path": "/marketValueStocksAndShares"
     }
   ]
 }
