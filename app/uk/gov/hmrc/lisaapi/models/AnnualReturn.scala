@@ -62,6 +62,8 @@ object AnnualReturn {
     (JsPath \ "supersede").readNullable[AnnualReturnSupersede]
   )(AnnualReturn.apply _)
 
+  implicit val writes = Json.writes[AnnualReturn]
+
   val desWrites: Writes[AnnualReturn] = (
     (JsPath \ "eventType").write[String] and
     (JsPath \ "eventDate").write[DateTime] and

@@ -52,18 +52,21 @@ class AnnualReturnController extends LisaController with LisaConstants {
                     val message = if (req.supersede.isEmpty) "Life event created" else "Life event superseded"
                     val data = ApiResponseData(message = message, lifeEventId = Some(success.lifeEventId))
 
+                    audit(lisaManager, accountId, req)
                     LisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.EVENT)
                     Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
                   case error: ReportLifeEventResponse =>
-                    val response = errors.getOrElse(error, ErrorInternalServerError).asResult
+                    val response = errors.getOrElse(error, ErrorInternalServerError)
 
-                    LisaMetrics.incrementMetrics(startTime, response.header.status, LisaMetricKeys.EVENT)
-                    response
+                    audit(lisaManager, accountId, req, Some(response.errorCode))
+                    LisaMetrics.incrementMetrics(startTime, response.httpStatusCode, LisaMetricKeys.EVENT)
+                    response.asResult
                 }
               } recover {
                 case e: Exception =>
                   Logger.error(s"submitAnnualReturn: An error occurred due to ${e.getMessage}, returning internal server error")
 
+                  audit(lisaManager, accountId, req, Some("INTERNAL_SERVER_ERROR"))
                   LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.EVENT)
                   InternalServerError(Json.toJson(ErrorInternalServerError))
               }
@@ -72,6 +75,19 @@ class AnnualReturnController extends LisaController with LisaConstants {
           )
         }
       }
+  }
+
+  private def audit(lisaManager: String, accountId: String, req: AnnualReturn, failureCode: Option[String] = None)
+                   (implicit hc: HeaderCarrier) = {
+    val (auditType, auditData) = failureCode match {
+      case Some(code) => ("lifeEventNotRequested", req.toStringMap ++ Map("reasonNotRequested" -> code))
+      case _ => ("lifeEventRequested", req.toStringMap)
+    }
+    auditService.audit(
+      auditType = auditType,
+      path = s"/manager/$lisaManager/accounts/$accountId/returns",
+      auditData = auditData ++ Map(ZREF -> lisaManager, ACCOUNTID -> accountId, "eventType" -> "Statutory Submission")
+    )
   }
 
   private val errors = Map[ReportLifeEventResponse, ErrorResponse](
@@ -93,14 +109,8 @@ class AnnualReturnController extends LisaController with LisaConstants {
       callback()
     }
     else {
-      auditService.audit(
-        auditType = "lifeEventNotRequested",
-        path = s"/manager/$lisaManager/accounts/$accountId/returns",
-        auditData = req.toStringMap ++ Map(ZREF -> lisaManager, "accountId" -> accountId, "reasonNotRequested" -> "FORBIDDEN")
-      )
-
+      audit(lisaManager, accountId, req, Some("FORBIDDEN"))
       LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.WITHDRAWAL_CHARGE)
-
       Future.successful(Forbidden(Json.toJson(ErrorForbidden(errors.toList))))
     }
   }

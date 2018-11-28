@@ -85,7 +85,6 @@ trait LisaController extends BaseController with LisaConstants with RunMode with
               Try(success(payload)) match {
                 case Success(result) => result
                 case Failure(ex: Exception) => {
-                  ex.printStackTrace()
                   Logger.error(s"LisaController An error occurred in Json payload validation ${ex.getMessage}")
                   LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.getMetricKey(request.uri))
 

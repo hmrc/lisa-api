@@ -16,14 +16,14 @@
 
 package unit.controllers
 
-import org.mockito.Matchers.any
-import org.mockito.Mockito.{reset, when}
-import org.scalatest.BeforeAndAfter
+import org.joda.time.DateTime
+import org.mockito.Matchers.{eq => MatcherEquals, _}
+import org.mockito.Mockito.{reset, verify, when}
+import org.scalatest.BeforeAndAfterEach
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.Logger
 import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{AnyContentAsEmpty, AnyContentAsJson, Result}
+import play.api.mvc.{AnyContentAsJson, Result}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
@@ -39,15 +39,13 @@ import scala.concurrent.Future
 class AnnualReturnControllerSpec extends PlaySpec
   with MockitoSugar
   with OneAppPerSuite
-  with BeforeAndAfter
+  with BeforeAndAfterEach
   with LisaConstants {
 
-  val acceptHeaderV1 = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
-  val acceptHeaderV2 = (HeaderNames.ACCEPT, "application/vnd.hmrc.2.0+json")
-
-  before {
+  override def beforeEach() {
     reset(mockAuditService)
     reset(mockValidator)
+    reset(mockService)
 
     when(mockAuthCon.authorise[Option[String]](any(),any())(any(), any())).thenReturn(Future(Some("1234")))
     when(mockValidator.validate(any())).thenReturn(Nil)
@@ -55,10 +53,8 @@ class AnnualReturnControllerSpec extends PlaySpec
 
   "Submit annual return" must {
 
-    // TODO: Auditing
-
     "return 201 created" when {
-      "a success response is received from des" in {
+      "the life event service returns a ReportLifeEventSuccessResponse" in {
         when(mockService.reportLifeEvent(any(), any(),any())(any())).
           thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
 
@@ -74,17 +70,10 @@ class AnnualReturnControllerSpec extends PlaySpec
           )
         }
       }
-      "a success response is received from des for a superseded life event" in {
+      "the life event service returns a ReportLifeEventSuccessResponse for a superseded life event" in {
         when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
 
-        val payload = json ++ Json.obj(
-          "supersede" -> Json.obj(
-            "originalLifeEventId" -> "1234567890",
-            "originalEventDate" -> "2018-01-01"
-          )
-        )
-
-        doRequest(payload = payload){ res =>
+        doRequest(payload = supersedeJson){ res =>
           status(res) mustBe CREATED
           contentAsJson(res) mustBe Json.obj(
             "data" -> Json.obj(
@@ -134,11 +123,7 @@ class AnnualReturnControllerSpec extends PlaySpec
 
     "return 403 forbidden" when {
       "given a json payload which does not meet the business rules" in {
-        val errors = List(ErrorValidation(
-          DATE_ERROR,
-          "The taxYear cannot be before 2017",
-          Some("/taxYear")
-        ))
+        val errors = List(ErrorValidation(DATE_ERROR, "The taxYear cannot be before 2017", Some("/taxYear")))
         when(mockValidator.validate(any())).thenReturn(errors)
 
         doRequest() { res =>
@@ -160,7 +145,7 @@ class AnnualReturnControllerSpec extends PlaySpec
           )
         }
       }
-      "a ReportLifeEventAccountVoidResponse is returned from DES" in {
+      "the life event service returns a ReportLifeEventAccountVoidResponse" in {
         when(mockService.reportLifeEvent(any(), any(),any())(any())).
           thenReturn(Future.successful(ReportLifeEventAccountVoidResponse))
 
@@ -172,7 +157,7 @@ class AnnualReturnControllerSpec extends PlaySpec
           )
         }
       }
-      "a ReportLifeEventAccountCancelledResponse is returned from DES" in {
+      "the life event service returns a ReportLifeEventAccountCancelledResponse" in {
         when(mockService.reportLifeEvent(any(), any(),any())(any())).
           thenReturn(Future.successful(ReportLifeEventAccountCancelledResponse))
 
@@ -184,7 +169,7 @@ class AnnualReturnControllerSpec extends PlaySpec
           )
         }
       }
-      "a ReportLifeEventMismatchResponse is returned from DES" in {
+      "the life event service returns a ReportLifeEventMismatchResponse" in {
         when(mockService.reportLifeEvent(any(), any(),any())(any())).
           thenReturn(Future.successful(ReportLifeEventMismatchResponse))
 
@@ -196,7 +181,7 @@ class AnnualReturnControllerSpec extends PlaySpec
           )
         }
       }
-      "a ReportLifeEventAlreadySupersededResponse is returned from DES" in {
+      "the life event service returns a ReportLifeEventAlreadySupersededResponse" in {
         when(mockService.reportLifeEvent(any(), any(),any())(any())).
           thenReturn(Future.successful(ReportLifeEventAlreadySupersededResponse))
 
@@ -211,7 +196,7 @@ class AnnualReturnControllerSpec extends PlaySpec
     }
 
     "return 404 not found" when {
-      "a ReportLifeEventAccountNotFoundResponse is returned from DES" in {
+      "the life event service returns a ReportLifeEventAccountNotFoundResponse" in {
         when(mockService.reportLifeEvent(any(), any(),any())(any())).
           thenReturn(Future.successful(ReportLifeEventAccountNotFoundResponse))
 
@@ -234,7 +219,7 @@ class AnnualReturnControllerSpec extends PlaySpec
     }
 
     "return 409 conflict" when {
-      "a ReportLifeEventAlreadyExistsResponse is returned from DES" in {
+      "the life event service returns a ReportLifeEventAlreadyExistsResponse" in {
         when(mockService.reportLifeEvent(any(), any(),any())(any())).
           thenReturn(Future.successful(ReportLifeEventAlreadyExistsResponse))
 
@@ -249,7 +234,7 @@ class AnnualReturnControllerSpec extends PlaySpec
     }
 
     "return 500 internal server error" when {
-      "the life event service returns an error" in {
+      "the life event service returns a error" in {
         when(mockService.reportLifeEvent(any(), any(),any())(any())).
           thenReturn(Future.failed(new RuntimeException("Test")))
 
@@ -259,7 +244,7 @@ class AnnualReturnControllerSpec extends PlaySpec
           (contentAsJson(res) \ "message").as[String] mustBe ErrorInternalServerError.message
         }
       }
-      "the life event service returns an unexpected response" in {
+      "the life event service returns a unexpected response" in {
         when(mockService.reportLifeEvent(any(), any(),any())(any())).
           thenReturn(Future.successful(ReportLifeEventFundReleaseNotFoundResponse))
 
@@ -270,9 +255,120 @@ class AnnualReturnControllerSpec extends PlaySpec
       }
     }
 
+    "audit lifeEventRequested" when {
+      "the life event service returns a ReportLifeEventSuccessResponse" in {
+        when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
+
+        val payload = supersedeJson
+
+        doRequest(payload = payload) { res =>
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = MatcherEquals("lifeEventRequested"),
+            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/returns"),
+            auditData = MatcherEquals(Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountId" -> accountId,
+              "eventType" -> "Statutory Submission",
+              "eventDate" -> (payload \ "eventDate").as[DateTime].toString("yyyy-MM-dd"),
+              "isaManagerName" -> (payload \ "isaManagerName").as[String],
+              "taxYear" -> (payload \ "taxYear").as[Int].toString,
+              "marketValueCash" -> (payload \ "marketValueCash").as[Int].toString,
+              "marketValueStocksAndShares" -> (payload \ "marketValueStocksAndShares").as[Int].toString,
+              "annualSubsCash" -> (payload \ "annualSubsCash").as[Int].toString,
+              "annualSubsStocksAndShares" -> (payload \ "annualSubsStocksAndShares").as[Int].toString,
+              "originalLifeEventId" -> (payload \ "supersede" \ "originalLifeEventId").as[String],
+              "originalEventDate" -> (payload \ "supersede" \ "originalEventDate").as[String]
+            ))
+          )(any())
+        }
+      }
+    }
+
+    "audit lifeEventNotRequested" when {
+      "given a json payload which does not meet the business rules" in {
+        val errors = List(ErrorValidation(DATE_ERROR, "The taxYear cannot be before 2017", Some("/taxYear")))
+        when(mockValidator.validate(any())).thenReturn(errors)
+
+        doRequest() { res =>
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = MatcherEquals("lifeEventNotRequested"),
+            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/returns"),
+            auditData = MatcherEquals(Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountId" -> accountId,
+              "eventType" -> "Statutory Submission",
+              "eventDate" -> (json \ "eventDate").as[DateTime].toString("yyyy-MM-dd"),
+              "isaManagerName" -> (json \ "isaManagerName").as[String],
+              "taxYear" -> (json \ "taxYear").as[Int].toString,
+              "marketValueCash" -> (json \ "marketValueCash").as[Int].toString,
+              "marketValueStocksAndShares" -> (json \ "marketValueStocksAndShares").as[Int].toString,
+              "annualSubsCash" -> (json \ "annualSubsCash").as[Int].toString,
+              "annualSubsStocksAndShares" -> (json \ "annualSubsStocksAndShares").as[Int].toString,
+              "reasonNotRequested" -> "FORBIDDEN"
+            ))
+          )(any())
+        }
+      }
+      "the life event service returns a failure response" in {
+        when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventAccountNotFoundResponse))
+
+        doRequest() { res =>
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = MatcherEquals("lifeEventNotRequested"),
+            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/returns"),
+            auditData = MatcherEquals(Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountId" -> accountId,
+              "eventType" -> "Statutory Submission",
+              "eventDate" -> (json \ "eventDate").as[DateTime].toString("yyyy-MM-dd"),
+              "isaManagerName" -> (json \ "isaManagerName").as[String],
+              "taxYear" -> (json \ "taxYear").as[Int].toString,
+              "marketValueCash" -> (json \ "marketValueCash").as[Int].toString,
+              "marketValueStocksAndShares" -> (json \ "marketValueStocksAndShares").as[Int].toString,
+              "annualSubsCash" -> (json \ "annualSubsCash").as[Int].toString,
+              "annualSubsStocksAndShares" -> (json \ "annualSubsStocksAndShares").as[Int].toString,
+              "reasonNotRequested" -> "INVESTOR_ACCOUNTID_NOT_FOUND"
+            ))
+          )(any())
+        }
+      }
+      "the life event service returns a error" in {
+        when(mockService.reportLifeEvent(any(), any(),any())(any())).
+          thenReturn(Future.failed(new RuntimeException("Test")))
+
+        doRequest() { res =>
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = MatcherEquals("lifeEventNotRequested"),
+            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/returns"),
+            auditData = MatcherEquals(Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountId" -> accountId,
+              "eventType" -> "Statutory Submission",
+              "eventDate" -> (json \ "eventDate").as[DateTime].toString("yyyy-MM-dd"),
+              "isaManagerName" -> (json \ "isaManagerName").as[String],
+              "taxYear" -> (json \ "taxYear").as[Int].toString,
+              "marketValueCash" -> (json \ "marketValueCash").as[Int].toString,
+              "marketValueStocksAndShares" -> (json \ "marketValueStocksAndShares").as[Int].toString,
+              "annualSubsCash" -> (json \ "annualSubsCash").as[Int].toString,
+              "annualSubsStocksAndShares" -> (json \ "annualSubsStocksAndShares").as[Int].toString,
+              "reasonNotRequested" -> "INTERNAL_SERVER_ERROR"
+            ))
+          )(any())
+        }
+      }
+    }
+
   }
 
-  val json = Json.obj(
+  private val acceptHeaderV1 = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
+  private val acceptHeaderV2 = (HeaderNames.ACCEPT, "application/vnd.hmrc.2.0+json")
+  private val lisaManager = "Z123456"
+  private val accountId = "1234567890"
+  private val json = Json.obj(
     "eventDate" -> "2018-04-05",
     "isaManagerName" -> "ISA Manager 1",
     "taxYear" -> 2018,
@@ -281,8 +377,14 @@ class AnnualReturnControllerSpec extends PlaySpec
     "annualSubsCash" -> 0,
     "annualSubsStocksAndShares" -> 55
   )
+  private val supersedeJson = json ++ Json.obj(
+    "supersede" -> Json.obj(
+      "originalLifeEventId" -> "1234567890",
+      "originalEventDate" -> "2018-01-01"
+    )
+  )
 
-  private def doRequest(lmrn: String = "Z123456", accountId: String = "1234567890", acceptHeader: (String, String) = acceptHeaderV2, payload: JsValue = json)
+  private def doRequest(lmrn: String = lisaManager, accountId: String = accountId, acceptHeader: (String, String) = acceptHeaderV2, payload: JsValue = json)
                        (callback: (Future[Result]) =>  Unit): Unit = {
     val req = FakeRequest(Helpers.POST, "/")
     val res = SUT.submitReturn(lmrn, accountId).apply(req.withHeaders(acceptHeader).withBody(AnyContentAsJson(payload)))
@@ -290,12 +392,12 @@ class AnnualReturnControllerSpec extends PlaySpec
     callback(res)
   }
 
-  val mockService: LifeEventService = mock[LifeEventService]
-  val mockAuditService: AuditService = mock[AuditService]
-  val mockAuthCon: LisaAuthConnector = mock[LisaAuthConnector]
-  val mockValidator: AnnualReturnValidator = mock[AnnualReturnValidator]
+  private val mockService: LifeEventService = mock[LifeEventService]
+  private val mockAuditService: AuditService = mock[AuditService]
+  private val mockAuthCon: LisaAuthConnector = mock[LisaAuthConnector]
+  private val mockValidator: AnnualReturnValidator = mock[AnnualReturnValidator]
 
-  val SUT = new AnnualReturnController {
+  private val SUT = new AnnualReturnController {
     override val authConnector = mockAuthCon
     override lazy val v2endpointsEnabled = true
     override val service: LifeEventService = mockService
