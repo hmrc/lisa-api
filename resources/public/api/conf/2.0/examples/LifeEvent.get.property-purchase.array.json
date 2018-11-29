@@ -1,0 +1,49 @@
+[
+  {
+    "lifeEventId": "3456789001",
+    "eventDate": "2017-05-10",
+    "eventType": "Funds release",
+    "withdrawalAmount": 4000.00,
+    "conveyancerReference": "CR12345-6789",
+    "propertyDetails": {
+      "nameOrNumber": "1",
+      "postalCode": "AA11 1AA"
+    },
+    "supersede": {
+      "originalEventDate": "2017-05-10",
+      "originalFundReleaseId": "3456789000"
+    }
+  },
+  {
+    "lifeEventId": "6789000002",
+    "eventDate": "2017-05-10",
+    "eventType": "Extension one",
+    "fundReleaseId": "3456789001",
+    "supersede": {
+      "originalEventDate": "2017-05-10",
+      "originalExtensionId": "6789000001"
+    }
+  },
+  {
+    "lifeEventId": "6789000004",
+    "eventDate": "2017-05-10",
+    "eventType": "Extension two",
+    "fundReleaseId": "3456789001",
+    "supersede": {
+      "originalEventDate": "2017-05-10",
+      "originalExtensionId": "6789000001"
+    }
+  },
+  {
+    "lifeEventId": "5678900001",
+    "eventDate": "2017-05-05",
+    "eventType": "Purchase outcome",
+    "fundReleaseId": "3456789001",
+    "propertyPurchaseResult": "Purchase completed",
+    "propertyPurchaseValue": 250000,
+    "supersede": {
+      "originalEventDate": "2017-05-05",
+      "originalPurchaseOutcomeId": "5678900001"
+    }
+  }
+]

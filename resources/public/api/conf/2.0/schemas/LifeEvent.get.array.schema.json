@@ -1,41 +1,129 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "array",
-  "minItems": 0,
+  "minItems": 1,
+  "maxItems": 4,
   "uniqueItems": true,
   "items": {
     "type": "object",
     "properties": {
       "lifeEventId": {
-        "$ref": "#/definitions/IDType"},
+        "$ref": "#/definitions/IDType",
+        "description": "The ID for the life event."
+      },
       "eventType" : {
-        "$ref": "#/definitions/eventType"},
+        "$ref": "#/definitions/eventType",
+        "description": "The type of event."
+      },
       "eventDate" : {
-        "$ref": "#/definitions/ISO8601-Date"}
+        "$ref": "#/definitions/ISO8601-Date",
+        "description": "This is the date the life event was reported."
+      },
+      "withdrawalAmount": {
+        "type": "number",
+        "description": "This is the amount that the investor has withdrawn from the LISA account."
+      },
+      "conveyancerReference": {
+        "description": "This is the reference for the conveyancer involved with the property purchase.",
+        "type": "string",
+        "pattern": "^[a-zA-Z0-9 :/-]{1,20}$",
+        "example": "CR12345-6789"
+      },
+      "propertyDetails": {
+        "type": "object",
+        "description": "The details of the property that you are requesting funds to buy.",
+        "properties": {
+          "nameOrNumber": {
+            "description": "The name or number of the property that you are requesting funds to buy.",
+            "type": "string",
+            "pattern": "^[A-Za-z0-9 :/-]{1,35}$",
+            "example": "Flat A"
+          },
+          "postalCode": {
+            "description": "The postcode of the property that you are requesting funds to buy.",
+            "type": "string",
+            "pattern": "^[A-Za-z0-9 ]{1,8}$",
+            "example": "AA1 1AA"
+          }
+        },
+        "required": [
+          "nameOrNumber",
+          "postalCode"
+        ],
+        "additionalProperties": false
+      },
+      "supersede": {
+        "type": "object",
+        "description": "Corrects an existing life event.",
+        "properties": {
+          "originalLifeEventId": {
+            "description": "The ID of the life event affected by the correction.",
+            "$ref": "#/definitions/IDType"
+          },
+          "originalFundReleaseId": {
+            "description": "The ID of the life event affected by the correction.",
+            "$ref": "#/definitions/IDType"
+          },
+          "originalExtensionId": {
+            "description": "The ID of the life event affected by the correction.",
+            "$ref": "#/definitions/IDType"
+          },
+          "originalPurchaseOutcomeId": {
+            "description": "The ID of the life event affected by the correction.",
+            "$ref": "#/definitions/IDType"
+          },
+          "originalEventDate": {
+            "description": "The eventDate of the life event affected by the correction.",
+            "$ref": "#/definitions/ISO8601-Date",
+            "example": "2017-05-11"
+          }
+        },
+        "required": [
+          "originalEventDate"
+        ],
+        "additionalProperties": false
+      },
+      "fundReleaseId": {
+        "$ref": "#/definitions/IDType",
+        "description": "The reference number you get when you report a fund release."
+      },
+      "propertyPurchaseValue": {
+        "type": "number",
+        "description": "The value of the property that the investor purchased. Only included if the purchase was completed."
+      },
+      "propertyPurchaseResult": {
+        "description": "Whether a property purchase was completed or failed.",
+        "type": "string",
+        "enum": ["Purchase failed", "Purchase completed"]
+      },
+      "supersededBy": {
+        "$ref": "#/definitions/IDType",
+        "description": "The ID of the transaction that supersedes the current one."
+      }
     },
+    "additionalProperties": false,
     "required": [
       "lifeEventId",
       "eventType",
       "eventDate"
-    ],
-    "additionalProperties": false,
-    "definitions":
-    {
-      "IDType": {
-        "type": "string",
-        "pattern": "^\\d{10}$",
-        "example": "0987654321"
-      },
-      "ISO8601-Date" : {
-        "id": "full-date",
-        "type": "string",
-        "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
-        "example": "2017-05-20"
-      },
-      "eventType" : {
-        "type" : "string",
-        "enum": ["LISA Investor Terminal Ill Health", "LISA Investor Death"]
-      }
+    ]
+  },
+  "definitions":
+  {
+    "IDType": {
+      "type": "string",
+      "pattern": "^\\d{10}$",
+      "example": "0987654321"
+    },
+    "ISO8601-Date" : {
+      "id": "full-date",
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+      "example": "2017-05-20"
+    },
+    "eventType" : {
+      "type" : "string",
+      "enum": ["LISA Investor Terminal Ill Health", "LISA Investor Death", "Funds release", "Extension one", "Extension two", "Purchase outcome"]
     }
   }
 }
