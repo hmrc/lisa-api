@@ -84,7 +84,7 @@ class AnnualReturnSpec extends PlaySpec
 
     val validJson = Json.obj(
       "eventDate" -> "2018-04-05",
-      "isaManagerName" -> "ISA Manager",
+      "lisaManagerName" -> "ISA Manager",
       "taxYear" -> 2018,
       "marketValueCash" -> 0,
       "marketValueStocksAndShares" -> 55,
@@ -95,7 +95,7 @@ class AnnualReturnSpec extends PlaySpec
     "serialize from json" in {
       val expected = AnnualReturn(
         eventDate = new DateTime("2018-04-05"),
-        isaManagerName = "ISA Manager",
+        lisaManagerName = "ISA Manager",
         taxYear = 2018,
         marketValueCash = 0,
         marketValueStocksAndShares = 55,
@@ -109,7 +109,7 @@ class AnnualReturnSpec extends PlaySpec
     "deserialize to json" in {
       val input = AnnualReturn(
         eventDate = new DateTime("2018-04-05"),
-        isaManagerName = "ISA Manager",
+        lisaManagerName = "ISA Manager",
         taxYear = 2018,
         marketValueCash = 0,
         marketValueStocksAndShares = 55,
@@ -133,26 +133,26 @@ class AnnualReturnSpec extends PlaySpec
         ((JsPath \ "eventDate"), List(ValidationError("error.formatting.date")))
       ))
     }
-    "ensure the isaManagerName is less than 50 characters" in {
+    "ensure the lisaManagerName is less than 50 characters" in {
       val tooLong = "123456789012345678901234567890123456789012345678901"
-      val invalidJson = validJson ++ Json.obj("isaManagerName" -> tooLong)
+      val invalidJson = validJson ++ Json.obj("lisaManagerName" -> tooLong)
 
       invalidJson.validate[AnnualReturn] mustBe JsError(errors = List(
-        ((JsPath \ "isaManagerName"), List(ValidationError("error.formatting.isaManagerName")))
+        ((JsPath \ "lisaManagerName"), List(ValidationError("error.formatting.lisaManagerName")))
       ))
     }
-    "ensure the isaManagerName doesn't have unexpected characters" in {
-      val invalidJson = validJson ++ Json.obj("isaManagerName" -> "?")
+    "ensure the lisaManagerName doesn't have unexpected characters" in {
+      val invalidJson = validJson ++ Json.obj("lisaManagerName" -> "?")
 
       invalidJson.validate[AnnualReturn] mustBe JsError(errors = List(
-        ((JsPath \ "isaManagerName"), List(ValidationError("error.formatting.isaManagerName")))
+        ((JsPath \ "lisaManagerName"), List(ValidationError("error.formatting.lisaManagerName")))
       ))
     }
-    "ensure the isaManagerName isn't empty" in {
-      val invalidJson = validJson ++ Json.obj("isaManagerName" -> "")
+    "ensure the lisaManagerName isn't empty" in {
+      val invalidJson = validJson ++ Json.obj("lisaManagerName" -> "")
 
       invalidJson.validate[AnnualReturn] mustBe JsError(errors = List(
-        ((JsPath \ "isaManagerName"), List(ValidationError("error.formatting.isaManagerName")))
+        ((JsPath \ "lisaManagerName"), List(ValidationError("error.formatting.lisaManagerName")))
       ))
     }
     "ensure the taxYear is four figures - it must be less than 10000" in {
@@ -224,7 +224,7 @@ class AnnualReturnSpec extends PlaySpec
     "require all fields except supersede" in {
       val expectedErrors = List(
         ((JsPath \ "eventDate"), List(ValidationError("error.path.missing"))),
-        ((JsPath \ "isaManagerName"), List(ValidationError("error.path.missing"))),
+        ((JsPath \ "lisaManagerName"), List(ValidationError("error.path.missing"))),
         ((JsPath \ "taxYear"), List(ValidationError("error.path.missing"))),
         ((JsPath \ "marketValueCash"), List(ValidationError("error.path.missing"))),
         ((JsPath \ "marketValueStocksAndShares"), List(ValidationError("error.path.missing"))),
@@ -258,7 +258,7 @@ class AnnualReturnSpec extends PlaySpec
     "return no errors for a valid return" in {
       val req = AnnualReturn(
         eventDate = new DateTime("2018-04-05"),
-        isaManagerName = "ISA Manager",
+        lisaManagerName = "ISA Manager",
         taxYear = 2018,
         marketValueCash = 0,
         marketValueStocksAndShares = 55,
@@ -271,7 +271,7 @@ class AnnualReturnSpec extends PlaySpec
     "return an error for a taxYear before the start of lisa" in {
       val req = AnnualReturn(
         eventDate = new DateTime("2018-04-05"),
-        isaManagerName = "ISA Manager",
+        lisaManagerName = "ISA Manager",
         taxYear = 2016,
         marketValueCash = 0,
         marketValueStocksAndShares = 55,
@@ -284,7 +284,7 @@ class AnnualReturnSpec extends PlaySpec
     "return an error for a taxYear after the current year" in {
       val req = AnnualReturn(
         eventDate = new DateTime("2018-04-05"),
-        isaManagerName = "ISA Manager",
+        lisaManagerName = "ISA Manager",
         taxYear = DateTime.now.plusYears(1).getYear,
         marketValueCash = 0,
         marketValueStocksAndShares = 55,
@@ -297,7 +297,7 @@ class AnnualReturnSpec extends PlaySpec
     "return an error if marketValueCash and marketValueStocksAndShares are specified" in {
       val req = AnnualReturn(
         eventDate = new DateTime("2018-04-05"),
-        isaManagerName = "ISA Manager",
+        lisaManagerName = "ISA Manager",
         taxYear = 2018,
         marketValueCash = 55,
         marketValueStocksAndShares = 55,
@@ -313,7 +313,7 @@ class AnnualReturnSpec extends PlaySpec
     "return an error if annualSubsCash and annualSubsStocksAndShares are specified" in {
       val req = AnnualReturn(
         eventDate = new DateTime("2018-04-05"),
-        isaManagerName = "ISA Manager",
+        lisaManagerName = "ISA Manager",
         taxYear = 2018,
         marketValueCash = 0,
         marketValueStocksAndShares = 0,
@@ -329,7 +329,7 @@ class AnnualReturnSpec extends PlaySpec
     "return an error if a mix of cash and stocks and shares are specified" in {
       val req = AnnualReturn(
         eventDate = new DateTime("2018-04-05"),
-        isaManagerName = "ISA Manager",
+        lisaManagerName = "ISA Manager",
         taxYear = 2018,
         marketValueCash = 55,
         marketValueStocksAndShares = 0,

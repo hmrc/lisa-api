@@ -32,7 +32,7 @@ case class AnnualReturnSupersede (
 
 case class AnnualReturn (
   eventDate: DateTime,
-  isaManagerName: IsaManagerName,
+  lisaManagerName: LisaManagerName,
   taxYear: Int,
   marketValueCash: Int,
   marketValueStocksAndShares: Int,
@@ -53,7 +53,7 @@ object AnnualReturn {
 
   implicit val reads: Reads[AnnualReturn] = (
     (JsPath \ "eventDate").read(JsonReads.notFutureDate) and
-    (JsPath \ "isaManagerName").read(JsonReads.isaManagerName) and
+    (JsPath \ "lisaManagerName").read(JsonReads.isaManagerName) and
     (JsPath \ "taxYear").read(JsonReads.taxYearReads) and
     (JsPath \ "marketValueCash").read(JsonReads.annualFigures) and
     (JsPath \ "marketValueStocksAndShares").read(JsonReads.annualFigures) and
@@ -89,7 +89,7 @@ object AnnualReturn {
       "Statutory Submission",
       req.eventDate,
       req.taxYear,
-      req.isaManagerName,
+      req.lisaManagerName,
       req.marketValueCash,
       req.marketValueStocksAndShares,
       req.annualSubsCash,

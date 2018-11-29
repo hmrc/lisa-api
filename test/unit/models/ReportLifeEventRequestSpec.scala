@@ -190,7 +190,7 @@ class ReportLifeEventRequestSpec extends PlaySpec {
     "correctly serialise a standard annual return" in {
       val input = AnnualReturn(
         eventDate = new DateTime("2018-04-05"),
-        isaManagerName = "ISA Manager",
+        lisaManagerName = "ISA Manager",
         taxYear = 2018,
         marketValueCash = 0,
         marketValueStocksAndShares = 65,
@@ -213,7 +213,7 @@ class ReportLifeEventRequestSpec extends PlaySpec {
     "correctly serialise a superseded annual return" in {
       val input = AnnualReturn(
         eventDate = new DateTime("2018-04-05"),
-        isaManagerName = "ISA Manager",
+        lisaManagerName = "ISA Manager",
         taxYear = 2018,
         marketValueCash = 0,
         marketValueStocksAndShares = 65,

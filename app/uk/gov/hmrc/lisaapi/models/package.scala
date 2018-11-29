@@ -41,7 +41,7 @@ package object models {
   type PropertyPurchaseResult = String
   type FundReleaseId = String
   type ExtensionId = String
-  type IsaManagerName = String
+  type LisaManagerName = String
 
   private val MIN_AMOUNT = BigDecimal("-99999999999999.98")
   private val MAX_AMOUNT = BigDecimal("99999999999999.98")
@@ -95,7 +95,7 @@ package object models {
       "^(Purchase failed|Purchase completed)$".r,
       "error.formatting.propertyPurchaseResult"
     )
-    val isaManagerName: Reads[IsaManagerName] = Reads.pattern("^[a-zA-Z0-9 '/,&().-]{1,50}$".r, "error.formatting.isaManagerName")
+    val isaManagerName: Reads[LisaManagerName] = Reads.pattern("^[a-zA-Z0-9 '/,&().-]{1,50}$".r, "error.formatting.lisaManagerName")
     val taxYearReads: Reads[Int] = Reads.filter[Int](ValidationError("error.formatting.taxYear"))((p:Int) => p > 999 && p < 10000)
     val annualFigures: Reads[Int] = Reads.filter[Int](ValidationError("error.formatting.annualFigures"))((p:Int) => p >= 0)
 
