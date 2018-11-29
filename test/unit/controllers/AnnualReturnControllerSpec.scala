@@ -181,18 +181,6 @@ class AnnualReturnControllerSpec extends PlaySpec
           )
         }
       }
-      "the life event service returns a ReportLifeEventAlreadySupersededResponse" in {
-        when(mockService.reportLifeEvent(any(), any(),any())(any())).
-          thenReturn(Future.successful(ReportLifeEventAlreadySupersededResponse))
-
-        doRequest(){ res =>
-          status(res) mustBe FORBIDDEN
-          contentAsJson(res) mustBe Json.obj(
-            "code" -> "SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED",
-            "message" -> "This life event has already been superseded"
-          )
-        }
-      }
     }
 
     "return 404 not found" when {
@@ -228,6 +216,18 @@ class AnnualReturnControllerSpec extends PlaySpec
           contentAsJson(res) mustBe Json.obj(
             "code" -> "LIFE_EVENT_ALREADY_EXISTS",
             "message" -> "The investor’s life event has already been reported"
+          )
+        }
+      }
+      "the life event service returns a ReportLifeEventAlreadySupersededResponse" in {
+        when(mockService.reportLifeEvent(any(), any(),any())(any())).
+          thenReturn(Future.successful(ReportLifeEventAlreadySupersededResponse))
+
+        doRequest(){ res =>
+          status(res) mustBe CONFLICT
+          contentAsJson(res) mustBe Json.obj(
+            "code" -> "SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED",
+            "message" -> "This life event has already been superseded"
           )
         }
       }

@@ -408,9 +408,13 @@
   "lisaManagerName": "LISA Manager",
   "taxYear": 2018,
   "marketValueCash": 0,
-  "marketValueStocksAndShares": 55,
+  "marketValueStocksAndShares": 65,
   "annualSubsCash": 0,
-  "annualSubsStocksAndShares": 55
+  "annualSubsStocksAndShares": 65,
+  "supersede": {
+    "originalLifeEventId": "7890000001",
+    "originalEventDate": "2018-04-05"
+  }
 }
 </pre>
             </td>

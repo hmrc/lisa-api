@@ -211,7 +211,7 @@ case object ErrorOutcomeAlreadyExists extends ErrorResponse(409, "PURCHASE_OUTCO
 case object ErrorOutcomeAlreadySuperseded extends ErrorResponse(409, "SUPERSEDED_PURCHASE_OUTCOME_ALREADY_SUPERSEDED", "This purchase outcome has already been superseded")
 
 case object ErrorLifeEventMismatch extends ErrorResponse(403, "SUPERSEDED_LIFE_EVENT_MISMATCH_ERROR", "originalLifeEventId and the originalEventDate do not match the information in the original request")
-case object ErrorLifeEventAlreadySuperseded extends ErrorResponse(403, "SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED", "This life event has already been superseded")
+case object ErrorLifeEventAlreadySuperseded extends ErrorResponse(409, "SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED", "This life event has already been superseded")
 
 object ErrorInvestorAlreadyExists {
 
