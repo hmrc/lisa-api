@@ -128,10 +128,6 @@ trait LisaController extends BaseController with LisaConstants with RunMode with
       LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.getMetricKey(request.uri))
       Future.successful(InternalServerError(toJson(ErrorInternalServerError)))
   }
-
-  def todo(id: String, accountId: String): Action[AnyContent] = Action.async { _ =>
-    Future.successful(NotImplemented(Json.toJson(ErrorNotImplemented)))
-  }
 }
 
 

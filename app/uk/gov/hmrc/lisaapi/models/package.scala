@@ -95,7 +95,7 @@ package object models {
       "^(Purchase failed|Purchase completed)$".r,
       "error.formatting.propertyPurchaseResult"
     )
-    val isaManagerName: Reads[LisaManagerName] = Reads.pattern("^[a-zA-Z0-9 '/,&().-]{1,50}$".r, "error.formatting.lisaManagerName")
+    val lisaManagerName: Reads[LisaManagerName] = Reads.pattern("^[a-zA-Z0-9 '/,&().-]{1,50}$".r, "error.formatting.lisaManagerName")
     val taxYearReads: Reads[Int] = Reads.filter[Int](ValidationError("error.formatting.taxYear"))((p:Int) => p > 999 && p < 10000)
     val annualFigures: Reads[Int] = Reads.filter[Int](ValidationError("error.formatting.annualFigures"))((p:Int) => p >= 0)
 

@@ -53,7 +53,7 @@ object AnnualReturn {
 
   implicit val reads: Reads[AnnualReturn] = (
     (JsPath \ "eventDate").read(JsonReads.notFutureDate) and
-    (JsPath \ "lisaManagerName").read(JsonReads.isaManagerName) and
+    (JsPath \ "lisaManagerName").read(JsonReads.lisaManagerName) and
     (JsPath \ "taxYear").read(JsonReads.taxYearReads) and
     (JsPath \ "marketValueCash").read(JsonReads.annualFigures) and
     (JsPath \ "marketValueStocksAndShares").read(JsonReads.annualFigures) and
