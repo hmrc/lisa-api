@@ -758,6 +758,123 @@ types:
                                     "code" : "LIFE_EVENT_ALREADY_EXISTS",
                                     "message" : "The investor’s life event has already been reported"
                               }
+                /returns:
+                  post:
+                    is: [headers.acceptHeader, headers.contentHeader]
+                    displayName: Send an annual return of information
+                    description: Report details to HMRC about LISA accounts you managed in the last tax year. You can also correct a previous return of information. You cannot send or correct a return of information if the investor account is cancelled or void.
+                    (annotations.scope): "write:lisa"
+                    (annotations.sandboxData): !include testdata/annual-return.md
+                    securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
+                    body:
+                      application/json:
+                        type: !include schemas/AnnualReturn.post.schema.json
+                        examples:
+                            initial-return: !include examples/AnnualReturn.post.json
+                            supersede-return: !include examples/AnnualReturnSuperseded.post.json
+                    responses:
+                      201:
+                        description: The LifeEvent resource has been created.
+                        body:
+                          application/json:
+                              type: !include schemas/AnnualReturn.post.response.schema.json
+                              example: !include examples/AnnualReturn.post.response.json
+                      400:
+                        body:
+                          application/json:
+                            type: !include schemas/ErrorCodes.schema.json
+                            examples:
+                              notOpenStatus:
+                                description: Bad Request
+                                value: |
+                                  {
+                                    "code" : "BAD_REQUEST",
+                                    "message" : "Bad Request"
+                                  }
+                              InvalidLmrn:
+                                description: lisaManagerReferenceNumber in the URL is in the wrong format
+                                value: |
+                                  {
+                                    "code" : "BAD_REQUEST",
+                                    "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
+                                  }
+                              InvalidAccountId:
+                                description: accountId in the URL is in the wrong format
+                                value: |
+                                  {
+                                    "code" : "BAD_REQUEST",
+                                    "message" : "accountId in the URL is in the wrong format"
+                                  }
+                      401:
+                        body:
+                          application/json:
+                            type: !include schemas/ErrorCodes.schema.json
+                            examples:
+                              notOpenStatus:
+                                description: lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
+                                value: |
+                                  {
+                                    "code" : "UNAUTHORIZED",
+                                    "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
+                                  }
+                      403:
+                        body:
+                          application/json:
+                            type: !include schemas/ErrorCodes.schema.json
+                            examples:
+                              accountVoid:
+                                description: The LISA account is already void
+                                value: |
+                                  {
+                                    "code" : "INVESTOR_ACCOUNT_ALREADY_VOID",
+                                    "message" : "The LISA account is already void"
+                                  }
+                              accountCancelled:
+                                description: The LISA account is already cancelled
+                                value: |
+                                  {
+                                    "code" : "INVESTOR_ACCOUNT_ALREADY_CANCELLED",
+                                    "message" : "The LISA account is already cancelled"
+                                  }
+                              supersedingLifeEventMisMatchError:
+                                description: originalLifeEventId and the originalEventDate do not match the information in the original request
+                                value: |
+                                  {
+                                    "code" : "SUPERSEDED_LIFE_EVENT_MISMATCH_ERROR",
+                                    "message" : "originalLifeEventId and the originalEventDate do not match the information in the original request"
+                                  }
+                      404:
+                        body:
+                          application/json:
+                            type: !include schemas/ErrorCodes.schema.json
+                            examples:
+                              accountIdNOTFound:
+                                description: The accountId does not match HMRC’s records
+                                value: |
+                                  {
+                                    "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
+                                    "message": "The accountId does not match HMRC’s records"
+                                  }
+                      409:
+                        body:
+                          application/json:
+                            description: The investor’s life event has already been reported
+                            type: !include schemas/ErrorCodes.schema.json
+                            examples:
+                              supersedingLifeEventAlreadySuperseded:
+                                description: This life event has already been superseded
+                                value: |
+                                  {
+                                    "code" : "SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED",
+                                    "message" : "This life event has already been superseded"
+                                  }
+                              lifeEventExists:
+                                description: The investor’s life event has already been reported
+                                value: |
+                                  {
+                                        "code" : "LIFE_EVENT_ALREADY_EXISTS",
+                                        "message" : "The investor’s life event has already been reported"
+                                  }
                 /property-purchase:
                   (annotations.group):
                     name: Property purchases

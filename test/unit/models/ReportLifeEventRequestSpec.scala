@@ -187,6 +187,60 @@ class ReportLifeEventRequestSpec extends PlaySpec {
       )
     }
 
+    "correctly serialise a standard annual return" in {
+      val input = AnnualReturn(
+        eventDate = new DateTime("2018-04-05"),
+        lisaManagerName = "ISA Manager",
+        taxYear = 2018,
+        marketValueCash = 0,
+        marketValueStocksAndShares = 65,
+        annualSubsCash = 0,
+        annualSubsStocksAndShares = 55
+      )
+
+      Json.toJson[ReportLifeEventRequestBase](input) mustBe Json.obj(
+        "eventType" -> "Statutory Submission",
+        "eventDate" -> "2018-04-05",
+        "isaManagerName" -> "ISA Manager",
+        "lisaAnnualCashSubs" -> 0,
+        "lisaAnnualStocksAndSharesSubs" -> 55,
+        "lisaMarketValueCash" -> 0,
+        "lisaMarketValueStocksAndShares" -> 65,
+        "taxYear" -> 2018
+      )
+    }
+
+    "correctly serialise a superseded annual return" in {
+      val input = AnnualReturn(
+        eventDate = new DateTime("2018-04-05"),
+        lisaManagerName = "ISA Manager",
+        taxYear = 2018,
+        marketValueCash = 0,
+        marketValueStocksAndShares = 65,
+        annualSubsCash = 0,
+        annualSubsStocksAndShares = 55,
+        supersede = Some(
+          AnnualReturnSupersede(
+            originalLifeEventId = "1234567890",
+            originalEventDate = new DateTime("2017-04-01")
+          )
+        )
+      )
+
+      Json.toJson[ReportLifeEventRequestBase](input) mustBe Json.obj(
+        "eventType" -> "Statutory Submission",
+        "eventDate" -> "2018-04-05",
+        "isaManagerName" -> "ISA Manager",
+        "lisaAnnualCashSubs" -> 0,
+        "lisaAnnualStocksAndSharesSubs" -> 55,
+        "lisaMarketValueCash" -> 0,
+        "lisaMarketValueStocksAndShares" -> 65,
+        "taxYear" -> 2018,
+        "supersededLifeEventID" -> "1234567890",
+        "supersededLifeEventDate" -> "2017-04-01"
+      )
+    }
+
   }
 
 }

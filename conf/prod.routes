@@ -13,6 +13,7 @@ POST      /manager/:id/accounts/:accountId/close-account                        
 POST      /manager/:id/accounts/reinstate-account                                   @uk.gov.hmrc.lisaapi.controllers.ReinstateAccountController.reinstateAccount(id: String)
 POST      /manager/:id/accounts/:accountId/update-subscription                      @uk.gov.hmrc.lisaapi.controllers.UpdateSubscriptionController.updateSubscription(id: String, accountId: String)
 POST      /manager/:id/accounts/:accountId/events                                   @uk.gov.hmrc.lisaapi.controllers.LifeEventController.reportLisaLifeEvent(id: String, accountId: String)
+POST      /manager/:id/accounts/:accountId/returns                                  @uk.gov.hmrc.lisaapi.controllers.AnnualReturnController.submitReturn(id: String, accountId: String)
 #GET       /manager/:id/accounts/:accountId/events/:eventId                         @uk.gov.hmrc.lisaapi.controllers.LifeEventController.getLifeEvent(id: String, accountId: String, eventId: String)
 POST      /manager/:id/accounts/:accountId/property-purchase                        @uk.gov.hmrc.lisaapi.controllers.PropertyPurchaseController.requestFundRelease(id: String, accountId: String)
 POST      /manager/:id/accounts/:accountId/property-purchase/extension              @uk.gov.hmrc.lisaapi.controllers.PropertyPurchaseController.requestExtension(id: String, accountId: String)

@@ -1,0 +1,80 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "eventDate": {
+      "description": "The date the return of information is sent. This cannot be in the future.",
+      "$ref": "#/definitions/ISO8601-Date"
+    },
+    "lisaManagerName": {
+      "type": "string",
+      "description": "The name of the LISA manager.",
+      "maxLength": 50,
+      "pattern": "^[a-zA-Z0-9 '/,&().-]{1,50}$"
+    },
+    "taxYear": {
+      "type": "integer",
+      "description": "The tax year for the return of information. Give the year that the tax year ends in. For example, for the 2017 to 2018 tax year give 2018.",
+      "min": 2017,
+      "pattern": "^[0-9]{4}$",
+      "example": "2018"
+    },
+    "marketValueCash": {
+      "$ref": "#/definitions/MarketValue",
+      "description": "The total value of the cash LISA account. Give the value to the nearest whole pound. Do not include decimal places. For example, send 54.56 as 55. If you give a value for marketValueCash, do not give a value for marketValueStocksAndShares."
+    },
+    "marketValueStocksAndShares": {
+      "$ref": "#/definitions/MarketValue",
+      "description": "The total value of the stocks and shares LISA account. Give the value to the nearest whole pound. Do not include decimal places. For example, send 54.56 as 55. If you give a value for marketValueStocksAndShares, do not give a value for marketValueCash."
+    },
+    "annualSubsCash": {
+      "$ref": "#/definitions/AnnualSubs",
+      "description": "The total value of subscriptions that the investor deposited into their cash LISA account during the tax year. Give the value to the nearest whole pound. Do not include decimal places. For example, send 54.56 as 55. If you give a value for annualSubsCash, do not give a value for annualSubsStocksAndShares."
+    },
+    "annualSubsStocksAndShares": {
+      "$ref": "#/definitions/AnnualSubs",
+      "description": "The total value of subscriptions that the investor deposited into their stocks and shares LISA account during the tax year. Give the value to the nearest whole pound. Do not include decimal places. For example, send 54.56 as 55. If you give a value for annualSubsStocksAndShares, do not give a value for annualSubsCash."
+    },
+    "supersede": {
+      "type": "object",
+      "description": "Correct an existing return of information.",
+      "properties": {
+        "originalLifeEventId": {
+          "type": "string",
+          "description": "The lifeEventId of the original return of information affected by the correction. This is used together with the originalEventDate to make sure the right return of information is replaced.",
+          "pattern": "^\\d{10}$"
+        },
+        "originalEventDate": {
+          "$ref": "#/definitions/ISO8601-Date",
+          "description": "The eventDate of the original return of information affected by the correction."
+        }
+      },
+      "required": ["originalLifeEventId", "originalEventDate"],
+      "additionalProperties": false
+    }
+  },
+  "required": ["eventDate", "lisaManagerName", "taxYear"],
+  "additionalProperties": false,
+  "definitions": {
+    "ISO8601-Date" : {
+      "id": "full-date",
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+      "example": "2018-03-31"
+    },
+    "AnnualSubs": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9999,
+      "pattern": "^[0-9]{1,4}$",
+      "example": "100"
+    },
+    "MarketValue": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 999999,
+      "pattern": "^[0-9]{1,6}$",
+      "example": "1000"
+    }
+  }
+}

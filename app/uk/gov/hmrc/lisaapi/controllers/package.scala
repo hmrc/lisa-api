@@ -38,6 +38,7 @@ package object controllers {
 }
 
 trait LisaConstants {
+  val ACCOUNTID: String = "accountId"
   val ZREF: String = "lisaManagerReferenceNumber"
   val NOTIFICATION:String  = "lateNotification"
   val DATE_ERROR = "INVALID_DATE"
