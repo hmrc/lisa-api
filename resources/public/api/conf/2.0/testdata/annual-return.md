@@ -16,7 +16,7 @@
 <pre class="code--block">
 {
   "eventDate": "2018-04-05",
-  "lisaManagerName": "LISA Manager",
+  "lisaManagerName": "Company Name",
   "taxYear": 2018,
   "marketValueCash": 0,
   "marketValueStocksAndShares": 55,
@@ -44,7 +44,7 @@
 <pre class="code--block">
 {
   "eventDate": "2018-04-05",
-  "lisaManagerName": "LISA Manager",
+  "lisaManagerName": "Company Name",
   "taxYear": 2018,
   "marketValueCash": 0,
   "marketValueStocksAndShares": 65,
@@ -76,7 +76,7 @@
 <pre class="code--block">
 {
   "eventDate": "2018-04-05",
-  "lisaManagerName": "LISA Manager",
+  "lisaManagerName": "Company Name",
   "taxYear": 2018,
   "marketValueCash": 0,
   "marketValueStocksAndShares": 55,
@@ -100,7 +100,7 @@
 <pre class="code--block">
 {
   "eventDate": "2018-04-05",
-  "lisaManagerName": "LISA Manager",
+  "lisaManagerName": "Company Name",
   "taxYear": 2018,
   "marketValueCash": 0,
   "marketValueStocksAndShares": 55,
@@ -169,7 +169,7 @@
 <pre class="code--block">
 {
   "eventDate": "2018-04-05",
-  "lisaManagerName": "LISA Manager",
+  "lisaManagerName": "Company Name",
   "taxYear": 2018,
   "marketValueCash": 0,
   "marketValueStocksAndShares": 55,
@@ -205,7 +205,7 @@
 <pre class="code--block">
 {
   "eventDate": "2018-04-05",
-  "lisaManagerName": "LISA Manager",
+  "lisaManagerName": "Company Name",
   "taxYear": 2016,
   "marketValueCash": 0,
   "marketValueStocksAndShares": 55,
@@ -236,7 +236,7 @@
 <pre class="code--block">
 {
   "eventDate": "2018-04-05",
-  "lisaManagerName": "LISA Manager",
+  "lisaManagerName": "Company Name",
   "taxYear": 3000,
   "marketValueCash": 0,
   "marketValueStocksAndShares": 55,
@@ -267,7 +267,7 @@
 <pre class="code--block">
 {
   "eventDate": "2018-04-05",
-  "lisaManagerName": "LISA Manager",
+  "lisaManagerName": "Company Name",
   "taxYear": 2018,
   "marketValueCash": 0,
   "marketValueStocksAndShares": 55,
@@ -291,7 +291,7 @@
 <pre class="code--block">
 {
   "eventDate": "2018-04-05",
-  "lisaManagerName": "LISA Manager",
+  "lisaManagerName": "Company Name",
   "taxYear": 2018,
   "marketValueCash": 0,
   "marketValueStocksAndShares": 55,
@@ -322,7 +322,7 @@
 <pre class="code--block">
 {
   "eventDate": "2018-04-05",
-  "lisaManagerName": "LISA Manager",
+  "lisaManagerName": "Company Name",
   "taxYear": 2018,
   "marketValueCash": 0,
   "marketValueStocksAndShares": 65,
@@ -350,7 +350,7 @@
 <pre class="code--block">
 {
   "eventDate": "2018-04-05",
-  "lisaManagerName": "LISA Manager",
+  "lisaManagerName": "Company Name",
   "taxYear": 2018,
   "marketValueCash": 0,
   "marketValueStocksAndShares": 55,
@@ -374,7 +374,7 @@
 <pre class="code--block">
 {
   "eventDate": "2018-04-05",
-  "lisaManagerName": "LISA Manager",
+  "lisaManagerName": "Company Name",
   "taxYear": 2018,
   "marketValueCash": 0,
   "marketValueStocksAndShares": 55,
@@ -405,7 +405,7 @@
 <pre class="code--block">
 {
   "eventDate": "2018-04-05",
-  "lisaManagerName": "LISA Manager",
+  "lisaManagerName": "Company Name",
   "taxYear": 2018,
   "marketValueCash": 0,
   "marketValueStocksAndShares": 65,
@@ -433,7 +433,7 @@
 <pre class="code--block">
 {
   "eventDate": "2018-04-05",
-  "lisaManagerName": "LISA Manager",
+  "lisaManagerName": "Company Name",
   "taxYear": 2018,
   "marketValueCash": 0,
   "marketValueStocksAndShares": 55,
