@@ -30,6 +30,7 @@ object ReportLifeEventRequestBase {
     case fundRelease: RequestFundReleaseRequest => RequestFundReleaseRequest.desWrites.writes(fundRelease)
     case purchaseExtension: RequestPurchaseExtension => RequestPurchaseExtension.desWrites.writes(purchaseExtension)
     case purchaseOutcome: RequestPurchaseOutcomeRequest => RequestPurchaseOutcomeRequest.desWrites.writes(purchaseOutcome)
+    case annualReturn: AnnualReturn => AnnualReturn.desWrites.writes(annualReturn)
   }
 }
 

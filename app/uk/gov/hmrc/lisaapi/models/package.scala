@@ -20,6 +20,7 @@ import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import play.api.data.validation.ValidationError
 import play.api.libs.json._
+import play.api.libs.functional.syntax._
 
 package object models {
 
@@ -40,6 +41,7 @@ package object models {
   type PropertyPurchaseResult = String
   type FundReleaseId = String
   type ExtensionId = String
+  type LisaManagerName = String
 
   private val MIN_AMOUNT = BigDecimal("-99999999999999.98")
   private val MAX_AMOUNT = BigDecimal("99999999999999.98")
@@ -93,7 +95,10 @@ package object models {
       "^(Purchase failed|Purchase completed)$".r,
       "error.formatting.propertyPurchaseResult"
     )
-    
+    val lisaManagerName: Reads[LisaManagerName] = Reads.pattern("^[a-zA-Z0-9 '/,&().-]{1,50}$".r, "error.formatting.lisaManagerName")
+    val taxYearReads: Reads[Int] = Reads.filter[Int](ValidationError("error.formatting.taxYear"))((p:Int) => p > 999 && p < 10000)
+    val annualFigures: Reads[Int] = Reads.filter[Int](ValidationError("error.formatting.annualFigures"))((p:Int) => p >= 0)
+
     val isoDate: Reads[DateTime] = isoDateReads()
     val notFutureDate: Reads[DateTime] = isoDateReads(false)
 
