@@ -13,7 +13,7 @@
       },
       "eventType" : {
         "$ref": "#/definitions/eventType",
-        "description": "The type of event."
+        "description": "The type of life event."
       },
       "eventDate" : {
         "$ref": "#/definitions/ISO8601-Date",
@@ -31,16 +31,16 @@
       },
       "propertyDetails": {
         "type": "object",
-        "description": "The details of the property that you are requesting funds to buy.",
+        "description": "The details of the property that you requested funds to buy.",
         "properties": {
           "nameOrNumber": {
-            "description": "The name or number of the property that you are requesting funds to buy.",
+            "description": "The name or number of the property that you requested funds to buy.",
             "type": "string",
             "pattern": "^[A-Za-z0-9 :/-]{1,35}$",
             "example": "Flat A"
           },
           "postalCode": {
-            "description": "The postcode of the property that you are requesting funds to buy.",
+            "description": "The postcode of the property that you requested funds to buy.",
             "type": "string",
             "pattern": "^[A-Za-z0-9 ]{1,8}$",
             "example": "AA1 1AA"
@@ -52,40 +52,9 @@
         ],
         "additionalProperties": false
       },
-      "supersede": {
-        "type": "object",
-        "description": "Corrects an existing life event.",
-        "properties": {
-          "originalLifeEventId": {
-            "description": "The ID of the life event affected by the correction.",
-            "$ref": "#/definitions/IDType"
-          },
-          "originalFundReleaseId": {
-            "description": "The ID of the life event affected by the correction.",
-            "$ref": "#/definitions/IDType"
-          },
-          "originalExtensionId": {
-            "description": "The ID of the life event affected by the correction.",
-            "$ref": "#/definitions/IDType"
-          },
-          "originalPurchaseOutcomeId": {
-            "description": "The ID of the life event affected by the correction.",
-            "$ref": "#/definitions/IDType"
-          },
-          "originalEventDate": {
-            "description": "The eventDate of the life event affected by the correction.",
-            "$ref": "#/definitions/ISO8601-Date",
-            "example": "2017-05-11"
-          }
-        },
-        "required": [
-          "originalEventDate"
-        ],
-        "additionalProperties": false
-      },
       "fundReleaseId": {
         "$ref": "#/definitions/IDType",
-        "description": "The reference number you get when you report a fund release."
+        "description": "The ID of the fund release for an extension or purchase outcome."
       },
       "propertyPurchaseValue": {
         "type": "number",
@@ -96,9 +65,69 @@
         "type": "string",
         "enum": ["Purchase failed", "Purchase completed"]
       },
+      "lisaManagerName": {
+        "type": "string",
+        "description": "The name of the LISA manager.",
+        "maxLength": 50,
+        "pattern": "^[a-zA-Z0-9 '/,&().-]{1,50}$"
+      },
+      "taxYear": {
+        "type": "integer",
+        "description": "The tax year for the return of information. This will be the year that the tax year ends in. For example, for the 2017 to 2018 tax year it will be 2018.",
+        "min": 2017,
+        "pattern": "^[0-9]{4}$",
+        "example": "2018"
+      },
+      "marketValueCash": {
+        "$ref": "#/definitions/MarketValue",
+        "description": "The total value that was reported for the cash LISA account."
+      },
+      "marketValueStocksAndShares": {
+        "$ref": "#/definitions/MarketValue",
+        "description": "The total value that was reported for the stocks and shares LISA account."
+      },
+      "annualSubsCash": {
+        "$ref": "#/definitions/AnnualSubs",
+        "description": "The total value that was reported for investor subscriptions into their cash LISA account during the tax year."
+      },
+      "annualSubsStocksAndShares": {
+        "$ref": "#/definitions/AnnualSubs",
+        "description": "The total value that was reported for investor subscriptions into their stocks and shares LISA account during the tax year."
+      },
+      "supersede": {
+        "type": "object",
+        "description": "Shows that a life event was corrected.",
+        "properties": {
+          "originalLifeEventId": {
+            "description": "The ID of the life event that was corrected.",
+            "$ref": "#/definitions/IDType"
+          },
+          "originalFundReleaseId": {
+            "description": "The ID of the fund release that was corrected.",
+            "$ref": "#/definitions/IDType"
+          },
+          "originalExtensionId": {
+            "description": "The ID of the purchase extension that was corrected.",
+            "$ref": "#/definitions/IDType"
+          },
+          "originalPurchaseOutcomeId": {
+            "description": "The ID of the purchase outcome that was corrected.",
+            "$ref": "#/definitions/IDType"
+          },
+          "originalEventDate": {
+            "description": "The eventDate of the life event that was corrected.",
+            "$ref": "#/definitions/ISO8601-Date",
+            "example": "2017-05-11"
+          }
+        },
+        "required": [
+          "originalEventDate"
+        ],
+        "additionalProperties": false
+      },
       "supersededBy": {
         "$ref": "#/definitions/IDType",
-        "description": "The ID of the transaction that supersedes the current one."
+        "description": "The ID of the life event that supersedes the current one."
       }
     },
     "additionalProperties": false,
@@ -124,6 +153,20 @@
     "eventType" : {
       "type" : "string",
       "enum": ["LISA Investor Terminal Ill Health", "LISA Investor Death", "Funds release", "Extension one", "Extension two", "Purchase outcome"]
+    },
+    "AnnualSubs": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9999,
+      "pattern": "^[0-9]{1,4}$",
+      "example": "100"
+    },
+    "MarketValue": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 999999,
+      "pattern": "^[0-9]{1,6}$",
+      "example": "1000"
     }
   }
 }
