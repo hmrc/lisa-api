@@ -22,7 +22,7 @@ import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.{LisaConstants, controllers}
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
-import uk.gov.hmrc.lisaapi.models.{ReportLifeEventFundReleaseNotFoundResponse, _}
+import uk.gov.hmrc.lisaapi.models.{ReportLifeEventFundReleaseNotFoundResponse, ReportLifeEventMismatchResponse, _}
 import uk.gov.hmrc.lisaapi.services.{AuditService, LifeEventService}
 import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
 
@@ -196,36 +196,33 @@ class PropertyPurchaseController extends LisaController with LisaConstants {
     ReportLifeEventAccountClosedResponse -> ErrorAccountAlreadyClosed,
     ReportLifeEventAccountCancelledResponse -> ErrorAccountAlreadyCancelled,
     ReportLifeEventAccountVoidResponse -> ErrorAccountAlreadyVoided,
-    ReportLifeEventAccountNotFoundResponse -> ErrorAccountNotFound
+    ReportLifeEventAccountNotFoundResponse -> ErrorAccountNotFound,
+    ReportLifeEventAlreadySupersededResponse -> ErrorLifeEventAlreadySuperseded,
+    ReportLifeEventAlreadyExistsResponse -> ErrorLifeEventAlreadyExists,
+    ReportLifeEventMismatchResponse -> ErrorLifeEventMismatch
   )
 
   private val fundReleaseErrors = commonErrors ++ Map (
-    ReportLifeEventMismatchResponse -> ErrorFundReleaseMismatch,
     ReportLifeEventAccountNotOpenLongEnoughResponse -> ErrorAccountNotOpenLongEnough,
-    ReportLifeEventOtherPurchaseOnRecordResponse -> ErrorFundReleaseOtherPropertyOnRecord,
-    ReportLifeEventAlreadyExistsResponse -> ErrorFundReleaseAlreadyExists,
-    ReportLifeEventAlreadySupersededResponse -> ErrorFundReleaseAlreadySuperseded
+    ReportLifeEventOtherPurchaseOnRecordResponse -> ErrorFundReleaseOtherPropertyOnRecord
   )
 
   private val extensionErrors = commonErrors ++ Map (
     ReportLifeEventExtensionOneNotYetApprovedResponse -> ErrorExtensionOneNotApproved,
     ReportLifeEventExtensionOneAlreadyApprovedResponse -> ErrorExtensionOneAlreadyApproved,
     ReportLifeEventExtensionTwoAlreadyApprovedResponse -> ErrorExtensionTwoAlreadyApproved,
-    ReportLifeEventMismatchResponse -> ErrorExtensionMismatch,
     ReportLifeEventFundReleaseNotFoundResponse -> ErrorFundReleaseNotFound,
-    ReportLifeEventAlreadyExistsResponse -> ErrorExtensionAlreadyExists,
-    ReportLifeEventFundReleaseSupersededResponse -> ErrorFundReleaseSuperseded,
-    ReportLifeEventAlreadySupersededResponse -> ErrorExtensionAlreadySuperseded
+    ReportLifeEventFundReleaseSupersededResponse -> ErrorFundReleaseSuperseded
   )
 
   // common errors not included as it should be possible to complete a purchase on a closed/cancelled/void account
   private val outcomeErrors = Map[ReportLifeEventResponse, ErrorResponse] (
-    ReportLifeEventMismatchResponse -> ErrorOutcomeMismatch,
+    ReportLifeEventMismatchResponse -> ErrorLifeEventMismatch,
     ReportLifeEventFundReleaseNotFoundResponse -> ErrorFundReleaseNotFound,
     ReportLifeEventAccountNotFoundResponse -> ErrorAccountNotFound,
     ReportLifeEventFundReleaseSupersededResponse -> ErrorFundReleaseSuperseded,
-    ReportLifeEventAlreadySupersededResponse -> ErrorOutcomeAlreadySuperseded,
-    ReportLifeEventAlreadyExistsResponse -> ErrorOutcomeAlreadyExists
+    ReportLifeEventAlreadySupersededResponse -> ErrorLifeEventAlreadySuperseded,
+    ReportLifeEventAlreadyExistsResponse -> ErrorLifeEventAlreadyExists
   )
 
   private def doFundReleaseAudit(lisaManager: String,
