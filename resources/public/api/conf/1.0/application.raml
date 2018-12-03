@@ -661,7 +661,7 @@ types:
                   description: !include documentation/LifeEvent
                   post:
                     is: [headers.acceptHeader, headers.contentHeader]
-                    displayName: Report a life event
+                    displayName: Report a death or terminal illness
                     description: !include documentation/LifeEvent
                     (annotations.scope): "write:lisa"
                     securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
