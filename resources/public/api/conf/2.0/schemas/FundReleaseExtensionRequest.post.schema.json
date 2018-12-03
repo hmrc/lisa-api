@@ -22,19 +22,19 @@
 			"type": "object",
 			"description": "Correct an existing extension.",
 			"properties": {
-				"originalExtensionId": {
-		      "description": "The ID of the extension affected by the correction.",
-		      "$ref": "#/definitions/IDType1",
-		      "example": "6789000001"
-		    },
-		    "originalEventDate": {
-		      "description": "The eventDate of the extension affected by the correction.",
-		      "$ref": "#/definitions/ISO8601-Date1",
-		      "example": "2017-05-11"
-		    }
+				"originalLifeEventId": {
+				  "description": "The ID of the extension affected by the correction.",
+				  "$ref": "#/definitions/IDType1",
+				  "example": "6789000001"
+				},
+				"originalEventDate": {
+				  "description": "The eventDate of the extension affected by the correction.",
+				  "$ref": "#/definitions/ISO8601-Date1",
+				  "example": "2017-05-11"
+				}
 			},
 			"required": [
-				"originalExtensionId",
+				"originalLifeEventId",
 				"originalEventDate"
 			],
 			"additionalProperties": false

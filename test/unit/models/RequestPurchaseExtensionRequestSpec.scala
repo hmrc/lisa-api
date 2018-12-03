@@ -52,7 +52,7 @@ class RequestPurchaseExtensionRequestSpec extends PlaySpec {
 
     }
 
-    "validates the fund release id" in {
+    "validate the fund release id" in {
 
       val json = """{"fundReleaseId":"x","eventDate":"2017-05-10","eventType":"Extension one"}"""
 
@@ -67,7 +67,7 @@ class RequestPurchaseExtensionRequestSpec extends PlaySpec {
 
     }
 
-    "validates the event type" in {
+    "validate the event type" in {
 
       val json = """{"fundReleaseId":"3456789001","eventDate":"2017-05-10","eventType":"Extension 1"}"""
 
@@ -82,7 +82,7 @@ class RequestPurchaseExtensionRequestSpec extends PlaySpec {
 
     }
 
-    "validates the event date" in {
+    "validate the event date" in {
 
       val json = """{"fundReleaseId":"3456789001","eventDate":"3000-05-10","eventType":"Extension one"}"""
 
@@ -103,14 +103,14 @@ class RequestPurchaseExtensionRequestSpec extends PlaySpec {
 
     "serialize from json" in {
 
-      val json = """{"eventDate":"2017-05-11","eventType":"Extension one","supersede":{"originalEventDate":"2017-05-10","originalExtensionId":"6789000001"}}"""
+      val json = """{"eventDate":"2017-05-11","eventType":"Extension one","supersede":{"originalEventDate":"2017-05-10","originalLifeEventId":"6789000001"}}"""
 
       Json.parse(json).as[RequestPurchaseExtension] mustBe RequestSupersededPurchaseExtension(
         eventDate = new DateTime("2017-05-11"),
         eventType = "Extension one",
         supersede = RequestExtensionSupersedeDetails(
           originalEventDate = new DateTime("2017-05-10"),
-          originalExtensionId = "6789000001"
+          originalLifeEventId = "6789000001"
         )
       )
 
@@ -123,7 +123,7 @@ class RequestPurchaseExtensionRequestSpec extends PlaySpec {
         eventType = "Extension one",
         supersede = RequestExtensionSupersedeDetails(
           originalEventDate = new DateTime("2017-05-10"),
-          originalExtensionId = "6789000001"
+          originalLifeEventId = "6789000001"
         )
       )
 
@@ -133,9 +133,9 @@ class RequestPurchaseExtensionRequestSpec extends PlaySpec {
 
     }
 
-    "validates the event type" in {
+    "validate the event type" in {
 
-      val json = """{"eventDate":"2017-05-11","eventType":"Extension 1","supersede":{"originalEventDate":"2017-05-10","originalExtensionId":"6789000001"}}"""
+      val json = """{"eventDate":"2017-05-11","eventType":"Extension 1","supersede":{"originalEventDate":"2017-05-10","originalLifeEventId":"6789000001"}}"""
 
       val res = Json.parse(json).validate[RequestPurchaseExtension]
 
@@ -148,9 +148,9 @@ class RequestPurchaseExtensionRequestSpec extends PlaySpec {
 
     }
 
-    "validates the event date" in {
+    "validate the event date" in {
 
-      val json = """{"eventDate":"3000-05-11","eventType":"Extension one","supersede":{"originalEventDate":"2017-05-10","originalExtensionId":"6789000001"}}"""
+      val json = """{"eventDate":"3000-05-11","eventType":"Extension one","supersede":{"originalEventDate":"2017-05-10","originalLifeEventId":"6789000001"}}"""
 
       val res = Json.parse(json).validate[RequestPurchaseExtension]
 
@@ -163,7 +163,7 @@ class RequestPurchaseExtensionRequestSpec extends PlaySpec {
 
     }
 
-    "validates the supersede object" in {
+    "validate the supersede object" in {
 
       val json = """{"eventDate":"2017-05-11","eventType":"Extension one", "supersede": {}}"""
 
@@ -173,16 +173,16 @@ class RequestPurchaseExtensionRequestSpec extends PlaySpec {
         case JsError(errors) => {
           errors.length mustBe 2
           errors must contain (JsPath \ "supersede" \ "originalEventDate", Seq(ValidationError("error.path.missing")))
-          errors must contain (JsPath \ "supersede" \ "originalExtensionId", Seq(ValidationError("error.path.missing")))
+          errors must contain (JsPath \ "supersede" \ "originalLifeEventId", Seq(ValidationError("error.path.missing")))
         }
         case _ => fail("Parsed invalid json as being valid")
       }
 
     }
 
-    "validates the originalEventDate" in {
+    "validate the originalEventDate" in {
 
-      val json = """{"eventDate":"2017-05-11","eventType":"Extension one","supersede":{"originalEventDate":"3000-05-10","originalExtensionId":"6789000001"}}"""
+      val json = """{"eventDate":"2017-05-11","eventType":"Extension one","supersede":{"originalEventDate":"3000-05-10","originalLifeEventId":"6789000001"}}"""
 
       val res = Json.parse(json).validate[RequestPurchaseExtension]
 
@@ -195,15 +195,15 @@ class RequestPurchaseExtensionRequestSpec extends PlaySpec {
 
     }
 
-    "validates the originalExtensionId" in {
+    "validate the originalLifeEventId" in {
 
-      val json = """{"eventDate":"2017-05-11","eventType":"Extension one","supersede":{"originalEventDate":"2017-05-10","originalExtensionId":"one"}}"""
+      val json = """{"eventDate":"2017-05-11","eventType":"Extension one","supersede":{"originalEventDate":"2017-05-10","originalLifeEventId":"one"}}"""
 
       val res = Json.parse(json).validate[RequestPurchaseExtension]
 
       res match {
         case JsError(errors) => {
-          errors mustBe Seq((JsPath \ "supersede" \ "originalExtensionId", Seq(ValidationError("error.formatting.extensionId"))))
+          errors mustBe Seq((JsPath \ "supersede" \ "originalLifeEventId", Seq(ValidationError("error.formatting.lifeEventId"))))
         }
         case _ => fail("Parsed invalid json as being valid")
       }

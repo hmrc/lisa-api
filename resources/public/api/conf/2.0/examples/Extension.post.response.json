@@ -1,8 +1,8 @@
 {
-  "status": 201,
-  "success": true,
   "data": {
-    "message": "Extension created",
-    "extensionId": "6789000001"
-  }
+    "lifeEventId": "6789000001",
+    "message": "Extension created"
+  },
+  "success": true,
+  "status": 201
 }
