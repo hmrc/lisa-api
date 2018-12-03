@@ -26,7 +26,7 @@ object FundReleasePropertyDetails {
   implicit val formats = Json.format[FundReleasePropertyDetails]
 }
 
-case class FundReleaseSupersedeDetails(originalFundReleaseId: LifeEventId, originalEventDate: DateTime)
+case class FundReleaseSupersedeDetails(originalLifeEventId: LifeEventId, originalEventDate: DateTime)
 
 object FundReleaseSupersedeDetails {
   implicit val dateReads: Reads[DateTime] = Reads.jodaDateReads("yyyy-MM-dd")
@@ -76,7 +76,7 @@ object RequestFundReleaseRequest {
     req.eventDate,
     req.withdrawalAmount,
     req.supersede.originalEventDate,
-    req.supersede.originalFundReleaseId
+    req.supersede.originalLifeEventId
   )}
 
   implicit val traitReads: Reads[RequestFundReleaseRequest] = Reads[RequestFundReleaseRequest] { json =>

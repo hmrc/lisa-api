@@ -70,7 +70,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
   "eventDate": "2017-05-05",
   "withdrawalAmount": 5000.00,
   "supersede": {
-    "originalFundReleaseId": "3456789000",
+    "originalLifeEventId": "3456789000",
     "originalEventDate": "2017-05-10"
   }
 }
@@ -90,7 +90,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
   "eventType": "Extension one",
   "supersede": {
     "originalEventDate": "2017-05-10",
-    "originalExtensionId": "6789000001"
+    "originalLifeEventId": "6789000001"
   }
 }
 """
@@ -111,7 +111,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
   "propertyPurchaseResult": "Purchase completed",
   "propertyPurchaseValue": 250000,
   "supersede": {
-    "originalPurchaseOutcomeId": "5678900001",
+    "originalLifeEventId": "5678900001",
     "originalEventDate": "2017-05-05"
   }
 }
@@ -151,7 +151,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
               "accountID" -> accountId,
               "eventDate" -> "2017-05-05",
               "withdrawalAmount" -> "5000.00",
-              "originalFundReleaseId" -> "3456789000",
+              "originalLifeEventId" -> "3456789000",
               "originalEventDate" -> "2017-05-10"
             ))
           )(any())
@@ -327,7 +327,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
     "return with 403 forbidden and a code of INVALID_DATA_PROVIDED" in {
       val json = Json.parse(fundReleaseJson).as[JsObject] ++ Json.obj(
         "supersede" -> Json.obj(
-          "originalFundReleaseId" -> "3456789000",
+          "originalLifeEventId" -> "3456789000",
           "originalEventDate" -> "2017-05-10"
         )
       )
@@ -420,7 +420,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
               "eventDate" -> "2017-05-11",
               "eventType" -> "Extension one",
               "originalEventDate" -> "2017-05-10",
-              "originalExtensionId" -> "6789000001"
+              "originalLifeEventId" -> "6789000001"
             ))
           )(any())
         }
@@ -703,7 +703,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
               "eventDate" -> "2017-06-10",
               "propertyPurchaseResult" -> "Purchase completed",
               "propertyPurchaseValue" -> "250000",
-              "originalPurchaseOutcomeId" -> "5678900001",
+              "originalLifeEventId" -> "5678900001",
               "originalEventDate" -> "2017-05-05"
             ))
           )(any())

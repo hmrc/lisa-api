@@ -52,7 +52,7 @@
   "propertyPurchaseResult": "Purchase completed",
   "propertyPurchaseValue": 250000,
   "supersede": {
-    "originalPurchaseOutcomeId": "5678900001",
+    "originalLifeEventId": "5678900001",
     "originalEventDate": "2017-05-10"
   }
 }                
@@ -135,7 +135,7 @@
   "propertyPurchaseResult": "Purchase completed",
   "propertyPurchaseValue": 250000,
   "supersede": {
-    "originalPurchaseOutcomeId": "5678900000",
+    "originalLifeEventId": "5678900000",
     "originalEventDate": "2017-05-10"
   }
 }    
@@ -214,7 +214,7 @@
   "propertyPurchaseResult": "Purchase completed",
   "propertyPurchaseValue": 250000,
   "supersede": {
-    "originalPurchaseOutcomeId": "5678900001",
+    "originalLifeEventId": "5678900001",
     "originalEventDate": "2017-05-10"
   }
 }       
@@ -268,7 +268,7 @@
   "propertyPurchaseResult": "Purchase completed",
   "propertyPurchaseValue": 250000,
   "supersede": {
-    "originalPurchaseOutcomeId": "5678900001",
+    "originalLifeEventId": "5678900001",
     "originalEventDate": "2017-05-10"
   }
 }

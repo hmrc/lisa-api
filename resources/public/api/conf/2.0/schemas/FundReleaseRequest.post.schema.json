@@ -44,7 +44,7 @@
 			"type": "object",
 			"description": "Correct an existing fund release with a new eventDate and withdrawalAmount.",
 			"properties": {
-				"originalFundReleaseId": {
+				"originalLifeEventId": {
 					"description": "The ID of the fund release affected by the correction.",
 					"$ref": "#/definitions/IDType"
 				},
@@ -54,7 +54,7 @@
 				}
 			},
 			"required": [
-				"originalFundReleaseId",
+				"originalLifeEventId",
 				"originalEventDate"
 			],
 			"additionalProperties": false

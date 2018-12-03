@@ -61,7 +61,7 @@
   "eventDate": "2017-05-05",
   "withdrawalAmount": 5000.00,
   "supersede": {
-    "originalFundReleaseId": "3456789000",
+    "originalLifeEventId": "3456789000",
     "originalEventDate": "2017-05-10"
   }
 }
@@ -328,7 +328,7 @@
   "eventDate": "2017-06-05",
   "withdrawalAmount": 10000.00,
   "supersede": {
-    "originalFundReleaseId": "3456789000",
+    "originalLifeEventId": "3456789000",
     "originalEventDate": "2017-05-05"
   }
 }
@@ -365,7 +365,7 @@
     "postalCode": "AA11 1AA"
   },
   "supersede": {
-    "originalFundReleaseId": "3456789000",
+    "originalLifeEventId": "3456789000",
     "originalEventDate": "2017-05-05"
   }
 }
@@ -430,7 +430,7 @@
   "eventDate": "2017-05-05",
   "withdrawalAmount": 4000.00,
   "supersede": {
-    "originalFundReleaseId": "3456789000",
+    "originalLifeEventId": "3456789000",
     "originalEventDate": "2017-05-10"
   }
 }

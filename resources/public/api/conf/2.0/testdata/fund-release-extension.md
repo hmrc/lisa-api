@@ -57,7 +57,7 @@
   "eventType": "Extension one",
   "supersede": {
     "originalEventDate": "2017-05-10",
-    "originalExtensionId": "6789000001"
+    "originalLifeEventId": "6789000001"
   }
 }
 </pre>
@@ -122,7 +122,7 @@
   "eventType": "Extension two",
   "supersede": {
     "originalEventDate": "2017-08-10",
-    "originalExtensionId": "6789000003"
+    "originalLifeEventId": "6789000003"
   }
 }
 </pre>
@@ -419,7 +419,7 @@
   "eventType": "Extension one",
   "supersede": {
     "originalEventDate": "2017-05-10",
-    "originalExtensionId": "6789000001"
+    "originalLifeEventId": "6789000001"
   }
 }
 </pre>
@@ -557,7 +557,7 @@
   "eventType": "Extension one",
   "supersede": {
     "originalEventDate": "2017-05-10",
-    "originalExtensionId": "6789000001"
+    "originalLifeEventId": "6789000001"
   }
 }
 </pre>

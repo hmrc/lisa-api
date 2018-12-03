@@ -40,7 +40,7 @@ case class RequestPurchaseOutcomeSupersededRequest (
 ) extends RequestPurchaseOutcomeRequest
 
 case class PurchaseOutcomeSupersede (
-  originalPurchaseOutcomeId: LifeEventId,
+  originalLifeEventId: LifeEventId,
   originalEventDate: DateTime
 )
 
@@ -48,7 +48,7 @@ object PurchaseOutcomeSupersede {
   implicit val dateReads: Reads[DateTime] = JsonReads.notFutureDate
 
   implicit val reads: Reads[PurchaseOutcomeSupersede] = (
-    (JsPath \ "originalPurchaseOutcomeId").read(JsonReads.fundReleaseId) and
+    (JsPath \ "originalLifeEventId").read(JsonReads.lifeEventId) and
     (JsPath \ "originalEventDate").read(JsonReads.notFutureDate).map(new DateTime(_))
   )(PurchaseOutcomeSupersede.apply _)
 }
@@ -100,7 +100,7 @@ object RequestPurchaseOutcomeRequest {
       "purchaseResult" -> req.propertyPurchaseResult,
       "purchaseValue" -> req.propertyPurchaseValue
     ),
-    req.supersede.originalPurchaseOutcomeId,
+    req.supersede.originalLifeEventId,
     req.supersede.originalEventDate.toString("yyyy-MM-dd")
   )}
 
