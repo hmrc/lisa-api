@@ -41,7 +41,7 @@
     </tr>
     <tr>
       <td>
-        <p>Purchase Outcome superseded</p>
+        <p>Purchase outcome superseded</p>
         <p class="code--block"> <strong>lisaManagerReferenceNumber:</strong><br /> <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br /> <br /> <strong>accountId:</strong><br />1234567890 </p>
       </td>
       <td>
@@ -124,7 +124,7 @@
     </tr>
     <tr>
       <td>
-        <p>Superseded purchase outcome mismatch error</p>
+        <p>Supersede details do not match the original request</p>
         <p class="code--block"> <strong>lisaManagerReferenceNumber:</strong><br /> <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br /> <br /> <strong>accountId:</strong><br />5000000403 </p>
       </td>
       <td>
@@ -145,8 +145,8 @@
         <p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
         <pre class="code--block">
 {
-  "code": "SUPERSEDED_PURCHASE_OUTCOME_MISMATCH_ERROR",
-  "message": "originalPurchaseOutcomeId and the originalEventDate do not match the information in the original request"
+  "code": "SUPERSEDED_LIFE_EVENT_MISMATCH_ERROR",
+  "message": "originalLifeEventId and the originalEventDate do not match the information in the original request"
 }  
 </pre>
       </td>
@@ -203,7 +203,7 @@
     </tr>
     <tr>
       <td>
-        <p>Superseded purchase outcome already superseded</p>
+        <p>The purchase outcome you are superseding has already been superseded</p>
         <p class="code--block"> <strong>lisaManagerReferenceNumber:</strong><br /> <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br /> <br /> <strong>accountId:</strong><br />1000000409 </p>
       </td>
       <td>
@@ -224,8 +224,8 @@
         <p>HTTP status: <code class="code--slim">409 (Conflict)</code></p>
         <pre class="code--block">
 {
-  "code": "SUPERSEDED_PURCHASE_OUTCOME_ALREADY_SUPERSEDED",
-  "message": "This purchase outcome has already been superseded"
+  "code": "SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED",
+  "message": "This life event has already been superseded"
 }                        
 </pre>
       </td>
@@ -249,15 +249,15 @@
         <p>HTTP status: <code class="code--slim">409 (Conflict)</code></p>
         <pre class="code--block">
 {
-  "code": "PURCHASE_OUTCOME_ALREADY_EXISTS",
-  "message": "The investor’s purchase outcome has already been reported"
+  "code": "LIFE_EVENT_ALREADY_EXISTS",
+  "message": "The investor’s life event has already been reported"
 }                                               
 </pre>
       </td>
     </tr>
     <tr>
       <td>
-        <p>Fund release superseded</p>
+        <p>The associated fund release has been superseded</p>
         <p class="code--block"> <strong>lisaManagerReferenceNumber:</strong><br /> <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br /> <br /> <strong>accountId:</strong><br />2000000409 </p>
       </td>
       <td>

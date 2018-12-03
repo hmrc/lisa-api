@@ -19,7 +19,7 @@
                   </p>
                </td>
          <td>
-             <pre class="code--block">
+<pre class="code--block">
 {
   "eventDate": "2017-05-10",
   "withdrawalAmount": 4000.00,
@@ -33,7 +33,7 @@
           </td>
           <td>
               <p>HTTP status: <code class="code--slim">201 (Created)</code></p>
-                <pre class="code--block">
+<pre class="code--block">
 {
   "status": 201,
   "success": true,
@@ -56,7 +56,7 @@
                            </p>
                        </td>
                        <td>
-        <pre class="code--block">
+<pre class="code--block">
 {
   "eventDate": "2017-05-05",
   "withdrawalAmount": 5000.00,
@@ -69,7 +69,7 @@
                      </td>
                      <td>
                          <p>HTTP status: <code class="code--slim">201 (Created)</code></p>
-                <pre class="code--block">
+<pre class="code--block">
 {
   "status": 201,
   "success": true,
@@ -92,7 +92,7 @@
                                         </p>
                                     </td>
                                     <td>
-        <pre class="code--block">
+<pre class="code--block">
 {
   "eventDate": "2017-05-10",
   "withdrawalAmount": 4000.00,
@@ -106,7 +106,7 @@
                                     </td>
                                     <td>
                                         <p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
-        <pre class="code--block">
+<pre class="code--block">
 {
   "code": "BAD_REQUEST",
   "message": "lisaManagerReferenceNumber in the URL is in the wrong format"
@@ -125,7 +125,7 @@
                                                     </p>
                                                 </td>
                                                 <td>
-                                    <pre class="code--block">
+<pre class="code--block">
 {
   "eventDate": "2017-05-10",
   "withdrawalAmount": 4000.00,
@@ -139,7 +139,7 @@
                                                 </td>
                                                 <td>
                                                     <p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
-                                    <pre class="code--block">
+<pre class="code--block">
 {
   "code": "BAD_REQUEST",
   "message": "accountId in the URL is in the wrong format"
@@ -158,7 +158,7 @@
                                                     </p>
                                                 </td>
  <td>
-                                                     <pre class="code--block">
+<pre class="code--block">
 {
   "eventDate": "2017-05-10",
   "withdrawalAmount": 4000.00,
@@ -172,7 +172,7 @@
                                                              </td>
                                                                  <td>
                                                                      <p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
-                                                     <pre class="code--block">
+<pre class="code--block">
 {
   "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED",
   "message": "The LISA account is already closed"
@@ -191,7 +191,7 @@
                                                                      </p>
                                                                      </td>
                                                                      <td>
-                                                                         <pre class="code--block"> 
+<pre class="code--block"> 
 {
   "eventDate": "2017-05-10",
   "withdrawalAmount": 4000.00,
@@ -205,7 +205,7 @@
                                                                    </td>
                                                                         <td>
                                                                             <p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
-                                                                            <pre class="code--block">
+<pre class="code--block">
 {
   "code": "INVESTOR_ACCOUNT_ALREADY_VOID",
   "message": "The LISA account is already void"
@@ -224,7 +224,7 @@
                                                                               </p>
                                                                               </td>
                                                                               <td>
-                                                                              <pre class="code--block"> 
+<pre class="code--block"> 
 {
   "eventDate": "2017-05-10",
   "withdrawalAmount": 4000.00,
@@ -238,7 +238,7 @@
                                                                                 </td>
                                                                                 <td>
                                                                                    <p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
-                                                                                   <pre class="code--block">
+<pre class="code--block">
 {
   "code": "INVESTOR_ACCOUNT_ALREADY_CANCELLED",
   "message": "The LISA account is already cancelled"
@@ -257,7 +257,7 @@
                                                                                             </p>
                                                                                             </td>
                                                                                                  <td>
-                                                                                            <pre class="code--block"> 
+<pre class="code--block"> 
 {
   "eventDate": "2017-05-10",
   "withdrawalAmount": 4000.00,
@@ -271,7 +271,7 @@
                                                                                             </td>
                                                                                             <td>
                                                                                                 <p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
-                                                                                                <pre class="code--block">
+<pre class="code--block">
 {
   "code": "COMPLIANCE_ERROR_ACCOUNT_NOT_OPEN_LONG_ENOUGH",
   "message": "The account has not been open for long enough"
@@ -290,7 +290,7 @@
                                                                                                    </p>
                                                                                                    </td>
                                                                                                    <td>
-                                                                                                   <pre class="code--block"> 
+<pre class="code--block"> 
 {
   "eventDate": "2017-05-10",
   "withdrawalAmount": 4000.00,
@@ -314,7 +314,7 @@
                                                                                                </tr> 
                                                                                                <tr>
                                                                                                <td>
-                                                                                                  <p>Superseded fund release mismatch error</p>
+                                                                                                  <p>Supersede details do not match the original request</p>
                                                                                                   <p class="code--block">
                                                                                                   <strong>lisaManagerReferenceNumber:</strong><br>
                                                                                                   <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
@@ -338,8 +338,8 @@
                                                                                                     <p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
                                                                                                     <pre class="code--block">
 {
-  "code": "SUPERSEDED_FUND_RELEASE_MISMATCH_ERROR",
-  "message": "originalFundReleaseId and the originalEventDate do not match the information in the original request"
+  "code": "SUPERSEDED_LIFE_EVENT_MISMATCH_ERROR",
+  "message": "originalLifeEventId and the originalEventDate do not match the information in the original request"
 }
 </pre>
                                                                                                    </td>
@@ -416,7 +416,7 @@
                                                                                               </tr>  
                                                                                               <tr>
                                                                                               <td>
-                                                                                                  <p>Superseded fund release account already superseded</p>
+                                                                                                  <p>The fund release you are superseding has already been superseded</p>
                                                                                                   <p class="code--block">
                                                                                                   <strong>lisaManagerReferenceNumber:</strong><br>
                                                                                                   <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
@@ -440,15 +440,15 @@
                                                                                                          <p>HTTP status: <code class="code--slim">409 (Conflict)</code></p>
                                                                                                          <pre class="code--block">
 {
-  "code": "SUPERSEDED_FUND_RELEASE_ALREADY_SUPERSEDED",
-  "message": "This fund release has already been superseded"
+  "code": "SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED",
+  "message": "This life event has already been superseded"
 }
 </pre>
                                                                                  </td>
                                                                                  </tr>
                                                                                  <tr>
                                                                                      <td>
-                                                                                        <p>Fund Release Already Exists</p>
+                                                                                        <p>Fund release already exists</p>
                                                                                         <p class="code--block">
                                                                                         <strong>lisaManagerReferenceNumber:</strong><br>
                                                                                         <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
@@ -473,8 +473,8 @@
                                                                                              <p>HTTP status: <code class="code--slim">409 (Conflict)</code></p>
                                                                                              <pre class="code--block">
 {
-  "code": "FUND_RELEASE_ALREADY_EXISTS",
-  "message": "The investor’s fund release has already been requested"
+  "code": "LIFE_EVENT_ALREADY_EXISTS",
+  "message": "The investor’s life event has already been reported"
 }
 </pre>
                                                                                         </td>
