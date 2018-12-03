@@ -1,6 +1,6 @@
 {
   "data": {
-    "purchaseOutcomeId": "5678900001",
+    "lifeEventId": "5678900001",
     "message": "Purchase outcome created"
   },
   "success": true,

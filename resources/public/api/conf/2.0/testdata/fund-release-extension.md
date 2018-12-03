@@ -35,7 +35,7 @@
   "success": true,
   "data": {
     "message": "Extension created",
-    "extensionId": "6789000001"
+    "lifeEventId": "6789000001"
   }
 }
 </pre>
@@ -69,7 +69,7 @@
   "success": true,
   "data": {
     "message": "Extension superseded",
-    "extensionId": "6789000002"
+    "lifeEventId": "6789000002"
   }
 }
 </pre>
@@ -100,7 +100,7 @@
   "success": true,
   "data": {
     "message": "Extension created",
-    "extensionId": "6789000003"
+    "lifeEventId": "6789000003"
   }
 }
 </pre>
@@ -134,7 +134,7 @@
   "success": true,
   "data": {
     "message": "Extension superseded",
-    "extensionId": "6789000004"
+    "lifeEventId": "6789000004"
   }
 }
 </pre>

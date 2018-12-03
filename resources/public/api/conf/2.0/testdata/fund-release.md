@@ -39,7 +39,7 @@
   "success": true,
   "data": {
     "message": "Fund release created",
-    "fundReleaseId": "3456789000"
+    "lifeEventId": "3456789000"
   }
 }
 </pre>         
@@ -75,7 +75,7 @@
   "success": true,
   "data": {
     "message": "Fund release superseded",
-    "fundReleaseId": "3456789001"
+    "lifeEventId": "3456789001"
   }
 }
 </pre>

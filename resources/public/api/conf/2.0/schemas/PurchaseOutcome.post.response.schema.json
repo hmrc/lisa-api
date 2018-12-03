@@ -6,7 +6,7 @@
       "description": "Response details.",
       "type": "object",
       "properties": {
-        "purchaseOutcomeId": {
+        "lifeEventId": {
           "description": "The purchase outcome’s ID reference number. You must store this ID as it is needed for other API calls.",
           "type": "string",
           "pattern": "^\\d{10}$"
@@ -19,7 +19,7 @@
           ]
         }
       },
-      "required": ["purchaseOutcomeId", "message"]
+      "required": ["lifeEventId", "message"]
     },
     "success": {
       "description": "Whether the API call was successful or not. Always true.",

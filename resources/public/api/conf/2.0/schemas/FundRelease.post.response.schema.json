@@ -6,7 +6,7 @@
       "description": "Response details.",
       "type": "object",
       "properties": {
-        "fundReleaseId": {
+        "lifeEventId": {
           "description": "The fund release’s ID reference number. You must store this ID as it is needed for other API calls.",
           "type": "string",
           "pattern": "^\\d{10}$"
@@ -20,7 +20,7 @@
           ]
         }
       },
-      "required": ["fundReleaseId", "message"]
+      "required": ["lifeEventId", "message"]
     },
     "success": {
       "description": "Whether the API call was successful or not. Always true.",
