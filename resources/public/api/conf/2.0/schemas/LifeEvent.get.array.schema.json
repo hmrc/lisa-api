@@ -153,7 +153,7 @@
     },
     "eventType" : {
       "type" : "string",
-      "enum": ["LISA Investor Terminal Ill Health", "LISA Investor Death", "Funds release", "Extension one", "Extension two", "Purchase outcome"]
+      "enum": ["LISA Investor Terminal Ill Health", "LISA Investor Death", "Funds release", "Extension one", "Extension two", "Purchase outcome", "Statutory Submission"]
     },
     "AnnualSubs": {
       "type": "integer",
