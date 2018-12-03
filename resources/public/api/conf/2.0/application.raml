@@ -970,11 +970,11 @@ types:
                                       "message" : "Another property purchase is already recorded"
                                     }
                                 supersedingLifeEventMisMatchError:
-                                  description: originalFundReleaseId and the originalEventDate do not match the information in the original request
+                                  description: originalLifeEventId and the originalEventDate do not match the information in the original request
                                   value: |
                                     {
-                                      "code" : "SUPERSEDED_FUND_RELEASE_MISMATCH_ERROR",
-                                      "message" : "originalFundReleaseId and the originalEventDate do not match the information in the original request"
+                                      "code" : "SUPERSEDED_LIFE_EVENT_MISMATCH_ERROR",
+                                      "message" : "originalLifeEventId and the originalEventDate do not match the information in the original request"
                                     }
                                 invalidDataProvided:
                                   description: You can only change eventDate or withdrawalAmount when superseding a property purchase fund release
@@ -1001,18 +1001,18 @@ types:
                               type: !include schemas/ErrorCodes.schema.json
                               examples:
                                 supersedingLifeEventAlreadySuperseded:
-                                  description: This fund release has already been superseded
+                                  description: This life event has already been superseded
                                   value: |
                                     {
-                                      "code" : "SUPERSEDED_FUND_RELEASE_ALREADY_SUPERSEDED",
-                                      "message" : "This fund release has already been superseded"
+                                      "code" : "SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED",
+                                      "message" : "This life event has already been superseded"
                                     }
                                 lifeEventExists:
-                                   description: The investor’s fund release has already been requested
+                                   description: The investor’s life event has already been reported
                                    value: |
                                      {
-                                       "code" : "FUND_RELEASE_ALREADY_EXISTS",
-                                       "message" : "The investor’s fund release has already been requested"
+                                       "code" : "LIFE_EVENT_ALREADY_EXISTS",
+                                       "message" : "The investor’s life event has already been reported"
                                      }
                   /purchase-extensions:
                     post:
@@ -1084,11 +1084,11 @@ types:
                                       "message" : "A second extension has already been approved"
                                     }
                                 supersedingLifeEventMisMatchError:
-                                  description: originalExtensionId and the originalEventDate do not match the information in the original request
+                                  description: originalLifeEventId and the originalEventDate do not match the information in the original request
                                   value: |
                                     {
-                                      "code" : "SUPERSEDED_EXTENSION_MISMATCH_ERROR",
-                                      "message" : "originalExtensionId and the originalEventDate do not match the information in the original request"
+                                      "code" : "SUPERSEDED_LIFE_EVENT_MISMATCH_ERROR",
+                                      "message" : "originalLifeEventId and the originalEventDate do not match the information in the original request"
                                     }
                         404:
                           body:
@@ -1115,11 +1115,11 @@ types:
                               type: !include schemas/ErrorCodes.schema.json
                               examples:
                                 lifeEventExists:
-                                  description: The investor’s purchase extension has already been requested
+                                  description: The investor’s life event has already been requested
                                   value: |
                                     {
-                                      "code" : "EXTENSION_ALREADY_EXISTS",
-                                      "message" : "The investor’s purchase extension has already been requested"
+                                      "code" : "LIFE_EVENT_ALREADY_EXISTS",
+                                      "message" : "The investor’s life event has already been reported"
                                     }
                                 fundReleaseLifeEventAlreadySuperseded:
                                   description: This fund release has already been superseded
@@ -1129,11 +1129,11 @@ types:
                                       "message" : "This fund release has already been superseded"
                                     }
                                 supersedingLifeEventAlreadySuperseded:
-                                  description: This extension has already been superseded
+                                  description: This life event has already been superseded
                                   value: |
                                     {
-                                      "code" : "SUPERSEDED_EXTENSION_ALREADY_SUPERSEDED",
-                                      "message" : "This extension has already been superseded"
+                                      "code" : "SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED",
+                                      "message" : "This life event has already been superseded"
                                     }
                   /purchase-outcomes:
                     post:
@@ -1163,11 +1163,11 @@ types:
                               type: !include schemas/ErrorCodes.schema.json
                               examples:
                                 mismatchError:
-                                   description: originalPurchaseOutcomeId and the originalEventDate do not match the information in the original request
+                                   description: originalLifeEventId and the originalEventDate do not match the information in the original request
                                    value: |
                                       {
-                                        "code": "SUPERSEDED_PURCHASE_OUTCOME_MISMATCH_ERROR",
-                                        "message": "originalPurchaseOutcomeId and the originalEventDate do not match the information in the original request"
+                                        "code": "SUPERSEDED_LIFE_EVENT_MISMATCH_ERROR",
+                                        "message": "originalLifeEventId and the originalEventDate do not match the information in the original request"
                                       }
 
                         404:
@@ -1202,18 +1202,18 @@ types:
                                       "message" : "This fund release has already been superseded"
                                     }
                                 supersedingLifeEventAlreadySuperseded:
-                                  description: This purchase outcome has already been superseded
+                                  description: This life event has already been superseded
                                   value: |
                                     {
-                                      "code" : "SUPERSEDED_PURCHASE_OUTCOME_ALREADY_SUPERSEDED",
-                                      "message" : "This purchase outcome has already been superseded"
+                                      "code" : "SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED",
+                                      "message" : "This life event has already been superseded"
                                     }
                                 lifeEventExists:
-                                  description: The investor’s purchase outcome has already been reported
+                                  description: The investor’s life event has already been reported
                                   value: |
                                     {
-                                       "code" : "PURCHASE_OUTCOME_ALREADY_EXISTS",
-                                       "message" : "The investor’s purchase outcome has already been reported"
+                                       "code" : "LIFE_EVENT_ALREADY_EXISTS",
+                                       "message" : "The investor’s life event has already been reported"
                                     }
                 /withdrawal-charges:
                   (annotations.group):
