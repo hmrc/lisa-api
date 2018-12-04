@@ -103,18 +103,6 @@
             "description": "The ID of the life event that was corrected.",
             "$ref": "#/definitions/IDType"
           },
-          "originalFundReleaseId": {
-            "description": "The ID of the fund release that was corrected.",
-            "$ref": "#/definitions/IDType"
-          },
-          "originalExtensionId": {
-            "description": "The ID of the purchase extension that was corrected.",
-            "$ref": "#/definitions/IDType"
-          },
-          "originalPurchaseOutcomeId": {
-            "description": "The ID of the purchase outcome that was corrected.",
-            "$ref": "#/definitions/IDType"
-          },
           "originalEventDate": {
             "description": "The eventDate of the life event that was corrected.",
             "$ref": "#/definitions/ISO8601-Date",
@@ -122,6 +110,7 @@
           }
         },
         "required": [
+          "originalLifeEventId",
           "originalEventDate"
         ],
         "additionalProperties": false

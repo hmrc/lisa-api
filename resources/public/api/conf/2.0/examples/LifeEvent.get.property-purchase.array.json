@@ -11,7 +11,7 @@
     },
     "supersede": {
       "originalEventDate": "2017-05-10",
-      "originalFundReleaseId": "3456789000"
+      "originalLifeEventId": "3456789000"
     }
   },
   {
@@ -21,7 +21,7 @@
     "fundReleaseId": "3456789001",
     "supersede": {
       "originalEventDate": "2017-05-10",
-      "originalExtensionId": "6789000001"
+      "originalLifeEventId": "6789000001"
     }
   },
   {
@@ -31,7 +31,7 @@
     "fundReleaseId": "3456789001",
     "supersede": {
       "originalEventDate": "2017-05-10",
-      "originalExtensionId": "6789000001"
+      "originalLifeEventId": "6789000001"
     }
   },
   {
@@ -43,7 +43,7 @@
     "propertyPurchaseValue": 250000,
     "supersede": {
       "originalEventDate": "2017-05-05",
-      "originalPurchaseOutcomeId": "5678900001"
+      "originalLifeEventId": "5678900001"
     }
   }
 ]
