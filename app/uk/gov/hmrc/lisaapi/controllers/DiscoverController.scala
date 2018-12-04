@@ -82,7 +82,7 @@ class DiscoverController extends LisaController {
       "life events": [
         {"href": "/lifetime-isa/manager/$lisaManagerReferenceNumber/accounts/{accountId}/events", "methods": ["POST"]}
       ],
-      "annual returns": {"href": "/lifetime-isa/manager/$lisaManagerReferenceNumber/accounts/{accountId}/returns", "methods": ["POST"]},
+      "annual returns": {"href": "/lifetime-isa/manager/$lisaManagerReferenceNumber/accounts/{accountId}/events/annual-returns", "methods": ["POST"]},
       "bonus payments": [
         {"href": "/lifetime-isa/manager/$lisaManagerReferenceNumber/accounts/{accountId}/transactions", "methods": ["POST"]},
         {"href": "/lifetime-isa/manager/$lisaManagerReferenceNumber/accounts/{accountId}/transactions/{transactionId}", "methods": ["GET"]}
@@ -91,9 +91,9 @@ class DiscoverController extends LisaController {
         {"href": "/lifetime-isa/manager/$lisaManagerReferenceNumber/accounts/{accountId}/withdrawal-charges", "methods": ["POST"]},
         {"href": "/lifetime-isa/manager/$lisaManagerReferenceNumber/accounts/{accountId}/withdrawal-charges/{transactionId}", "methods": ["GET"]}
       ],
-      "property purchase fund release": {"href": "/lifetime-isa/manager/$lisaManagerReferenceNumber/accounts/{accountId}/property-purchase", "methods": ["POST"]},
-      "property purchase extension": {"href": "/lifetime-isa/manager/$lisaManagerReferenceNumber/accounts/{accountId}/property-purchase/extension", "methods": ["POST"]},
-      "property purchase outcome": {"href": "/lifetime-isa/manager/$lisaManagerReferenceNumber/accounts/{accountId}/property-purchase/outcome", "methods": ["POST"]},
+      "property purchase fund release": {"href": "/lifetime-isa/manager/$lisaManagerReferenceNumber/accounts/{accountId}/events/fund-releases", "methods": ["POST"]},
+      "property purchase extension": {"href": "/lifetime-isa/manager/$lisaManagerReferenceNumber/accounts/{accountId}/events/purchase-extensions", "methods": ["POST"]},
+      "property purchase outcome": {"href": "/lifetime-isa/manager/$lisaManagerReferenceNumber/accounts/{accountId}/events/purchase-outcomes", "methods": ["POST"]},
       "bulk payments": {"href": "/lifetime-isa/manager/$lisaManagerReferenceNumber/payments?startDate={startDate}&endDate={endDate}", "methods": ["GET"]},
       "bulk payment breakdown": {"href": "/lifetime-isa/manager/$lisaManagerReferenceNumber/accounts/{accountId}/transactions/{transactionId}/payments", "methods": ["GET"]}
     }

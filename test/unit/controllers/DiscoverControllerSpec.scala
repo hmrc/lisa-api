@@ -55,7 +55,7 @@ class DiscoverControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSu
       status(res) mustBe OK
       val json = contentAsJson(res)
       (json \ "_links" \ "close account" \ "href").as[String] mustBe "/lifetime-isa/manager/Z019283/accounts/{accountId}/close-account"
-      (json \ "_links" \ "property purchase fund release" \ "href").asOpt[String] mustBe Some("/lifetime-isa/manager/Z019283/accounts/{accountId}/property-purchase")
+      (json \ "_links" \ "property purchase fund release" \ "href").asOpt[String] mustBe Some("/lifetime-isa/manager/Z019283/accounts/{accountId}/events/fund-releases")
     }
 
     "return the lisa manager reference number provided" in {

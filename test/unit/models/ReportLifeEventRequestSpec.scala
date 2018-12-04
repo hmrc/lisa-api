@@ -92,7 +92,7 @@ class ReportLifeEventRequestSpec extends PlaySpec {
         eventDate = new DateTime("2017-05-05"),
         withdrawalAmount = 5000,
         supersede = FundReleaseSupersedeDetails(
-          originalFundReleaseId = "3456789000",
+          originalLifeEventId = "3456789000",
           originalEventDate = new DateTime("2017-05-10")
         )
       )
@@ -128,7 +128,7 @@ class ReportLifeEventRequestSpec extends PlaySpec {
         eventType = "Extension two",
         supersede = RequestExtensionSupersedeDetails(
           originalEventDate = new DateTime("2017-05-10"),
-          originalExtensionId = "6789000001"
+          originalLifeEventId = "6789000001"
         )
       )
       val output = Json.toJson[ReportLifeEventRequestBase](input)
@@ -168,7 +168,7 @@ class ReportLifeEventRequestSpec extends PlaySpec {
         propertyPurchaseResult = "Purchase completed",
         propertyPurchaseValue = 250000,
         supersede = PurchaseOutcomeSupersede(
-          originalPurchaseOutcomeId = "5678900001",
+          originalLifeEventId = "5678900001",
           originalEventDate = new DateTime("2017-05-05")
         )
       )

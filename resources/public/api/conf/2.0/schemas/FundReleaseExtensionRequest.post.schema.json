@@ -22,7 +22,7 @@
 			"type": "object",
 			"description": "Correct an existing extension.",
 			"properties": {
-				"originalExtensionId": {
+				"originalLifeEventId": {
 				  "description": "The ID of the extension affected by the correction.",
 				  "$ref": "#/definitions/IDType1",
 				  "example": "6789000001"
@@ -34,7 +34,7 @@
 				}
 			},
 			"required": [
-				"originalExtensionId",
+				"originalLifeEventId",
 				"originalEventDate"
 			],
 			"additionalProperties": false

@@ -27,7 +27,7 @@ abstract class RequestPurchaseExtension extends ReportLifeEventRequestBase {
 
 case class RequestStandardPurchaseExtension(fundReleaseId: LifeEventId, eventDate: DateTime, eventType: LifeEventType) extends RequestPurchaseExtension
 case class RequestSupersededPurchaseExtension(eventDate: DateTime, eventType: LifeEventType, supersede: RequestExtensionSupersedeDetails) extends RequestPurchaseExtension
-case class RequestExtensionSupersedeDetails(originalEventDate: DateTime, originalExtensionId: LifeEventId)
+case class RequestExtensionSupersedeDetails(originalEventDate: DateTime, originalLifeEventId: LifeEventId)
 
 object RequestPurchaseExtension {
   implicit val dateReads: Reads[DateTime] = JsonReads.notFutureDate
@@ -35,7 +35,7 @@ object RequestPurchaseExtension {
 
   implicit val supersedeDetailReads: Reads[RequestExtensionSupersedeDetails] = (
     (JsPath \ "originalEventDate").read(JsonReads.notFutureDate) and
-    (JsPath \ "originalExtensionId").read[LifeEventId](JsonReads.extensionId)
+    (JsPath \ "originalLifeEventId").read[LifeEventId](JsonReads.lifeEventId)
   )(RequestExtensionSupersedeDetails.apply _)
 
   val standardReads: Reads[RequestStandardPurchaseExtension] = (
@@ -69,7 +69,7 @@ object RequestPurchaseExtension {
     req.eventType,
     req.eventDate,
     req.supersede.originalEventDate,
-    req.supersede.originalExtensionId
+    req.supersede.originalLifeEventId
   )}
 
   implicit val reads: Reads[RequestPurchaseExtension] = Reads[RequestPurchaseExtension] { json =>

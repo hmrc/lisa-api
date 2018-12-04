@@ -1,6 +1,6 @@
 {
   "data": {
-    "fundReleaseId": "3456789001",
+    "lifeEventId": "3456789001",
     "message": "Fund release superseded"
   },
   "success": true,

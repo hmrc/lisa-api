@@ -24,7 +24,7 @@ import uk.gov.hmrc.lisaapi.models._
 class RequestPurchaseOutcomeRequestSpec extends PlaySpec {
 
   val standardJson = """{"fundReleaseId":"3456789000","eventDate":"2017-05-05","propertyPurchaseResult":"Purchase completed","propertyPurchaseValue":250000}"""
-  val supersededJson = """{"fundReleaseId":"3456789000","eventDate":"2017-06-10","propertyPurchaseResult":"Purchase completed","propertyPurchaseValue":250000,"supersede":{"originalPurchaseOutcomeId":"5678900001","originalEventDate":"2017-05-05"}}"""
+  val supersededJson = """{"fundReleaseId":"3456789000","eventDate":"2017-06-10","propertyPurchaseResult":"Purchase completed","propertyPurchaseValue":250000,"supersede":{"originalLifeEventId":"5678900001","originalEventDate":"2017-05-05"}}"""
 
   "RequestPurchaseOutcomeStandardRequest" must {
 
@@ -94,7 +94,7 @@ class RequestPurchaseOutcomeRequestSpec extends PlaySpec {
         propertyPurchaseResult = "Purchase completed",
         propertyPurchaseValue = 250000,
         supersede = PurchaseOutcomeSupersede(
-          originalPurchaseOutcomeId = "5678900001",
+          originalLifeEventId = "5678900001",
           originalEventDate = new DateTime("2017-05-05")
         )
       )
@@ -107,7 +107,7 @@ class RequestPurchaseOutcomeRequestSpec extends PlaySpec {
         propertyPurchaseResult = "Purchase completed",
         propertyPurchaseValue = 250000,
         supersede = PurchaseOutcomeSupersede(
-          originalPurchaseOutcomeId = "5678900001",
+          originalLifeEventId = "5678900001",
           originalEventDate = new DateTime("2017-05-05")
         )
       )
@@ -146,10 +146,10 @@ class RequestPurchaseOutcomeRequestSpec extends PlaySpec {
       Json.parse(json).validate[RequestPurchaseOutcomeRequest] mustBe JsError((JsPath \ "propertyPurchaseValue"), "error.formatting.currencyNegativeDisallowed")
     }
 
-    "validate the originalPurchaseOutcomeId" in {
+    "validate the originalLifeEventId" in {
       val json = supersededJson.replace("5678900001", "x")
 
-      Json.parse(json).validate[RequestPurchaseOutcomeRequest] mustBe JsError((JsPath \ "supersede" \ "originalPurchaseOutcomeId"), "error.formatting.fundReleaseId")
+      Json.parse(json).validate[RequestPurchaseOutcomeRequest] mustBe JsError((JsPath \ "supersede" \ "originalLifeEventId"), "error.formatting.lifeEventId")
     }
 
     "validate the originalEventDate" when {

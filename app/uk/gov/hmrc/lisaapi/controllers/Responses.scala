@@ -183,35 +183,18 @@ case object ErrorWithdrawalSupersededOutcomeError extends ErrorResponse(403, "SU
 case object ErrorWithdrawalTimescalesExceeded extends ErrorResponse(403, "WITHDRAWAL_CHARGE_TIMESCALES_EXCEEDED", "The timescale for reporting a withdrawal charge has passed. The claim period lasts for 6 years and 14 days")
 
 
-
-
-
 case object ErrorLifeEventAlreadyExists extends ErrorResponse(409, "LIFE_EVENT_ALREADY_EXISTS", "The investor’s life event has already been reported")
-
+case object ErrorLifeEventMismatch extends ErrorResponse(403, "SUPERSEDED_LIFE_EVENT_MISMATCH_ERROR", "originalLifeEventId and the originalEventDate do not match the information in the original request")
+case object ErrorLifeEventAlreadySuperseded extends ErrorResponse(409, "SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED", "This life event has already been superseded")
 
 case object ErrorAccountNotOpenLongEnough extends ErrorResponse(403, "COMPLIANCE_ERROR_ACCOUNT_NOT_OPEN_LONG_ENOUGH", "The account has not been open for long enough")
 case object ErrorFundReleaseOtherPropertyOnRecord extends ErrorResponse(403, "COMPLIANCE_ERROR_OTHER_PURCHASE_ON_RECORD", "Another property purchase is already recorded")
-case object ErrorFundReleaseMismatch extends ErrorResponse(403, "SUPERSEDED_FUND_RELEASE_MISMATCH_ERROR", "originalFundReleaseId and the originalEventDate do not match the information in the original request")
 case object ErrorInvalidDataProvided extends ErrorResponse(403, "INVALID_DATA_PROVIDED", "You can only change eventDate or withdrawalAmount when superseding a property purchase fund release")
-case object ErrorFundReleaseAlreadyExists extends ErrorResponse(409, "FUND_RELEASE_ALREADY_EXISTS", "The investor’s fund release has already been requested")
-case object ErrorFundReleaseAlreadySuperseded extends ErrorResponse(409, "SUPERSEDED_FUND_RELEASE_ALREADY_SUPERSEDED", "This fund release has already been superseded")
-
-
 case object ErrorExtensionOneNotApproved extends ErrorResponse(403, "FIRST_EXTENSION_NOT_APPROVED", "A first extension has not yet been approved")
-case object ErrorExtensionMismatch extends ErrorResponse(403, "SUPERSEDED_EXTENSION_MISMATCH_ERROR", "originalExtensionId and the originalEventDate do not match the information in the original request")
 case object ErrorFundReleaseNotFound extends ErrorResponse(404, "FUND_RELEASE_NOT_FOUND", "The fundReleaseId does not match HMRC’s records")
-case object ErrorExtensionAlreadyExists extends ErrorResponse(409, "EXTENSION_ALREADY_EXISTS", "The investor’s purchase extension has already been requested")
 case object ErrorFundReleaseSuperseded extends ErrorResponse(409, "FUND_RELEASE_SUPERSEDED", "This fund release has already been superseded")
 case object ErrorExtensionOneAlreadyApproved extends ErrorResponse(403, "FIRST_EXTENSION_ALREADY_APPROVED", "A first extension has already been approved")
 case object ErrorExtensionTwoAlreadyApproved extends ErrorResponse(403, "SECOND_EXTENSION_ALREADY_APPROVED", "A second extension has already been approved")
-case object ErrorExtensionAlreadySuperseded extends ErrorResponse(409, "SUPERSEDED_EXTENSION_ALREADY_SUPERSEDED", "This extension has already been superseded")
-
-case object ErrorOutcomeMismatch extends ErrorResponse(403, "SUPERSEDED_PURCHASE_OUTCOME_MISMATCH_ERROR", "originalPurchaseOutcomeId and the originalEventDate do not match the information in the original request")
-case object ErrorOutcomeAlreadyExists extends ErrorResponse(409, "PURCHASE_OUTCOME_ALREADY_EXISTS", "The investor’s purchase outcome has already been reported")
-case object ErrorOutcomeAlreadySuperseded extends ErrorResponse(409, "SUPERSEDED_PURCHASE_OUTCOME_ALREADY_SUPERSEDED", "This purchase outcome has already been superseded")
-
-case object ErrorLifeEventMismatch extends ErrorResponse(403, "SUPERSEDED_LIFE_EVENT_MISMATCH_ERROR", "originalLifeEventId and the originalEventDate do not match the information in the original request")
-case object ErrorLifeEventAlreadySuperseded extends ErrorResponse(409, "SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED", "This life event has already been superseded")
 
 object ErrorInvestorAlreadyExists {
 

@@ -91,13 +91,13 @@ class RequestFundReleaseRequestSpec extends PlaySpec {
 
     "serialize from json" in {
 
-      val json = """{"eventDate":"2017-05-05","withdrawalAmount":5000,"supersede":{"originalFundReleaseId":"3456789000","originalEventDate":"2017-05-10"}}"""
+      val json = """{"eventDate":"2017-05-05","withdrawalAmount":5000,"supersede":{"originalLifeEventId":"3456789000","originalEventDate":"2017-05-10"}}"""
 
       Json.parse(json).as[RequestFundReleaseRequest] mustBe SupersedeFundReleaseRequest(
         eventDate = new DateTime("2017-05-05"),
         withdrawalAmount = 5000,
         supersede = FundReleaseSupersedeDetails(
-          originalFundReleaseId = "3456789000",
+          originalLifeEventId = "3456789000",
           originalEventDate = new DateTime("2017-05-10")
         )
       )
@@ -110,7 +110,7 @@ class RequestFundReleaseRequestSpec extends PlaySpec {
         eventDate = new DateTime("2017-05-05"),
         withdrawalAmount = 5000,
         supersede = FundReleaseSupersedeDetails(
-          originalFundReleaseId = "3456789000",
+          originalLifeEventId = "3456789000",
           originalEventDate = new DateTime("2017-05-10")
         )
       )
