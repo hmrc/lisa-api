@@ -9,7 +9,7 @@
     </thead>
     <tbody>
         <tr>
-            <td><p>Request with a valid LISA Manager reference number, account ID and life event ID</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>accountId: 1234567890<br>lifeEventId: 1234567891</p></td>
+            <td><p>Request with a valid LISA Manager reference number, account ID and life event ID</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567890<br>lifeEventId: 1234567891</p></td>
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
 <pre class="code--block">
 {
@@ -32,7 +32,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request containing an account ID that does not exist</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>accountId: 0000000404<br>lifeEventId: 1234567891</p></td>
+            <td><p>Request containing an account ID that does not exist</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 0000000404<br>lifeEventId: 1234567891</p></td>
             <td><p>HTTP status: <code class="code--slim">404 (Not found)</code></p>
 <pre class="code--block">
 {
@@ -43,7 +43,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request containing an account ID that does not exist</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>accountId: 1000000404<br>lifeEventId: 1234567890</p></td>
+            <td><p>Request containing an account ID that does not exist</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1000000404<br>lifeEventId: 1234567890</p></td>
             <td><p>HTTP status: <code class="code--slim">404 (Not found)</code></p>
 <pre class="code--block">
 {
@@ -54,7 +54,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request with an invalid 'Accept' header</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>accountId: 1234567890<br>lifeEventId: 1234567891<br><br>Accept: application/vnd.hmrc.1.0</p></td>
+            <td><p>Request with an invalid 'Accept' header</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567890<br>lifeEventId: 1234567891<br><br>Accept: application/vnd.hmrc.1.0</p></td>
             <td><p>HTTP status: <code class="code--slim">406 (Not Acceptable)</code></p>
 <pre class="code--block">
 {

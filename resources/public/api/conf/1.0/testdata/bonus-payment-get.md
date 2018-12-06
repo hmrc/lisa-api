@@ -14,7 +14,7 @@
 		    <td>
 		    	<p>Retrieve details for a bonus payment associated with a LISA account</p>
 		    	<p class ="code--block">
-		    		<strong>lisaManagerReferenceNumber:</strong> <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
+		    		<strong>lisaManagerReferenceNumber:</strong> <a href="#testing">Use your test user profile</a><br>
 		    		<strong>accountId:</strong> 1234567890<br>
 		    		<strong>transactionId:</strong> 0123456789
 		    	</p>
@@ -50,7 +50,7 @@
 	    <td>
 		    	<p>Retrieve details for a bonus payment associated with a LISA account (regular bonus)</p>
 		    	<p class ="code--block">
-		    		<strong>lisaManagerReferenceNumber:</strong> <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
+		    		<strong>lisaManagerReferenceNumber:</strong> <a href="#testing">Use your test user profile</a><br>
 		    		<strong>accountId:</strong> 1234567890<br>
 		    		<strong>transactionId:</strong> 0003456789
 		    	</p>
@@ -100,7 +100,7 @@
 		    <td>
 		    	<p>Request with an invalid accountId</p>
 		    	<p class ="code--block">
-		    		<strong>lisaManagerReferenceNumber:</strong> <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
+		    		<strong>lisaManagerReferenceNumber:</strong> <a href="#testing">Use your test user profile</a><br>
 		    		<strong>accountId:</strong> 1234%3D5678<br>
 		    		<strong>transactionId:</strong> 0123456789
 		    	</p>
@@ -119,7 +119,7 @@
 		    <td>
 		    	<p>Request with an invalid bonus payment transaction</p>
 		    	<p class ="code--block">
-		    		<strong>lisaManagerReferenceNumber:</strong> <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
+		    		<strong>lisaManagerReferenceNumber:</strong> <a href="#testing">Use your test user profile</a><br>
 		    		<strong>accountId:</strong> 1234567890<br>
 		    		<strong>transactionId:</strong> 0000000404
 		    	</p>
@@ -138,7 +138,7 @@
 		    <td>
 		    	<p>Request with an invalid LISA account</p>
 		    	<p class ="code--block">
-		    		<strong>lisaManagerReferenceNumber:</strong> <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
+		    		<strong>lisaManagerReferenceNumber:</strong> <a href="#testing">Use your test user profile</a><br>
 		    		<strong>accountId:</strong> 1234567899<br>
 		    		<strong>transactionId:</strong> 1000000404
 		    	</p>
