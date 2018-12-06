@@ -312,7 +312,7 @@
         </tr>
         <tr>
             <td>
-                <p>This LISA account is already closed</p>
+                <p>This LISA account is already cancelled</p>
                 <p class="code--block">
                     <strong>lisaManagerReferenceNumber:</strong><br>
                     <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
