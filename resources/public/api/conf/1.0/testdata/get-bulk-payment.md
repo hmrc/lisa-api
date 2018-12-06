@@ -12,7 +12,7 @@
             <td>
                 <p>Request for payments where some are found</p>
                 <p class="code--block">
-                    lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
+                    lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
                     startDate: 2017-05-20<br>
                     endDate: 2017-10-20
                 </p>
@@ -49,7 +49,7 @@
             <td>
                 <p>Request for payments where none are found</p>
                 <p class="code--block">
-                    lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
+                    lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
                     startDate: 2017-04-06<br>
                     endDate: 2017-04-06
                 </p>
@@ -83,7 +83,7 @@
             <td>
                 <p>Request with startDate in the wrong format</p>
                 <p class="code--block">
-                    lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
+                    lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
                     startDate: 20-05-2017<br>
                     endDate: 2017-05-20
                 </p>
@@ -101,7 +101,7 @@
             <td>
                 <p>Request with endDate in the wrong format</p>
                 <p class="code--block">
-                    lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
+                    lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
                     startDate: 2017-05-20<br>
                     endDate: 20-05-2017
                 </p>
@@ -119,7 +119,7 @@
             <td>
                 <p>Request with startDate and endDate in the wrong format</p>
                 <p class="code--block">
-                    lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
+                    lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
                     startDate: 20-05-2017<br>
                     endDate: 20-05-2017
                 </p>
@@ -137,7 +137,7 @@
             <td>
                 <p>Request with and endDate in the future</p>
                 <p class="code--block">
-                    lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
+                    lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
                     startDate: (today's date)<br>
                     endDate: (any date in the future)
                 </p>
@@ -155,7 +155,7 @@
             <td>
                 <p>Request with an endDate before the startDate</p>
                 <p class="code--block">
-                    lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
+                    lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
                     startDate: 2017-12-20<br>
                     endDate: 2017-12-19
                 </p>
@@ -173,7 +173,7 @@
             <td>
                 <p>Request with an endDate before the startDate</p>
                 <p class="code--block">
-                    lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
+                    lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
                     startDate: 2017-04-05<br>
                     endDate: 2017-04-06
                 </p>
@@ -191,7 +191,7 @@
             <td>
                 <p>Request with an endDate over a year after startDate</p>
                 <p class="code--block">
-                    lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
+                    lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
                     startDate: 2017-04-06<br>
                     endDate: 2018-04-07
                 </p>
@@ -209,7 +209,7 @@
             <td>
                 <p>Request with an invalid 'Accept' header</p>
                 <p class="code--block">
-                    lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
+                    lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
                     startDate: 2017-04-06<br>
                     endDate: 2017-05-05
                     <br>

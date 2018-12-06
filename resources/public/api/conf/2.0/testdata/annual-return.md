@@ -11,7 +11,7 @@
     </thead>
     <tbody>
         <tr>
-            <td><p>Successfully sent an annual return of information</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
+            <td><p>Successfully sent an annual return of information</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
             <td>
 <pre class="code--block">
 {
@@ -39,7 +39,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Successfully corrected an annual return of information</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
+            <td><p>Successfully corrected an annual return of information</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
             <td>
 <pre class="code--block">
 {
@@ -95,7 +95,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Account ID in the wrong format</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>accountId: 1234%3D5678</p></td>
+            <td><p>Account ID in the wrong format</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234%3D5678</p></td>
             <td>
 <pre class="code--block">
 {
@@ -119,7 +119,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Wrong or missing data</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
+            <td><p>Wrong or missing data</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
             <td>
 <pre class="code--block">
 {
@@ -164,7 +164,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>A mixture of cash and stocks and shares in the same annual return</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
+            <td><p>A mixture of cash and stocks and shares in the same annual return</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
             <td>
 <pre class="code--block">
 {
@@ -200,7 +200,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Tax year before 2017</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
+            <td><p>Tax year before 2017</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
             <td>
 <pre class="code--block">
 {
@@ -231,7 +231,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Tax year in the future</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
+            <td><p>Tax year in the future</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
             <td>
 <pre class="code--block">
 {
@@ -262,7 +262,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Account cancelled</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>accountId: 2000000403</p></td>
+            <td><p>Account cancelled</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 2000000403</p></td>
             <td>
 <pre class="code--block">
 {
@@ -286,7 +286,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Account void</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>accountId: 3000000403</p></td>
+            <td><p>Account void</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 3000000403</p></td>
             <td>
 <pre class="code--block">
 {
@@ -313,7 +313,7 @@
             <td>
                 <p>Supersede details do not match the original return of information</p>
                 <p class="code--block">
-                lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a>
+                lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a>
                 <br>
                 accountId: 5000000403
                 </p>
@@ -345,7 +345,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Account could not be found</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>accountId: 0000000404</p></td>
+            <td><p>Account could not be found</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 0000000404</p></td>
             <td>
 <pre class="code--block">
 {
@@ -369,7 +369,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Accept header is missing or invalid</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>accountId: 1234567890<br><br>Accept: application/vnd.hmrc.1.0</p></td>
+            <td><p>Accept header is missing or invalid</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567890<br><br>Accept: application/vnd.hmrc.1.0</p></td>
             <td>
 <pre class="code--block">
 {
@@ -396,7 +396,7 @@
             <td>
                 <p>Life event already superseded</p>
                 <p class="code--block">
-                    lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a>
+                    lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a>
                     <br>
                     accountId: 1000000409
                 </p>
@@ -428,7 +428,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Life event already exists</p><p class="code--block">lisaManagerReferenceNumber: <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>accountId: 0000000409</p></td>
+            <td><p>Life event already exists</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 0000000409</p></td>
             <td>
 <pre class="code--block">
 {
