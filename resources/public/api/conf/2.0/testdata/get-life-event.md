@@ -32,6 +32,67 @@
     </tr>
     <tr>
       <td>
+        <p>Annual return of information that has been superseded</p>
+        <p class="code--block">
+          lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+          accountId: 1234567890<br>
+          lifeEventId: 7890000001
+        </p>
+      </td>
+      <td>
+        <p>HTTP status: <code class="code--slim">200 (OK)</code></p>
+<pre class="code--block">
+[
+  {
+    "lifeEventId": "7890000001",
+    "eventDate": "2018-04-05",
+    "eventType": "Statutory Submission",
+    "lisaManagerName": "Company Name",
+    "taxYear": 2018,
+    "marketValueCash": 0,
+    "marketValueStocksAndShares": 55,
+    "annualSubsCash": 0,
+    "annualSubsStocksAndShares": 55,
+    "supersededBy": "7890000002"
+  }
+]
+</pre>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <p>Annual return of information that supersedes another</p>
+        <p class="code--block">
+          lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+          accountId: 1234567890<br>
+          lifeEventId: 7890000002
+        </p>
+      </td>
+      <td>
+        <p>HTTP status: <code class="code--slim">200 (OK)</code></p>
+<pre class="code--block">
+[
+  {
+    "lifeEventId": "7890000002",
+    "eventType": "Statutory Submission",
+    "eventDate": "2018-04-05",
+    "lisaManagerName": "Company Name",
+    "taxYear": 2018,
+    "marketValueCash": 0,
+    "marketValueStocksAndShares": 65,
+    "annualSubsCash": 0,
+    "annualSubsStocksAndShares": 65,
+    "supersede": {
+      "originalLifeEventId": "7890000001",
+      "originalEventDate": "2018-04-05"
+    }
+  }
+]
+</pre>
+      </td>
+    </tr>
+    <tr>
+      <td>
         <p>lisaManagerReferenceNumber is in the wrong format</p>
         <p class="code--block">
           lisaManagerReferenceNumber: 123456<br>
