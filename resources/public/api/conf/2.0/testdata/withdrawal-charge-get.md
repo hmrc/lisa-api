@@ -13,7 +13,7 @@
                 <p>Withdrawal transaction which has been superseded</p>
                 <p class="code--block">
                     <strong>lisaManagerReferenceNumber:</strong><br>
-                    <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
+                    <a href="#testing">Use your test user profile</a><br>
                     <br>
                     <strong>accountId:</strong><br>1234567890
                     <br>
@@ -41,7 +41,7 @@
                 <p>Withdrawal transaction which has not been superseded</p>
                 <p class="code--block">
                     <strong>lisaManagerReferenceNumber:</strong><br>
-                    <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
+                    <a href="#testing">Use your test user profile</a><br>
                     <br>
                     <strong>accountId:</strong><br>1234567890
                     <br>
@@ -68,7 +68,7 @@
                 <p>Withdrawal transaction which supersedes another</p>
                 <p class="code--block">
                     <strong>lisaManagerReferenceNumber:</strong><br>
-                    <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
+                    <a href="#testing">Use your test user profile</a><br>
                     <br>
                     <strong>accountId:</strong><br>1234567890
                     <br>
@@ -123,7 +123,7 @@
                 <p>Invalid Account ID</p>
                 <p class="code--block">
                     <strong>lisaManagerReferenceNumber:</strong><br>
-                    <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
+                    <a href="#testing">Use your test user profile</a><br>
                     <br>
                     <strong>accountId:</strong><br>1234%3D5678
                     <br>
@@ -145,7 +145,7 @@
                 <p>Account ID does not exist</p>
                 <p class="code--block">
                     <strong>lisaManagerReferenceNumber:</strong><br>
-                    <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
+                    <a href="#testing">Use your test user profile</a><br>
                     <br>
                     <strong>accountId:</strong><br>1234567890
                     <br>
@@ -167,7 +167,7 @@
                 <p>Transaction ID does not exist</p>
                 <p class="code--block">
                     <strong>lisaManagerReferenceNumber:</strong><br>
-                    <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
+                    <a href="#testing">Use your test user profile</a><br>
                     <br>
                     <strong>accountId:</strong><br>1234567890
                     <br>

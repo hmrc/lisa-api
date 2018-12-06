@@ -15,7 +15,7 @@
               <p>Request with a valid payload, LISA Manager reference number and account ID</p>
               <p class="code--block">
                 <strong>lisaManagerReferenceNumber:</strong><br>
-                <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
+                <a href="#testing">Use your test user profile</a><br>
                 <br>
                 <strong>accountId:</strong><br>
                 1234567890
@@ -64,7 +64,7 @@
               <p>Request with a valid payload, LISA Manager reference number and account ID (late notification)</p>
               <p class="code--block">
                 <strong>lisaManagerReferenceNumber:</strong><br>
-                <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
+                <a href="#testing">Use your test user profile</a><br>
                 <br>
                 <strong>accountId:</strong><br>
                 1234567891
@@ -109,7 +109,7 @@
               <p>Request with a valid payload, LISA Manager reference number and account ID (regular bonus)</p>
               <p class="code--block">
                 <strong>lisaManagerReferenceNumber:</strong><br>
-                <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
+                <a href="#testing">Use your test user profile</a><br>
                 <br>
                 <strong>accountId:</strong><br>
                 1234567890
@@ -198,7 +198,7 @@
               <p>Request with a valid payload and LISA Manager reference number, but an invalid account ID</p>
               <p class ="code--block">
                 <strong>lisaManagerReferenceNumber:</strong><br>
-                <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
+                <a href="#testing">Use your test user profile</a><br>
                 <br>
                 <strong>accountId:</strong><br>
                 1234%3D5678
@@ -243,7 +243,7 @@
             <p>Request containing invalid and/or missing data</p>
             <p class="code--block">
               <strong>lisaManagerReferenceNumber:</strong><br>
-              <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
+              <a href="#testing">Use your test user profile</a><br>
               <br>
               <strong>accountId:</strong><br>
               1234567890
@@ -314,7 +314,7 @@
               <p>Request with invalid monetary amounts and/or invalid dates</p>
               <p class="code--block">
                 <strong>lisaManagerReferenceNumber:</strong><br>
-                <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
+                <a href="#testing">Use your test user profile</a><br>
                 <br>
                 <strong>accountId:</strong><br>
                 1234567890
@@ -406,7 +406,7 @@
             <p>Request with a 'claimReason' of 'Life Event', but without a lifeEventId</p>
             <p class="code--block">
               <strong>lisaManagerReferenceNumber:</strong><br>
-              <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
+              <a href="#testing">Use your test user profile</a><br>
               <br>
               <strong>accountId:</strong><br>
               1234567890
@@ -450,7 +450,7 @@
               <p>Request containing invalid bonus payment figures</p>
               <p class="code--block">
                 <strong>lisaManagerReferenceNumber:</strong><br>
-                <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
+                <a href="#testing">Use your test user profile</a><br>
                 <br>
                 <strong>accountId:</strong><br>
                 0000000403
@@ -491,7 +491,7 @@
               <p>Request for an account that has already been closed or made void.</p>
               <p class="code--block">
                 <strong>lisaManagerReferenceNumber:</strong><br>
-                <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
+                <a href="#testing">Use your test user profile</a><br>
                 <br>
                 <strong>accountId:</strong><br>
                 0000000903
@@ -532,7 +532,7 @@
               <p>Request for a bonus claim after 5 April 2018 containing help to buy funds.</p>
               <p class="code--block">
                 <strong>lisaManagerReferenceNumber:</strong><br>
-                <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
+                <a href="#testing">Use your test user profile</a><br>
                 <br>
                 <strong>accountId:</strong><br>
                 1234567890
@@ -576,7 +576,7 @@
               <p>Request containing a life event ID that does not exist</p>
               <p class="code--block">
                 <strong>lisaManagerReferenceNumber:</strong><br>
-                <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
+                <a href="#testing">Use your test user profile</a><br>
                 <br>
                 <strong>accountId:</strong><br>
                 1000000404
@@ -621,7 +621,7 @@
               <p>Request containing an account ID that does not exist</p>
               <p class="code--block">
                 <strong>lisaManagerReferenceNumber:</strong><br>
-                <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
+                <a href="#testing">Use your test user profile</a><br>
                 <br>
                 <strong>accountId:</strong><br>
                 0000000404
@@ -666,7 +666,7 @@
               <p>Request with an invalid 'Accept' header</p>
               <p class="code--block">
                 <strong>lisaManagerReferenceNumber:</strong><br>
-                <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/1.0#testing">Use your test user profile</a><br>
+                <a href="#testing">Use your test user profile</a><br>
                 <br>
                 <strong>accountId:</strong><br>
                 1234567890<br>
