@@ -32,7 +32,7 @@
     </tr>
     <tr>
       <td>
-        <p>Annual return of information that has been superseded</p>
+        <p>Annual return of information which has been superseded</p>
         <p class="code--block">
           lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
           accountId: 1234567890<br>
@@ -61,7 +61,7 @@
     </tr>
     <tr>
       <td>
-        <p>Annual return of information that supersedes another</p>
+        <p>Annual return of information which supersedes another</p>
         <p class="code--block">
           lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
           accountId: 1234567890<br>
@@ -85,6 +85,247 @@
     "supersede": {
       "originalLifeEventId": "7890000001",
       "originalEventDate": "2018-04-05"
+    }
+  }
+]
+</pre>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <p>Funds release which has been superseded</p>
+        <p class="code--block">
+          lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+          accountId: 1234567890<br>
+          lifeEventId: 3456789000
+        </p>
+      </td>
+      <td>
+        <p>HTTP status: <code class="code--slim">200 (OK)</code></p>
+<pre class="code--block">
+[
+  {
+    "lifeEventId": "3456789000",
+    "eventType": "Funds release"
+    "eventDate": "2017-05-10",
+    "withdrawalAmount": 4000.00,
+    "conveyancerReference": "CR12345-6789",
+    "propertyDetails": {
+      "nameOrNumber": "1",
+      "postalCode": "AA11 1AA"
+    },
+    "supersededBy": "3456789001"
+  }
+]
+</pre>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <p>Funds release which has associated data</p>
+        <p class="code--block">
+          lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+          accountId: 1234567890<br>
+          lifeEventId: 3456789001
+        </p>
+      </td>
+      <td>
+        <p>HTTP status: <code class="code--slim">200 (OK)</code></p>
+<pre class="code--block">
+[
+  {
+    "lifeEventId": "3456789001",
+    "eventType": "Funds release",
+    "eventDate": "2017-05-05",
+    "withdrawalAmount": 5000.00,
+    "supersede": {
+      "originalLifeEventId": "3456789000",
+      "originalEventDate": "2017-05-10"
+    }
+  },
+  {
+    "lifeEventId": "6789000002",
+    "eventDate": "2017-05-11",
+    "eventType": "Extension one",
+    "supersede": {
+      "originalEventDate": "2017-05-10",
+      "originalLifeEventId": "6789000001"
+    }
+  },
+  {
+    "lifeEventId": "6789000004",
+    "eventDate": "2017-08-11",
+    "eventType": "Extension two",
+    "supersede": {
+      "originalEventDate": "2017-08-10",
+      "originalLifeEventId": "6789000003"
+    }
+  },
+  {
+    "lifeEventId": "5678900002",
+    "fundReleaseId": "3456789001",
+    "eventDate": "2017-06-10",
+    "eventType": "Purchase outcome",
+    "propertyPurchaseResult": "Purchase completed",
+    "propertyPurchaseValue": 250000,
+    "supersede": {
+      "originalLifeEventId": "5678900001",
+      "originalEventDate": "2017-05-05"
+    }
+  }
+]
+</pre>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <p>Purchase extension one which has been superseded</p>
+        <p class="code--block">
+          lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+          accountId: 1234567890<br>
+          lifeEventId: 6789000001
+        </p>
+      </td>
+      <td>
+        <p>HTTP status: <code class="code--slim">200 (OK)</code></p>
+<pre class="code--block">
+[
+  {
+    "lifeEventId": "6789000001"
+    "fundReleaseId": "3456789001",
+    "eventDate": "2017-05-10",
+    "eventType": "Extension one",
+    "supersededBy": "6789000002"
+  }
+]
+</pre>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <p>Purchase extension one which supersedes another</p>
+        <p class="code--block">
+          lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+          accountId: 1234567890<br>
+          lifeEventId: 6789000002
+        </p>
+      </td>
+      <td>
+        <p>HTTP status: <code class="code--slim">200 (OK)</code></p>
+<pre class="code--block">
+[
+  {
+    "lifeEventId": "6789000001"
+    "eventDate": "2017-05-11",
+    "eventType": "Extension one",
+    "supersede": {
+      "originalEventDate": "2017-05-10",
+      "originalLifeEventId": "6789000001"
+    }
+  }
+]
+</pre>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <p>Purchase extension two which has been superseded</p>
+        <p class="code--block">
+          lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+          accountId: 1234567890<br>
+          lifeEventId: 6789000003
+        </p>
+      </td>
+      <td>
+        <p>HTTP status: <code class="code--slim">200 (OK)</code></p>
+<pre class="code--block">
+[
+  {
+    "lifeEventId": "6789000003"
+    "fundReleaseId": "3456789001",
+    "eventDate": "2017-08-10",
+    "eventType": "Extension two"
+    "supersededBy": "6789000004"
+  }
+]
+</pre>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <p>Purchase extension two which supersedes another</p>
+        <p class="code--block">
+          lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+          accountId: 1234567890<br>
+          lifeEventId: 6789000004
+        </p>
+      </td>
+      <td>
+        <p>HTTP status: <code class="code--slim">200 (OK)</code></p>
+<pre class="code--block">
+[
+  {
+    "lifeEventId": "6789000004"
+    "eventDate": "2017-08-11",
+    "eventType": "Extension two",
+    "supersede": {
+      "originalEventDate": "2017-08-10",
+      "originalLifeEventId": "6789000003"
+    }
+  }
+]
+</pre>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <p>Purchase outcome which has been superseded</p>
+        <p class="code--block">
+          lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+          accountId: 1234567890<br>
+          lifeEventId: 5678900001
+        </p>
+      </td>
+      <td>
+        <p>HTTP status: <code class="code--slim">200 (OK)</code></p>
+<pre class="code--block">
+[
+  {
+    "lifeEventId": "5678900001"
+    "fundReleaseId": "3456789001",
+    "eventDate": "2017-05-10",
+    "eventType": "Purchase outcome",
+    "propertyPurchaseResult": "Purchase completed",
+    "propertyPurchaseValue": 250000
+    "supersededBy": "5678900002"
+  }
+]
+</pre>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <p>Purchase outcome which supersedes another</p>
+        <p class="code--block">
+          lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+          accountId: 1234567890<br>
+          lifeEventId: 5678900002
+        </p>
+      </td>
+      <td>
+        <p>HTTP status: <code class="code--slim">200 (OK)</code></p>
+<pre class="code--block">
+[
+  {
+    "lifeEventId": "5678900002"
+    "fundReleaseId": "3456789001",
+    "eventDate": "2017-05-10",
+    "eventType": "Purchase outcome",
+    "propertyPurchaseResult": "Purchase completed",
+    "propertyPurchaseValue": 250000,
+    "supersede": {
+      "originalLifeEventId": "5678900001",
+      "originalEventDate": "2017-05-10"
     }
   }
 ]
