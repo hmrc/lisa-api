@@ -19,6 +19,36 @@
         "$ref": "#/definitions/ISO8601-Date",
         "description": "This is the date the life event was reported."
       },
+      "lisaManagerName": {
+        "type": "string",
+        "description": "The name of the LISA provider.",
+        "maxLength": 50,
+        "pattern": "^[a-zA-Z0-9 '/,&().-]{1,50}$",
+        "example": "Company Name"
+      },
+      "taxYear": {
+        "type": "integer",
+        "description": "The tax year for the return of information. This will be the year that the tax year ends in. For example, for the 2017 to 2018 tax year it will be 2018.",
+        "min": 2017,
+        "pattern": "^[0-9]{4}$",
+        "example": "2018"
+      },
+      "marketValueCash": {
+        "$ref": "#/definitions/MarketValue",
+        "description": "The total value that was reported for the cash LISA account."
+      },
+      "marketValueStocksAndShares": {
+        "$ref": "#/definitions/MarketValue",
+        "description": "The total value that was reported for the stocks and shares LISA account."
+      },
+      "annualSubsCash": {
+        "$ref": "#/definitions/AnnualSubs",
+        "description": "The total value that was reported for investor subscriptions into their cash LISA account during the tax year."
+      },
+      "annualSubsStocksAndShares": {
+        "$ref": "#/definitions/AnnualSubs",
+        "description": "The total value that was reported for investor subscriptions into their stocks and shares LISA account during the tax year."
+      },
       "withdrawalAmount": {
         "type": "number",
         "description": "This is the amount that the investor has withdrawn from the LISA account."
@@ -64,36 +94,6 @@
         "description": "Whether a property purchase was completed or failed.",
         "type": "string",
         "enum": ["Purchase failed", "Purchase completed"]
-      },
-      "lisaManagerName": {
-        "type": "string",
-        "description": "The name of the LISA provider.",
-        "maxLength": 50,
-        "pattern": "^[a-zA-Z0-9 '/,&().-]{1,50}$",
-        "example": "Company Name"
-      },
-      "taxYear": {
-        "type": "integer",
-        "description": "The tax year for the return of information. This will be the year that the tax year ends in. For example, for the 2017 to 2018 tax year it will be 2018.",
-        "min": 2017,
-        "pattern": "^[0-9]{4}$",
-        "example": "2018"
-      },
-      "marketValueCash": {
-        "$ref": "#/definitions/MarketValue",
-        "description": "The total value that was reported for the cash LISA account."
-      },
-      "marketValueStocksAndShares": {
-        "$ref": "#/definitions/MarketValue",
-        "description": "The total value that was reported for the stocks and shares LISA account."
-      },
-      "annualSubsCash": {
-        "$ref": "#/definitions/AnnualSubs",
-        "description": "The total value that was reported for investor subscriptions into their cash LISA account during the tax year."
-      },
-      "annualSubsStocksAndShares": {
-        "$ref": "#/definitions/AnnualSubs",
-        "description": "The total value that was reported for investor subscriptions into their stocks and shares LISA account during the tax year."
       },
       "supersede": {
         "type": "object",
@@ -142,7 +142,15 @@
     },
     "eventType" : {
       "type" : "string",
-      "enum": ["LISA Investor Terminal Ill Health", "LISA Investor Death", "Funds release", "Extension one", "Extension two", "Purchase outcome", "Statutory Submission"]
+      "enum": [
+        "LISA Investor Death",
+        "LISA Investor Terminal Ill Health",
+        "Statutory Submission",
+        "Funds release",
+        "Extension one",
+        "Extension two",
+        "Purchase outcome"
+      ]
     },
     "AnnualSubs": {
       "type": "integer",

@@ -4,6 +4,11 @@
     "eventType": "Funds release",
     "eventDate": "2017-05-05",
     "withdrawalAmount": 5000.00,
+    "conveyancerReference": "CR12345-6789",
+    "propertyDetails": {
+      "nameOrNumber": "1",
+      "postalCode": "AA11 1AA"
+    },
     "supersede": {
       "originalLifeEventId": "3456789000",
       "originalEventDate": "2017-05-10"
@@ -11,8 +16,9 @@
   },
   {
     "lifeEventId": "6789000002",
-    "eventDate": "2017-05-11",
     "eventType": "Extension one",
+    "eventDate": "2017-05-11",
+    "fundReleaseId": "3456789001",
     "supersede": {
       "originalEventDate": "2017-05-10",
       "originalLifeEventId": "6789000001"
@@ -20,8 +26,9 @@
   },
   {
     "lifeEventId": "6789000004",
-    "eventDate": "2017-08-11",
     "eventType": "Extension two",
+    "eventDate": "2017-08-11",
+    "fundReleaseId": "3456789001",
     "supersede": {
       "originalEventDate": "2017-08-10",
       "originalLifeEventId": "6789000003"
