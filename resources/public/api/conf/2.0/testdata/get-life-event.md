@@ -403,8 +403,8 @@
         <p>Life event not found</p>
         <p class="code--block">
           lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
-          accountId: 1000000404<br>
-          lifeEventId: 1234567891
+          accountId: 1234567890<br>
+          lifeEventId: 0000000404
         </p>
       </td>
       <td>
