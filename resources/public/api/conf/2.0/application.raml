@@ -1227,6 +1227,7 @@ types:
                         is: [headers.acceptHeader, headers.contentHeader]
                         (annotations.scope): "read:lisa"
                         securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]
+                        (annotations.sandboxData): !include testdata/get-life-event.md
                         responses:
                           200:
                             body:
@@ -1234,6 +1235,7 @@ types:
                                 type: !include schemas/LifeEvent.get.array.schema.json
                                 examples:
                                   ill: !include examples/LifeEvent.get.ill-health.array.json
+                                  return: !include examples/LifeEvent.get.annual-return.array.json
                                   property: !include examples/LifeEvent.get.property-purchase.array.json
                           400:
                             body:

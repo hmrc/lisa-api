@@ -1,23 +1,23 @@
 [
   {
     "lifeEventId": "3456789001",
-    "eventDate": "2017-05-10",
     "eventType": "Funds release",
-    "withdrawalAmount": 4000.00,
+    "eventDate": "2017-05-05",
+    "withdrawalAmount": 5000.00,
     "conveyancerReference": "CR12345-6789",
     "propertyDetails": {
       "nameOrNumber": "1",
       "postalCode": "AA11 1AA"
     },
     "supersede": {
-      "originalEventDate": "2017-05-10",
-      "originalLifeEventId": "3456789000"
+      "originalLifeEventId": "3456789000",
+      "originalEventDate": "2017-05-10"
     }
   },
   {
     "lifeEventId": "6789000002",
-    "eventDate": "2017-05-10",
     "eventType": "Extension one",
+    "eventDate": "2017-05-11",
     "fundReleaseId": "3456789001",
     "supersede": {
       "originalEventDate": "2017-05-10",
@@ -26,24 +26,24 @@
   },
   {
     "lifeEventId": "6789000004",
-    "eventDate": "2017-05-10",
     "eventType": "Extension two",
+    "eventDate": "2017-08-11",
     "fundReleaseId": "3456789001",
     "supersede": {
-      "originalEventDate": "2017-05-10",
-      "originalLifeEventId": "6789000001"
+      "originalEventDate": "2017-08-10",
+      "originalLifeEventId": "6789000003"
     }
   },
   {
-    "lifeEventId": "5678900001",
-    "eventDate": "2017-05-05",
-    "eventType": "Purchase outcome",
+    "lifeEventId": "5678900002",
     "fundReleaseId": "3456789001",
+    "eventDate": "2017-06-10",
+    "eventType": "Purchase outcome",
     "propertyPurchaseResult": "Purchase completed",
     "propertyPurchaseValue": 250000,
     "supersede": {
-      "originalEventDate": "2017-05-05",
-      "originalLifeEventId": "5678900001"
+      "originalLifeEventId": "5678900001",
+      "originalEventDate": "2017-05-05"
     }
   }
 ]
