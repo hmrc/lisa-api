@@ -51,7 +51,7 @@ class ReportLifeEventRequestSpec extends PlaySpec {
 
   }
 
-  "ReportLifeEventRequestBase" must {
+  "ReportLifeEventRequestBase writes" must {
 
     "correctly serialise a standard life event" in {
       val input = ReportLifeEventRequest( "LISA Investor Terminal Ill Health", new DateTime("2017-01-01"))
@@ -239,6 +239,43 @@ class ReportLifeEventRequestSpec extends PlaySpec {
         "supersededLifeEventID" -> "1234567890",
         "supersededLifeEventDate" -> "2017-04-01"
       )
+    }
+
+  }
+
+  "ReportLifeEventRequestBase reads" must {
+
+    "correctly deserialise a AnnualReturn" in {
+      val input = Json.obj(
+        "lifeEventType" -> "STATUTORY_SUBMISSION",
+        "lifeEventDate" -> "2018-04-05",
+        "isaManagerName" -> "ISA Manager",
+        "annualSubsCash" -> 0,
+        "annualSubsStocksAndShares" -> 55,
+        "marketValueCash" -> 0,
+        "marketValueStocksAndShares" -> 65,
+        "taxYear" -> "2018",
+        "supersededLifeEventId" -> "1234567890",
+        "supersededLifeEventDate" -> "2018-04-04",
+        "lifeEventSupersededById" -> "1234567891"
+      )
+
+      val expected = AnnualReturn(
+        eventDate = new DateTime("2018-04-05"),
+        lisaManagerName = "ISA Manager",
+        taxYear = 2018,
+        marketValueCash = 0,
+        marketValueStocksAndShares = 65,
+        annualSubsCash = 0,
+        annualSubsStocksAndShares = 55,
+        supersede = Some(AnnualReturnSupersede(
+          originalEventDate = new DateTime("2018-04-04"),
+          originalLifeEventId = "1234567890"
+        )),
+        supersededBy = Some("1234567891")
+      )
+
+      input.as[ReportLifeEventRequestBase] mustBe expected
     }
 
   }

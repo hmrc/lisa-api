@@ -19,12 +19,19 @@ package uk.gov.hmrc.lisaapi.models
 import org.joda.time.DateTime
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsPath, Reads, Writes}
+import uk.gov.hmrc.lisaapi.models.des.DesResponse
 
-trait ReportLifeEventRequestBase extends Product
+trait ReportLifeEventRequestBase extends Product with DesResponse
 
 case class ReportLifeEventRequest(eventType: LifeEventType,  eventDate: DateTime) extends ReportLifeEventRequestBase
 
 object ReportLifeEventRequestBase {
+  implicit val reads: Reads[ReportLifeEventRequestBase] = Reads[ReportLifeEventRequestBase] { json =>
+    (json \ "lifeEventType").as[String] match {
+      case "STATUTORY_SUBMISSION" => AnnualReturn.desReads.reads(json)
+    }
+  }
+
   implicit val writes: Writes[ReportLifeEventRequestBase] = Writes[ReportLifeEventRequestBase] {
     case deathTerminalIllness: ReportLifeEventRequest => ReportLifeEventRequest.desWrites.writes(deathTerminalIllness)
     case fundRelease: RequestFundReleaseRequest => RequestFundReleaseRequest.desWrites.writes(fundRelease)
@@ -44,4 +51,5 @@ object ReportLifeEventRequest {
     (JsPath \ "eventType").write[String] and
     (JsPath \ "eventDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd"))
   )(unlift(ReportLifeEventRequest.unapply))
+
 }

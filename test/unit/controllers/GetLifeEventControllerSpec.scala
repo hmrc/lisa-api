@@ -16,22 +16,25 @@
 
 package unit.controllers
 
+import org.joda.time.DateTime
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
-import uk.gov.hmrc.lisaapi.controllers.{ErrorNotImplemented, GetLifeEventController}
+import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountNotFound, ErrorNotImplemented, GetLifeEventController}
+import uk.gov.hmrc.lisaapi.models.{AnnualReturn, AnnualReturnSupersede, ReportLifeEventRequest, ReportLifeEventRequestBase}
+import uk.gov.hmrc.lisaapi.services.LifeEventService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class GetLifeEventControllerSpec extends PlaySpec with MockitoSugar with BeforeAndAfter {
+class GetLifeEventControllerSpec extends PlaySpec with MockitoSugar with BeforeAndAfter with OneAppPerSuite {
 
   val acceptHeaderV1: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
   val acceptHeaderV2: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.2.0+json")
@@ -52,20 +55,55 @@ class GetLifeEventControllerSpec extends PlaySpec with MockitoSugar with BeforeA
       status(res) mustBe NOT_ACCEPTABLE
     }
 
-    "return not implemented for api version 2" in {
-      val req = FakeRequest(Helpers.GET, "/")
-      val res = SUT.getLifeEvent(lisaManager, accountId, eventId).apply(req.withHeaders(acceptHeaderV2))
+    "return ok for api version 2" when {
+      "given a successful response from the service layer" in {
+        val annualReturn = AnnualReturn(
+          eventDate = new DateTime("2018-04-05"),
+          lisaManagerName = "ISA Manager",
+          taxYear = 2018,
+          marketValueCash = 0,
+          marketValueStocksAndShares = 65,
+          annualSubsCash = 0,
+          annualSubsStocksAndShares = 55,
+          supersede = Some(AnnualReturnSupersede(
+            originalEventDate = new DateTime("2018-04-04"),
+            originalLifeEventId = "1234567890"
+          )),
+          supersededBy = Some("1234567891")
+        )
 
-      status(res) mustBe NOT_IMPLEMENTED
-      contentAsJson(res) mustBe Json.toJson(ErrorNotImplemented)
+        when(mockService.getLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(Right(List(annualReturn))))
+
+        val res = SUT.getLifeEvent(lisaManager, accountId, eventId).apply(FakeRequest().withHeaders(acceptHeaderV2))
+
+        status(res) mustBe OK
+        contentAsJson(res) mustBe Json.arr(ReportLifeEventRequestBase.writes.writes(annualReturn))
+      }
+    }
+
+    "return an error for api version 2" when {
+      "given an error response from the service layer" in {
+        when(mockService.getLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(Left(ErrorAccountNotFound)))
+
+        val res = SUT.getLifeEvent(lisaManager, accountId, eventId).apply(FakeRequest().withHeaders(acceptHeaderV2))
+
+        status(res) mustBe NOT_FOUND
+        contentAsJson(res) mustBe Json.obj(
+          "code" -> ErrorAccountNotFound.errorCode,
+          "message" -> ErrorAccountNotFound.message
+        )
+      }
+
     }
 
   }
 
   val mockAuthCon: LisaAuthConnector = mock[LisaAuthConnector]
+  val mockService: LifeEventService = mock[LifeEventService]
 
   val SUT = new GetLifeEventController {
     override val authConnector = mockAuthCon
+    override val service = mockService
     override lazy val v2endpointsEnabled = true
   }
 

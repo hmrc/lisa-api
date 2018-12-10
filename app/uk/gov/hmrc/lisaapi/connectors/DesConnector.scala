@@ -183,6 +183,46 @@ trait DesConnector extends ServicesConfig {
   }
 
   /**
+    * Attempts to get a LISA Life Event
+    */
+  def getLifeEvent(lisaManager: String, accountId: String, lifeEventId: LifeEventId)
+                     (implicit hc: HeaderCarrier): Future[Either[DesFailureResponse, Seq[ReportLifeEventRequestBase]]] = {
+
+    val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/life-events/$lifeEventId"
+    Logger.debug("Getting life event from des: " + uri)
+
+    val result: Future[HttpResponse] = httpGet.GET(uri)(
+      httpReads,
+      hc = updateHeaderCarrierWithAllDesHeaders(hc),
+      MdcLoggingExecutionContext.fromLoggingDetails(hc)
+    )
+
+    result.map(res => {
+      Logger.debug("Get life event returned status: " + res.status)
+
+      Try(res.json.as[Seq[ReportLifeEventRequestBase]]) match {
+        case Success(data) => Right(data)
+        case Failure(er) =>
+          if (res.status == 200 | res.status == 201) {
+            Logger.error(s"Error from DES (parsing as DesResponse): ${er.getMessage}")
+          }
+
+          Try(res.json.as[DesFailureResponse]) match {
+            case Success(data) => {
+              Logger.info(s"DesFailureResponse from DES: ${data}")
+              Left(data)
+            }
+            case Failure(ex) => {
+              Logger.error(s"Error from DES (parsing as DesFailureResponse): ${ex.getMessage}")
+              Left(DesFailureResponse())
+            }
+          }
+      }
+
+    })
+  }
+
+  /**
     * Attempts to update the first subscription date
     */
   def updateFirstSubDate(lisaManager: String, accountId: String, request: UpdateSubscriptionRequest)
