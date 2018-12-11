@@ -191,10 +191,10 @@ class LifeEventServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuit
 
     }
 
-    "return a Right with a RequestLifeEventBase" when {
+    "return a Right with a Seq GetLifeEventItem" when {
 
-      "a RequestLifeEventBase is returned" in {
-        val success = List(ReportLifeEventRequest("X", new DateTime("2018-12-10")))
+      "a Seq GetLifeEventItem is returned" in {
+        val success = List(GetLifeEventItem("12345", "STATUTORY_SUBMISSION", new DateTime("2018-01-01")))
 
         when(mockDesConnector.getLifeEvent(any(), any(), any())(any())).
           thenReturn(Future.successful(Right(success)))
@@ -214,7 +214,7 @@ class LifeEventServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuit
     callback(response)
   }
 
-  private def doGetRequest(callback: (Either[ErrorResponse, Seq[ReportLifeEventRequestBase]]) => Unit): Unit = {
+  private def doGetRequest(callback: (Either[ErrorResponse, Seq[GetLifeEventItem]]) => Unit): Unit = {
     val response = Await.result(SUT.getLifeEvent("Z019283", "192837", "5581145645")(HeaderCarrier()), Duration.Inf)
 
     callback(response)

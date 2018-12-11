@@ -26,12 +26,6 @@ trait ReportLifeEventRequestBase extends Product with DesResponse
 case class ReportLifeEventRequest(eventType: LifeEventType,  eventDate: DateTime) extends ReportLifeEventRequestBase
 
 object ReportLifeEventRequestBase {
-  implicit val reads: Reads[ReportLifeEventRequestBase] = Reads[ReportLifeEventRequestBase] { json =>
-    (json \ "lifeEventType").as[String] match {
-      case "STATUTORY_SUBMISSION" => AnnualReturn.desReads.reads(json)
-    }
-  }
-
   implicit val writes: Writes[ReportLifeEventRequestBase] = Writes[ReportLifeEventRequestBase] {
     case deathTerminalIllness: ReportLifeEventRequest => ReportLifeEventRequest.desWrites.writes(deathTerminalIllness)
     case fundRelease: RequestFundReleaseRequest => RequestFundReleaseRequest.desWrites.writes(fundRelease)

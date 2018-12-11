@@ -186,7 +186,7 @@ trait DesConnector extends ServicesConfig {
     * Attempts to get a LISA Life Event
     */
   def getLifeEvent(lisaManager: String, accountId: String, lifeEventId: LifeEventId)
-                     (implicit hc: HeaderCarrier): Future[Either[DesFailureResponse, Seq[ReportLifeEventRequestBase]]] = {
+                     (implicit hc: HeaderCarrier): Future[Either[DesFailureResponse, Seq[GetLifeEventItem]]] = {
 
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/life-events/$lifeEventId"
     Logger.debug("Getting life event from des: " + uri)
@@ -200,7 +200,7 @@ trait DesConnector extends ServicesConfig {
     result.map(res => {
       Logger.debug("Get life event returned status: " + res.status)
 
-      Try(res.json.as[Seq[ReportLifeEventRequestBase]]) match {
+      Try(res.json.as[Seq[GetLifeEventItem]]) match {
         case Success(data) => Right(data)
         case Failure(er) =>
           if (res.status == 200 | res.status == 201) {

@@ -28,7 +28,7 @@ import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
 import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountNotFound, ErrorNotImplemented, GetLifeEventController}
-import uk.gov.hmrc.lisaapi.models.{AnnualReturn, AnnualReturnSupersede, ReportLifeEventRequest, ReportLifeEventRequestBase}
+import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.LifeEventService
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -57,27 +57,14 @@ class GetLifeEventControllerSpec extends PlaySpec with MockitoSugar with BeforeA
 
     "return ok for api version 2" when {
       "given a successful response from the service layer" in {
-        val annualReturn = AnnualReturn(
-          eventDate = new DateTime("2018-04-05"),
-          lisaManagerName = "ISA Manager",
-          taxYear = 2018,
-          marketValueCash = 0,
-          marketValueStocksAndShares = 65,
-          annualSubsCash = 0,
-          annualSubsStocksAndShares = 55,
-          supersede = Some(AnnualReturnSupersede(
-            originalEventDate = new DateTime("2018-04-04"),
-            originalLifeEventId = "1234567890"
-          )),
-          supersededBy = Some("1234567891")
-        )
+        val annualReturn = GetLifeEventItem("12345", "STATUTORY_SUBMISSION", new DateTime("2018-01-01"))
 
         when(mockService.getLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(Right(List(annualReturn))))
 
         val res = SUT.getLifeEvent(lisaManager, accountId, eventId).apply(FakeRequest().withHeaders(acceptHeaderV2))
 
         status(res) mustBe OK
-        contentAsJson(res) mustBe Json.arr(ReportLifeEventRequestBase.writes.writes(annualReturn))
+        contentAsJson(res) mustBe Json.toJson[Seq[GetLifeEventItem]](List(annualReturn))
       }
     }
 

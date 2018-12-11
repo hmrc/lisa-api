@@ -595,7 +595,7 @@ class DesConnectorSpec extends PlaySpec
 
     }
 
-    "return a Right of ReportLifeEventRequestBase" when {
+    "return a Right of Seq GetLifeEventItem" when {
 
       "DES returns successfully" in {
 
@@ -605,36 +605,19 @@ class DesConnectorSpec extends PlaySpec
               HttpResponse(
                 responseStatus = OK,
                 responseJson = Some(Json.arr(Json.obj(
+                  "lifeEventId" -> "1234567890",
                   "lifeEventType" -> "STATUTORY_SUBMISSION",
-                  "lifeEventDate" -> "2018-04-05",
-                  "isaManagerName" -> "ISA Manager",
-                  "annualSubsCash" -> 0,
-                  "annualSubsStocksAndShares" -> 55,
-                  "marketValueCash" -> 0,
-                  "marketValueStocksAndShares" -> 65,
-                  "taxYear" -> "2018",
-                  "supersededLifeEventId" -> "1234567890",
-                  "supersededLifeEventDate" -> "2018-04-04",
-                  "lifeEventSupersededById" -> "1234567891"
+                  "lifeEventDate" -> "2018-04-05"
                 )))
               )
             )
           )
 
         doRetrieveLifeEventRequest { response =>
-          response mustBe Right(List(AnnualReturn(
-            eventDate = new DateTime("2018-04-05"),
-            lisaManagerName = "ISA Manager",
-            taxYear = 2018,
-            marketValueCash = 0,
-            marketValueStocksAndShares = 65,
-            annualSubsCash = 0,
-            annualSubsStocksAndShares = 55,
-            supersede = Some(AnnualReturnSupersede(
-              originalEventDate = new DateTime("2018-04-04"),
-              originalLifeEventId = "1234567890"
-            )),
-            supersededBy = Some("1234567891")
+          response mustBe Right(List(GetLifeEventItem(
+            lifeEventId = "1234567890",
+            eventType = "Statutory Submission",
+            eventDate = new DateTime("2018-04-05")
           )))
         }
 
@@ -1388,7 +1371,7 @@ class DesConnectorSpec extends PlaySpec
     callback(response)
   }
 
-  private def doRetrieveLifeEventRequest(callback: (Either[DesResponse, Seq[ReportLifeEventRequestBase]]) => Unit) = {
+  private def doRetrieveLifeEventRequest(callback: (Either[DesResponse, Seq[GetLifeEventItem]]) => Unit) = {
     val response = Await.result(SUT.getLifeEvent("Z123456", "ABC12345", "1234567890"), Duration.Inf)
 
     callback(response)

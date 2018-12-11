@@ -51,7 +51,7 @@ trait LifeEventService {
   }
 
   def getLifeEvent(lisaManager: String, accountId: String, lifeEventId: LifeEventId)
-                  (implicit hc: HeaderCarrier): Future[Either[ErrorResponse, Seq[ReportLifeEventRequestBase]]] = {
+                  (implicit hc: HeaderCarrier): Future[Either[ErrorResponse, Seq[GetLifeEventItem]]] = {
     val response = desConnector.getLifeEvent(lisaManager, accountId, lifeEventId)
 
     response map {
