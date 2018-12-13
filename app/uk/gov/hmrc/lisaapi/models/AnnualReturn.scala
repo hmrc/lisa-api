@@ -26,20 +26,20 @@ import uk.gov.hmrc.lisaapi.services.CurrentDateService
 import scala.collection.mutable.ListBuffer
 
 case class AnnualReturnSupersede (
-                                   originalLifeEventId: LifeEventId,
-                                   originalEventDate: DateTime
-                                 )
+  originalLifeEventId: LifeEventId,
+  originalEventDate: DateTime
+)
 
 case class AnnualReturn (
-                          eventDate: DateTime,
-                          lisaManagerName: LisaManagerName,
-                          taxYear: Int,
-                          marketValueCash: Int,
-                          marketValueStocksAndShares: Int,
-                          annualSubsCash: Int,
-                          annualSubsStocksAndShares: Int,
-                          supersede: Option[AnnualReturnSupersede] = None
-                        ) extends ReportLifeEventRequestBase
+  eventDate: DateTime,
+  lisaManagerName: LisaManagerName,
+  taxYear: Int,
+  marketValueCash: Int,
+  marketValueStocksAndShares: Int,
+  annualSubsCash: Int,
+  annualSubsStocksAndShares: Int,
+  supersede: Option[AnnualReturnSupersede] = None
+) extends ReportLifeEventRequestBase
 
 object AnnualReturnSupersede {
   implicit val dateReads: Reads[DateTime] = JsonReads.notFutureDate
@@ -53,29 +53,29 @@ object AnnualReturn {
 
   implicit val reads: Reads[AnnualReturn] = (
     (JsPath \ "eventDate").read(JsonReads.notFutureDate) and
-      (JsPath \ "lisaManagerName").read(JsonReads.lisaManagerName) and
-      (JsPath \ "taxYear").read(JsonReads.taxYearReads) and
-      (JsPath \ "marketValueCash").read(JsonReads.annualFigures) and
-      (JsPath \ "marketValueStocksAndShares").read(JsonReads.annualFigures) and
-      (JsPath \ "annualSubsCash").read(JsonReads.annualFigures) and
-      (JsPath \ "annualSubsStocksAndShares").read(JsonReads.annualFigures) and
-      (JsPath \ "supersede").readNullable[AnnualReturnSupersede]
-    )(AnnualReturn.apply _)
+    (JsPath \ "lisaManagerName").read(JsonReads.lisaManagerName) and
+    (JsPath \ "taxYear").read(JsonReads.taxYearReads) and
+    (JsPath \ "marketValueCash").read(JsonReads.annualFigures) and
+    (JsPath \ "marketValueStocksAndShares").read(JsonReads.annualFigures) and
+    (JsPath \ "annualSubsCash").read(JsonReads.annualFigures) and
+    (JsPath \ "annualSubsStocksAndShares").read(JsonReads.annualFigures) and
+    (JsPath \ "supersede").readNullable[AnnualReturnSupersede]
+  )(AnnualReturn.apply _)
 
   implicit val writes = Json.writes[AnnualReturn]
 
   val desWrites: Writes[AnnualReturn] = (
     (JsPath \ "eventType").write[String] and
-      (JsPath \ "eventDate").write[DateTime] and
-      (JsPath \ "taxYear").write[Int] and
-      (JsPath \ "isaManagerName").write[String] and
-      (JsPath \ "lisaMarketValueCash").write[Int] and
-      (JsPath \ "lisaMarketValueStocksAndShares").write[Int] and
-      (JsPath \ "lisaAnnualCashSubs").write[Int] and
-      (JsPath \ "lisaAnnualStocksAndSharesSubs").write[Int] and
-      (JsPath \ "supersededLifeEventDate").writeNullable[DateTime] and
-      (JsPath \ "supersededLifeEventID").writeNullable[LifeEventId]
-    ){req: AnnualReturn =>
+    (JsPath \ "eventDate").write[DateTime] and
+    (JsPath \ "taxYear").write[Int] and
+    (JsPath \ "isaManagerName").write[String] and
+    (JsPath \ "lisaMarketValueCash").write[Int] and
+    (JsPath \ "lisaMarketValueStocksAndShares").write[Int] and
+    (JsPath \ "lisaAnnualCashSubs").write[Int] and
+    (JsPath \ "lisaAnnualStocksAndSharesSubs").write[Int] and
+    (JsPath \ "supersededLifeEventDate").writeNullable[DateTime] and
+    (JsPath \ "supersededLifeEventID").writeNullable[LifeEventId]
+  ){req: AnnualReturn =>
     val supersededLifeEventDate = req.supersede match {
       case None => None
       case Some(sup) => Some(sup.originalEventDate)
@@ -108,9 +108,9 @@ trait AnnualReturnValidator extends LisaConstants {
   def validate(req: AnnualReturn): Seq[ErrorValidation] = {
     (
       taxYearIsAfter2016 andThen
-        taxYearIsNotInFuture andThen
-        onlyCashOrStocksHaveBeenSpecified
-      ).apply(ValidationRequest(req)).errors
+      taxYearIsNotInFuture andThen
+      onlyCashOrStocksHaveBeenSpecified
+    ).apply(ValidationRequest(req)).errors
   }
 
   private val taxYearIsAfter2016: PartialFunction[ValidationRequest, ValidationRequest] = {
