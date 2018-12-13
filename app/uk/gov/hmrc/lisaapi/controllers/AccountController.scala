@@ -16,13 +16,15 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
+import com.google.inject.Inject
 import play.api.Logger
 import play.api.data.validation.ValidationError
 import play.api.libs.json.Json.toJson
 import play.api.libs.json.{JsObject, JsPath, Json}
 import play.api.mvc.{Action, AnyContent, Result}
+import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.lisaapi.LisaConstants
+import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AccountService, AuditService}
@@ -31,10 +33,11 @@ import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext._
 
 import scala.concurrent.Future
 
-class AccountController extends LisaController with LisaConstants {
-
-  val service: AccountService = AccountService
-  val auditService: AuditService = AuditService
+class AccountController @Inject()(
+                                   val authConnector: AuthConnector,
+                                   val appContext: AppContext,
+                                   service: AccountService,
+                                   auditService: AuditService) extends LisaController2 {
 
   def createOrTransferLisaAccount(lisaManager: String): Action[AnyContent] =
     (validateHeader() andThen validateLMRN(lisaManager)).async { implicit request =>

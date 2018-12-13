@@ -27,7 +27,7 @@ import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.{FakeApplication, FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
-import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
+import uk.gov.hmrc.lisaapi.config.{AppContext, LisaAuthConnector}
 import uk.gov.hmrc.lisaapi.controllers._
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{BulkPaymentService, CurrentDateService}
@@ -274,10 +274,7 @@ class BulkPaymentControllerSpec extends PlaySpec
   val mockAuthCon: LisaAuthConnector = mock[LisaAuthConnector]
   val mockCurrentDateService: CurrentDateService = mock[CurrentDateService]
 
-  val SUT = new BulkPaymentController {
-    override val service: BulkPaymentService = mockService
-    override val authConnector = mockAuthCon
-    override val currentDateService = mockCurrentDateService
+  val SUT = new BulkPaymentController(mockAuthCon, AppContext, mockCurrentDateService, mockService) {
     override lazy val v2endpointsEnabled = true
   }
 

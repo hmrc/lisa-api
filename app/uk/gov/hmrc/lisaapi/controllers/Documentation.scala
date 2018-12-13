@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
+import com.google.inject.Inject
 import play.api.http.{HttpErrorHandler, LazyHttpErrorHandler}
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.api.controllers.DocumentationController
@@ -24,10 +25,10 @@ import uk.gov.hmrc.lisaapi.config.APIAccessConfig
 import uk.gov.hmrc.lisaapi.domain.APIAccess
 import uk.gov.hmrc.lisaapi.views._
 
-class  Documentation(httpErrorHandler: HttpErrorHandler) extends DocumentationController(httpErrorHandler) {
+class Documentation @Inject()(httpErrorHandler: HttpErrorHandler) extends DocumentationController(httpErrorHandler) {
 
   override def documentation(version: String, endpointName: String): Action[AnyContent] = {
-    super.at(s"/public/api/documentation/$version", s"${endpointName.replaceAll(" ", "-")}.xml")
+    at(s"/public/api/documentation/$version", s"${endpointName.replaceAll(" ", "-")}.xml")
   }
 
   override def definition(): Action[AnyContent] = Action {
@@ -42,7 +43,7 @@ class  Documentation(httpErrorHandler: HttpErrorHandler) extends DocumentationCo
   }
 
   def raml(version: String, file: String): Action[AnyContent] = {
-    super.at(s"/public/api/conf/$version", file)
+    at(s"/public/api/conf/$version", file)
   }
 
   private def buildAccess() = {

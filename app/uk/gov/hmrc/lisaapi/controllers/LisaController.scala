@@ -24,7 +24,7 @@ import play.api.mvc._
 import uk.gov.hmrc.auth.core.retrieve.Retrievals.internalId
 import uk.gov.hmrc.auth.core.{AuthorisationException, AuthorisedFunctions, Enrolment, InsufficientEnrolments}
 import uk.gov.hmrc.lisaapi.LisaConstants
-import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
+import uk.gov.hmrc.lisaapi.config.{AppContext, LisaAuthConnector}
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.utils.ErrorConverter
 import uk.gov.hmrc.play.config.RunMode
@@ -34,11 +34,15 @@ import uk.gov.hmrc.play.microservice.controller.BaseController
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 
-trait LisaController extends BaseController with LisaConstants with RunMode with AuthorisedFunctions with APIVersioning with LisaActions {
+trait LisaController extends LisaController2 {
+  override val appContext: AppContext = AppContext
+  val authConnector: LisaAuthConnector = LisaAuthConnector
+}
+
+trait LisaController2 extends BaseController with LisaConstants with AuthorisedFunctions with APIVersioning with LisaActions {
 
   override val validateVersion: String => Boolean = str => str == "1.0" || str == "2.0"
   override val validateContentType: String => Boolean = _ == "json"
-  val authConnector: LisaAuthConnector = LisaAuthConnector
   lazy val errorConverter: ErrorConverter = ErrorConverter
 
   protected def withValidLMRN(lisaManager: String)(success: () => Future[Result])(implicit request: Request[AnyContent], startTime: Long): Future[Result] = {

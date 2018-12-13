@@ -16,24 +16,27 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
+import com.google.inject.Inject
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, Result}
+import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, LifeEventService}
 import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.lisaapi.LisaConstants
+import scala.concurrent.{ExecutionContext, Future}
 
-import scala.concurrent.Future
-
-class LifeEventController extends LisaController with LisaConstants {
-
-  val service: LifeEventService = LifeEventService
-  val auditService: AuditService = AuditService
+class LifeEventController @Inject()(
+                                     val authConnector: AuthConnector,
+                                     val appContext: AppContext,
+                                     service: LifeEventService,
+                                     auditService: AuditService
+                                   )(implicit ec: ExecutionContext)
+  extends LisaController2 {
 
   def reportLisaLifeEvent(lisaManager: String, accountId: String): Action[AnyContent] = validateHeader().async {
     implicit request =>
@@ -57,10 +60,10 @@ class LifeEventController extends LisaController with LisaConstants {
   }
 
   private def handleReportLifeEventResponse(lisaManager: String,
-                                             accountId: String,
-                                             startTime: Long,
-                                             req: ReportLifeEventRequest,
-                                             res: ReportLifeEventResponse)
+                                            accountId: String,
+                                            startTime: Long,
+                                            req: ReportLifeEventRequest,
+                                            res: ReportLifeEventResponse)
                                            (implicit hc: HeaderCarrier) = {
     res match {
       case ReportLifeEventSuccessResponse(lifeEventId) => {
@@ -94,7 +97,7 @@ class LifeEventController extends LisaController with LisaConstants {
         LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.EVENT)
         NotFound(Json.toJson(ErrorAccountNotFound))
       }
-      case unexpected:ReportLifeEventResponse => {
+      case unexpected: ReportLifeEventResponse => {
         Logger.debug(s"Matched an unexpected response: $unexpected, returning a 500 error")
         doAudit(lisaManager, accountId, req, false, lifeEventAuditData(ErrorInternalServerError.errorCode))
         LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.EVENT)

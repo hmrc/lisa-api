@@ -29,7 +29,7 @@ import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.LisaConstants
-import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
+import uk.gov.hmrc.lisaapi.config.{AppContext, LisaAuthConnector}
 import uk.gov.hmrc.lisaapi.controllers.{BonusPaymentController, ErrorAccountNotFound, ErrorBadRequestLmrn, ErrorBonusPaymentTransactionNotFound, ErrorValidation}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, BonusOrWithdrawalService, BonusPaymentService, CurrentDateService}
@@ -1000,13 +1000,7 @@ class BonusPaymentControllerSpec extends PlaySpec
   val mockDateTimeService: CurrentDateService = mock[CurrentDateService]
   val mockValidator: BonusPaymentValidator = mock[BonusPaymentValidator]
 
-  val SUT = new BonusPaymentController {
-    override val postService: BonusPaymentService = mockPostService
-    override val getService: BonusOrWithdrawalService = mockGetService
-    override val auditService: AuditService = mockAuditService
-    override val authConnector: LisaAuthConnector = mockAuthCon
-    override val validator: BonusPaymentValidator = mockValidator
-    override val dateTimeService: CurrentDateService = mockDateTimeService
+  val SUT = new BonusPaymentController(mockAuthCon, AppContext, mockGetService, mockPostService, mockAuditService, mockValidator, mockDateTimeService) {
     override lazy val v2endpointsEnabled = true
   }
 }

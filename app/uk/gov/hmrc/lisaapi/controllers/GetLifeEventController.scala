@@ -16,13 +16,18 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
+import com.google.inject.Inject
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
-import uk.gov.hmrc.lisaapi.LisaConstants
+import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.lisaapi.config.AppContext
 
 import scala.concurrent.Future
 
-class GetLifeEventController extends LisaController with LisaConstants {
+class GetLifeEventController @Inject()(
+                                        val authConnector: AuthConnector,
+                                        val appContext: AppContext)
+  extends LisaController2 {
 
   override val validateVersion: String => Boolean = _ == "2.0"
 

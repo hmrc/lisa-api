@@ -16,23 +16,26 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
+import com.google.inject.Inject
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, Result}
+import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.lisaapi.LisaConstants
+import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AccountService, AuditService}
 import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class CloseAccountController extends LisaController with LisaConstants {
-
-  val service: AccountService = AccountService
-  val auditService: AuditService = AuditService
+class CloseAccountController @Inject()(
+                                        val authConnector: AuthConnector,
+                                        val appContext: AppContext,
+                                        auditService: AuditService,
+                                        service: AccountService
+                                      )(implicit ec: ExecutionContext) extends LisaController2 {
 
   def closeLisaAccount(lisaManager: String, accountId: String): Action[AnyContent] =
     (validateHeader() andThen validateLMRN(lisaManager) andThen validateAccountId(accountId)).async { implicit request =>

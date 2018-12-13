@@ -16,28 +16,32 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
+import com.google.inject.Inject
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, Result}
+import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.lisaapi.LisaConstants
+import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, BonusOrWithdrawalService, CurrentDateService, WithdrawalService}
 import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
 import uk.gov.hmrc.lisaapi.utils.WithdrawalChargeValidator
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class WithdrawalController extends LisaController with LisaConstants {
+class WithdrawalController @Inject() (
+                                       val authConnector: AuthConnector,
+                                       val appContext: AppContext,
+                                       postService: WithdrawalService,
+                                       getService: BonusOrWithdrawalService,
+                                       auditService: AuditService,
+                                       validator: WithdrawalChargeValidator,
+                                       dateTimeService: CurrentDateService
+                                     )(implicit ec: ExecutionContext) extends LisaController2 {
 
   override val validateVersion: String => Boolean = _ == "2.0"
-  val postService: WithdrawalService = WithdrawalService
-  val getService: BonusOrWithdrawalService = BonusOrWithdrawalService
-  val auditService: AuditService = AuditService
-  val validator: WithdrawalChargeValidator = WithdrawalChargeValidator
-  val dateTimeService: CurrentDateService = CurrentDateService
 
   def reportWithdrawalCharge(lisaManager: String, accountId: String): Action[AnyContent] = validateHeader().async {
     implicit request =>

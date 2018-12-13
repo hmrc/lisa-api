@@ -27,11 +27,13 @@ lazy val lisaapi = (project in file("."))
   .settings(
     name := "lisa-api",
     majorVersion := 2,
+    PlayKeys.playDefaultPort := 9667,
     libraryDependencies ++= AppDependencies(),
     retrieveManaged := true,
     evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
     routesGenerator := StaticRoutesGenerator,
     unmanagedResourceDirectories in Compile += baseDirectory.value / "resources",
+    fork in Test := true,
     resolvers ++= Seq(
       Resolver.bintrayRepo("hmrc", "releases"),
       Resolver.jcenterRepo

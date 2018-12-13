@@ -27,7 +27,7 @@ import play.api.mvc.{AnyContentAsJson, Result}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
-import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
+import uk.gov.hmrc.lisaapi.config.{AppContext, LisaAuthConnector}
 import uk.gov.hmrc.lisaapi.controllers.{ErrorBadRequestAccountId, ErrorBadRequestLmrn, LifeEventController}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, LifeEventService}
@@ -288,11 +288,7 @@ class LifeEventControllerSpec extends PlaySpec
   val mockService: LifeEventService = mock[LifeEventService]
   val mockAuditService: AuditService = mock[AuditService]
   val mockAuthCon: LisaAuthConnector = mock[LisaAuthConnector]
-
-  val SUT = new LifeEventController {
-    override val service: LifeEventService = mockService
-    override val auditService: AuditService = mockAuditService
-    override val authConnector = mockAuthCon
+  val SUT = new LifeEventController(mockAuthCon, AppContext, mockService, mockAuditService) {
     override lazy val v2endpointsEnabled = true
   }
 

@@ -16,24 +16,29 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
+import com.google.inject.Inject
 import play.api.Logger
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, AnyContent}
+import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.{LisaConstants, controllers}
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models.{ReportLifeEventFundReleaseNotFoundResponse, ReportLifeEventMismatchResponse, _}
 import uk.gov.hmrc.lisaapi.services.{AuditService, LifeEventService}
 import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class PropertyPurchaseController extends LisaController with LisaConstants {
+class PropertyPurchaseController @Inject() (
+                                             val authConnector: AuthConnector,
+                                             val appContext: AppContext,
+                                             service: LifeEventService,
+                                             auditService: AuditService
+                                           )(implicit ec: ExecutionContext) extends LisaController2 {
 
   override val validateVersion: String => Boolean = _ == "2.0"
-  val service: LifeEventService = LifeEventService
-  val auditService: AuditService = AuditService
 
   def requestFundRelease(lisaManager: String, accountId: String): Action[AnyContent] = validateHeader().async {
     implicit request =>
@@ -58,7 +63,7 @@ class PropertyPurchaseController extends LisaController with LisaConstants {
                 )))))
               }
               else {
-                service.reportLifeEvent(lisaManager, accountId, req) map {
+                service.reportLifeEvent(lisaManager, accountId, req).map {
                   case res: ReportLifeEventSuccessResponse => {
                     Logger.debug("Fund release successful")
                     doFundReleaseAudit(lisaManager, accountId, req, true)
@@ -104,7 +109,7 @@ class PropertyPurchaseController extends LisaController with LisaConstants {
                 )))))
               }
               else {
-                service.reportLifeEvent(lisaManager, accountId, req) map {
+                service.reportLifeEvent(lisaManager, accountId, req).map {
                   case res: ReportLifeEventSuccessResponse => {
                     Logger.debug("Extension successful")
                     doExtensionAudit(lisaManager, accountId, req, true)

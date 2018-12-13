@@ -16,11 +16,13 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
+import com.google.inject.Inject
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, Result}
+import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.lisaapi.LisaConstants
+import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, LifeEventService}
@@ -29,12 +31,14 @@ import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext._
 
 import scala.concurrent.Future
 
-class AnnualReturnController extends LisaController with LisaConstants {
+class AnnualReturnController @Inject()(
+                                       val authConnector: AuthConnector,
+                                       val appContext: AppContext,
+                                       service: LifeEventService,
+                                       auditService: AuditService,
+                                       validator: AnnualReturnValidator) extends LisaController2 {
 
   override val validateVersion: String => Boolean = _ == "2.0"
-  val service: LifeEventService = LifeEventService
-  val validator: AnnualReturnValidator = AnnualReturnValidator
-  val auditService: AuditService = AuditService
 
   def submitReturn(lisaManager: String, accountId: String): Action[AnyContent] = validateHeader().async {
     implicit request =>

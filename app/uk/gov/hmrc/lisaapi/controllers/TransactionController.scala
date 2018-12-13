@@ -16,20 +16,23 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
+import com.google.inject.Inject
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
-import uk.gov.hmrc.lisaapi.LisaConstants
+import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
-import uk.gov.hmrc.lisaapi.models.{GetTransactionAccountNotFoundResponse, GetTransactionErrorResponse, GetTransactionSuccessResponse, GetTransactionTransactionNotFoundResponse}
+import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.TransactionService
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class TransactionController extends LisaController with LisaConstants {
-
-  val service: TransactionService = TransactionService
+class TransactionController @Inject() (
+                                        val authConnector: AuthConnector,
+                                        val appContext: AppContext,
+                                        service: TransactionService
+                                      )(implicit ec: ExecutionContext) extends LisaController2 {
 
   def getTransaction(lisaManager: String, accountId: String, transactionId: String): Action[AnyContent] =
     validateHeader().async { implicit request =>

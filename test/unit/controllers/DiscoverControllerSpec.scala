@@ -24,7 +24,7 @@ import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.test.Helpers._
 import play.api.test._
 import play.mvc.Http.HeaderNames
-import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
+import uk.gov.hmrc.lisaapi.config.{AppContext, LisaAuthConnector}
 import uk.gov.hmrc.lisaapi.controllers.{DiscoverController, ErrorAcceptHeaderInvalid, ErrorBadRequestLmrn}
 
 import scala.concurrent.Future
@@ -98,9 +98,9 @@ class DiscoverControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSu
 
   }
 
-  val mockAuthConnector:LisaAuthConnector = mock[LisaAuthConnector]
+  val mockAuthConnector: LisaAuthConnector = mock[LisaAuthConnector]
 
-  val SUT = new DiscoverController {
+  val SUT = new DiscoverController(mockAuthConnector, AppContext) {
     override val authConnector: LisaAuthConnector = mockAuthConnector
     override lazy val v2endpointsEnabled = true
   }

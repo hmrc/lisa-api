@@ -26,7 +26,7 @@ import play.api.mvc.{AnyContentAsJson, Result}
 import play.api.test.Helpers._
 import play.api.test._
 import play.mvc.Http.HeaderNames
-import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
+import uk.gov.hmrc.lisaapi.config.{AppContext, LisaAuthConnector}
 import uk.gov.hmrc.lisaapi.controllers.{CloseAccountController, ErrorBadRequestAccountId, ErrorBadRequestLmrn}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AccountService, AuditService}
@@ -333,10 +333,7 @@ class CloseAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppP
 
   val mockService: AccountService = mock[AccountService]
   val mockAuditService: AuditService = mock[AuditService]
-  val SUT = new CloseAccountController {
-    override val service: AccountService = mockService
-    override val auditService: AuditService = mockAuditService
-    override val authConnector = mockAuthCon
+  val SUT = new CloseAccountController(mockAuthCon, AppContext, mockAuditService, mockService) {
     override lazy val v2endpointsEnabled = true
   }
 

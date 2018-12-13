@@ -16,23 +16,25 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
-import java.util.concurrent.TimeUnit
-
+import com.google.inject.Inject
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
-import uk.gov.hmrc.lisaapi.LisaConstants
+import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, InvestorService}
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import uk.gov.hmrc.http.HeaderCarrier
+import scala.concurrent.ExecutionContext
 
-class InvestorController extends LisaController with LisaConstants  {
-
-  val service: InvestorService = InvestorService
-  val auditService: AuditService = AuditService
+class InvestorController @Inject()(
+                                    val authConnector: AuthConnector,
+                                    val appContext: AppContext,
+                                    service: InvestorService,
+                                    auditService: AuditService
+                                  )(implicit ec: ExecutionContext) extends LisaController2 {
 
   def createLisaInvestor(lisaManager: String): Action[AnyContent] = validateHeader().async {
     implicit request =>
@@ -42,17 +44,15 @@ class InvestorController extends LisaController with LisaConstants  {
       withValidLMRN(lisaManager) { () =>
         withValidJson[CreateLisaInvestorRequest](
           createRequest => {
-            service.createInvestor(lisaManager, createRequest).map { res =>
-              res match {
-                case CreateLisaInvestorSuccessResponse(investorId) =>
-                  handleCreatedResponse(lisaManager, createRequest, investorId)
-                case CreateLisaInvestorAlreadyExistsResponse(investorId) =>
-                  handleExistsResponse(lisaManager, createRequest, investorId)
-                case CreateLisaInvestorInvestorNotFoundResponse =>
-                  handleInvestorNotFound(lisaManager, createRequest)
-                case CreateLisaInvestorErrorResponse =>
-                  handleError(lisaManager, createRequest)
-              }
+            service.createInvestor(lisaManager, createRequest).map {
+              case CreateLisaInvestorSuccessResponse(investorId) =>
+                handleCreatedResponse(lisaManager, createRequest, investorId)
+              case CreateLisaInvestorAlreadyExistsResponse(investorId) =>
+                handleExistsResponse(lisaManager, createRequest, investorId)
+              case CreateLisaInvestorInvestorNotFoundResponse =>
+                handleInvestorNotFound(lisaManager, createRequest)
+              case CreateLisaInvestorErrorResponse =>
+                handleError(lisaManager, createRequest)
             } recover {
               case e: Exception =>
                 Logger.error(s"createLisaInvestor: An error occurred due to ${e.getMessage} returning internal server error")

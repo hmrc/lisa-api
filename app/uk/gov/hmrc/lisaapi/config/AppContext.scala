@@ -20,7 +20,7 @@ package uk.gov.hmrc.lisaapi.config
 import play.api.Play._
 import uk.gov.hmrc.play.config.ServicesConfig
 
-object AppContext extends ServicesConfig {
+trait AppContext extends ServicesConfig {
   lazy val appName = current.configuration.getString("appName").getOrElse(throw new RuntimeException("appName is not configured"))
   lazy val appUrl = current.configuration.getString("appUrl").getOrElse(throw new RuntimeException("appUrl is not configured"))
   lazy val serviceLocatorUrl: String = baseUrl("service-locator")
@@ -35,3 +35,5 @@ object AppContext extends ServicesConfig {
   lazy val v1endpointsEnabled = current.configuration.getBoolean("api.endpointsEnabled").getOrElse(throw new RuntimeException(s"Missing key api.endpointsEnabled"))
   lazy val v2endpointsEnabled = current.configuration.getBoolean("api.endpointsEnabledv2").getOrElse(throw new RuntimeException(s"Missing key api.endpointsEnabledv2"))
 }
+
+object AppContext extends AppContext

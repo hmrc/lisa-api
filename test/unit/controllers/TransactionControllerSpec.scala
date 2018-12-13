@@ -27,7 +27,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.api.controllers.ErrorAcceptHeaderInvalid
-import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
+import uk.gov.hmrc.lisaapi.config.{AppContext, LisaAuthConnector}
 import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountNotFound, ErrorBadRequestAccountId, ErrorBadRequestLmrn, TransactionController}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.TransactionService
@@ -194,9 +194,7 @@ class TransactionControllerSpec extends PlaySpec
   val mockService: TransactionService = mock[TransactionService]
   val mockAuthCon: LisaAuthConnector = mock[LisaAuthConnector]
 
-  val SUT = new TransactionController {
-    override val service: TransactionService = mockService
-    override val authConnector = mockAuthCon
+  val SUT = new TransactionController(mockAuthCon, AppContext, mockService) {
     override lazy val v2endpointsEnabled = true
   }
 

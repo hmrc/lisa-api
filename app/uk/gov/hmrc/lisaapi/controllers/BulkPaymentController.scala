@@ -16,23 +16,26 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
+import com.google.inject.Inject
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import play.api.libs.json.Reads.of
 import play.api.libs.json._
 import play.api.mvc.{Action, AnyContent, Result}
-import uk.gov.hmrc.lisaapi.LisaConstants
+import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models.{GetBulkPaymentNotFoundResponse, GetBulkPaymentSuccessResponse}
 import uk.gov.hmrc.lisaapi.services.{BulkPaymentService, CurrentDateService}
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class BulkPaymentController extends LisaController with LisaConstants {
-
-  val currentDateService: CurrentDateService = CurrentDateService
-  val service: BulkPaymentService = BulkPaymentService
+class BulkPaymentController @Inject()(
+                                       val authConnector: AuthConnector,
+                                       val appContext: AppContext,
+                                       currentDateService: CurrentDateService,
+                                       service: BulkPaymentService
+                                     )(implicit ec: ExecutionContext) extends LisaController2 {
 
   def getBulkPayment(lisaManager: String, startDate: String, endDate: String): Action[AnyContent] =
     validateHeader().async { implicit request =>

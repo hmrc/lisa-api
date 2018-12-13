@@ -16,22 +16,25 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
+import com.google.inject.Inject
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, Result}
+import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.lisaapi.LisaConstants
+import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models.{UpdateSubscriptionSuccessResponse, _}
 import uk.gov.hmrc.lisaapi.services.{AuditService, UpdateSubscriptionService}
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class UpdateSubscriptionController extends LisaController with LisaConstants {
-
-  val service: UpdateSubscriptionService = UpdateSubscriptionService
-  val auditService: AuditService = AuditService
+class UpdateSubscriptionController @Inject() (
+                                               val authConnector: AuthConnector,
+                                               val appContext: AppContext,
+                                               service: UpdateSubscriptionService,
+                                               auditService: AuditService = AuditService
+                                             )(implicit ec: ExecutionContext) extends LisaController2 {
 
   val failureEvent: String = "firstSubscriptionDateNotUpdated"
   val failureReason: String = "reasonNotUpdated"
