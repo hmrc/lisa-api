@@ -24,10 +24,9 @@ import play.api.mvc._
 import uk.gov.hmrc.auth.core.retrieve.Retrievals.internalId
 import uk.gov.hmrc.auth.core.{AuthorisationException, AuthorisedFunctions, Enrolment, InsufficientEnrolments}
 import uk.gov.hmrc.lisaapi.LisaConstants
-import uk.gov.hmrc.lisaapi.config.{AppContext, LisaAuthConnector}
+import uk.gov.hmrc.lisaapi.config.{AppContext, LisaAuthConnector, WSHttp}
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.utils.ErrorConverter
-import uk.gov.hmrc.play.config.RunMode
 import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext._
 import uk.gov.hmrc.play.microservice.controller.BaseController
 
@@ -36,7 +35,7 @@ import scala.util.{Failure, Success, Try}
 
 trait LisaController extends LisaController2 {
   override val appContext: AppContext = AppContext
-  val authConnector: LisaAuthConnector = LisaAuthConnector
+  val authConnector: LisaAuthConnector = new LisaAuthConnector(WSHttp)
 }
 
 trait LisaController2 extends BaseController with LisaConstants with AuthorisedFunctions with APIVersioning with LisaActions {

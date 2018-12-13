@@ -16,17 +16,16 @@
 
 package uk.gov.hmrc.lisaapi.services
 
+import com.google.inject.Inject
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des._
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import play.api.Logger
 import uk.gov.hmrc.http.HeaderCarrier
 
-trait BonusPaymentService {
-  val desConnector: DesConnector
+class BonusPaymentService @Inject()(desConnector: DesConnector)(implicit ec: ExecutionContext) {
 
   // scalastyle:off cyclomatic.complexity
   def requestBonusPayment(lisaManager: String, accountId: String, request: RequestBonusPaymentRequest)
@@ -78,8 +77,4 @@ trait BonusPaymentService {
     }
   }
 
-}
-
-object BonusPaymentService extends BonusPaymentService {
-  override val desConnector: DesConnector = DesConnector
 }

@@ -16,18 +16,16 @@
 
 package uk.gov.hmrc.lisaapi.services
 
+import com.google.inject.Inject
 import play.api.Logger
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des.DesFailureResponse
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-trait InvestorService  {
-  val desConnector: DesConnector
-
+class InvestorService @Inject()(desConnector: DesConnector)(implicit ec: ExecutionContext)  {
 
   def createInvestor(lisaManager: String, request: CreateLisaInvestorRequest)(implicit hc: HeaderCarrier) : Future[CreateLisaInvestorResponse] = {
     val response = desConnector.createInvestor(lisaManager, request)
@@ -47,8 +45,4 @@ trait InvestorService  {
     }
   }
 
-}
-
-object InvestorService extends InvestorService {
-  override val desConnector: DesConnector = DesConnector
 }

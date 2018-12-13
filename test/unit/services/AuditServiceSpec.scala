@@ -29,6 +29,7 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.DataEvent
 
 import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
+import scala.concurrent.ExecutionContext.Implicits.global
 import uk.gov.hmrc.http.HeaderCarrier
 
 class AuditServiceSpec extends PlaySpec
@@ -123,7 +124,5 @@ class AuditServiceSpec extends PlaySpec
   implicit val hc:HeaderCarrier = HeaderCarrier()
   val mockAuditConnector = mock[AuditConnector]
 
-  object SUT extends AuditService {
-    override val connector:AuditConnector = mockAuditConnector
-  }
+  object SUT extends AuditService(mockAuditConnector)
 }

@@ -16,18 +16,17 @@
 
 package uk.gov.hmrc.lisaapi.services
 
+import com.google.inject.Inject
 import play.api.Logger
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des._
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.http.HeaderCarrier
 
 
-trait LifeEventService {
-  val desConnector: DesConnector
+class LifeEventService @Inject()(desConnector: DesConnector)(implicit ec: ExecutionContext) {
 
   def reportLifeEvent(lisaManager: String, accountId: String, request: ReportLifeEventRequestBase)
                      (implicit hc: HeaderCarrier): Future[ReportLifeEventResponse] = {
@@ -67,8 +66,4 @@ trait LifeEventService {
     "PURCHASE_EXTENSION_2_LIFE_EVENT_ALREADY_APPROVED" -> ReportLifeEventExtensionTwoAlreadyApprovedResponse,
     "PURCHASE_EXTENSION_1_LIFE_EVENT_NOT_YET_APPROVED" -> ReportLifeEventExtensionOneNotYetApprovedResponse
   )
-}
-
-object LifeEventService extends LifeEventService{
-  override val desConnector: DesConnector = DesConnector
 }

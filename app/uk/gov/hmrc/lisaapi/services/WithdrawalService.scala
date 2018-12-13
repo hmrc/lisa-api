@@ -16,17 +16,16 @@
 
 package uk.gov.hmrc.lisaapi.services
 
+import com.google.inject.Inject
 import play.api.Logger
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesTransactionResponse}
 import uk.gov.hmrc.lisaapi.models._
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-trait WithdrawalService {
-  val desConnector: DesConnector
+class WithdrawalService @Inject()(desConnector: DesConnector)(implicit ec: ExecutionContext) {
 
   // scalastyle:off cyclomatic.complexity
   def reportWithdrawalCharge(lisaManager: String, accountId: String, request: ReportWithdrawalChargeRequest)
@@ -69,9 +68,4 @@ trait WithdrawalService {
       }
     }
   }
-
-}
-
-object WithdrawalService extends WithdrawalService {
-  override val desConnector: DesConnector = DesConnector
 }

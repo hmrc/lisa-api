@@ -33,7 +33,7 @@ class UpdateSubscriptionController @Inject() (
                                                val authConnector: AuthConnector,
                                                val appContext: AppContext,
                                                service: UpdateSubscriptionService,
-                                               auditService: AuditService = AuditService
+                                               auditService: AuditService
                                              )(implicit ec: ExecutionContext) extends LisaController2 {
 
   val failureEvent: String = "firstSubscriptionDateNotUpdated"

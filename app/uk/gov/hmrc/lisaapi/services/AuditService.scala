@@ -16,19 +16,16 @@
 
 package uk.gov.hmrc.lisaapi.services
 
-import org.joda.time.DateTime
-import uk.gov.hmrc.lisaapi.config.MicroserviceAuditConnector
+import com.google.inject.Inject
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.audit.AuditExtensions._
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.audit.model.DataEvent
-import uk.gov.hmrc.play.audit.AuditExtensions._
 import uk.gov.hmrc.play.config.AppName
 
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
-import uk.gov.hmrc.http.HeaderCarrier
+import scala.concurrent.{ExecutionContext, Future}
 
-trait AuditService extends AppName {
-  val connector: AuditConnector
+class AuditService @Inject()(connector: AuditConnector)(implicit ec: ExecutionContext) extends AppName {
 
   def audit(auditType: String, path: String, auditData: Map[String, String])(implicit hc:HeaderCarrier): Future[AuditResult] = {
     val event = DataEvent(
@@ -41,10 +38,4 @@ trait AuditService extends AppName {
     connector.sendEvent(event)
   }
 
-}
-
-
-
-object AuditService extends AuditService {
-  override val connector: AuditConnector = MicroserviceAuditConnector
 }
