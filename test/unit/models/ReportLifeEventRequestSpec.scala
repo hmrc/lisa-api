@@ -51,7 +51,7 @@ class ReportLifeEventRequestSpec extends PlaySpec {
 
   }
 
-  "ReportLifeEventRequestBase writes" must {
+  "ReportLifeEventRequestBase" must {
 
     "correctly serialise a standard life event" in {
       val input = ReportLifeEventRequest( "LISA Investor Terminal Ill Health", new DateTime("2017-01-01"))

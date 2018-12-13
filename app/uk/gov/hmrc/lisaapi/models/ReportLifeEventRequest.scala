@@ -19,9 +19,8 @@ package uk.gov.hmrc.lisaapi.models
 import org.joda.time.DateTime
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsPath, Reads, Writes}
-import uk.gov.hmrc.lisaapi.models.des.DesResponse
 
-trait ReportLifeEventRequestBase extends Product with DesResponse
+trait ReportLifeEventRequestBase extends Product
 
 case class ReportLifeEventRequest(eventType: LifeEventType,  eventDate: DateTime) extends ReportLifeEventRequestBase
 
@@ -45,5 +44,4 @@ object ReportLifeEventRequest {
     (JsPath \ "eventType").write[String] and
     (JsPath \ "eventDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd"))
   )(unlift(ReportLifeEventRequest.unapply))
-
 }
