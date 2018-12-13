@@ -74,6 +74,8 @@ object GetLisaAccountSuccessResponse {
       creationReason = creationReason match {
         case "NEW" => "New"
         case "TRANSFERRED" => "Transferred"
+        case "CURRENT_YEAR_FUNDS_TRANSFERRED" => "Current year funds transferred"
+        case "PREVIOUS_YEAR_FUNDS_TRANSFERRED" => "Previous year funds transferred"
         case "REINSTATED" => "Reinstated"
       },
       firstSubscriptionDate = firstSubscriptionDate,
