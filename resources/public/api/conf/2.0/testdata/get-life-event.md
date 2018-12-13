@@ -302,7 +302,7 @@
   {
     "lifeEventId": "5678900001",
     "eventType": "Purchase outcome",
-    "eventDate": "2017-05-05",
+    "eventDate": "2017-10-05",
     "fundReleaseId": "3456789001",
     "propertyPurchaseResult": "Purchase completed",
     "propertyPurchaseValue": 250000,
@@ -328,13 +328,13 @@
   {
     "lifeEventId": "5678900002",
     "eventType": "Purchase outcome",
-    "eventDate": "2017-06-10",
+    "eventDate": "2017-10-10",
     "fundReleaseId": "3456789001",
     "propertyPurchaseResult": "Purchase completed",
     "propertyPurchaseValue": 250000,
     "supersede": {
       "originalLifeEventId": "5678900001",
-      "originalEventDate": "2017-05-05"
+      "originalEventDate": "2017-10-05"
     }
   }
 ]
