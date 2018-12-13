@@ -26,21 +26,20 @@ import uk.gov.hmrc.lisaapi.services.CurrentDateService
 import scala.collection.mutable.ListBuffer
 
 case class AnnualReturnSupersede (
-  originalLifeEventId: LifeEventId,
-  originalEventDate: DateTime
-)
+                                   originalLifeEventId: LifeEventId,
+                                   originalEventDate: DateTime
+                                 )
 
 case class AnnualReturn (
-  eventDate: DateTime,
-  lisaManagerName: LisaManagerName,
-  taxYear: Int,
-  marketValueCash: Int,
-  marketValueStocksAndShares: Int,
-  annualSubsCash: Int,
-  annualSubsStocksAndShares: Int,
-  supersede: Option[AnnualReturnSupersede] = None,
-  supersededBy: Option[LifeEventId] = None
-) extends ReportLifeEventRequestBase
+                          eventDate: DateTime,
+                          lisaManagerName: LisaManagerName,
+                          taxYear: Int,
+                          marketValueCash: Int,
+                          marketValueStocksAndShares: Int,
+                          annualSubsCash: Int,
+                          annualSubsStocksAndShares: Int,
+                          supersede: Option[AnnualReturnSupersede] = None
+                        ) extends ReportLifeEventRequestBase
 
 object AnnualReturnSupersede {
   implicit val dateReads: Reads[DateTime] = JsonReads.notFutureDate
@@ -54,63 +53,29 @@ object AnnualReturn {
 
   implicit val reads: Reads[AnnualReturn] = (
     (JsPath \ "eventDate").read(JsonReads.notFutureDate) and
-    (JsPath \ "lisaManagerName").read(JsonReads.lisaManagerName) and
-    (JsPath \ "taxYear").read(JsonReads.taxYearReads) and
-    (JsPath \ "marketValueCash").read(JsonReads.annualFigures) and
-    (JsPath \ "marketValueStocksAndShares").read(JsonReads.annualFigures) and
-    (JsPath \ "annualSubsCash").read(JsonReads.annualFigures) and
-    (JsPath \ "annualSubsStocksAndShares").read(JsonReads.annualFigures) and
-    (JsPath \ "supersede").readNullable[AnnualReturnSupersede] and
-    Reads.pure[Option[LifeEventId]](None)
-  )(AnnualReturn.apply _)
-
-  val desReads: Reads[AnnualReturn] = (
-    (JsPath \ "lifeEventDate").read(JsonReads.notFutureDate) and
-    (JsPath \ "isaManagerName").read(JsonReads.lisaManagerName) and
-    (JsPath \ "taxYear").read[String].map(_.toInt) and
-    (JsPath \ "marketValueCash").read(JsonReads.annualFigures) and
-    (JsPath \ "marketValueStocksAndShares").read(JsonReads.annualFigures) and
-    (JsPath \ "annualSubsCash").read(JsonReads.annualFigures) and
-    (JsPath \ "annualSubsStocksAndShares").read(JsonReads.annualFigures) and
-    (JsPath \ "supersededLifeEventId").readNullable(JsonReads.lifeEventId) and
-    (JsPath \ "supersededLifeEventDate").readNullable(JsonReads.notFutureDate) and
-    (JsPath \ "lifeEventSupersededById").readNullable(JsonReads.lifeEventId)
-  )(
-    (eventDate, lisaManagerName, taxYear, marketValueCash, marketValueStocksAndShares,
-    annualSubsCash, annualSubsStocksAndShares, supersededLifeEventId, supersededLifeEventDate, supersededBy) => {
-      val supersede = (supersededLifeEventId, supersededLifeEventDate) match {
-        case (Some(id), Some(date)) => Some(AnnualReturnSupersede(id, date))
-        case _ => None
-      }
-
-      AnnualReturn(
-        eventDate = eventDate,
-        lisaManagerName = lisaManagerName,
-        taxYear = taxYear,
-        marketValueCash = marketValueCash,
-        marketValueStocksAndShares = marketValueStocksAndShares,
-        annualSubsCash = annualSubsCash,
-        annualSubsStocksAndShares = annualSubsStocksAndShares,
-        supersede = supersede,
-        supersededBy = supersededBy
-      )
-    }
-  )
+      (JsPath \ "lisaManagerName").read(JsonReads.lisaManagerName) and
+      (JsPath \ "taxYear").read(JsonReads.taxYearReads) and
+      (JsPath \ "marketValueCash").read(JsonReads.annualFigures) and
+      (JsPath \ "marketValueStocksAndShares").read(JsonReads.annualFigures) and
+      (JsPath \ "annualSubsCash").read(JsonReads.annualFigures) and
+      (JsPath \ "annualSubsStocksAndShares").read(JsonReads.annualFigures) and
+      (JsPath \ "supersede").readNullable[AnnualReturnSupersede]
+    )(AnnualReturn.apply _)
 
   implicit val writes = Json.writes[AnnualReturn]
 
   val desWrites: Writes[AnnualReturn] = (
     (JsPath \ "eventType").write[String] and
-    (JsPath \ "eventDate").write[DateTime] and
-    (JsPath \ "taxYear").write[Int] and
-    (JsPath \ "isaManagerName").write[String] and
-    (JsPath \ "lisaMarketValueCash").write[Int] and
-    (JsPath \ "lisaMarketValueStocksAndShares").write[Int] and
-    (JsPath \ "lisaAnnualCashSubs").write[Int] and
-    (JsPath \ "lisaAnnualStocksAndSharesSubs").write[Int] and
-    (JsPath \ "supersededLifeEventDate").writeNullable[DateTime] and
-    (JsPath \ "supersededLifeEventID").writeNullable[LifeEventId]
-  ){req: AnnualReturn =>
+      (JsPath \ "eventDate").write[DateTime] and
+      (JsPath \ "taxYear").write[Int] and
+      (JsPath \ "isaManagerName").write[String] and
+      (JsPath \ "lisaMarketValueCash").write[Int] and
+      (JsPath \ "lisaMarketValueStocksAndShares").write[Int] and
+      (JsPath \ "lisaAnnualCashSubs").write[Int] and
+      (JsPath \ "lisaAnnualStocksAndSharesSubs").write[Int] and
+      (JsPath \ "supersededLifeEventDate").writeNullable[DateTime] and
+      (JsPath \ "supersededLifeEventID").writeNullable[LifeEventId]
+    ){req: AnnualReturn =>
     val supersededLifeEventDate = req.supersede match {
       case None => None
       case Some(sup) => Some(sup.originalEventDate)
@@ -143,9 +108,9 @@ trait AnnualReturnValidator extends LisaConstants {
   def validate(req: AnnualReturn): Seq[ErrorValidation] = {
     (
       taxYearIsAfter2016 andThen
-      taxYearIsNotInFuture andThen
-      onlyCashOrStocksHaveBeenSpecified
-    ).apply(ValidationRequest(req)).errors
+        taxYearIsNotInFuture andThen
+        onlyCashOrStocksHaveBeenSpecified
+      ).apply(ValidationRequest(req)).errors
   }
 
   private val taxYearIsAfter2016: PartialFunction[ValidationRequest, ValidationRequest] = {
