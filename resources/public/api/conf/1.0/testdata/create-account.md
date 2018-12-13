@@ -266,7 +266,7 @@
 <pre class="code--block">
 {
   "code": "TRANSFER_ACCOUNT_DATA_NOT_PROVIDED",
-  "message": "You must give a transferredFromAccountId, transferredFromLMRN and transferInDate when the creationReason is transferred"
+  "message": "You must give a transferredFromAccountId, transferredFromLMRN and transferInDate when the creationReason is transferred, current or previous year funds transferred"
 }
 </pre>
             </td>
@@ -292,7 +292,7 @@
 <pre class="code--block">
 {
   "code": "TRANSFER_ACCOUNT_DATA_PROVIDED",
-  "message": "You must only give a transferredFromAccountId, transferredFromLMRN, and transferInDate when the creationReason is transferred"
+  "message": "You must only give a transferredFromAccountId, transferredFromLMRN, and transferInDate when the creationReason is transferred, current or previous year funds transferred"
 }
 </pre>
             </td>

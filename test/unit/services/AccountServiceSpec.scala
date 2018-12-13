@@ -426,7 +426,7 @@ class AccountServiceSpec extends PlaySpec
 
   private def doTransferRequest(callback: (CreateLisaAccountResponse) => Unit) = {
     val accountTransfer = AccountTransfer("123456", "123456", testDate)
-    val request = CreateLisaAccountTransferRequest("1234567890", "9876543210", testDate, accountTransfer)
+    val request = CreateLisaAccountTransferRequest("Transferred", "1234567890", "9876543210", testDate, accountTransfer)
     val response = Await.result(SUT.transferAccount(testLMRN, request)(HeaderCarrier()), Duration.Inf)
 
     callback(response)
