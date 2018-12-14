@@ -15,7 +15,7 @@
     },
     "taxYear": {
       "type": "integer",
-      "description": "The tax year for the return of information. Give the year that the tax year ends in. For example, for the 2017 to 2018 tax year give 2018.",
+      "description": "The tax year for the return of information. You cannot give the current tax year. You can only send a return of information for a previous tax year. Give the year that the tax year ends in. For example, for the 2017 to 2018 tax year give 2018.",
       "min": 2017,
       "pattern": "^[0-9]{4}$",
       "example": "2018"

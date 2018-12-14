@@ -1031,7 +1031,7 @@ types:
             /payments:
               get:
                   is: [headers.acceptHeader]
-                  displayName: Get a list of all payments and debts in a date range
+                  displayName: Get a list of all payments in a date range
                   description: Get a list of all pending and paid payments from HMRC in a specific date range.
                   (annotations.scope): "read:lisa"
                   securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]

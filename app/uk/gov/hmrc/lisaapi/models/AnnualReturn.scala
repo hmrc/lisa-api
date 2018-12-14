@@ -108,6 +108,7 @@ trait AnnualReturnValidator extends LisaConstants {
   def validate(req: AnnualReturn): Seq[ErrorValidation] = {
     (
       taxYearIsAfter2016 andThen
+      taxYearIsNotCurrent andThen
       taxYearIsNotInFuture andThen
       onlyCashOrStocksHaveBeenSpecified
     ).apply(ValidationRequest(req)).errors
@@ -118,6 +119,22 @@ trait AnnualReturnValidator extends LisaConstants {
       req.copy(errors = req.errors :+ ErrorValidation(DATE_ERROR, "The taxYear cannot be before 2017", Some("/taxYear")))
     }
     case req: ValidationRequest => req
+  }
+
+  private val taxYearIsNotCurrent: PartialFunction[ValidationRequest, ValidationRequest] = {
+    case req: ValidationRequest => {
+      val now = currentDateService.now()
+      val currentYear = now.getYear()
+      val currentTaxYearStart = new DateTime(currentYear, TAX_YEAR_START_MONTH, TAX_YEAR_START_DAY, 0, 0)
+      val currentTaxYear = if (now.isBefore(currentTaxYearStart)) currentYear else currentYear + 1
+
+      if (req.data.taxYear == currentTaxYear) {
+        req.copy(errors = req.errors :+ ErrorValidation(DATE_ERROR, "The taxYear must be a previous tax year", Some("/taxYear")))
+      }
+      else {
+        req
+      }
+    }
   }
 
   private val taxYearIsNotInFuture: PartialFunction[ValidationRequest, ValidationRequest] = {
