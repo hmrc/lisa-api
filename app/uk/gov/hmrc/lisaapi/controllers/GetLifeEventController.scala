@@ -19,12 +19,16 @@ package uk.gov.hmrc.lisaapi.controllers
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.lisaapi.LisaConstants
+import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
+import uk.gov.hmrc.lisaapi.services.LifeEventService
 
-import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class GetLifeEventController extends LisaController with LisaConstants {
 
   override val validateVersion: String => Boolean = _ == "2.0"
+
+  val service: LifeEventService = LifeEventService
 
   def getLifeEvent(lisaManager: String, accountId: String, lifeEventId: String): Action[AnyContent] = validateHeader().async { implicit request =>
     implicit val startTime: Long = System.currentTimeMillis()
@@ -32,7 +36,16 @@ class GetLifeEventController extends LisaController with LisaConstants {
     withValidLMRN(lisaManager) { () =>
       withValidAccountId(accountId) { () =>
         withEnrolment(lisaManager) { (_) =>
-          Future.successful(NotImplemented(Json.toJson(ErrorNotImplemented)))
+          service.getLifeEvent(lisaManager, accountId, lifeEventId) map {
+            case Left(error) => {
+              LisaMetrics.incrementMetrics(startTime, error.httpStatusCode, LisaMetricKeys.EVENT)
+              error.asResult
+            }
+            case Right(success) => {
+              LisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.EVENT)
+              Ok(Json.toJson(success))
+            }
+          }
         }
       }
     }
