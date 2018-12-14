@@ -537,6 +537,96 @@ class DesConnectorSpec extends PlaySpec
 
   }
 
+  "Retrieve Life Event endpoint" must {
+
+    "return a Left of DesFailureResponse" when {
+
+      "a specific failure is returned" in {
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = CONFLICT,
+                responseJson = Some(Json.parse(
+                  """{
+                    | "code": "ERROR_CODE",
+                    | "reason" : "ERROR MESSAGE"
+                  }""".stripMargin))
+              )
+            )
+          )
+
+        doRetrieveLifeEventRequest { response =>
+          response mustBe Left(DesFailureResponse("ERROR_CODE", "ERROR MESSAGE"))
+        }
+      }
+
+      "the response has no json body" in {
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = INTERNAL_SERVER_ERROR,
+                responseJson = None
+              )
+            )
+          )
+
+        doRetrieveLifeEventRequest { response =>
+          response mustBe Left(DesFailureResponse())
+        }
+      }
+
+      "the response is badly formed" in {
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = INTERNAL_SERVER_ERROR,
+                responseJson = Some(Json.obj("test" -> "test"))
+              )
+            )
+          )
+
+        doRetrieveLifeEventRequest { response =>
+          response mustBe Left(DesFailureResponse())
+        }
+      }
+
+    }
+
+    "return a Right of Seq GetLifeEventItem" when {
+
+      "DES returns successfully" in {
+
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = OK,
+                responseJson = Some(Json.arr(Json.obj(
+                  "lifeEventId" -> "1234567890",
+                  "lifeEventType" -> "STATUTORY_SUBMISSION",
+                  "lifeEventDate" -> "2018-04-05"
+                )))
+              )
+            )
+          )
+
+        doRetrieveLifeEventRequest { response =>
+          response mustBe Right(List(GetLifeEventItem(
+            lifeEventId = "1234567890",
+            eventType = "Statutory Submission",
+            eventDate = new DateTime("2018-04-05")
+          )))
+        }
+
+      }
+
+    }
+
+  }
+
   "Request Bonus Payment endpoint" must {
 
     "return a populated DesTransactionResponse" when {
@@ -1277,6 +1367,12 @@ class DesConnectorSpec extends PlaySpec
   private def doReportLifeEventRequest(callback: (DesResponse) => Unit) = {
     val request = ReportLifeEventRequest("LISA Investor Terminal Ill Health",new DateTime("2000-01-01"))
     val response = Await.result(SUT.reportLifeEvent("Z123456", "ABC12345", request), Duration.Inf)
+
+    callback(response)
+  }
+
+  private def doRetrieveLifeEventRequest(callback: (Either[DesResponse, Seq[GetLifeEventItem]]) => Unit) = {
+    val response = Await.result(SUT.getLifeEvent("Z123456", "ABC12345", "1234567890"), Duration.Inf)
 
     callback(response)
   }
