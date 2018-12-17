@@ -34,8 +34,9 @@ class BulkPaymentController @Inject()(
                                        val authConnector: AuthConnector,
                                        val appContext: AppContext,
                                        currentDateService: CurrentDateService,
-                                       service: BulkPaymentService
-                                     )(implicit ec: ExecutionContext) extends LisaController2 {
+                                       service: BulkPaymentService,
+                                       val lisaMetrics: LisaMetrics
+                                     )(implicit ec: ExecutionContext) extends LisaController {
 
   def getBulkPayment(lisaManager: String, startDate: String, endDate: String): Action[AnyContent] =
     validateHeader().async { implicit request =>
@@ -47,21 +48,21 @@ class BulkPaymentController @Inject()(
 
             response flatMap {
               case s: GetBulkPaymentSuccessResponse => {
-                LisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.TRANSACTION)
+                lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.TRANSACTION)
                 withApiVersion {
                   case Some(VERSION_1) => Future.successful(transformV1Response(Json.toJson(s)))
                   case Some(VERSION_2) => Future.successful(Ok(Json.toJson(s)))
                 }
               }
               case GetBulkPaymentNotFoundResponse => {
-                LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.TRANSACTION)
+                lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.TRANSACTION)
                 withApiVersion {
                   case Some(VERSION_1) => Future.successful(NotFound(Json.toJson(ErrorBulkTransactionNotFoundV1)))
                   case Some(VERSION_2) => Future.successful(NotFound(Json.toJson(ErrorBulkTransactionNotFoundV2)))
                 }
               }
               case _ => {
-                LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.TRANSACTION)
+                lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.TRANSACTION)
                 Future.successful(InternalServerError(Json.toJson(ErrorInternalServerError)))
               }
             }
@@ -99,13 +100,13 @@ class BulkPaymentController @Inject()(
         }
       }
       case (None, Some(_)) =>
-        LisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.TRANSACTION)
+        lisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.TRANSACTION)
         Future.successful(BadRequest(Json.toJson(ErrorBadRequestStart)))
       case (Some(_), None) =>
-        LisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.TRANSACTION)
+        lisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.TRANSACTION)
         Future.successful(BadRequest(Json.toJson(ErrorBadRequestEnd)))
       case _ =>
-        LisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.TRANSACTION)
+        lisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.TRANSACTION)
         Future.successful(BadRequest(Json.toJson(ErrorBadRequestStartEnd)))
     }
   }
@@ -116,25 +117,25 @@ class BulkPaymentController @Inject()(
 
     // end date is in the future
     if (endDate.isAfter(currentDateService.now())) {
-      LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.TRANSACTION)
+      lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.TRANSACTION)
       Future.successful(Forbidden(Json.toJson(ErrorBadRequestEndInFuture)))
     }
 
     // end date is before start date
     else if (endDate.isBefore(startDate)) {
-      LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.TRANSACTION)
+      lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.TRANSACTION)
       Future.successful(Forbidden(Json.toJson(ErrorBadRequestEndBeforeStart)))
     }
 
     // start date is before 6 april 2017
     else if (startDate.isBefore(LISA_START_DATE)) {
-      LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.TRANSACTION)
+      lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.TRANSACTION)
       Future.successful(Forbidden(Json.toJson(ErrorBadRequestStartBefore6April2017)))
     }
 
     // there's more than a year between start date and end date
     else if (endDate.isAfter(startDate.plusYears(1))) {
-      LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.TRANSACTION)
+      lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.TRANSACTION)
       Future.successful(Forbidden(Json.toJson(ErrorBadRequestOverYearBetweenStartAndEnd)))
     }
 

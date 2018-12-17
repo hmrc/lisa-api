@@ -31,7 +31,6 @@ lazy val lisaapi = (project in file("."))
     libraryDependencies ++= AppDependencies(),
     retrieveManaged := true,
     evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
-    routesGenerator := StaticRoutesGenerator,
     unmanagedResourceDirectories in Compile += baseDirectory.value / "resources",
     fork in Test := true,
     resolvers ++= Seq(

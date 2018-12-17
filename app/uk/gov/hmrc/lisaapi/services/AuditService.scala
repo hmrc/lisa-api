@@ -17,6 +17,7 @@
 package uk.gov.hmrc.lisaapi.services
 
 import com.google.inject.Inject
+import play.api.Configuration
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.AuditExtensions._
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
@@ -25,7 +26,10 @@ import uk.gov.hmrc.play.config.AppName
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AuditService @Inject()(connector: AuditConnector)(implicit ec: ExecutionContext) extends AppName {
+class AuditService @Inject()(
+                              connector: AuditConnector,
+                              val appNameConfiguration: Configuration
+                            )(implicit ec: ExecutionContext) extends AppName {
 
   def audit(auditType: String, path: String, auditData: Map[String, String])(implicit hc:HeaderCarrier): Future[AuditResult] = {
     val event = DataEvent(

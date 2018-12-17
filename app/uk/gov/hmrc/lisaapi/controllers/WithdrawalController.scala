@@ -38,8 +38,9 @@ class WithdrawalController @Inject() (
                                        getService: BonusOrWithdrawalService,
                                        auditService: AuditService,
                                        validator: WithdrawalChargeValidator,
-                                       dateTimeService: CurrentDateService
-                                     )(implicit ec: ExecutionContext) extends LisaController2 {
+                                       dateTimeService: CurrentDateService,
+                                       val lisaMetrics: LisaMetrics
+                                     )(implicit ec: ExecutionContext) extends LisaController {
 
   override val validateVersion: String => Boolean = _ == "2.0"
 
@@ -93,23 +94,23 @@ class WithdrawalController @Inject() (
 
     getService.getBonusOrWithdrawal(lisaManager, accountId, transactionId).map {
       case response: GetWithdrawalResponse =>
-        LisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.WITHDRAWAL_CHARGE)
+        lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.WITHDRAWAL_CHARGE)
         Ok(Json.toJson(response))
 
       case _: GetBonusResponse =>
-        LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.WITHDRAWAL_CHARGE)
+        lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.WITHDRAWAL_CHARGE)
         NotFound(Json.toJson(ErrorWithdrawalNotFound))
 
       case GetBonusOrWithdrawalTransactionNotFoundResponse =>
-        LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.WITHDRAWAL_CHARGE)
+        lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.WITHDRAWAL_CHARGE)
         NotFound(Json.toJson(ErrorWithdrawalNotFound))
 
       case GetBonusOrWithdrawalInvestorNotFoundResponse =>
-        LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.WITHDRAWAL_CHARGE)
+        lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.WITHDRAWAL_CHARGE)
         NotFound(Json.toJson(ErrorAccountNotFound))
 
       case _ =>
-        LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.WITHDRAWAL_CHARGE)
+        lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.WITHDRAWAL_CHARGE)
         InternalServerError(Json.toJson(ErrorInternalServerError))
     }
   }
@@ -129,7 +130,7 @@ class WithdrawalController @Inject() (
     else {
       auditFailure(lisaManager, accountId, data, ErrorWithdrawalTimescalesExceeded.errorCode)
 
-      LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.WITHDRAWAL_CHARGE)
+      lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.WITHDRAWAL_CHARGE)
 
       Future.successful(Forbidden(Json.toJson(ErrorWithdrawalTimescalesExceeded)))
     }
@@ -147,7 +148,7 @@ class WithdrawalController @Inject() (
     else {
       auditFailure(lisaManager, accountId, data, "FORBIDDEN")
 
-      LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.WITHDRAWAL_CHARGE)
+      lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.WITHDRAWAL_CHARGE)
 
       Future.successful(Forbidden(Json.toJson(ErrorForbidden(errors.toList))))
     }
@@ -190,7 +191,7 @@ class WithdrawalController @Inject() (
         data
     }
 
-    LisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.WITHDRAWAL_CHARGE)
+    lisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.WITHDRAWAL_CHARGE)
 
     Created(Json.toJson(ApiResponse(data = Some(responseData), success = true, status = CREATED)))
   }
@@ -203,55 +204,55 @@ class WithdrawalController @Inject() (
     errorResponse match {
       case ReportWithdrawalChargeAccountCancelled => {
         auditFailure(lisaManager, accountId, req, ErrorAccountAlreadyCancelled.errorCode)
-        LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.WITHDRAWAL_CHARGE)
+        lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.WITHDRAWAL_CHARGE)
 
         Forbidden(Json.toJson(ErrorAccountAlreadyCancelled))
       }
       case ReportWithdrawalChargeAccountVoid => {
         auditFailure(lisaManager, accountId, req, ErrorAccountAlreadyVoided.errorCode)
-        LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.WITHDRAWAL_CHARGE)
+        lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.WITHDRAWAL_CHARGE)
 
         Forbidden(Json.toJson(ErrorAccountAlreadyVoided))
       }
       case ReportWithdrawalChargeReportingError => {
         auditFailure(lisaManager, accountId, req, ErrorWithdrawalReportingError.errorCode)
-        LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.WITHDRAWAL_CHARGE)
+        lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.WITHDRAWAL_CHARGE)
 
         Forbidden(Json.toJson(ErrorWithdrawalReportingError))
       }
       case ReportWithdrawalChargeAlreadySuperseded => {
         auditFailure(lisaManager, accountId, req, ErrorWithdrawalAlreadySuperseded.errorCode)
-        LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.WITHDRAWAL_CHARGE)
+        lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.WITHDRAWAL_CHARGE)
 
         Forbidden(Json.toJson(ErrorWithdrawalAlreadySuperseded))
       }
       case ReportWithdrawalChargeSupersedeAmountMismatch => {
         auditFailure(lisaManager, accountId, req, ErrorWithdrawalSupersededAmountMismatch.errorCode)
-        LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.WITHDRAWAL_CHARGE)
+        lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.WITHDRAWAL_CHARGE)
 
         Forbidden(Json.toJson(ErrorWithdrawalSupersededAmountMismatch))
       }
       case ReportWithdrawalChargeSupersedeOutcomeError => {
         auditFailure(lisaManager, accountId, req, ErrorWithdrawalSupersededOutcomeError.errorCode)
-        LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.WITHDRAWAL_CHARGE)
+        lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.WITHDRAWAL_CHARGE)
 
         Forbidden(Json.toJson(ErrorWithdrawalSupersededOutcomeError))
       }
       case ReportWithdrawalChargeAccountNotFound => {
         auditFailure(lisaManager, accountId, req, ErrorAccountNotFound.errorCode)
-        LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.WITHDRAWAL_CHARGE)
+        lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.WITHDRAWAL_CHARGE)
 
         NotFound(Json.toJson(ErrorAccountNotFound))
       }
       case ReportWithdrawalChargeAlreadyExists => {
         auditFailure(lisaManager, accountId, req, ErrorWithdrawalExists.errorCode)
-        LisaMetrics.incrementMetrics(startTime, CONFLICT, LisaMetricKeys.WITHDRAWAL_CHARGE)
+        lisaMetrics.incrementMetrics(startTime, CONFLICT, LisaMetricKeys.WITHDRAWAL_CHARGE)
 
         Conflict(Json.toJson(ErrorWithdrawalExists))
       }
       case _ =>
         auditFailure(lisaManager, accountId, req, ErrorInternalServerError.errorCode)
-        LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.WITHDRAWAL_CHARGE)
+        lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.WITHDRAWAL_CHARGE)
 
         InternalServerError(Json.toJson(ErrorInternalServerError))
     }
@@ -262,7 +263,7 @@ class WithdrawalController @Inject() (
     Logger.debug("An error occurred")
 
     auditFailure(lisaManager, accountId, req, ErrorInternalServerError.errorCode)
-    LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.WITHDRAWAL_CHARGE)
+    lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.WITHDRAWAL_CHARGE)
 
     InternalServerError(Json.toJson(ErrorInternalServerError))
   }

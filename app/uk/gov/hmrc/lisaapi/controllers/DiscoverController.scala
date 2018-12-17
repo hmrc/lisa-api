@@ -23,12 +23,14 @@ import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class DiscoverController @Inject()(
                                     val authConnector: AuthConnector,
-                                    val appContext: AppContext)
-  extends LisaController2 {
+                                    val appContext: AppContext,
+                                    val lisaMetrics: LisaMetrics)
+                                  (implicit ec: ExecutionContext)
+  extends LisaController {
 
   def discover(lisaManagerReferenceNumber: String): Action[AnyContent] =
     (validateHeader andThen
@@ -41,7 +43,7 @@ class DiscoverController @Inject()(
           case Some(VERSION_2) => Future.successful(Ok(Json.parse(v2(lisaManagerReferenceNumber))))
         }
 
-        LisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.DISCOVER)
+        lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.DISCOVER)
         result
       }
     }

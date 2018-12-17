@@ -31,8 +31,9 @@ import scala.concurrent.{ExecutionContext, Future}
 class TransactionController @Inject() (
                                         val authConnector: AuthConnector,
                                         val appContext: AppContext,
-                                        service: TransactionService
-                                      )(implicit ec: ExecutionContext) extends LisaController2 {
+                                        service: TransactionService,
+                                        val lisaMetrics: LisaMetrics
+                                      )(implicit ec: ExecutionContext) extends LisaController {
 
   def getTransaction(lisaManager: String, accountId: String, transactionId: String): Action[AnyContent] =
     validateHeader().async { implicit request =>
@@ -45,7 +46,7 @@ class TransactionController @Inject() (
               case success: GetTransactionSuccessResponse => {
                 Logger.debug("Matched Valid Response")
 
-                LisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.TRANSACTION)
+                lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.TRANSACTION)
 
                 withApiVersion {
                   case Some(VERSION_1) => Future.successful(Ok(Json.toJson(success.copy(transactionType = None, supersededBy = None))))
@@ -55,14 +56,14 @@ class TransactionController @Inject() (
               case GetTransactionAccountNotFoundResponse => {
                 Logger.debug("Matched Not Found Response")
 
-                LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.TRANSACTION)
+                lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.TRANSACTION)
 
                 Future.successful(NotFound(Json.toJson(ErrorAccountNotFound)))
               }
               case GetTransactionTransactionNotFoundResponse => {
                 Logger.debug("Matched Not Found Response")
 
-                LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.TRANSACTION)
+                lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.TRANSACTION)
 
                 withApiVersion {
                   case Some(VERSION_1) => Future.successful(NotFound(Json.toJson(ErrorBonusPaymentTransactionNotFound)))
@@ -72,7 +73,7 @@ class TransactionController @Inject() (
               case GetTransactionErrorResponse => {
                 Logger.debug("Matched an error")
 
-                LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.TRANSACTION)
+                lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.TRANSACTION)
 
                 Future.successful(InternalServerError(Json.toJson(ErrorInternalServerError)))
               }

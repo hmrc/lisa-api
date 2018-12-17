@@ -21,13 +21,16 @@ import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.lisaapi.config.AppContext
+import uk.gov.hmrc.lisaapi.metrics.LisaMetrics
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class GetLifeEventController @Inject()(
                                         val authConnector: AuthConnector,
-                                        val appContext: AppContext)
-  extends LisaController2 {
+                                        val appContext: AppContext,
+                                        val lisaMetrics: LisaMetrics)
+                                      (implicit ec: ExecutionContext)
+  extends LisaController {
 
   override val validateVersion: String => Boolean = _ == "2.0"
 

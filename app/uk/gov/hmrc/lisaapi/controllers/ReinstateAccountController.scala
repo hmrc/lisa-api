@@ -34,8 +34,9 @@ class ReinstateAccountController @Inject() (
                                              val authConnector: AuthConnector,
                                              val appContext: AppContext,
                                              service: ReinstateAccountService,
-                                             auditService: AuditService
-                                           )(implicit ec: ExecutionContext) extends LisaController2 {
+                                             auditService: AuditService,
+                                             val lisaMetrics: LisaMetrics
+                                           )(implicit ec: ExecutionContext) extends LisaController {
 
   def reinstateAccount (lisaManager: String): Action[AnyContent] = Action.async{ implicit request =>
     implicit val startTime: Long = System.currentTimeMillis()
@@ -58,7 +59,7 @@ class ReinstateAccountController @Inject() (
           path = getReinstateEndpointUrl(lisaManager, accountId),
           auditData = Map(ZREF -> lisaManager, "accountId" -> accountId)
         )
-        LisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.REINSTATE)
+        lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.REINSTATE)
         val data = ApiResponseData(message = "This account has been reinstated", accountId = Some(accountId))
         Ok(Json.toJson(ApiResponse(data = Some(data), success = true, status = OK)))
       }
@@ -90,7 +91,7 @@ class ReinstateAccountController @Inject() (
     } recover {
       case _:Exception  => {
         Logger.error(s"ReinstateAccountController: reinstateAccount: An error occurred returning internal server error")
-        LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.REINSTATE)
+        lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.REINSTATE)
         InternalServerError(Json.toJson(ErrorInternalServerError))
       }
     }
@@ -112,7 +113,7 @@ class ReinstateAccountController @Inject() (
       )
     )
 
-    LisaMetrics.incrementMetrics(startTime, status, LisaMetricKeys.REINSTATE)
+    lisaMetrics.incrementMetrics(startTime, status, LisaMetricKeys.REINSTATE)
 
     val msg = message match {
       case Some(text) => text

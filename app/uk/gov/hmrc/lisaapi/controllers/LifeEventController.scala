@@ -34,9 +34,10 @@ class LifeEventController @Inject()(
                                      val authConnector: AuthConnector,
                                      val appContext: AppContext,
                                      service: LifeEventService,
-                                     auditService: AuditService
+                                     auditService: AuditService,
+                                     val lisaMetrics: LisaMetrics
                                    )(implicit ec: ExecutionContext)
-  extends LisaController2 {
+  extends LisaController {
 
   def reportLisaLifeEvent(lisaManager: String, accountId: String): Action[AnyContent] = validateHeader().async {
     implicit request =>
@@ -69,38 +70,38 @@ class LifeEventController @Inject()(
       case ReportLifeEventSuccessResponse(lifeEventId) => {
         Logger.debug("Matched Valid Response ")
         doAudit(lisaManager, accountId, req, true)
-        LisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.EVENT)
+        lisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.EVENT)
         val data = ApiResponseData(message = "Life event created", lifeEventId = Some(lifeEventId))
         Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
       }
       case ReportLifeEventInappropriateResponse => {
         Logger.debug("Matched Inappropriate")
         doAudit(lisaManager, accountId, req, false, lifeEventAuditData(ErrorLifeEventInappropriate.errorCode))
-        LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.EVENT)
+        lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.EVENT)
         Forbidden(Json.toJson(ErrorLifeEventInappropriate))
       }
       case ReportLifeEventAccountClosedOrVoidResponse => {
         Logger.debug("Account Closed or VOID")
         doAudit(lisaManager, accountId, req, false, lifeEventAuditData(ErrorAccountAlreadyClosedOrVoid.errorCode))
-        LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.EVENT)
+        lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.EVENT)
         Forbidden(Json.toJson(ErrorAccountAlreadyClosedOrVoid))
       }
       case ReportLifeEventAlreadyExistsResponse => {
         Logger.debug("Matched Already Exists")
         doAudit(lisaManager, accountId, req, false, lifeEventAuditData(ErrorLifeEventAlreadyExists.errorCode))
-        LisaMetrics.incrementMetrics(startTime, CONFLICT, LisaMetricKeys.EVENT)
+        lisaMetrics.incrementMetrics(startTime, CONFLICT, LisaMetricKeys.EVENT)
         Conflict(Json.toJson(ErrorLifeEventAlreadyExists))
       }
       case ReportLifeEventAccountNotFoundResponse => {
         Logger.debug("Matched Account Not Found")
         doAudit(lisaManager, accountId, req, false, lifeEventAuditData(ErrorAccountNotFound.errorCode))
-        LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.EVENT)
+        lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.EVENT)
         NotFound(Json.toJson(ErrorAccountNotFound))
       }
       case unexpected: ReportLifeEventResponse => {
         Logger.debug(s"Matched an unexpected response: $unexpected, returning a 500 error")
         doAudit(lisaManager, accountId, req, false, lifeEventAuditData(ErrorInternalServerError.errorCode))
-        LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.EVENT)
+        lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.EVENT)
         InternalServerError(Json.toJson(ErrorInternalServerError))
       }
     }
@@ -125,7 +126,7 @@ class LifeEventController @Inject()(
       Logger.debug("Life event not reported - invalid event date")
 
       doAudit(lisaManager, accountId, req, false, lifeEventAuditData("FORBIDDEN"))
-      LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.EVENT)
+      lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.EVENT)
 
       Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
         ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("eventDate"), Some("/eventDate"))

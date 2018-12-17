@@ -33,8 +33,9 @@ class InvestorController @Inject()(
                                     val authConnector: AuthConnector,
                                     val appContext: AppContext,
                                     service: InvestorService,
-                                    auditService: AuditService
-                                  )(implicit ec: ExecutionContext) extends LisaController2 {
+                                    auditService: AuditService,
+                                    val lisaMetrics: LisaMetrics
+                                  )(implicit ec: ExecutionContext) extends LisaController {
 
   def createLisaInvestor(lisaManager: String): Action[AnyContent] = validateHeader().async {
     implicit request =>
@@ -78,7 +79,7 @@ class InvestorController @Inject()(
 
     val data = ApiResponseData(message = "Investor created", investorId = Some(investorId))
 
-    LisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.INVESTOR)
+    lisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.INVESTOR)
     
     Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
   }
@@ -99,7 +100,7 @@ class InvestorController @Inject()(
       )
     )
 
-    LisaMetrics.incrementMetrics(startTime, CONFLICT, LisaMetricKeys.INVESTOR)
+    lisaMetrics.incrementMetrics(startTime, CONFLICT, LisaMetricKeys.INVESTOR)
 
     Conflict(Json.toJson(result))
   }
@@ -117,7 +118,7 @@ class InvestorController @Inject()(
       )
     )
 
-    LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.INVESTOR)
+    lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.INVESTOR)
 
     Forbidden(Json.toJson(ErrorInvestorNotFound))
   }
@@ -135,7 +136,7 @@ class InvestorController @Inject()(
       )
     )
 
-    LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.INVESTOR)
+    lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.INVESTOR)
 
     InternalServerError(Json.toJson(ErrorInternalServerError))
   }

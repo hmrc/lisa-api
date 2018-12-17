@@ -34,8 +34,9 @@ class CloseAccountController @Inject()(
                                         val authConnector: AuthConnector,
                                         val appContext: AppContext,
                                         auditService: AuditService,
-                                        service: AccountService
-                                      )(implicit ec: ExecutionContext) extends LisaController2 {
+                                        service: AccountService,
+                                        val lisaMetrics: LisaMetrics
+                                      )(implicit ec: ExecutionContext) extends LisaController {
 
   def closeLisaAccount(lisaManager: String, accountId: String): Action[AnyContent] =
     (validateHeader() andThen validateLMRN(lisaManager) andThen validateAccountId(accountId)).async { implicit request =>
@@ -54,7 +55,7 @@ class CloseAccountController @Inject()(
                   )
                 )
 
-                LisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.CLOSE)
+                lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.CLOSE)
 
                 val data = ApiResponseData(message = "LISA account closed", accountId = Some(accountId))
 
@@ -87,7 +88,7 @@ class CloseAccountController @Inject()(
           "reasonNotClosed" -> "FORBIDDEN")
       )
 
-      LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.CLOSE)
+      lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.CLOSE)
 
       Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
         ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("closureDate"), Some("/closureDate"))
@@ -112,7 +113,7 @@ class CloseAccountController @Inject()(
       )
     )
 
-    LisaMetrics.incrementMetrics(startTime, response.httpStatusCode, LisaMetricKeys.CLOSE)
+    lisaMetrics.incrementMetrics(startTime, response.httpStatusCode, LisaMetricKeys.CLOSE)
 
     response.asResult
   }

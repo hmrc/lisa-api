@@ -30,9 +30,10 @@ class GetAccountController @Inject()(
                                       val authConnector: AuthConnector,
                                       val appContext: AppContext,
                                       service: AccountService,
-                                      auditService: AuditService
+                                      auditService: AuditService,
+                                      val lisaMetrics: LisaMetrics
                                     )
-  extends LisaController2 {
+  extends LisaController {
 
   def getAccountDetails(lisaManager: String, accountId: String): Action[AnyContent] =
     (validateHeader() andThen validateLMRN(lisaManager) andThen validateAccountId(accountId)).async { implicit request =>
@@ -40,15 +41,15 @@ class GetAccountController @Inject()(
       withEnrolment(lisaManager) { (_) =>
         service.getAccount(lisaManager, accountId).map {
           case response: GetLisaAccountSuccessResponse =>
-            LisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.ACCOUNT)
+            lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.ACCOUNT)
             Ok(Json.toJson(response))
 
           case GetLisaAccountDoesNotExistResponse =>
-            LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.ACCOUNT)
+            lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.ACCOUNT)
             NotFound(Json.toJson(ErrorAccountNotFound))
 
           case _ =>
-            LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.ACCOUNT)
+            lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.ACCOUNT)
             InternalServerError(Json.toJson(ErrorInternalServerError))
         }
       }

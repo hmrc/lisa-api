@@ -36,7 +36,9 @@ class AnnualReturnController @Inject()(
                                        val appContext: AppContext,
                                        service: LifeEventService,
                                        auditService: AuditService,
-                                       validator: AnnualReturnValidator) extends LisaController2 {
+                                       validator: AnnualReturnValidator,
+                                       val lisaMetrics: LisaMetrics
+                                      ) extends LisaController {
 
   override val validateVersion: String => Boolean = _ == "2.0"
 
@@ -57,13 +59,13 @@ class AnnualReturnController @Inject()(
                     val data = ApiResponseData(message = message, lifeEventId = Some(success.lifeEventId))
 
                     audit(lisaManager, accountId, req)
-                    LisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.EVENT)
+                    lisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.EVENT)
                     Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
                   case error: ReportLifeEventResponse =>
                     val response = errors.getOrElse(error, ErrorInternalServerError)
 
                     audit(lisaManager, accountId, req, Some(response.errorCode))
-                    LisaMetrics.incrementMetrics(startTime, response.httpStatusCode, LisaMetricKeys.EVENT)
+                    lisaMetrics.incrementMetrics(startTime, response.httpStatusCode, LisaMetricKeys.EVENT)
                     response.asResult
                 }
               } recover {
@@ -71,7 +73,7 @@ class AnnualReturnController @Inject()(
                   Logger.error(s"submitAnnualReturn: An error occurred due to ${e.getMessage}, returning internal server error")
 
                   audit(lisaManager, accountId, req, Some("INTERNAL_SERVER_ERROR"))
-                  LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.EVENT)
+                  lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.EVENT)
                   InternalServerError(Json.toJson(ErrorInternalServerError))
               }
             },
@@ -114,7 +116,7 @@ class AnnualReturnController @Inject()(
     }
     else {
       audit(lisaManager, accountId, req, Some("FORBIDDEN"))
-      LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.WITHDRAWAL_CHARGE)
+      lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.WITHDRAWAL_CHARGE)
       Future.successful(Forbidden(Json.toJson(ErrorForbidden(errors.toList))))
     }
   }

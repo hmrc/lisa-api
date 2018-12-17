@@ -16,16 +16,15 @@
 
 package uk.gov.hmrc.lisaapi
 
-import play.api.inject.{Binding, Module}
-import play.api.{Configuration, Environment}
-import uk.gov.hmrc.lisaapi.models.AnnualReturnValidator
-import uk.gov.hmrc.lisaapi.services._
+import javax.inject.{Inject, Singleton}
 
-class LisaModule extends Module {
-  override def bindings(environment: Environment, configuration: Configuration): Seq[Binding[_]] = {
-    Seq(
-      bind[AnnualReturnValidator] toInstance AnnualReturnValidator,
-      bind[CurrentDateService] toInstance CurrentDateService
-    )
-  }
+import play.api.Configuration
+import uk.gov.hmrc.api.connector.ApiServiceLocatorConnector
+import uk.gov.hmrc.http.HeaderCarrier
+
+@Singleton
+class ApplicationRegistration @Inject()(serviceLocatorConnector: ApiServiceLocatorConnector, config: Configuration) {
+  val registrationEnabled: Boolean = config.getBoolean("service-locator.enabled").getOrElse(false)
+
+  if (registrationEnabled) serviceLocatorConnector.register(HeaderCarrier())
 }

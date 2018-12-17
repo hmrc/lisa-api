@@ -35,8 +35,9 @@ class PropertyPurchaseController @Inject() (
                                              val authConnector: AuthConnector,
                                              val appContext: AppContext,
                                              service: LifeEventService,
-                                             auditService: AuditService
-                                           )(implicit ec: ExecutionContext) extends LisaController2 {
+                                             auditService: AuditService,
+                                             val lisaMetrics: LisaMetrics
+                                           )(implicit ec: ExecutionContext) extends LisaController {
 
   override val validateVersion: String => Boolean = _ == "2.0"
 
@@ -51,13 +52,13 @@ class PropertyPurchaseController @Inject() (
               if (conveyancerOrPropertyDetailsIncludedOnASupersedeRequest(request.body.asJson)) {
                 Logger.debug("Fund release not reported - conveyancer and/or property details included on a supersede request")
                 doFundReleaseAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> ErrorInvalidDataProvided.errorCode))
-                LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
+                lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
                 Future.successful(Forbidden(Json.toJson(ErrorInvalidDataProvided)))
               }
               else if (req.eventDate.isBefore(LISA_START_DATE)) {
                 Logger.debug("Fund release not reported - invalid event date")
                 doFundReleaseAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> "FORBIDDEN"))
-                LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
+                lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
                 Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
                   ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("eventDate"), Some("/eventDate"))
                 )))))
@@ -67,7 +68,7 @@ class PropertyPurchaseController @Inject() (
                   case res: ReportLifeEventSuccessResponse => {
                     Logger.debug("Fund release successful")
                     doFundReleaseAudit(lisaManager, accountId, req, true)
-                    LisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.PROPERTY_PURCHASE)
+                    lisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.PROPERTY_PURCHASE)
                     val data = req match {
                       case _: InitialFundReleaseRequest => ApiResponseData(message = "Fund release created", lifeEventId = Some(res.lifeEventId))
                       case _: SupersedeFundReleaseRequest => ApiResponseData(message = "Fund release superseded", lifeEventId = Some(res.lifeEventId))
@@ -78,7 +79,7 @@ class PropertyPurchaseController @Inject() (
                     val response = fundReleaseErrors.getOrElse(res, ErrorInternalServerError)
                     Logger.debug(s"Fund Release received $res, responding with $response")
                     doFundReleaseAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> response.errorCode))
-                    LisaMetrics.incrementMetrics(startTime, response.httpStatusCode, LisaMetricKeys.PROPERTY_PURCHASE)
+                    lisaMetrics.incrementMetrics(startTime, response.httpStatusCode, LisaMetricKeys.PROPERTY_PURCHASE)
                     response.asResult
                   }
                 }
@@ -102,7 +103,7 @@ class PropertyPurchaseController @Inject() (
                 Logger.debug("Extension not reported - invalid event date")
 
                 doExtensionAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> "FORBIDDEN"))
-                LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
+                lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
 
                 Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
                   ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("eventDate"), Some("/eventDate"))
@@ -113,7 +114,7 @@ class PropertyPurchaseController @Inject() (
                   case res: ReportLifeEventSuccessResponse => {
                     Logger.debug("Extension successful")
                     doExtensionAudit(lisaManager, accountId, req, true)
-                    LisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.PROPERTY_PURCHASE)
+                    lisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.PROPERTY_PURCHASE)
                     val data = req match {
                       case _: RequestStandardPurchaseExtension => ApiResponseData(message = "Extension created", lifeEventId = Some(res.lifeEventId))
                       case _: RequestSupersededPurchaseExtension => ApiResponseData(message = "Extension superseded", lifeEventId = Some(res.lifeEventId))
@@ -124,7 +125,7 @@ class PropertyPurchaseController @Inject() (
                     val response = extensionErrors.getOrElse(res, ErrorInternalServerError)
                     Logger.debug(s"Extension received $res, responding with $response")
                     doExtensionAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> response.errorCode))
-                    LisaMetrics.incrementMetrics(startTime, response.httpStatusCode, LisaMetricKeys.PROPERTY_PURCHASE)
+                    lisaMetrics.incrementMetrics(startTime, response.httpStatusCode, LisaMetricKeys.PROPERTY_PURCHASE)
                     Status(response.httpStatusCode)(Json.toJson(response))
                   }
                 }
@@ -147,7 +148,7 @@ class PropertyPurchaseController @Inject() (
                 Logger.debug("Purchase outcome not reported - invalid event date")
 
                 doOutcomeAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> "FORBIDDEN"))
-                LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
+                lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
 
                 Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
                   ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("eventDate"), Some("/eventDate"))
@@ -158,7 +159,7 @@ class PropertyPurchaseController @Inject() (
                   case res: ReportLifeEventSuccessResponse => {
                     Logger.debug("Purchase outcome successful")
                     doOutcomeAudit(lisaManager, accountId, req, true)
-                    LisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.PROPERTY_PURCHASE)
+                    lisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.PROPERTY_PURCHASE)
                     val data = req match {
                       case _: RequestPurchaseOutcomeStandardRequest => {
                         ApiResponseData(message = "Purchase outcome created", lifeEventId = Some(res.lifeEventId))
@@ -173,7 +174,7 @@ class PropertyPurchaseController @Inject() (
                     val response = outcomeErrors.getOrElse(res, ErrorInternalServerError)
                     Logger.debug(s"Purchase outcome received $res, responding with $response")
                     doOutcomeAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> response.errorCode))
-                    LisaMetrics.incrementMetrics(startTime, response.httpStatusCode, LisaMetricKeys.PROPERTY_PURCHASE)
+                    lisaMetrics.incrementMetrics(startTime, response.httpStatusCode, LisaMetricKeys.PROPERTY_PURCHASE)
                     Status(response.httpStatusCode)(Json.toJson(response))
                   }
                 }
