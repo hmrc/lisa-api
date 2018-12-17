@@ -221,7 +221,3 @@ class BonusPaymentValidator @Inject()(currentDateService: CurrentDateService) ex
   }
 
 }
-
-object BonusPaymentValidator extends BonusPaymentValidator {
-  val currentDateService: CurrentDateService = CurrentDateService
-}

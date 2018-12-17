@@ -16,13 +16,12 @@
 
 package uk.gov.hmrc.lisaapi
 
-import play.api.{Configuration, Environment}
 import play.api.inject.{Binding, Module}
+import play.api.{Configuration, Environment}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.lisaapi.config.{AppContext, LisaAuthConnector, WSHttp}
 import uk.gov.hmrc.lisaapi.models.AnnualReturnValidator
 import uk.gov.hmrc.lisaapi.services._
-import uk.gov.hmrc.lisaapi.utils.BonusPaymentValidator
 
 class LisaModule extends Module {
   override def bindings(environment: Environment, configuration: Configuration): Seq[Binding[_]] = {
@@ -30,7 +29,6 @@ class LisaModule extends Module {
       bind[AuthConnector].to[LisaAuthConnector],
       bind[AppContext] toInstance AppContext,
       bind[AnnualReturnValidator] toInstance AnnualReturnValidator,
-      bind[BonusPaymentValidator] toInstance BonusPaymentValidator,
       bind[CurrentDateService] toInstance CurrentDateService,
       bind[WSHttp] toInstance WSHttp
     )
