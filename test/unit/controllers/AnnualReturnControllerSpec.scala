@@ -27,9 +27,11 @@ import play.api.mvc.{AnyContentAsJson, Result}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
+import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.lisaapi.LisaConstants
-import uk.gov.hmrc.lisaapi.config.{AppContext, LisaAuthConnector}
+import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.controllers.{AnnualReturnController, ErrorBadRequest, ErrorBadRequestAccountId, ErrorBadRequestLmrn, ErrorForbidden, ErrorInternalServerError, ErrorValidation}
+import uk.gov.hmrc.lisaapi.metrics.LisaMetrics
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, LifeEventService}
 
@@ -394,10 +396,12 @@ class AnnualReturnControllerSpec extends PlaySpec
 
   private val mockService: LifeEventService = mock[LifeEventService]
   private val mockAuditService: AuditService = mock[AuditService]
-  private val mockAuthCon: LisaAuthConnector = mock[LisaAuthConnector]
+  private val mockAuthCon: AuthConnector = mock[AuthConnector]
   private val mockValidator: AnnualReturnValidator = mock[AnnualReturnValidator]
+  val mockAppContext: AppContext = mock[AppContext]
+  val mockLisaMetrics: LisaMetrics = mock[LisaMetrics]
 
-  private val SUT = new AnnualReturnController(mockAuthCon, AppContext, mockService, mockAuditService, mockValidator) {
+  private val SUT = new AnnualReturnController(mockAuthCon, mockAppContext, mockService, mockAuditService, mockValidator, mockLisaMetrics) {
     override lazy val v2endpointsEnabled = true
   }
 

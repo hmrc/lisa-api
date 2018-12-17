@@ -26,8 +26,10 @@ import play.api.mvc.{AnyContentAsJson, Result}
 import play.api.test.Helpers._
 import play.api.test._
 import play.mvc.Http.HeaderNames
-import uk.gov.hmrc.lisaapi.config.{AppContext, LisaAuthConnector}
+import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.controllers.{CloseAccountController, ErrorBadRequestAccountId, ErrorBadRequestLmrn}
+import uk.gov.hmrc.lisaapi.metrics.LisaMetrics
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AccountService, AuditService}
 
@@ -45,7 +47,7 @@ class CloseAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppP
 
   val closeAccountJson = s"""{"accountClosureReason" : "All funds withdrawn", "closureDate" : "$validDate"}"""
 
-  val mockAuthCon = mock[LisaAuthConnector]
+  val mockAuthCon = mock[AuthConnector]
 
   override def beforeEach() {
     reset(mockAuditService)
@@ -333,7 +335,10 @@ class CloseAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppP
 
   val mockService: AccountService = mock[AccountService]
   val mockAuditService: AuditService = mock[AuditService]
-  val SUT = new CloseAccountController(mockAuthCon, AppContext, mockAuditService, mockService) {
+  val mockAppContext: AppContext = mock[AppContext]
+  val mockLisaMetrics: LisaMetrics = mock[LisaMetrics]
+
+  val SUT = new CloseAccountController(mockAuthCon, mockAppContext, mockAuditService, mockService, mockLisaMetrics) {
     override lazy val v2endpointsEnabled = true
   }
 

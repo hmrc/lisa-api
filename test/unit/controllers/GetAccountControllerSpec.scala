@@ -28,8 +28,9 @@ import play.api.test.Helpers._
 import play.api.test._
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.auth.core.AuthConnector
-import uk.gov.hmrc.lisaapi.config.{AppContext, LisaAuthConnector}
+import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.controllers.GetAccountController
+import uk.gov.hmrc.lisaapi.metrics.LisaMetrics
 import uk.gov.hmrc.lisaapi.models.{GetLisaAccountDoesNotExistResponse, GetLisaAccountErrorResponse, GetLisaAccountSuccessResponse, GetLisaAccountTransferAccount}
 import uk.gov.hmrc.lisaapi.services.{AccountService, AuditService}
 
@@ -41,7 +42,7 @@ class GetAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPer
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
   val lisaManager = "Z019283"
   val accountId = "ABC/12345"
-  val mockAuthCon = mock[LisaAuthConnector]
+  val mockAuthCon = mock[AuthConnector]
 
   val validDate = "2017-04-06"
   val invalidDate = "2015-04-05"
@@ -204,7 +205,9 @@ class GetAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPer
 
   val mockService: AccountService = mock[AccountService]
   val mockAuditService: AuditService = mock[AuditService]
-  val SUT = new GetAccountController(mockAuthCon, AppContext, mockService, mockAuditService) {
+  val mockAppContext: AppContext = mock[AppContext]
+  val mockLisaMetrics: LisaMetrics = mock[LisaMetrics]
+  val SUT = new GetAccountController(mockAuthCon, mockAppContext, mockService, mockAuditService, mockLisaMetrics) {
     override lazy val v2endpointsEnabled = true
   }
 

@@ -277,8 +277,5 @@ class WithdrawalChargeValidatorSpec extends PlaySpec
 
   val mockDateService: CurrentDateService = mock[CurrentDateService]
 
-  object SUT extends WithdrawalChargeValidator {
-    override val currentDateService: CurrentDateService = mockDateService
-  }
-
+  object SUT extends WithdrawalChargeValidator(mockDateService)
 }

@@ -19,21 +19,19 @@ package unit.controllers
 import org.joda.time.DateTime
 import org.mockito.Matchers.{eq => matchersEquals, _}
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
 import org.scalatest._
+import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.Application
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.mvc.AnyContentAsJson
 import play.api.test.Helpers._
 import play.api.test._
 import play.mvc.Http.HeaderNames
-import uk.gov.hmrc.lisaapi.config.{AppContext, LisaAuthConnector}
+import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.controllers._
 import uk.gov.hmrc.lisaapi.metrics.LisaMetrics
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.models.des.DesFailureResponse
 import uk.gov.hmrc.lisaapi.services.{AuditService, InvestorService}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -266,8 +264,10 @@ class InvestorControllerSpec extends PlaySpec
 
   val mockAuditService: AuditService = mock[AuditService]
   val mockService: InvestorService = mock[InvestorService]
-  val mockAuthCon :LisaAuthConnector = mock[LisaAuthConnector]
-  val SUT = new InvestorController(mockAuthCon, AppContext, mockService, mockAuditService) {
+  val mockAuthCon: AuthConnector = mock[AuthConnector]
+  val mockAppContext: AppContext = mock[AppContext]
+  val mockLisaMetrics: LisaMetrics = mock[LisaMetrics]
+  val SUT = new InvestorController(mockAuthCon, mockAppContext, mockService, mockAuditService, mockLisaMetrics) {
     override lazy val v2endpointsEnabled = true
   }
 }

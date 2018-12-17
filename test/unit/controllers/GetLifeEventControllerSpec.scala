@@ -25,8 +25,10 @@ import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
-import uk.gov.hmrc.lisaapi.config.{AppContext, LisaAuthConnector}
+import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.controllers.{ErrorNotImplemented, GetLifeEventController}
+import uk.gov.hmrc.lisaapi.metrics.LisaMetrics
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -62,9 +64,11 @@ class GetLifeEventControllerSpec extends PlaySpec with MockitoSugar with BeforeA
 
   }
 
-  val mockAuthCon: LisaAuthConnector = mock[LisaAuthConnector]
+  val mockAuthCon: AuthConnector = mock[AuthConnector]
+  val mockAppContext: AppContext = mock[AppContext]
+  val mockLisaMetrics: LisaMetrics = mock[LisaMetrics]
 
-  val SUT = new GetLifeEventController(mockAuthCon, AppContext) {
+  val SUT = new GetLifeEventController(mockAuthCon, mockAppContext, mockLisaMetrics) {
     override lazy val v2endpointsEnabled = true
   }
 

@@ -23,14 +23,15 @@ import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import play.api.Configuration
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.models.{Bonuses, HelpToBuyTransfer, InboundPayments, RequestBonusPaymentRequest}
 import uk.gov.hmrc.lisaapi.services.AuditService
+import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.DataEvent
 
-import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
 import scala.concurrent.ExecutionContext.Implicits.global
-import uk.gov.hmrc.http.HeaderCarrier
 
 class AuditServiceSpec extends PlaySpec
   with MockitoSugar
@@ -123,6 +124,7 @@ class AuditServiceSpec extends PlaySpec
 
   implicit val hc:HeaderCarrier = HeaderCarrier()
   val mockAuditConnector = mock[AuditConnector]
+  val mockConfiguration = mock[Configuration]
 
-  object SUT extends AuditService(mockAuditConnector)
+  object SUT extends AuditService(mockAuditConnector, mockConfiguration)
 }

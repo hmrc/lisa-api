@@ -26,8 +26,10 @@ import play.api.mvc.{AnyContentAsJson, Result}
 import play.api.test.Helpers._
 import play.api.test._
 import play.mvc.Http.HeaderNames
-import uk.gov.hmrc.lisaapi.config.{AppContext, LisaAuthConnector}
+import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.controllers._
+import uk.gov.hmrc.lisaapi.metrics.LisaMetrics
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AccountService, AuditService}
 
@@ -39,7 +41,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
   val lisaManager = "Z019283"
   val accountId = "ABC/12345"
-  val mockAuthCon = mock[LisaAuthConnector]
+  val mockAuthCon = mock[AuthConnector]
 
   override def beforeEach() {
     reset(mockAuditService)
@@ -718,7 +720,9 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
   val mockService: AccountService = mock[AccountService]
   val mockAuditService: AuditService = mock[AuditService]
-  val SUT = new AccountController(mockAuthCon, AppContext, mockService, mockAuditService) {
+  val mockAppContext: AppContext = mock[AppContext]
+  val mockLisaMetrics: LisaMetrics = mock[LisaMetrics]
+  val SUT = new AccountController(mockAuthCon, mockAppContext, mockService, mockAuditService, mockLisaMetrics) {
     override lazy val v2endpointsEnabled = true
   }
 

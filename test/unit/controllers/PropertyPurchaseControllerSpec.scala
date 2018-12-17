@@ -27,9 +27,11 @@ import play.api.mvc.{AnyContentAsJson, Result}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
+import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.lisaapi.config.{AppContext, LisaAuthConnector}
+import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.controllers.{ErrorBadRequestAccountId, ErrorBadRequestLmrn, PropertyPurchaseController}
+import uk.gov.hmrc.lisaapi.metrics.LisaMetrics
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, LifeEventService}
 
@@ -922,9 +924,11 @@ class PropertyPurchaseControllerSpec extends PlaySpec
 
   val mockService: LifeEventService = mock[LifeEventService]
   val mockAuditService: AuditService = mock[AuditService]
-  val mockAuthCon: LisaAuthConnector = mock[LisaAuthConnector]
+  val mockAuthCon: AuthConnector = mock[AuthConnector]
+  val mockAppContext: AppContext = mock[AppContext]
+  val mockLisaMetrics: LisaMetrics = mock[LisaMetrics]
 
-  val SUT = new PropertyPurchaseController(mockAuthCon, AppContext, mockService, mockAuditService) {
+  val SUT = new PropertyPurchaseController(mockAuthCon, mockAppContext, mockService, mockAuditService, mockLisaMetrics) {
     override lazy val v2endpointsEnabled = true
   }
 
