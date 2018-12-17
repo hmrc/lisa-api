@@ -25,6 +25,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.Configuration
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.logging.Authorization
 import uk.gov.hmrc.lisaapi.models.{Bonuses, HelpToBuyTransfer, InboundPayments, RequestBonusPaymentRequest}
 import uk.gov.hmrc.lisaapi.services.AuditService
 import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
@@ -122,9 +123,9 @@ class AuditServiceSpec extends PlaySpec
     }
   }
 
-  implicit val hc:HeaderCarrier = HeaderCarrier()
+  implicit val hc: HeaderCarrier = HeaderCarrier(authorization = Some(Authorization("auth-token")))
   val mockAuditConnector = mock[AuditConnector]
-  val mockConfiguration = mock[Configuration]
+  val configuration = Configuration("appName" -> "lisa-api")
 
-  object SUT extends AuditService(mockAuditConnector, mockConfiguration)
+  object SUT extends AuditService(mockAuditConnector, configuration)
 }

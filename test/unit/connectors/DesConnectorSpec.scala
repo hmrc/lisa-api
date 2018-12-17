@@ -23,7 +23,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.{JsValue, Json}
 import play.api.test.Helpers._
-import play.api.{Configuration, Environment}
+import play.api.{Configuration, Environment, Mode}
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
@@ -1345,9 +1345,11 @@ class DesConnectorSpec extends PlaySpec
   }
 
   val mockHttp = mock[HttpClient]
-  val mockConfiguration = mock[Configuration]
+  val configuration = Configuration("microservice.services.des.host" -> "", "microservice.services.des.port" -> 0)
   val mockEnvironment = mock[Environment]
   val mockAppContext = mock[AppContext]
   implicit val hc = HeaderCarrier()
-  object SUT extends DesConnector(mockHttp, mockConfiguration, mockEnvironment, mockAppContext)
+  object SUT extends DesConnector(mockHttp, configuration, mockEnvironment, mockAppContext) {
+    override val mode = Mode.Test
+  }
 }
