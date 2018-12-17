@@ -67,7 +67,7 @@ object AnnualReturn {
   val desWrites: Writes[AnnualReturn] = (
     (JsPath \ "eventType").write[String] and
     (JsPath \ "eventDate").write[DateTime] and
-    (JsPath \ "taxYear").write[Int] and
+    (JsPath \ "taxYear").write[String] and
     (JsPath \ "isaManagerName").write[String] and
     (JsPath \ "lisaMarketValueCash").write[Int] and
     (JsPath \ "lisaMarketValueStocksAndShares").write[Int] and
@@ -88,7 +88,7 @@ object AnnualReturn {
     (
       "Statutory Submission",
       req.eventDate,
-      req.taxYear,
+      req.taxYear.toString,
       req.lisaManagerName,
       req.marketValueCash,
       req.marketValueStocksAndShares,
