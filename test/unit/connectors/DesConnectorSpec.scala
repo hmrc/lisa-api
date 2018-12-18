@@ -1338,7 +1338,7 @@ class DesConnectorSpec extends PlaySpec
 
   private def doTransferAccountRequest(callback: (DesResponse) => Unit) = {
     val transferAccount = AccountTransfer("1234", "1234", new DateTime("2000-01-01"))
-    val request = CreateLisaAccountTransferRequest("1234567890",  "9876543210", new DateTime("2000-01-01"), transferAccount)
+    val request = CreateLisaAccountTransferRequest("Transferred", "1234567890",  "9876543210", new DateTime("2000-01-01"), transferAccount)
     val response = Await.result(SUT.transferAccount("Z019283", request), Duration.Inf)
 
     callback(response)

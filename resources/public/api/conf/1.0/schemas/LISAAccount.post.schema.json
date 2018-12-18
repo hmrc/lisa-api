@@ -17,17 +17,18 @@
       "type": "string",
       "enum": [
         "New",
-        "Transferred"
+        "Transferred",
+        "Current year funds transferred",
+        "Previous year funds transferred"
       ]
     },
     "firstSubscriptionDate": {
       "description":"The date of the first deposit into the account - if this is a transfer, use the date of deposit into the account managed by the previous provider. This cannot be in the future.",
       "$ref": "#/definitions/ISO8601-Date"
-
     },
     "transferAccount": {
       "type": "object",
-      "description" : "If the creationReason is ‘Transferred’, then this is required.",
+      "description" : "If the creationReason is ‘Transferred’, 'Current year funds transferred', or 'Previous year funds transferred', then this is required.",
       "properties": {
         "transferredFromAccountId": {
           "description" : "The previous provider’s own unique reference number for the investor’s LISA account.",
@@ -50,40 +51,35 @@
         "transferInDate"
       ]
     }
-  }
-  ,
-
+  },
   "required": [
-      "investorId",
-      "accountId",
-      "creationReason",
-      "firstSubscriptionDate"
-    ],
-    "additionalProperties": false,
-    "definitions": {
-      "ISO8601-Date": {
-        "id": "full-date",
-        "type": "string",
-        "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
-        "example": "2017-04-20"
-      },
-      "IDType": {
-        "type": "string",
-        "pattern": "^\\d{10}$",
-        "example": "1234567890"
-      },
-      "LISAManagerReferenceNumberType": {
-        "type": "string",
-        "pattern": "^Z([0-9]{4}|[0-9]{6})$",
-        "example": "Z1234"
-      }
-    ,
-      "accountIdType": {
-        "type": "string",
-        "example": "AB9876543210",
-        "pattern": "^[a-zA-Z0-9 :/-]{1,20}$"
-      }
+    "investorId",
+    "accountId",
+    "creationReason",
+    "firstSubscriptionDate"
+  ],
+  "additionalProperties": false,
+  "definitions": {
+    "ISO8601-Date": {
+      "id": "full-date",
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+      "example": "2017-04-20"
+    },
+    "IDType": {
+      "type": "string",
+      "pattern": "^\\d{10}$",
+      "example": "1234567890"
+    },
+    "LISAManagerReferenceNumberType": {
+      "type": "string",
+      "pattern": "^Z([0-9]{4}|[0-9]{6})$",
+      "example": "Z1234"
+    },
+    "accountIdType": {
+      "type": "string",
+      "example": "AB9876543210",
+      "pattern": "^[a-zA-Z0-9 :/-]{1,20}$"
     }
-
-
+  }
 }
