@@ -59,6 +59,60 @@
     </tr>
     <tr>
       <td>
+        <p>Request with a valid LISA Manager reference number and account ID (Current year funds transferred)</p>
+        <p class="code--block">
+          lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+          accountId: 1234567892
+        </p>
+      </td>
+      <td>
+        <p>HTTP status: <code class="code--slim">200 (OK)</code></p>
+<pre class="code--block">
+{
+  "investorId": "9876543210",
+  "creationReason": "Current year funds transferred",
+  "accountId": "1234567892",
+  "firstSubscriptionDate": "2017-04-06",
+  "accountStatus": "OPEN",
+  "subscriptionStatus": "AVAILABLE",
+  "transferAccount": {
+    "transferredFromAccountId": "8765432100",
+    "transferredFromLMRN": "Z654321",
+    "transferInDate": "2017-04-06"
+  }
+}
+</pre>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <p>Request with a valid LISA Manager reference number and account ID (Previous year funds transferred)</p>
+        <p class="code--block">
+          lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+          accountId: 1234567893
+        </p>
+      </td>
+      <td>
+        <p>HTTP status: <code class="code--slim">200 (OK)</code></p>
+<pre class="code--block">
+{
+  "investorId": "9876543210",
+  "creationReason": "Previous year funds transferred",
+  "accountId": "1234567893",
+  "firstSubscriptionDate": "2017-04-06",
+  "accountStatus": "OPEN",
+  "subscriptionStatus": "AVAILABLE",
+  "transferAccount": {
+    "transferredFromAccountId": "8765432100",
+    "transferredFromLMRN": "Z654321",
+    "transferInDate": "2017-04-06"
+  }
+}
+</pre>
+      </td>
+    </tr>
+    <tr>
+      <td>
         <p>Request with a valid LISA Manager reference number and account ID (voided account)</p>
         <p class="code--block">
           lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
