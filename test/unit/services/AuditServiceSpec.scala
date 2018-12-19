@@ -80,7 +80,6 @@ class AuditServiceSpec extends PlaySpec
 
       event.detail must contain ("investorId" -> "1234567890")
       event.detail must contain ("investorNINO" -> "AB123456D")
-      event.detail must contain key "Authorization"
     }
 
     "build an audit event with the correct detail when passed a RequestBonusPaymentRequest" in {
@@ -112,8 +111,6 @@ class AuditServiceSpec extends PlaySpec
       event.detail must contain ("totalBonusDueYTD" -> "1000.0")
       event.detail must contain ("bonusPaidYTD" -> "1000.0")
       event.detail must contain ("claimReason" -> "Life Event")
-
-      event.detail must contain key "Authorization"
     }
 
     "send an event via the audit connector" in {
@@ -123,7 +120,7 @@ class AuditServiceSpec extends PlaySpec
     }
   }
 
-  implicit val hc: HeaderCarrier = HeaderCarrier(authorization = Some(Authorization("auth-token")))
+  implicit val hc: HeaderCarrier = HeaderCarrier(authorization = Some(Authorization("abcde")))
   val mockAuditConnector = mock[AuditConnector]
   val configuration = Configuration("appName" -> "lisa-api")
 
