@@ -29,7 +29,7 @@ import uk.gov.hmrc.lisaapi.services.LifeEventService
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountNotFound, ErrorInternalServerError, ErrorLifeEventIdNotFound, ErrorResponse}
+import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountNotFound, ErrorInternalServerError, ErrorLifeEventIdNotFound, ErrorResponse, ErrorServiceUnavailable}
 
 class LifeEventServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
 
@@ -155,6 +155,13 @@ class LifeEventServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuit
       }
     }
 
+    "return ReportLifeEventServiceUnavailableResponse" when {
+      "a DesUnavailableResponse is received" in {
+        when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(DesUnavailableResponse))
+        doPostRequest(response => response mustBe ReportLifeEventServiceUnavailableResponse)
+      }
+    }
+
     "return ReportLifeEventErrorResponse" when {
       "the error code doesn't match any of the previous values" in {
         when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("XXX","Any other error condition")))
@@ -182,9 +189,16 @@ class LifeEventServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuit
         doGetRequest { _ mustBe Left(ErrorLifeEventIdNotFound) }
       }
 
+      "a DesUnavailableResponse is returned" in {
+        when (mockDesConnector.getLifeEvent(any(), any(), any())(any())).
+          thenReturn(Future.successful(Left(DesUnavailableResponse)))
+
+        doGetRequest { _ mustBe Left(ErrorServiceUnavailable) }
+      }
+
       "any other error code is returned" in {
         when (mockDesConnector.getLifeEvent(any(), any(), any())(any())).
-          thenReturn(Future.successful(Left(DesFailureResponse("SERVER_ERROR"))))
+          thenReturn(Future.successful(Left(DesFailureResponse("ERROR"))))
 
         doGetRequest { _ mustBe Left(ErrorInternalServerError) }
       }

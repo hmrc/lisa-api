@@ -24,7 +24,7 @@ import uk.gov.hmrc.lisaapi.models.des._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountNotFound, ErrorInternalServerError, ErrorLifeEventIdNotFound, ErrorResponse}
+import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountNotFound, ErrorInternalServerError, ErrorLifeEventIdNotFound, ErrorResponse, ErrorServiceUnavailable}
 
 
 trait LifeEventService {
@@ -38,6 +38,10 @@ trait LifeEventService {
       case successResponse: DesLifeEventResponse => {
         Logger.debug("Matched DesLifeEventResponse")
         ReportLifeEventSuccessResponse(successResponse.lifeEventID)
+      }
+      case DesUnavailableResponse => {
+        Logger.debug("Matched DesUnavailableResponse")
+        ReportLifeEventServiceUnavailableResponse
       }
       case failureResponse: DesFailureResponse => {
         Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
@@ -74,7 +78,8 @@ trait LifeEventService {
 
   private val getErrors = Map[String, ErrorResponse](
     "INVESTOR_ACCOUNT_ID_NOT_FOUND" -> ErrorAccountNotFound,
-    "LIFE_EVENT_ID_NOT_FOUND" -> ErrorLifeEventIdNotFound
+    "LIFE_EVENT_ID_NOT_FOUND" -> ErrorLifeEventIdNotFound,
+    "SERVER_ERROR" -> ErrorServiceUnavailable
   )
 
   private val postErrors = Map[String, ReportLifeEventResponse](
