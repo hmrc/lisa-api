@@ -24,7 +24,7 @@ import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.test.Helpers._
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.models.des.{DesAccountResponse, DesEmptySuccessResponse, DesFailureResponse}
+import uk.gov.hmrc.lisaapi.models.des.{DesAccountResponse, DesEmptySuccessResponse, DesFailureResponse, DesUnavailableResponse}
 import uk.gov.hmrc.lisaapi.services.AccountService
 
 import scala.concurrent.duration.Duration
@@ -87,6 +87,14 @@ class AccountServiceSpec extends PlaySpec
     }
 
     "return the type-appropriate response" when {
+      "a DesUnavailable response comes from DES" in {
+        when(mockDesConnector.createAccount(any(), any())(any()))
+          .thenReturn(Future.successful(DesUnavailableResponse))
+
+        doCreateRequest { response =>
+          response mustBe CreateLisaAccountServiceUnavailableResponse
+        }
+      }
       "a INVESTOR_NOT_FOUND response comes from DES" in {
         when(mockDesConnector.createAccount(any(), any())(any()))
           .thenReturn(Future.successful(DesFailureResponse(code = "INVESTOR_NOT_FOUND")))
@@ -198,6 +206,14 @@ class AccountServiceSpec extends PlaySpec
     }
 
     "return the type-appropriate response" when {
+      "a DesUnavailable response comes from DES" in {
+        when(mockDesConnector.transferAccount(any(), any())(any()))
+          .thenReturn(Future.successful(DesUnavailableResponse))
+
+        doTransferRequest { response =>
+          response mustBe CreateLisaAccountServiceUnavailableResponse
+        }
+      }
       "a INVESTOR_NOT_FOUND response comes from DES" in {
         when(mockDesConnector.transferAccount(any(), any())(any()))
           .thenReturn(Future.successful(DesFailureResponse(code = "INVESTOR_NOT_FOUND")))

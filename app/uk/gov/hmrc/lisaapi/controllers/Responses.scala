@@ -105,6 +105,8 @@ case object ErrorAcceptHeaderContentInvalid extends ErrorResponse(406, "ACCEPT_H
 
 case object ErrorInternalServerError extends ErrorResponse(500, "INTERNAL_SERVER_ERROR", "Internal server error")
 
+case object ErrorServiceUnavailable extends ErrorResponse(503, "SERVER_ERROR", "Service unavailable")
+
 case object InvalidAuthorisationHeader extends ErrorResponse(403, "AUTH_HEADER_INVALID", "The value provided for Authorization header is invalid")
 
 case object InvalidAcceptHeader extends ErrorResponse(401, "ACCEPT_HEADER_INVALID", "The accept header is missing or invalid")

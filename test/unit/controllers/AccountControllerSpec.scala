@@ -710,6 +710,23 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
       }
     }
 
+    "return with status 503 service unavailable" when {
+      "the data service returns a CreateLisaAccountServiceUnavailableResponse for a create request" in {
+        when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountServiceUnavailableResponse))
+
+        doCreateOrTransferRequest(createAccountJson) { res =>
+          status(res) mustBe SERVICE_UNAVAILABLE
+        }
+      }
+      "the data service returns a CreateLisaAccountServiceUnavailableResponse for a transfer request" in {
+        when(mockService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountServiceUnavailableResponse))
+
+        doCreateOrTransferRequest(transferAccountJson) { res =>
+          status(res) mustBe SERVICE_UNAVAILABLE
+        }
+      }
+    }
+
   }
 
   def doCreateOrTransferRequest(jsonString: String, lmrn: String = lisaManager)(callback: (Future[Result]) => Unit) {

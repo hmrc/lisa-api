@@ -37,6 +37,11 @@ trait AccountService {
 
         CreateLisaAccountSuccessResponse(successResponse.accountID)
       }
+      case DesUnavailableResponse => {
+        Logger.debug("Matched DesUnavailableResponse")
+
+        CreateLisaAccountServiceUnavailableResponse
+      }
       case failureResponse: DesFailureResponse => {
         Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
 
@@ -89,6 +94,11 @@ trait AccountService {
         Logger.debug("Matched DesAccountResponse")
 
         CreateLisaAccountSuccessResponse(successResponse.accountID)
+      }
+      case DesUnavailableResponse => {
+        Logger.debug("Matched DesUnavailableResponse")
+
+        CreateLisaAccountServiceUnavailableResponse
       }
       case failureResponse: DesFailureResponse => {
         Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
