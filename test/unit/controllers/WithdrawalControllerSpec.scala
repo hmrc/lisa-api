@@ -30,7 +30,7 @@ import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
-import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountAlreadyCancelled, ErrorAccountAlreadyVoided, ErrorAccountNotFound, ErrorInternalServerError, ErrorValidation, ErrorWithdrawalExists, ErrorWithdrawalNotFound, ErrorWithdrawalTimescalesExceeded, WithdrawalController}
+import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountAlreadyCancelled, ErrorAccountAlreadyVoided, ErrorAccountNotFound, ErrorInternalServerError, ErrorServiceUnavailable, ErrorValidation, ErrorWithdrawalExists, ErrorWithdrawalNotFound, ErrorWithdrawalTimescalesExceeded, WithdrawalController}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, BonusOrWithdrawalService, CurrentDateService, WithdrawalService}
 import uk.gov.hmrc.lisaapi.utils.WithdrawalChargeValidator
@@ -300,6 +300,20 @@ class WithdrawalControllerSpec extends PlaySpec
           status(res) mustBe INTERNAL_SERVER_ERROR
           (contentAsJson(res) \ "code").as[String] mustBe ErrorInternalServerError.errorCode
           (contentAsJson(res) \ "message").as[String] mustBe ErrorInternalServerError.message
+        }
+      }
+
+    }
+
+    "return with status 503 service unavailable" when {
+
+      "given a ReportWithdrawalChargeServiceUnavailable from the service layer" in {
+        when(mockPostService.reportWithdrawalCharge(any(), any(), any())(any())).
+          thenReturn(Future.successful(ReportWithdrawalChargeServiceUnavailable))
+
+        doRequest(validWithdrawalJson) { res =>
+          status(res) mustBe SERVICE_UNAVAILABLE
+          contentAsJson(res) mustBe ErrorServiceUnavailable.asJson
         }
       }
 
