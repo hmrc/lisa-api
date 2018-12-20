@@ -29,7 +29,7 @@ import play.api.test._
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
 import uk.gov.hmrc.lisaapi.controllers.GetAccountController
-import uk.gov.hmrc.lisaapi.models.{GetLisaAccountDoesNotExistResponse, GetLisaAccountErrorResponse, GetLisaAccountSuccessResponse, GetLisaAccountTransferAccount}
+import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AccountService, AuditService}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -178,6 +178,13 @@ class GetAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPer
           (json \ "accountClosureReason").asOpt[String] mustBe None
           (json \ "closureDate").asOpt[String] mustBe None
           (json \ "transferAccount").asOpt[JsObject] mustBe None
+        })
+      }
+      "returning a service unavailable response" in {
+        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountServiceUnavailable))
+        doSyncGetAccountDetailsRequest(res => {
+          status(res) mustBe SERVICE_UNAVAILABLE
+          (contentAsJson(res) \ "code").as[String] mustBe "SERVER_ERROR"
         })
       }
       "returning a account not found response" in {

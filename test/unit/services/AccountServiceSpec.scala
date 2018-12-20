@@ -295,6 +295,15 @@ class AccountServiceSpec extends PlaySpec
 
     "return the type-appropriate response" when {
 
+      "given a DesUnavailableResponse" in {
+        when(mockDesConnector.closeAccount(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesUnavailableResponse))
+
+        doCloseRequest { response =>
+          response mustBe CloseLisaAccountServiceUnavailable
+        }
+      }
+
       "given failureResponse for a Account Already Void Response" in {
         when(mockDesConnector.closeAccount(any(), any(), any())(any()))
           .thenReturn(
@@ -410,6 +419,15 @@ class AccountServiceSpec extends PlaySpec
     }
 
     "return the type-appropriate response" when {
+
+      "given a DesUnavailableResponse" in {
+        when(mockDesConnector.getAccountInformation(any(), any())(any()))
+          .thenReturn(Future.successful(DesUnavailableResponse))
+
+        val res = Await.result(SUT.getAccount(testLMRN, "A123456")(HeaderCarrier()), Duration.Inf)
+
+        res mustBe GetLisaAccountServiceUnavailable
+      }
 
       "given failureResponse for a INVESTOR_ACCOUNTID_NOT_FOUND" in {
         when(mockDesConnector.getAccountInformation(any(), any())(any()))

@@ -49,6 +49,7 @@ class CloseAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppP
 
   override def beforeEach() {
     reset(mockAuditService)
+    reset(mockService)
   }
 
   "The Close Account endpoint" must {
@@ -311,6 +312,17 @@ class CloseAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppP
 
         doCloseRequest(closeAccountJson) { res =>
           status(res) mustBe (INTERNAL_SERVER_ERROR)
+        }
+      }
+    }
+
+    "return with status 503 service unavailable" when {
+      "the data service returns an error" in {
+        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountServiceUnavailable))
+
+        doCloseRequest(closeAccountJson) { res =>
+          status(res) mustBe SERVICE_UNAVAILABLE
+          (contentAsJson(res) \ "code").as[String] mustBe "SERVER_ERROR"
         }
       }
     }
