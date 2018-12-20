@@ -252,6 +252,7 @@ class BonusPaymentController extends LisaController with LisaConstants {
           case Some(VERSION_1) => ErrorInternalServerError
           case Some(VERSION_2) => ErrorBonusClaimAlreadySuperseded(e.transactionId)
         }
+      case RequestBonusPaymentServiceUnavailable => ErrorServiceUnavailable
       case _ =>
         getAPIVersionFromRequest(request) match {
           case Some(VERSION_1) => requestBonusErrorsV1.getOrElse(errorResponse, ErrorInternalServerError)

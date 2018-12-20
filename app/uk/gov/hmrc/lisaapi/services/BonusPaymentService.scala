@@ -55,6 +55,11 @@ trait BonusPaymentService {
           case "SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED" => RequestBonusPaymentAlreadySuperseded(conflictResponse.transactionID)
         }
       }
+      case DesUnavailableResponse => {
+        Logger.debug("Matched DesUnavailableResponse")
+
+        RequestBonusPaymentServiceUnavailable
+      }
       case failureResponse: DesFailureResponse => {
         Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
 

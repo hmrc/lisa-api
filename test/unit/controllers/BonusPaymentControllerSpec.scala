@@ -509,6 +509,20 @@ class BonusPaymentControllerSpec extends PlaySpec
 
     }
 
+    "return with status 503 service unavailable" when {
+
+      "a exception gets thrown" in {
+        when(mockPostService.requestBonusPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(RequestBonusPaymentServiceUnavailable))
+
+        doRequest(validBonusPaymentJson) { res =>
+          status(res) mustBe SERVICE_UNAVAILABLE
+          (contentAsJson(res) \ "code").as[String] mustBe "SERVER_ERROR"
+        }
+      }
+
+    }
+
     "audit bonusPaymentRequested" when {
 
       "given a success response from the service layer and all optional fields" when {
