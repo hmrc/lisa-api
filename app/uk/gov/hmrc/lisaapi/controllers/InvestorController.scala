@@ -32,39 +32,32 @@ class InvestorController extends LisaController with LisaConstants  {
   val service: InvestorService = InvestorService
   val auditService: AuditService = AuditService
 
-  def createLisaInvestor(lisaManager: String): Action[AnyContent] = validateHeader().async {
-    implicit request =>
-      implicit val startTime: Long = System.currentTimeMillis()
-      Logger.debug(s"LISA HTTP Request: ${request.uri} and method: ${request.method}")
-
-      withValidLMRN(lisaManager) { () =>
-        withValidJson[CreateLisaInvestorRequest](
-          createRequest => {
-            service.createInvestor(lisaManager, createRequest).map { res =>
-              res match {
-                case CreateLisaInvestorSuccessResponse(investorId) =>
-                  handleCreatedResponse(lisaManager, createRequest, investorId)
-                case CreateLisaInvestorAlreadyExistsResponse(investorId) =>
-                  handleExistsResponse(lisaManager, createRequest, investorId)
-                case CreateLisaInvestorInvestorNotFoundResponse =>
-                  handleError(lisaManager, createRequest, ErrorInvestorNotFound)
-                case CreateLisaInvestorServiceUnavailableResponse =>
-                  handleError(lisaManager, createRequest, ErrorServiceUnavailable)
-                case CreateLisaInvestorErrorResponse =>
-                  handleError(lisaManager, createRequest, ErrorInternalServerError)
-              }
-            } recover {
-              case e: Exception =>
-                Logger.error(s"createLisaInvestor: An error occurred due to ${e.getMessage} returning internal server error")
-                handleError(lisaManager, createRequest, ErrorInternalServerError)
-            }
-          }, lisaManager = lisaManager
-        )
-      }
+  def createLisaInvestor(lisaManager: String): Action[AnyContent] = (validateHeader() andThen validateLMRN(lisaManager)).async { implicit request =>
+    implicit val startTime: Long = System.currentTimeMillis()
+    Logger.debug(s"LISA HTTP Request: ${request.uri} and method: ${request.method}")
+    withValidJson[CreateLisaInvestorRequest](
+      createRequest => {
+        service.createInvestor(lisaManager, createRequest).map { res =>
+          res match {
+            case CreateLisaInvestorSuccessResponse(investorId) =>
+              success(lisaManager, createRequest, investorId)
+            case CreateLisaInvestorAlreadyExistsResponse(investorId) =>
+              error(lisaManager, createRequest, ErrorInvestorAlreadyExists(investorId))
+            case r: CreateLisaInvestorResponse =>
+              error(lisaManager, createRequest, errorMap.getOrElse(r, ErrorInternalServerError))
+          }
+        } recover {
+          case e: Exception =>
+            Logger.error(s"createLisaInvestor: An error occurred due to ${e.getMessage} returning internal server error")
+            error(lisaManager, createRequest, ErrorInternalServerError)
+        }
+      },
+      lisaManager = lisaManager
+    )
   }
 
-  private def handleCreatedResponse(lisaManager: String, createRequest: CreateLisaInvestorRequest, investorId: String)
-                                   (implicit hc: HeaderCarrier, startTime: Long) = {
+  private def success(lisaManager: String, createRequest: CreateLisaInvestorRequest, investorId: String)
+                     (implicit hc: HeaderCarrier, startTime: Long) = {
     auditService.audit(
       auditType = "investorCreated",
       path = getEndpointUrl(lisaManager),
@@ -83,29 +76,13 @@ class InvestorController extends LisaController with LisaConstants  {
     Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
   }
 
-  private def handleExistsResponse(lisaManager: String, createRequest: CreateLisaInvestorRequest, investorId: String)
-                                  (implicit hc: HeaderCarrier, startTime: Long) = {
-    val result = ErrorInvestorAlreadyExists(investorId)
+  private def error(lisaManager: String, createRequest: CreateLisaInvestorRequest, response: ErrorResponse)
+                   (implicit hc: HeaderCarrier, startTime: Long) = {
+    val additionalAuditData = response match {
+      case res: ErrorResponseWithId => Some(("investorID" -> res.id))
+      case _ => None
+    }
 
-    auditService.audit(
-      auditType = "investorNotCreated",
-      path = getEndpointUrl(lisaManager),
-      auditData = Map(
-        ZREF -> lisaManager,
-        "investorNINO" -> createRequest.investorNINO,
-        "dateOfBirth" -> createRequest.dateOfBirth.toString("yyyy-MM-dd"),
-        "investorID" -> investorId,
-        "reasonNotCreated" -> result.errorCode
-      )
-    )
-
-    LisaMetrics.incrementMetrics(startTime, CONFLICT, LisaMetricKeys.INVESTOR)
-
-    result.asResult
-  }
-
-  private def handleError(lisaManager: String, createRequest: CreateLisaInvestorRequest, response: ErrorResponse)
-                         (implicit hc: HeaderCarrier, startTime: Long) = {
     auditService.audit(
       auditType = "investorNotCreated",
       path = getEndpointUrl(lisaManager),
@@ -114,13 +91,19 @@ class InvestorController extends LisaController with LisaConstants  {
         "investorNINO" -> createRequest.investorNINO,
         "dateOfBirth" -> createRequest.dateOfBirth.toString("yyyy-MM-dd"),
         "reasonNotCreated" -> response.errorCode
-      )
+      ) ++ additionalAuditData
     )
 
     LisaMetrics.incrementMetrics(startTime, response.httpStatusCode, LisaMetricKeys.INVESTOR)
 
     response.asResult
   }
+
+  private val errorMap = Map[CreateLisaInvestorResponse, ErrorResponse](
+    CreateLisaInvestorInvestorNotFoundResponse -> ErrorInvestorNotFound,
+    CreateLisaInvestorServiceUnavailableResponse -> ErrorServiceUnavailable,
+    CreateLisaInvestorErrorResponse -> ErrorInternalServerError
+  )
 
   private def getEndpointUrl(lisaManagerReferenceNumber: String):String = {
     s"/manager/$lisaManagerReferenceNumber/investors"
