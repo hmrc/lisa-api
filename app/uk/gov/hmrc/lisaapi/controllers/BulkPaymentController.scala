@@ -23,7 +23,7 @@ import play.api.libs.json._
 import play.api.mvc.{Action, AnyContent, Result}
 import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
-import uk.gov.hmrc.lisaapi.models.{GetBulkPaymentNotFoundResponse, GetBulkPaymentSuccessResponse}
+import uk.gov.hmrc.lisaapi.models.{GetBulkPaymentNotFoundResponse, GetBulkPaymentServiceUnavailableResponse, GetBulkPaymentSuccessResponse}
 import uk.gov.hmrc.lisaapi.services.{BulkPaymentService, CurrentDateService}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -57,6 +57,7 @@ class BulkPaymentController extends LisaController with LisaConstants {
                   case Some(VERSION_2) => Future.successful(NotFound(Json.toJson(ErrorBulkTransactionNotFoundV2)))
                 }
               }
+              case GetBulkPaymentServiceUnavailableResponse => Future.successful(ErrorServiceUnavailable.asResult)
               case _ => {
                 LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.TRANSACTION)
                 Future.successful(InternalServerError(Json.toJson(ErrorInternalServerError)))
