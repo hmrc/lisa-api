@@ -24,7 +24,7 @@ import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.models.des.{DesAccountResponse, DesEmptySuccessResponse, DesFailureResponse, DesReinstateAccountSuccessResponse}
+import uk.gov.hmrc.lisaapi.models.des._
 import uk.gov.hmrc.lisaapi.services.{AccountService, ReinstateAccountService}
 
 import scala.concurrent.duration.Duration
@@ -55,8 +55,17 @@ class ReinstateAccountServiceSpec extends PlaySpec
 
     }
 
+    "return the type-appropriate error response" when {
 
-    "return the type-appropriate response" when {
+      "given a DesUnavailableResponse" in {
+        when(mockDesConnector.reinstateAccount(any(), any())(any()))
+          .thenReturn(Future.successful(DesUnavailableResponse))
+
+        doReinstateRequest { response =>
+          response mustBe ReinstateLisaAccountServiceUnavailableResponse
+        }
+
+      }
 
       "given failureResponse for a Account Already Closed Response" in {
         when(mockDesConnector.reinstateAccount(any(), any())(any()))

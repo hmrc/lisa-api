@@ -17,7 +17,7 @@
 package uk.gov.hmrc.lisaapi.controllers
 
 import play.api.Logger
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Result, Results}
 
 sealed abstract class ErrorResponse(
@@ -27,6 +27,9 @@ sealed abstract class ErrorResponse(
                          ) {
   def asResult: Result = {
     Results.Status(httpStatusCode)(Json.toJson(this))
+  }
+  def asJson: JsValue = {
+    Json.toJson(this)
   }
 }
 
