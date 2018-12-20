@@ -408,10 +408,22 @@ class WithdrawalControllerSpec extends PlaySpec
 
     }
 
-    "return an internal server error response" in {
-      when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusOrWithdrawalErrorResponse))
+    "return a internal server error response" in {
+      when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).
+        thenReturn(Future.successful(GetBonusOrWithdrawalErrorResponse))
+
       doGetRequest(res => {
         (contentAsJson(res) \ "code").as[String] mustBe "INTERNAL_SERVER_ERROR"
+      })
+    }
+
+    "return a service unavailable response" in {
+      when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).
+        thenReturn(Future.successful(GetBonusOrWithdrawalServiceUnavailableResponse))
+
+      doGetRequest(res => {
+        status(res) mustBe SERVICE_UNAVAILABLE
+        (contentAsJson(res) \ "code").as[String] mustBe "SERVER_ERROR"
       })
     }
 

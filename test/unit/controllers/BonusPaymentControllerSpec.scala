@@ -939,7 +939,7 @@ class BonusPaymentControllerSpec extends PlaySpec
 
     }
 
-    "return an internal server error response" when {
+    "return a internal server error response" when {
       "an error is returned from the service layer" in {
         when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusOrWithdrawalErrorResponse))
         doGetBonusPaymentTransactionRequest(res => {
@@ -967,6 +967,19 @@ class BonusPaymentControllerSpec extends PlaySpec
           },
           acceptHeaderV1
         )
+      }
+    }
+
+    "return a service unavailable response" when {
+
+      "GetBonusOrWithdrawalServiceUnavailableResponse is returned from the service layer" in {
+        when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).
+          thenReturn(Future.successful(GetBonusOrWithdrawalServiceUnavailableResponse))
+
+        doGetBonusPaymentTransactionRequest(res => {
+          status(res) mustBe SERVICE_UNAVAILABLE
+          (contentAsJson(res) \ "code").as[String] mustBe "SERVER_ERROR"
+        })
       }
     }
 

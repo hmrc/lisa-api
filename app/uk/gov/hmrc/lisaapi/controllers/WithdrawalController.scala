@@ -104,6 +104,10 @@ class WithdrawalController extends LisaController with LisaConstants {
         LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.WITHDRAWAL_CHARGE)
         NotFound(Json.toJson(ErrorAccountNotFound))
 
+      case GetBonusOrWithdrawalServiceUnavailableResponse =>
+        LisaMetrics.incrementMetrics(startTime, SERVICE_UNAVAILABLE, LisaMetricKeys.WITHDRAWAL_CHARGE)
+        ServiceUnavailable(Json.toJson(ErrorServiceUnavailable))
+
       case _ =>
         LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.WITHDRAWAL_CHARGE)
         InternalServerError(Json.toJson(ErrorInternalServerError))
