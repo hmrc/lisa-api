@@ -69,6 +69,12 @@ class UpdateSubscriptionController extends LisaController with LisaConstants {
                     Map(failureReason -> ErrorAccountAlreadyVoided.errorCode))
                   LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.UPDATE_SUBSCRIPTION)
                   Forbidden(Json.toJson(ErrorAccountAlreadyVoided))
+                case UpdateSubscriptionServiceUnavailableResponse =>
+                  Logger.error("Service unavailable")
+                  doAudit(lisaManager, accountId, updateSubsRequest, failureEvent,
+                    Map(failureReason -> ErrorServiceUnavailable.errorCode))
+                  LisaMetrics.incrementMetrics(startTime, SERVICE_UNAVAILABLE, LisaMetricKeys.UPDATE_SUBSCRIPTION)
+                  ErrorServiceUnavailable.asResult
                 case _ =>
                   Logger.debug("Matched Error")
                   doAudit(lisaManager, accountId, updateSubsRequest, failureEvent,

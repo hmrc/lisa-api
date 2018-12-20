@@ -49,7 +49,6 @@ class UpdateSubscriptionServiceSpec extends PlaySpec with MockitoSugar with OneA
       }
     }
 
-
     "return a Not Found response" when {
       "given DesFailureReponse and status 404" in {
         when(mockDesConnector.updateFirstSubDate(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNTID_NOT_FOUND","The accountID given does not match with HMRC’s records")))
@@ -63,19 +62,20 @@ class UpdateSubscriptionServiceSpec extends PlaySpec with MockitoSugar with OneA
         doRequest(response => response mustBe UpdateSubscriptionAccountClosedResponse)
       }
     }
+
     "return a Forbidden account closed response" when {
       "given DesFailureReponse and status 403 for cancelled account" in {
         when(mockDesConnector.updateFirstSubDate(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_CANCELLED","The LISA account is already cancelled")))
         doRequest(response => response mustBe UpdateSubscriptionAccountClosedResponse)
       }
     }
+
     "return a Forbidden account voided response" when {
       "given DesFailureReponse and status 403" in {
         when(mockDesConnector.updateFirstSubDate(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_VOID","The LISA account is already voided")))
         doRequest(response => response mustBe UpdateSubscriptionAccountVoidedResponse)
       }
     }
-
 
     "return a Internal Server Error response" when {
       "When INTERNAL_SERVER_ERROR sent" in {
@@ -86,6 +86,15 @@ class UpdateSubscriptionServiceSpec extends PlaySpec with MockitoSugar with OneA
       "When Invalid Code Sent" in {
         when(mockDesConnector.updateFirstSubDate(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("INVALID","Invalid Code")))
         doRequest(response => response mustBe UpdateSubscriptionErrorResponse)
+      }
+    }
+
+    "return a Service Unavailable response" when {
+      "a DesUnavailableResponse is returned" in {
+        when(mockDesConnector.updateFirstSubDate(any(), any(),any())(any())).
+          thenReturn(Future.successful(DesUnavailableResponse))
+
+        doRequest(response => response mustBe UpdateSubscriptionServiceUnavailableResponse)
       }
     }
 
