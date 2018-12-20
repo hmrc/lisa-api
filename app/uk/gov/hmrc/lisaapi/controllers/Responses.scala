@@ -166,7 +166,7 @@ case object ErrorBonusSupersededOutcomeError extends ErrorResponse(403, "SUPERSE
 
 case object ErrorBonusClaimTimescaleExceeded extends ErrorResponse(403, "BONUS_CLAIM_TIMESCALES_EXCEEDED", "The timescale for claiming a bonus has passed. The claim period lasts for 6 years and 14 days")
 
-case object ErrorBonusHelpToBuyNotApplicable extends ErrorResponse(403, "HELP_TO_BUY_NOT_APPLICABLE", "Help to Buy is not applicable on this account")
+case object ErrorBonusHelpToBuyNotApplicable extends ErrorResponse(403, "HELP_TO_BUY_NOT_APPLICABLE", "Help to buy is only applicable for claims within the 2017-18 tax year")
 
 case object ErrorNoSubscriptions extends ErrorResponse(403, "ACCOUNT_ERROR_NO_SUBSCRIPTIONS_THIS_TAX_YEAR", "A bonus payment is not possible because the account has no subscriptions for that tax year")
 

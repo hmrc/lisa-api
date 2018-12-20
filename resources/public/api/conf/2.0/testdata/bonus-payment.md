@@ -792,7 +792,7 @@
 <pre class ="code--block">
 {
   "code": "HELP_TO_BUY_NOT_APPLICABLE",
-  "message": "Help to Buy is not applicable on this account"
+  "message": "Help to buy is only applicable for claims within the 2017-18 tax year"
 }
 </pre>
             </td>

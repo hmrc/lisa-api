@@ -212,7 +212,7 @@ class BonusPaymentControllerSpec extends PlaySpec
           val json = contentAsJson(res)
 
           (json \ "code").as[String] mustBe "HELP_TO_BUY_NOT_APPLICABLE"
-          (json \ "message").as[String] mustBe "Help to Buy is not applicable on this account"
+          (json \ "message").as[String] mustBe "Help to buy is only applicable for claims within the 2017-18 tax year"
         }
       }
 
