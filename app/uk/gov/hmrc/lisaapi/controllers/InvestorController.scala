@@ -16,18 +16,16 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
-import java.util.concurrent.TimeUnit
-
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, InvestorService}
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import uk.gov.hmrc.http.HeaderCarrier
 
 class InvestorController extends LisaController with LisaConstants  {
 
@@ -49,14 +47,16 @@ class InvestorController extends LisaController with LisaConstants  {
                 case CreateLisaInvestorAlreadyExistsResponse(investorId) =>
                   handleExistsResponse(lisaManager, createRequest, investorId)
                 case CreateLisaInvestorInvestorNotFoundResponse =>
-                  handleInvestorNotFound(lisaManager, createRequest)
+                  handleError(lisaManager, createRequest, ErrorInvestorNotFound)
+                case CreateLisaInvestorServiceUnavailableResponse =>
+                  handleError(lisaManager, createRequest, ErrorServiceUnavailable)
                 case CreateLisaInvestorErrorResponse =>
-                  handleError(lisaManager, createRequest)
+                  handleError(lisaManager, createRequest, ErrorInternalServerError)
               }
             } recover {
               case e: Exception =>
                 Logger.error(s"createLisaInvestor: An error occurred due to ${e.getMessage} returning internal server error")
-                handleError(lisaManager, createRequest)
+                handleError(lisaManager, createRequest, ErrorInternalServerError)
             }
           }, lisaManager = lisaManager
         )
@@ -101,28 +101,10 @@ class InvestorController extends LisaController with LisaConstants  {
 
     LisaMetrics.incrementMetrics(startTime, CONFLICT, LisaMetricKeys.INVESTOR)
 
-    Conflict(Json.toJson(result))
+    result.asResult
   }
 
-  private def handleInvestorNotFound(lisaManager: String, createRequest: CreateLisaInvestorRequest)
-                                    (implicit hc: HeaderCarrier, startTime: Long) = {
-    auditService.audit(
-      auditType = "investorNotCreated",
-      path = getEndpointUrl(lisaManager),
-      auditData = Map(
-        ZREF -> lisaManager,
-        "investorNINO" -> createRequest.investorNINO,
-        "dateOfBirth" -> createRequest.dateOfBirth.toString("yyyy-MM-dd"),
-        "reasonNotCreated" -> ErrorInvestorNotFound.errorCode
-      )
-    )
-
-    LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.INVESTOR)
-
-    Forbidden(Json.toJson(ErrorInvestorNotFound))
-  }
-
-  private def handleError(lisaManager: String, createRequest: CreateLisaInvestorRequest)
+  private def handleError(lisaManager: String, createRequest: CreateLisaInvestorRequest, response: ErrorResponse)
                          (implicit hc: HeaderCarrier, startTime: Long) = {
     auditService.audit(
       auditType = "investorNotCreated",
@@ -131,13 +113,13 @@ class InvestorController extends LisaController with LisaConstants  {
         ZREF -> lisaManager,
         "investorNINO" -> createRequest.investorNINO,
         "dateOfBirth" -> createRequest.dateOfBirth.toString("yyyy-MM-dd"),
-        "reasonNotCreated" -> ErrorInternalServerError.errorCode
+        "reasonNotCreated" -> response.errorCode
       )
     )
 
-    LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.INVESTOR)
+    LisaMetrics.incrementMetrics(startTime, response.httpStatusCode, LisaMetricKeys.INVESTOR)
 
-    InternalServerError(Json.toJson(ErrorInternalServerError))
+    response.asResult
   }
 
   private def getEndpointUrl(lisaManagerReferenceNumber: String):String = {
