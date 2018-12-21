@@ -385,6 +385,17 @@ class PropertyPurchaseControllerSpec extends PlaySpec
       }
     }
 
+    "return with 503 service unavailable and a code of SERVER_ERROR" in {
+      when(mockService.reportLifeEvent(any(), any(),any())(any())).
+        thenReturn(Future.successful(ReportLifeEventServiceUnavailableResponse))
+
+      doFundReleaseRequest(fundReleaseJson){ res =>
+        status(res) mustBe SERVICE_UNAVAILABLE
+        (contentAsJson(res) \ "code").as[String] mustBe "SERVER_ERROR"
+        (contentAsJson(res) \ "message").as[String] mustBe "Service unavailable"
+      }
+    }
+
   }
 
   "Request Extension" should {
@@ -666,6 +677,17 @@ class PropertyPurchaseControllerSpec extends PlaySpec
       }
     }
 
+    "return with 503 service unavailable and a code of SERVER_ERROR" in {
+      when(mockService.reportLifeEvent(any(), any(),any())(any())).
+        thenReturn(Future.successful(ReportLifeEventServiceUnavailableResponse))
+
+      doExtensionRequest(extensionJson){ res =>
+        status(res) mustBe SERVICE_UNAVAILABLE
+        (contentAsJson(res) \ "code").as[String] mustBe "SERVER_ERROR"
+        (contentAsJson(res) \ "message").as[String] mustBe "Service unavailable"
+      }
+    }
+
   }
 
   "Report Purchase Outcome" should {
@@ -891,6 +913,17 @@ class PropertyPurchaseControllerSpec extends PlaySpec
           (contentAsJson(res) \ "code").as[String] mustBe "INTERNAL_SERVER_ERROR"
           (contentAsJson(res) \ "message").as[String] mustBe "Internal server error"
         }
+      }
+    }
+
+    "return with 503 service unavailable and a code of SERVER_ERROR" in {
+      when(mockService.reportLifeEvent(any(), any(),any())(any())).
+        thenReturn(Future.successful(ReportLifeEventServiceUnavailableResponse))
+
+      doOutcomeRequest(outcomeJson) { res =>
+        status(res) mustBe SERVICE_UNAVAILABLE
+        (contentAsJson(res) \ "code").as[String] mustBe "SERVER_ERROR"
+        (contentAsJson(res) \ "message").as[String] mustBe "Service unavailable"
       }
     }
 

@@ -20,7 +20,7 @@ import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, Result}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.lisaapi.LisaConstants
+import uk.gov.hmrc.lisaapi.{LisaConstants, models}
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AccountService, AuditService}
@@ -119,7 +119,8 @@ class CloseAccountController extends LisaController with LisaConstants {
     CloseLisaAccountAlreadyClosedResponse -> ErrorAccountAlreadyClosed,
     CloseLisaAccountCancellationPeriodExceeded -> ErrorAccountCancellationPeriodExceeded,
     CloseLisaAccountWithinCancellationPeriod -> ErrorAccountWithinCancellationPeriod,
-    CloseLisaAccountNotFoundResponse -> ErrorAccountNotFound
+    CloseLisaAccountNotFoundResponse -> ErrorAccountNotFound,
+    CloseLisaAccountServiceUnavailable -> ErrorServiceUnavailable
   )
 
   private def getCloseEndpointUrl(lisaManagerReferenceNumber: String, accountID: String): String = {

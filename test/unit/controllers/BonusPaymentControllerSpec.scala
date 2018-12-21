@@ -509,6 +509,20 @@ class BonusPaymentControllerSpec extends PlaySpec
 
     }
 
+    "return with status 503 service unavailable" when {
+
+      "a exception gets thrown" in {
+        when(mockPostService.requestBonusPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(RequestBonusPaymentServiceUnavailable))
+
+        doRequest(validBonusPaymentJson) { res =>
+          status(res) mustBe SERVICE_UNAVAILABLE
+          (contentAsJson(res) \ "code").as[String] mustBe "SERVER_ERROR"
+        }
+      }
+
+    }
+
     "audit bonusPaymentRequested" when {
 
       "given a success response from the service layer and all optional fields" when {
@@ -939,7 +953,7 @@ class BonusPaymentControllerSpec extends PlaySpec
 
     }
 
-    "return an internal server error response" when {
+    "return a internal server error response" when {
       "an error is returned from the service layer" in {
         when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusOrWithdrawalErrorResponse))
         doGetBonusPaymentTransactionRequest(res => {
@@ -967,6 +981,19 @@ class BonusPaymentControllerSpec extends PlaySpec
           },
           acceptHeaderV1
         )
+      }
+    }
+
+    "return a service unavailable response" when {
+
+      "GetBonusOrWithdrawalServiceUnavailableResponse is returned from the service layer" in {
+        when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).
+          thenReturn(Future.successful(GetBonusOrWithdrawalServiceUnavailableResponse))
+
+        doGetBonusPaymentTransactionRequest(res => {
+          status(res) mustBe SERVICE_UNAVAILABLE
+          (contentAsJson(res) \ "code").as[String] mustBe "SERVER_ERROR"
+        })
       }
     }
 

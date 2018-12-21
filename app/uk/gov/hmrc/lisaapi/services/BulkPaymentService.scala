@@ -20,8 +20,8 @@ import org.joda.time.DateTime
 import play.api.Logger
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
-import uk.gov.hmrc.lisaapi.models.des.DesFailureResponse
-import uk.gov.hmrc.lisaapi.models.{GetBulkPaymentErrorResponse, GetBulkPaymentNotFoundResponse, GetBulkPaymentResponse, GetBulkPaymentSuccessResponse}
+import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesUnavailableResponse}
+import uk.gov.hmrc.lisaapi.models._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -37,6 +37,7 @@ trait BulkPaymentService {
       case GetBulkPaymentNotFoundResponse => GetBulkPaymentNotFoundResponse
       case s: GetBulkPaymentSuccessResponse if s.payments.isEmpty => GetBulkPaymentNotFoundResponse
       case s: GetBulkPaymentSuccessResponse => s
+      case DesUnavailableResponse => GetBulkPaymentServiceUnavailableResponse
       case f: DesFailureResponse => {
         f.code match {
           case "NOT_FOUND" |

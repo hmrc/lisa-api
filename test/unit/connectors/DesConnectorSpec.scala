@@ -21,17 +21,16 @@ import org.mockito.Matchers.{eq => matchersEquals, _}
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
+import play.api.libs.json.{JsValue, Json}
+import play.api.test.Helpers._
+import uk.gov.hmrc.http._
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des._
-import play.api.test.Helpers._
 
-import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
 import scala.io.Source
-import uk.gov.hmrc.http._
-import uk.gov.hmrc.lisaapi.models
 
 class DesConnectorSpec extends PlaySpec
   with MockitoSugar
@@ -62,13 +61,14 @@ class DesConnectorSpec extends PlaySpec
     }
 
     "return the default DesFailureResponse" when {
+
       "the DES response has no json body" in {
 
         when(mockHttpPost.POST[CreateLisaInvestorRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = SERVICE_UNAVAILABLE,
+                responseStatus = GATEWAY_TIMEOUT,
                 responseJson = None
               )
             )
@@ -94,6 +94,7 @@ class DesConnectorSpec extends PlaySpec
           response must be(DesFailureResponse())
         }
       }
+
     }
 
     "return a populated CreateLisaInvestorAlreadyExistsResponse" when {
@@ -137,6 +138,26 @@ class DesConnectorSpec extends PlaySpec
 
     }
 
+    "return a DesUnavailableResponse" when {
+
+      "a 503 is returned" in {
+        when(mockHttpPost.POST[CreateLisaInvestorRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = SERVICE_UNAVAILABLE,
+                responseJson = None
+              )
+            )
+          )
+
+        doCreateInvestorRequest { response =>
+          response mustBe DesUnavailableResponse
+        }
+      }
+
+    }
+
   }
 
   "Create Account endpoint" must {
@@ -168,7 +189,7 @@ class DesConnectorSpec extends PlaySpec
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = SERVICE_UNAVAILABLE,
+                responseStatus = GATEWAY_TIMEOUT,
                 responseJson = None
               )
             )
@@ -184,7 +205,7 @@ class DesConnectorSpec extends PlaySpec
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = SERVICE_UNAVAILABLE,
+                responseStatus = GATEWAY_TIMEOUT,
                 responseJson = Some(Json.parse(s"""{"problem": "service unavailable"}"""))
               )
             )
@@ -192,6 +213,26 @@ class DesConnectorSpec extends PlaySpec
 
         doCreateAccountRequest { response =>
           response mustBe DesFailureResponse()
+        }
+      }
+
+    }
+
+    "return a DesUnavailableResponse" when {
+
+      "a 503 is returned" in {
+        when(mockHttpPost.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = SERVICE_UNAVAILABLE,
+                responseJson = None
+              )
+            )
+          )
+
+        doCreateAccountRequest { response =>
+          response mustBe DesUnavailableResponse
         }
       }
 
@@ -248,7 +289,7 @@ class DesConnectorSpec extends PlaySpec
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = SERVICE_UNAVAILABLE,
+                responseStatus = GATEWAY_TIMEOUT,
                 responseJson = None
               )
             )
@@ -264,7 +305,7 @@ class DesConnectorSpec extends PlaySpec
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = SERVICE_UNAVAILABLE,
+                responseStatus = GATEWAY_TIMEOUT,
                 responseJson = Some(Json.parse(s"""{"problem": "service unavailable"}"""))
               )
             )
@@ -297,23 +338,46 @@ class DesConnectorSpec extends PlaySpec
 
     }
 
+    "return a DesUnavailableResponse" when {
+
+      "a 503 is returned" in {
+        when(mockHttpPost.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = SERVICE_UNAVAILABLE,
+                responseJson = None
+              )
+            )
+          )
+
+        doTransferAccountRequest { response =>
+          response mustBe DesUnavailableResponse
+        }
+      }
+
+    }
+
   }
 
   "Close Lisa Account endpoint" must {
 
-    "Return a status code of 200" when {
-      "Given a 200 response from DES" in {
+    "return a DesEmptySuccessResponse" when {
+
+      "DES returns 200 ok" in {
         when(mockHttpPost.POST[CloseLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(Future.successful(HttpResponse(responseStatus = OK, responseJson = None)))
 
         doCloseAccountRequest { response =>
-          response must be(DesEmptySuccessResponse)
+          response mustBe DesEmptySuccessResponse
         }
       }
+
     }
 
-    "Return no DesAccountResponse" when {
-      "The DES response has no json body" in {
+    "return a DesUnavailableResponse" when {
+
+      "a 503 is returned" in {
         when(mockHttpPost.POST[CloseLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
@@ -325,28 +389,71 @@ class DesConnectorSpec extends PlaySpec
           )
 
         doCloseAccountRequest { response =>
-          response must be(DesFailureResponse())
+          response mustBe DesUnavailableResponse
         }
       }
+
     }
+
+    "return a DesFailureResponse" when {
+
+      "any other response is received" in {
+        when(mockHttpPost.POST[CloseLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = GATEWAY_TIMEOUT,
+                responseJson = None
+              )
+            )
+          )
+
+        doCloseAccountRequest { response =>
+          response mustBe DesFailureResponse()
+        }
+      }
+
+    }
+
   }
 
   "Reinstate Lisa Account endpoint" must {
 
-    "Return a status code of 200" when {
-      "Given a 200 response from DES" in {
+    "return a populated success response" when {
+      "DES returns 200 ok" in {
         when(mockHttpPut.PUT[JsValue, HttpResponse](any(), any())(any(),any(), any(), any()))
-          .thenReturn (Future.successful(HttpResponse(responseStatus = OK,
-            responseJson =  Some(Json.parse(s"""{"code": "SUCCESS", "reason": "Account successfully reinstated"}""")))))
+          .thenReturn (Future.successful(
+            HttpResponse(
+              responseStatus = OK,
+              responseJson = Some(Json.parse(s"""{"code": "SUCCESS", "reason": "Account successfully reinstated"}"""))
+            )))
 
         doReinstateAccountRequest { response =>
-          response must be(DesReinstateAccountSuccessResponse("SUCCESS", "Account successfully reinstated"))
+          response mustBe DesReinstateAccountSuccessResponse("SUCCESS", "Account successfully reinstated")
         }
       }
     }
 
-    "Return no DesAccountResponse" when {
-      "The DES response has no json body" in {
+    "return a generic failure response" when {
+      "the DES response has no json body" in {
+        when(mockHttpPut.PUT[JsValue,HttpResponse](any(),any())(any(), any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = GATEWAY_TIMEOUT,
+                responseJson = None
+              )
+            )
+          )
+
+        doReinstateAccountRequest { response =>
+          response mustBe DesFailureResponse()
+        }
+      }
+    }
+
+    "return a DesUnavailableResponse" when {
+      "a 503 is returned" in {
         when(mockHttpPut.PUT[JsValue,HttpResponse](any(),any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
@@ -358,17 +465,18 @@ class DesConnectorSpec extends PlaySpec
           )
 
         doReinstateAccountRequest { response =>
-          response must be(DesFailureResponse())
+          response mustBe DesUnavailableResponse
         }
       }
     }
+
   }
 
   "Update First Subscription date endpoint" must {
 
-    "Return a populated DesUpdateSubscriptionSuccessResponse" when {
+    "return a populated DesUpdateSubscriptionSuccessResponse" when {
 
-      "The DES response has a json body that is in the correct format" in {
+      "the DES response has a json body that is in the correct format" in {
         when(mockHttpPut.PUT[UpdateSubscriptionRequest, HttpResponse](any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
@@ -380,15 +488,54 @@ class DesConnectorSpec extends PlaySpec
           )
 
         updateFirstSubscriptionDateRequest { response =>
-          response must be((
-            DesUpdateSubscriptionSuccessResponse("INVESTOR_ACCOUNT_NOW_VOID", "Date of first Subscription updated successfully, but as a result of the date change the account has subsequently been voided" )
-          ))
+          response mustBe DesUpdateSubscriptionSuccessResponse(
+            "INVESTOR_ACCOUNT_NOW_VOID",
+            "Date of first Subscription updated successfully, but as a result of the date change the account has subsequently been voided"
+          )
         }
       }
+
     }
 
-    "Return an failure response" when {
-      "The DES response has no json body" in {
+    "return a failure response" when {
+
+      "the DES response has no json body" in {
+        when(mockHttpPut.PUT[UpdateSubscriptionRequest, HttpResponse](any(), any())(any(), any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = GATEWAY_TIMEOUT,
+                responseJson = None
+              )
+            )
+          )
+
+        updateFirstSubscriptionDateRequest { response =>
+          response mustBe DesFailureResponse()
+        }
+      }
+
+      "status is 201 and json is invalid" in {
+        when(mockHttpPut.PUT[UpdateSubscriptionRequest, HttpResponse](any(), any())(any(), any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = CREATED,
+                responseJson = Some(Json.parse(s"""{"code": "UPDATED_AND_ACCOUNT_VOIDED", "message": "LISA Account firstSubscriptionDate has been updated successfully"}"""))
+              )
+            )
+          )
+
+        updateFirstSubscriptionDateRequest { response =>
+          response mustBe DesFailureResponse()
+        }
+      }
+
+    }
+
+    "return a DesUnavailableResponse" when {
+
+      "a 503 response is returned" in {
         when(mockHttpPut.PUT[UpdateSubscriptionRequest, HttpResponse](any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
@@ -400,72 +547,19 @@ class DesConnectorSpec extends PlaySpec
           )
 
         updateFirstSubscriptionDateRequest { response =>
-          response must be(DesFailureResponse())
+          response mustBe DesUnavailableResponse
         }
       }
-    }
 
-    "Return a DesFailureResponse" when {
-      "Status is 201 and Json is invalid" in {
-        when(mockHttpPost.POST[UpdateSubscriptionRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                responseStatus = CREATED,
-                responseJson = Some(Json.parse(s"""{"code": "UPDATED_AND_ACCOUNT_VOIDED", "message": "LISA Account firstSubscriptionDate has been updated successfully"}"""))
-              )
-            )
-          )
-
-        updateFirstSubscriptionDateRequest { response =>
-          response must be(DesFailureResponse("INTERNAL_SERVER_ERROR","Internal Server Error"))
-        }
-
-      }
     }
 
   }
 
   "Report Life Event endpoint" must {
 
-    "Return an failure response" when {
-      "The DES response has no json body" in {
-        when(mockHttpPost.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                responseStatus = SERVICE_UNAVAILABLE,
-                responseJson = None
-              )
-            )
-          )
+    "return a populated DesSuccessResponse" when {
 
-        doReportLifeEventRequest { response =>
-          response must be(DesFailureResponse())
-        }
-      }
-    }
-
-    "Return any empty LifeEventResponse" when {
-      "The DES response has a json body that is in an incorrect format" in {
-        when(mockHttpPost.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                responseStatus = OK,
-                responseJson = Some(Json.parse("""[1,2,3]"""))
-              )
-            )
-          )
-
-        doReportLifeEventRequest { response =>
-          response must be(DesFailureResponse())
-        }
-      }
-    }
-
-    "Return a populated DesSuccessResponse" when {
-      "The DES response has a json body that is in the correct format" in {
+      "the DES response has a json body that is in the correct format" in {
         when(mockHttpPost.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
@@ -477,13 +571,35 @@ class DesConnectorSpec extends PlaySpec
           )
 
         doReportLifeEventRequest { response =>
-          response must be(DesLifeEventResponse("87654321"))
+          response mustBe DesLifeEventResponse("87654321")
         }
       }
+
     }
 
-    "Return a DesFailureResponse" when {
-      "Status is 201 and Json is invalid" in {
+    "return a DesUnavailableResponse" when {
+
+      "a 503 is returned" in {
+        when(mockHttpPost.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = SERVICE_UNAVAILABLE,
+                responseJson = None
+              )
+            )
+          )
+
+        doReportLifeEventRequest { response =>
+          response mustBe DesUnavailableResponse
+        }
+      }
+
+    }
+
+    "return a generic DesFailureResponse" when {
+
+      "the response json is invalid" in {
         when(mockHttpPost.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
@@ -495,14 +611,31 @@ class DesConnectorSpec extends PlaySpec
           )
 
         doReportLifeEventRequest { response =>
-          response must be(DesFailureResponse("INTERNAL_SERVER_ERROR","Internal Server Error"))
+          response mustBe DesFailureResponse()
         }
-
       }
+
+      "the response has no json body" in {
+        when(mockHttpPost.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = CREATED,
+                responseJson = None
+              )
+            )
+          )
+
+        doReportLifeEventRequest { response =>
+          response mustBe DesFailureResponse()
+        }
+      }
+
     }
 
-    "Return a populated DesFailureResponse" when {
-      "A LIFE_EVENT_INAPPROPRIATE failure is returned" in {
+    "return a populated DesFailureResponse" when {
+
+      "a LIFE_EVENT_INAPPROPRIATE failure is returned" in {
         when(mockHttpPost.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
@@ -514,11 +647,11 @@ class DesConnectorSpec extends PlaySpec
           )
 
         doReportLifeEventRequest { response =>
-          response must be(DesFailureResponse("LIFE_EVENT_INAPPROPRIATE","The life event conflicts with previous life event reported."))
+          response mustBe DesFailureResponse("LIFE_EVENT_INAPPROPRIATE","The life event conflicts with previous life event reported.")
         }
       }
 
-      "A LIFE_EVENT_ALREADY_EXISTS failure is returned" in {
+      "a LIFE_EVENT_ALREADY_EXISTS failure is returned" in {
         when(mockHttpPost.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
@@ -530,14 +663,35 @@ class DesConnectorSpec extends PlaySpec
           )
 
         doReportLifeEventRequest { response =>
-          response must be(DesFailureResponse("LIFE_EVENT_ALREADY_EXISTS", "The investor’s life event has already been reported."))
+          response mustBe DesFailureResponse("LIFE_EVENT_ALREADY_EXISTS", "The investor’s life event has already been reported.")
         }
       }
+
     }
 
   }
 
   "Retrieve Life Event endpoint" must {
+
+    "return a Left of DesUnavailableResponse" when {
+
+      "a 503 is returned" in {
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = SERVICE_UNAVAILABLE,
+                responseJson = None
+              )
+            )
+          )
+
+        doRetrieveLifeEventRequest { response =>
+          response mustBe Left(DesUnavailableResponse)
+        }
+      }
+
+    }
 
     "return a Left of DesFailureResponse" when {
 
@@ -666,12 +820,13 @@ class DesConnectorSpec extends PlaySpec
     }
 
     "return the default DesFailureResponse" when {
+
       "the DES response has no json body" in {
         when(mockHttpPost.POST[RequestBonusPaymentRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = SERVICE_UNAVAILABLE,
+                responseStatus = GATEWAY_TIMEOUT,
                 responseJson = None
               )
             )
@@ -697,6 +852,7 @@ class DesConnectorSpec extends PlaySpec
           response mustBe DesFailureResponse()
         }
       }
+
     }
 
     "return a specific DesFailureResponse" when {
@@ -719,9 +875,49 @@ class DesConnectorSpec extends PlaySpec
 
     }
 
+    "return a DesUnavailableResponse" when {
+
+      "a 503 is returned" in {
+        when(mockHttpPost.POST[RequestBonusPaymentRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = SERVICE_UNAVAILABLE,
+                responseJson = None
+              )
+            )
+          )
+
+        doRequestBonusPaymentRequest { response =>
+          response mustBe DesUnavailableResponse
+        }
+      }
+
+    }
+
   }
 
   "Retrieve Bonus Payment endpoint" must {
+
+    "return a DesUnavailableResponse" when {
+
+      "a 503 is returned" in {
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = SERVICE_UNAVAILABLE,
+                responseJson = None
+              )
+            )
+          )
+
+        doRetrieveBonusPaymentRequest { response =>
+          response mustBe DesUnavailableResponse
+        }
+      }
+
+    }
 
     "return a DesFailureResponse" when {
 
@@ -799,6 +995,24 @@ class DesConnectorSpec extends PlaySpec
   }
 
   "Retrieve Transaction endpoint" must {
+
+    "return a unavailable response" when {
+      "a 503 is returned" in {
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = SERVICE_UNAVAILABLE,
+                responseJson = None
+              )
+            )
+          )
+
+        doRetrieveTransactionRequest { response =>
+          response mustBe DesUnavailableResponse
+        }
+      }
+    }
 
     "return a failure response" when {
       "the DES response is a failure response" in {
@@ -905,6 +1119,24 @@ class DesConnectorSpec extends PlaySpec
   }
 
   "Retrieve Bulk Payment endpoint" must {
+
+    "return a unavailable response" when {
+      "a 503 is returned" in {
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = SERVICE_UNAVAILABLE,
+                responseJson = None
+              )
+            )
+          )
+
+        doRetrieveBulkPaymentRequest { response =>
+          response mustBe DesUnavailableResponse
+        }
+      }
+    }
 
     "return a failure response" when {
       "the DES response is a failure response" in {
@@ -1077,6 +1309,24 @@ class DesConnectorSpec extends PlaySpec
 
   "Retrieve Account endpoint" must {
 
+    "return a unavailable response" when {
+      "a 503 is returned" in {
+        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = SERVICE_UNAVAILABLE,
+                responseJson = None
+              )
+            )
+          )
+
+        doRetrieveAccountRequest { response =>
+          response mustBe DesUnavailableResponse
+        }
+      }
+    }
+
     "return a failure response" when {
       "the DES response is a failure response" in {
         when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
@@ -1247,6 +1497,7 @@ class DesConnectorSpec extends PlaySpec
     }
 
     "return a populated DesTransactionResponse" when {
+
       "the DES response has a json body that is in the correct format" in {
         when(mockHttpPost.POST[ReportWithdrawalChargeRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
@@ -1262,15 +1513,17 @@ class DesConnectorSpec extends PlaySpec
           response mustBe DesTransactionResponse("87654321", Some("On Time"))
         }
       }
+
     }
 
     "return the default DesFailureResponse" when {
+
       "the DES response has no json body" in {
         when(mockHttpPost.POST[ReportWithdrawalChargeRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = SERVICE_UNAVAILABLE,
+                responseStatus = GATEWAY_TIMEOUT,
                 responseJson = None
               )
             )
@@ -1296,6 +1549,7 @@ class DesConnectorSpec extends PlaySpec
           response mustBe DesFailureResponse()
         }
       }
+
     }
 
     "return a specific DesFailureResponse" when {
@@ -1313,6 +1567,26 @@ class DesConnectorSpec extends PlaySpec
 
         doReportWithdrawalRequest { response =>
           response mustBe DesFailureResponse("LIFE_EVENT_DOES_NOT_EXIST", "The lifeEventId does not match with HMRC’s records.")
+        }
+      }
+
+    }
+
+    "return a DesUnavailableResponse" when {
+
+      "a 503 is returned" in {
+        when(mockHttpPost.POST[ReportWithdrawalChargeRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = SERVICE_UNAVAILABLE,
+                responseJson = None
+              )
+            )
+          )
+
+        doReportWithdrawalRequest { response =>
+          response mustBe DesUnavailableResponse
         }
       }
 
@@ -1371,7 +1645,7 @@ class DesConnectorSpec extends PlaySpec
     callback(response)
   }
 
-  private def doRetrieveLifeEventRequest(callback: (Either[DesResponse, Seq[GetLifeEventItem]]) => Unit) = {
+  private def doRetrieveLifeEventRequest(callback: (Either[DesFailure, Seq[GetLifeEventItem]]) => Unit) = {
     val response = Await.result(SUT.getLifeEvent("Z123456", "ABC12345", "1234567890"), Duration.Inf)
 
     callback(response)

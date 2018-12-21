@@ -41,7 +41,6 @@ class ReinstateAccountController extends LisaController with LisaConstants {
         lisaManager = lisaManager
       )
     }
-
   }
 
   private def processReinstateAccount(lisaManager: String, accountId: String)
@@ -59,35 +58,26 @@ class ReinstateAccountController extends LisaController with LisaConstants {
         Ok(Json.toJson(ApiResponse(data = Some(data), success = true, status = OK)))
       }
       case ReinstateLisaAccountAlreadyClosedResponse =>
-        processReinstateFailure(
-          lisaManager,
-          accountId,
-          ErrorAccountAlreadyClosed,
-          FORBIDDEN,
-          Some("You cannot reinstate this account because it was closed with a closure reason of transferred out")
-        )
+        val message = Some("You cannot reinstate this account because it was closed with a closure reason of transferred out")
+        processReinstateFailure(lisaManager, accountId, ErrorAccountAlreadyClosed, message)
       case ReinstateLisaAccountAlreadyCancelledResponse =>
-        processReinstateFailure(
-          lisaManager,
-          accountId,
-          ErrorAccountAlreadyClosed,
-          FORBIDDEN,
-          Some("You cannot reinstate this account because it was closed with a closure reason of cancellation")
-        )
+        val message = Some("You cannot reinstate this account because it was closed with a closure reason of cancellation")
+        processReinstateFailure(lisaManager, accountId, ErrorAccountAlreadyClosed, message)
       case ReinstateLisaAccountAlreadyOpenResponse =>
-        processReinstateFailure(lisaManager, accountId, ErrorAccountAlreadyOpen, FORBIDDEN, None)
+        processReinstateFailure(lisaManager, accountId, ErrorAccountAlreadyOpen)
       case ReinstateLisaAccountInvestorComplianceCheckFailedResponse =>
-        processReinstateFailure(lisaManager, accountId, ErrorInvestorComplianceCheckFailedReinstate, FORBIDDEN, None)
+        processReinstateFailure(lisaManager, accountId, ErrorInvestorComplianceCheckFailedReinstate)
       case ReinstateLisaAccountNotFoundResponse =>
-        processReinstateFailure(lisaManager, accountId, ErrorAccountNotFound, NOT_FOUND, None)
-      case ReinstateLisaAccountErrorResponse => {
-        processReinstateFailure(lisaManager, accountId, ErrorInternalServerError, INTERNAL_SERVER_ERROR, None)
-      }
+        processReinstateFailure(lisaManager, accountId, ErrorAccountNotFound)
+      case ReinstateLisaAccountServiceUnavailableResponse =>
+        processReinstateFailure(lisaManager, accountId, ErrorServiceUnavailable)
+      case ReinstateLisaAccountErrorResponse =>
+        processReinstateFailure(lisaManager, accountId, ErrorInternalServerError)
     } recover {
       case _:Exception  => {
         Logger.error(s"ReinstateAccountController: reinstateAccount: An error occurred returning internal server error")
         LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.REINSTATE)
-        InternalServerError(Json.toJson(ErrorInternalServerError))
+        ErrorInternalServerError.asResult
       }
     }
   }
@@ -96,7 +86,7 @@ class ReinstateAccountController extends LisaController with LisaConstants {
     s"/manager/$lisaManagerReferenceNumber/accounts/$accountID/reinstate"
   }
 
-  private def processReinstateFailure(lisaManager: String, accountId: String, err: ErrorResponse, status: Int, message: Option[String])
+  private def processReinstateFailure(lisaManager: String, accountId: String, err: ErrorResponse, message: Option[String] = None)
                                      (implicit hc: HeaderCarrier, startTime: Long): Result = {
     auditService.audit(
       auditType = "accountNotReinstated",
@@ -108,7 +98,7 @@ class ReinstateAccountController extends LisaController with LisaConstants {
       )
     )
 
-    LisaMetrics.incrementMetrics(startTime, status, LisaMetricKeys.REINSTATE)
+    LisaMetrics.incrementMetrics(startTime, err.httpStatusCode, LisaMetricKeys.REINSTATE)
 
     val msg = message match {
       case Some(text) => text
@@ -117,7 +107,7 @@ class ReinstateAccountController extends LisaController with LisaConstants {
 
     val data = ApiResponseData(code = Some(err.errorCode), message = msg)
 
-    Status(status).apply(Json.toJson(Some(data)))
+    Status(err.httpStatusCode).apply(Json.toJson(Some(data)))
   }
 
 }

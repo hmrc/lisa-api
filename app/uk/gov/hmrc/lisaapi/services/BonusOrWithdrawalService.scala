@@ -20,7 +20,7 @@ import play.api.Logger
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesResponse}
+import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesResponse, DesUnavailableResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -39,7 +39,11 @@ trait BonusOrWithdrawalService {
 
         successResponse
       }
+      case DesUnavailableResponse => {
+        Logger.debug("Matched DesUnavailableResponse")
 
+        GetBonusOrWithdrawalServiceUnavailableResponse
+      }
       case failureResponse: DesFailureResponse => {
         Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
 

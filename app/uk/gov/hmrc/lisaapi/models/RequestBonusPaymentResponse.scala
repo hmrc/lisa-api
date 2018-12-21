@@ -16,8 +16,6 @@
 
 package uk.gov.hmrc.lisaapi.models
 
-import uk.gov.hmrc.lisaapi.models.des.DesFailureResponse
-
 trait RequestBonusPaymentResponse
 
 trait RequestBonusPaymentSuccessResponse extends RequestBonusPaymentResponse {
@@ -38,6 +36,7 @@ case object RequestBonusPaymentSupersededAmountMismatch extends RequestBonusPaym
 case object RequestBonusPaymentSupersededOutcomeError extends RequestBonusPaymentErrorResponse
 case object RequestBonusPaymentNoSubscriptions extends RequestBonusPaymentErrorResponse
 case object RequestBonusPaymentError extends RequestBonusPaymentErrorResponse
+case object RequestBonusPaymentServiceUnavailable extends RequestBonusPaymentErrorResponse
 
 case class RequestBonusPaymentClaimAlreadyExists(transactionId: TransactionId) extends RequestBonusPaymentErrorResponse
 case class RequestBonusPaymentAlreadySuperseded(transactionId: TransactionId) extends RequestBonusPaymentErrorResponse

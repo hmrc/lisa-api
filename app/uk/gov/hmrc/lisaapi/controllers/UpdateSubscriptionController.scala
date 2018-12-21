@@ -33,55 +33,46 @@ class UpdateSubscriptionController extends LisaController with LisaConstants {
   val service: UpdateSubscriptionService = UpdateSubscriptionService
   val auditService: AuditService = AuditService
 
-  val failureEvent: String = "firstSubscriptionDateNotUpdated"
-  val failureReason: String = "reasonNotUpdated"
-
-  def updateSubscription (lisaManager: String, accountId: String): Action[AnyContent] = validateHeader().async { implicit request =>
+  def updateSubscription (lisaManager: String, accountId: String): Action[AnyContent] =
+    (validateHeader() andThen validateLMRN(lisaManager) andThen validateAccountId(accountId)).async { implicit request =>
     implicit val startTime: Long = System.currentTimeMillis()
-    withValidLMRN(lisaManager) { () =>
-      withValidAccountId(accountId) { () =>
-        withValidJson[UpdateSubscriptionRequest]( updateSubsRequest => {
-          withValidDates(lisaManager, accountId, updateSubsRequest) { () =>
-            service.updateSubscription(lisaManager, accountId, updateSubsRequest) map { result =>
-              Logger.debug("Entering Updated subscription Controller and the response is " + result.toString)
-              result match {
-                case success: UpdateSubscriptionSuccessResponse =>
-                  Logger.debug("First Subscription date updated")
-                  doAudit(lisaManager, accountId, updateSubsRequest, "firstSubscriptionDateUpdated")
-                  val data = ApiResponseData(message = success.message, code = Some(success.code), accountId = Some(accountId))
-                  LisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.UPDATE_SUBSCRIPTION)
-                  Ok(Json.toJson(ApiResponse(data = Some(data), success = true, status = OK)))
-                case UpdateSubscriptionAccountNotFoundResponse =>
-                  Logger.debug("First Subscription date not updated")
-                  doAudit(lisaManager, accountId, updateSubsRequest, failureEvent,
-                    Map(failureReason -> ErrorAccountNotFound.errorCode))
-                  LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.UPDATE_SUBSCRIPTION)
-                  NotFound(Json.toJson(ErrorAccountNotFound))
-                case UpdateSubscriptionAccountClosedResponse =>
-                  Logger.error("Account Closed")
-                  doAudit(lisaManager, accountId, updateSubsRequest, failureEvent,
-                    Map(failureReason -> ErrorAccountAlreadyClosed.errorCode))
-                  LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.UPDATE_SUBSCRIPTION)
-                  Forbidden(Json.toJson(ErrorAccountAlreadyClosed))
-                case UpdateSubscriptionAccountVoidedResponse =>
-                  Logger.error("Account Voided")
-                  doAudit(lisaManager, accountId, updateSubsRequest, failureEvent,
-                    Map(failureReason -> ErrorAccountAlreadyVoided.errorCode))
-                  LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.UPDATE_SUBSCRIPTION)
-                  Forbidden(Json.toJson(ErrorAccountAlreadyVoided))
-                case _ =>
-                  Logger.debug("Matched Error")
-                  doAudit(lisaManager, accountId, updateSubsRequest, failureEvent,
-                    Map(failureReason -> ErrorInternalServerError.errorCode))
-                  Logger.error(s"First Subscription date not updated : DES unknown case , returning internal server error")
-                  LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.UPDATE_SUBSCRIPTION)
-                  InternalServerError(Json.toJson(ErrorInternalServerError))
-              }
+
+    withValidJson[UpdateSubscriptionRequest](
+      updateSubsRequest => {
+        withValidDates(lisaManager, accountId, updateSubsRequest) { () =>
+          service.updateSubscription(lisaManager, accountId, updateSubsRequest) map { result =>
+            Logger.debug("Entering Updated subscription Controller and the response is " + result.toString)
+            result match {
+              case success: UpdateSubscriptionSuccessResponse =>
+                Logger.debug("First Subscription date updated")
+                doAudit(lisaManager, accountId, updateSubsRequest, "firstSubscriptionDateUpdated")
+                val data = ApiResponseData(message = success.message, code = Some(success.code), accountId = Some(accountId))
+                LisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.UPDATE_SUBSCRIPTION)
+                Ok(Json.toJson(ApiResponse(data = Some(data), success = true, status = OK)))
+              case UpdateSubscriptionAccountNotFoundResponse =>
+                error(ErrorAccountNotFound, lisaManager, accountId, updateSubsRequest)
+              case UpdateSubscriptionAccountClosedResponse =>
+                error(ErrorAccountAlreadyClosed, lisaManager, accountId, updateSubsRequest)
+              case UpdateSubscriptionAccountVoidedResponse =>
+                error(ErrorAccountAlreadyVoided, lisaManager, accountId, updateSubsRequest)
+              case UpdateSubscriptionServiceUnavailableResponse =>
+                error(ErrorServiceUnavailable, lisaManager, accountId, updateSubsRequest)
+              case _ =>
+                error(ErrorInternalServerError, lisaManager, accountId, updateSubsRequest)
             }
           }
-        }, lisaManager = lisaManager)
-      }
-    }
+        }
+      },
+      lisaManager = lisaManager
+    )
+  }
+
+  private def error(e: ErrorResponse, lisaManager: String, accountId: String, req: UpdateSubscriptionRequest)
+                   (implicit hc: HeaderCarrier, startTime: Long): Result = {
+    Logger.debug("Matched an error")
+    doAudit(lisaManager, accountId, req, "firstSubscriptionDateNotUpdated", Map("reasonNotUpdated" -> e.errorCode))
+    LisaMetrics.incrementMetrics(startTime, e.httpStatusCode, LisaMetricKeys.UPDATE_SUBSCRIPTION)
+    e.asResult
   }
 
   private def withValidDates(lisaManager: String, accountId: String, updateSubsRequest: UpdateSubscriptionRequest)
@@ -112,17 +103,13 @@ class UpdateSubscriptionController extends LisaController with LisaConstants {
                      (implicit hc: HeaderCarrier) = {
     auditService.audit(
       auditType = auditType,
-      path = getEndpointUrl(lisaManager, accountId),
+      path = s"/manager/$lisaManager/accounts/$accountId/update-subscription",
       auditData = Map(
       "lisaManagerReferenceNumber" -> lisaManager,
       "accountID" -> accountId,
       "firstSubscriptionDate" -> updateSubsRequest.firstSubscriptionDate.toString("yyyy-MM-dd")
       ) ++ extraData
     )
-  }
-
-  private def getEndpointUrl(lisaManagerReferenceNumber: String, accountId: AccountId): String = {
-    s"/manager/$lisaManagerReferenceNumber/accounts/$accountId/update-subscription"
   }
 
 }

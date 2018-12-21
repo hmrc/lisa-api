@@ -24,7 +24,7 @@ import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.models.des.DesFailureResponse
+import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesUnavailableResponse}
 import uk.gov.hmrc.lisaapi.services.BonusOrWithdrawalService
 
 import scala.concurrent.duration.Duration
@@ -78,6 +78,17 @@ class BonusOrWithdrawalServiceSpec extends PlaySpec with MockitoSugar with OneAp
 
         doRequest { response =>
           response mustBe GetBonusOrWithdrawalInvestorNotFoundResponse
+        }
+      }
+    }
+
+    "return a service unavailable response" when {
+      "given a DesUnavailableResponse from the DES connector" in {
+        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
+          thenReturn(Future.successful(DesUnavailableResponse))
+
+        doRequest { response =>
+          response mustBe GetBonusOrWithdrawalServiceUnavailableResponse
         }
       }
     }

@@ -110,6 +110,10 @@ class BonusPaymentController extends LisaController with LisaConstants {
         LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.BONUS_PAYMENT)
         Future.successful(NotFound(Json.toJson(ErrorAccountNotFound)))
 
+      case GetBonusOrWithdrawalServiceUnavailableResponse =>
+        LisaMetrics.incrementMetrics(startTime, SERVICE_UNAVAILABLE, LisaMetricKeys.BONUS_PAYMENT)
+        Future.successful(ServiceUnavailable(Json.toJson(ErrorServiceUnavailable)))
+
       case _ =>
         LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.BONUS_PAYMENT)
         Future.successful(InternalServerError(Json.toJson(ErrorInternalServerError)))
@@ -248,6 +252,7 @@ class BonusPaymentController extends LisaController with LisaConstants {
           case Some(VERSION_1) => ErrorInternalServerError
           case Some(VERSION_2) => ErrorBonusClaimAlreadySuperseded(e.transactionId)
         }
+      case RequestBonusPaymentServiceUnavailable => ErrorServiceUnavailable
       case _ =>
         getAPIVersionFromRequest(request) match {
           case Some(VERSION_1) => requestBonusErrorsV1.getOrElse(errorResponse, ErrorInternalServerError)

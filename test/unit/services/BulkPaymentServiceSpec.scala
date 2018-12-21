@@ -23,7 +23,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
-import uk.gov.hmrc.lisaapi.models.des.DesFailureResponse
+import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesUnavailableResponse}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.BulkPaymentService
 
@@ -90,6 +90,17 @@ class BulkPaymentServiceSpec extends PlaySpec
 
         doRequest{ response =>
           response mustBe GetBulkPaymentNotFoundResponse
+        }
+      }
+    }
+
+    "return service unavailable" when {
+      "the connector returns a DesUnavailableResponse" in {
+        when(mockDesConnector.getBulkPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(DesUnavailableResponse))
+
+        doRequest{ response =>
+          response mustBe GetBulkPaymentServiceUnavailableResponse
         }
       }
     }

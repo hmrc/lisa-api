@@ -25,7 +25,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesTransactionResponse}
+import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesTransactionResponse, DesUnavailableResponse}
 import uk.gov.hmrc.lisaapi.services.WithdrawalService
 
 import scala.concurrent.duration.Duration
@@ -141,6 +141,17 @@ class WithdrawalServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
         doRequest { response =>
           response mustBe ReportWithdrawalChargeSupersedeOutcomeError
+        }
+      }
+    }
+
+    "return a service unavailable response" when {
+      "given a DesUnavailableResponse from the DES connector" in {
+        when(mockDesConnector.reportWithdrawalCharge(any(), any(), any())(any())).
+          thenReturn(Future.successful(DesUnavailableResponse))
+
+        doRequest { response =>
+          response mustBe ReportWithdrawalChargeServiceUnavailable
         }
       }
     }

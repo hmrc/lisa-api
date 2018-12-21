@@ -43,6 +43,7 @@ case class GetLisaAccountTransferAccount(
 
 case object GetLisaAccountDoesNotExistResponse extends GetLisaAccountResponse
 case object GetLisaAccountErrorResponse extends GetLisaAccountResponse
+case object GetLisaAccountServiceUnavailable extends GetLisaAccountResponse
 
 object GetLisaAccountTransferAccount {
   implicit val writes: Writes[GetLisaAccountTransferAccount] = (

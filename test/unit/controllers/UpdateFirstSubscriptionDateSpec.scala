@@ -142,6 +142,23 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
           )(any())
         }
       }
+      "the data service returns a UpdateSubscriptionServiceUnavailableResponse" in {
+        when(mockService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionServiceUnavailableResponse))
+
+        doUpdateSubsDate(updateFirstSubscriptionDate) { result =>
+          await(result)
+          verify(mockAuditService).audit(
+            auditType = matchersEquals("firstSubscriptionDateNotUpdated"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/update-subscription"),
+            auditData = matchersEquals(Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountID" -> accountId,
+              "firstSubscriptionDate" -> "2017-04-06",
+              "reasonNotUpdated" -> "SERVER_ERROR"
+            ))
+          )(any())
+        }
+      }
       "the data service returns a UpdateFirstSubscriptionDateErrorResponse" in {
         when(mockService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionErrorResponse))
 
@@ -252,6 +269,16 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
 
         doUpdateSubsDate(updateFirstSubscriptionDate) { res =>
           status(res) mustBe (INTERNAL_SERVER_ERROR)
+        }
+      }
+    }
+    "return with status 503 service unavailable" when {
+      "the data service returns a UpdateSubscriptionServiceUnavailableResponse" in {
+        when(mockService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionServiceUnavailableResponse))
+
+        doUpdateSubsDate(updateFirstSubscriptionDate) { res =>
+          status(res) mustBe SERVICE_UNAVAILABLE
+          (contentAsJson(res) \ "code").as[String] mustBe "SERVER_ERROR"
         }
       }
     }

@@ -26,6 +26,7 @@ case class CreateLisaInvestorSuccessResponse(investorId: String) extends CreateL
 case class CreateLisaInvestorAlreadyExistsResponse(investorId: String) extends CreateLisaInvestorResponse
 case object CreateLisaInvestorInvestorNotFoundResponse extends CreateLisaInvestorResponse
 case object CreateLisaInvestorErrorResponse extends CreateLisaInvestorResponse
+case object CreateLisaInvestorServiceUnavailableResponse extends CreateLisaInvestorResponse
 
 object CreateLisaInvestorResponse {
   implicit val successReads: Reads[CreateLisaInvestorSuccessResponse] =

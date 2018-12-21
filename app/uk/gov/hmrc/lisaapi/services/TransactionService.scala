@@ -34,6 +34,10 @@ trait TransactionService {
       case success: GetBonusOrWithdrawalSuccessResponse => {
         handleITMPResponse(lisaManager, accountId, transactionId, success)
       }
+      case DesUnavailableResponse => {
+        Logger.debug("503 from ITMP")
+        Future.successful(GetTransactionServiceUnavailableResponse)
+      }
       case error: DesFailureResponse => {
         Logger.debug(s"Error from ITMP: ${error.code}")
 
@@ -95,6 +99,7 @@ trait TransactionService {
     val transaction: Future[DesResponse] = desConnector.getTransaction(lisaManager, accountId, transactionId)
 
     transaction map {
+      case DesUnavailableResponse => GetTransactionServiceUnavailableResponse
       case collected: DesGetTransactionCollected => {
         GetTransactionSuccessResponse(
           transactionId = transactionId,
@@ -134,6 +139,7 @@ trait TransactionService {
     val transaction: Future[DesResponse] = desConnector.getTransaction(lisaManager, accountId, transactionId)
 
     transaction map {
+      case DesUnavailableResponse => GetTransactionServiceUnavailableResponse
       case paid: DesGetTransactionPaid => {
         GetTransactionSuccessResponse(
           transactionId = transactionId,

@@ -29,7 +29,6 @@ import scala.concurrent.Future
 trait UpdateSubscriptionService {
   val desConnector: DesConnector
 
-
   def updateSubscription(lisaManager: String, accountId: String, request: UpdateSubscriptionRequest)(implicit hc: HeaderCarrier): Future[UpdateSubscriptionResponse] = {
     val response = desConnector.updateFirstSubDate(lisaManager, accountId, request)
 
@@ -40,6 +39,10 @@ trait UpdateSubscriptionService {
           case true => UpdateSubscriptionSuccessResponse(Constants.updateCode,Constants.updateMsg)
           case _ => UpdateSubscriptionSuccessResponse(Constants.voidCode,  Constants.voidMsg)
         }
+      }
+      case DesUnavailableResponse => {
+        Logger.debug("Update subscription des unavailable response")
+        UpdateSubscriptionServiceUnavailableResponse
       }
       case failureResponse: DesFailureResponse => {
         Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)

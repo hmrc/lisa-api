@@ -25,6 +25,7 @@ trait GetBulkPaymentResponse extends DesResponse
 
 case object GetBulkPaymentNotFoundResponse extends GetBulkPaymentResponse
 case object GetBulkPaymentErrorResponse extends GetBulkPaymentResponse
+case object GetBulkPaymentServiceUnavailableResponse extends GetBulkPaymentResponse
 
 trait BulkPayment
 

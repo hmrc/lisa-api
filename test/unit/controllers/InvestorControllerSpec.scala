@@ -148,7 +148,6 @@ class InvestorControllerSpec extends PlaySpec
     }
 
     "return with status 500 internal server error" when {
-
       "an exception gets thrown" in {
         when(mockService.createInvestor(any(), any())(any())).
           thenThrow(new RuntimeException("Test"))
@@ -160,6 +159,21 @@ class InvestorControllerSpec extends PlaySpec
 
         status(res) mustBe (INTERNAL_SERVER_ERROR)
         (contentAsJson(res) \ "code").as[String] mustBe ("INTERNAL_SERVER_ERROR")
+      }
+    }
+
+    "return with status 503 service unavailable" when {
+      "given a CreateLisaInvestorServiceUnavailableResponse" in {
+        when(mockService.createInvestor(any(), any())(any())).
+          thenReturn(Future.successful(CreateLisaInvestorServiceUnavailableResponse))
+
+        val res = SUT.createLisaInvestor(lisaManager).
+          apply(FakeRequest(Helpers.PUT, "/").
+            withHeaders(acceptHeader).
+            withBody(AnyContentAsJson(Json.parse(investorJson))))
+
+        status(res) mustBe SERVICE_UNAVAILABLE
+        (contentAsJson(res) \ "code").as[String] mustBe "SERVER_ERROR"
       }
     }
 

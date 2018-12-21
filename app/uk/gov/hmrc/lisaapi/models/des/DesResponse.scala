@@ -23,13 +23,18 @@ import uk.gov.hmrc.lisaapi.models._
 
 trait DesResponse
 
+sealed abstract class DesFailure extends DesResponse {
+  val code: String
+  val reason: String
+}
+
 case class DesAccountResponse(accountID: String) extends DesResponse
 
 case class DesLifeEventResponse(lifeEventID: String) extends DesResponse
 case class DesLifeEventRetrievalResponse(lifeEventID: LifeEventId, eventType: LifeEventType, eventDate: DateTime) extends DesResponse
 case class DesCreateInvestorResponse(investorID: String) extends DesResponse
 case class DesTransactionResponse(transactionID: String, message: Option[String]) extends DesResponse
-case class DesFailureResponse(code: String = "INTERNAL_SERVER_ERROR", reason: String = "Internal Server Error") extends DesResponse
+case class DesFailureResponse(code: String = "INTERNAL_SERVER_ERROR", reason: String = "Internal Server Error") extends DesFailure
 case class DesLifeEventExistResponse(code: String, reason: String, lifeEventID: String) extends DesResponse
 case class DesTransactionExistResponse(code: String, reason: String, transactionID: String) extends DesResponse
 case object DesEmptySuccessResponse extends DesResponse
@@ -45,6 +50,10 @@ case class DesGetBonusPaymentResponse(lifeEventId: Option[LifeEventId],
                                       status: String,
                                       supersededBy: Option[TransactionId] = None,
                                       supersede: Option[Supersede] = None) extends DesResponse
+case object DesUnavailableResponse extends DesFailure {
+  override val code = "SERVER_ERROR"
+  override val reason = "Service Unavailable"
+}
 
 object DesResponse {
   implicit val desCreateAccountResponseFormats: OFormat[DesAccountResponse] = Json.format[DesAccountResponse]
