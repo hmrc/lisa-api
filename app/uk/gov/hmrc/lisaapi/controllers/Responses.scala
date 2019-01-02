@@ -17,7 +17,7 @@
 package uk.gov.hmrc.lisaapi.controllers
 
 import play.api.Logger
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Result, Results}
 
 sealed abstract class ErrorResponse(
@@ -27,6 +27,9 @@ sealed abstract class ErrorResponse(
                          ) {
   def asResult: Result = {
     Results.Status(httpStatusCode)(Json.toJson(this))
+  }
+  def asJson: JsValue = {
+    Json.toJson(this)
   }
 }
 
@@ -105,6 +108,8 @@ case object ErrorAcceptHeaderContentInvalid extends ErrorResponse(406, "ACCEPT_H
 
 case object ErrorInternalServerError extends ErrorResponse(500, "INTERNAL_SERVER_ERROR", "Internal server error")
 
+case object ErrorServiceUnavailable extends ErrorResponse(503, "SERVER_ERROR", "Service unavailable")
+
 case object InvalidAuthorisationHeader extends ErrorResponse(403, "AUTH_HEADER_INVALID", "The value provided for Authorization header is invalid")
 
 case object InvalidAcceptHeader extends ErrorResponse(401, "ACCEPT_HEADER_INVALID", "The accept header is missing or invalid")
@@ -144,9 +149,9 @@ case object ErrorBulkTransactionNotFoundV1 extends ErrorResponse(404, "PAYMENT_N
 
 case object ErrorBulkTransactionNotFoundV2 extends ErrorResponse(404, "TRANSACTION_NOT_FOUND", "No payments or debts exist for this date range")
 
-case object ErrorTransferAccountDataNotProvided extends ErrorResponse(403, "TRANSFER_ACCOUNT_DATA_NOT_PROVIDED", "You must give a transferredFromAccountId, transferredFromLMRN and transferInDate when the creationReason is transferred")
+case object ErrorTransferAccountDataNotProvided extends ErrorResponse(403, "TRANSFER_ACCOUNT_DATA_NOT_PROVIDED", "You must give a transferredFromAccountId, transferredFromLMRN and transferInDate when the creationReason is transferred, current or previous year funds transferred")
 
-case object ErrorTransferAccountDataProvided extends ErrorResponse(403, "TRANSFER_ACCOUNT_DATA_PROVIDED", "You must only give a transferredFromAccountId, transferredFromLMRN, and transferInDate when the creationReason is transferred")
+case object ErrorTransferAccountDataProvided extends ErrorResponse(403, "TRANSFER_ACCOUNT_DATA_PROVIDED", "You must only give a transferredFromAccountId, transferredFromLMRN, and transferInDate when the creationReason is transferred, current or previous year funds transferred")
 
 case object ErrorLifeEventInappropriate extends ErrorResponse(403, "LIFE_EVENT_INAPPROPRIATE", "The life event conflicts with a previous life event reported")
 
@@ -166,7 +171,7 @@ case object ErrorBonusSupersededOutcomeError extends ErrorResponse(403, "SUPERSE
 
 case object ErrorBonusClaimTimescaleExceeded extends ErrorResponse(403, "BONUS_CLAIM_TIMESCALES_EXCEEDED", "The timescale for claiming a bonus has passed. The claim period lasts for 6 years and 14 days")
 
-case object ErrorBonusHelpToBuyNotApplicable extends ErrorResponse(403, "HELP_TO_BUY_NOT_APPLICABLE", "Help to Buy is not applicable on this account")
+case object ErrorBonusHelpToBuyNotApplicable extends ErrorResponse(403, "HELP_TO_BUY_NOT_APPLICABLE", "Help to buy is only applicable for claims within the 2017-18 tax year")
 
 case object ErrorNoSubscriptions extends ErrorResponse(403, "ACCOUNT_ERROR_NO_SUBSCRIPTIONS_THIS_TAX_YEAR", "A bonus payment is not possible because the account has no subscriptions for that tax year")
 

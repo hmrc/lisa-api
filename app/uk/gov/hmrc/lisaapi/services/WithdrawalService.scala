@@ -20,7 +20,7 @@ import com.google.inject.Inject
 import play.api.Logger
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
-import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesTransactionResponse}
+import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesTransactionResponse, DesUnavailableResponse}
 import uk.gov.hmrc.lisaapi.models._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -47,6 +47,11 @@ class WithdrawalService @Inject()(desConnector: DesConnector)(implicit ec: Execu
             ReportWithdrawalChargeSupersededResponse(successResponse.transactionID)
           }
         }
+      }
+      case DesUnavailableResponse => {
+        Logger.debug("Matched DesUnavailableResponse")
+
+        ReportWithdrawalChargeServiceUnavailable
       }
       case failureResponse: DesFailureResponse => {
         Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)

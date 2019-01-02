@@ -21,14 +21,16 @@ import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.lisaapi.config.AppContext
-import uk.gov.hmrc.lisaapi.metrics.LisaMetrics
+import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
+import uk.gov.hmrc.lisaapi.services.LifeEventService
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 class GetLifeEventController @Inject()(
                                         val authConnector: AuthConnector,
                                         val appContext: AppContext,
-                                        val lisaMetrics: LisaMetrics)
+                                        val lisaMetrics: LisaMetrics,
+                                        val service: LifeEventService)
                                       (implicit ec: ExecutionContext)
   extends LisaController {
 
@@ -40,7 +42,16 @@ class GetLifeEventController @Inject()(
     withValidLMRN(lisaManager) { () =>
       withValidAccountId(accountId) { () =>
         withEnrolment(lisaManager) { (_) =>
-          Future.successful(NotImplemented(Json.toJson(ErrorNotImplemented)))
+          service.getLifeEvent(lisaManager, accountId, lifeEventId) map {
+            case Left(error) => {
+              lisaMetrics.incrementMetrics(startTime, error.httpStatusCode, LisaMetricKeys.EVENT)
+              error.asResult
+            }
+            case Right(success) => {
+              lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.EVENT)
+              Ok(Json.toJson(success))
+            }
+          }
         }
       }
     }

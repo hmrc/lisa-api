@@ -206,7 +206,7 @@ class ReportLifeEventRequestSpec extends PlaySpec {
         "lisaAnnualStocksAndSharesSubs" -> 55,
         "lisaMarketValueCash" -> 0,
         "lisaMarketValueStocksAndShares" -> 65,
-        "taxYear" -> 2018
+        "taxYear" -> "2018"
       )
     }
 
@@ -235,7 +235,7 @@ class ReportLifeEventRequestSpec extends PlaySpec {
         "lisaAnnualStocksAndSharesSubs" -> 55,
         "lisaMarketValueCash" -> 0,
         "lisaMarketValueStocksAndShares" -> 65,
-        "taxYear" -> 2018,
+        "taxYear" -> "2018",
         "supersededLifeEventID" -> "1234567890",
         "supersededLifeEventDate" -> "2017-04-01"
       )

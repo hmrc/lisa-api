@@ -31,7 +31,7 @@ import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.config.AppContext
-import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountAlreadyCancelled, ErrorAccountAlreadyVoided, ErrorAccountNotFound, ErrorInternalServerError, ErrorValidation, ErrorWithdrawalExists, ErrorWithdrawalNotFound, ErrorWithdrawalTimescalesExceeded, WithdrawalController}
+import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountAlreadyCancelled, ErrorAccountAlreadyVoided, ErrorAccountNotFound, ErrorInternalServerError, ErrorServiceUnavailable, ErrorValidation, ErrorWithdrawalExists, ErrorWithdrawalNotFound, ErrorWithdrawalTimescalesExceeded, WithdrawalController}
 import uk.gov.hmrc.lisaapi.metrics.LisaMetrics
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, BonusOrWithdrawalService, CurrentDateService, WithdrawalService}
@@ -307,6 +307,20 @@ class WithdrawalControllerSpec extends PlaySpec
 
     }
 
+    "return with status 503 service unavailable" when {
+
+      "given a ReportWithdrawalChargeServiceUnavailable from the service layer" in {
+        when(mockPostService.reportWithdrawalCharge(any(), any(), any())(any())).
+          thenReturn(Future.successful(ReportWithdrawalChargeServiceUnavailable))
+
+        doRequest(validWithdrawalJson) { res =>
+          status(res) mustBe SERVICE_UNAVAILABLE
+          contentAsJson(res) mustBe ErrorServiceUnavailable.asJson
+        }
+      }
+
+    }
+
   }
 
   "the GET withdrawal charge endpoint" must {
@@ -410,10 +424,22 @@ class WithdrawalControllerSpec extends PlaySpec
 
     }
 
-    "return an internal server error response" in {
-      when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusOrWithdrawalErrorResponse))
+    "return a internal server error response" in {
+      when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).
+        thenReturn(Future.successful(GetBonusOrWithdrawalErrorResponse))
+
       doGetRequest(res => {
         (contentAsJson(res) \ "code").as[String] mustBe "INTERNAL_SERVER_ERROR"
+      })
+    }
+
+    "return a service unavailable response" in {
+      when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).
+        thenReturn(Future.successful(GetBonusOrWithdrawalServiceUnavailableResponse))
+
+      doGetRequest(res => {
+        status(res) mustBe SERVICE_UNAVAILABLE
+        (contentAsJson(res) \ "code").as[String] mustBe "SERVER_ERROR"
       })
     }
 

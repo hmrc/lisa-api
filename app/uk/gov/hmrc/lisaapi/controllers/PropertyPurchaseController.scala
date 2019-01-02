@@ -24,6 +24,7 @@ import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.{LisaConstants, controllers}
+import uk.gov.hmrc.lisaapi.{LisaConstants, controllers, models}
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models.{ReportLifeEventFundReleaseNotFoundResponse, ReportLifeEventMismatchResponse, _}
 import uk.gov.hmrc.lisaapi.services.{AuditService, LifeEventService}
@@ -205,7 +206,8 @@ class PropertyPurchaseController @Inject() (
     ReportLifeEventAccountNotFoundResponse -> ErrorAccountNotFound,
     ReportLifeEventAlreadySupersededResponse -> ErrorLifeEventAlreadySuperseded,
     ReportLifeEventAlreadyExistsResponse -> ErrorLifeEventAlreadyExists,
-    ReportLifeEventMismatchResponse -> ErrorLifeEventMismatch
+    ReportLifeEventMismatchResponse -> ErrorLifeEventMismatch,
+    ReportLifeEventServiceUnavailableResponse -> ErrorServiceUnavailable
   )
 
   private val fundReleaseErrors = commonErrors ++ Map (
@@ -228,7 +230,8 @@ class PropertyPurchaseController @Inject() (
     ReportLifeEventAccountNotFoundResponse -> ErrorAccountNotFound,
     ReportLifeEventFundReleaseSupersededResponse -> ErrorFundReleaseSuperseded,
     ReportLifeEventAlreadySupersededResponse -> ErrorLifeEventAlreadySuperseded,
-    ReportLifeEventAlreadyExistsResponse -> ErrorLifeEventAlreadyExists
+    ReportLifeEventAlreadyExistsResponse -> ErrorLifeEventAlreadyExists,
+    ReportLifeEventServiceUnavailableResponse -> ErrorServiceUnavailable
   )
 
   private def doFundReleaseAudit(lisaManager: String,

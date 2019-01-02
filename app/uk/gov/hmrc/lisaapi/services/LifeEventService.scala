@@ -24,6 +24,7 @@ import uk.gov.hmrc.lisaapi.models.des._
 
 import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountNotFound, ErrorInternalServerError, ErrorLifeEventIdNotFound, ErrorResponse, ErrorServiceUnavailable}
 
 
 class LifeEventService @Inject()(desConnector: DesConnector)(implicit ec: ExecutionContext) {
@@ -37,10 +38,14 @@ class LifeEventService @Inject()(desConnector: DesConnector)(implicit ec: Execut
         Logger.debug("Matched DesLifeEventResponse")
         ReportLifeEventSuccessResponse(successResponse.lifeEventID)
       }
+      case DesUnavailableResponse => {
+        Logger.debug("Matched DesUnavailableResponse")
+        ReportLifeEventServiceUnavailableResponse
+      }
       case failureResponse: DesFailureResponse => {
         Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
 
-        errorResponses.getOrElse(failureResponse.code, {
+        postErrors.getOrElse(failureResponse.code, {
           Logger.warn(s"Report life event returned error: ${failureResponse.code}")
           ReportLifeEventErrorResponse
         })
@@ -48,7 +53,35 @@ class LifeEventService @Inject()(desConnector: DesConnector)(implicit ec: Execut
     }
   }
 
-  private val errorResponses = Map[String, ReportLifeEventResponse](
+  def getLifeEvent(lisaManager: String, accountId: String, lifeEventId: LifeEventId)
+                  (implicit hc: HeaderCarrier): Future[Either[ErrorResponse, Seq[GetLifeEventItem]]] = {
+    val response = desConnector.getLifeEvent(lisaManager, accountId, lifeEventId)
+
+    response map {
+      case Right(successResponse) => {
+        Logger.debug("Matched ReportLifeEventRequestBase")
+        Right(successResponse)
+      }
+      case Left(failureResponse) => {
+        Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
+
+        val error = getErrors.getOrElse(failureResponse.code, {
+          Logger.warn(s"Report life event returned error: ${failureResponse.code}")
+          ErrorInternalServerError
+        })
+
+        Left(error)
+      }
+    }
+  }
+
+  private val getErrors = Map[String, ErrorResponse](
+    "INVESTOR_ACCOUNT_ID_NOT_FOUND" -> ErrorAccountNotFound,
+    "LIFE_EVENT_ID_NOT_FOUND" -> ErrorLifeEventIdNotFound,
+    "SERVER_ERROR" -> ErrorServiceUnavailable
+  )
+
+  private val postErrors = Map[String, ReportLifeEventResponse](
     "LIFE_EVENT_ALREADY_EXISTS" -> ReportLifeEventAlreadyExistsResponse,
     "LIFE_EVENT_INAPPROPRIATE" -> ReportLifeEventInappropriateResponse,
     "INVESTOR_ACCOUNTID_NOT_FOUND" -> ReportLifeEventAccountNotFoundResponse,

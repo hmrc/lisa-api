@@ -53,29 +53,28 @@ class TransactionController @Inject() (
                   case Some(VERSION_2) => Future.successful(Ok(Json.toJson(success.copy(bonusDueForPeriod = None))))
                 }
               }
-              case GetTransactionAccountNotFoundResponse => {
-                Logger.debug("Matched Not Found Response")
-
-                lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.TRANSACTION)
-
-                Future.successful(NotFound(Json.toJson(ErrorAccountNotFound)))
-              }
               case GetTransactionTransactionNotFoundResponse => {
                 Logger.debug("Matched Not Found Response")
 
                 lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.TRANSACTION)
 
                 withApiVersion {
-                  case Some(VERSION_1) => Future.successful(NotFound(Json.toJson(ErrorBonusPaymentTransactionNotFound)))
-                  case Some(VERSION_2) => Future.successful(NotFound(Json.toJson(ErrorTransactionNotFound)))
+                  case Some(VERSION_1) => Future.successful(ErrorBonusPaymentTransactionNotFound.asResult)
+                  case Some(VERSION_2) => Future.successful(ErrorTransactionNotFound.asResult)
                 }
               }
-              case GetTransactionErrorResponse => {
+              case res: GetTransactionResponse => {
                 Logger.debug("Matched an error")
 
-                lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.TRANSACTION)
+                val errors = Map[GetTransactionResponse, ErrorResponse] (
+                  GetTransactionAccountNotFoundResponse -> ErrorAccountNotFound,
+                  GetTransactionServiceUnavailableResponse -> ErrorServiceUnavailable
+                )
+                val error = errors.getOrElse(res, ErrorInternalServerError)
 
-                Future.successful(InternalServerError(Json.toJson(ErrorInternalServerError)))
+                lisaMetrics.incrementMetrics(startTime, error.httpStatusCode, LisaMetricKeys.TRANSACTION)
+
+                Future.successful(error.asResult)
               }
             }
           }

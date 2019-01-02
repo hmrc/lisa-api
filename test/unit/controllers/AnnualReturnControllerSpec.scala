@@ -30,7 +30,7 @@ import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.config.AppContext
-import uk.gov.hmrc.lisaapi.controllers.{AnnualReturnController, ErrorBadRequest, ErrorBadRequestAccountId, ErrorBadRequestLmrn, ErrorForbidden, ErrorInternalServerError, ErrorValidation}
+import uk.gov.hmrc.lisaapi.controllers.{AnnualReturnController, ErrorBadRequest, ErrorBadRequestAccountId, ErrorBadRequestLmrn, ErrorForbidden, ErrorInternalServerError, ErrorServiceUnavailable, ErrorValidation}
 import uk.gov.hmrc.lisaapi.metrics.LisaMetrics
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, LifeEventService}
@@ -253,6 +253,18 @@ class AnnualReturnControllerSpec extends PlaySpec
         doRequest() { res =>
           status(res) mustBe INTERNAL_SERVER_ERROR
           contentAsJson(res) mustBe Json.toJson(ErrorInternalServerError)
+        }
+      }
+    }
+
+    "return 503 service unavailable" when {
+      "the life event service returns a ReportLifeEventServiceUnavailableResponse" in {
+        when(mockService.reportLifeEvent(any(), any(),any())(any())).
+          thenReturn(Future.successful(ReportLifeEventServiceUnavailableResponse))
+
+        doRequest() { res =>
+          status(res) mustBe SERVICE_UNAVAILABLE
+          contentAsJson(res) mustBe ErrorServiceUnavailable.asJson
         }
       }
     }

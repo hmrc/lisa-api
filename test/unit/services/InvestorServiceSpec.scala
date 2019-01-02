@@ -24,7 +24,7 @@ import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.models.des.DesFailureResponse
+import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesUnavailableResponse}
 import uk.gov.hmrc.lisaapi.services.InvestorService
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -77,6 +77,17 @@ class InvestorServiceSpec extends PlaySpec
         }
       }
 
+    }
+
+    "return a Service Unavailable Response" when {
+      "given any other response from the DES connector" in {
+        when(mockDesConnector.createInvestor(any(), any())(any()))
+          .thenReturn(Future.successful(DesUnavailableResponse))
+
+        doRequest{response =>
+          response mustBe CreateLisaInvestorServiceUnavailableResponse
+        }
+      }
     }
 
     "return an Error Response" when {

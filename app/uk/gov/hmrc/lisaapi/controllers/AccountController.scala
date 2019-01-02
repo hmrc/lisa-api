@@ -117,6 +117,8 @@ class AccountController @Inject()(
           handleCreateOrTransferFailure(lisaManager, creationRequest, ErrorAccountAlreadyExists(creationRequest.accountId), CONFLICT, action)
         case CreateLisaAccountErrorResponse =>
           handleCreateOrTransferFailure(lisaManager, creationRequest, ErrorInternalServerError, INTERNAL_SERVER_ERROR, action)
+        case CreateLisaAccountServiceUnavailableResponse =>
+          handleCreateOrTransferFailure(lisaManager, creationRequest, ErrorServiceUnavailable, SERVICE_UNAVAILABLE, action)
       } recover {
         case e: Exception =>
           Logger.error(s"AccountController: An error occurred due to ${e.getMessage} returning internal server error")
@@ -157,6 +159,8 @@ class AccountController @Inject()(
           handleCreateOrTransferFailure(lisaManager, transferRequest, ErrorAccountAlreadyExists(transferRequest.accountId), CONFLICT, action)
         case CreateLisaAccountErrorResponse =>
           handleCreateOrTransferFailure(lisaManager, transferRequest, ErrorInternalServerError, INTERNAL_SERVER_ERROR, action)
+        case CreateLisaAccountServiceUnavailableResponse =>
+          handleCreateOrTransferFailure(lisaManager, transferRequest, ErrorServiceUnavailable, SERVICE_UNAVAILABLE, action)
       } recover {
         case e: Exception =>
           Logger.error(s"AccountController: An error occurred in due to ${e.getMessage} returning internal server error")

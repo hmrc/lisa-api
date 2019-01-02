@@ -22,7 +22,7 @@ import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
-import uk.gov.hmrc.lisaapi.models.{GetLisaAccountDoesNotExistResponse, GetLisaAccountSuccessResponse}
+import uk.gov.hmrc.lisaapi.models.{GetLisaAccountDoesNotExistResponse, GetLisaAccountServiceUnavailable, GetLisaAccountSuccessResponse}
 import uk.gov.hmrc.lisaapi.services.{AccountService, AuditService}
 import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext._
 
@@ -47,6 +47,10 @@ class GetAccountController @Inject()(
           case GetLisaAccountDoesNotExistResponse =>
             lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.ACCOUNT)
             NotFound(Json.toJson(ErrorAccountNotFound))
+
+          case GetLisaAccountServiceUnavailable =>
+            lisaMetrics.incrementMetrics(startTime, SERVICE_UNAVAILABLE, LisaMetricKeys.ACCOUNT)
+            ServiceUnavailable(Json.toJson(ErrorServiceUnavailable))
 
           case _ =>
             lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.ACCOUNT)

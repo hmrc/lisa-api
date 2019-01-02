@@ -191,6 +191,19 @@ class TransactionControllerSpec extends PlaySpec
       }
     }
 
+    "return 503 service unavailable" when {
+      "the service returns a GetTransactionServiceUnavailableResponse" in {
+        when(mockService.getTransaction(any(), any(), any())(any())).
+          thenReturn(Future.successful(GetTransactionServiceUnavailableResponse))
+
+        val res = SUT.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV2))
+
+        status(res) mustBe SERVICE_UNAVAILABLE
+
+        (contentAsJson(res) \ "code").as[String] mustBe "SERVER_ERROR"
+      }
+    }
+
   }
 
   val mockService: TransactionService = mock[TransactionService]

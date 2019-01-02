@@ -106,7 +106,7 @@
 [
   {
     "lifeEventId": "3456789000",
-    "eventType": "Funds release"
+    "eventType": "Funds release",
     "eventDate": "2017-05-10",
     "withdrawalAmount": 4000.00,
     "conveyancerReference": "CR12345-6789",
@@ -154,8 +154,8 @@
     "eventDate": "2017-05-11",
     "fundReleaseId": "3456789001",
     "supersede": {
-      "originalEventDate": "2017-05-10",
-      "originalLifeEventId": "6789000001"
+      "originalLifeEventId": "6789000001",
+      "originalEventDate": "2017-05-10"
     }
   },
   {
@@ -164,20 +164,20 @@
     "eventDate": "2017-08-11",
     "fundReleaseId": "3456789001",
     "supersede": {
-      "originalEventDate": "2017-08-10",
-      "originalLifeEventId": "6789000003"
+      "originalLifeEventId": "6789000003",
+      "originalEventDate": "2017-08-10"
     }
   },
   {
     "lifeEventId": "5678900002",
     "fundReleaseId": "3456789001",
-    "eventDate": "2017-06-10",
+    "eventDate": "2017-10-10",
     "eventType": "Purchase outcome",
     "propertyPurchaseResult": "Purchase completed",
     "propertyPurchaseValue": 250000,
     "supersede": {
       "originalLifeEventId": "5678900001",
-      "originalEventDate": "2017-05-05"
+      "originalEventDate": "2017-10-05"
     }
   }
 ]
@@ -222,13 +222,13 @@
 <pre class="code--block">
 [
   {
-    "lifeEventId": "6789000001",
+    "lifeEventId": "6789000002",
     "eventType": "Extension one",
     "eventDate": "2017-05-11",
     "fundReleaseId": "3456789001",
     "supersede": {
-      "originalEventDate": "2017-05-10",
-      "originalLifeEventId": "6789000001"
+      "originalLifeEventId": "6789000001",
+      "originalEventDate": "2017-05-10"
     }
   }
 ]
@@ -250,7 +250,7 @@
 [
   {
     "lifeEventId": "6789000003",
-    "eventType": "Extension two"
+    "eventType": "Extension two",
     "eventDate": "2017-08-10",
     "fundReleaseId": "3456789001",
     "supersededBy": "6789000004"
@@ -278,8 +278,8 @@
     "eventDate": "2017-08-11",
     "fundReleaseId": "3456789001",
     "supersede": {
-      "originalEventDate": "2017-08-10",
-      "originalLifeEventId": "6789000003"
+      "originalLifeEventId": "6789000003",
+      "originalEventDate": "2017-08-10"
     }
   }
 ]
@@ -302,10 +302,10 @@
   {
     "lifeEventId": "5678900001",
     "eventType": "Purchase outcome",
-    "eventDate": "2017-05-10",
+    "eventDate": "2017-10-05",
     "fundReleaseId": "3456789001",
     "propertyPurchaseResult": "Purchase completed",
-    "propertyPurchaseValue": 250000
+    "propertyPurchaseValue": 250000,
     "supersededBy": "5678900002"
   }
 ]
@@ -328,13 +328,13 @@
   {
     "lifeEventId": "5678900002",
     "eventType": "Purchase outcome",
-    "eventDate": "2017-05-10",
+    "eventDate": "2017-10-10",
     "fundReleaseId": "3456789001",
     "propertyPurchaseResult": "Purchase completed",
     "propertyPurchaseValue": 250000,
     "supersede": {
       "originalLifeEventId": "5678900001",
-      "originalEventDate": "2017-05-10"
+      "originalEventDate": "2017-10-05"
     }
   }
 ]
@@ -403,8 +403,8 @@
         <p>Life event not found</p>
         <p class="code--block">
           lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
-          accountId: 1000000404<br>
-          lifeEventId: 1234567891
+          accountId: 1234567890<br>
+          lifeEventId: 0000000404
         </p>
       </td>
       <td>
@@ -412,7 +412,7 @@
 <pre class="code--block">
 {
   "code": "LIFE_EVENT_NOT_FOUND",
-  "message": "The lifeEventId does not match HMRC’s records"
+  "message": "The lifeEventId does not match with HMRC’s records"
 }
 </pre>
       </td>

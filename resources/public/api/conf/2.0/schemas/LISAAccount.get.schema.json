@@ -18,6 +18,8 @@
       "enum": [
         "New",
         "Transferred",
+        "Current year funds transferred",
+        "Previous year funds transferred",
         "Reinstated"
       ]
     },
@@ -62,7 +64,7 @@
 
     "transferAccount": {
       "type": "object",
-      "description" : "If the creationReason is ‘Transferred’, then this is required.",
+      "description" : "Account transfer information.",
       "properties": {
         "transferredFromAccountId": {
           "description" : "The previous provider's own unique reference number for the investor’s LISA account.",

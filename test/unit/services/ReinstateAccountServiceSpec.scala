@@ -23,7 +23,7 @@ import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesReinstateAccountSuccessResponse}
+import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesReinstateAccountSuccessResponse, _}
 import uk.gov.hmrc.lisaapi.services.ReinstateAccountService
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -43,9 +43,9 @@ class ReinstateAccountServiceSpec extends PlaySpec
       "given no rds code and an account id" in {
         when(mockDesConnector.reinstateAccount(any(), any())(any()))
           .thenReturn(
-            Future.successful((
+            Future.successful(
               DesReinstateAccountSuccessResponse("code", "reason")
-            ))
+            )
           )
 
         doReinstateRequest { response =>
@@ -55,8 +55,17 @@ class ReinstateAccountServiceSpec extends PlaySpec
 
     }
 
+    "return the type-appropriate error response" when {
 
-    "return the type-appropriate response" when {
+      "given a DesUnavailableResponse" in {
+        when(mockDesConnector.reinstateAccount(any(), any())(any()))
+          .thenReturn(Future.successful(DesUnavailableResponse))
+
+        doReinstateRequest { response =>
+          response mustBe ReinstateLisaAccountServiceUnavailableResponse
+        }
+
+      }
 
       "given failureResponse for a Account Already Closed Response" in {
         when(mockDesConnector.reinstateAccount(any(), any())(any()))

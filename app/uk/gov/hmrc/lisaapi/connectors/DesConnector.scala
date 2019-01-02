@@ -18,6 +18,7 @@ package uk.gov.hmrc.lisaapi.connectors
 
 import com.google.inject.Inject
 import org.joda.time.DateTime
+import play.api.http.Status._
 import play.api.{Configuration, Environment, Logger}
 import play.api.libs.json.{JsValue, Json, Reads}
 import play.utils.UriEncoding
@@ -67,7 +68,8 @@ class DesConnector @Inject()(
     result.map(res => {
       Logger.debug("Create Investor request returned status: " + res.status)
       res.status match {
-        case 409 => parseDesResponse[CreateLisaInvestorAlreadyExistsResponse](res)
+        case SERVICE_UNAVAILABLE => DesUnavailableResponse
+        case CONFLICT => parseDesResponse[CreateLisaInvestorAlreadyExistsResponse](res)
         case _ => parseDesResponse[CreateLisaInvestorSuccessResponse](res)
       }
     })
@@ -85,7 +87,8 @@ class DesConnector @Inject()(
     result.map(res => {
       Logger.debug("Create Account request returned status: " + res.status)
       res.status match {
-        case 201 => DesAccountResponse(request.accountId)
+        case SERVICE_UNAVAILABLE => DesUnavailableResponse
+        case CREATED => DesAccountResponse(request.accountId)
         case _ => parseDesResponse[DesFailureResponse](res)
       }
     })
@@ -103,9 +106,14 @@ class DesConnector @Inject()(
 
     result.map(res => {
       Logger.debug("Get Account request returned status: " + res.status)
-      parseDesResponse[GetLisaAccountSuccessResponse](res) match {
-        case success: GetLisaAccountSuccessResponse => success.copy(accountId = accountId)
-        case fail: DesResponse => fail
+      res.status match {
+        case SERVICE_UNAVAILABLE => DesUnavailableResponse
+        case _ => {
+          parseDesResponse[GetLisaAccountSuccessResponse](res) match {
+            case success: GetLisaAccountSuccessResponse => success.copy(accountId = accountId)
+            case fail: DesResponse => fail
+          }
+        }
       }
     })
   }
@@ -113,8 +121,8 @@ class DesConnector @Inject()(
   /**
     * Attempts to reinstate a LISA account
     */
-  def reinstateAccount (lisaManager: String, accountId: String)
-                           (implicit hc: HeaderCarrier): Future[DesResponse] = {
+  def reinstateAccount(lisaManager: String, accountId: String)
+                      (implicit hc: HeaderCarrier): Future[DesResponse] = {
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/reinstate"
     Logger.debug("Reinstate Account request returned status: " + uri)
 
@@ -122,7 +130,8 @@ class DesConnector @Inject()(
     result.map(res => {
       Logger.debug("Reinstate Account request returned status: " + res.status)
       res.status match {
-        case 200 => parseDesResponse[DesReinstateAccountSuccessResponse](res)
+        case SERVICE_UNAVAILABLE => DesUnavailableResponse
+        case OK => parseDesResponse[DesReinstateAccountSuccessResponse](res)
         case _ => parseDesResponse[DesFailureResponse](res)
       }
     })
@@ -140,7 +149,8 @@ class DesConnector @Inject()(
     result.map(res => {
       Logger.debug("Create Transfer request returned status: " + res.status)
       res.status match {
-        case 201 => DesAccountResponse(request.accountId)
+        case SERVICE_UNAVAILABLE => DesUnavailableResponse
+        case CREATED => DesAccountResponse(request.accountId)
         case _ => parseDesResponse[DesFailureResponse](res)
       }
     })
@@ -158,7 +168,8 @@ class DesConnector @Inject()(
     result.map(res => {
       Logger.debug("Close Account request returned status: " + res.status)
       res.status match {
-        case 200 => DesEmptySuccessResponse
+        case SERVICE_UNAVAILABLE => DesUnavailableResponse
+        case OK => DesEmptySuccessResponse
         case _ => parseDesResponse[DesFailureResponse](res)
       }
     })
@@ -177,6 +188,7 @@ class DesConnector @Inject()(
     result.map(res => {
       Logger.debug("Life Event request returned status: " + res.status)
       res.status match {
+        case SERVICE_UNAVAILABLE => DesUnavailableResponse
         case _ => parseDesResponse[DesLifeEventResponse](res)
       }
 
@@ -184,10 +196,55 @@ class DesConnector @Inject()(
   }
 
   /**
+    * Attempts to get a LISA Life Event
+    */
+  def getLifeEvent(lisaManager: String, accountId: String, lifeEventId: LifeEventId)
+                  (implicit hc: HeaderCarrier): Future[Either[DesFailure, Seq[GetLifeEventItem]]] = {
+
+    val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/life-events/$lifeEventId"
+    Logger.debug("Getting life event from des: " + uri)
+
+    val result: Future[HttpResponse] = wsHttp.GET(uri)(
+      httpReads,
+      hc = updateHeaderCarrierWithAllDesHeaders(hc),
+      implicitly
+    )
+
+    result.map(res => {
+      Logger.debug("Get life event returned status: " + res.status)
+
+      res.status match {
+        case SERVICE_UNAVAILABLE => Left(DesUnavailableResponse)
+        case _ => {
+          Try(res.json.as[Seq[GetLifeEventItem]]) match {
+            case Success(data) => Right(data)
+            case Failure(er) => {
+              if (res.status == 200 | res.status == 201) {
+                Logger.error(s"Error from DES (parsing as DesResponse): ${er.getMessage}")
+              }
+
+              Try(res.json.as[DesFailureResponse]) match {
+                case Success(data) => {
+                  Logger.info(s"DesFailureResponse from DES: ${data}")
+                  Left(data)
+                }
+                case Failure(ex) => {
+                  Logger.error(s"Error from DES (parsing as DesFailureResponse): ${ex.getMessage}")
+                  Left(DesFailureResponse())
+                }
+              }
+            }
+          }
+        }
+      }
+    })
+  }
+
+  /**
     * Attempts to update the first subscription date
     */
   def updateFirstSubDate(lisaManager: String, accountId: String, request: UpdateSubscriptionRequest)
-                     (implicit hc: HeaderCarrier): Future[DesResponse] = {
+                        (implicit hc: HeaderCarrier): Future[DesResponse] = {
 
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}"
     Logger.debug("Posting update subscription request to des: " + uri)
@@ -196,8 +253,9 @@ class DesConnector @Inject()(
     result.map(res => {
       Logger.debug("Update first subscription date request returned status: " + res.status)
       res.status match {
-        case 200 => parseDesResponse[DesUpdateSubscriptionSuccessResponse](res)
-        case 409 => parseDesResponse[DesTransactionExistResponse](res)
+        case OK => parseDesResponse[DesUpdateSubscriptionSuccessResponse](res)
+        case CONFLICT => parseDesResponse[DesTransactionExistResponse](res)
+        case SERVICE_UNAVAILABLE => DesUnavailableResponse
         case _ => parseDesResponse[DesFailureResponse](res)
       }
 
@@ -219,7 +277,8 @@ class DesConnector @Inject()(
     result.map(res => {
       Logger.debug("Bonus Payment request returned status: " + res.status)
       res.status match {
-        case 409 => parseDesResponse[DesTransactionExistResponse](res)
+        case CONFLICT => parseDesResponse[DesTransactionExistResponse](res)
+        case SERVICE_UNAVAILABLE => DesUnavailableResponse
         case _ => parseDesResponse[DesTransactionResponse](res)
       }
     })
@@ -237,7 +296,10 @@ class DesConnector @Inject()(
 
     result.map(res => {
       Logger.debug("Get Bonus Payment transaction details returned status: " + res.status)
-      parseDesResponse[GetBonusOrWithdrawalResponse](res)
+      res.status match {
+        case SERVICE_UNAVAILABLE => DesUnavailableResponse
+        case _ => parseDesResponse[GetBonusOrWithdrawalResponse](res)
+      }
     })
   }
 
@@ -257,7 +319,10 @@ class DesConnector @Inject()(
 
     result.map(res => {
       Logger.debug("Withdrawal request returned status: " + res.status)
-      parseDesResponse[DesTransactionResponse](res)
+      res.status match {
+        case SERVICE_UNAVAILABLE => DesUnavailableResponse
+        case _ => parseDesResponse[DesTransactionResponse](res)
+      }
     })
   }
 
@@ -273,7 +338,10 @@ class DesConnector @Inject()(
 
     result.map(res => {
       Logger.debug("Get Transaction details returned status: " + res.status)
-      parseDesResponse[DesGetTransactionResponse](res)
+      res.status match {
+        case SERVICE_UNAVAILABLE => DesUnavailableResponse
+        case _ => parseDesResponse[DesGetTransactionResponse](res)
+      }
     })
   }
 
@@ -294,7 +362,10 @@ class DesConnector @Inject()(
 
     result.map(res => {
       Logger.debug("Get Bulk payment details returned status: " + res.status)
-      parseDesResponse[GetBulkPaymentResponse](res)
+      res.status match {
+        case SERVICE_UNAVAILABLE => DesUnavailableResponse
+        case _ => parseDesResponse[GetBulkPaymentResponse](res)
+      }
     })
   }
 

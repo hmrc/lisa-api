@@ -251,14 +251,14 @@ types:
                                     "message" : "Previous Investor Account Doesn’t Exist"
                                   }
                               noTransferAccntData:
-                                description: You must give a transferredFromAccountId, transferredFromLMRN and transferInDate when the creationReason is transferred
+                                description: You must give a transferredFromAccountId, transferredFromLMRN and transferInDate when the creationReason is transferred, current or previous year funds transferred
                                 value: |
                                   {
                                     "code" : "TRANSFER_ACCOUNT_DATA_NOT_PROVIDED",
                                     "message" : "transfer account data not provided"
                                   }
                               transferAccntDataProvided:
-                                description: You must only give a transferredFromAccountId, transferredFromLMRN, and transferInDate when the creationReason is transferred
+                                description: You must only give a transferredFromAccountId, transferredFromLMRN, and transferInDate when the creationReason is transferred, current or previous year funds transferred
                                 value: |
                                   {
                                     "code" : "TRANSFER_ACCOUNT_DATA_PROVIDED",
@@ -1031,7 +1031,7 @@ types:
             /payments:
               get:
                   is: [headers.acceptHeader]
-                  displayName: Get a list of all payments and debts in a date range
+                  displayName: Get a list of all payments in a date range
                   description: Get a list of all pending and paid payments from HMRC in a specific date range.
                   (annotations.scope): "read:lisa"
                   securedBy: [ sec.oauth_2_0: { scopes: [ "read:lisa" ] } ]

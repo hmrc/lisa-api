@@ -328,6 +328,55 @@ class TransactionServiceSpec extends PlaySpec
       }
     }
 
+    "return a Service Unavailable error" when {
+      "ITMP returns a 503" in {
+        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
+          thenReturn(Future.successful(DesUnavailableResponse))
+
+        val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
+
+        result mustBe GetTransactionServiceUnavailableResponse
+      }
+      "ETMP returns a 503 for a paid transaction" in {
+        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
+          thenReturn(Future.successful(GetBonusResponse(
+            lifeEventId = None,
+            periodStartDate = new DateTime("2001-01-01"),
+            periodEndDate = new DateTime("2002-01-01"),
+            htbTransfer = None,
+            inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
+            bonuses = Bonuses(1.0, 1.0, None, "X"),
+            creationDate = new DateTime("2000-01-01"),
+            paymentStatus = TransactionPaymentStatus.PAID)))
+
+        when(mockDesConnector.getTransaction(any(), any(), any())(any())).
+          thenReturn(Future.successful(DesUnavailableResponse))
+
+        val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
+
+        result mustBe GetTransactionServiceUnavailableResponse
+      }
+      "ETMP returns a 503 for a collected transaction" in {
+        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
+          thenReturn(Future.successful(GetBonusResponse(
+            lifeEventId = None,
+            periodStartDate = new DateTime("2001-01-01"),
+            periodEndDate = new DateTime("2002-01-01"),
+            htbTransfer = None,
+            inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
+            bonuses = Bonuses(1.0, 1.0, None, "X"),
+            creationDate = new DateTime("2000-01-01"),
+            paymentStatus = TransactionPaymentStatus.COLLECTED)))
+
+        when(mockDesConnector.getTransaction(any(), any(), any())(any())).
+          thenReturn(Future.successful(DesUnavailableResponse))
+
+        val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
+
+        result mustBe GetTransactionServiceUnavailableResponse
+      }
+    }
+
   }
 
   val mockDesConnector = mock[DesConnector]

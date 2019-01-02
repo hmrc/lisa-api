@@ -35,7 +35,10 @@ class ReinstateAccountService @Inject()(desConnector: DesConnector)(implicit ec:
         Logger.debug("Reinstate account success response")
         ReinstateLisaAccountSuccessResponse(successResponse.code, successResponse.reason)
       }
-
+      case DesUnavailableResponse => {
+        Logger.debug("Reinstate account returned service unavailable")
+        ReinstateLisaAccountServiceUnavailableResponse
+      }
       case failureResponse: DesFailureResponse => {
         failureResponse.code match {
           case "INVESTOR_ACCOUNT_ALREADY_CLOSED" => ReinstateLisaAccountAlreadyClosedResponse

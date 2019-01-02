@@ -88,7 +88,8 @@ class DiscoverController @Inject()(
       "reinstate account": {"href": "/lifetime-isa/manager/$lisaManagerReferenceNumber/accounts/reinstate-account", "methods": ["POST"]},
       "update subscription": {"href": "/lifetime-isa/manager/$lisaManagerReferenceNumber/accounts/{accountId}/update-subscription", "methods": ["POST"]},
       "life events": [
-        {"href": "/lifetime-isa/manager/$lisaManagerReferenceNumber/accounts/{accountId}/events", "methods": ["POST"]}
+        {"href": "/lifetime-isa/manager/$lisaManagerReferenceNumber/accounts/{accountId}/events", "methods": ["POST"]},
+        {"href": "/lifetime-isa/manager/$lisaManagerReferenceNumber/accounts/{accountId}/events/{lifeEventId}", "methods": ["GET"]}
       ],
       "annual returns": {"href": "/lifetime-isa/manager/$lisaManagerReferenceNumber/accounts/{accountId}/events/annual-returns", "methods": ["POST"]},
       "bonus payments": [

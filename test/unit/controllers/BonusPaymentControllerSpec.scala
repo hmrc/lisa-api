@@ -214,7 +214,7 @@ class BonusPaymentControllerSpec extends PlaySpec
           val json = contentAsJson(res)
 
           (json \ "code").as[String] mustBe "HELP_TO_BUY_NOT_APPLICABLE"
-          (json \ "message").as[String] mustBe "Help to Buy is not applicable on this account"
+          (json \ "message").as[String] mustBe "Help to buy is only applicable for claims within the 2017-18 tax year"
         }
       }
 
@@ -507,6 +507,20 @@ class BonusPaymentControllerSpec extends PlaySpec
           },
           acceptHeaderV2
         )
+      }
+
+    }
+
+    "return with status 503 service unavailable" when {
+
+      "a exception gets thrown" in {
+        when(mockPostService.requestBonusPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(RequestBonusPaymentServiceUnavailable))
+
+        doRequest(validBonusPaymentJson) { res =>
+          status(res) mustBe SERVICE_UNAVAILABLE
+          (contentAsJson(res) \ "code").as[String] mustBe "SERVER_ERROR"
+        }
       }
 
     }
@@ -941,7 +955,7 @@ class BonusPaymentControllerSpec extends PlaySpec
 
     }
 
-    "return an internal server error response" when {
+    "return a internal server error response" when {
       "an error is returned from the service layer" in {
         when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusOrWithdrawalErrorResponse))
         doGetBonusPaymentTransactionRequest(res => {
@@ -969,6 +983,19 @@ class BonusPaymentControllerSpec extends PlaySpec
           },
           acceptHeaderV1
         )
+      }
+    }
+
+    "return a service unavailable response" when {
+
+      "GetBonusOrWithdrawalServiceUnavailableResponse is returned from the service layer" in {
+        when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).
+          thenReturn(Future.successful(GetBonusOrWithdrawalServiceUnavailableResponse))
+
+        doGetBonusPaymentTransactionRequest(res => {
+          status(res) mustBe SERVICE_UNAVAILABLE
+          (contentAsJson(res) \ "code").as[String] mustBe "SERVER_ERROR"
+        })
       }
     }
 

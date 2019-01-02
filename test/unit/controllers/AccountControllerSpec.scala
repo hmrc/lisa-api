@@ -195,6 +195,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               "investorId" -> "9876543210",
               "accountId" -> "8765/432100",
               "firstSubscriptionDate" -> s"$validDate",
+              "creationReason" -> "Transferred",
               "transferredFromAccountId" -> "Z54/3210",
               "transferredFromLMRN" -> "Z543333",
               "transferInDate" -> s"$validDate",
@@ -251,6 +252,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               "investorId" -> "9876543210",
               "accountId" -> "8765/432100",
               "firstSubscriptionDate" -> s"$validDate",
+              "creationReason" -> "Transferred",
               "transferredFromAccountId" -> "Z54/3210",
               "transferredFromLMRN" -> "Z543333",
               "transferInDate" -> s"$validDate"
@@ -269,6 +271,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorId" -> "9876543210",
               "accountId" -> "8765/432100",
+              "creationReason" -> "Transferred",
               "firstSubscriptionDate" -> invalidDate,
               "transferredFromAccountId" -> "Z54/3210",
               "transferredFromLMRN" -> "Z543333",
@@ -288,6 +291,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorId" -> "9876543210",
               "accountId" -> "8765/432100",
+              "creationReason" -> "Transferred",
               "firstSubscriptionDate" -> s"$validDate",
               "transferredFromAccountId" -> "Z54/3210",
               "transferredFromLMRN" -> "Z543333",
@@ -307,6 +311,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorId" -> "9876543210",
               "accountId" -> "8765/432100",
+              "creationReason" -> "Transferred",
               "firstSubscriptionDate" -> s"$validDate",
               "transferredFromAccountId" -> "Z54/3210",
               "transferredFromLMRN" -> "Z543333",
@@ -326,6 +331,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorId" -> "9876543210",
               "accountId" -> "8765/432100",
+              "creationReason" -> "Transferred",
               "firstSubscriptionDate" -> s"$validDate",
               "transferredFromAccountId" -> "Z54/3210",
               "transferredFromLMRN" -> "Z543333",
@@ -345,6 +351,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorId" -> "9876543210",
               "accountId" -> "8765/432100",
+              "creationReason" -> "Transferred",
               "firstSubscriptionDate" -> s"$validDate",
               "transferredFromAccountId" -> "Z54/3210",
               "transferredFromLMRN" -> "Z543333",
@@ -364,6 +371,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorId" -> "9876543210",
               "accountId" -> "8765/432100",
+              "creationReason" -> "Transferred",
               "firstSubscriptionDate" -> s"$validDate",
               "transferredFromAccountId" -> "Z54/3210",
               "transferredFromLMRN" -> "Z543333",
@@ -383,6 +391,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorId" -> "9876543210",
               "accountId" -> "8765/432100",
+              "creationReason" -> "Transferred",
               "firstSubscriptionDate" -> s"$validDate",
               "transferredFromAccountId" -> "Z54/3210",
               "transferredFromLMRN" -> "Z543333",
@@ -402,6 +411,7 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorId" -> "9876543210",
               "accountId" -> "8765/432100",
+              "creationReason" -> "Transferred",
               "firstSubscriptionDate" -> s"$validDate",
               "transferredFromAccountId" -> "Z54/3210",
               "transferredFromLMRN" -> "Z543333",
@@ -698,6 +708,23 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
         doCreateOrTransferRequest(transferAccountJson) { res =>
           status(res) mustBe (INTERNAL_SERVER_ERROR)
+        }
+      }
+    }
+
+    "return with status 503 service unavailable" when {
+      "the data service returns a CreateLisaAccountServiceUnavailableResponse for a create request" in {
+        when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountServiceUnavailableResponse))
+
+        doCreateOrTransferRequest(createAccountJson) { res =>
+          status(res) mustBe SERVICE_UNAVAILABLE
+        }
+      }
+      "the data service returns a CreateLisaAccountServiceUnavailableResponse for a transfer request" in {
+        when(mockService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountServiceUnavailableResponse))
+
+        doCreateOrTransferRequest(transferAccountJson) { res =>
+          status(res) mustBe SERVICE_UNAVAILABLE
         }
       }
     }

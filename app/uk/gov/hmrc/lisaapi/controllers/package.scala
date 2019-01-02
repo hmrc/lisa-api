@@ -48,4 +48,6 @@ trait LisaConstants {
   val LISA_START_DATE_ERROR = "The %s cannot be before 6 April 2017"
   val VERSION_1 = "1.0"
   val VERSION_2 = "2.0"
+  val TAX_YEAR_START_MONTH = 4
+  val TAX_YEAR_START_DAY = 6
 }

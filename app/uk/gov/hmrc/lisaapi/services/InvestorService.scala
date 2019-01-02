@@ -21,7 +21,7 @@ import play.api.Logger
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.models.des.DesFailureResponse
+import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesUnavailableResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -33,6 +33,7 @@ class InvestorService @Inject()(desConnector: DesConnector)(implicit ec: Executi
     response map {
       case successResponse: CreateLisaInvestorSuccessResponse => successResponse
       case existsResponse: CreateLisaInvestorAlreadyExistsResponse => existsResponse
+      case DesUnavailableResponse => CreateLisaInvestorServiceUnavailableResponse
       case error: DesFailureResponse => {
         error.code match {
           case "INVESTOR_NOT_FOUND" => CreateLisaInvestorInvestorNotFoundResponse

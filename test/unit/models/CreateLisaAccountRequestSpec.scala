@@ -53,6 +53,55 @@ class CreateLisaAccountRequestSpec extends PlaySpec {
         case JsSuccess(data, path) => {
           data match {
             case req: CreateLisaAccountTransferRequest => {
+              req.creationReason mustBe "Transferred"
+              req.investorId mustBe "9876543210"
+              req.accountId mustBe "8765432100"
+              req.firstSubscriptionDate.getYear mustBe 2011
+              req.firstSubscriptionDate.getMonthOfYear mustBe 3
+              req.firstSubscriptionDate.getDayOfMonth mustBe 23
+              req.transferAccount mustBe AccountTransfer("Z543210", "Z543333", new DateTime("2015-12-13"))
+            }
+            case _ => fail()
+          }
+        }
+      }
+    }
+
+    "serialize transfer current year funds request from json" in {
+      val res = Json.
+                  parse(validAccountTransferRequest.replace("Transferred", "Current year funds transferred")).
+                  validate[CreateLisaAccountRequest]
+
+      res match {
+        case JsError(errors) => fail()
+        case JsSuccess(data, path) => {
+          data match {
+            case req: CreateLisaAccountTransferRequest => {
+              req.creationReason mustBe "Current year funds transferred"
+              req.investorId mustBe "9876543210"
+              req.accountId mustBe "8765432100"
+              req.firstSubscriptionDate.getYear mustBe 2011
+              req.firstSubscriptionDate.getMonthOfYear mustBe 3
+              req.firstSubscriptionDate.getDayOfMonth mustBe 23
+              req.transferAccount mustBe AccountTransfer("Z543210", "Z543333", new DateTime("2015-12-13"))
+            }
+            case _ => fail()
+          }
+        }
+      }
+    }
+
+    "serialize transfer previous year funds request from json" in {
+      val res = Json.
+        parse(validAccountTransferRequest.replace("Transferred", "Previous year funds transferred")).
+        validate[CreateLisaAccountRequest]
+
+      res match {
+        case JsError(errors) => fail()
+        case JsSuccess(data, path) => {
+          data match {
+            case req: CreateLisaAccountTransferRequest => {
+              req.creationReason mustBe "Previous year funds transferred"
               req.investorId mustBe "9876543210"
               req.accountId mustBe "8765432100"
               req.firstSubscriptionDate.getYear mustBe 2011
@@ -88,6 +137,7 @@ class CreateLisaAccountRequestSpec extends PlaySpec {
 
     "deserialize transfer request to json" in {
       val request = CreateLisaAccountTransferRequest(
+        creationReason = "Transferred",
         investorId = "9876543210",
         accountId = "8765432100",
         firstSubscriptionDate = new DateTime("2011-03-23"),
@@ -97,6 +147,42 @@ class CreateLisaAccountRequestSpec extends PlaySpec {
       val json = Json.toJson[CreateLisaAccountRequest](request)
 
       json mustBe Json.parse(validAccountTransferRequest.replace("Id", "ID"))
+    }
+
+    "deserialize transfer current year funds request to json" in {
+      val request = CreateLisaAccountTransferRequest(
+        creationReason = "Current year funds transferred",
+        investorId = "9876543210",
+        accountId = "8765432100",
+        firstSubscriptionDate = new DateTime("2011-03-23"),
+        transferAccount = AccountTransfer("Z543210", "Z543333", new DateTime("2015-12-13"))
+      )
+
+      val json = Json.toJson[CreateLisaAccountRequest](request)
+
+      json mustBe Json.parse(
+        validAccountTransferRequest.
+          replace("Id", "ID").
+          replace("Transferred", "CurrentYearFundsTransferred")
+      )
+    }
+
+    "deserialize transfer previous year funds request to json" in {
+      val request = CreateLisaAccountTransferRequest(
+        creationReason = "Previous year funds transferred",
+        investorId = "9876543210",
+        accountId = "8765432100",
+        firstSubscriptionDate = new DateTime("2011-03-23"),
+        transferAccount = AccountTransfer("Z543210", "Z543333", new DateTime("2015-12-13"))
+      )
+
+      val json = Json.toJson[CreateLisaAccountRequest](request)
+
+      json mustBe Json.parse(
+        validAccountTransferRequest.
+          replace("Id", "ID").
+          replace("Transferred", "PreviousYearFundsTransferred")
+      )
     }
 
     "deserialize creation request to json" in {

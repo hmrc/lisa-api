@@ -23,7 +23,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
-import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesTransactionExistResponse, DesTransactionResponse}
+import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesTransactionExistResponse, DesTransactionResponse, DesUnavailableResponse}
 import uk.gov.hmrc.lisaapi.models.{RequestBonusPaymentResponse, _}
 import uk.gov.hmrc.lisaapi.services.BonusPaymentService
 
@@ -213,6 +213,17 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
 
         doRequest { response =>
           response mustBe RequestBonusPaymentError
+        }
+      }
+    }
+
+    "return a service unavailable response" when {
+      "given a DesUnavailableResponse from the DES connector" in {
+        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(DesUnavailableResponse))
+
+        doRequest { response =>
+          response mustBe RequestBonusPaymentServiceUnavailable
         }
       }
     }

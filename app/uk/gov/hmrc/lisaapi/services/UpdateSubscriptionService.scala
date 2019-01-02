@@ -39,6 +39,10 @@ class UpdateSubscriptionService @Inject()(desConnector: DesConnector)(implicit e
           case _ => UpdateSubscriptionSuccessResponse(Constants.voidCode,  Constants.voidMsg)
         }
       }
+      case DesUnavailableResponse => {
+        Logger.debug("Update subscription des unavailable response")
+        UpdateSubscriptionServiceUnavailableResponse
+      }
       case failureResponse: DesFailureResponse => {
         Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
 

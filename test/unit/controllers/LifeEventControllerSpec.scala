@@ -277,6 +277,16 @@ class LifeEventControllerSpec extends PlaySpec
       }
     }
 
+    "return with 503 service unavailable when a service unavailable response is returned" in {
+      when(mockService.reportLifeEvent(any(), any(),any())(any())).
+        thenReturn(Future.successful(ReportLifeEventServiceUnavailableResponse))
+
+      doReportLifeEventRequest(reportLifeEventJson){res =>
+        status(res) mustBe SERVICE_UNAVAILABLE
+        (contentAsJson(res) \ "code").as[String] mustBe "SERVER_ERROR"
+      }
+    }
+
   }
 
   def doReportLifeEventRequest(jsonString: String, lmrn: String = lisaManager, accId: String = accountId)(callback: (Future[Result]) =>  Unit): Unit = {

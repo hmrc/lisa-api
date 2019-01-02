@@ -36,6 +36,11 @@ class AccountService @Inject()(desConnector: DesConnector)(implicit ec: Executio
 
         CreateLisaAccountSuccessResponse(successResponse.accountID)
       }
+      case DesUnavailableResponse => {
+        Logger.debug("Matched DesUnavailableResponse")
+
+        CreateLisaAccountServiceUnavailableResponse
+      }
       case failureResponse: DesFailureResponse => {
         Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
 
@@ -65,7 +70,11 @@ class AccountService @Inject()(desConnector: DesConnector)(implicit ec: Executio
 
         res
       }
+      case DesUnavailableResponse => {
+        Logger.debug("Matched GetLisaAccountServiceUnavailable")
 
+        GetLisaAccountServiceUnavailable
+      }
       case failureResponse: DesFailureResponse => {
         Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
 
@@ -88,6 +97,11 @@ class AccountService @Inject()(desConnector: DesConnector)(implicit ec: Executio
         Logger.debug("Matched DesAccountResponse")
 
         CreateLisaAccountSuccessResponse(successResponse.accountID)
+      }
+      case DesUnavailableResponse => {
+        Logger.debug("Matched DesUnavailableResponse")
+
+        CreateLisaAccountServiceUnavailableResponse
       }
       case failureResponse: DesFailureResponse => {
         Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
@@ -116,6 +130,9 @@ class AccountService @Inject()(desConnector: DesConnector)(implicit ec: Executio
     response map {
       case DesEmptySuccessResponse => {
         CloseLisaAccountSuccessResponse(accountId)
+      }
+      case DesUnavailableResponse => {
+        CloseLisaAccountServiceUnavailable
       }
       case failureResponse: DesFailureResponse => {
         failureResponse.code match {

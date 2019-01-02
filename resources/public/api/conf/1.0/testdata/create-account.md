@@ -66,6 +66,66 @@
             </td>
         </tr>
         <tr>
+            <td><p>Transfer current year request with a valid payload and LISA Manager reference number</p><p class ="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a></p></td>
+            <td>
+<pre class="code--block">
+{
+  "investorId": "9876543210",
+  "creationReason": "Current year funds transferred",
+  "accountId": "1234567892",
+  "firstSubscriptionDate": "2017-04-06",
+  "transferAccount": {
+    "transferredFromAccountId": "8765432100",
+    "transferredFromLMRN": "Z654321",
+    "transferInDate": "2017-04-06"
+  }
+}
+</pre>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">201 (Created)</code></p>
+<pre class="code--block">
+{
+  "status": 201,
+  "success": true,
+  "data": {
+    "message": "Account transferred",
+    "accountId": "1234567892"
+  }
+}
+</pre>
+            </td>
+        </tr>
+        <tr>
+            <td><p>Transfer previous year request with a valid payload and LISA Manager reference number</p><p class ="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a></p></td>
+            <td>
+<pre class="code--block">
+{
+  "investorId": "9876543210",
+  "creationReason": "Previous year funds transferred",
+  "accountId": "1234567893",
+  "firstSubscriptionDate": "2017-04-06",
+  "transferAccount": {
+    "transferredFromAccountId": "8765432100",
+    "transferredFromLMRN": "Z654321",
+    "transferInDate": "2017-04-06"
+  }
+}
+</pre>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">201 (Created)</code></p>
+<pre class="code--block">
+{
+  "status": 201,
+  "success": true,
+  "data": {
+    "message": "Account transferred",
+    "accountId": "1234567893"
+  }
+}
+</pre>
+            </td>
+        </tr>
+        <tr>
             <td><p>Request with a valid payload and an invalid LISA Manager reference number</p><p class ="code--block">lisaManagerReferenceNumber: A123456</p></td>
             <td>
 <pre class="code--block">
@@ -266,7 +326,7 @@
 <pre class="code--block">
 {
   "code": "TRANSFER_ACCOUNT_DATA_NOT_PROVIDED",
-  "message": "You must give a transferredFromAccountId, transferredFromLMRN and transferInDate when the creationReason is transferred"
+  "message": "You must give a transferredFromAccountId, transferredFromLMRN and transferInDate when the creationReason is transferred, current or previous year funds transferred"
 }
 </pre>
             </td>
@@ -292,7 +352,7 @@
 <pre class="code--block">
 {
   "code": "TRANSFER_ACCOUNT_DATA_PROVIDED",
-  "message": "You must only give a transferredFromAccountId, transferredFromLMRN, and transferInDate when the creationReason is transferred"
+  "message": "You must only give a transferredFromAccountId, transferredFromLMRN, and transferInDate when the creationReason is transferred, current or previous year funds transferred"
 }
 </pre>
             </td>

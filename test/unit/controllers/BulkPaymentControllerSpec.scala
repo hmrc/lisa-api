@@ -208,6 +208,23 @@ class BulkPaymentControllerSpec extends PlaySpec
       }
     }
 
+    "return 503 SERVER_ERROR" when {
+      "the service return a GetBulkPaymentServiceUnavailableResponse" in {
+        when(mockService.getBulkPayment(any(), any(), any())(any())).
+          thenReturn(Future.successful(GetBulkPaymentServiceUnavailableResponse))
+
+        val result = SUT.getBulkPayment(lmrn, validDate, validDate).
+          apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
+
+        status(result) mustBe SERVICE_UNAVAILABLE
+
+        val json = contentAsJson(result)
+
+        (json \ "code").as[String] mustBe "SERVER_ERROR"
+        (json \ "message").as[String] mustBe "Service unavailable"
+      }
+    }
+
   }
 
   "transformV1Response" must {

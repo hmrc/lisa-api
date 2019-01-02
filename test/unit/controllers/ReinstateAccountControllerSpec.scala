@@ -144,6 +144,22 @@ class ReinstateAccountControllerSpec extends PlaySpec with MockitoSugar with One
 
         }
       }
+      "the data service returns a ReinstateLisaAccountServiceUnavailableResponse" in {
+        when(mockService.reinstateAccountService(any(), any())(any())).
+          thenReturn(Future.successful(ReinstateLisaAccountServiceUnavailableResponse))
+
+        doSyncReinstateAccount(reinstateAccountValidJson) { res =>
+          verify(mockAuditService).audit(
+            auditType = matchersEquals("accountNotReinstated"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/reinstate"),
+            auditData = matchersEquals(Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountId" -> accountId,
+              "reasonNotReinstated" -> "SERVER_ERROR"
+            )))(any())
+
+        }
+      }
       "the data service returns an error" in {
         when(mockService.reinstateAccountService(any(), any())(any())).thenReturn(Future.successful(ReinstateLisaAccountErrorResponse))
 
@@ -263,6 +279,18 @@ class ReinstateAccountControllerSpec extends PlaySpec with MockitoSugar with One
 
           status(res) mustBe INTERNAL_SERVER_ERROR
           contentAsJson(res)  mustBe Json.toJson(ErrorInternalServerError)
+        }
+      }
+    }
+
+    "return with status 503 service unavailable" when {
+      "the data service returns a ReinstateLisaAccountServiceUnavailableResponse" in {
+        when(mockService.reinstateAccountService(any(), any())(any())).
+          thenReturn(Future.successful(ReinstateLisaAccountServiceUnavailableResponse))
+
+        doReinstateRequest(reinstateAccountValidJson) { res =>
+          status(res) mustBe SERVICE_UNAVAILABLE
+          contentAsJson(res) mustBe ErrorServiceUnavailable.asJson
         }
       }
     }
