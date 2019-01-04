@@ -42,6 +42,10 @@ class LifeEventService @Inject()(desConnector: DesConnector)(implicit ec: Execut
         Logger.debug("Matched DesUnavailableResponse")
         ReportLifeEventServiceUnavailableResponse
       }
+      case response: DesLifeEventExistResponse => {
+        Logger.debug("Matched DesLifeEventExistResponse")
+        ReportLifeEventAlreadyExistsResponse(response.lifeEventID)
+      }
       case failureResponse: DesFailureResponse => {
         Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
 
@@ -82,7 +86,6 @@ class LifeEventService @Inject()(desConnector: DesConnector)(implicit ec: Execut
   )
 
   private val postErrors = Map[String, ReportLifeEventResponse](
-    "LIFE_EVENT_ALREADY_EXISTS" -> ReportLifeEventAlreadyExistsResponse,
     "LIFE_EVENT_INAPPROPRIATE" -> ReportLifeEventInappropriateResponse,
     "INVESTOR_ACCOUNTID_NOT_FOUND" -> ReportLifeEventAccountNotFoundResponse,
     "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID" -> ReportLifeEventAccountClosedOrVoidResponse,

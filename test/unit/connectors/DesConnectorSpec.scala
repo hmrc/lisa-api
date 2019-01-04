@@ -534,7 +534,7 @@ class DesConnectorSpec extends PlaySpec
 
   }
 
-  "return a DesUnavailableResponse" when {
+  "return a DesUnavailableResponse" must {
 
     "a 503 response is returned" in {
       when(mockHttp.PUT[UpdateSubscriptionRequest, HttpResponse](any(), any())(any(), any(), any(), any()))
@@ -650,19 +650,23 @@ class DesConnectorSpec extends PlaySpec
         }
       }
 
+    }
+
+    "return a populated DesLifeEventExistResponse" when {
+
       "a LIFE_EVENT_ALREADY_EXISTS failure is returned" in {
         when(mockHttp.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
                 responseStatus = CONFLICT,
-                responseJson = Some(Json.parse(s"""{"code": "LIFE_EVENT_ALREADY_EXISTS", "reason": "The investor’s life event has already been reported."}"""))
+                responseJson = Some(Json.parse(s"""{"code": "LIFE_EVENT_ALREADY_EXISTS", "reason": "The investor’s life event id 9999999979 has already been reported."}"""))
               )
             )
           )
 
         doReportLifeEventRequest { response =>
-          response mustBe DesFailureResponse("LIFE_EVENT_ALREADY_EXISTS", "The investor’s life event has already been reported.")
+          response mustBe DesLifeEventExistResponse("LIFE_EVENT_ALREADY_EXISTS", "The investor’s life event has already been reported.", "9999999979")
         }
       }
 

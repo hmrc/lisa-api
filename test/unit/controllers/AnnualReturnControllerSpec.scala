@@ -211,13 +211,14 @@ class AnnualReturnControllerSpec extends PlaySpec
     "return 409 conflict" when {
       "the life event service returns a ReportLifeEventAlreadyExistsResponse" in {
         when(mockService.reportLifeEvent(any(), any(),any())(any())).
-          thenReturn(Future.successful(ReportLifeEventAlreadyExistsResponse))
+          thenReturn(Future.successful(ReportLifeEventAlreadyExistsResponse("123")))
 
         doRequest(){ res =>
           status(res) mustBe CONFLICT
           contentAsJson(res) mustBe Json.obj(
             "code" -> "LIFE_EVENT_ALREADY_EXISTS",
-            "message" -> "The investor’s life event has already been reported"
+            "message" -> "The investor’s life event has already been reported.",
+            "lifeEventId" -> "123"
           )
         }
       }

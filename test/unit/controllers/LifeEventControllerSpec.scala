@@ -120,7 +120,7 @@ class LifeEventControllerSpec extends PlaySpec
         }
       }
       "the request results in a ReportLifeEventAlreadyExistsResponse" in {
-        when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventAlreadyExistsResponse))
+        when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventAlreadyExistsResponse("123")))
         doReportLifeEventRequest(reportLifeEventJson){res =>
           await(res)
           verify(mockAuditService).audit(
@@ -262,10 +262,12 @@ class LifeEventControllerSpec extends PlaySpec
     }
 
     "return with 409 conflict and a code of LIFE_EVENT_ALREADY_EXISTS" in {
-      when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventAlreadyExistsResponse))
+      when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventAlreadyExistsResponse("123")))
       doReportLifeEventRequest(reportLifeEventJson){res =>
-        status(res) mustBe (CONFLICT)
-        (contentAsJson(res) \"code").as[String] mustBe ("LIFE_EVENT_ALREADY_EXISTS")
+        status(res) mustBe CONFLICT
+        val json = contentAsJson(res)
+        (json \"code").as[String] mustBe "LIFE_EVENT_ALREADY_EXISTS"
+        (json \"lifeEventId").as[String] mustBe "123"
       }
     }
 

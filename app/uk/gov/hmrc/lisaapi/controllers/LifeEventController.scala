@@ -59,7 +59,7 @@ class LifeEventController @Inject()(
                 }
                 case ReportLifeEventInappropriateResponse => error(ErrorLifeEventInappropriate, lisaManager, accountId, req)
                 case ReportLifeEventAccountClosedOrVoidResponse => error(ErrorAccountAlreadyClosedOrVoid, lisaManager, accountId, req)
-                case ReportLifeEventAlreadyExistsResponse => error(ErrorLifeEventAlreadyExists, lisaManager, accountId, req)
+                case ReportLifeEventAlreadyExistsResponse(lifeEventId) => error(ErrorLifeEventAlreadyExists(lifeEventId), lisaManager, accountId, req)
                 case ReportLifeEventAccountNotFoundResponse => error(ErrorAccountNotFound, lisaManager, accountId, req)
                 case ReportLifeEventServiceUnavailableResponse => error(ErrorServiceUnavailable, lisaManager, accountId, req)
                 case unexpected:ReportLifeEventResponse => {

@@ -361,11 +361,12 @@ class PropertyPurchaseControllerSpec extends PlaySpec
     }
 
     "return with 409 conflict and a code of LIFE_EVENT_ALREADY_EXISTS" in {
-      when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventAlreadyExistsResponse))
+      when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventAlreadyExistsResponse("123")))
       doFundReleaseRequest(fundReleaseJson){ res =>
         status(res) mustBe CONFLICT
         (contentAsJson(res) \ "code").as[String] mustBe "LIFE_EVENT_ALREADY_EXISTS"
-        (contentAsJson(res) \ "message").as[String] mustBe "The investor’s life event has already been reported"
+        (contentAsJson(res) \ "message").as[String] mustBe "The investor’s life event has already been reported."
+        (contentAsJson(res) \ "lifeEventId").as[String] mustBe "123"
       }
     }
 
@@ -644,11 +645,12 @@ class PropertyPurchaseControllerSpec extends PlaySpec
     }
 
     "return with 409 conflict and a code of LIFE_EVENT_ALREADY_EXISTS" in {
-      when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventAlreadyExistsResponse))
+      when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventAlreadyExistsResponse("123")))
       doExtensionRequest(extensionJson){ res =>
         status(res) mustBe CONFLICT
         (contentAsJson(res) \ "code").as[String] mustBe "LIFE_EVENT_ALREADY_EXISTS"
-        (contentAsJson(res) \ "message").as[String] mustBe "The investor’s life event has already been reported"
+        (contentAsJson(res) \ "message").as[String] mustBe "The investor’s life event has already been reported."
+        (contentAsJson(res) \ "lifeEventId").as[String] mustBe "123"
       }
     }
 
@@ -890,11 +892,12 @@ class PropertyPurchaseControllerSpec extends PlaySpec
     }
 
     "return with 409 conflict and a code of LIFE_EVENT_ALREADY_EXISTS" in {
-      when(mockService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventAlreadyExistsResponse))
+      when(mockService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventAlreadyExistsResponse("123")))
       doOutcomeRequest(outcomeJson) { res =>
         status(res) mustBe CONFLICT
         (contentAsJson(res) \ "code").as[String] mustBe "LIFE_EVENT_ALREADY_EXISTS"
-        (contentAsJson(res) \ "message").as[String] mustBe "The investor’s life event has already been reported"
+        (contentAsJson(res) \ "message").as[String] mustBe "The investor’s life event has already been reported."
+        (contentAsJson(res) \ "lifeEventId").as[String] mustBe "123"
       }
     }
 

@@ -80,7 +80,16 @@ object DesResponse {
     (JsPath \ "eventDate").read(JsonReads.notFutureDate).map(new DateTime(_))
   )(DesLifeEventRetrievalResponse.apply _)
 
-  implicit val requestLifeEventAlreadyExistResponseFormats: OFormat[DesLifeEventExistResponse] = Json.format[DesLifeEventExistResponse]
+  private def extractLifeEventIdFromReason(reason: String): String = {
+    "The investor’s life event id (\\d+) has already been reported.".r.findFirstMatchIn(reason).get.group(1)
+  }
+
+  implicit val requestLifeEventAlreadyExistResponseReads: Reads[DesLifeEventExistResponse] = (
+    (JsPath \ "code").read[String] and
+    Reads.pure("The investor’s life event has already been reported.") and
+    (JsPath \ "reason").read[String].map(extractLifeEventIdFromReason)
+  )(DesLifeEventExistResponse.apply _)
+
   implicit val requestTransactionAlreadyExistResponseFormats: OFormat[DesTransactionExistResponse] = Json.format[DesTransactionExistResponse]
 
   implicit val desGetBonusPaymentResponse: Reads[DesGetBonusPaymentResponse] = (
