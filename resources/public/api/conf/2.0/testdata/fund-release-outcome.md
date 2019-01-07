@@ -282,7 +282,7 @@
 {
   "code": "FUND_RELEASE_SUPERSEDED",
   "message": "This fund release has already been superseded",
-  "lifeEventId": "5678900001"
+  "lifeEventId": "3456789001"
 }                                               
 </pre>
       </td>
