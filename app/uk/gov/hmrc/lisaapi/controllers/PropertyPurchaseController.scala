@@ -204,7 +204,7 @@ class PropertyPurchaseController @Inject() (
     case ReportLifeEventAccountCancelledResponse => ErrorAccountAlreadyCancelled
     case ReportLifeEventAccountVoidResponse => ErrorAccountAlreadyVoided
     case ReportLifeEventAccountNotFoundResponse => ErrorAccountNotFound
-    case ReportLifeEventAlreadySupersededResponse => ErrorLifeEventAlreadySuperseded
+    case ReportLifeEventAlreadySupersededResponse(lifeEventId) => ErrorLifeEventAlreadySuperseded(lifeEventId)
     case ReportLifeEventAlreadyExistsResponse(lifeEventId) => ErrorLifeEventAlreadyExists(lifeEventId)
     case ReportLifeEventMismatchResponse => ErrorLifeEventMismatch
     case ReportLifeEventServiceUnavailableResponse => ErrorServiceUnavailable
@@ -217,8 +217,8 @@ class PropertyPurchaseController @Inject() (
 
   private val extensionErrors: PartialFunction[ReportLifeEventResponse, ErrorResponse] = commonErrors.orElse({
     case ReportLifeEventExtensionOneNotYetApprovedResponse => ErrorExtensionOneNotApproved
-    case ReportLifeEventExtensionOneAlreadyApprovedResponse => ErrorExtensionOneAlreadyApproved
-    case ReportLifeEventExtensionTwoAlreadyApprovedResponse => ErrorExtensionTwoAlreadyApproved
+    case ReportLifeEventExtensionOneAlreadyApprovedResponse(lifeEventId) => ErrorExtensionOneAlreadyApproved(lifeEventId)
+    case ReportLifeEventExtensionTwoAlreadyApprovedResponse(lifeEventId) => ErrorExtensionTwoAlreadyApproved(lifeEventId)
     case ReportLifeEventFundReleaseNotFoundResponse => ErrorFundReleaseNotFound
     case ReportLifeEventFundReleaseSupersededResponse => ErrorFundReleaseSuperseded
   })
@@ -229,7 +229,7 @@ class PropertyPurchaseController @Inject() (
     case ReportLifeEventFundReleaseNotFoundResponse => ErrorFundReleaseNotFound
     case ReportLifeEventAccountNotFoundResponse => ErrorAccountNotFound
     case ReportLifeEventFundReleaseSupersededResponse => ErrorFundReleaseSuperseded
-    case ReportLifeEventAlreadySupersededResponse => ErrorLifeEventAlreadySuperseded
+    case ReportLifeEventAlreadySupersededResponse(lifeEventId) => ErrorLifeEventAlreadySuperseded(lifeEventId)
     case ReportLifeEventAlreadyExistsResponse(lifeEventId) => ErrorLifeEventAlreadyExists(lifeEventId)
     case ReportLifeEventServiceUnavailableResponse => ErrorServiceUnavailable
   }

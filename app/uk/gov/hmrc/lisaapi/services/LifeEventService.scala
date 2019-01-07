@@ -26,6 +26,8 @@ import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountNotFound, ErrorInternalServerError, ErrorLifeEventIdNotFound, ErrorResponse, ErrorServiceUnavailable}
 
+import scala.util.matching.Regex
+
 
 class LifeEventService @Inject()(desConnector: DesConnector)(implicit ec: ExecutionContext) {
 
@@ -42,14 +44,10 @@ class LifeEventService @Inject()(desConnector: DesConnector)(implicit ec: Execut
         Logger.debug("Matched DesUnavailableResponse")
         ReportLifeEventServiceUnavailableResponse
       }
-      case response: DesLifeEventExistResponse => {
-        Logger.debug("Matched DesLifeEventExistResponse")
-        ReportLifeEventAlreadyExistsResponse(response.lifeEventID)
-      }
       case failureResponse: DesFailureResponse => {
         Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
 
-        postErrors.getOrElse(failureResponse.code, {
+        postErrors.applyOrElse((failureResponse.code, failureResponse), { _:(String, DesFailureResponse) =>
           Logger.warn(s"Report life event returned error: ${failureResponse.code}")
           ReportLifeEventErrorResponse
         })
@@ -85,21 +83,39 @@ class LifeEventService @Inject()(desConnector: DesConnector)(implicit ec: Execut
     "SERVER_ERROR" -> ErrorServiceUnavailable
   )
 
-  private val postErrors = Map[String, ReportLifeEventResponse](
-    "LIFE_EVENT_INAPPROPRIATE" -> ReportLifeEventInappropriateResponse,
-    "INVESTOR_ACCOUNTID_NOT_FOUND" -> ReportLifeEventAccountNotFoundResponse,
-    "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID" -> ReportLifeEventAccountClosedOrVoidResponse,
-    "INVESTOR_ACCOUNT_ALREADY_CLOSED" -> ReportLifeEventAccountClosedResponse,
-    "INVESTOR_ACCOUNT_ALREADY_VOID" -> ReportLifeEventAccountVoidResponse,
-    "INVESTOR_ACCOUNT_ALREADY_CANCELLED" -> ReportLifeEventAccountCancelledResponse,
-    "SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED" -> ReportLifeEventAlreadySupersededResponse,
-    "SUPERSEDING_LIFE_EVENT_MISMATCH" -> ReportLifeEventMismatchResponse,
-    "COMPLIANCE_ERROR_ACCOUNT_NOT_OPEN_LONG_ENOUGH" -> ReportLifeEventAccountNotOpenLongEnoughResponse,
-    "COMPLIANCE_ERROR_OTHER_PURCHASE_ON_RECORD" -> ReportLifeEventOtherPurchaseOnRecordResponse,
-    "FUND_RELEASE_LIFE_EVENT_ID_SUPERSEDED" -> ReportLifeEventFundReleaseSupersededResponse,
-    "FUND_RELEASE_LIFE_EVENT_ID_NOT_FOUND" -> ReportLifeEventFundReleaseNotFoundResponse,
-    "PURCHASE_EXTENSION_1_LIFE_EVENT_ALREADY_APPROVED" -> ReportLifeEventExtensionOneAlreadyApprovedResponse,
-    "PURCHASE_EXTENSION_2_LIFE_EVENT_ALREADY_APPROVED" -> ReportLifeEventExtensionTwoAlreadyApprovedResponse,
-    "PURCHASE_EXTENSION_1_LIFE_EVENT_NOT_YET_APPROVED" -> ReportLifeEventExtensionOneNotYetApprovedResponse
-  )
+  private val postErrors: PartialFunction[(String, DesFailureResponse), ReportLifeEventResponse] = {
+    case ("LIFE_EVENT_ALREADY_EXISTS", res) => {
+      val lifeEventId = extractLifeEventIdFromReason(res.reason, "^The investor’s life event id (\\d{10}) has already been reported\\.$".r)
+      ReportLifeEventAlreadyExistsResponse(lifeEventId)
+    }
+    case ("SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED", res) => {
+      val lifeEventId = extractLifeEventIdFromReason(res.reason, "^The life event id (\\d{10}) has already been superseded\\.$".r)
+      ReportLifeEventAlreadySupersededResponse(lifeEventId)
+    }
+    case ("PURCHASE_EXTENSION_1_LIFE_EVENT_ALREADY_APPROVED", res) => {
+      val lifeEventId = extractLifeEventIdFromReason(res.reason, "^Extension 1 life event (\\d{10}) has already been recorded for this account\\.$".r)
+      ReportLifeEventExtensionOneAlreadyApprovedResponse(lifeEventId)
+    }
+    case ("PURCHASE_EXTENSION_2_LIFE_EVENT_ALREADY_APPROVED", res) => {
+      val lifeEventId = extractLifeEventIdFromReason(res.reason, "^Extension 2 life event (\\d{10}) has already been recorded for this account\\.$".r)
+      ReportLifeEventExtensionTwoAlreadyApprovedResponse(lifeEventId)
+    }
+    case ("LIFE_EVENT_INAPPROPRIATE", _) => ReportLifeEventInappropriateResponse
+    case ("INVESTOR_ACCOUNTID_NOT_FOUND", _) => ReportLifeEventAccountNotFoundResponse
+    case ("INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID", _) => ReportLifeEventAccountClosedOrVoidResponse
+    case ("INVESTOR_ACCOUNT_ALREADY_CLOSED", _) => ReportLifeEventAccountClosedResponse
+    case ("INVESTOR_ACCOUNT_ALREADY_VOID", _) => ReportLifeEventAccountVoidResponse
+    case ("INVESTOR_ACCOUNT_ALREADY_CANCELLED", _) => ReportLifeEventAccountCancelledResponse
+    case ("SUPERSEDING_LIFE_EVENT_MISMATCH", _) => ReportLifeEventMismatchResponse
+    case ("COMPLIANCE_ERROR_ACCOUNT_NOT_OPEN_LONG_ENOUGH", _) => ReportLifeEventAccountNotOpenLongEnoughResponse
+    case ("COMPLIANCE_ERROR_OTHER_PURCHASE_ON_RECORD", _) => ReportLifeEventOtherPurchaseOnRecordResponse
+    case ("FUND_RELEASE_LIFE_EVENT_ID_SUPERSEDED", _) => ReportLifeEventFundReleaseSupersededResponse
+    case ("FUND_RELEASE_LIFE_EVENT_ID_NOT_FOUND", _) => ReportLifeEventFundReleaseNotFoundResponse
+    case ("PURCHASE_EXTENSION_1_LIFE_EVENT_NOT_YET_APPROVED", _) => ReportLifeEventExtensionOneNotYetApprovedResponse
+  }
+
+  private def extractLifeEventIdFromReason(reason: String, regex: Regex) = {
+    regex.findFirstMatchIn(reason).get.group(1)
+  }
+
 }

@@ -189,7 +189,6 @@ class DesConnector @Inject()(
       Logger.debug("Life Event request returned status: " + res.status)
       res.status match {
         case SERVICE_UNAVAILABLE => DesUnavailableResponse
-        case CONFLICT => parseDesResponse[DesLifeEventExistResponse](res)
         case _ => parseDesResponse[DesLifeEventResponse](res)
       }
 

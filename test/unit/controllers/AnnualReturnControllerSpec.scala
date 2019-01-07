@@ -224,13 +224,14 @@ class AnnualReturnControllerSpec extends PlaySpec
       }
       "the life event service returns a ReportLifeEventAlreadySupersededResponse" in {
         when(mockService.reportLifeEvent(any(), any(),any())(any())).
-          thenReturn(Future.successful(ReportLifeEventAlreadySupersededResponse))
+          thenReturn(Future.successful(ReportLifeEventAlreadySupersededResponse("123")))
 
         doRequest(){ res =>
           status(res) mustBe CONFLICT
           contentAsJson(res) mustBe Json.obj(
             "code" -> "SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED",
-            "message" -> "This life event has already been superseded"
+            "message" -> "This life event has already been superseded",
+            "lifeEventId" -> "123"
           )
         }
       }

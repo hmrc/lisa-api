@@ -35,7 +35,6 @@ case class DesLifeEventRetrievalResponse(lifeEventID: LifeEventId, eventType: Li
 case class DesCreateInvestorResponse(investorID: String) extends DesResponse
 case class DesTransactionResponse(transactionID: String, message: Option[String]) extends DesResponse
 case class DesFailureResponse(code: String = "INTERNAL_SERVER_ERROR", reason: String = "Internal Server Error") extends DesFailure
-case class DesLifeEventExistResponse(lifeEventID: String) extends DesResponse
 case class DesTransactionExistResponse(code: String, reason: String, transactionID: String) extends DesResponse
 case object DesEmptySuccessResponse extends DesResponse
 case class DesUpdateSubscriptionSuccessResponse (code: String, reason: String)extends DesResponse
@@ -80,13 +79,6 @@ object DesResponse {
     (JsPath \ "eventType").read(JsonReads.lifeEventType) and
     (JsPath \ "eventDate").read(JsonReads.notFutureDate).map(new DateTime(_))
   )(DesLifeEventRetrievalResponse.apply _)
-
-  private def extractLifeEventIdFromReason(reason: String): String = {
-    "^The investor’s life event id (\\d{10}) has already been reported\\.$".r.findFirstMatchIn(reason).get.group(1)
-  }
-
-  implicit val requestLifeEventAlreadyExistResponseReads: Reads[DesLifeEventExistResponse] = (__ \ "reason").
-    read[String].map{ reason => DesLifeEventExistResponse(extractLifeEventIdFromReason(reason)) }
 
   implicit val requestTransactionAlreadyExistResponseFormats: OFormat[DesTransactionExistResponse] = Json.format[DesTransactionExistResponse]
 
