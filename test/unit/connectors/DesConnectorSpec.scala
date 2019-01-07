@@ -666,7 +666,7 @@ class DesConnectorSpec extends PlaySpec
           )
 
         doReportLifeEventRequest { response =>
-          response mustBe DesLifeEventExistResponse("LIFE_EVENT_ALREADY_EXISTS", "The investor’s life event has already been reported.", "9999999979")
+          response mustBe DesLifeEventExistResponse("9999999979")
         }
       }
 

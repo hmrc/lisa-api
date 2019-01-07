@@ -266,8 +266,8 @@ class LifeEventControllerSpec extends PlaySpec
       doReportLifeEventRequest(reportLifeEventJson){res =>
         status(res) mustBe CONFLICT
         val json = contentAsJson(res)
-        (json \"code").as[String] mustBe "LIFE_EVENT_ALREADY_EXISTS"
-        (json \"lifeEventId").as[String] mustBe "123"
+        (json \ "code").as[String] mustBe "LIFE_EVENT_ALREADY_EXISTS"
+        (json \ "lifeEventId").as[String] mustBe "123"
       }
     }
 

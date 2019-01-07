@@ -44,6 +44,13 @@ class LifeEventServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuit
       }
     }
 
+    "return ReportLifeEventAlreadyExistsResponse" when {
+      "given a life event exists response from the DES connector" in {
+        when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(DesLifeEventExistResponse("9999999979")))
+        doPostRequest(response => response mustBe ReportLifeEventAlreadyExistsResponse("9999999979"))
+      }
+    }
+
     "return ReportLifeEventInappropriateResponse" when {
       "the error code is LIFE_EVENT_INAPPROPRIATE" in {
         when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("LIFE_EVENT_INAPPROPRIATE","The life Event was inappropriate")))
@@ -76,13 +83,6 @@ class LifeEventServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuit
       "the error code is INVESTOR_ACCOUNT_ALREADY_CANCELLED" in {
         when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_CANCELLED","")))
         doPostRequest(response => response mustBe ReportLifeEventAccountCancelledResponse)
-      }
-    }
-
-    "return ReportLifeEventAlreadyExistsResponse" when {
-      "the error code is LIFE_EVENT_ALREADY_EXISTS" in {
-        when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(DesLifeEventExistResponse("LIFE_EVENT_ALREADY_EXISTS","The investor’s life event id 9999999979 has already been reported.", "9999999979")))
-        doPostRequest(response => response mustBe ReportLifeEventAlreadyExistsResponse("9999999979"))
       }
     }
 
@@ -165,7 +165,7 @@ class LifeEventServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuit
 
     "return ReportLifeEventErrorResponse" when {
       "the error code doesn't match any of the previous values" in {
-        when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("XXX","Any other error condition")))
+        when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("LIFE_EVENT_ALREADY_EXISTS")))
         doPostRequest(response => response mustBe ReportLifeEventErrorResponse)
       }
     }

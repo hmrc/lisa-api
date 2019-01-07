@@ -35,7 +35,7 @@ case class DesLifeEventRetrievalResponse(lifeEventID: LifeEventId, eventType: Li
 case class DesCreateInvestorResponse(investorID: String) extends DesResponse
 case class DesTransactionResponse(transactionID: String, message: Option[String]) extends DesResponse
 case class DesFailureResponse(code: String = "INTERNAL_SERVER_ERROR", reason: String = "Internal Server Error") extends DesFailure
-case class DesLifeEventExistResponse(code: String, reason: String, lifeEventID: String) extends DesResponse
+case class DesLifeEventExistResponse(lifeEventID: String) extends DesResponse
 case class DesTransactionExistResponse(code: String, reason: String, transactionID: String) extends DesResponse
 case object DesEmptySuccessResponse extends DesResponse
 case class DesUpdateSubscriptionSuccessResponse (code: String, reason: String)extends DesResponse
@@ -50,6 +50,7 @@ case class DesGetBonusPaymentResponse(lifeEventId: Option[LifeEventId],
                                       status: String,
                                       supersededBy: Option[TransactionId] = None,
                                       supersede: Option[Supersede] = None) extends DesResponse
+
 case object DesUnavailableResponse extends DesFailure {
   override val code = "SERVER_ERROR"
   override val reason = "Service Unavailable"
@@ -81,14 +82,11 @@ object DesResponse {
   )(DesLifeEventRetrievalResponse.apply _)
 
   private def extractLifeEventIdFromReason(reason: String): String = {
-    "The investor’s life event id (\\d+) has already been reported.".r.findFirstMatchIn(reason).get.group(1)
+    "^The investor’s life event id (\\d{10}) has already been reported\\.$".r.findFirstMatchIn(reason).get.group(1)
   }
 
-  implicit val requestLifeEventAlreadyExistResponseReads: Reads[DesLifeEventExistResponse] = (
-    (JsPath \ "code").read[String] and
-    Reads.pure("The investor’s life event has already been reported.") and
-    (JsPath \ "reason").read[String].map(extractLifeEventIdFromReason)
-  )(DesLifeEventExistResponse.apply _)
+  implicit val requestLifeEventAlreadyExistResponseReads: Reads[DesLifeEventExistResponse] = (__ \ "reason").
+    read[String].map{ reason => DesLifeEventExistResponse(extractLifeEventIdFromReason(reason)) }
 
   implicit val requestTransactionAlreadyExistResponseFormats: OFormat[DesTransactionExistResponse] = Json.format[DesTransactionExistResponse]
 
