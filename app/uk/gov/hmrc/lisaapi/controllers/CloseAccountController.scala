@@ -16,23 +16,28 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
+import com.google.inject.Inject
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, Result}
+import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.{LisaConstants, models}
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AccountService, AuditService}
 import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class CloseAccountController extends LisaController with LisaConstants {
-
-  val service: AccountService = AccountService
-  val auditService: AuditService = AuditService
+class CloseAccountController @Inject()(
+                                        val authConnector: AuthConnector,
+                                        val appContext: AppContext,
+                                        auditService: AuditService,
+                                        service: AccountService,
+                                        val lisaMetrics: LisaMetrics
+                                      )(implicit ec: ExecutionContext) extends LisaController {
 
   def closeLisaAccount(lisaManager: String, accountId: String): Action[AnyContent] =
     (validateHeader() andThen validateLMRN(lisaManager) andThen validateAccountId(accountId)).async { implicit request =>
@@ -51,7 +56,7 @@ class CloseAccountController extends LisaController with LisaConstants {
                   )
                 )
 
-                LisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.CLOSE)
+                lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.CLOSE)
 
                 val data = ApiResponseData(message = "LISA account closed", accountId = Some(accountId))
 
@@ -84,7 +89,7 @@ class CloseAccountController extends LisaController with LisaConstants {
           "reasonNotClosed" -> "FORBIDDEN")
       )
 
-      LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.CLOSE)
+      lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.CLOSE)
 
       Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
         ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("closureDate"), Some("/closureDate"))
@@ -109,7 +114,7 @@ class CloseAccountController extends LisaController with LisaConstants {
       )
     )
 
-    LisaMetrics.incrementMetrics(startTime, response.httpStatusCode, LisaMetricKeys.CLOSE)
+    lisaMetrics.incrementMetrics(startTime, response.httpStatusCode, LisaMetricKeys.CLOSE)
 
     response.asResult
   }

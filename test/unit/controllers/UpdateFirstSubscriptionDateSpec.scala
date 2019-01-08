@@ -16,7 +16,6 @@
 
 package unit.controllers
 
-import org.joda.time.DateTime
 import org.mockito.Matchers.{eq => matchersEquals, _}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
@@ -27,11 +26,13 @@ import play.api.mvc.{AnyContentAsJson, Result}
 import play.api.test.Helpers._
 import play.api.test._
 import play.mvc.Http.HeaderNames
-import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
-import uk.gov.hmrc.lisaapi.controllers._
-import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.services.{AccountService, AuditService, UpdateSubscriptionService}
+import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.lisaapi.config.AppContext
+import uk.gov.hmrc.lisaapi.controllers._
+import uk.gov.hmrc.lisaapi.metrics.LisaMetrics
+import uk.gov.hmrc.lisaapi.models._
+import uk.gov.hmrc.lisaapi.services.{AuditService, UpdateSubscriptionService}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -42,7 +43,7 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
   val lisaManager = "Z019283"
   val accountId = "1234/567890"
-  val mockAuthCon = mock[LisaAuthConnector]
+  val mockAuthCon = mock[AuthConnector]
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
@@ -293,10 +294,10 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
 
   val mockService: UpdateSubscriptionService = mock[UpdateSubscriptionService]
   val mockAuditService: AuditService = mock[AuditService]
-  val SUT = new UpdateSubscriptionController{
-    override val service: UpdateSubscriptionService = mockService
-    override val auditService: AuditService = mockAuditService
-    override val authConnector = mockAuthCon
+  val mockAppContext: AppContext = mock[AppContext]
+  val mockLisaMetrics: LisaMetrics = mock[LisaMetrics]
+
+  val SUT = new UpdateSubscriptionController(mockAuthCon, mockAppContext, mockService, mockAuditService, mockLisaMetrics) {
     override lazy val v2endpointsEnabled = true
   }
 

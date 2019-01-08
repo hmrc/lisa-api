@@ -16,18 +16,17 @@
 
 package uk.gov.hmrc.lisaapi.services
 
+import com.google.inject.Inject
 import play.api.Logger
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des._
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 
-trait UpdateSubscriptionService {
-  val desConnector: DesConnector
+class UpdateSubscriptionService @Inject()(desConnector: DesConnector)(implicit ec: ExecutionContext) {
 
   def updateSubscription(lisaManager: String, accountId: String, request: UpdateSubscriptionRequest)(implicit hc: HeaderCarrier): Future[UpdateSubscriptionResponse] = {
     val response = desConnector.updateFirstSubDate(lisaManager, accountId, request)
@@ -61,10 +60,6 @@ trait UpdateSubscriptionService {
     }
   }
 
-}
-
-object UpdateSubscriptionService extends UpdateSubscriptionService {
-  override val desConnector: DesConnector = DesConnector
 }
 
 object Constants {

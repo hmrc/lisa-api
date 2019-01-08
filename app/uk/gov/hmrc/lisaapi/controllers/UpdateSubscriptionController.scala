@@ -16,22 +16,26 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
+import com.google.inject.Inject
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, Result}
+import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.lisaapi.LisaConstants
+import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models.{UpdateSubscriptionSuccessResponse, _}
 import uk.gov.hmrc.lisaapi.services.{AuditService, UpdateSubscriptionService}
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class UpdateSubscriptionController extends LisaController with LisaConstants {
-
-  val service: UpdateSubscriptionService = UpdateSubscriptionService
-  val auditService: AuditService = AuditService
+class UpdateSubscriptionController @Inject() (
+                                               val authConnector: AuthConnector,
+                                               val appContext: AppContext,
+                                               service: UpdateSubscriptionService,
+                                               auditService: AuditService,
+                                               val lisaMetrics: LisaMetrics
+                                             )(implicit ec: ExecutionContext) extends LisaController {
 
   def updateSubscription (lisaManager: String, accountId: String): Action[AnyContent] =
     (validateHeader() andThen validateLMRN(lisaManager) andThen validateAccountId(accountId)).async { implicit request =>
@@ -47,7 +51,7 @@ class UpdateSubscriptionController extends LisaController with LisaConstants {
                 Logger.debug("First Subscription date updated")
                 doAudit(lisaManager, accountId, updateSubsRequest, "firstSubscriptionDateUpdated")
                 val data = ApiResponseData(message = success.message, code = Some(success.code), accountId = Some(accountId))
-                LisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.UPDATE_SUBSCRIPTION)
+                lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.UPDATE_SUBSCRIPTION)
                 Ok(Json.toJson(ApiResponse(data = Some(data), success = true, status = OK)))
               case UpdateSubscriptionAccountNotFoundResponse =>
                 error(ErrorAccountNotFound, lisaManager, accountId, updateSubsRequest)
@@ -71,7 +75,7 @@ class UpdateSubscriptionController extends LisaController with LisaConstants {
                    (implicit hc: HeaderCarrier, startTime: Long): Result = {
     Logger.debug("Matched an error")
     doAudit(lisaManager, accountId, req, "firstSubscriptionDateNotUpdated", Map("reasonNotUpdated" -> e.errorCode))
-    LisaMetrics.incrementMetrics(startTime, e.httpStatusCode, LisaMetricKeys.UPDATE_SUBSCRIPTION)
+    lisaMetrics.incrementMetrics(startTime, e.httpStatusCode, LisaMetricKeys.UPDATE_SUBSCRIPTION)
     e.asResult
   }
 
@@ -84,7 +88,7 @@ class UpdateSubscriptionController extends LisaController with LisaConstants {
 
       doAudit(lisaManager, accountId, updateSubsRequest, "firstSubscriptionDateNotUpdated", Map("reasonNotUpdated" -> "FORBIDDEN"))
 
-      LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.UPDATE_SUBSCRIPTION)
+      lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.UPDATE_SUBSCRIPTION)
 
       Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
         ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("firstSubscriptionDate"), Some("/firstSubscriptionDate"))

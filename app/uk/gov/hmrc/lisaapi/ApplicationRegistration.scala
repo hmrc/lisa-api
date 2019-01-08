@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.lisaapi.services
+package uk.gov.hmrc.lisaapi
 
-import com.google.inject.Inject
-import org.joda.time.DateTime
+import javax.inject.{Inject, Singleton}
 
-class CurrentDateService @Inject()() {
+import play.api.Configuration
+import uk.gov.hmrc.api.connector.ApiServiceLocatorConnector
+import uk.gov.hmrc.http.HeaderCarrier
 
-  def now(): DateTime = {
-    DateTime.now
-  }
+@Singleton
+class ApplicationRegistration @Inject()(serviceLocatorConnector: ApiServiceLocatorConnector, config: Configuration) {
+  val registrationEnabled: Boolean = config.getBoolean("service-locator.enabled").getOrElse(false)
 
+  if (registrationEnabled) serviceLocatorConnector.register(HeaderCarrier())
 }
-
-object CurrentDateService extends CurrentDateService

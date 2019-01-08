@@ -433,8 +433,6 @@ class BonusPaymentValidatorSpec extends PlaySpec
 
   val mockDateService: CurrentDateService = mock[CurrentDateService]
 
-  object SUT extends BonusPaymentValidator {
-    override val currentDateService: CurrentDateService = mockDateService
-  }
+  object SUT extends BonusPaymentValidator(mockDateService)
 
 }

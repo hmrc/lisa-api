@@ -16,18 +16,24 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
+import com.google.inject.Inject
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
-import uk.gov.hmrc.lisaapi.LisaConstants
+import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models.{GetLisaAccountDoesNotExistResponse, GetLisaAccountServiceUnavailable, GetLisaAccountSuccessResponse}
 import uk.gov.hmrc.lisaapi.services.{AccountService, AuditService}
 import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext._
 
-class GetAccountController extends LisaController with LisaConstants {
-
-  val service: AccountService = AccountService
-  val auditService: AuditService = AuditService
+class GetAccountController @Inject()(
+                                      val authConnector: AuthConnector,
+                                      val appContext: AppContext,
+                                      service: AccountService,
+                                      auditService: AuditService,
+                                      val lisaMetrics: LisaMetrics
+                                    )
+  extends LisaController {
 
   def getAccountDetails(lisaManager: String, accountId: String): Action[AnyContent] =
     (validateHeader() andThen validateLMRN(lisaManager) andThen validateAccountId(accountId)).async { implicit request =>
@@ -35,19 +41,19 @@ class GetAccountController extends LisaController with LisaConstants {
       withEnrolment(lisaManager) { (_) =>
         service.getAccount(lisaManager, accountId).map {
           case response: GetLisaAccountSuccessResponse =>
-            LisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.ACCOUNT)
+            lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.ACCOUNT)
             Ok(Json.toJson(response))
 
           case GetLisaAccountDoesNotExistResponse =>
-            LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.ACCOUNT)
+            lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.ACCOUNT)
             NotFound(Json.toJson(ErrorAccountNotFound))
 
           case GetLisaAccountServiceUnavailable =>
-            LisaMetrics.incrementMetrics(startTime, SERVICE_UNAVAILABLE, LisaMetricKeys.ACCOUNT)
+            lisaMetrics.incrementMetrics(startTime, SERVICE_UNAVAILABLE, LisaMetricKeys.ACCOUNT)
             ServiceUnavailable(Json.toJson(ErrorServiceUnavailable))
 
           case _ =>
-            LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.ACCOUNT)
+            lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.ACCOUNT)
             InternalServerError(Json.toJson(ErrorInternalServerError))
         }
       }

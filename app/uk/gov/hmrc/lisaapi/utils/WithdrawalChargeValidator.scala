@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.lisaapi.utils
 
+import com.google.inject.Inject
 import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.controllers.ErrorValidation
 import uk.gov.hmrc.lisaapi.models.ReportWithdrawalChargeRequest
@@ -23,9 +24,7 @@ import uk.gov.hmrc.lisaapi.services.CurrentDateService
 
 case class WithdrawalChargeValidationRequest(data: ReportWithdrawalChargeRequest, errors: Seq[ErrorValidation] = Nil)
 
-trait WithdrawalChargeValidator extends LisaConstants {
-
-  val currentDateService: CurrentDateService
+class WithdrawalChargeValidator @Inject()(currentDateService: CurrentDateService) extends LisaConstants {
 
   def validate(data: ReportWithdrawalChargeRequest): Seq[ErrorValidation] = {
     (
@@ -116,8 +115,4 @@ trait WithdrawalChargeValidator extends LisaConstants {
       }
     }
 
-}
-
-object WithdrawalChargeValidator extends WithdrawalChargeValidator {
-  val currentDateService: CurrentDateService = CurrentDateService
 }

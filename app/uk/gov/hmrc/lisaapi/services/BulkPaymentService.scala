@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.lisaapi.services
 
+import com.google.inject.Inject
 import org.joda.time.DateTime
 import play.api.Logger
 import uk.gov.hmrc.http.HeaderCarrier
@@ -23,11 +24,9 @@ import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesUnavailableResponse}
 import uk.gov.hmrc.lisaapi.models._
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-trait BulkPaymentService {
-  val desConnector: DesConnector
+class BulkPaymentService @Inject()(desConnector: DesConnector)(implicit ec: ExecutionContext) {
 
   def getBulkPayment(lisaManager: String, startDate: DateTime, endDate: DateTime)
                     (implicit hc: HeaderCarrier): Future[GetBulkPaymentResponse] = {
@@ -52,8 +51,4 @@ trait BulkPaymentService {
     }
   }
 
-}
-
-object BulkPaymentService extends BulkPaymentService {
-  override val desConnector: DesConnector = DesConnector
 }

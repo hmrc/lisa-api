@@ -27,11 +27,13 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.api.controllers.ErrorAcceptHeaderInvalid
-import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
-import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountNotFound, ErrorBadRequestAccountId, ErrorBadRequestLmrn, TransactionController}
+import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.lisaapi.config.AppContext
+import uk.gov.hmrc.lisaapi.controllers.{ErrorBadRequestAccountId, ErrorBadRequestLmrn, TransactionController}
+import uk.gov.hmrc.lisaapi.metrics.LisaMetrics
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.TransactionService
-import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -205,11 +207,11 @@ class TransactionControllerSpec extends PlaySpec
   }
 
   val mockService: TransactionService = mock[TransactionService]
-  val mockAuthCon: LisaAuthConnector = mock[LisaAuthConnector]
+  val mockAuthCon: AuthConnector = mock[AuthConnector]
+  val mockAppContext: AppContext = mock[AppContext]
+  val mockLisaMetrics: LisaMetrics = mock[LisaMetrics]
 
-  val SUT = new TransactionController {
-    override val service: TransactionService = mockService
-    override val authConnector = mockAuthCon
+  val SUT = new TransactionController(mockAuthCon, mockAppContext, mockService, mockLisaMetrics) {
     override lazy val v2endpointsEnabled = true
   }
 

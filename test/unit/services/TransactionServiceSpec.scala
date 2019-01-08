@@ -29,6 +29,7 @@ import uk.gov.hmrc.lisaapi.models.des._
 import uk.gov.hmrc.lisaapi.services.TransactionService
 
 import scala.concurrent.{Await, Future}
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 
 class TransactionServiceSpec extends PlaySpec
@@ -379,8 +380,6 @@ class TransactionServiceSpec extends PlaySpec
   }
 
   val mockDesConnector = mock[DesConnector]
-  object SUT extends TransactionService {
-    override val desConnector: DesConnector = mockDesConnector
-  }
+  object SUT extends TransactionService(mockDesConnector)
 
 }

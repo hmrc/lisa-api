@@ -16,23 +16,27 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
+import com.google.inject.Inject
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import play.api.libs.json.Reads.of
 import play.api.libs.json._
 import play.api.mvc.{Action, AnyContent, Result}
-import uk.gov.hmrc.lisaapi.LisaConstants
+import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models.{GetBulkPaymentNotFoundResponse, GetBulkPaymentServiceUnavailableResponse, GetBulkPaymentSuccessResponse}
 import uk.gov.hmrc.lisaapi.services.{BulkPaymentService, CurrentDateService}
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class BulkPaymentController extends LisaController with LisaConstants {
-
-  val currentDateService: CurrentDateService = CurrentDateService
-  val service: BulkPaymentService = BulkPaymentService
+class BulkPaymentController @Inject()(
+                                       val authConnector: AuthConnector,
+                                       val appContext: AppContext,
+                                       currentDateService: CurrentDateService,
+                                       service: BulkPaymentService,
+                                       val lisaMetrics: LisaMetrics
+                                     )(implicit ec: ExecutionContext) extends LisaController {
 
   def getBulkPayment(lisaManager: String, startDate: String, endDate: String): Action[AnyContent] =
     validateHeader().async { implicit request =>
@@ -44,14 +48,14 @@ class BulkPaymentController extends LisaController with LisaConstants {
 
             response flatMap {
               case s: GetBulkPaymentSuccessResponse => {
-                LisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.TRANSACTION)
+                lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.TRANSACTION)
                 withApiVersion {
                   case Some(VERSION_1) => Future.successful(transformV1Response(Json.toJson(s)))
                   case Some(VERSION_2) => Future.successful(Ok(Json.toJson(s)))
                 }
               }
               case GetBulkPaymentNotFoundResponse => {
-                LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.TRANSACTION)
+                lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.TRANSACTION)
                 withApiVersion {
                   case Some(VERSION_1) => Future.successful(NotFound(Json.toJson(ErrorBulkTransactionNotFoundV1)))
                   case Some(VERSION_2) => Future.successful(NotFound(Json.toJson(ErrorBulkTransactionNotFoundV2)))
@@ -59,7 +63,7 @@ class BulkPaymentController extends LisaController with LisaConstants {
               }
               case GetBulkPaymentServiceUnavailableResponse => Future.successful(ErrorServiceUnavailable.asResult)
               case _ => {
-                LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.TRANSACTION)
+                lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.TRANSACTION)
                 Future.successful(InternalServerError(Json.toJson(ErrorInternalServerError)))
               }
             }
@@ -97,13 +101,13 @@ class BulkPaymentController extends LisaController with LisaConstants {
         }
       }
       case (None, Some(_)) =>
-        LisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.TRANSACTION)
+        lisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.TRANSACTION)
         Future.successful(BadRequest(Json.toJson(ErrorBadRequestStart)))
       case (Some(_), None) =>
-        LisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.TRANSACTION)
+        lisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.TRANSACTION)
         Future.successful(BadRequest(Json.toJson(ErrorBadRequestEnd)))
       case _ =>
-        LisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.TRANSACTION)
+        lisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.TRANSACTION)
         Future.successful(BadRequest(Json.toJson(ErrorBadRequestStartEnd)))
     }
   }
@@ -114,25 +118,25 @@ class BulkPaymentController extends LisaController with LisaConstants {
 
     // end date is in the future
     if (endDate.isAfter(currentDateService.now())) {
-      LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.TRANSACTION)
+      lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.TRANSACTION)
       Future.successful(Forbidden(Json.toJson(ErrorBadRequestEndInFuture)))
     }
 
     // end date is before start date
     else if (endDate.isBefore(startDate)) {
-      LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.TRANSACTION)
+      lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.TRANSACTION)
       Future.successful(Forbidden(Json.toJson(ErrorBadRequestEndBeforeStart)))
     }
 
     // start date is before 6 april 2017
     else if (startDate.isBefore(LISA_START_DATE)) {
-      LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.TRANSACTION)
+      lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.TRANSACTION)
       Future.successful(Forbidden(Json.toJson(ErrorBadRequestStartBefore6April2017)))
     }
 
     // there's more than a year between start date and end date
     else if (endDate.isAfter(startDate.plusYears(1))) {
-      LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.TRANSACTION)
+      lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.TRANSACTION)
       Future.successful(Forbidden(Json.toJson(ErrorBadRequestOverYearBetweenStartAndEnd)))
     }
 

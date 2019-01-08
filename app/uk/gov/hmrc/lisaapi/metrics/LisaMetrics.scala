@@ -19,26 +19,23 @@ package uk.gov.hmrc.lisaapi.metrics
 import java.util.concurrent.TimeUnit
 
 import com.codahale.metrics.MetricRegistry
-import uk.gov.hmrc.play.graphite.MicroserviceMetrics
+import com.google.inject.Inject
+import com.kenshoo.play.metrics.Metrics
 
 import scala.util.Try
 
-trait LisaMetrics {
-  def timer (diff: Long, unit: TimeUnit, metricType: String) : Unit
-}
-
-object LisaMetrics extends LisaMetrics with MicroserviceMetrics {
+class LisaMetrics @Inject()(metrics: Metrics) {
 
   val registry: MetricRegistry = metrics.defaultRegistry
 
-  override def timer(diff: Long, unit: TimeUnit, metricType: String):Unit = registry.timer(s"${metricType}").update(diff, unit)
+  def timer(diff: Long, unit: TimeUnit, metricType: String):Unit = registry.timer(s"${metricType}").update(diff, unit)
 
   def incrementMetrics(startTime: Long, status: Int, api: String): Unit = {
     val diff = System.currentTimeMillis() - startTime
     val unit = TimeUnit.MILLISECONDS
 
-    LisaMetrics.timer(diff, unit, api)
-    LisaMetrics.timer(diff, unit, LisaMetricKeys.lisaMetric(status, api))
+    timer(diff, unit, api)
+    timer(diff, unit, LisaMetricKeys.lisaMetric(status, api))
   }
 
 }

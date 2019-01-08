@@ -28,6 +28,7 @@ import uk.gov.hmrc.lisaapi.models.{RequestBonusPaymentResponse, _}
 import uk.gov.hmrc.lisaapi.services.BonusPaymentService
 
 import scala.concurrent.duration.Duration
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Await, Future}
 
 class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
@@ -250,8 +251,5 @@ class BonusPaymentServiceSpec extends PlaySpec with MockitoSugar with OneAppPerS
   }
 
   val mockDesConnector = mock[DesConnector]
-  object SUT extends BonusPaymentService {
-    override val desConnector: DesConnector = mockDesConnector
-  }
-
+  object SUT extends BonusPaymentService(mockDesConnector)
 }

@@ -16,29 +16,30 @@
 
 package uk.gov.hmrc.lisaapi.connectors
 
+import com.google.inject.Inject
 import org.joda.time.DateTime
 import play.api.http.Status._
-import play.api.Logger
+import play.api.{Configuration, Environment, Logger}
 import play.api.libs.json.{JsValue, Json, Reads}
 import play.utils.UriEncoding
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.http.logging.Authorization
-import uk.gov.hmrc.lisaapi.config.{AppContext, WSHttp}
+import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des._
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import uk.gov.hmrc.play.config.ServicesConfig
-import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 
-trait DesConnector extends ServicesConfig {
+class DesConnector @Inject()(
+                              wsHttp: HttpClient,
+                              val runModeConfiguration: Configuration,
+                              environment: Environment,
+                              appContext: AppContext
+                            )(implicit ec: ExecutionContext) extends ServicesConfig {
 
-
-  val httpPost:HttpPost = WSHttp
-  val httpPut:HttpPut = WSHttp
-  val httpGet:HttpGet = WSHttp
   val urlEncodingFormat:String = "utf-8"
   lazy val desUrl = baseUrl("des")
   lazy val lisaServiceUrl = s"$desUrl/lifetime-isa/manager"
@@ -48,12 +49,12 @@ trait DesConnector extends ServicesConfig {
   }
 
   private def updateHeaderCarrier(headerCarrier: HeaderCarrier) =
-    headerCarrier.copy(extraHeaders = Seq(("Environment" -> AppContext.desUrlHeaderEnv)),
-          authorization = Some(Authorization(s"Bearer ${AppContext.desAuthToken}")))
+    headerCarrier.copy(extraHeaders = Seq(("Environment" -> appContext.desUrlHeaderEnv)),
+          authorization = Some(Authorization(s"Bearer ${appContext.desAuthToken}")))
 
   private def updateHeaderCarrierWithAllDesHeaders(headerCarrier: HeaderCarrier) =
-    headerCarrier.copy(extraHeaders = Seq(("Environment" -> AppContext.desUrlHeaderEnv), ("OriginatorId" -> "DA2_LISA")),
-      authorization = Some(Authorization(s"Bearer ${AppContext.desAuthToken}")))
+    headerCarrier.copy(extraHeaders = Seq(("Environment" -> appContext.desUrlHeaderEnv), ("OriginatorId" -> "DA2_LISA")),
+      authorization = Some(Authorization(s"Bearer ${appContext.desAuthToken}")))
 
   /**
     * Attempts to create a new LISA investor
@@ -62,7 +63,7 @@ trait DesConnector extends ServicesConfig {
                     (implicit hc: HeaderCarrier): Future[DesResponse] = {
     val uri = s"$lisaServiceUrl/$lisaManager/investors"
     Logger.debug("Posting Create Investor request to des: " + uri)
-    val result = httpPost.POST[CreateLisaInvestorRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
+    val result = wsHttp.POST[CreateLisaInvestorRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc), implicitly)
 
     result.map(res => {
       Logger.debug("Create Investor request returned status: " + res.status)
@@ -81,7 +82,7 @@ trait DesConnector extends ServicesConfig {
                    (implicit hc: HeaderCarrier): Future[DesResponse] = {
     val uri = s"$lisaServiceUrl/$lisaManager/accounts"
     Logger.debug("Posting Create Account request to des: " + uri)
-    val result = httpPost.POST[CreateLisaAccountCreationRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
+    val result = wsHttp.POST[CreateLisaAccountCreationRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc), implicitly)
 
     result.map(res => {
       Logger.debug("Create Account request returned status: " + res.status)
@@ -101,7 +102,7 @@ trait DesConnector extends ServicesConfig {
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}"
     Logger.debug("Getting the Account details from des: " + uri)
 
-    val result: Future[HttpResponse] = httpGet.GET(uri)(httpReads, hc = updateHeaderCarrierWithAllDesHeaders(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
+    val result: Future[HttpResponse] = wsHttp.GET(uri)(httpReads, hc = updateHeaderCarrierWithAllDesHeaders(hc), implicitly)
 
     result.map(res => {
       Logger.debug("Get Account request returned status: " + res.status)
@@ -125,7 +126,7 @@ trait DesConnector extends ServicesConfig {
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/reinstate"
     Logger.debug("Reinstate Account request returned status: " + uri)
 
-    val result = httpPut.PUT[JsValue,HttpResponse](uri,Json.toJson(""))(implicitly,httpReads, updateHeaderCarrierWithAllDesHeaders(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
+    val result = wsHttp.PUT[JsValue,HttpResponse](uri,Json.toJson(""))(implicitly,httpReads, updateHeaderCarrierWithAllDesHeaders(hc), implicitly)
     result.map(res => {
       Logger.debug("Reinstate Account request returned status: " + res.status)
       res.status match {
@@ -143,7 +144,7 @@ trait DesConnector extends ServicesConfig {
                      (implicit hc: HeaderCarrier): Future[DesResponse] = {
     val uri = s"$lisaServiceUrl/$lisaManager/accounts"
     Logger.debug("Posting Create Transfer request to des: " + uri)
-    val result = httpPost.POST[CreateLisaAccountTransferRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
+    val result = wsHttp.POST[CreateLisaAccountTransferRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc), implicitly)
 
     result.map(res => {
       Logger.debug("Create Transfer request returned status: " + res.status)
@@ -162,7 +163,7 @@ trait DesConnector extends ServicesConfig {
                   (implicit hc: HeaderCarrier): Future[DesResponse] = {
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/close-account"
     Logger.debug("Posting Close Account request to des: " + uri)
-    val result = httpPost.POST[CloseLisaAccountRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
+    val result = wsHttp.POST[CloseLisaAccountRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc), implicitly)
 
     result.map(res => {
       Logger.debug("Close Account request returned status: " + res.status)
@@ -182,7 +183,7 @@ trait DesConnector extends ServicesConfig {
 
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/life-event"
     Logger.debug("Posting Life Event request to des: " + uri)
-    val result = httpPost.POST[ReportLifeEventRequestBase, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
+    val result = wsHttp.POST[ReportLifeEventRequestBase, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc), implicitly)
 
     result.map(res => {
       Logger.debug("Life Event request returned status: " + res.status)
@@ -203,10 +204,10 @@ trait DesConnector extends ServicesConfig {
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/life-events/$lifeEventId"
     Logger.debug("Getting life event from des: " + uri)
 
-    val result: Future[HttpResponse] = httpGet.GET(uri)(
+    val result: Future[HttpResponse] = wsHttp.GET(uri)(
       httpReads,
       hc = updateHeaderCarrierWithAllDesHeaders(hc),
-      MdcLoggingExecutionContext.fromLoggingDetails(hc)
+      implicitly
     )
 
     result.map(res => {
@@ -247,7 +248,7 @@ trait DesConnector extends ServicesConfig {
 
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}"
     Logger.debug("Posting update subscription request to des: " + uri)
-    val result = httpPut.PUT[UpdateSubscriptionRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrierWithAllDesHeaders(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
+    val result = wsHttp.PUT[UpdateSubscriptionRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrierWithAllDesHeaders(hc), implicitly)
 
     result.map(res => {
       Logger.debug("Update first subscription date request returned status: " + res.status)
@@ -271,7 +272,7 @@ trait DesConnector extends ServicesConfig {
 
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/bonus-claim"
     Logger.debug("Posting Bonus Payment request to des: " + uri)
-    val result = httpPost.POST[RequestBonusPaymentRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
+    val result = wsHttp.POST[RequestBonusPaymentRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc), implicitly)
 
     result.map(res => {
       Logger.debug("Bonus Payment request returned status: " + res.status)
@@ -291,7 +292,7 @@ trait DesConnector extends ServicesConfig {
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/transaction/$transactionId"
     Logger.debug("Getting the Bonus Payment transaction details from des: " + uri)
 
-    val result: Future[HttpResponse] = httpGet.GET(uri)(httpReads, hc = updateHeaderCarrierWithAllDesHeaders(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
+    val result: Future[HttpResponse] = wsHttp.GET(uri)(httpReads, hc = updateHeaderCarrierWithAllDesHeaders(hc), implicitly)
 
     result.map(res => {
       Logger.debug("Get Bonus Payment transaction details returned status: " + res.status)
@@ -314,7 +315,7 @@ trait DesConnector extends ServicesConfig {
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/withdrawal"
     Logger.debug("Posting withdrawal request to des: " + uri)
 
-    val result = httpPost.POST[ReportWithdrawalChargeRequest, HttpResponse](uri, request)(ReportWithdrawalChargeRequest.desReportWithdrawalChargeWrites, httpReads, updateHeaderCarrier(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
+    val result = wsHttp.POST[ReportWithdrawalChargeRequest, HttpResponse](uri, request)(ReportWithdrawalChargeRequest.desReportWithdrawalChargeWrites, httpReads, updateHeaderCarrier(hc), implicitly)
 
     result.map(res => {
       Logger.debug("Withdrawal request returned status: " + res.status)
@@ -333,7 +334,7 @@ trait DesConnector extends ServicesConfig {
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/transaction/$transactionId/bonusChargeDetails"
     Logger.debug("Getting the Transaction details from des: " + uri)
 
-    val result: Future[HttpResponse] = httpGet.GET(uri)(httpReads, hc = updateHeaderCarrier(hc), MdcLoggingExecutionContext.fromLoggingDetails(hc))
+    val result: Future[HttpResponse] = wsHttp.GET(uri)(httpReads, hc = updateHeaderCarrier(hc), implicitly)
 
     result.map(res => {
       Logger.debug("Get Transaction details returned status: " + res.status)
@@ -353,10 +354,10 @@ trait DesConnector extends ServicesConfig {
 
     Logger.debug("Getting Bulk payment details from des: " + uri)
 
-    val result: Future[HttpResponse] = httpGet.GET(uri)(
+    val result: Future[HttpResponse] = wsHttp.GET(uri)(
       httpReads,
       hc = updateHeaderCarrierWithAllDesHeaders(hc),
-      MdcLoggingExecutionContext.fromLoggingDetails(hc)
+      implicitly
     )
 
     result.map(res => {
@@ -388,6 +389,5 @@ trait DesConnector extends ServicesConfig {
     }
   }
 
+  override protected def mode = environment.mode
 }
-
-object DesConnector extends DesConnector

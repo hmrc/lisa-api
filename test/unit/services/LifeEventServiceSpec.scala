@@ -27,6 +27,7 @@ import uk.gov.hmrc.lisaapi.models.des._
 import uk.gov.hmrc.lisaapi.services.LifeEventService
 
 import scala.concurrent.duration.Duration
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Await, Future}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountNotFound, ErrorInternalServerError, ErrorLifeEventIdNotFound, ErrorResponse, ErrorServiceUnavailable}
@@ -235,7 +236,5 @@ class LifeEventServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuit
   }
 
   val mockDesConnector = mock[DesConnector]
-  object SUT extends LifeEventService {
-    override val desConnector: DesConnector = mockDesConnector
-  }
+  object SUT extends LifeEventService(mockDesConnector)
 }

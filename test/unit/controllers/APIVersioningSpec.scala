@@ -22,6 +22,7 @@ import play.api.http.HeaderNames.ACCEPT
 import play.api.mvc._
 import play.api.test.{FakeApplication, FakeRequest}
 import play.test.Helpers
+import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.controllers.{APIVersioning, ErrorAcceptHeaderContentInvalid, ErrorAcceptHeaderInvalid, ErrorAcceptHeaderVersionInvalid}
 
 import scala.concurrent.duration._
@@ -88,12 +89,16 @@ class APIVersioningSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
     override val validateVersion: String => Boolean = List("1.0", "2.0") contains _
     override val validateContentType: String => Boolean = _ == "json"
     override lazy val v2endpointsEnabled: Boolean = true
+
+    override protected def appContext: AppContext = ???
   }
 
   object APIVersioningImplV2Disabled extends APIVersioning {
     override val validateVersion: String => Boolean = List("1.0", "2.0") contains _
     override val validateContentType: String => Boolean = _ == "json"
     override lazy val v2endpointsEnabled: Boolean = false
+
+    override protected def appContext: AppContext = ???
   }
 
   def withApiVersionTest[A](request: Request[A]): Result = {

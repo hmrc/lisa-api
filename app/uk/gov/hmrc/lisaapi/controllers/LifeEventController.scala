@@ -16,24 +16,28 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
+import com.google.inject.Inject
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, Result}
+import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, LifeEventService}
 import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.lisaapi.LisaConstants
+import scala.concurrent.{ExecutionContext, Future}
 
-import scala.concurrent.Future
-
-class LifeEventController extends LisaController with LisaConstants {
-
-  val service: LifeEventService = LifeEventService
-  val auditService: AuditService = AuditService
+class LifeEventController @Inject()(
+                                     val authConnector: AuthConnector,
+                                     val appContext: AppContext,
+                                     service: LifeEventService,
+                                     auditService: AuditService,
+                                     val lisaMetrics: LisaMetrics
+                                   )(implicit ec: ExecutionContext)
+  extends LisaController {
 
   def reportLisaLifeEvent(lisaManager: String, accountId: String): Action[AnyContent] =
     (validateHeader() andThen validateLMRN(lisaManager) andThen validateAccountId(accountId)).async { implicit request =>
@@ -49,7 +53,7 @@ class LifeEventController extends LisaController with LisaConstants {
                 case ReportLifeEventSuccessResponse(lifeEventId) => {
                   Logger.debug("Matched Valid Response ")
                   doAudit(lisaManager, accountId, req, true)
-                  LisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.EVENT)
+                  lisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.EVENT)
                   val data = ApiResponseData(message = "Life event created", lifeEventId = Some(lifeEventId))
                   Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
                 }
@@ -74,7 +78,7 @@ class LifeEventController extends LisaController with LisaConstants {
                    (implicit hc: HeaderCarrier, startTime: Long): Result = {
     Logger.debug("Matched an error response")
     doAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> e.errorCode))
-    LisaMetrics.incrementMetrics(startTime, e.httpStatusCode, LisaMetricKeys.EVENT)
+    lisaMetrics.incrementMetrics(startTime, e.httpStatusCode, LisaMetricKeys.EVENT)
     e.asResult
   }
 
@@ -97,7 +101,7 @@ class LifeEventController extends LisaController with LisaConstants {
       Logger.debug("Life event not reported - invalid event date")
 
       doAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> "FORBIDDEN"))
-      LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.EVENT)
+      lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.EVENT)
 
       Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
         ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("eventDate"), Some("/eventDate"))

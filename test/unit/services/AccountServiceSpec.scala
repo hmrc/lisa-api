@@ -21,15 +21,15 @@ import org.mockito.Matchers._
 import org.mockito.Mockito.when
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.test.Helpers._
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des.{DesAccountResponse, DesEmptySuccessResponse, DesFailureResponse, DesUnavailableResponse}
 import uk.gov.hmrc.lisaapi.services.AccountService
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
-import uk.gov.hmrc.http.HeaderCarrier
 
 // scalastyle:off multiple.string.literals
 class AccountServiceSpec extends PlaySpec
@@ -478,7 +478,5 @@ class AccountServiceSpec extends PlaySpec
 
   val mockDesConnector: DesConnector = mock[DesConnector]
 
-  object SUT extends AccountService {
-    override val desConnector: DesConnector = mockDesConnector
-  }
+  object SUT extends AccountService(mockDesConnector)
 }

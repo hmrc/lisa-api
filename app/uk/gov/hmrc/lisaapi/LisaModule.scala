@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.lisaapi.services
+package uk.gov.hmrc.lisaapi
 
-import com.google.inject.Inject
-import org.joda.time.DateTime
+import play.api.inject.{Binding, Module}
+import play.api.{Configuration, Environment}
+import uk.gov.hmrc.lisaapi.models.AnnualReturnValidator
+import uk.gov.hmrc.lisaapi.services._
 
-class CurrentDateService @Inject()() {
-
-  def now(): DateTime = {
-    DateTime.now
+class LisaModule extends Module {
+  override def bindings(environment: Environment, configuration: Configuration): Seq[Binding[_]] = {
+    Seq(
+      bind[AnnualReturnValidator] toInstance AnnualReturnValidator,
+      bind[CurrentDateService] toInstance CurrentDateService
+    )
   }
-
 }
-
-object CurrentDateService extends CurrentDateService

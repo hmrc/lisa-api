@@ -23,13 +23,16 @@ import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import play.api.Configuration
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.logging.Authorization
 import uk.gov.hmrc.lisaapi.models.{Bonuses, HelpToBuyTransfer, InboundPayments, RequestBonusPaymentRequest}
 import uk.gov.hmrc.lisaapi.services.AuditService
+import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.DataEvent
 
-import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
-import uk.gov.hmrc.http.HeaderCarrier
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class AuditServiceSpec extends PlaySpec
   with MockitoSugar
@@ -77,7 +80,6 @@ class AuditServiceSpec extends PlaySpec
 
       event.detail must contain ("investorId" -> "1234567890")
       event.detail must contain ("investorNINO" -> "AB123456D")
-      event.detail must contain key "Authorization"
     }
 
     "build an audit event with the correct detail when passed a RequestBonusPaymentRequest" in {
@@ -109,8 +111,6 @@ class AuditServiceSpec extends PlaySpec
       event.detail must contain ("totalBonusDueYTD" -> "1000.0")
       event.detail must contain ("bonusPaidYTD" -> "1000.0")
       event.detail must contain ("claimReason" -> "Life Event")
-
-      event.detail must contain key "Authorization"
     }
 
     "send an event via the audit connector" in {
@@ -120,10 +120,9 @@ class AuditServiceSpec extends PlaySpec
     }
   }
 
-  implicit val hc:HeaderCarrier = HeaderCarrier()
+  implicit val hc: HeaderCarrier = HeaderCarrier(authorization = Some(Authorization("abcde")))
   val mockAuditConnector = mock[AuditConnector]
+  val configuration = Configuration("appName" -> "lisa-api")
 
-  object SUT extends AuditService {
-    override val connector:AuditConnector = mockAuditConnector
-  }
+  object SUT extends AuditService(mockAuditConnector, configuration)
 }

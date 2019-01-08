@@ -16,13 +16,15 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
+import com.google.inject.Inject
 import play.api.Logger
 import play.api.data.validation.ValidationError
 import play.api.libs.json.Json.toJson
 import play.api.libs.json.{JsObject, JsPath, Json}
 import play.api.mvc.{Action, AnyContent, Result}
+import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.lisaapi.LisaConstants
+import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AccountService, AuditService}
@@ -31,10 +33,13 @@ import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext._
 
 import scala.concurrent.Future
 
-class AccountController extends LisaController with LisaConstants {
-
-  val service: AccountService = AccountService
-  val auditService: AuditService = AuditService
+class AccountController @Inject()(
+                                   val authConnector: AuthConnector,
+                                   val appContext: AppContext,
+                                   service: AccountService,
+                                   auditService: AuditService,
+                                   val lisaMetrics: LisaMetrics
+                                 ) extends LisaController {
 
   def createOrTransferLisaAccount(lisaManager: String): Action[AnyContent] =
     (validateHeader() andThen validateLMRN(lisaManager)).async { implicit request =>
@@ -43,7 +48,7 @@ class AccountController extends LisaController with LisaConstants {
       withValidJson[CreateLisaAccountRequest]({
         case createRequest: CreateLisaAccountCreationRequest =>
           if (hasAccountTransferData(request.body.asJson.get.as[JsObject])) {
-            LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.ACCOUNT)
+            lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.ACCOUNT)
 
             Future.successful(Forbidden(toJson(ErrorTransferAccountDataProvided)))
           }
@@ -62,12 +67,12 @@ class AccountController extends LisaController with LisaConstants {
             }
 
             if (transferAccountDataNotProvided > 0) {
-              LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.ACCOUNT)
+              lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.ACCOUNT)
 
               Future.successful(Forbidden(toJson(ErrorTransferAccountDataNotProvided)))
             }
             else {
-              LisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.ACCOUNT)
+              lisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.ACCOUNT)
 
               Future.successful(BadRequest(toJson(ErrorBadRequest(errorConverter.convert(errors)))))
             }
@@ -95,7 +100,7 @@ class AccountController extends LisaController with LisaConstants {
 
           val data = ApiResponseData(message = "Account created", accountId = Some(accountId))
 
-          LisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.ACCOUNT)
+          lisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.ACCOUNT)
 
           Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
         case CreateLisaAccountInvestorNotFoundResponse =>
@@ -137,7 +142,7 @@ class AccountController extends LisaController with LisaConstants {
 
           val data = ApiResponseData(message = "Account transferred", accountId = Some(accountId))
 
-          LisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.ACCOUNT)
+          lisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.ACCOUNT)
 
           Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
         case CreateLisaAccountInvestorNotFoundResponse =>
@@ -176,7 +181,7 @@ class AccountController extends LisaController with LisaConstants {
           "reasonNotCreated" -> "FORBIDDEN")
       )
 
-      LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.ACCOUNT)
+      lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.ACCOUNT)
 
       Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
         ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("firstSubscriptionDate"), Some("/firstSubscriptionDate"))
@@ -224,7 +229,7 @@ class AccountController extends LisaController with LisaConstants {
           "reasonNotCreated" -> "FORBIDDEN")
       )
 
-      LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.ACCOUNT)
+      lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.ACCOUNT)
 
       Future.successful(Forbidden(Json.toJson(ErrorForbidden(errors))))
     }
@@ -248,7 +253,7 @@ class AccountController extends LisaController with LisaConstants {
       )
     )
 
-    LisaMetrics.incrementMetrics(startTime, status, LisaMetricKeys.ACCOUNT)
+    lisaMetrics.incrementMetrics(startTime, status, LisaMetricKeys.ACCOUNT)
 
     Status(status).apply(Json.toJson(e))
   }

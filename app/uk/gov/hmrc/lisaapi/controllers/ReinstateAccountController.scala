@@ -16,22 +16,27 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
+import com.google.inject.Inject
 import play.api.Logger
 import play.api.libs.json.{JsObject, JsPath, Json}
 import play.api.mvc.{Action, AnyContent, Result}
+import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.LisaConstants
+import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, ReinstateAccountService}
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class ReinstateAccountController extends LisaController with LisaConstants {
-
-  val service: ReinstateAccountService = ReinstateAccountService
-  val auditService: AuditService = AuditService
+class ReinstateAccountController @Inject() (
+                                             val authConnector: AuthConnector,
+                                             val appContext: AppContext,
+                                             service: ReinstateAccountService,
+                                             auditService: AuditService,
+                                             val lisaMetrics: LisaMetrics
+                                           )(implicit ec: ExecutionContext) extends LisaController {
 
   def reinstateAccount (lisaManager: String): Action[AnyContent] = Action.async{ implicit request =>
     implicit val startTime: Long = System.currentTimeMillis()
@@ -53,7 +58,7 @@ class ReinstateAccountController extends LisaController with LisaConstants {
           path = getReinstateEndpointUrl(lisaManager, accountId),
           auditData = Map(ZREF -> lisaManager, "accountId" -> accountId)
         )
-        LisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.REINSTATE)
+        lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.REINSTATE)
         val data = ApiResponseData(message = "This account has been reinstated", accountId = Some(accountId))
         Ok(Json.toJson(ApiResponse(data = Some(data), success = true, status = OK)))
       }
@@ -76,7 +81,7 @@ class ReinstateAccountController extends LisaController with LisaConstants {
     } recover {
       case _:Exception  => {
         Logger.error(s"ReinstateAccountController: reinstateAccount: An error occurred returning internal server error")
-        LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.REINSTATE)
+        lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.REINSTATE)
         ErrorInternalServerError.asResult
       }
     }
@@ -98,7 +103,7 @@ class ReinstateAccountController extends LisaController with LisaConstants {
       )
     )
 
-    LisaMetrics.incrementMetrics(startTime, err.httpStatusCode, LisaMetricKeys.REINSTATE)
+    lisaMetrics.incrementMetrics(startTime, err.httpStatusCode, LisaMetricKeys.REINSTATE)
 
     val msg = message match {
       case Some(text) => text
