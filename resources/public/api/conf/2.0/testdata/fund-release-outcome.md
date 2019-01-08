@@ -265,7 +265,7 @@
       <td>
         <pre class="code--block">
 {
-  "fundReleaseId": "3456789001",
+  "fundReleaseId": "3456789000",
   "eventDate": "2017-10-05",
   "propertyPurchaseResult": "Purchase completed",
   "propertyPurchaseValue": 250000,
