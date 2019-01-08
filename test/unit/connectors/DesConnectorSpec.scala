@@ -534,7 +534,7 @@ class DesConnectorSpec extends PlaySpec
 
   }
 
-  "return a DesUnavailableResponse" must {
+  "return a DesUnavailableResponse" when {
 
     "a 503 response is returned" in {
       when(mockHttp.PUT[UpdateSubscriptionRequest, HttpResponse](any(), any())(any(), any(), any(), any()))
