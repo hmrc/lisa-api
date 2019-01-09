@@ -100,6 +100,10 @@ class LifeEventService @Inject()(desConnector: DesConnector)(implicit ec: Execut
       val lifeEventId = extractLifeEventIdFromReason(res.reason, "^Extension 2 life event (\\d{10}) has already been recorded for this account\\.$".r)
       ReportLifeEventExtensionTwoAlreadyApprovedResponse(lifeEventId)
     }
+    case ("FUND_RELEASE_LIFE_EVENT_ID_SUPERSEDED", res) => {
+      val lifeEventId = extractLifeEventIdFromReason(res.reason, "^The fund release life event id (\\d{10}) in the request has been superseded\\.$".r)
+      ReportLifeEventFundReleaseSupersededResponse(lifeEventId)
+    }
     case ("LIFE_EVENT_INAPPROPRIATE", _) => ReportLifeEventInappropriateResponse
     case ("INVESTOR_ACCOUNTID_NOT_FOUND", _) => ReportLifeEventAccountNotFoundResponse
     case ("INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID", _) => ReportLifeEventAccountClosedOrVoidResponse
@@ -109,7 +113,6 @@ class LifeEventService @Inject()(desConnector: DesConnector)(implicit ec: Execut
     case ("SUPERSEDING_LIFE_EVENT_MISMATCH", _) => ReportLifeEventMismatchResponse
     case ("COMPLIANCE_ERROR_ACCOUNT_NOT_OPEN_LONG_ENOUGH", _) => ReportLifeEventAccountNotOpenLongEnoughResponse
     case ("COMPLIANCE_ERROR_OTHER_PURCHASE_ON_RECORD", _) => ReportLifeEventOtherPurchaseOnRecordResponse
-    case ("FUND_RELEASE_LIFE_EVENT_ID_SUPERSEDED", _) => ReportLifeEventFundReleaseSupersededResponse
     case ("FUND_RELEASE_LIFE_EVENT_ID_NOT_FOUND", _) => ReportLifeEventFundReleaseNotFoundResponse
     case ("PURCHASE_EXTENSION_1_LIFE_EVENT_NOT_YET_APPROVED", _) => ReportLifeEventExtensionOneNotYetApprovedResponse
   }

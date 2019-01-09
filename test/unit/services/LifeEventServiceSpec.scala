@@ -129,8 +129,8 @@ class LifeEventServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuit
 
     "return ReportLifeEventFundReleaseSupersededResponse" when {
       "the error code is FUND_RELEASE_LIFE_EVENT_ID_SUPERSEDED" in {
-        when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("FUND_RELEASE_LIFE_EVENT_ID_SUPERSEDED","")))
-        doPostRequest(response => response mustBe ReportLifeEventFundReleaseSupersededResponse)
+        when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("FUND_RELEASE_LIFE_EVENT_ID_SUPERSEDED","The fund release life event id 9999999992 in the request has been superseded.")))
+        doPostRequest(response => response mustBe ReportLifeEventFundReleaseSupersededResponse("9999999992"))
       }
     }
 

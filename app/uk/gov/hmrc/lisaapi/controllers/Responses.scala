@@ -197,7 +197,7 @@ case object ErrorFundReleaseOtherPropertyOnRecord extends ErrorResponse(403, "CO
 case object ErrorInvalidDataProvided extends ErrorResponse(403, "INVALID_DATA_PROVIDED", "You can only change eventDate or withdrawalAmount when superseding a property purchase fund release")
 case object ErrorExtensionOneNotApproved extends ErrorResponse(403, "FIRST_EXTENSION_NOT_APPROVED", "A first extension has not yet been approved")
 case object ErrorFundReleaseNotFound extends ErrorResponse(404, "FUND_RELEASE_NOT_FOUND", "The fundReleaseId does not match HMRC’s records")
-case object ErrorFundReleaseSuperseded extends ErrorResponse(409, "FUND_RELEASE_SUPERSEDED", "This fund release has already been superseded")
+case class ErrorFundReleaseSuperseded(lifeEventId: String) extends ErrorResponseWithLifeEventId(409, "FUND_RELEASE_SUPERSEDED", "This fund release has already been superseded", lifeEventId)
 case class ErrorExtensionOneAlreadyApproved(lifeEventId: String) extends ErrorResponseWithLifeEventId(403, "FIRST_EXTENSION_ALREADY_APPROVED", "A first extension has already been approved", lifeEventId)
 case class ErrorExtensionTwoAlreadyApproved(lifeEventId: String) extends ErrorResponseWithLifeEventId(403, "SECOND_EXTENSION_ALREADY_APPROVED", "A second extension has already been approved", lifeEventId)
 

@@ -220,7 +220,7 @@ class PropertyPurchaseController @Inject() (
     case ReportLifeEventExtensionOneAlreadyApprovedResponse(lifeEventId) => ErrorExtensionOneAlreadyApproved(lifeEventId)
     case ReportLifeEventExtensionTwoAlreadyApprovedResponse(lifeEventId) => ErrorExtensionTwoAlreadyApproved(lifeEventId)
     case ReportLifeEventFundReleaseNotFoundResponse => ErrorFundReleaseNotFound
-    case ReportLifeEventFundReleaseSupersededResponse => ErrorFundReleaseSuperseded
+    case ReportLifeEventFundReleaseSupersededResponse(lifeEventId) => ErrorFundReleaseSuperseded(lifeEventId)
   })
 
   // common errors not included as it should be possible to complete a purchase on a closed/cancelled/void account
@@ -228,7 +228,7 @@ class PropertyPurchaseController @Inject() (
     case ReportLifeEventMismatchResponse => ErrorLifeEventMismatch
     case ReportLifeEventFundReleaseNotFoundResponse => ErrorFundReleaseNotFound
     case ReportLifeEventAccountNotFoundResponse => ErrorAccountNotFound
-    case ReportLifeEventFundReleaseSupersededResponse => ErrorFundReleaseSuperseded
+    case ReportLifeEventFundReleaseSupersededResponse(lifeEventId) => ErrorFundReleaseSuperseded(lifeEventId)
     case ReportLifeEventAlreadySupersededResponse(lifeEventId) => ErrorLifeEventAlreadySuperseded(lifeEventId)
     case ReportLifeEventAlreadyExistsResponse(lifeEventId) => ErrorLifeEventAlreadyExists(lifeEventId)
     case ReportLifeEventServiceUnavailableResponse => ErrorServiceUnavailable
