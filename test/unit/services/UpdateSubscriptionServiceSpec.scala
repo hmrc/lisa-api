@@ -28,6 +28,7 @@ import uk.gov.hmrc.lisaapi.models.des._
 import uk.gov.hmrc.lisaapi.services.UpdateSubscriptionService
 
 import scala.concurrent.duration.Duration
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Await, Future}
 
 class UpdateSubscriptionServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
@@ -110,7 +111,5 @@ class UpdateSubscriptionServiceSpec extends PlaySpec with MockitoSugar with OneA
   }
 
   val mockDesConnector = mock[DesConnector]
-  object SUT extends UpdateSubscriptionService {
-    override val desConnector: DesConnector = mockDesConnector
-  }
+  object SUT extends UpdateSubscriptionService(mockDesConnector)
 }

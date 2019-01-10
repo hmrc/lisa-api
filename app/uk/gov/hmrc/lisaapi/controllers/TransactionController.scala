@@ -16,20 +16,24 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
+import com.google.inject.Inject
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
-import uk.gov.hmrc.lisaapi.LisaConstants
+import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.TransactionService
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class TransactionController extends LisaController with LisaConstants {
-
-  val service: TransactionService = TransactionService
+class TransactionController @Inject() (
+                                        val authConnector: AuthConnector,
+                                        val appContext: AppContext,
+                                        service: TransactionService,
+                                        val lisaMetrics: LisaMetrics
+                                      )(implicit ec: ExecutionContext) extends LisaController {
 
   def getTransaction(lisaManager: String, accountId: String, transactionId: String): Action[AnyContent] =
     validateHeader().async { implicit request =>
@@ -42,7 +46,7 @@ class TransactionController extends LisaController with LisaConstants {
               case success: GetTransactionSuccessResponse => {
                 Logger.debug("Matched Valid Response")
 
-                LisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.TRANSACTION)
+                lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.TRANSACTION)
 
                 withApiVersion {
                   case Some(VERSION_1) => Future.successful(Ok(Json.toJson(success.copy(transactionType = None, supersededBy = None))))
@@ -52,7 +56,7 @@ class TransactionController extends LisaController with LisaConstants {
               case GetTransactionTransactionNotFoundResponse => {
                 Logger.debug("Matched Not Found Response")
 
-                LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.TRANSACTION)
+                lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.TRANSACTION)
 
                 withApiVersion {
                   case Some(VERSION_1) => Future.successful(ErrorBonusPaymentTransactionNotFound.asResult)
@@ -68,7 +72,7 @@ class TransactionController extends LisaController with LisaConstants {
                 )
                 val error = errors.getOrElse(res, ErrorInternalServerError)
 
-                LisaMetrics.incrementMetrics(startTime, error.httpStatusCode, LisaMetricKeys.TRANSACTION)
+                lisaMetrics.incrementMetrics(startTime, error.httpStatusCode, LisaMetricKeys.TRANSACTION)
 
                 Future.successful(error.asResult)
               }

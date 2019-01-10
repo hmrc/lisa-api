@@ -22,15 +22,17 @@ import org.mockito.Mockito._
 import org.scalatest._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.libs.json.{JsError, Json}
+import play.api.libs.json.Json
 import play.api.mvc.{AnyContentAsJson, Result}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
+import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.LisaConstants
-import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
+import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.controllers.{BonusPaymentController, ErrorAccountNotFound, ErrorBadRequestLmrn, ErrorBonusPaymentTransactionNotFound, ErrorValidation}
+import uk.gov.hmrc.lisaapi.metrics.LisaMetrics
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, BonusOrWithdrawalService, BonusPaymentService, CurrentDateService}
 import uk.gov.hmrc.lisaapi.utils.BonusPaymentValidator
@@ -1023,17 +1025,14 @@ class BonusPaymentControllerSpec extends PlaySpec
   val mockPostService: BonusPaymentService = mock[BonusPaymentService]
   val mockGetService: BonusOrWithdrawalService = mock[BonusOrWithdrawalService]
   val mockAuditService: AuditService = mock[AuditService]
-  val mockAuthCon: LisaAuthConnector = mock[LisaAuthConnector]
+  val mockAuthCon: AuthConnector = mock[AuthConnector]
   val mockDateTimeService: CurrentDateService = mock[CurrentDateService]
   val mockValidator: BonusPaymentValidator = mock[BonusPaymentValidator]
 
-  val SUT = new BonusPaymentController {
-    override val postService: BonusPaymentService = mockPostService
-    override val getService: BonusOrWithdrawalService = mockGetService
-    override val auditService: AuditService = mockAuditService
-    override val authConnector: LisaAuthConnector = mockAuthCon
-    override val validator: BonusPaymentValidator = mockValidator
-    override val dateTimeService: CurrentDateService = mockDateTimeService
+  val mockAppContext: AppContext = mock[AppContext]
+  val mockLisaMetrics: LisaMetrics = mock[LisaMetrics]
+
+  val SUT = new BonusPaymentController(mockAuthCon, mockAppContext, mockGetService, mockPostService, mockAuditService, mockValidator, mockDateTimeService, mockLisaMetrics) {
     override lazy val v2endpointsEnabled = true
   }
 }

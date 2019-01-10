@@ -16,7 +16,6 @@
 
 package unit.services
 
-import org.joda.time.DateTime
 import org.mockito.Matchers._
 import org.mockito.Mockito.when
 import org.scalatest.mock.MockitoSugar
@@ -24,9 +23,10 @@ import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.models.des._
-import uk.gov.hmrc.lisaapi.services.{AccountService, ReinstateAccountService}
+import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesReinstateAccountSuccessResponse, _}
+import uk.gov.hmrc.lisaapi.services.ReinstateAccountService
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
@@ -43,9 +43,9 @@ class ReinstateAccountServiceSpec extends PlaySpec
       "given no rds code and an account id" in {
         when(mockDesConnector.reinstateAccount(any(), any())(any()))
           .thenReturn(
-            Future.successful((
+            Future.successful(
               DesReinstateAccountSuccessResponse("code", "reason")
-            ))
+            )
           )
 
         doReinstateRequest { response =>
@@ -158,7 +158,5 @@ class ReinstateAccountServiceSpec extends PlaySpec
 
   val mockDesConnector: DesConnector = mock[DesConnector]
 
-  object SUT extends ReinstateAccountService {
-    override val desConnector: DesConnector = mockDesConnector
-  }
+  object SUT extends ReinstateAccountService(mockDesConnector)
 }

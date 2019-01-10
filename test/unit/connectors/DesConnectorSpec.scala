@@ -23,11 +23,15 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.{JsValue, Json}
 import play.api.test.Helpers._
+import play.api.{Configuration, Environment, Mode}
 import uk.gov.hmrc.http._
+import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des._
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 import scala.io.Source
@@ -41,7 +45,7 @@ class DesConnectorSpec extends PlaySpec
     "return a populated CreateLisaInvestorSuccessResponse" when {
 
       "The DES response has a json body that is in the correct format" in {
-        when(mockHttpPost.POST[CreateLisaInvestorRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockHttp.POST[CreateLisaInvestorRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -64,7 +68,7 @@ class DesConnectorSpec extends PlaySpec
 
       "the DES response has no json body" in {
 
-        when(mockHttpPost.POST[CreateLisaInvestorRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockHttp.POST[CreateLisaInvestorRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -80,7 +84,7 @@ class DesConnectorSpec extends PlaySpec
       }
 
       "the DES response has a json body that is in an incorrect format" in {
-        when(mockHttpPost.POST[CreateLisaInvestorRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockHttp.POST[CreateLisaInvestorRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -94,14 +98,13 @@ class DesConnectorSpec extends PlaySpec
           response must be(DesFailureResponse())
         }
       }
-
     }
 
     "return a populated CreateLisaInvestorAlreadyExistsResponse" when {
 
       "the investor already exists response is returned" in {
         val investorID = "1234567890"
-        when(mockHttpPost.POST[CreateLisaInvestorRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockHttp.POST[CreateLisaInvestorRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -121,7 +124,7 @@ class DesConnectorSpec extends PlaySpec
     "return a specific DesFailureResponse" when {
 
       "a specific failure is returned" in {
-        when(mockHttpPost.POST[CreateLisaInvestorRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockHttp.POST[CreateLisaInvestorRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -141,7 +144,7 @@ class DesConnectorSpec extends PlaySpec
     "return a DesUnavailableResponse" when {
 
       "a 503 is returned" in {
-        when(mockHttpPost.POST[CreateLisaInvestorRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockHttp.POST[CreateLisaInvestorRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -165,7 +168,7 @@ class DesConnectorSpec extends PlaySpec
     "return a populated success response" when {
 
       "DES returns 201 created" in {
-        when(mockHttpPost.POST[CreateLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockHttp.POST[CreateLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -185,7 +188,7 @@ class DesConnectorSpec extends PlaySpec
     "return a generic failure response" when {
 
       "the DES response is not 201 created and has no json body" in {
-        when(mockHttpPost.POST[CreateLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockHttp.POST[CreateLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -201,7 +204,7 @@ class DesConnectorSpec extends PlaySpec
       }
 
       "the DES response is not 201 created and has a json body that is not in the correct format" in {
-        when(mockHttpPost.POST[CreateLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockHttp.POST[CreateLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -221,7 +224,7 @@ class DesConnectorSpec extends PlaySpec
     "return a DesUnavailableResponse" when {
 
       "a 503 is returned" in {
-        when(mockHttpPost.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockHttp.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -241,7 +244,7 @@ class DesConnectorSpec extends PlaySpec
     "return a type-appropriate failure response" when {
 
       "a specific failure is returned" in {
-        when(mockHttpPost.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockHttp.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -265,7 +268,7 @@ class DesConnectorSpec extends PlaySpec
     "return a populated success response" when {
 
       "DES returns 201 created" in {
-        when(mockHttpPost.POST[CreateLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockHttp.POST[CreateLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -285,7 +288,7 @@ class DesConnectorSpec extends PlaySpec
     "return a generic failure response" when {
 
       "the DES response is not 201 created and has no json body" in {
-        when(mockHttpPost.POST[CreateLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockHttp.POST[CreateLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -301,7 +304,7 @@ class DesConnectorSpec extends PlaySpec
       }
 
       "the DES response is not 201 created and has a json body that is not in the correct format" in {
-        when(mockHttpPost.POST[CreateLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockHttp.POST[CreateLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -321,7 +324,7 @@ class DesConnectorSpec extends PlaySpec
     "return a type-appropriate failure response" when {
 
       "a specific failure is returned" in {
-        when(mockHttpPost.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockHttp.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -341,7 +344,7 @@ class DesConnectorSpec extends PlaySpec
     "return a DesUnavailableResponse" when {
 
       "a 503 is returned" in {
-        when(mockHttpPost.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockHttp.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -365,20 +368,19 @@ class DesConnectorSpec extends PlaySpec
     "return a DesEmptySuccessResponse" when {
 
       "DES returns 200 ok" in {
-        when(mockHttpPost.POST[CloseLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockHttp.POST[CloseLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(Future.successful(HttpResponse(responseStatus = OK, responseJson = None)))
 
         doCloseAccountRequest { response =>
           response mustBe DesEmptySuccessResponse
         }
       }
-
     }
 
     "return a DesUnavailableResponse" when {
 
       "a 503 is returned" in {
-        when(mockHttpPost.POST[CloseLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockHttp.POST[CloseLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -392,13 +394,12 @@ class DesConnectorSpec extends PlaySpec
           response mustBe DesUnavailableResponse
         }
       }
-
     }
 
     "return a DesFailureResponse" when {
 
       "any other response is received" in {
-        when(mockHttpPost.POST[CloseLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockHttp.POST[CloseLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -421,8 +422,8 @@ class DesConnectorSpec extends PlaySpec
 
     "return a populated success response" when {
       "DES returns 200 ok" in {
-        when(mockHttpPut.PUT[JsValue, HttpResponse](any(), any())(any(),any(), any(), any()))
-          .thenReturn (Future.successful(
+        when(mockHttp.PUT[JsValue, HttpResponse](any(), any())(any(), any(), any(), any()))
+          .thenReturn(Future.successful(
             HttpResponse(
               responseStatus = OK,
               responseJson = Some(Json.parse(s"""{"code": "SUCCESS", "reason": "Account successfully reinstated"}"""))
@@ -436,7 +437,7 @@ class DesConnectorSpec extends PlaySpec
 
     "return a generic failure response" when {
       "the DES response has no json body" in {
-        when(mockHttpPut.PUT[JsValue,HttpResponse](any(),any())(any(), any(), any(), any()))
+        when(mockHttp.PUT[JsValue, HttpResponse](any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -454,7 +455,7 @@ class DesConnectorSpec extends PlaySpec
 
     "return a DesUnavailableResponse" when {
       "a 503 is returned" in {
-        when(mockHttpPut.PUT[JsValue,HttpResponse](any(),any())(any(), any(), any(), any()))
+        when(mockHttp.PUT[JsValue, HttpResponse](any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -477,7 +478,7 @@ class DesConnectorSpec extends PlaySpec
     "return a populated DesUpdateSubscriptionSuccessResponse" when {
 
       "the DES response has a json body that is in the correct format" in {
-        when(mockHttpPut.PUT[UpdateSubscriptionRequest, HttpResponse](any(), any())(any(), any(), any(), any()))
+        when(mockHttp.PUT[UpdateSubscriptionRequest, HttpResponse](any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -494,13 +495,12 @@ class DesConnectorSpec extends PlaySpec
           )
         }
       }
-
     }
 
     "return a failure response" when {
 
       "the DES response has no json body" in {
-        when(mockHttpPut.PUT[UpdateSubscriptionRequest, HttpResponse](any(), any())(any(), any(), any(), any()))
+        when(mockHttp.PUT[UpdateSubscriptionRequest, HttpResponse](any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -514,43 +514,42 @@ class DesConnectorSpec extends PlaySpec
           response mustBe DesFailureResponse()
         }
       }
-
-      "status is 201 and json is invalid" in {
-        when(mockHttpPut.PUT[UpdateSubscriptionRequest, HttpResponse](any(), any())(any(), any(), any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                responseStatus = CREATED,
-                responseJson = Some(Json.parse(s"""{"code": "UPDATED_AND_ACCOUNT_VOIDED", "message": "LISA Account firstSubscriptionDate has been updated successfully"}"""))
-              )
-            )
-          )
-
-        updateFirstSubscriptionDateRequest { response =>
-          response mustBe DesFailureResponse()
-        }
-      }
-
     }
 
-    "return a DesUnavailableResponse" when {
-
-      "a 503 response is returned" in {
-        when(mockHttpPut.PUT[UpdateSubscriptionRequest, HttpResponse](any(), any())(any(), any(), any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                responseStatus = SERVICE_UNAVAILABLE,
-                responseJson = None
-              )
+    "status is 201 and json is invalid" in {
+      when(mockHttp.PUT[UpdateSubscriptionRequest, HttpResponse](any(), any())(any(), any(), any(), any()))
+        .thenReturn(
+          Future.successful(
+            HttpResponse(
+              responseStatus = CREATED,
+              responseJson = Some(Json.parse(s"""{"code": "UPDATED_AND_ACCOUNT_VOIDED", "message": "LISA Account firstSubscriptionDate has been updated successfully"}"""))
             )
           )
+        )
 
-        updateFirstSubscriptionDateRequest { response =>
-          response mustBe DesUnavailableResponse
-        }
+      updateFirstSubscriptionDateRequest { response =>
+        response mustBe DesFailureResponse()
       }
+    }
 
+  }
+
+  "return a DesUnavailableResponse" when {
+
+    "a 503 response is returned" in {
+      when(mockHttp.PUT[UpdateSubscriptionRequest, HttpResponse](any(), any())(any(), any(), any(), any()))
+        .thenReturn(
+          Future.successful(
+            HttpResponse(
+              responseStatus = SERVICE_UNAVAILABLE,
+              responseJson = None
+            )
+          )
+        )
+
+      updateFirstSubscriptionDateRequest { response =>
+        response mustBe DesUnavailableResponse
+      }
     }
 
   }
@@ -560,7 +559,7 @@ class DesConnectorSpec extends PlaySpec
     "return a populated DesSuccessResponse" when {
 
       "the DES response has a json body that is in the correct format" in {
-        when(mockHttpPost.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockHttp.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -580,7 +579,7 @@ class DesConnectorSpec extends PlaySpec
     "return a DesUnavailableResponse" when {
 
       "a 503 is returned" in {
-        when(mockHttpPost.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockHttp.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -600,7 +599,7 @@ class DesConnectorSpec extends PlaySpec
     "return a generic DesFailureResponse" when {
 
       "the response json is invalid" in {
-        when(mockHttpPost.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockHttp.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -616,7 +615,7 @@ class DesConnectorSpec extends PlaySpec
       }
 
       "the response has no json body" in {
-        when(mockHttpPost.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockHttp.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -636,7 +635,7 @@ class DesConnectorSpec extends PlaySpec
     "return a populated DesFailureResponse" when {
 
       "a LIFE_EVENT_INAPPROPRIATE failure is returned" in {
-        when(mockHttpPost.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockHttp.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -647,12 +646,12 @@ class DesConnectorSpec extends PlaySpec
           )
 
         doReportLifeEventRequest { response =>
-          response mustBe DesFailureResponse("LIFE_EVENT_INAPPROPRIATE","The life event conflicts with previous life event reported.")
+          response mustBe DesFailureResponse("LIFE_EVENT_INAPPROPRIATE", "The life event conflicts with previous life event reported.")
         }
       }
 
       "a LIFE_EVENT_ALREADY_EXISTS failure is returned" in {
-        when(mockHttpPost.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockHttp.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -676,7 +675,7 @@ class DesConnectorSpec extends PlaySpec
     "return a Left of DesUnavailableResponse" when {
 
       "a 503 is returned" in {
-        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -696,7 +695,7 @@ class DesConnectorSpec extends PlaySpec
     "return a Left of DesFailureResponse" when {
 
       "a specific failure is returned" in {
-        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -716,7 +715,7 @@ class DesConnectorSpec extends PlaySpec
       }
 
       "the response has no json body" in {
-        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -732,7 +731,7 @@ class DesConnectorSpec extends PlaySpec
       }
 
       "the response is badly formed" in {
-        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -753,7 +752,7 @@ class DesConnectorSpec extends PlaySpec
 
       "DES returns successfully" in {
 
-        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -785,7 +784,7 @@ class DesConnectorSpec extends PlaySpec
 
     "return a populated DesTransactionResponse" when {
       "the DES response has a json body that is in the correct format" in {
-        when(mockHttpPost.POST[RequestBonusPaymentRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockHttp.POST[RequestBonusPaymentRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -803,7 +802,7 @@ class DesConnectorSpec extends PlaySpec
 
     "return a populated DesTransactionExistResponse" when {
       "the DES response returns a 409 with a json body that is in the correct format" in {
-        when(mockHttpPost.POST[RequestBonusPaymentRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockHttp.POST[RequestBonusPaymentRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -822,7 +821,7 @@ class DesConnectorSpec extends PlaySpec
     "return the default DesFailureResponse" when {
 
       "the DES response has no json body" in {
-        when(mockHttpPost.POST[RequestBonusPaymentRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockHttp.POST[RequestBonusPaymentRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -838,7 +837,7 @@ class DesConnectorSpec extends PlaySpec
       }
 
       "the DES response has a json body that is in an incorrect format" in {
-        when(mockHttpPost.POST[RequestBonusPaymentRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockHttp.POST[RequestBonusPaymentRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -858,7 +857,7 @@ class DesConnectorSpec extends PlaySpec
     "return a specific DesFailureResponse" when {
 
       "a specific failure is returned" in {
-        when(mockHttpPost.POST[RequestBonusPaymentRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockHttp.POST[RequestBonusPaymentRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -878,7 +877,7 @@ class DesConnectorSpec extends PlaySpec
     "return a DesUnavailableResponse" when {
 
       "a 503 is returned" in {
-        when(mockHttpPost.POST[RequestBonusPaymentRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockHttp.POST[RequestBonusPaymentRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -902,7 +901,7 @@ class DesConnectorSpec extends PlaySpec
     "return a DesUnavailableResponse" when {
 
       "a 503 is returned" in {
-        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -922,7 +921,7 @@ class DesConnectorSpec extends PlaySpec
     "return a DesFailureResponse" when {
 
       "a specific failure is returned" in {
-        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -942,7 +941,7 @@ class DesConnectorSpec extends PlaySpec
       }
 
       "the response has no json body" in {
-        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -963,7 +962,7 @@ class DesConnectorSpec extends PlaySpec
 
       "DES returns successfully" in {
 
-        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -998,7 +997,7 @@ class DesConnectorSpec extends PlaySpec
 
     "return a unavailable response" when {
       "a 503 is returned" in {
-        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1016,7 +1015,7 @@ class DesConnectorSpec extends PlaySpec
 
     "return a failure response" when {
       "the DES response is a failure response" in {
-        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1035,7 +1034,7 @@ class DesConnectorSpec extends PlaySpec
         }
       }
       "the DES response has no json body" in {
-        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1050,7 +1049,7 @@ class DesConnectorSpec extends PlaySpec
         }
       }
       "the DES response is invalid" in {
-        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1071,15 +1070,16 @@ class DesConnectorSpec extends PlaySpec
 
     "return a success response" when {
       "the DES response is a valid Pending transaction" in {
-        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
                 responseStatus = OK,
-                responseJson = Some(Json.parse("""{
-                                                 |    "paymentStatus": "PENDING",
-                                                 |    "paymentDueDate": "2000-01-01"
-                                                 |}""".stripMargin))
+                responseJson = Some(Json.parse(
+                  """{
+                    |    "paymentStatus": "PENDING",
+                    |    "paymentDueDate": "2000-01-01"
+                    |}""".stripMargin))
               )
             )
           )
@@ -1091,17 +1091,18 @@ class DesConnectorSpec extends PlaySpec
         }
       }
       "the DES response is a valid Paid transaction" in {
-        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
                 responseStatus = OK,
-                responseJson = Some(Json.parse("""{
-                                                 |    "paymentStatus": "PAID",
-                                                 |    "paymentDate": "2000-01-01",
-                                                 |    "paymentReference": "002630000993",
-                                                 |    "paymentAmount": 1.00
-                                                 |}""".stripMargin))
+                responseJson = Some(Json.parse(
+                  """{
+                    |    "paymentStatus": "PAID",
+                    |    "paymentDate": "2000-01-01",
+                    |    "paymentReference": "002630000993",
+                    |    "paymentAmount": 1.00
+                    |}""".stripMargin))
               )
             )
           )
@@ -1122,7 +1123,7 @@ class DesConnectorSpec extends PlaySpec
 
     "return a unavailable response" when {
       "a 503 is returned" in {
-        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1140,7 +1141,7 @@ class DesConnectorSpec extends PlaySpec
 
     "return a failure response" when {
       "the DES response is a failure response" in {
-        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1159,7 +1160,7 @@ class DesConnectorSpec extends PlaySpec
         }
       }
       "the DES response has no json body" in {
-        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1176,7 +1177,7 @@ class DesConnectorSpec extends PlaySpec
       "the DES response is missing a processingDate" in {
         val responseJson = Json.parse("{}")
 
-        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1194,31 +1195,32 @@ class DesConnectorSpec extends PlaySpec
 
     "return a success response" when {
       "the DES response is the appropriate json response" in {
-        val responseJson = Json.parse("""{
-                                        |    "processingDate": "2017-03-07T09:30:00.000Z",
-                                        |    "idNumber": "Z5555",
-                                        |    "financialTransactions": [
-                                        |      {
-                                        |        "clearedAmount": -1000,
-                                        |        "sapDocumentNumber": "ABC123456789",
-                                        |        "items": [
-                                        |          {
-                                        |            "clearingDate": "2017-06-01"
-                                        |          }
-                                        |        ]
-                                        |      },
-                                        |      {
-                                        |        "outstandingAmount": -1500.55,
-                                        |        "items": [
-                                        |          {
-                                        |            "dueDate": "2017-07-01"
-                                        |          }
-                                        |        ]
-                                        |      }
-                                        |    ]
-                                        |}""".stripMargin)
+        val responseJson = Json.parse(
+          """{
+            |    "processingDate": "2017-03-07T09:30:00.000Z",
+            |    "idNumber": "Z5555",
+            |    "financialTransactions": [
+            |      {
+            |        "clearedAmount": -1000,
+            |        "sapDocumentNumber": "ABC123456789",
+            |        "items": [
+            |          {
+            |            "clearingDate": "2017-06-01"
+            |          }
+            |        ]
+            |      },
+            |      {
+            |        "outstandingAmount": -1500.55,
+            |        "items": [
+            |          {
+            |            "dueDate": "2017-07-01"
+            |          }
+            |        ]
+            |      }
+            |    ]
+            |}""".stripMargin)
 
-        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1248,7 +1250,7 @@ class DesConnectorSpec extends PlaySpec
             | "idNumber": "Z1234"
             |}""".stripMargin)
 
-        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1269,7 +1271,7 @@ class DesConnectorSpec extends PlaySpec
             | "financialTransactions": []
             |}""".stripMargin)
 
-        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1289,7 +1291,7 @@ class DesConnectorSpec extends PlaySpec
             | "processingDate": "2017-03-07T09:30:00.000Z"
             |}""".stripMargin)
 
-        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1311,7 +1313,7 @@ class DesConnectorSpec extends PlaySpec
 
     "return a unavailable response" when {
       "a 503 is returned" in {
-        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1329,7 +1331,7 @@ class DesConnectorSpec extends PlaySpec
 
     "return a failure response" when {
       "the DES response is a failure response" in {
-        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1348,7 +1350,7 @@ class DesConnectorSpec extends PlaySpec
         }
       }
       "the DES response has no json body" in {
-        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1365,7 +1367,7 @@ class DesConnectorSpec extends PlaySpec
       "the DES response is missing required fields" in {
         val responseJson = Json.parse("{}")
 
-        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1383,23 +1385,24 @@ class DesConnectorSpec extends PlaySpec
 
     "return a success response" when {
       "the DES response is the appropriate json response" in {
-        val responseJson = Json.parse("""{
-                                          |  "investorId": "1234567890",
-                                          |  "status": "OPEN",
-                                          |  "creationDate": "2016-01-01",
-                                          |  "creationReason": "REINSTATED",
-                                          |  "hmrcClosureDate": "2016-02-01",
-                                          |  "accountClosureReason": "TRANSFERRED_OUT",
-                                          |  "transferInDate": "2016-03-01",
-                                          |  "transferOutDate": "2016-04-01",
-                                          |  "xferredFromAccountId": "123abc789ABC34567890",
-                                          |  "xferredFromLmrn": "Z123453",
-                                          |  "lisaManagerClosureDate": "2016-05-01",
-                                          |  "subscriptionStatus": "AVAILABLE",
-                                          |  "firstSubscriptionDate": "2016-01-06"
-                                          |}""".stripMargin)
+        val responseJson = Json.parse(
+          """{
+            |  "investorId": "1234567890",
+            |  "status": "OPEN",
+            |  "creationDate": "2016-01-01",
+            |  "creationReason": "REINSTATED",
+            |  "hmrcClosureDate": "2016-02-01",
+            |  "accountClosureReason": "TRANSFERRED_OUT",
+            |  "transferInDate": "2016-03-01",
+            |  "transferOutDate": "2016-04-01",
+            |  "xferredFromAccountId": "123abc789ABC34567890",
+            |  "xferredFromLmrn": "Z123453",
+            |  "lisaManagerClosureDate": "2016-05-01",
+            |  "subscriptionStatus": "AVAILABLE",
+            |  "firstSubscriptionDate": "2016-01-06"
+            |}""".stripMargin)
 
-        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1431,22 +1434,23 @@ class DesConnectorSpec extends PlaySpec
 
     "return a subscriptionStatus of AVAILABLE" when {
       "there is no subscriptionStatus in the json response from DES" in {
-        val responseJson = Json.parse("""{
-                                        |  "investorId": "1234567890",
-                                        |  "status": "OPEN",
-                                        |  "creationDate": "2016-01-01",
-                                        |  "creationReason": "REINSTATED",
-                                        |  "hmrcClosureDate": "2016-02-01",
-                                        |  "accountClosureReason": "TRANSFERRED_OUT",
-                                        |  "transferInDate": "2016-03-01",
-                                        |  "transferOutDate": "2016-04-01",
-                                        |  "xferredFromAccountId": "123abc789ABC34567890",
-                                        |  "xferredFromLmrn": "Z123453",
-                                        |  "lisaManagerClosureDate": "2016-05-01",
-                                        |  "firstSubscriptionDate": "2016-01-06"
-                                        |}""".stripMargin)
+        val responseJson = Json.parse(
+          """{
+            |  "investorId": "1234567890",
+            |  "status": "OPEN",
+            |  "creationDate": "2016-01-01",
+            |  "creationReason": "REINSTATED",
+            |  "hmrcClosureDate": "2016-02-01",
+            |  "accountClosureReason": "TRANSFERRED_OUT",
+            |  "transferInDate": "2016-03-01",
+            |  "transferOutDate": "2016-04-01",
+            |  "xferredFromAccountId": "123abc789ABC34567890",
+            |  "xferredFromLmrn": "Z123453",
+            |  "lisaManagerClosureDate": "2016-05-01",
+            |  "firstSubscriptionDate": "2016-01-06"
+            |}""".stripMargin)
 
-        when(mockHttpGet.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1481,7 +1485,7 @@ class DesConnectorSpec extends PlaySpec
   "Report withdrawal endpoint" must {
 
     "uses the des writes when posting data" in {
-      when(mockHttpPost.POST[ReportWithdrawalChargeRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+      when(mockHttp.POST[ReportWithdrawalChargeRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
         .thenReturn(
           Future.successful(
             HttpResponse(
@@ -1492,14 +1496,14 @@ class DesConnectorSpec extends PlaySpec
         )
 
       doReportWithdrawalRequest { response =>
-        verify(mockHttpPost).POST(any(), any(), any())(matchersEquals(ReportWithdrawalChargeRequest.desReportWithdrawalChargeWrites), any(), any(), any())
+        verify(mockHttp).POST(any(), any(), any())(matchersEquals(ReportWithdrawalChargeRequest.desReportWithdrawalChargeWrites), any(), any(), any())
       }
     }
 
     "return a populated DesTransactionResponse" when {
 
       "the DES response has a json body that is in the correct format" in {
-        when(mockHttpPost.POST[ReportWithdrawalChargeRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockHttp.POST[ReportWithdrawalChargeRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1519,7 +1523,7 @@ class DesConnectorSpec extends PlaySpec
     "return the default DesFailureResponse" when {
 
       "the DES response has no json body" in {
-        when(mockHttpPost.POST[ReportWithdrawalChargeRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockHttp.POST[ReportWithdrawalChargeRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1535,7 +1539,7 @@ class DesConnectorSpec extends PlaySpec
       }
 
       "the DES response has a json body that is in an incorrect format" in {
-        when(mockHttpPost.POST[ReportWithdrawalChargeRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockHttp.POST[ReportWithdrawalChargeRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1555,7 +1559,7 @@ class DesConnectorSpec extends PlaySpec
     "return a specific DesFailureResponse" when {
 
       "a specific failure is returned" in {
-        when(mockHttpPost.POST[ReportWithdrawalChargeRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockHttp.POST[ReportWithdrawalChargeRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1575,7 +1579,7 @@ class DesConnectorSpec extends PlaySpec
     "return a DesUnavailableResponse" when {
 
       "a 503 is returned" in {
-        when(mockHttpPost.POST[ReportWithdrawalChargeRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockHttp.POST[ReportWithdrawalChargeRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1595,6 +1599,10 @@ class DesConnectorSpec extends PlaySpec
   }
 
   val validBonusPaymentResponseJson = Source.fromInputStream(getClass().getResourceAsStream("/json/request.valid.bonus-payment-response.json")).mkString
+  val mockHttp = mock[HttpClient]
+  val configuration = Configuration("microservice.services.des.host" -> "", "microservice.services.des.port" -> 0)
+  val mockEnvironment = mock[Environment]
+  val mockAppContext = mock[AppContext]
 
   private def doCreateInvestorRequest(callback: (DesResponse) => Unit) = {
     val request = CreateLisaInvestorRequest("AB123456A", "A", "B", new DateTime("2000-01-01"))
@@ -1604,7 +1612,7 @@ class DesConnectorSpec extends PlaySpec
   }
 
   private def doCreateAccountRequest(callback: (DesResponse) => Unit) = {
-    val request = CreateLisaAccountCreationRequest("1234567890",  "9876543210", new DateTime("2000-01-01"))
+    val request = CreateLisaAccountCreationRequest("1234567890", "9876543210", new DateTime("2000-01-01"))
     val response = Await.result(SUT.createAccount("Z019283", request), Duration.Inf)
 
     callback(response)
@@ -1612,7 +1620,7 @@ class DesConnectorSpec extends PlaySpec
 
   private def doTransferAccountRequest(callback: (DesResponse) => Unit) = {
     val transferAccount = AccountTransfer("1234", "1234", new DateTime("2000-01-01"))
-    val request = CreateLisaAccountTransferRequest("Transferred", "1234567890",  "9876543210", new DateTime("2000-01-01"), transferAccount)
+    val request = CreateLisaAccountTransferRequest("Transferred", "1234567890", "9876543210", new DateTime("2000-01-01"), transferAccount)
     val response = Await.result(SUT.transferAccount("Z019283", request), Duration.Inf)
 
     callback(response)
@@ -1639,7 +1647,7 @@ class DesConnectorSpec extends PlaySpec
   }
 
   private def doReportLifeEventRequest(callback: (DesResponse) => Unit) = {
-    val request = ReportLifeEventRequest("LISA Investor Terminal Ill Health",new DateTime("2000-01-01"))
+    val request = ReportLifeEventRequest("LISA Investor Terminal Ill Health", new DateTime("2000-01-01"))
     val response = Await.result(SUT.reportLifeEvent("Z123456", "ABC12345", request), Duration.Inf)
 
     callback(response)
@@ -1710,16 +1718,10 @@ class DesConnectorSpec extends PlaySpec
 
     callback(response)
   }
-
-  val mockHttpPost = mock[HttpPost]
-  val mockHttpGet = mock[HttpGet]
-  val mockHttpPut = mock[HttpPut]
-
   implicit val hc = HeaderCarrier()
 
-  object SUT extends DesConnector {
-    override val httpPost = mockHttpPost
-    override val httpGet = mockHttpGet
-    override val httpPut = mockHttpPut
+  object SUT extends DesConnector(mockHttp, configuration, mockEnvironment, mockAppContext) {
+    override val mode = Mode.Test
   }
+
 }

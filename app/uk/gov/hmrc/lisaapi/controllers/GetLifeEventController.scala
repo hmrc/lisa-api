@@ -16,19 +16,25 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
+import com.google.inject.Inject
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
-import uk.gov.hmrc.lisaapi.LisaConstants
+import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.services.LifeEventService
 
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.ExecutionContext
 
-class GetLifeEventController extends LisaController with LisaConstants {
+class GetLifeEventController @Inject()(
+                                        val authConnector: AuthConnector,
+                                        val appContext: AppContext,
+                                        val lisaMetrics: LisaMetrics,
+                                        val service: LifeEventService)
+                                      (implicit ec: ExecutionContext)
+  extends LisaController {
 
   override val validateVersion: String => Boolean = _ == "2.0"
-
-  val service: LifeEventService = LifeEventService
 
   def getLifeEvent(lisaManager: String, accountId: String, lifeEventId: String): Action[AnyContent] = validateHeader().async { implicit request =>
     implicit val startTime: Long = System.currentTimeMillis()
@@ -38,11 +44,11 @@ class GetLifeEventController extends LisaController with LisaConstants {
         withEnrolment(lisaManager) { (_) =>
           service.getLifeEvent(lisaManager, accountId, lifeEventId) map {
             case Left(error) => {
-              LisaMetrics.incrementMetrics(startTime, error.httpStatusCode, LisaMetricKeys.EVENT)
+              lisaMetrics.incrementMetrics(startTime, error.httpStatusCode, LisaMetricKeys.EVENT)
               error.asResult
             }
             case Right(success) => {
-              LisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.EVENT)
+              lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.EVENT)
               Ok(Json.toJson(success))
             }
           }

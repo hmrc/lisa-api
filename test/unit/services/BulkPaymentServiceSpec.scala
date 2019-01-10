@@ -29,6 +29,7 @@ import uk.gov.hmrc.lisaapi.services.BulkPaymentService
 
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class BulkPaymentServiceSpec extends PlaySpec
   with MockitoSugar
@@ -127,7 +128,5 @@ class BulkPaymentServiceSpec extends PlaySpec
   val lmrn = "Z123456"
   val date = new DateTime("2018-01-01")
   val mockDesConnector = mock[DesConnector]
-  object SUT extends BulkPaymentService {
-    override val desConnector: DesConnector = mockDesConnector
-  }
+  object SUT extends BulkPaymentService(mockDesConnector)
 }

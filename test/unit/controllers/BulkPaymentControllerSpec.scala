@@ -22,13 +22,14 @@ import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.Play
 import play.api.libs.json.Json
 import play.api.test.Helpers._
-import play.api.test.{FakeApplication, FakeRequest, Helpers}
+import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
-import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
+import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.controllers._
+import uk.gov.hmrc.lisaapi.metrics.LisaMetrics
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{BulkPaymentService, CurrentDateService}
 
@@ -288,13 +289,12 @@ class BulkPaymentControllerSpec extends PlaySpec
   )
 
   val mockService: BulkPaymentService = mock[BulkPaymentService]
-  val mockAuthCon: LisaAuthConnector = mock[LisaAuthConnector]
+  val mockAuthCon: AuthConnector = mock[AuthConnector]
   val mockCurrentDateService: CurrentDateService = mock[CurrentDateService]
+  val mockAppContext: AppContext = mock[AppContext]
+  val mockLisaMetrics: LisaMetrics = mock[LisaMetrics]
 
-  val SUT = new BulkPaymentController {
-    override val service: BulkPaymentService = mockService
-    override val authConnector = mockAuthCon
-    override val currentDateService = mockCurrentDateService
+  val SUT = new BulkPaymentController(mockAuthCon, mockAppContext, mockCurrentDateService, mockService, mockLisaMetrics) {
     override lazy val v2endpointsEnabled = true
   }
 

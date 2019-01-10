@@ -16,17 +16,16 @@
 
 package uk.gov.hmrc.lisaapi.services
 
+import com.google.inject.Inject
 import play.api.Logger
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesResponse, DesUnavailableResponse}
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-trait BonusOrWithdrawalService {
-  val desConnector: DesConnector
+class BonusOrWithdrawalService @Inject()(desConnector: DesConnector)(implicit ec: ExecutionContext) {
 
   def getBonusOrWithdrawal(lisaManager: String, accountId: String, transactionId: String)
                           (implicit hc: HeaderCarrier): Future[GetBonusOrWithdrawalResponse] = {
@@ -58,9 +57,4 @@ trait BonusOrWithdrawalService {
       }
     }
   }
-
-}
-
-object BonusOrWithdrawalService extends BonusOrWithdrawalService {
-  override val desConnector: DesConnector = DesConnector
 }

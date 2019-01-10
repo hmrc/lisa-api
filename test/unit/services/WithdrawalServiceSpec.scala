@@ -29,6 +29,7 @@ import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesTransactionRespons
 import uk.gov.hmrc.lisaapi.services.WithdrawalService
 
 import scala.concurrent.duration.Duration
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Await, Future}
 
 class WithdrawalServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
@@ -186,8 +187,6 @@ class WithdrawalServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSui
   }
 
   val mockDesConnector = mock[DesConnector]
-  object SUT extends WithdrawalService {
-    override val desConnector: DesConnector = mockDesConnector
-  }
+  object SUT extends WithdrawalService(mockDesConnector)
 
 }

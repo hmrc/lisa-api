@@ -16,21 +16,21 @@
 
 package uk.gov.hmrc.lisaapi.utils
 
+import com.google.inject.Inject
 import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.controllers.ErrorValidation
-import uk.gov.hmrc.lisaapi.models.{Amount, BonusRecovery, RequestBonusPaymentRequest}
+import uk.gov.hmrc.lisaapi.models.{BonusRecovery, RequestBonusPaymentRequest}
 import uk.gov.hmrc.lisaapi.services.CurrentDateService
 
 import scala.collection.mutable.ListBuffer
 
 case class BonusPaymentValidationRequest(data: RequestBonusPaymentRequest, errors: Seq[ErrorValidation] = Nil)
 
-trait BonusPaymentValidator extends LisaConstants {
+class BonusPaymentValidator @Inject()(currentDateService: CurrentDateService) extends LisaConstants {
 
   val inboundPayments: String = "/inboundPayments"
   val htbTransfer: String = "/htbTransfer"
   val bonuses: String = "/bonuses"
-  val currentDateService: CurrentDateService
 
   def validate(data: RequestBonusPaymentRequest): Seq[ErrorValidation] = {
     (
@@ -220,8 +220,4 @@ trait BonusPaymentValidator extends LisaConstants {
     newErrs
   }
 
-}
-
-object BonusPaymentValidator extends BonusPaymentValidator {
-  val currentDateService: CurrentDateService = CurrentDateService
 }

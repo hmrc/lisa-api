@@ -26,9 +26,11 @@ import play.api.mvc.{Action, AnyContent, AnyContentAsJson}
 import play.api.test.Helpers._
 import play.api.test._
 import play.mvc.Http.HeaderNames
-import uk.gov.hmrc.lisaapi.config.LisaAuthConnector
-import uk.gov.hmrc.lisaapi.controllers.{AccountController, ErrorNotImplemented}
-import uk.gov.hmrc.lisaapi.services.AccountService
+import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.lisaapi.config.AppContext
+import uk.gov.hmrc.lisaapi.controllers.AccountController
+import uk.gov.hmrc.lisaapi.metrics.LisaMetrics
+import uk.gov.hmrc.lisaapi.services.{AccountService, AuditService}
 import uk.gov.hmrc.lisaapi.utils.ErrorConverter
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -98,10 +100,11 @@ class LisaControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite 
 
   val mockService = mock[AccountService]
   val mockErrorConverter = mock[ErrorConverter]
-  val mockAuthCon: LisaAuthConnector = mock[LisaAuthConnector]
-  val SUT = new AccountController {
-    override val service: AccountService = mockService
-    override val authConnector = mockAuthCon
+  val mockAuthCon: AuthConnector = mock[AuthConnector]
+  val mockAuditService: AuditService = mock[AuditService]
+  val mockAppContext: AppContext = mock[AppContext]
+  val mockLisaMetrics: LisaMetrics = mock[LisaMetrics]
+  val SUT = new AccountController(mockAuthCon, mockAppContext, mockService, mockAuditService, mockLisaMetrics) {
 
     def testJsonValidator(): Action[AnyContent] = validateHeader().async { implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()

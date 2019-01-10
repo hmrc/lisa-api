@@ -27,7 +27,9 @@ trait APIVersioning {
 
   val validateVersion: String => Boolean
   val validateContentType: String => Boolean
-  lazy val v2endpointsEnabled: Boolean = AppContext.v2endpointsEnabled
+  lazy val v2endpointsEnabled: Boolean = appContext.v2endpointsEnabled
+
+  protected def appContext: AppContext
 
   def validateHeader(): ActionBuilder[Request] = new ActionBuilder[Request] {
     override def invokeBlock[A](request: Request[A], block: Request[A] => Future[Result]) = {

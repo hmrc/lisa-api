@@ -16,28 +16,33 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
+import com.google.inject.Inject
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, Result}
+import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.lisaapi.LisaConstants
+import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, BonusOrWithdrawalService, CurrentDateService, WithdrawalService}
 import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
 import uk.gov.hmrc.lisaapi.utils.WithdrawalChargeValidator
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class WithdrawalController extends LisaController with LisaConstants {
+class WithdrawalController @Inject() (
+                                       val authConnector: AuthConnector,
+                                       val appContext: AppContext,
+                                       postService: WithdrawalService,
+                                       getService: BonusOrWithdrawalService,
+                                       auditService: AuditService,
+                                       validator: WithdrawalChargeValidator,
+                                       dateTimeService: CurrentDateService,
+                                       val lisaMetrics: LisaMetrics
+                                     )(implicit ec: ExecutionContext) extends LisaController {
 
   override val validateVersion: String => Boolean = _ == "2.0"
-  val postService: WithdrawalService = WithdrawalService
-  val getService: BonusOrWithdrawalService = BonusOrWithdrawalService
-  val auditService: AuditService = AuditService
-  val validator: WithdrawalChargeValidator = WithdrawalChargeValidator
-  val dateTimeService: CurrentDateService = CurrentDateService
 
   def reportWithdrawalCharge(lisaManager: String, accountId: String): Action[AnyContent] =
     (validateHeader() andThen validateLMRN(lisaManager) andThen validateAccountId(accountId)).async { implicit request =>
@@ -85,27 +90,27 @@ class WithdrawalController extends LisaController with LisaConstants {
 
     getService.getBonusOrWithdrawal(lisaManager, accountId, transactionId).map {
       case response: GetWithdrawalResponse =>
-        LisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.WITHDRAWAL_CHARGE)
+        lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.WITHDRAWAL_CHARGE)
         Ok(Json.toJson(response))
 
       case _: GetBonusResponse =>
-        LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.WITHDRAWAL_CHARGE)
+        lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.WITHDRAWAL_CHARGE)
         NotFound(Json.toJson(ErrorWithdrawalNotFound))
 
       case GetBonusOrWithdrawalTransactionNotFoundResponse =>
-        LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.WITHDRAWAL_CHARGE)
+        lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.WITHDRAWAL_CHARGE)
         NotFound(Json.toJson(ErrorWithdrawalNotFound))
 
       case GetBonusOrWithdrawalInvestorNotFoundResponse =>
-        LisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.WITHDRAWAL_CHARGE)
+        lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.WITHDRAWAL_CHARGE)
         NotFound(Json.toJson(ErrorAccountNotFound))
 
       case GetBonusOrWithdrawalServiceUnavailableResponse =>
-        LisaMetrics.incrementMetrics(startTime, SERVICE_UNAVAILABLE, LisaMetricKeys.WITHDRAWAL_CHARGE)
+        lisaMetrics.incrementMetrics(startTime, SERVICE_UNAVAILABLE, LisaMetricKeys.WITHDRAWAL_CHARGE)
         ServiceUnavailable(Json.toJson(ErrorServiceUnavailable))
 
       case _ =>
-        LisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.WITHDRAWAL_CHARGE)
+        lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.WITHDRAWAL_CHARGE)
         InternalServerError(Json.toJson(ErrorInternalServerError))
     }
   }
@@ -125,7 +130,7 @@ class WithdrawalController extends LisaController with LisaConstants {
     else {
       auditFailure(lisaManager, accountId, data, ErrorWithdrawalTimescalesExceeded.errorCode)
 
-      LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.WITHDRAWAL_CHARGE)
+      lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.WITHDRAWAL_CHARGE)
 
       Future.successful(Forbidden(Json.toJson(ErrorWithdrawalTimescalesExceeded)))
     }
@@ -143,7 +148,7 @@ class WithdrawalController extends LisaController with LisaConstants {
     else {
       auditFailure(lisaManager, accountId, data, "FORBIDDEN")
 
-      LisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.WITHDRAWAL_CHARGE)
+      lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.WITHDRAWAL_CHARGE)
 
       Future.successful(Forbidden(Json.toJson(ErrorForbidden(errors.toList))))
     }
@@ -186,7 +191,7 @@ class WithdrawalController extends LisaController with LisaConstants {
         data
     }
 
-    LisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.WITHDRAWAL_CHARGE)
+    lisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.WITHDRAWAL_CHARGE)
 
     Created(Json.toJson(ApiResponse(data = Some(responseData), success = true, status = CREATED)))
   }
@@ -196,7 +201,7 @@ class WithdrawalController extends LisaController with LisaConstants {
     val error = errorMap.getOrElse(errorResponse, ErrorInternalServerError)
 
     auditFailure(lisaManager, accountId, req, error.errorCode)
-    LisaMetrics.incrementMetrics(startTime, error.httpStatusCode, LisaMetricKeys.WITHDRAWAL_CHARGE)
+    lisaMetrics.incrementMetrics(startTime, error.httpStatusCode, LisaMetricKeys.WITHDRAWAL_CHARGE)
 
     error.asResult
   }
