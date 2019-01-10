@@ -57,6 +57,8 @@ class UpdateSubscriptionController @Inject() (
                 error(ErrorAccountNotFound, lisaManager, accountId, updateSubsRequest)
               case UpdateSubscriptionAccountClosedResponse =>
                 error(ErrorAccountAlreadyClosed, lisaManager, accountId, updateSubsRequest)
+              case UpdateSubscriptionAccountCancelledResponse =>
+                error(ErrorAccountAlreadyCancelled, lisaManager, accountId, updateSubsRequest)
               case UpdateSubscriptionAccountVoidedResponse =>
                 error(ErrorAccountAlreadyVoided, lisaManager, accountId, updateSubsRequest)
               case UpdateSubscriptionServiceUnavailableResponse =>
