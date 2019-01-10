@@ -63,7 +63,7 @@ class AnnualReturnController @Inject()(
                     lisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.EVENT)
                     Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
                   case error: ReportLifeEventResponse =>
-                    val response = errors.getOrElse(error, ErrorInternalServerError)
+                    val response = getErrorResponse(error)
 
                     audit(lisaManager, accountId, req, Some(response.errorCode))
                     lisaMetrics.incrementMetrics(startTime, response.httpStatusCode, LisaMetricKeys.EVENT)
@@ -97,15 +97,18 @@ class AnnualReturnController @Inject()(
     )
   }
 
-  private val errors = Map[ReportLifeEventResponse, ErrorResponse](
-    ReportLifeEventAccountNotFoundResponse -> ErrorAccountNotFound,
-    ReportLifeEventAccountVoidResponse -> ErrorAccountAlreadyVoided,
-    ReportLifeEventAccountCancelledResponse -> ErrorAccountAlreadyCancelled,
-    ReportLifeEventMismatchResponse -> ErrorLifeEventMismatch,
-    ReportLifeEventAlreadySupersededResponse -> ErrorLifeEventAlreadySuperseded,
-    ReportLifeEventAlreadyExistsResponse -> ErrorLifeEventAlreadyExists,
-    ReportLifeEventServiceUnavailableResponse -> ErrorServiceUnavailable
-  )
+  private def getErrorResponse(response: ReportLifeEventResponse): ErrorResponse = {
+    response match {
+      case ReportLifeEventAccountNotFoundResponse => ErrorAccountNotFound
+      case ReportLifeEventAccountVoidResponse => ErrorAccountAlreadyVoided
+      case ReportLifeEventAccountCancelledResponse => ErrorAccountAlreadyCancelled
+      case ReportLifeEventMismatchResponse => ErrorLifeEventMismatch
+      case ReportLifeEventAlreadySupersededResponse(lifeEventId) => ErrorLifeEventAlreadySuperseded(lifeEventId)
+      case ReportLifeEventAlreadyExistsResponse(lifeEventId) => ErrorLifeEventAlreadyExists(lifeEventId)
+      case ReportLifeEventServiceUnavailableResponse => ErrorServiceUnavailable
+      case _ => ErrorInternalServerError
+    }
+  }
 
   private def withValidData(req: AnnualReturn)
                            (lisaManager: String, accountId: String)

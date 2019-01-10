@@ -35,7 +35,6 @@ case class DesLifeEventRetrievalResponse(lifeEventID: LifeEventId, eventType: Li
 case class DesCreateInvestorResponse(investorID: String) extends DesResponse
 case class DesTransactionResponse(transactionID: String, message: Option[String]) extends DesResponse
 case class DesFailureResponse(code: String = "INTERNAL_SERVER_ERROR", reason: String = "Internal Server Error") extends DesFailure
-case class DesLifeEventExistResponse(code: String, reason: String, lifeEventID: String) extends DesResponse
 case class DesTransactionExistResponse(code: String, reason: String, transactionID: String) extends DesResponse
 case object DesEmptySuccessResponse extends DesResponse
 case class DesUpdateSubscriptionSuccessResponse (code: String, reason: String)extends DesResponse
@@ -50,6 +49,7 @@ case class DesGetBonusPaymentResponse(lifeEventId: Option[LifeEventId],
                                       status: String,
                                       supersededBy: Option[TransactionId] = None,
                                       supersede: Option[Supersede] = None) extends DesResponse
+
 case object DesUnavailableResponse extends DesFailure {
   override val code = "SERVER_ERROR"
   override val reason = "Service Unavailable"
@@ -80,7 +80,6 @@ object DesResponse {
     (JsPath \ "eventDate").read(JsonReads.notFutureDate).map(new DateTime(_))
   )(DesLifeEventRetrievalResponse.apply _)
 
-  implicit val requestLifeEventAlreadyExistResponseFormats: OFormat[DesLifeEventExistResponse] = Json.format[DesLifeEventExistResponse]
   implicit val requestTransactionAlreadyExistResponseFormats: OFormat[DesTransactionExistResponse] = Json.format[DesTransactionExistResponse]
 
   implicit val desGetBonusPaymentResponse: Reads[DesGetBonusPaymentResponse] = (

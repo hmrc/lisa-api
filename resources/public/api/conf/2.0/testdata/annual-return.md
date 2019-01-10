@@ -422,7 +422,8 @@
 <pre class="code--block">
 {
   "code": "SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED",
-  "message": "This life event has already been superseded"
+  "message": "This life event has already been superseded",
+  "lifeEventId": "7890000002"
 }
 </pre>
             </td>
@@ -446,7 +447,8 @@
 <pre class="code--block">
 {
   "code": "LIFE_EVENT_ALREADY_EXISTS",
-  "message": "The investor’s life event has already been reported"
+  "message": "The investor’s life event has already been reported",
+  "lifeEventId": "7890000001"
 }
 </pre>
             </td>

@@ -77,7 +77,7 @@ class PropertyPurchaseController @Inject() (
                     Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
                   }
                   case res: ReportLifeEventResponse => {
-                    val response = fundReleaseErrors.getOrElse(res, ErrorInternalServerError)
+                    val response = fundReleaseErrors.applyOrElse(res, {_ : ReportLifeEventResponse => ErrorInternalServerError})
                     Logger.debug(s"Fund Release received $res, responding with $response")
                     doFundReleaseAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> response.errorCode))
                     lisaMetrics.incrementMetrics(startTime, response.httpStatusCode, LisaMetricKeys.PROPERTY_PURCHASE)
@@ -123,7 +123,7 @@ class PropertyPurchaseController @Inject() (
                     Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
                   }
                   case res: ReportLifeEventResponse => {
-                    val response = extensionErrors.getOrElse(res, ErrorInternalServerError)
+                    val response = extensionErrors.applyOrElse(res, {_ : ReportLifeEventResponse => ErrorInternalServerError})
                     Logger.debug(s"Extension received $res, responding with $response")
                     doExtensionAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> response.errorCode))
                     lisaMetrics.incrementMetrics(startTime, response.httpStatusCode, LisaMetricKeys.PROPERTY_PURCHASE)
@@ -172,7 +172,7 @@ class PropertyPurchaseController @Inject() (
                     Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
                   }
                   case res: ReportLifeEventResponse => {
-                    val response = outcomeErrors.getOrElse(res, ErrorInternalServerError)
+                    val response: ErrorResponse = outcomeErrors.applyOrElse(res, {_ : ReportLifeEventResponse => ErrorInternalServerError})
                     Logger.debug(s"Purchase outcome received $res, responding with $response")
                     doOutcomeAudit(lisaManager, accountId, req, false, Map("reasonNotReported" -> response.errorCode))
                     lisaMetrics.incrementMetrics(startTime, response.httpStatusCode, LisaMetricKeys.PROPERTY_PURCHASE)
@@ -199,40 +199,40 @@ class PropertyPurchaseController @Inject() (
     }
   }
 
-  private val commonErrors = Map[ReportLifeEventResponse, ErrorResponse] (
-    ReportLifeEventAccountClosedResponse -> ErrorAccountAlreadyClosed,
-    ReportLifeEventAccountCancelledResponse -> ErrorAccountAlreadyCancelled,
-    ReportLifeEventAccountVoidResponse -> ErrorAccountAlreadyVoided,
-    ReportLifeEventAccountNotFoundResponse -> ErrorAccountNotFound,
-    ReportLifeEventAlreadySupersededResponse -> ErrorLifeEventAlreadySuperseded,
-    ReportLifeEventAlreadyExistsResponse -> ErrorLifeEventAlreadyExists,
-    ReportLifeEventMismatchResponse -> ErrorLifeEventMismatch,
-    ReportLifeEventServiceUnavailableResponse -> ErrorServiceUnavailable
-  )
+  private val commonErrors: PartialFunction[ReportLifeEventResponse, ErrorResponse] = {
+    case ReportLifeEventAccountClosedResponse => ErrorAccountAlreadyClosed
+    case ReportLifeEventAccountCancelledResponse => ErrorAccountAlreadyCancelled
+    case ReportLifeEventAccountVoidResponse => ErrorAccountAlreadyVoided
+    case ReportLifeEventAccountNotFoundResponse => ErrorAccountNotFound
+    case ReportLifeEventAlreadySupersededResponse(lifeEventId) => ErrorLifeEventAlreadySuperseded(lifeEventId)
+    case ReportLifeEventAlreadyExistsResponse(lifeEventId) => ErrorLifeEventAlreadyExists(lifeEventId)
+    case ReportLifeEventMismatchResponse => ErrorLifeEventMismatch
+    case ReportLifeEventServiceUnavailableResponse => ErrorServiceUnavailable
+  }
 
-  private val fundReleaseErrors = commonErrors ++ Map (
-    ReportLifeEventAccountNotOpenLongEnoughResponse -> ErrorAccountNotOpenLongEnough,
-    ReportLifeEventOtherPurchaseOnRecordResponse -> ErrorFundReleaseOtherPropertyOnRecord
-  )
+  private val fundReleaseErrors: PartialFunction[ReportLifeEventResponse, ErrorResponse] = commonErrors.orElse({
+    case ReportLifeEventAccountNotOpenLongEnoughResponse => ErrorAccountNotOpenLongEnough
+    case ReportLifeEventOtherPurchaseOnRecordResponse => ErrorFundReleaseOtherPropertyOnRecord
+  })
 
-  private val extensionErrors = commonErrors ++ Map (
-    ReportLifeEventExtensionOneNotYetApprovedResponse -> ErrorExtensionOneNotApproved,
-    ReportLifeEventExtensionOneAlreadyApprovedResponse -> ErrorExtensionOneAlreadyApproved,
-    ReportLifeEventExtensionTwoAlreadyApprovedResponse -> ErrorExtensionTwoAlreadyApproved,
-    ReportLifeEventFundReleaseNotFoundResponse -> ErrorFundReleaseNotFound,
-    ReportLifeEventFundReleaseSupersededResponse -> ErrorFundReleaseSuperseded
-  )
+  private val extensionErrors: PartialFunction[ReportLifeEventResponse, ErrorResponse] = commonErrors.orElse({
+    case ReportLifeEventExtensionOneNotYetApprovedResponse => ErrorExtensionOneNotApproved
+    case ReportLifeEventExtensionOneAlreadyApprovedResponse(lifeEventId) => ErrorExtensionOneAlreadyApproved(lifeEventId)
+    case ReportLifeEventExtensionTwoAlreadyApprovedResponse(lifeEventId) => ErrorExtensionTwoAlreadyApproved(lifeEventId)
+    case ReportLifeEventFundReleaseNotFoundResponse => ErrorFundReleaseNotFound
+    case ReportLifeEventFundReleaseSupersededResponse(lifeEventId) => ErrorFundReleaseSuperseded(lifeEventId)
+  })
 
   // common errors not included as it should be possible to complete a purchase on a closed/cancelled/void account
-  private val outcomeErrors = Map[ReportLifeEventResponse, ErrorResponse] (
-    ReportLifeEventMismatchResponse -> ErrorLifeEventMismatch,
-    ReportLifeEventFundReleaseNotFoundResponse -> ErrorFundReleaseNotFound,
-    ReportLifeEventAccountNotFoundResponse -> ErrorAccountNotFound,
-    ReportLifeEventFundReleaseSupersededResponse -> ErrorFundReleaseSuperseded,
-    ReportLifeEventAlreadySupersededResponse -> ErrorLifeEventAlreadySuperseded,
-    ReportLifeEventAlreadyExistsResponse -> ErrorLifeEventAlreadyExists,
-    ReportLifeEventServiceUnavailableResponse -> ErrorServiceUnavailable
-  )
+  private val outcomeErrors: PartialFunction[ReportLifeEventResponse, ErrorResponse] = {
+    case ReportLifeEventMismatchResponse => ErrorLifeEventMismatch
+    case ReportLifeEventFundReleaseNotFoundResponse => ErrorFundReleaseNotFound
+    case ReportLifeEventAccountNotFoundResponse => ErrorAccountNotFound
+    case ReportLifeEventFundReleaseSupersededResponse(lifeEventId) => ErrorFundReleaseSuperseded(lifeEventId)
+    case ReportLifeEventAlreadySupersededResponse(lifeEventId) => ErrorLifeEventAlreadySuperseded(lifeEventId)
+    case ReportLifeEventAlreadyExistsResponse(lifeEventId) => ErrorLifeEventAlreadyExists(lifeEventId)
+    case ReportLifeEventServiceUnavailableResponse => ErrorServiceUnavailable
+  }
 
   private def doFundReleaseAudit(lisaManager: String,
                                  accountId: String,

@@ -217,7 +217,8 @@
 <pre class="code--block">
 {
   "code": "LIFE_EVENT_ALREADY_EXISTS",
-  "message": "The investor’s life event has already been reported"
+  "message": "The investor’s life event has already been reported",
+  "lifeEventId": "1234567891"
 }
 </pre>
             </td>

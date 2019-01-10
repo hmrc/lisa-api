@@ -60,7 +60,7 @@ class LifeEventController @Inject()(
                 case res: ReportLifeEventResponse => {
                   withApiVersion {
                     case Some(VERSION_1) => {
-                      val errorResponse = v1errors.getOrElse(res, {
+                      val errorResponse = v1errors.applyOrElse(res, { _: ReportLifeEventResponse =>
                         Logger.debug(s"Matched an unexpected response: $res, returning a 500 error")
                         ErrorInternalServerError
                       })
@@ -68,7 +68,7 @@ class LifeEventController @Inject()(
                       Future.successful(error(errorResponse, lisaManager, accountId, req))
                     }
                     case Some(VERSION_2) => {
-                      val errorResponse = v2errors.getOrElse(res, {
+                      val errorResponse = v2errors.applyOrElse(res, { _: ReportLifeEventResponse =>
                         Logger.debug(s"Matched an unexpected response: $res, returning a 500 error")
                         ErrorInternalServerError
                       })
@@ -85,22 +85,22 @@ class LifeEventController @Inject()(
       )
     }
 
-  private val commonErrors = Map[ReportLifeEventResponse, ErrorResponse](
-    ReportLifeEventInappropriateResponse -> ErrorLifeEventInappropriate,
-    ReportLifeEventAlreadyExistsResponse -> ErrorLifeEventAlreadyExists,
-    ReportLifeEventAccountNotFoundResponse -> ErrorAccountNotFound,
-    ReportLifeEventServiceUnavailableResponse -> ErrorServiceUnavailable
-  )
+  private val commonErrors: PartialFunction[ReportLifeEventResponse, ErrorResponse] = {
+    case ReportLifeEventInappropriateResponse => ErrorLifeEventInappropriate
+    case ReportLifeEventAlreadyExistsResponse(lifeEventId) => ErrorLifeEventAlreadyExists(lifeEventId)
+    case ReportLifeEventAccountNotFoundResponse => ErrorAccountNotFound
+    case ReportLifeEventServiceUnavailableResponse => ErrorServiceUnavailable
+  }
 
-  private val v1errors = commonErrors ++ Map[ReportLifeEventResponse, ErrorResponse](
-    ReportLifeEventAccountClosedOrVoidResponse -> ErrorAccountAlreadyClosedOrVoid
-  )
+  private val v1errors: PartialFunction[ReportLifeEventResponse, ErrorResponse] = commonErrors.orElse({
+    case ReportLifeEventAccountClosedOrVoidResponse => ErrorAccountAlreadyClosedOrVoid
+  })
 
-  private val v2errors = commonErrors ++ Map[ReportLifeEventResponse, ErrorResponse](
-    ReportLifeEventAccountClosedResponse -> ErrorAccountAlreadyClosed,
-    ReportLifeEventAccountCancelledResponse -> ErrorAccountAlreadyCancelled,
-    ReportLifeEventAccountVoidResponse -> ErrorAccountAlreadyVoided
-  )
+  private val v2errors: PartialFunction[ReportLifeEventResponse, ErrorResponse] = commonErrors.orElse({
+    case ReportLifeEventAccountClosedResponse => ErrorAccountAlreadyClosed
+    case ReportLifeEventAccountCancelledResponse => ErrorAccountAlreadyCancelled
+    case ReportLifeEventAccountVoidResponse => ErrorAccountAlreadyVoided
+  })
 
   private def error(e: ErrorResponse, lisaManager: String, accountId: String, req: ReportLifeEventRequest)
                    (implicit hc: HeaderCarrier, startTime: Long): Result = {

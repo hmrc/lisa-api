@@ -650,22 +650,6 @@ class DesConnectorSpec extends PlaySpec
         }
       }
 
-      "a LIFE_EVENT_ALREADY_EXISTS failure is returned" in {
-        when(mockHttp.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                responseStatus = CONFLICT,
-                responseJson = Some(Json.parse(s"""{"code": "LIFE_EVENT_ALREADY_EXISTS", "reason": "The investor’s life event has already been reported."}"""))
-              )
-            )
-          )
-
-        doReportLifeEventRequest { response =>
-          response mustBe DesFailureResponse("LIFE_EVENT_ALREADY_EXISTS", "The investor’s life event has already been reported.")
-        }
-      }
-
     }
 
   }
