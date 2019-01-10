@@ -268,15 +268,22 @@ types:
                                 description: The LISA account is already closed
                                 value: |
                                   {
-                                    "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED",
-                                    "message": "The LISA account is already closed"
+                                    "code" : "INVESTOR_ACCOUNT_ALREADY_CLOSED",
+                                    "message" : "The LISA account is already closed"
                                   }
-                              accountVoided:
+                              accountCancelled:
+                                description: The LISA account is already cancelled
+                                value: |
+                                  {
+                                    "code" : "INVESTOR_ACCOUNT_ALREADY_CANCELLED",
+                                    "message" : "The LISA account is already cancelled"
+                                  }
+                              accountVoid:
                                 description: The LISA account is already void
                                 value: |
                                   {
-                                    "code": "INVESTOR_ACCOUNT_ALREADY_VOID",
-                                    "message": "The LISA account is already void"
+                                    "code" : "INVESTOR_ACCOUNT_ALREADY_VOID",
+                                    "message" : "The LISA account is already void"
                                   }
                       409:
                         body:
