@@ -367,7 +367,8 @@
 <pre class="code--block">
 {
   "code": "FIRST_EXTENSION_ALREADY_APPROVED",
-  "message": "A first extension has already been approved"
+  "message": "A first extension has already been approved",
+  "lifeEventId": "6789000001"
 }
 </pre>
             </td>
@@ -394,7 +395,8 @@
 <pre class="code--block">
 {
   "code": "SECOND_EXTENSION_ALREADY_APPROVED",
-  "message": "A second extension has already been approved"
+  "message": "A second extension has already been approved",
+  "lifeEventId": "6789000003"
 }
 </pre>
             </td>
@@ -505,7 +507,8 @@
 <pre class="code--block">
 {
   "code": "LIFE_EVENT_ALREADY_EXISTS",
-  "message": "The investor’s life event has already been reported"
+  "message": "The investor’s life event has already been reported",
+  "lifeEventId": "6789000001"
 }
 </pre>
             </td>
@@ -522,7 +525,7 @@
             <td>
 <pre class="code--block">
 {
-  "fundReleaseId": "3456789001",
+  "fundReleaseId": "3456789000",
   "eventDate": "2017-05-10",
   "eventType": "Extension one"
 }
@@ -533,6 +536,7 @@
 {
   "code": "FUND_RELEASE_SUPERSEDED",
   "message": "This fund release has already been superseded"
+  "lifeEventId": "3456789001"
 }
 </pre>
             </td>
@@ -562,7 +566,8 @@
 <pre class="code--block">
 {
   "code": "SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED",
-  "message": "This life event has already been superseded"
+  "message": "This life event has already been superseded",
+  "lifeEventId": "6789000002"
 }
 </pre>
             </td>

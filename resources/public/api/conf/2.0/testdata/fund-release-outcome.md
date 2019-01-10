@@ -225,7 +225,8 @@
         <pre class="code--block">
 {
   "code": "SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED",
-  "message": "This life event has already been superseded"
+  "message": "This life event has already been superseded",
+  "lifeEventId": "5678900002"
 }                        
 </pre>
       </td>
@@ -250,7 +251,8 @@
         <pre class="code--block">
 {
   "code": "LIFE_EVENT_ALREADY_EXISTS",
-  "message": "The investor’s life event has already been reported"
+  "message": "The investor’s life event has already been reported",
+  "lifeEventId": "5678900001"
 }                                               
 </pre>
       </td>
@@ -263,7 +265,7 @@
       <td>
         <pre class="code--block">
 {
-  "fundReleaseId": "3456789001",
+  "fundReleaseId": "3456789000",
   "eventDate": "2017-10-05",
   "propertyPurchaseResult": "Purchase completed",
   "propertyPurchaseValue": 250000,
@@ -279,7 +281,8 @@
         <pre class="code--block">
 {
   "code": "FUND_RELEASE_SUPERSEDED",
-  "message": "This fund release has already been superseded"
+  "message": "This fund release has already been superseded",
+  "lifeEventId": "3456789001"
 }                                               
 </pre>
       </td>
