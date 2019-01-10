@@ -49,7 +49,7 @@ class AccountService @Inject()(desConnector: DesConnector)(implicit ec: Executio
           case "INVESTOR_ELIGIBILITY_CHECK_FAILED" => CreateLisaAccountInvestorNotEligibleResponse
           case "INVESTOR_COMPLIANCE_CHECK_FAILED" => CreateLisaAccountInvestorComplianceCheckFailedResponse
           case "INVESTOR_ACCOUNT_ALREADY_EXISTS" => CreateLisaAccountAlreadyExistsResponse
-          case "INVESTOR_ACCOUNT_ALREADY_CANCELLED" => CreateLisaAccountInvestorAccountAlreadyClosedResponse
+          case "INVESTOR_ACCOUNT_ALREADY_CANCELLED" => CreateLisaAccountInvestorAccountAlreadyCancelledResponse
           case "INVESTOR_ACCOUNT_ALREADY_CLOSED" => CreateLisaAccountInvestorAccountAlreadyClosedResponse
           case "INVESTOR_ACCOUNT_ALREADY_VOID" => CreateLisaAccountInvestorAccountAlreadyVoidResponse
           case _ => {

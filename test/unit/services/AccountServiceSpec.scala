@@ -140,7 +140,7 @@ class AccountServiceSpec extends PlaySpec
           .thenReturn(Future.successful(DesFailureResponse(code = "INVESTOR_ACCOUNT_ALREADY_CANCELLED")))
 
         doCreateRequest { response =>
-          response mustBe CreateLisaAccountInvestorAccountAlreadyClosedResponse
+          response mustBe CreateLisaAccountInvestorAccountAlreadyCancelledResponse
         }
       }
       "a INVESTOR_ACCOUNT_ALREADY_VOID response comes from DES" in {
