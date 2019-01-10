@@ -188,7 +188,7 @@ case object ErrorWithdrawalSupersededOutcomeError extends ErrorResponse(403, "SU
 case object ErrorWithdrawalTimescalesExceeded extends ErrorResponse(403, "WITHDRAWAL_CHARGE_TIMESCALES_EXCEEDED", "The timescale for reporting a withdrawal charge has passed. The claim period lasts for 6 years and 14 days")
 
 
-case class ErrorLifeEventAlreadyExists(lifeEventId: String) extends ErrorResponseWithLifeEventId(409, "LIFE_EVENT_ALREADY_EXISTS", "The investor’s life event has already been reported.", lifeEventId)
+case class ErrorLifeEventAlreadyExists(lifeEventId: String) extends ErrorResponseWithLifeEventId(409, "LIFE_EVENT_ALREADY_EXISTS", "The investor’s life event has already been reported", lifeEventId)
 case object ErrorLifeEventMismatch extends ErrorResponse(403, "SUPERSEDED_LIFE_EVENT_MISMATCH_ERROR", "originalLifeEventId and the originalEventDate do not match the information in the original request")
 case class ErrorLifeEventAlreadySuperseded(lifeEventId: String) extends ErrorResponseWithLifeEventId(409, "SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED", "This life event has already been superseded", lifeEventId)
 

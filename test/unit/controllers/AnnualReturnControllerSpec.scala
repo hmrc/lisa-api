@@ -217,7 +217,7 @@ class AnnualReturnControllerSpec extends PlaySpec
           status(res) mustBe CONFLICT
           contentAsJson(res) mustBe Json.obj(
             "code" -> "LIFE_EVENT_ALREADY_EXISTS",
-            "message" -> "The investor’s life event has already been reported.",
+            "message" -> "The investor’s life event has already been reported",
             "lifeEventId" -> "123"
           )
         }
