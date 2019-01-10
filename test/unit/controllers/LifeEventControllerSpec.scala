@@ -30,7 +30,7 @@ import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.config.AppContext
-import uk.gov.hmrc.lisaapi.controllers.{ErrorBadRequestAccountId, ErrorBadRequestLmrn, LifeEventController}
+import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountAlreadyCancelled, ErrorAccountAlreadyClosed, ErrorAccountAlreadyVoided, ErrorBadRequestAccountId, ErrorBadRequestLmrn, LifeEventController}
 import uk.gov.hmrc.lisaapi.metrics.LisaMetrics
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, LifeEventService}
@@ -43,7 +43,8 @@ class LifeEventControllerSpec extends PlaySpec
   with OneAppPerSuite
   with BeforeAndAfter {
 
-  val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
+  val acceptHeaderV1: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
+  val acceptHeaderV2: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.2.0+json")
   val lisaManager = "Z019283"
   val accountId = "ABC/12345"
   val validDate = "2017-04-06"
@@ -244,7 +245,7 @@ class LifeEventControllerSpec extends PlaySpec
       }
     }
 
-    "return with 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID" in {
+    "return with 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID in version 1" in {
       when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful((ReportLifeEventAccountClosedOrVoidResponse)))
       doReportLifeEventRequest(reportLifeEventJson){res =>
         status(res) mustBe (FORBIDDEN)
@@ -252,6 +253,34 @@ class LifeEventControllerSpec extends PlaySpec
         (contentAsJson(res) \"message").as[String] mustBe ("This LISA account has already been closed or been made void by HMRC")
       }
     }
+
+    "return with 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_CLOSED in version 2" in {
+      when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful((ReportLifeEventAccountClosedResponse)))
+      doReportLifeEventRequest(reportLifeEventJson, acceptHeader = acceptHeaderV2){res =>
+        status(res) mustBe (FORBIDDEN)
+        (contentAsJson(res) \"code").as[String] mustBe ErrorAccountAlreadyClosed.errorCode
+        (contentAsJson(res) \"message").as[String] mustBe ErrorAccountAlreadyClosed.message
+      }
+    }
+
+    "return with 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_CANCELLED in version 2" in {
+      when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful((ReportLifeEventAccountCancelledResponse)))
+      doReportLifeEventRequest(reportLifeEventJson, acceptHeader = acceptHeaderV2){res =>
+        status(res) mustBe (FORBIDDEN)
+        (contentAsJson(res) \"code").as[String] mustBe ErrorAccountAlreadyCancelled.errorCode
+        (contentAsJson(res) \"message").as[String] mustBe ErrorAccountAlreadyCancelled.message
+      }
+    }
+
+    "return with 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_VOID in version 2" in {
+      when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful((ReportLifeEventAccountVoidResponse)))
+      doReportLifeEventRequest(reportLifeEventJson, acceptHeader = acceptHeaderV2){res =>
+        status(res) mustBe (FORBIDDEN)
+        (contentAsJson(res) \"code").as[String] mustBe ErrorAccountAlreadyVoided.errorCode
+        (contentAsJson(res) \"message").as[String] mustBe ErrorAccountAlreadyVoided.message
+      }
+    }
+
 
     "return with 404 not found and a code of INVESTOR_ACCOUNTID_NOT_FOUND" in {
       when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful((ReportLifeEventAccountNotFoundResponse)))
@@ -289,10 +318,12 @@ class LifeEventControllerSpec extends PlaySpec
 
   }
 
-  def doReportLifeEventRequest(jsonString: String, lmrn: String = lisaManager, accId: String = accountId)(callback: (Future[Result]) =>  Unit): Unit = {
+  def doReportLifeEventRequest(jsonString: String, lmrn: String = lisaManager, accId: String = accountId, acceptHeader: (String, String) = acceptHeaderV1)
+                              (callback: (Future[Result]) =>  Unit): Unit = {
     val req = FakeRequest(Helpers.PUT, "/")
-    val res = SUT.reportLisaLifeEvent(lmrn, accId).apply(req.withHeaders(acceptHeader).
-      withBody(AnyContentAsJson(Json.parse(jsonString))))
+    val res = SUT.reportLisaLifeEvent(lmrn, accId).
+                    apply(req.withHeaders(acceptHeader).
+                    withBody(AnyContentAsJson(Json.parse(jsonString))))
 
     callback(res)
   }
