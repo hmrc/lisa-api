@@ -268,15 +268,22 @@ types:
                                 description: The LISA account is already closed
                                 value: |
                                   {
-                                    "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED",
-                                    "message": "The LISA account is already closed"
+                                    "code" : "INVESTOR_ACCOUNT_ALREADY_CLOSED",
+                                    "message" : "The LISA account is already closed"
                                   }
-                              accountVoided:
+                              accountCancelled:
+                                description: The LISA account is already cancelled
+                                value: |
+                                  {
+                                    "code" : "INVESTOR_ACCOUNT_ALREADY_CANCELLED",
+                                    "message" : "The LISA account is already cancelled"
+                                  }
+                              accountVoid:
                                 description: The LISA account is already void
                                 value: |
                                   {
-                                    "code": "INVESTOR_ACCOUNT_ALREADY_VOID",
-                                    "message": "The LISA account is already void"
+                                    "code" : "INVESTOR_ACCOUNT_ALREADY_VOID",
+                                    "message" : "The LISA account is already void"
                                   }
                       409:
                         body:
@@ -633,14 +640,21 @@ types:
                                 value: |
                                   {
                                     "code" : "INVESTOR_ACCOUNT_ALREADY_CLOSED",
-                                    "message" : "The Investor Account is already closed"
+                                    "message" : "The LISA account is already closed"
+                                  }
+                              accountCancelled:
+                                description: The LISA account is already cancelled
+                                value: |
+                                  {
+                                    "code" : "INVESTOR_ACCOUNT_ALREADY_CLOSED",
+                                    "message" : "The LISA account is already cancelled"
                                   }
                               accountVoided:
                                 description: The LISA account is already void
                                 value: |
                                   {
                                     "code" : "INVESTOR_ACCOUNT_ALREADY_VOID",
-                                    "message" : "The Investor Account is already void"
+                                    "message" : "The LISA account is already void"
                                   }
                       404:
                         body:
@@ -729,12 +743,26 @@ types:
                                     "code" : "LIFE_EVENT_INAPPROPRIATE",
                                     "message" : "The life event conflicts with a previous life event reported"
                                   }
-                              accountClosedOrVoided:
-                                description: This LISA account has already been closed or been made void by HMRC
+                              accountClosed:
+                                description: The LISA account is already closed
                                 value: |
                                   {
-                                    "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID",
-                                    "message": "This LISA account has already been closed or been made void by HMRC"
+                                    "code" : "INVESTOR_ACCOUNT_ALREADY_CLOSED",
+                                    "message" : "The LISA account is already closed"
+                                  }
+                              accountCancelled:
+                                description: The LISA account is already cancelled
+                                value: |
+                                  {
+                                    "code" : "INVESTOR_ACCOUNT_ALREADY_CLOSED",
+                                    "message" : "The LISA account is already cancelled"
+                                  }
+                              accountVoided:
+                                description: The LISA account is already void
+                                value: |
+                                  {
+                                    "code" : "INVESTOR_ACCOUNT_ALREADY_VOID",
+                                    "message" : "The LISA account is already void"
                                   }
                       404:
                         body:
@@ -1364,7 +1392,7 @@ types:
                                     "code" : "FORBIDDEN",
                                     "message" : "There is a problem with the request data"
                                   }
-                              accountClosed:
+                              accountCancelled:
                                 description: The LISA account is already cancelled
                                 value: |
                                   {
@@ -1606,19 +1634,19 @@ types:
                                     "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED",
                                     "message": "The LISA account is already closed"
                                   }
+                              accountCancelled:
+                                description: The LISA account is already cancelled
+                                value: |
+                                  {
+                                    "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED",
+                                    "message": "The LISA account is already cancelled"
+                                  }
                               accountVoid:
                                 description: The LISA account is already void
                                 value: |
                                   {
                                     "code": "INVESTOR_ACCOUNT_ALREADY_VOID",
                                     "message": "The LISA account is already void"
-                                  }
-                              accountCancelled:
-                                description: The LISA account is already cancelled
-                                value: |
-                                  {
-                                    "code": "INVESTOR_ACCOUNT_ALREADY_CANCELLED",
-                                    "message": "The LISA account is already cancelled"
                                   }
                               helpToBuyNotApplicable:
                                 description: "Help to buy is only applicable for claims within the 2017-18 tax year"
