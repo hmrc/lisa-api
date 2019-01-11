@@ -361,20 +361,22 @@ class PropertyPurchaseControllerSpec extends PlaySpec
     }
 
     "return with 409 conflict and a code of LIFE_EVENT_ALREADY_EXISTS" in {
-      when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventAlreadyExistsResponse))
+      when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventAlreadyExistsResponse("123")))
       doFundReleaseRequest(fundReleaseJson){ res =>
         status(res) mustBe CONFLICT
         (contentAsJson(res) \ "code").as[String] mustBe "LIFE_EVENT_ALREADY_EXISTS"
         (contentAsJson(res) \ "message").as[String] mustBe "The investor’s life event has already been reported"
+        (contentAsJson(res) \ "lifeEventId").as[String] mustBe "123"
       }
     }
 
     "return with 409 conflict and a code of SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED" in {
-      when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventAlreadySupersededResponse))
+      when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventAlreadySupersededResponse("123")))
       doFundReleaseRequest(fundReleaseJson){ res =>
         status(res) mustBe CONFLICT
         (contentAsJson(res) \ "code").as[String] mustBe "SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED"
         (contentAsJson(res) \ "message").as[String] mustBe "This life event has already been superseded"
+        (contentAsJson(res) \ "lifeEventId").as[String] mustBe "123"
       }
     }
 
@@ -589,20 +591,22 @@ class PropertyPurchaseControllerSpec extends PlaySpec
     }
 
     "return with 403 forbidden and a code of FIRST_EXTENSION_ALREADY_APPROVED" in {
-      when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventExtensionOneAlreadyApprovedResponse))
+      when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventExtensionOneAlreadyApprovedResponse("123")))
       doExtensionRequest(extensionJson){ res =>
         status(res) mustBe FORBIDDEN
         (contentAsJson(res) \ "code").as[String] mustBe "FIRST_EXTENSION_ALREADY_APPROVED"
         (contentAsJson(res) \ "message").as[String] mustBe "A first extension has already been approved"
+        (contentAsJson(res) \ "lifeEventId").as[String] mustBe "123"
       }
     }
 
     "return with 403 forbidden and a code of SECOND_EXTENSION_ALREADY_APPROVED" in {
-      when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventExtensionTwoAlreadyApprovedResponse))
+      when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventExtensionTwoAlreadyApprovedResponse("321")))
       doExtensionRequest(extensionJson){ res =>
         status(res) mustBe FORBIDDEN
         (contentAsJson(res) \ "code").as[String] mustBe "SECOND_EXTENSION_ALREADY_APPROVED"
         (contentAsJson(res) \ "message").as[String] mustBe "A second extension has already been approved"
+        (contentAsJson(res) \ "lifeEventId").as[String] mustBe "321"
       }
     }
 
@@ -644,29 +648,32 @@ class PropertyPurchaseControllerSpec extends PlaySpec
     }
 
     "return with 409 conflict and a code of LIFE_EVENT_ALREADY_EXISTS" in {
-      when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventAlreadyExistsResponse))
+      when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventAlreadyExistsResponse("123")))
       doExtensionRequest(extensionJson){ res =>
         status(res) mustBe CONFLICT
         (contentAsJson(res) \ "code").as[String] mustBe "LIFE_EVENT_ALREADY_EXISTS"
         (contentAsJson(res) \ "message").as[String] mustBe "The investor’s life event has already been reported"
+        (contentAsJson(res) \ "lifeEventId").as[String] mustBe "123"
       }
     }
 
     "return with 409 conflict and a code of FUND_RELEASE_SUPERSEDED" in {
-      when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventFundReleaseSupersededResponse))
+      when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventFundReleaseSupersededResponse("666")))
       doExtensionRequest(extensionJson){ res =>
         status(res) mustBe CONFLICT
         (contentAsJson(res) \ "code").as[String] mustBe "FUND_RELEASE_SUPERSEDED"
         (contentAsJson(res) \ "message").as[String] mustBe "This fund release has already been superseded"
+        (contentAsJson(res) \ "lifeEventId").as[String] mustBe "666"
       }
     }
 
     "return with 409 conflict and a code of SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED" in {
-      when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventAlreadySupersededResponse))
+      when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventAlreadySupersededResponse("321")))
       doExtensionRequest(extensionJson){ res =>
         status(res) mustBe CONFLICT
         (contentAsJson(res) \ "code").as[String] mustBe "SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED"
         (contentAsJson(res) \ "message").as[String] mustBe "This life event has already been superseded"
+        (contentAsJson(res) \ "lifeEventId").as[String] mustBe "321"
       }
     }
 
@@ -872,29 +879,32 @@ class PropertyPurchaseControllerSpec extends PlaySpec
     }
 
     "return with 409 conflict and a code of FUND_RELEASE_SUPERSEDED" in {
-      when(mockService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventFundReleaseSupersededResponse))
+      when(mockService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventFundReleaseSupersededResponse("555")))
       doOutcomeRequest(outcomeJson) { res =>
         status(res) mustBe CONFLICT
         (contentAsJson(res) \ "code").as[String] mustBe "FUND_RELEASE_SUPERSEDED"
         (contentAsJson(res) \ "message").as[String] mustBe "This fund release has already been superseded"
+        (contentAsJson(res) \ "lifeEventId").as[String] mustBe "555"
       }
     }
 
     "return with 409 conflict and a code of SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED" in {
-      when(mockService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventAlreadySupersededResponse))
+      when(mockService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventAlreadySupersededResponse("789")))
       doOutcomeRequest(outcomeJson) { res =>
         status(res) mustBe CONFLICT
         (contentAsJson(res) \ "code").as[String] mustBe "SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED"
         (contentAsJson(res) \ "message").as[String] mustBe "This life event has already been superseded"
+        (contentAsJson(res) \ "lifeEventId").as[String] mustBe "789"
       }
     }
 
     "return with 409 conflict and a code of LIFE_EVENT_ALREADY_EXISTS" in {
-      when(mockService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventAlreadyExistsResponse))
+      when(mockService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventAlreadyExistsResponse("123")))
       doOutcomeRequest(outcomeJson) { res =>
         status(res) mustBe CONFLICT
         (contentAsJson(res) \ "code").as[String] mustBe "LIFE_EVENT_ALREADY_EXISTS"
         (contentAsJson(res) \ "message").as[String] mustBe "The investor’s life event has already been reported"
+        (contentAsJson(res) \ "lifeEventId").as[String] mustBe "123"
       }
     }
 

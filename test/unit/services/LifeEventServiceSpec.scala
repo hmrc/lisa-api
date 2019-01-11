@@ -44,6 +44,26 @@ class LifeEventServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuit
       }
     }
 
+    "return ReportLifeEventAlreadyExistsResponse" when {
+      "the error code is LIFE_EVENT_ALREADY_EXISTS" in {
+        val response = DesFailureResponse("LIFE_EVENT_ALREADY_EXISTS", "The investor’s life event id 9999999979 has already been reported.")
+
+        when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(response))
+
+        doPostRequest(response => response mustBe ReportLifeEventAlreadyExistsResponse("9999999979"))
+      }
+    }
+
+    "return ReportLifeEventAlreadySupersededResponse" when {
+      "the error code is SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED" in {
+        val response = DesFailureResponse("SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED", "The life event id 9999999989 has already been superseded.")
+
+        when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(response))
+
+        doPostRequest(response => response mustBe ReportLifeEventAlreadySupersededResponse("9999999989"))
+      }
+    }
+
     "return ReportLifeEventInappropriateResponse" when {
       "the error code is LIFE_EVENT_INAPPROPRIATE" in {
         when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("LIFE_EVENT_INAPPROPRIATE","The life Event was inappropriate")))
@@ -79,24 +99,10 @@ class LifeEventServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuit
       }
     }
 
-    "return ReportLifeEventAlreadyExistsResponse" when {
-      "the error code is LIFE_EVENT_ALREADY_EXISTS" in {
-        when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("LIFE_EVENT_ALREADY_EXISTS","The life Event Already Exists")))
-        doPostRequest(response => response mustBe ReportLifeEventAlreadyExistsResponse)
-      }
-    }
-
     "return ReportLifeEventAccountNotFoundResponse" when {
       "the error code is INVESTOR_ACCOUNTID_NOT_FOUND" in {
         when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNTID_NOT_FOUND","The accountID given does not match with HMRC’s records")))
         doPostRequest(response => response mustBe ReportLifeEventAccountNotFoundResponse)
-      }
-    }
-
-    "return ReportLifeEventAlreadySupersededResponse" when {
-      "the error code is SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED" in {
-        when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED","")))
-        doPostRequest(response => response mustBe ReportLifeEventAlreadySupersededResponse)
       }
     }
 
@@ -123,8 +129,8 @@ class LifeEventServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuit
 
     "return ReportLifeEventFundReleaseSupersededResponse" when {
       "the error code is FUND_RELEASE_LIFE_EVENT_ID_SUPERSEDED" in {
-        when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("FUND_RELEASE_LIFE_EVENT_ID_SUPERSEDED","")))
-        doPostRequest(response => response mustBe ReportLifeEventFundReleaseSupersededResponse)
+        when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("FUND_RELEASE_LIFE_EVENT_ID_SUPERSEDED","The fund release life event id 9999999992 in the request has been superseded.")))
+        doPostRequest(response => response mustBe ReportLifeEventFundReleaseSupersededResponse("9999999992"))
       }
     }
 
@@ -137,15 +143,15 @@ class LifeEventServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuit
 
     "return ReportLifeEventExtensionOneAlreadyApprovedResponse" when {
       "the error code is PURCHASE_EXTENSION_1_LIFE_EVENT_ALREADY_APPROVED" in {
-        when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("PURCHASE_EXTENSION_1_LIFE_EVENT_ALREADY_APPROVED","")))
-        doPostRequest(response => response mustBe ReportLifeEventExtensionOneAlreadyApprovedResponse)
+        when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("PURCHASE_EXTENSION_1_LIFE_EVENT_ALREADY_APPROVED","Extension 1 life event 9999999999 has already been recorded for this account.")))
+        doPostRequest(response => response mustBe ReportLifeEventExtensionOneAlreadyApprovedResponse("9999999999"))
       }
     }
 
     "return ReportLifeEventExtensionTwoAlreadyApprovedResponse" when {
       "the error code is PURCHASE_EXTENSION_2_LIFE_EVENT_ALREADY_APPROVED" in {
-        when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("PURCHASE_EXTENSION_2_LIFE_EVENT_ALREADY_APPROVED","")))
-        doPostRequest(response => response mustBe ReportLifeEventExtensionTwoAlreadyApprovedResponse)
+        when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("PURCHASE_EXTENSION_2_LIFE_EVENT_ALREADY_APPROVED","Extension 2 life event 9999999991 has already been recorded for this account.")))
+        doPostRequest(response => response mustBe ReportLifeEventExtensionTwoAlreadyApprovedResponse("9999999991"))
       }
     }
 
@@ -165,7 +171,7 @@ class LifeEventServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuit
 
     "return ReportLifeEventErrorResponse" when {
       "the error code doesn't match any of the previous values" in {
-        when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("XXX","Any other error condition")))
+        when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("XXX")))
         doPostRequest(response => response mustBe ReportLifeEventErrorResponse)
       }
     }

@@ -47,11 +47,11 @@ case class ErrorResponseWithId(
                                 id: String
                               ) extends ErrorResponse(httpStatusCode, errorCode, message)
 
-case class ErrorResponseWithLifeEventId(
+class ErrorResponseWithLifeEventId(
                                          override val httpStatusCode: Int,
                                          override val errorCode: String,
                                          override val message: String,
-                                         lifeEventID: String
+                                         val lifeEventID: String
                                        ) extends ErrorResponse(httpStatusCode, errorCode, message)
 
 case class ErrorResponseWithTransactionId(
@@ -188,18 +188,18 @@ case object ErrorWithdrawalSupersededOutcomeError extends ErrorResponse(403, "SU
 case object ErrorWithdrawalTimescalesExceeded extends ErrorResponse(403, "WITHDRAWAL_CHARGE_TIMESCALES_EXCEEDED", "The timescale for reporting a withdrawal charge has passed. The claim period lasts for 6 years and 14 days")
 
 
-case object ErrorLifeEventAlreadyExists extends ErrorResponse(409, "LIFE_EVENT_ALREADY_EXISTS", "The investor’s life event has already been reported")
+case class ErrorLifeEventAlreadyExists(lifeEventId: String) extends ErrorResponseWithLifeEventId(409, "LIFE_EVENT_ALREADY_EXISTS", "The investor’s life event has already been reported", lifeEventId)
 case object ErrorLifeEventMismatch extends ErrorResponse(403, "SUPERSEDED_LIFE_EVENT_MISMATCH_ERROR", "originalLifeEventId and the originalEventDate do not match the information in the original request")
-case object ErrorLifeEventAlreadySuperseded extends ErrorResponse(409, "SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED", "This life event has already been superseded")
+case class ErrorLifeEventAlreadySuperseded(lifeEventId: String) extends ErrorResponseWithLifeEventId(409, "SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED", "This life event has already been superseded", lifeEventId)
 
 case object ErrorAccountNotOpenLongEnough extends ErrorResponse(403, "COMPLIANCE_ERROR_ACCOUNT_NOT_OPEN_LONG_ENOUGH", "The account has not been open for long enough")
 case object ErrorFundReleaseOtherPropertyOnRecord extends ErrorResponse(403, "COMPLIANCE_ERROR_OTHER_PURCHASE_ON_RECORD", "Another property purchase is already recorded")
 case object ErrorInvalidDataProvided extends ErrorResponse(403, "INVALID_DATA_PROVIDED", "You can only change eventDate or withdrawalAmount when superseding a property purchase fund release")
 case object ErrorExtensionOneNotApproved extends ErrorResponse(403, "FIRST_EXTENSION_NOT_APPROVED", "A first extension has not yet been approved")
 case object ErrorFundReleaseNotFound extends ErrorResponse(404, "FUND_RELEASE_NOT_FOUND", "The fundReleaseId does not match HMRC’s records")
-case object ErrorFundReleaseSuperseded extends ErrorResponse(409, "FUND_RELEASE_SUPERSEDED", "This fund release has already been superseded")
-case object ErrorExtensionOneAlreadyApproved extends ErrorResponse(403, "FIRST_EXTENSION_ALREADY_APPROVED", "A first extension has already been approved")
-case object ErrorExtensionTwoAlreadyApproved extends ErrorResponse(403, "SECOND_EXTENSION_ALREADY_APPROVED", "A second extension has already been approved")
+case class ErrorFundReleaseSuperseded(lifeEventId: String) extends ErrorResponseWithLifeEventId(409, "FUND_RELEASE_SUPERSEDED", "This fund release has already been superseded", lifeEventId)
+case class ErrorExtensionOneAlreadyApproved(lifeEventId: String) extends ErrorResponseWithLifeEventId(403, "FIRST_EXTENSION_ALREADY_APPROVED", "A first extension has already been approved", lifeEventId)
+case class ErrorExtensionTwoAlreadyApproved(lifeEventId: String) extends ErrorResponseWithLifeEventId(403, "SECOND_EXTENSION_ALREADY_APPROVED", "A second extension has already been approved", lifeEventId)
 
 object ErrorInvestorAlreadyExists {
 
