@@ -147,7 +147,7 @@
             </td>
         </tr>
         <tr>
-            <td><p>Request for an account that has already been closed or voided</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 0000000903</p></td>
+            <td><p>Request for an account that has already been closed</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1000000403</p></td>
             <td>
 <pre class="code--block">
 {
@@ -159,8 +159,46 @@
             <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
 <pre class="code--block">
 {
-  "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID",
-  "message": "This LISA account has already been closed or been made void by HMRC"
+  "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED",
+  "message": "The LISA account is already closed"
+}
+</pre>
+            </td>
+        </tr>
+        <tr>
+            <td><p>Request for an account that has already been cancelled</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 2000000403</p></td>
+            <td>
+<pre class="code--block">
+{
+  "eventType": "LISA Investor Terminal Ill Health",
+  "eventDate": "2017-04-20"
+}
+</pre>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
+<pre class="code--block">
+{
+  "code": "INVESTOR_ACCOUNT_ALREADY_CANCELLED",
+  "message": "The LISA account is already cancelled"
+}
+</pre>
+            </td>
+        </tr>
+        <tr>
+            <td><p>Request for an account that has already been void</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 3000000403</p></td>
+            <td>
+<pre class="code--block">
+{
+  "eventType": "LISA Investor Terminal Ill Health",
+  "eventDate": "2017-04-20"
+}
+</pre>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
+<pre class="code--block">
+{
+  "code": "INVESTOR_ACCOUNT_ALREADY_VOID",
+  "message": "The LISA account is already void"
 }
 </pre>
             </td>
