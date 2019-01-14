@@ -625,6 +625,25 @@ class AccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSui
       }
     }
 
+    "return with status 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_CANCELLED" when {
+      "the data service returns a CreateLisaAccountInvestorAccountAlreadyCancelledResponse for a create request" in {
+        when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorAccountAlreadyCancelledResponse))
+
+        doCreateOrTransferRequest(createAccountJson) { res =>
+          status(res) mustBe (FORBIDDEN)
+          (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ACCOUNT_ALREADY_CANCELLED")
+        }
+      }
+      "the data service returns a CreateLisaAccountInvestorAccountAlreadyCancelledResponse for a transfer request" in {
+        when(mockService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorAccountAlreadyCancelledResponse))
+
+        doCreateOrTransferRequest(transferAccountJson) { res =>
+          status(res) mustBe (FORBIDDEN)
+          (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ACCOUNT_ALREADY_CANCELLED")
+        }
+      }
+    }
+
     "return with status 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_VOID" when {
       "the data service returns a CreateLisaAccountInvestorAccountAlreadyVoidResponse for a create request" in {
         when(mockService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorAccountAlreadyVoidResponse))

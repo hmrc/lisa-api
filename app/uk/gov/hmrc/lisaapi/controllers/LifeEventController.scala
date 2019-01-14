@@ -46,7 +46,7 @@ class LifeEventController @Inject()(
       withValidJson[ReportLifeEventRequest](
         req => {
           withValidDates(lisaManager, accountId, req) { () =>
-            service.reportLifeEvent(lisaManager, accountId, req) map { res =>
+            service.reportLifeEvent(lisaManager, accountId, req) flatMap { res =>
               Logger.debug("Entering LifeEvent Controller and the response is " + res.toString)
 
               res match {
@@ -55,16 +55,27 @@ class LifeEventController @Inject()(
                   doAudit(lisaManager, accountId, req, true)
                   lisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.EVENT)
                   val data = ApiResponseData(message = "Life event created", lifeEventId = Some(lifeEventId))
-                  Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
+                  Future.successful(Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED))))
                 }
-                case ReportLifeEventInappropriateResponse => error(ErrorLifeEventInappropriate, lisaManager, accountId, req)
-                case ReportLifeEventAccountClosedOrVoidResponse => error(ErrorAccountAlreadyClosedOrVoid, lisaManager, accountId, req)
-                case ReportLifeEventAlreadyExistsResponse(lifeEventId) => error(ErrorLifeEventAlreadyExists(lifeEventId), lisaManager, accountId, req)
-                case ReportLifeEventAccountNotFoundResponse => error(ErrorAccountNotFound, lisaManager, accountId, req)
-                case ReportLifeEventServiceUnavailableResponse => error(ErrorServiceUnavailable, lisaManager, accountId, req)
-                case unexpected:ReportLifeEventResponse => {
-                  Logger.debug(s"Matched an unexpected response: $unexpected, returning a 500 error")
-                  error(ErrorInternalServerError, lisaManager, accountId, req)
+                case res: ReportLifeEventResponse => {
+                  withApiVersion {
+                    case Some(VERSION_1) => {
+                      val errorResponse = v1errors.applyOrElse(res, { _: ReportLifeEventResponse =>
+                        Logger.debug(s"Matched an unexpected response: $res, returning a 500 error")
+                        ErrorInternalServerError
+                      })
+
+                      Future.successful(error(errorResponse, lisaManager, accountId, req))
+                    }
+                    case Some(VERSION_2) => {
+                      val errorResponse = v2errors.applyOrElse(res, { _: ReportLifeEventResponse =>
+                        Logger.debug(s"Matched an unexpected response: $res, returning a 500 error")
+                        ErrorInternalServerError
+                      })
+
+                      Future.successful(error(errorResponse, lisaManager, accountId, req))
+                    }
+                  }
                 }
               }
             }
@@ -73,6 +84,23 @@ class LifeEventController @Inject()(
         lisaManager = lisaManager
       )
     }
+
+  private val commonErrors: PartialFunction[ReportLifeEventResponse, ErrorResponse] = {
+    case ReportLifeEventInappropriateResponse => ErrorLifeEventInappropriate
+    case ReportLifeEventAlreadyExistsResponse(lifeEventId) => ErrorLifeEventAlreadyExists(lifeEventId)
+    case ReportLifeEventAccountNotFoundResponse => ErrorAccountNotFound
+    case ReportLifeEventServiceUnavailableResponse => ErrorServiceUnavailable
+  }
+
+  private val v1errors: PartialFunction[ReportLifeEventResponse, ErrorResponse] = commonErrors.orElse({
+    case ReportLifeEventAccountClosedOrVoidResponse => ErrorAccountAlreadyClosedOrVoid
+  })
+
+  private val v2errors: PartialFunction[ReportLifeEventResponse, ErrorResponse] = commonErrors.orElse({
+    case ReportLifeEventAccountClosedResponse => ErrorAccountAlreadyClosed
+    case ReportLifeEventAccountCancelledResponse => ErrorAccountAlreadyCancelled
+    case ReportLifeEventAccountVoidResponse => ErrorAccountAlreadyVoided
+  })
 
   private def error(e: ErrorResponse, lisaManager: String, accountId: String, req: ReportLifeEventRequest)
                    (implicit hc: HeaderCarrier, startTime: Long): Result = {

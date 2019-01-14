@@ -49,7 +49,7 @@ class UpdateSubscriptionService @Inject()(desConnector: DesConnector)(implicit e
         failureResponse.code match {
           case Constants.accNotFound => UpdateSubscriptionAccountNotFoundResponse
           case Constants.accClosed => UpdateSubscriptionAccountClosedResponse
-          case Constants.accCancelled => UpdateSubscriptionAccountClosedResponse
+          case Constants.accCancelled => UpdateSubscriptionAccountCancelledResponse
           case Constants.accVoid => UpdateSubscriptionAccountVoidedResponse
           case _ => {
             Logger.warn(s"Update date of first subscription returned error: ${failureResponse.code}")

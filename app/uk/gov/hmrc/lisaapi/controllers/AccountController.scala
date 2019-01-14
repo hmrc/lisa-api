@@ -111,6 +111,8 @@ class AccountController @Inject()(
           handleCreateOrTransferFailure(lisaManager, creationRequest, ErrorInvestorComplianceCheckFailedCreateTransfer, FORBIDDEN, action)
         case CreateLisaAccountInvestorAccountAlreadyClosedResponse =>
           handleCreateOrTransferFailure(lisaManager, creationRequest, ErrorAccountAlreadyClosed, FORBIDDEN, action)
+        case CreateLisaAccountInvestorAccountAlreadyCancelledResponse =>
+          handleCreateOrTransferFailure(lisaManager, creationRequest, ErrorAccountAlreadyCancelled, FORBIDDEN, action)
         case CreateLisaAccountInvestorAccountAlreadyVoidResponse =>
           handleCreateOrTransferFailure(lisaManager, creationRequest, ErrorAccountAlreadyVoided, FORBIDDEN, action)
         case CreateLisaAccountAlreadyExistsResponse =>
@@ -153,6 +155,8 @@ class AccountController @Inject()(
           handleCreateOrTransferFailure(lisaManager, transferRequest, ErrorPreviousAccountDoesNotExist, FORBIDDEN, action)
         case CreateLisaAccountInvestorAccountAlreadyClosedResponse =>
           handleCreateOrTransferFailure(lisaManager, transferRequest, ErrorAccountAlreadyClosed, FORBIDDEN, action)
+        case CreateLisaAccountInvestorAccountAlreadyCancelledResponse =>
+          handleCreateOrTransferFailure(lisaManager, transferRequest, ErrorAccountAlreadyCancelled, FORBIDDEN, action)
         case CreateLisaAccountInvestorAccountAlreadyVoidResponse =>
           handleCreateOrTransferFailure(lisaManager, transferRequest, ErrorAccountAlreadyVoided, FORBIDDEN, action)
         case CreateLisaAccountAlreadyExistsResponse =>

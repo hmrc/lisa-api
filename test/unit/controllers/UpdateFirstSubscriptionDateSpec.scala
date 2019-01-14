@@ -243,6 +243,16 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
         }
       }
     }
+    "return with status 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_CANCELLED" when {
+      "the data service returns a UpdateSubscriptionAccountCancelledResponse" in {
+        when(mockService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionAccountCancelledResponse))
+
+        doUpdateSubsDate(updateFirstSubscriptionDate) { res =>
+          status(res) mustBe (FORBIDDEN)
+          (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ACCOUNT_ALREADY_CANCELLED")
+        }
+      }
+    }
     "return with status 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_VOID" when {
       "the data service returns a UpdateSubscriptionAccountVoidedResponse" in {
         when(mockService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionAccountVoidedResponse))

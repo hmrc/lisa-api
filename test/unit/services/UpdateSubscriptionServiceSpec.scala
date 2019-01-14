@@ -64,10 +64,10 @@ class UpdateSubscriptionServiceSpec extends PlaySpec with MockitoSugar with OneA
       }
     }
 
-    "return a Forbidden account closed response" when {
+    "return a Forbidden account cancelled response" when {
       "given DesFailureReponse and status 403 for cancelled account" in {
         when(mockDesConnector.updateFirstSubDate(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_CANCELLED","The LISA account is already cancelled")))
-        doRequest(response => response mustBe UpdateSubscriptionAccountClosedResponse)
+        doRequest(response => response mustBe UpdateSubscriptionAccountCancelledResponse)
       }
     }
 

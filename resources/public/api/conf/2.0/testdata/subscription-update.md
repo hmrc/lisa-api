@@ -161,6 +161,24 @@
             </td>
         </tr>
         <tr>
+            <td><p>Request for an account that has already been cancelled</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 0000000903</p></td>
+            <td>
+<pre class="code--block">
+{
+  "firstSubscriptionDate": "2017-05-20"
+}
+</pre>
+            </td>
+            <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
+<pre class="code--block">
+{
+  "code": "INVESTOR_ACCOUNT_ALREADY_CANCELLED",
+  "message": "The LISA account is already cancelled"
+}
+</pre>
+            </td>
+        </tr>
+        <tr>
             <td><p>Request for an account that has already been void</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 0000000902</p></td>
             <td>
 <pre class="code--block">
