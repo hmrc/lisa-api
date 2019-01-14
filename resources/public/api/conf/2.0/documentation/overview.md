@@ -1,12 +1,10 @@
-
-
 This API allows financial organisations to report Lifetime ISA (LISA) information to HM Revenue and Customs (HMRC) and get information about payments made by HMRC.
 
-This version of the API is in development and is very likely to change.
+The API allows the financial organisation to:
 
-The current API allows the financial organisation to:
-
-  * report a new investor to HMRC    
-  * create, transfer or close a LISA account    
-  * report an investor life event    
-  * request a bonus payment    
+* report a new investor to HMRC
+* create, transfer or make changes to a LISA account
+* get details of a LISA account
+* report or get details of an investor life event
+* request or get details of bonus payments and withdrawal charges
+* get payment and debt information
