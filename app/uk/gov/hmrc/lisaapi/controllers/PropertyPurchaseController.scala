@@ -162,10 +162,10 @@ class PropertyPurchaseController @Inject() (
                     doOutcomeAudit(lisaManager, accountId, req, true)
                     lisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.PROPERTY_PURCHASE)
                     val data = req match {
-                      case _: RequestPurchaseOutcomeStandardRequest => {
+                      case _: RequestPurchaseOutcomeCompletedRequest | _: RequestPurchaseOutcomeFailedRequest => {
                         ApiResponseData(message = "Purchase outcome created", lifeEventId = Some(res.lifeEventId))
                       }
-                      case _: RequestPurchaseOutcomeSupersededRequest => {
+                      case _: RequestPurchaseOutcomeSupersededCompletedRequest | _: RequestPurchaseOutcomeSupersededFailedRequest => {
                         ApiResponseData(message = "Purchase outcome superseded", lifeEventId = Some(res.lifeEventId))
                       }
                     }

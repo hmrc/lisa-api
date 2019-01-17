@@ -142,7 +142,7 @@ class ReportLifeEventRequestSpec extends PlaySpec {
     }
 
     "correctly serialise a standard purchase outcome" in {
-      val input = RequestPurchaseOutcomeStandardRequest(
+      val input = RequestPurchaseOutcomeCompletedRequest(
         fundReleaseId = "3456789000",
         eventDate = new DateTime("2017-05-05"),
         propertyPurchaseResult = "Purchase completed",
@@ -162,7 +162,7 @@ class ReportLifeEventRequestSpec extends PlaySpec {
     }
 
     "correctly serialise a superseded purchase outcome" in {
-      val input = RequestPurchaseOutcomeSupersededRequest(
+      val input = RequestPurchaseOutcomeSupersededCompletedRequest(
         fundReleaseId = "3456789000",
         eventDate = new DateTime("2017-06-10"),
         propertyPurchaseResult = "Purchase completed",
