@@ -163,7 +163,6 @@ class ReportLifeEventRequestSpec extends PlaySpec {
 
     "correctly serialise a superseded purchase outcome" in {
       val input = RequestPurchaseOutcomeSupersededCompletedRequest(
-        fundReleaseId = "3456789000",
         eventDate = new DateTime("2017-06-10"),
         propertyPurchaseResult = "Purchase completed",
         propertyPurchaseValue = 250000,
@@ -177,7 +176,6 @@ class ReportLifeEventRequestSpec extends PlaySpec {
       output mustBe Json.obj(
         "eventType" -> "Purchase Result",
         "eventDate" -> "2017-06-10",
-        "fundsReleaseLifeEventID" -> "3456789000",
         "propertyDetails" -> Json.obj(
           "purchaseResult" -> "Purchase completed",
           "purchaseValue" -> 250000
