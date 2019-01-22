@@ -108,7 +108,6 @@ class PropertyPurchaseControllerSpec extends PlaySpec
 
   val supersededOutcomeJson = """
 {
-  "fundReleaseId": "3456789000",
   "eventDate": "2017-06-10",
   "propertyPurchaseResult": "Purchase completed",
   "propertyPurchaseValue": 250000,
@@ -730,7 +729,6 @@ class PropertyPurchaseControllerSpec extends PlaySpec
             auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountID" -> accountId,
-              "fundReleaseId" -> "3456789000",
               "eventDate" -> "2017-06-10",
               "propertyPurchaseResult" -> "Purchase completed",
               "propertyPurchaseValue" -> "250000",

@@ -47,7 +47,6 @@
       <td>
         <pre class="code--block">
 {
-  "fundReleaseId": "3456789001",
   "eventDate": "2017-10-05",
   "propertyPurchaseResult": "Purchase completed",
   "propertyPurchaseValue": 250000,
@@ -130,7 +129,6 @@
       <td>
         <pre class="code--block">
 {
-  "fundReleaseId": "3456789001",
   "eventDate": "2017-10-05",
   "propertyPurchaseResult": "Purchase completed",
   "propertyPurchaseValue": 250000,
@@ -209,7 +207,6 @@
       <td>
         <pre class="code--block">
 {
-  "fundReleaseId": "3456789001",
   "eventDate": "2017-10-05",
   "propertyPurchaseResult": "Purchase completed",
   "propertyPurchaseValue": 250000,
@@ -268,11 +265,7 @@
   "fundReleaseId": "3456789000",
   "eventDate": "2017-10-05",
   "propertyPurchaseResult": "Purchase completed",
-  "propertyPurchaseValue": 250000,
-  "supersede": {
-    "originalLifeEventId": "5678900001",
-    "originalEventDate": "2017-10-10"
-  }
+  "propertyPurchaseValue": 250000
 }
 </pre>
       </td>

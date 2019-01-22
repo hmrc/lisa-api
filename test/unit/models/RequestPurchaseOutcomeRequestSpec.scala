@@ -135,13 +135,12 @@ class RequestPurchaseOutcomeRequestSpec extends PlaySpec {
 
   "RequestPurchaseOutcomeSupersededCompletedRequest" must {
 
-    val supersededJson = """{"fundReleaseId":"3456789000","eventDate":"2017-06-10","propertyPurchaseResult":"Purchase completed","propertyPurchaseValue":250000,"supersede":{"originalLifeEventId":"5678900001","originalEventDate":"2017-05-05"}}"""
+    val supersededJson = """{"eventDate":"2017-06-10","propertyPurchaseResult":"Purchase completed","propertyPurchaseValue":250000,"supersede":{"originalLifeEventId":"5678900001","originalEventDate":"2017-05-05"}}"""
 
     "serialise from json" in {
       val json = supersededJson
 
       Json.parse(json).as[RequestPurchaseOutcomeRequest] mustBe RequestPurchaseOutcomeSupersededCompletedRequest(
-        fundReleaseId = "3456789000",
         eventDate = new DateTime("2017-06-10"),
         propertyPurchaseResult = "Purchase completed",
         propertyPurchaseValue = 250000,
@@ -154,7 +153,6 @@ class RequestPurchaseOutcomeRequestSpec extends PlaySpec {
 
     "serialise to json" in {
       val input = RequestPurchaseOutcomeSupersededCompletedRequest(
-        fundReleaseId = "3456789000",
         eventDate = new DateTime("2017-06-10"),
         propertyPurchaseResult = "Purchase completed",
         propertyPurchaseValue = 250000,
@@ -164,13 +162,7 @@ class RequestPurchaseOutcomeRequestSpec extends PlaySpec {
         )
       )
 
-      Json.toJson[RequestPurchaseOutcomeRequest](input).toString() mustBe """{"eventType":"Purchase Result","eventDate":"2017-06-10","fundsReleaseLifeEventID":"3456789000","propertyDetails":{"purchaseResult":"Purchase completed","purchaseValue":250000},"supersededLifeEventID":"5678900001","supersededLifeEventDate":"2017-05-05"}"""
-    }
-
-    "validate the fundReleaseId" in {
-      val json = supersededJson.replace("3456789000", "x")
-
-      Json.parse(json).validate[RequestPurchaseOutcomeRequest] mustBe JsError((JsPath \ "fundReleaseId"), "error.formatting.fundReleaseId")
+      Json.toJson[RequestPurchaseOutcomeRequest](input).toString() mustBe """{"eventType":"Purchase Result","eventDate":"2017-06-10","propertyDetails":{"purchaseResult":"Purchase completed","purchaseValue":250000},"supersededLifeEventID":"5678900001","supersededLifeEventDate":"2017-05-05"}"""
     }
 
     "validate the eventDate" when {
@@ -222,7 +214,6 @@ class RequestPurchaseOutcomeRequestSpec extends PlaySpec {
   "RequestPurchaseOutcomeSupersededFailedRequest" must {
 
     val supersededFailedRequest = Json.obj(
-      "fundReleaseId" -> "3456789000",
       "eventDate" -> "2017-06-10",
       "propertyPurchaseResult" -> "Purchase failed",
       "supersede" -> Json.obj(
@@ -233,7 +224,6 @@ class RequestPurchaseOutcomeRequestSpec extends PlaySpec {
 
     "serialise from json" in {
       supersededFailedRequest.as[RequestPurchaseOutcomeRequest] mustBe RequestPurchaseOutcomeSupersededFailedRequest(
-        fundReleaseId = "3456789000",
         eventDate = new DateTime("2017-06-10"),
         propertyPurchaseResult = "Purchase failed",
         supersede = PurchaseOutcomeSupersede(
@@ -245,7 +235,6 @@ class RequestPurchaseOutcomeRequestSpec extends PlaySpec {
 
     "serialise to json" in {
       val input = RequestPurchaseOutcomeSupersededFailedRequest(
-        fundReleaseId = "3456789000",
         eventDate = new DateTime("2017-06-10"),
         propertyPurchaseResult = "Purchase failed",
         supersede = PurchaseOutcomeSupersede(
@@ -254,13 +243,7 @@ class RequestPurchaseOutcomeRequestSpec extends PlaySpec {
         )
       )
 
-      Json.toJson[RequestPurchaseOutcomeRequest](input).toString() mustBe """{"eventType":"Purchase Result","eventDate":"2017-06-10","fundsReleaseLifeEventID":"3456789000","propertyDetails":{"purchaseResult":"Purchase failed"},"supersededLifeEventID":"5678900001","supersededLifeEventDate":"2017-05-05"}"""
-    }
-
-    "validate the fundReleaseId" in {
-      val json = supersededFailedRequest ++ Json.obj("fundReleaseId" -> "x")
-
-      json.validate[RequestPurchaseOutcomeRequest] mustBe JsError((JsPath \ "fundReleaseId"), "error.formatting.fundReleaseId")
+      Json.toJson[RequestPurchaseOutcomeRequest](input).toString() mustBe """{"eventType":"Purchase Result","eventDate":"2017-06-10","propertyDetails":{"purchaseResult":"Purchase failed"},"supersededLifeEventID":"5678900001","supersededLifeEventDate":"2017-05-05"}"""
     }
 
     "validate the eventDate" when {
