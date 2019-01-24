@@ -58,6 +58,7 @@ class WithdrawalService @Inject()(desConnector: DesConnector)(implicit ec: Execu
 
         conflictResponse.code match {
           case "SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED" => ReportWithdrawalChargeAlreadySuperseded(conflictResponse.transactionID)
+          case "WITHDRAWAL_CHARGE_ALREADY_EXISTS" => ReportWithdrawalChargeAlreadyExists
         }
       }
       case failureResponse: DesFailureResponse => {
@@ -67,7 +68,6 @@ class WithdrawalService @Inject()(desConnector: DesConnector)(implicit ec: Execu
           case "INVESTOR_ACCOUNTID_NOT_FOUND" => ReportWithdrawalChargeAccountNotFound
           case "INVESTOR_ACCOUNT_ALREADY_VOID" => ReportWithdrawalChargeAccountVoid
           case "INVESTOR_ACCOUNT_ALREADY_CANCELLED" => ReportWithdrawalChargeAccountCancelled
-          case "WITHDRAWAL_CHARGE_ALREADY_EXISTS" => ReportWithdrawalChargeAlreadyExists
           case "WITHDRAWAL_REPORTING_ERROR" => ReportWithdrawalChargeReportingError
           case "SUPERSEDING_TRANSACTION_ID_AMOUNT_MISMATCH" => ReportWithdrawalChargeSupersedeAmountMismatch
           case "SUPERSEDING_TRANSACTION_OUTCOME_ERROR" => ReportWithdrawalChargeSupersedeOutcomeError
