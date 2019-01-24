@@ -25,7 +25,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesTransactionResponse, DesUnavailableResponse}
+import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesTransactionExistResponse, DesTransactionResponse, DesUnavailableResponse}
 import uk.gov.hmrc.lisaapi.services.WithdrawalService
 
 import scala.concurrent.duration.Duration
@@ -115,11 +115,12 @@ class WithdrawalServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
     "return a already superseded response" when {
       "given the code SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED from the DES connector" in {
+        val originalTransactionId: String = "originalTransactionId"
         when(mockDesConnector.reportWithdrawalCharge(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED", "xxxx")))
+          thenReturn(Future.successful(DesTransactionExistResponse("SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED", "xxxx", originalTransactionId)))
 
         doRequest { response =>
-          response mustBe ReportWithdrawalChargeAlreadySuperseded("random")
+          response mustBe ReportWithdrawalChargeAlreadySuperseded(originalTransactionId)
         }
       }
     }
