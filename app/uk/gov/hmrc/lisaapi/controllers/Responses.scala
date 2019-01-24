@@ -179,8 +179,6 @@ case object ErrorWithdrawalExists extends ErrorResponse(409, "WITHDRAWAL_CHARGE_
 
 case object ErrorWithdrawalReportingError extends ErrorResponse(403, "WITHDRAWAL_REPORTING_ERROR", "The withdrawal charge does not equal 25% of the withdrawal amount")
 
-case object ErrorWithdrawalAlreadySuperseded extends ErrorResponse(403, "WITHDRAWAL_CHARGE_ALREADY_SUPERSEDED", "This withdrawal charge has already been superseded")
-
 case object ErrorWithdrawalSupersededAmountMismatch extends ErrorResponse(403, "SUPERSEDED_WITHDRAWAL_CHARGE_ID_AMOUNT_MISMATCH", "originalTransactionId and the originalWithdrawalChargeAmount do not match the information in the original request")
 
 case object ErrorWithdrawalSupersededOutcomeError extends ErrorResponse(403, "SUPERSEDED_WITHDRAWAL_CHARGE_OUTCOME_ERROR", "The calculation from your superseded withdrawal charge is incorrect")
@@ -200,6 +198,14 @@ case object ErrorFundReleaseNotFound extends ErrorResponse(404, "FUND_RELEASE_NO
 case class ErrorFundReleaseSuperseded(lifeEventId: String) extends ErrorResponseWithLifeEventId(409, "FUND_RELEASE_SUPERSEDED", "This fund release has already been superseded", lifeEventId)
 case class ErrorExtensionOneAlreadyApproved(lifeEventId: String) extends ErrorResponseWithLifeEventId(403, "FIRST_EXTENSION_ALREADY_APPROVED", "A first extension has already been approved", lifeEventId)
 case class ErrorExtensionTwoAlreadyApproved(lifeEventId: String) extends ErrorResponseWithLifeEventId(403, "SECOND_EXTENSION_ALREADY_APPROVED", "A second extension has already been approved", lifeEventId)
+
+object ErrorWithdrawalAlreadySuperseded {
+
+  def apply(transactionId: String) = {
+    ErrorResponseWithTransactionId(403, "WITHDRAWAL_CHARGE_ALREADY_SUPERSEDED", "This withdrawal charge has already been superseded", transactionId)
+  }
+
+}
 
 object ErrorInvestorAlreadyExists {
 

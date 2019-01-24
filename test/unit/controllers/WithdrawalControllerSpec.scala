@@ -157,6 +157,7 @@ class WithdrawalControllerSpec extends PlaySpec
           status(res) mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "WITHDRAWAL_CHARGE_ALREADY_SUPERSEDED"
           (contentAsJson(res) \ "message").as[String] mustBe "This withdrawal charge has already been superseded"
+          (contentAsJson(res) \ "transactionId").as[String] mustBe transactionId
         }
       }
 
