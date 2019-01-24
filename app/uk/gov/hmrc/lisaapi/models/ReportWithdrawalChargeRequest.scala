@@ -20,7 +20,11 @@ import org.joda.time.DateTime
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsPath, Reads, Writes}
 
-sealed trait WithdrawalSupersede extends Product
+trait WithdrawalSupersede extends Product {
+  val originalTransactionId: String
+  val originalWithdrawalChargeAmount: Amount
+  val transactionResult: Amount
+}
 
 case class WithdrawalSuperseded(
   originalTransactionId: String,

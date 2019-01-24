@@ -57,6 +57,17 @@ class WithdrawalService @Inject()(desConnector: DesConnector)(implicit ec: Execu
         Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
 
         request match {
+          case supersede: SupersededWithdrawalChargeRequest => {
+            failureResponse.code match {
+              case "SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED" => ReportWithdrawalChargeAlreadySuperseded(supersede.supersede.originalTransactionId)
+              case "SUPERSEDING_TRANSACTION_ID_AMOUNT_MISMATCH" => ReportWithdrawalChargeSupersedeAmountMismatch
+              case "SUPERSEDING_TRANSACTION_OUTCOME_ERROR" => ReportWithdrawalChargeSupersedeOutcomeError
+              case _ => {
+                Logger.warn(s"Request bonus payment returned error: ${failureResponse.code}")
+                ReportWithdrawalChargeError
+              }
+            }
+          }
           case regular: RegularWithdrawalChargeRequest => {
             failureResponse.code match {
               case "INVESTOR_ACCOUNTID_NOT_FOUND" => ReportWithdrawalChargeAccountNotFound
@@ -64,17 +75,6 @@ class WithdrawalService @Inject()(desConnector: DesConnector)(implicit ec: Execu
               case "INVESTOR_ACCOUNT_ALREADY_CANCELLED" => ReportWithdrawalChargeAccountCancelled
               case "WITHDRAWAL_CHARGE_ALREADY_EXISTS" => ReportWithdrawalChargeAlreadyExists
               case "WITHDRAWAL_REPORTING_ERROR" => ReportWithdrawalChargeReportingError
-              case _ => {
-                Logger.warn(s"Request bonus payment returned error: ${failureResponse.code}")
-                ReportWithdrawalChargeError
-              }
-            }
-          }
-          case supersede: SupersededWithdrawalChargeRequest => {
-            failureResponse.code match {
-              case "SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED" => ReportWithdrawalChargeAlreadySuperseded(supersede.supersede.originalTransactionId)
-              case "SUPERSEDING_TRANSACTION_ID_AMOUNT_MISMATCH" => ReportWithdrawalChargeSupersedeAmountMismatch
-              case "SUPERSEDING_TRANSACTION_OUTCOME_ERROR" => ReportWithdrawalChargeSupersedeOutcomeError
               case _ => {
                 Logger.warn(s"Request bonus payment returned error: ${failureResponse.code}")
                 ReportWithdrawalChargeError
