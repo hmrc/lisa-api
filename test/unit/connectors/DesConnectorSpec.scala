@@ -1504,6 +1504,40 @@ class DesConnectorSpec extends PlaySpec
 
     }
 
+    "return a populated DesTransactionExistResponse" when {
+      "the DES response has status CONFLICT" in {
+        when(mockHttp.POST[ReportWithdrawalChargeRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = CONFLICT,
+                responseJson = Some(Json.parse(s"""{"code": "CONFLICT","reason": "CONFLICT","transactionID":"CONFLICT"}"""))
+              )
+            )
+          )
+
+        doReportWithdrawalRequest { response =>
+          response mustBe DesTransactionExistResponse("CONFLICT", "CONFLICT", "CONFLICT")
+        }
+      }
+
+      "the DES response has status FORBIDDEN and a transactionID value in the json body" in {
+        when(mockHttp.POST[ReportWithdrawalChargeRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = FORBIDDEN,
+                responseJson = Some(Json.parse(s"""{"code": "WITHDRAWAL_CHARGE_ALREADY_SUPERSEDED","reason": "This withdrawal charge has already been superseded","transactionID": "2345678901"}"""))
+              )
+            )
+          )
+
+        doReportWithdrawalRequest { response =>
+          response mustBe DesTransactionExistResponse("WITHDRAWAL_CHARGE_ALREADY_SUPERSEDED", "This withdrawal charge has already been superseded", "2345678901")
+        }
+      }
+    }
+
     "return the default DesFailureResponse" when {
 
       "the DES response has no json body" in {
