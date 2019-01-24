@@ -1511,13 +1511,13 @@ class DesConnectorSpec extends PlaySpec
             Future.successful(
               HttpResponse(
                 responseStatus = CONFLICT,
-                responseJson = Some(Json.parse(s"""{"code": "CONFLICT","reason": "CONFLICT","transactionID":"CONFLICT"}"""))
+                responseJson = Some(Json.parse(s"""{"code": "WITHDRAWAL_CHARGE_ALREADY_EXISTS","reason": "A withdrawal charge with these details has already been requested for this investor","transactionID":"2345678901"}"""))
               )
             )
           )
 
         doReportWithdrawalRequest { response =>
-          response mustBe DesTransactionExistResponse("CONFLICT", "CONFLICT", "CONFLICT")
+          response mustBe DesTransactionExistResponse("WITHDRAWAL_CHARGE_ALREADY_EXISTS", "A withdrawal charge with these details has already been requested for this investor", "2345678901")
         }
       }
 
