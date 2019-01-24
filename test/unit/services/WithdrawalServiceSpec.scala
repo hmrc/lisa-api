@@ -93,8 +93,9 @@ class WithdrawalServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
     "return a charge already exists response" when {
       "given the code WITHDRAWAL_CHARGE_ALREADY_EXISTS from the DES connector" in {
+        val originalTransactionId: String = "originalTransactionId"
         when(mockDesConnector.reportWithdrawalCharge(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("WITHDRAWAL_CHARGE_ALREADY_EXISTS", "xxxx")))
+          thenReturn(Future.successful(DesTransactionExistResponse("WITHDRAWAL_CHARGE_ALREADY_EXISTS", "xxxx", originalTransactionId)))
 
         doRequest { response =>
           response mustBe ReportWithdrawalChargeAlreadyExists
