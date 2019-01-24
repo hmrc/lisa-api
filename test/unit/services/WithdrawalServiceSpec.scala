@@ -98,7 +98,7 @@ class WithdrawalServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSui
           thenReturn(Future.successful(DesTransactionExistResponse("WITHDRAWAL_CHARGE_ALREADY_EXISTS", "xxxx", originalTransactionId)))
 
         doRequest { response =>
-          response mustBe ReportWithdrawalChargeAlreadyExists
+          response mustBe ReportWithdrawalChargeAlreadyExists(originalTransactionId)
         }
       }
     }

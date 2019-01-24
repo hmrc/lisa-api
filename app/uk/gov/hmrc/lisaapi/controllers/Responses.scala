@@ -175,8 +175,6 @@ case object ErrorBonusHelpToBuyNotApplicable extends ErrorResponse(403, "HELP_TO
 
 case object ErrorNoSubscriptions extends ErrorResponse(403, "ACCOUNT_ERROR_NO_SUBSCRIPTIONS_THIS_TAX_YEAR", "A bonus payment is not possible because the account has no subscriptions for that tax year")
 
-case object ErrorWithdrawalExists extends ErrorResponse(409, "WITHDRAWAL_CHARGE_ALREADY_EXISTS", "A withdrawal charge with these details has already been requested for this investor")
-
 case object ErrorWithdrawalReportingError extends ErrorResponse(403, "WITHDRAWAL_REPORTING_ERROR", "The withdrawal charge does not equal 25% of the withdrawal amount")
 
 case object ErrorWithdrawalSupersededAmountMismatch extends ErrorResponse(403, "SUPERSEDED_WITHDRAWAL_CHARGE_ID_AMOUNT_MISMATCH", "originalTransactionId and the originalWithdrawalChargeAmount do not match the information in the original request")
@@ -205,6 +203,13 @@ object ErrorWithdrawalAlreadySuperseded {
     ErrorResponseWithTransactionId(403, "WITHDRAWAL_CHARGE_ALREADY_SUPERSEDED", "This withdrawal charge has already been superseded", transactionId)
   }
 
+}
+
+object ErrorWithdrawalExists {
+
+  def apply(transactionId: String) = {
+    ErrorResponseWithTransactionId(409, "WITHDRAWAL_CHARGE_ALREADY_EXISTS", "A withdrawal charge with these details has already been requested for this investor", transactionId)
+  }
 }
 
 object ErrorInvestorAlreadyExists {

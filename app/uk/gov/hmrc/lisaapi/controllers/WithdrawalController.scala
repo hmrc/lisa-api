@@ -208,7 +208,7 @@ class WithdrawalController @Inject() (
 
   val errorOutcomes:  PartialFunction[ReportWithdrawalChargeErrorResponse, ErrorResponse] = {
     case ReportWithdrawalChargeServiceUnavailable => ErrorServiceUnavailable
-    case ReportWithdrawalChargeAlreadyExists => ErrorWithdrawalExists
+    case ReportWithdrawalChargeAlreadyExists(transactionId) => ErrorWithdrawalExists(transactionId)
     case ReportWithdrawalChargeAccountNotFound => ErrorAccountNotFound
     case ReportWithdrawalChargeSupersedeOutcomeError => ErrorWithdrawalSupersededOutcomeError
     case ReportWithdrawalChargeSupersedeAmountMismatch => ErrorWithdrawalSupersededAmountMismatch
