@@ -319,7 +319,7 @@ class DesConnector @Inject()(
 
     result.map(res => {
       Logger.debug("Withdrawal request returned status: " + res.status)
-      (res.status, res.body.contains("transactionID")) match {
+      (res.status, res.body != null && res.body.contains("transactionID")) match {
         case (CONFLICT, _) => parseDesResponse[DesTransactionExistResponse](res)
         case (FORBIDDEN, true) => parseDesResponse[DesTransactionExistResponse](res)
         case (SERVICE_UNAVAILABLE, _) => DesUnavailableResponse
