@@ -119,7 +119,7 @@ class WithdrawalServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSui
           thenReturn(Future.successful(DesFailureResponse("SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED", "xxxx")))
 
         doRequest { response =>
-          response mustBe ReportWithdrawalChargeAlreadySuperseded
+          response mustBe ReportWithdrawalChargeAlreadySuperseded("random")
         }
       }
     }
