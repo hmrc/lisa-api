@@ -453,7 +453,8 @@
 <pre class="code--block">
 {
   "code": "WITHDRAWAL_CHARGE_ALREADY_SUPERSEDED",
-  "message": "This withdrawal charge has already been superseded"
+  "message": "This withdrawal charge has already been superseded",
+  "transactionId": "2345678901"
 }
 </pre>
             </td>
@@ -638,7 +639,8 @@
 <pre class="code--block">
 {
   "code": "WITHDRAWAL_CHARGE_ALREADY_EXISTS",
-  "message": "A withdrawal charge with these details has already been requested for this investor"
+  "message": "A withdrawal charge with these details has already been requested for this investor",
+  "transactionId": "2345678901"
 }
 </pre>
             </td>
