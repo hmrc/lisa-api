@@ -151,7 +151,7 @@ class WithdrawalControllerSpec extends PlaySpec
 
       "given a ReportWithdrawalChargeAlreadySuperseded from the service layer" in {
         when(mockPostService.reportWithdrawalCharge(any(), any(), any())(any())).
-          thenReturn(Future.successful(ReportWithdrawalChargeAlreadySuperseded))
+          thenReturn(Future.successful(ReportWithdrawalChargeAlreadySuperseded(transactionId)))
 
         doRequest(validWithdrawalJson) { res =>
           status(res) mustBe FORBIDDEN

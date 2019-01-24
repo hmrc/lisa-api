@@ -24,7 +24,7 @@ import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
-import uk.gov.hmrc.lisaapi.models._
+import uk.gov.hmrc.lisaapi.models.{ReportWithdrawalChargeAlreadySuperseded, _}
 import uk.gov.hmrc.lisaapi.services.{AuditService, BonusOrWithdrawalService, CurrentDateService, WithdrawalService}
 import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
 import uk.gov.hmrc.lisaapi.utils.WithdrawalChargeValidator
@@ -212,7 +212,7 @@ class WithdrawalController @Inject() (
     case ReportWithdrawalChargeAccountNotFound => ErrorAccountNotFound
     case ReportWithdrawalChargeSupersedeOutcomeError => ErrorWithdrawalSupersededOutcomeError
     case ReportWithdrawalChargeSupersedeAmountMismatch => ErrorWithdrawalSupersededAmountMismatch
-    case ReportWithdrawalChargeAlreadySuperseded => ErrorWithdrawalAlreadySuperseded("random")
+    case ReportWithdrawalChargeAlreadySuperseded(transactionId) => ErrorWithdrawalAlreadySuperseded(transactionId)
     case ReportWithdrawalChargeReportingError => ErrorWithdrawalReportingError
     case ReportWithdrawalChargeAccountVoid => ErrorAccountAlreadyVoided
     case ReportWithdrawalChargeAccountCancelled => ErrorAccountAlreadyCancelled
