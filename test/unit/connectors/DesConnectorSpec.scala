@@ -1511,7 +1511,7 @@ class DesConnectorSpec extends PlaySpec
             Future.successful(
               HttpResponse(
                 responseStatus = CONFLICT,
-                responseJson = Some(Json.parse(s"""{"code": "WITHDRAWAL_CHARGE_ALREADY_EXISTS","reason": "A withdrawal charge with these details has already been requested for this investor","transactionID":"2345678901"}"""))
+                responseJson = Some(Json.parse(s"""{"code": "WITHDRAWAL_CHARGE_ALREADY_EXISTS","reason": "A withdrawal charge with these details has already been requested for this investor","investorTransactionID":"2345678901"}"""))
               )
             )
           )
@@ -1527,13 +1527,13 @@ class DesConnectorSpec extends PlaySpec
             Future.successful(
               HttpResponse(
                 responseStatus = FORBIDDEN,
-                responseJson = Some(Json.parse(s"""{"code": "WITHDRAWAL_CHARGE_ALREADY_SUPERSEDED","reason": "This withdrawal charge has already been superseded","transactionID": "2345678901"}"""))
+                responseJson = Some(Json.parse(s"""{"code": "SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED","reason": "This withdrawal charge has already been superseded","supersededTransactionByID": "2345678901"}"""))
               )
             )
           )
 
         doReportWithdrawalRequest { response =>
-          response mustBe DesTransactionExistResponse("WITHDRAWAL_CHARGE_ALREADY_SUPERSEDED", "This withdrawal charge has already been superseded", "2345678901")
+          response mustBe DesTransactionExistResponse("SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED", "This withdrawal charge has already been superseded", "2345678901")
         }
       }
     }
