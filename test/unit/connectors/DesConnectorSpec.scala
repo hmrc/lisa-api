@@ -1517,7 +1517,7 @@ class DesConnectorSpec extends PlaySpec
           )
 
         doReportWithdrawalRequest { response =>
-          response mustBe DesTransactionExistResponse("WITHDRAWAL_CHARGE_ALREADY_EXISTS", "A withdrawal charge with these details has already been requested for this investor", "2345678901")
+          response mustBe DesWithdrawalChargeAlreadyExistsResponse("WITHDRAWAL_CHARGE_ALREADY_EXISTS", "A withdrawal charge with these details has already been requested for this investor", "2345678901")
         }
       }
 
@@ -1533,7 +1533,7 @@ class DesConnectorSpec extends PlaySpec
           )
 
         doReportWithdrawalRequest { response =>
-          response mustBe DesTransactionExistResponse("SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED", "This withdrawal charge has already been superseded", "2345678901")
+          response mustBe DesWithdrawalChargeAlreadySupersededResponse("SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED", "This withdrawal charge has already been superseded", "2345678901")
         }
       }
     }
