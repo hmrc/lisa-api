@@ -612,7 +612,7 @@
         </tr>
         <tr>
             <td>
-                <p>Withdrawl charge has already been reported</p>
+                <p>Withdrawal charge has already been reported</p>
                 <p class="code--block">
                     <strong>lisaManagerReferenceNumber:</strong><br>
                     <a href="#testing">Use your test user profile</a><br>
