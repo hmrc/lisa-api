@@ -20,7 +20,7 @@ import com.google.inject.Inject
 import play.api.Logger
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
-import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesTransactionExistResponse, DesTransactionResponse, DesUnavailableResponse}
+import uk.gov.hmrc.lisaapi.models.des._
 import uk.gov.hmrc.lisaapi.models._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -50,16 +50,15 @@ class WithdrawalService @Inject()(desConnector: DesConnector)(implicit ec: Execu
       }
       case DesUnavailableResponse => {
         Logger.debug("Matched DesUnavailableResponse")
-
         ReportWithdrawalChargeServiceUnavailable
       }
-      case conflictResponse: DesTransactionExistResponse => {
-        Logger.debug("Matched DesTransactionExistResponse and the code is " + conflictResponse.code)
-
-        conflictResponse.code match {
-          case "SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED" => ReportWithdrawalChargeAlreadySuperseded(conflictResponse.transactionID)
-          case "WITHDRAWAL_CHARGE_ALREADY_EXISTS" => ReportWithdrawalChargeAlreadyExists(conflictResponse.transactionID)
-        }
+      case alreadyExistsResponse: DesWithdrawalChargeAlreadyExistsResponse => {
+        Logger.debug("Matched DesWithdrawalChargeAlreadyExistsResponse and the code is " + alreadyExistsResponse.code)
+        ReportWithdrawalChargeAlreadyExists(alreadyExistsResponse.investorTransactionID)
+      }
+      case alreadySupersededResponse: DesWithdrawalChargeAlreadySupersededResponse => {
+        Logger.debug("Matched DesWithdrawalChargeAlreadySupersededResponse and the code is " + alreadySupersededResponse.code)
+        ReportWithdrawalChargeAlreadySuperseded(alreadySupersededResponse.supersededTransactionByID)
       }
       case failureResponse: DesFailureResponse => {
         Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
