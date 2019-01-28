@@ -198,7 +198,7 @@ class WithdrawalController @Inject() (
 
   private def handleFailure(lisaManager: String, accountId: String, req: ReportWithdrawalChargeRequest, errorResponse: ReportWithdrawalChargeErrorResponse)
                            (implicit hc: HeaderCarrier, startTime: Long) = {
-    val error = errorMap.getOrElse(errorResponse, ErrorInternalServerError)
+    val error = errorOutcomes.applyOrElse(errorResponse, {_ : ReportWithdrawalChargeErrorResponse => ErrorInternalServerError})
 
     auditFailure(lisaManager, accountId, req, error.errorCode)
     lisaMetrics.incrementMetrics(startTime, error.httpStatusCode, LisaMetricKeys.WITHDRAWAL_CHARGE)
@@ -206,17 +206,17 @@ class WithdrawalController @Inject() (
     error.asResult
   }
 
-  val errorMap = Map[ReportWithdrawalChargeErrorResponse, ErrorResponse](
-    ReportWithdrawalChargeServiceUnavailable -> ErrorServiceUnavailable,
-    ReportWithdrawalChargeAlreadyExists -> ErrorWithdrawalExists,
-    ReportWithdrawalChargeAccountNotFound -> ErrorAccountNotFound,
-    ReportWithdrawalChargeSupersedeOutcomeError -> ErrorWithdrawalSupersededOutcomeError,
-    ReportWithdrawalChargeSupersedeAmountMismatch -> ErrorWithdrawalSupersededAmountMismatch,
-    ReportWithdrawalChargeAlreadySuperseded -> ErrorWithdrawalAlreadySuperseded,
-    ReportWithdrawalChargeReportingError -> ErrorWithdrawalReportingError,
-    ReportWithdrawalChargeAccountVoid -> ErrorAccountAlreadyVoided,
-    ReportWithdrawalChargeAccountCancelled -> ErrorAccountAlreadyCancelled
-  )
+  val errorOutcomes:  PartialFunction[ReportWithdrawalChargeErrorResponse, ErrorResponse] = {
+    case ReportWithdrawalChargeServiceUnavailable => ErrorServiceUnavailable
+    case ReportWithdrawalChargeAlreadyExists(transactionId) => ErrorWithdrawalExists(transactionId)
+    case ReportWithdrawalChargeAccountNotFound => ErrorAccountNotFound
+    case ReportWithdrawalChargeSupersedeOutcomeError => ErrorWithdrawalSupersededOutcomeError
+    case ReportWithdrawalChargeSupersedeAmountMismatch => ErrorWithdrawalSupersededAmountMismatch
+    case ReportWithdrawalChargeAlreadySuperseded(transactionId) => ErrorWithdrawalAlreadySuperseded(transactionId)
+    case ReportWithdrawalChargeReportingError => ErrorWithdrawalReportingError
+    case ReportWithdrawalChargeAccountVoid => ErrorAccountAlreadyVoided
+    case ReportWithdrawalChargeAccountCancelled => ErrorAccountAlreadyCancelled
+  }
 
   private def auditFailure(lisaManager: String, accountId: String, req: ReportWithdrawalChargeRequest, failureReason: String)
                           (implicit hc: HeaderCarrier) = {

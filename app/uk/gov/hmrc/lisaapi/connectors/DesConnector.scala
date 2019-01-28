@@ -319,8 +319,10 @@ class DesConnector @Inject()(
 
     result.map(res => {
       Logger.debug("Withdrawal request returned status: " + res.status)
-      res.status match {
-        case SERVICE_UNAVAILABLE => DesUnavailableResponse
+      (res.status, res.body != null && res.body.contains("supersededTransactionByID")) match {
+        case (CONFLICT, _) => parseDesResponse[DesWithdrawalChargeAlreadyExistsResponse](res)
+        case (FORBIDDEN, true) => parseDesResponse[DesWithdrawalChargeAlreadySupersededResponse](res)
+        case (SERVICE_UNAVAILABLE, _) => DesUnavailableResponse
         case _ => parseDesResponse[DesTransactionResponse](res)
       }
     })

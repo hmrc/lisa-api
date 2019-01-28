@@ -25,7 +25,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesTransactionResponse, DesUnavailableResponse}
+import uk.gov.hmrc.lisaapi.models.des._
 import uk.gov.hmrc.lisaapi.services.WithdrawalService
 
 import scala.concurrent.duration.Duration
@@ -93,11 +93,12 @@ class WithdrawalServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
     "return a charge already exists response" when {
       "given the code WITHDRAWAL_CHARGE_ALREADY_EXISTS from the DES connector" in {
+        val originalTransactionId: String = "originalTransactionId"
         when(mockDesConnector.reportWithdrawalCharge(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("WITHDRAWAL_CHARGE_ALREADY_EXISTS", "xxxx")))
+          thenReturn(Future.successful(DesWithdrawalChargeAlreadyExistsResponse("WITHDRAWAL_CHARGE_ALREADY_EXISTS", "xxxx", originalTransactionId)))
 
         doRequest { response =>
-          response mustBe ReportWithdrawalChargeAlreadyExists
+          response mustBe ReportWithdrawalChargeAlreadyExists(originalTransactionId)
         }
       }
     }
@@ -115,11 +116,12 @@ class WithdrawalServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSui
 
     "return a already superseded response" when {
       "given the code SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED from the DES connector" in {
+        val originalTransactionId: String = "originalTransactionId"
         when(mockDesConnector.reportWithdrawalCharge(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED", "xxxx")))
+          thenReturn(Future.successful(DesWithdrawalChargeAlreadySupersededResponse("SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED", "xxxx", originalTransactionId)))
 
         doRequest { response =>
-          response mustBe ReportWithdrawalChargeAlreadySuperseded
+          response mustBe ReportWithdrawalChargeAlreadySuperseded(originalTransactionId)
         }
       }
     }

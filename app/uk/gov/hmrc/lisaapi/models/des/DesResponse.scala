@@ -36,6 +36,8 @@ case class DesCreateInvestorResponse(investorID: String) extends DesResponse
 case class DesTransactionResponse(transactionID: String, message: Option[String]) extends DesResponse
 case class DesFailureResponse(code: String = "INTERNAL_SERVER_ERROR", reason: String = "Internal Server Error") extends DesFailure
 case class DesTransactionExistResponse(code: String, reason: String, transactionID: String) extends DesResponse
+case class DesWithdrawalChargeAlreadyExistsResponse(code: String, reason: String, investorTransactionID: String) extends DesResponse
+case class DesWithdrawalChargeAlreadySupersededResponse(code: String, reason: String, supersededTransactionByID: String) extends DesResponse
 case object DesEmptySuccessResponse extends DesResponse
 case class DesUpdateSubscriptionSuccessResponse (code: String, reason: String)extends DesResponse
 case class DesReinstateAccountSuccessResponse (code: String, reason: String)extends DesResponse
@@ -81,6 +83,8 @@ object DesResponse {
   )(DesLifeEventRetrievalResponse.apply _)
 
   implicit val requestTransactionAlreadyExistResponseFormats: OFormat[DesTransactionExistResponse] = Json.format[DesTransactionExistResponse]
+  implicit val requestWithdrawalChargeAlreadyExistsResponseFormats: OFormat[DesWithdrawalChargeAlreadyExistsResponse] = Json.format[DesWithdrawalChargeAlreadyExistsResponse]
+  implicit val requestWithdrawalChargeAlreadySupersededResponseFormats: OFormat[DesWithdrawalChargeAlreadySupersededResponse] = Json.format[DesWithdrawalChargeAlreadySupersededResponse]
 
   implicit val desGetBonusPaymentResponse: Reads[DesGetBonusPaymentResponse] = (
     (JsPath \ "lifeEventId").readNullable(JsonReads.lifeEventId) and

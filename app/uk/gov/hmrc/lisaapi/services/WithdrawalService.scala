@@ -20,7 +20,7 @@ import com.google.inject.Inject
 import play.api.Logger
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
-import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesTransactionResponse, DesUnavailableResponse}
+import uk.gov.hmrc.lisaapi.models.des._
 import uk.gov.hmrc.lisaapi.models._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -50,8 +50,15 @@ class WithdrawalService @Inject()(desConnector: DesConnector)(implicit ec: Execu
       }
       case DesUnavailableResponse => {
         Logger.debug("Matched DesUnavailableResponse")
-
         ReportWithdrawalChargeServiceUnavailable
+      }
+      case alreadyExistsResponse: DesWithdrawalChargeAlreadyExistsResponse => {
+        Logger.debug("Matched DesWithdrawalChargeAlreadyExistsResponse and the code is " + alreadyExistsResponse.code)
+        ReportWithdrawalChargeAlreadyExists(alreadyExistsResponse.investorTransactionID)
+      }
+      case alreadySupersededResponse: DesWithdrawalChargeAlreadySupersededResponse => {
+        Logger.debug("Matched DesWithdrawalChargeAlreadySupersededResponse and the code is " + alreadySupersededResponse.code)
+        ReportWithdrawalChargeAlreadySuperseded(alreadySupersededResponse.supersededTransactionByID)
       }
       case failureResponse: DesFailureResponse => {
         Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
@@ -60,9 +67,7 @@ class WithdrawalService @Inject()(desConnector: DesConnector)(implicit ec: Execu
           case "INVESTOR_ACCOUNTID_NOT_FOUND" => ReportWithdrawalChargeAccountNotFound
           case "INVESTOR_ACCOUNT_ALREADY_VOID" => ReportWithdrawalChargeAccountVoid
           case "INVESTOR_ACCOUNT_ALREADY_CANCELLED" => ReportWithdrawalChargeAccountCancelled
-          case "WITHDRAWAL_CHARGE_ALREADY_EXISTS" => ReportWithdrawalChargeAlreadyExists
           case "WITHDRAWAL_REPORTING_ERROR" => ReportWithdrawalChargeReportingError
-          case "SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED" => ReportWithdrawalChargeAlreadySuperseded
           case "SUPERSEDING_TRANSACTION_ID_AMOUNT_MISMATCH" => ReportWithdrawalChargeSupersedeAmountMismatch
           case "SUPERSEDING_TRANSACTION_OUTCOME_ERROR" => ReportWithdrawalChargeSupersedeOutcomeError
           case _ => {

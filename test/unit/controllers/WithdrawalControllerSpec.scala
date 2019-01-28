@@ -151,12 +151,13 @@ class WithdrawalControllerSpec extends PlaySpec
 
       "given a ReportWithdrawalChargeAlreadySuperseded from the service layer" in {
         when(mockPostService.reportWithdrawalCharge(any(), any(), any())(any())).
-          thenReturn(Future.successful(ReportWithdrawalChargeAlreadySuperseded))
+          thenReturn(Future.successful(ReportWithdrawalChargeAlreadySuperseded(transactionId)))
 
         doRequest(validWithdrawalJson) { res =>
           status(res) mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "WITHDRAWAL_CHARGE_ALREADY_SUPERSEDED"
           (contentAsJson(res) \ "message").as[String] mustBe "This withdrawal charge has already been superseded"
+          (contentAsJson(res) \ "transactionId").as[String] mustBe transactionId
         }
       }
 
@@ -268,12 +269,13 @@ class WithdrawalControllerSpec extends PlaySpec
 
       "given a ReportWithdrawalChargeAlreadyExists from the service layer" in {
         when(mockPostService.reportWithdrawalCharge(any(), any(), any())(any())).
-          thenReturn(Future.successful(ReportWithdrawalChargeAlreadyExists))
+          thenReturn(Future.successful(ReportWithdrawalChargeAlreadyExists(transactionId)))
 
         doRequest(validWithdrawalJson) { res =>
           status(res) mustBe CONFLICT
-          (contentAsJson(res) \ "code").as[String] mustBe ErrorWithdrawalExists.errorCode
-          (contentAsJson(res) \ "message").as[String] mustBe ErrorWithdrawalExists.message
+          (contentAsJson(res) \ "code").as[String] mustBe "WITHDRAWAL_CHARGE_ALREADY_EXISTS"
+          (contentAsJson(res) \ "message").as[String] mustBe "A withdrawal charge with these details has already been requested for this investor"
+          (contentAsJson(res) \ "transactionId").as[String] mustBe transactionId
         }
       }
 
