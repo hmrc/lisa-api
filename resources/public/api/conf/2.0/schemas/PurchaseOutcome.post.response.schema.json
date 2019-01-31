@@ -15,7 +15,8 @@
           "description": "A human-readable explanation for the result of the API call.",
           "type": "string",
           "enum": [
-            "Purchase outcome created"
+            "Purchase outcome created",
+            "Purchase outcome superseded"
           ]
         }
       },

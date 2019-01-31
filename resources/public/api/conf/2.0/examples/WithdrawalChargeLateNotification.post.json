@@ -1,0 +1,10 @@
+{
+  "claimPeriodStartDate": "2017-12-06",
+  "claimPeriodEndDate": "2018-01-05",
+  "withdrawalAmount": 1000.00,
+  "withdrawalChargeAmount": 250.00,
+  "withdrawalChargeAmountYTD": 500.00,
+  "fundsDeductedDuringWithdrawal": true,
+  "withdrawalReason": "Regular withdrawal",
+  "automaticRecoveryAmount": 250.00
+}

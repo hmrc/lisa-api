@@ -808,7 +808,9 @@ types:
                           body:
                             application/json:
                                 type: !include schemas/AnnualReturn.post.response.schema.json
-                                example: !include examples/AnnualReturn.post.response.json
+                                examples:
+                                   lifeEventCreated: !include examples/AnnualReturn.post.response.json
+                                   lifeEventSuperseded: !include examples/AnnualReturn.post.response.1.json
                         400:
                           body:
                             application/json:
@@ -1066,6 +1068,7 @@ types:
                               type: !include schemas/Extension.post.response.schema.json
                               examples:
                                 lifeEventCreated: !include examples/Extension.post.response.json
+                                lifeEventSuperseded: !include examples/Extension.post.response.1.json
                         403:
                           body:
                             application/json:
@@ -1187,6 +1190,7 @@ types:
                               type: !include schemas/PurchaseOutcome.post.response.schema.json
                               examples:
                                 lifeEventCreated: !include examples/PurchaseOutcome.post.response.json
+                                lifeEventSuperseded: !include examples/PurchaseOutcome.post.response.1.json
                         403:
                           body:
                             application/json:
@@ -1333,7 +1337,8 @@ types:
                         type: !include schemas/WithdrawalCharge.post.schema.json
                         examples:
                           example-1: !include examples/WithdrawalCharge.post.json
-                          example-2: !include examples/WithdrawalChargeSupersede.post.json
+                          example-2: !include examples/WithdrawalChargeLateNotification.post.json
+                          example-3: !include examples/WithdrawalChargeSupersede.post.json
                     responses:
                       201:
                         description: The LISA transaction resource has been created.
@@ -1556,7 +1561,8 @@ types:
                         type: !include schemas/BonusPaymentRequest.post.schema.json
                         examples:
                           example-1: !include examples/BonusPaymentRequest.post.json
-                          example-2: !include examples/BonusPaymentsuperseded.post.json
+                          example-2: !include examples/BonusPaymentLateNotification.post.json
+                          example-3: !include examples/BonusPaymentsuperseded.post.json
                     responses:
                       201:
                         description: The LISA transaction resource has been created.
