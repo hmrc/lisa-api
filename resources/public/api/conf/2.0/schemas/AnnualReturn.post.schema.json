@@ -22,19 +22,19 @@
     },
     "marketValueCash": {
       "$ref": "#/definitions/MarketValue",
-      "description": "The total value of the cash LISA account. Give the value to the nearest whole pound. Do not include decimal places. For example, send 54.56 as 55. If you give a value for marketValueCash, do not give a value for marketValueStocksAndShares."
+      "description": "The total value of the cash LISA account. Give the value to the nearest whole pound. Do not include decimal places. For example, send 54.56 as 55. If you give a value for marketValueCash, give a value of 0 for marketValueStocksAndShares and annualSubsStocksAndShares."
     },
     "marketValueStocksAndShares": {
       "$ref": "#/definitions/MarketValue",
-      "description": "The total value of the stocks and shares LISA account. Give the value to the nearest whole pound. Do not include decimal places. For example, send 54.56 as 55. If you give a value for marketValueStocksAndShares, do not give a value for marketValueCash."
+      "description": "The total value of the stocks and shares LISA account. Give the value to the nearest whole pound. Do not include decimal places. For example, send 54.56 as 55. If you give a value for marketValueStocksAndShares, give a value of 0 for marketValueCash and annualSubsCash."
     },
     "annualSubsCash": {
       "$ref": "#/definitions/AnnualSubs",
-      "description": "The total value of subscriptions that the investor deposited into their cash LISA account during the tax year. Give the value to the nearest whole pound. Do not include decimal places. For example, send 54.56 as 55. If you give a value for annualSubsCash, do not give a value for annualSubsStocksAndShares."
+      "description": "The total value of subscriptions that the investor deposited into their cash LISA account during the tax year. Give the value to the nearest whole pound. Do not include decimal places. For example, send 54.56 as 55. If you give a value for annualSubsCash, give a value of 0 for marketValueStocksAndShares and annualSubsStocksAndShares."
     },
     "annualSubsStocksAndShares": {
       "$ref": "#/definitions/AnnualSubs",
-      "description": "The total value of subscriptions that the investor deposited into their stocks and shares LISA account during the tax year. Give the value to the nearest whole pound. Do not include decimal places. For example, send 54.56 as 55. If you give a value for annualSubsStocksAndShares, do not give a value for annualSubsCash."
+      "description": "The total value of subscriptions that the investor deposited into their stocks and shares LISA account during the tax year. Give the value to the nearest whole pound. Do not include decimal places. For example, send 54.56 as 55. If you give a value for annualSubsStocksAndShares, give a value of 0 for marketValueCash and annualSubsCash."
     },
     "supersede": {
       "type": "object",
@@ -54,7 +54,7 @@
       "additionalProperties": false
     }
   },
-  "required": ["eventDate", "lisaManagerName", "taxYear"],
+  "required": ["eventDate", "lisaManagerName", "taxYear", "marketValueCash", "marketValueStocksAndShares", "annualSubsCash", "annualSubsStocksAndShares"],
   "additionalProperties": false,
   "definitions": {
     "ISO8601-Date" : {
