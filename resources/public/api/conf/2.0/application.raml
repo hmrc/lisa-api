@@ -9,6 +9,8 @@ baseUri: http://api.service.hmrc.gov.uk
 documentation:
   - title: Overview
     content: !include documentation/overview.md
+  - title: Switch to version 2.0
+    content: !include documentation/switchToVersion2_0.md
   - title: Save reference numbers
     content: !include documentation/reference-numbers.md
   - title: Versioning
@@ -806,7 +808,9 @@ types:
                           body:
                             application/json:
                                 type: !include schemas/AnnualReturn.post.response.schema.json
-                                example: !include examples/AnnualReturn.post.response.json
+                                examples:
+                                   lifeEventCreated: !include examples/AnnualReturn.post.response.json
+                                   lifeEventSuperseded: !include examples/AnnualReturnSuperseded.post.response.json
                         400:
                           body:
                             application/json:
@@ -1064,6 +1068,7 @@ types:
                               type: !include schemas/Extension.post.response.schema.json
                               examples:
                                 lifeEventCreated: !include examples/Extension.post.response.json
+                                lifeEventSuperseded: !include examples/ExtensionSuperseded.post.response.json
                         403:
                           body:
                             application/json:
@@ -1185,6 +1190,7 @@ types:
                               type: !include schemas/PurchaseOutcome.post.response.schema.json
                               examples:
                                 lifeEventCreated: !include examples/PurchaseOutcome.post.response.json
+                                lifeEventSuperseded: !include examples/PurchaseOutcomeSuperseded.post.response.json
                         403:
                           body:
                             application/json:

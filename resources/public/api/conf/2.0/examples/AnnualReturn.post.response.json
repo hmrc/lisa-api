@@ -1,8 +1,8 @@
 {
-  "status": 201,
-  "success": true,
   "data": {
-    "message": "Life event created",
-    "lifeEventId": "7890000001"
-  }
+    "lifeEventId": "7890000001",
+    "message": "Life event created"
+  },
+  "success": true,
+  "status": 201
 }

@@ -1,0 +1,8 @@
+{
+  "data": {
+    "lifeEventId": "7890000002",
+    "message": "Life event superseded"
+  },
+  "success": true,
+  "status": 201
+}
