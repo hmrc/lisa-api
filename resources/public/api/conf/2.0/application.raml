@@ -810,7 +810,7 @@ types:
                                 type: !include schemas/AnnualReturn.post.response.schema.json
                                 examples:
                                    lifeEventCreated: !include examples/AnnualReturn.post.response.json
-                                   lifeEventSuperseded: !include examples/AnnualReturn.post.response.1.json
+                                   lifeEventSuperseded: !include examples/AnnualReturnSuperseded.post.response.json
                         400:
                           body:
                             application/json:
@@ -1068,7 +1068,7 @@ types:
                               type: !include schemas/Extension.post.response.schema.json
                               examples:
                                 lifeEventCreated: !include examples/Extension.post.response.json
-                                lifeEventSuperseded: !include examples/Extension.post.response.1.json
+                                lifeEventSuperseded: !include examples/ExtensionSuperseded.post.response.json
                         403:
                           body:
                             application/json:
@@ -1190,7 +1190,7 @@ types:
                               type: !include schemas/PurchaseOutcome.post.response.schema.json
                               examples:
                                 lifeEventCreated: !include examples/PurchaseOutcome.post.response.json
-                                lifeEventSuperseded: !include examples/PurchaseOutcome.post.response.1.json
+                                lifeEventSuperseded: !include examples/PurchaseOutcomeSuperseded.post.response.json
                         403:
                           body:
                             application/json:
