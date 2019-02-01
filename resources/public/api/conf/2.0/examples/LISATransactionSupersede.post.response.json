@@ -1,8 +1,8 @@
 {
-  "success": true,
-  "status": 201,
   "data": {
     "transactionId": "0000456789",
     "message": "Bonus transaction superseded"
-  }
+  },
+  "success": true,
+  "status": 201
 }

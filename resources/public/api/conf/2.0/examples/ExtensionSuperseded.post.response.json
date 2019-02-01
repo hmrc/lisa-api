@@ -1,0 +1,8 @@
+{
+  "data": {
+    "lifeEventId": "6789000002",
+    "message": "Extension superseded"
+  },
+  "success": true,
+  "status": 201
+}

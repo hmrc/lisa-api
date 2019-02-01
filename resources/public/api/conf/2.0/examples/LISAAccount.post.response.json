@@ -1,8 +1,8 @@
 {
-  "status": 201,
-  "success": true,
   "data": {
-    "message": "Account created",
-    "accountId": "1234567890"
-  }
+    "accountId": "1234567890",
+    "message": "Account created"
+  },
+  "success": true,
+  "status": 201
 }
