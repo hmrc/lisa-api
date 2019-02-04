@@ -122,7 +122,7 @@
     </tr>
     <tr>
       <td>
-        <p>Funds release which has associated data</p>
+        <p>Funds release one which has associated data</p>
         <p class="code--block">
           lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
           accountId: 1234567890<br>
@@ -179,6 +179,65 @@
       "originalLifeEventId": "5678900001",
       "originalEventDate": "2017-10-05"
     }
+  }
+]
+</pre>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <p>Funds release two which has associated data</p>
+        <p class="code--block">
+          lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+          accountId: 1234567891<br>
+          lifeEventId: 3456789002
+        </p>
+      </td>
+      <td>
+        <p>HTTP status: <code class="code--slim">200 (OK)</code></p>
+<pre class="code--block">
+[
+  {
+    "lifeEventId": "3456789002",
+    "eventType": "Funds release",
+    "eventDate": "2017-05-05",
+    "withdrawalAmount": 5000.00,
+    "conveyancerReference": "CR12345-6789",
+    "propertyDetails": {
+      "nameOrNumber": "1",
+      "postalCode": "AA11 1AA"
+    },
+    "supersede": {
+      "originalLifeEventId": "3456789000",
+      "originalEventDate": "2017-05-10"
+    }
+  },
+  {
+    "lifeEventId": "6789000002",
+    "eventType": "Extension one",
+    "eventDate": "2017-05-11",
+    "fundReleaseId": "3456789002",
+    "supersede": {
+      "originalLifeEventId": "6789000001",
+      "originalEventDate": "2017-05-10"
+    }
+  },
+  {
+    "lifeEventId": "6789000004",
+    "eventType": "Extension two",
+    "eventDate": "2017-08-11",
+    "fundReleaseId": "3456789002",
+    "supersede": {
+      "originalLifeEventId": "6789000003",
+      "originalEventDate": "2017-08-10"
+    }
+  },
+  {
+    "lifeEventId": "5678900003",
+    "fundReleaseId": "3456789002",
+    "eventDate": "2017-10-10",
+    "eventType": "Purchase outcome",
+    "propertyPurchaseResult": "Purchase failed"
   }
 ]
 </pre>
@@ -336,6 +395,30 @@
       "originalLifeEventId": "5678900001",
       "originalEventDate": "2017-10-05"
     }
+  }
+]
+</pre>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <p>Purchase outcome failure</p>
+        <p class="code--block">
+          lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+          accountId: 1234567891<br>
+          lifeEventId: 5678900003
+        </p>
+      </td>
+      <td>
+        <p>HTTP status: <code class="code--slim">200 (OK)</code></p>
+<pre class="code--block">
+[
+  {
+    "lifeEventId": "5678900003",
+    "eventType": "Purchase outcome",
+    "eventDate": "2017-10-10",
+    "fundReleaseId": "3456789002",
+    "propertyPurchaseResult": "Purchase failed"
   }
 ]
 </pre>
