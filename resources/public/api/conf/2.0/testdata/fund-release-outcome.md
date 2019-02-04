@@ -73,6 +73,34 @@
     </tr>
     <tr>
       <td>
+        <p>Purchase outcome created</p>
+        <p class="code--block"> <strong>lisaManagerReferenceNumber:</strong><br /> <a href="#testing">Use your test user profile</a><br /> <br /> <strong>accountId:</strong><br />1234567891 </p>
+      </td>
+      <td>
+<pre class="code--block">
+{
+  "fundReleaseId": "3456789001",
+  "eventDate": "2017-10-10",
+  "propertyPurchaseResult": "Purchase failed"
+}
+</pre>
+      </td>
+      <td>
+        <p>HTTP status: <code class="code--slim">201 (Created)</code></p>
+<pre class="code--block">
+{
+  "status": 201,
+  "success": true,
+  "data": {
+    "lifeEventId": "5678900003",
+    "message": "Purchase outcome created"
+  }
+}
+</pre>
+      </td>
+    </tr>
+    <tr>
+      <td>
         <p>Invalid LISA Manager Reference Number</p>
         <p class="code--block"> <strong>lisaManagerReferenceNumber:</strong><br /> 123456 <br /> <br /> <strong>accountId:</strong><br />1234567890 </p>
       </td>
