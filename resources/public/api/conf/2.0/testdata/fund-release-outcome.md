@@ -12,7 +12,7 @@
     </tr>
     <tr>
       <td>
-        <p>Purchase outcome created</p>
+        <p>Successful purchase outcome</p>
         <p class="code--block"> <strong>lisaManagerReferenceNumber:</strong><br /> <a href="#testing">Use your test user profile</a><br /> <br /> <strong>accountId:</strong><br />1234567890 </p>
       </td>
       <td>
@@ -73,7 +73,7 @@
     </tr>
     <tr>
       <td>
-        <p>Purchase outcome created</p>
+        <p>Failed purchase outcome</p>
         <p class="code--block"> <strong>lisaManagerReferenceNumber:</strong><br /> <a href="#testing">Use your test user profile</a><br /> <br /> <strong>accountId:</strong><br />1234567891 </p>
       </td>
       <td>

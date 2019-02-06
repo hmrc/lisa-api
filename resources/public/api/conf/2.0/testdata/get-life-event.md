@@ -122,7 +122,7 @@
     </tr>
     <tr>
       <td>
-        <p>Funds release one which has associated data</p>
+        <p>Funds release which has associated data and successful outcome</p>
         <p class="code--block">
           lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
           accountId: 1234567890<br>
@@ -186,7 +186,7 @@
     </tr>
     <tr>
       <td>
-        <p>Funds release two which has associated data</p>
+        <p>Funds release with failure outcome</p>
         <p class="code--block">
           lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
           accountId: 1234567891<br>
@@ -210,26 +210,6 @@
     "supersede": {
       "originalLifeEventId": "3456789000",
       "originalEventDate": "2017-05-10"
-    }
-  },
-  {
-    "lifeEventId": "6789000002",
-    "eventType": "Extension one",
-    "eventDate": "2017-05-11",
-    "fundReleaseId": "3456789002",
-    "supersede": {
-      "originalLifeEventId": "6789000001",
-      "originalEventDate": "2017-05-10"
-    }
-  },
-  {
-    "lifeEventId": "6789000004",
-    "eventType": "Extension two",
-    "eventDate": "2017-08-11",
-    "fundReleaseId": "3456789002",
-    "supersede": {
-      "originalLifeEventId": "6789000003",
-      "originalEventDate": "2017-08-10"
     }
   },
   {
