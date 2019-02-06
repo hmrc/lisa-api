@@ -179,7 +179,7 @@
         </tr>
         <tr>
             <td>
-                <p>Request with an endDate before the startDate</p>
+                <p>startDate cannot be before 6 April 2017</p>
                 <p class="code--block">
                     lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
                     startDate: 2017-04-05<br>
