@@ -12,7 +12,7 @@
     </tr>
     <tr>
       <td>
-        <p>Purchase outcome created</p>
+        <p>Successful purchase outcome</p>
         <p class="code--block"> <strong>lisaManagerReferenceNumber:</strong><br /> <a href="#testing">Use your test user profile</a><br /> <br /> <strong>accountId:</strong><br />1234567890 </p>
       </td>
       <td>
@@ -68,6 +68,34 @@
     "message": "Purchase outcome superseded"
   }
 }        
+</pre>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <p>Failed purchase outcome</p>
+        <p class="code--block"> <strong>lisaManagerReferenceNumber:</strong><br /> <a href="#testing">Use your test user profile</a><br /> <br /> <strong>accountId:</strong><br />1234567891 </p>
+      </td>
+      <td>
+<pre class="code--block">
+{
+  "fundReleaseId": "3456789002",
+  "eventDate": "2017-10-10",
+  "propertyPurchaseResult": "Purchase failed"
+}
+</pre>
+      </td>
+      <td>
+        <p>HTTP status: <code class="code--slim">201 (Created)</code></p>
+<pre class="code--block">
+{
+  "status": 201,
+  "success": true,
+  "data": {
+    "lifeEventId": "5678900003",
+    "message": "Purchase outcome created"
+  }
+}
 </pre>
       </td>
     </tr>
