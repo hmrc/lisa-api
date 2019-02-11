@@ -1,26 +1,26 @@
 {
-	"$schema": "http://json-schema.org/draft-04/schema#",
-	"type": "object",
-	"properties":
-	{
-	  "lisaManagerReferenceNumber": {
-		"description": "The reference given to the LISA provider when they applied for approval from HMRC.",
-		"$ref": "#/definitions/LISAManagerReferenceNumberType"
-	  },
-	  "_links" : {"type" : "object"}
-	},
-	"required" :
-	[
-		"lisaManagerReferenceNumber"
-	],
-	"additionalProperties": false,
-	"definitions":
-	{
-		"LISAManagerReferenceNumberType" :
-		{
-			"type" : "string",
-			"pattern": "^Z([0-9]{4}|[0-9]{6})$",
-			"example": "Z1234"
-		}
-	}
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties":
+  {
+    "lisaManagerReferenceNumber": {
+      "description": "The reference given to the LISA provider when they applied for approval from HMRC.",
+      "$ref": "#/definitions/LISAManagerReferenceNumberType"
+    },
+    "_links" : {"type" : "object"}
+  },
+  "required" :
+  [
+    "lisaManagerReferenceNumber"
+  ],
+  "additionalProperties": false,
+  "definitions":
+  {
+    "LISAManagerReferenceNumberType" :
+    {
+      "type" : "string",
+      "pattern": "^Z([0-9]{4}|[0-9]{6})$",
+      "example": "Z1234"
+    }
+  }
 }

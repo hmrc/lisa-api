@@ -91,7 +91,7 @@ types:
               post:
                   is: [headers.acceptHeader, headers.contentHeader]
                   displayName: Create a LISA investor
-                  description: !include documentation/LISAInvestor.post
+                  description: Report a new LISA investor to HMRC to generate an investor ID. If the investor already exists, you will get their reference number.
                   (annotations.scope): "write:lisa"
                   securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
                   (annotations.sandboxData): !include testdata/lisa-create-investor.md
@@ -166,10 +166,9 @@ types:
               (annotations.group):
                 name: LISA accounts
                 description: ""
-              description: !include documentation/LISAAccount
               post:
                     is: [headers.acceptHeader, headers.contentHeader]
-                    description: !include documentation/LISAAccount
+                    description: Create a new account you’ve set up for an investor, or transfer an existing account from another LISA provider. If you’re creating a new account you’ll need to create a LISA investor first.
                     displayName: Create or transfer a LISA account
                     (annotations.scope): "write:lisa"
                     securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
@@ -674,11 +673,10 @@ types:
                   (annotations.group):
                     name: Life events
                     description: ""
-                  description: !include documentation/LifeEvent
                   post:
                     is: [headers.acceptHeader, headers.contentHeader]
                     displayName: Report a death or terminal illness
-                    description: !include documentation/LifeEvent
+                    description: Report to HMRC if an investor has been diagnosed with a terminal illness or died. You need to do this to get a lifeEventId before you can request a bonus payment from HMRC.
                     (annotations.scope): "write:lisa"
                     securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
                     (annotations.sandboxData): !include testdata/life-event.md
@@ -1548,7 +1546,6 @@ types:
                   (annotations.group):
                     name: Bonus requests
                     description: ""
-                  description: !include documentation/LISATransaction
                   post:
                     is: [headers.acceptHeader, headers.contentHeader]
                     displayName: Request a bonus payment
