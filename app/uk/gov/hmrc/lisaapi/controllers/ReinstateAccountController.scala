@@ -67,7 +67,7 @@ class ReinstateAccountController @Inject() (
         processReinstateFailure(lisaManager, accountId, ErrorAccountAlreadyClosed, message)
       case ReinstateLisaAccountAlreadyCancelledResponse =>
         val message = Some("You cannot reinstate this account because it was closed with a closure reason of cancellation")
-        processReinstateFailure(lisaManager, accountId, ErrorAccountAlreadyClosed, message)
+        processReinstateFailure(lisaManager, accountId, ErrorAccountAlreadyCancelled, message)
       case ReinstateLisaAccountAlreadyOpenResponse =>
         processReinstateFailure(lisaManager, accountId, ErrorAccountAlreadyOpen)
       case ReinstateLisaAccountInvestorComplianceCheckFailedResponse =>

@@ -97,7 +97,7 @@ class ReinstateAccountControllerSpec extends PlaySpec with MockitoSugar with One
             auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountId" -> accountId,
-              "reasonNotReinstated" -> "INVESTOR_ACCOUNT_ALREADY_CLOSED"
+              "reasonNotReinstated" -> "INVESTOR_ACCOUNT_ALREADY_CANCELLED"
             )))(any())
         }
       }
@@ -203,7 +203,7 @@ class ReinstateAccountControllerSpec extends PlaySpec with MockitoSugar with One
 
         doReinstateRequest (reinstateAccountValidJson, lisaManager) { res =>
           status(res) mustBe (FORBIDDEN)
-          (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ACCOUNT_ALREADY_CLOSED")
+          (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ACCOUNT_ALREADY_CANCELLED")
         }
       }
     }
