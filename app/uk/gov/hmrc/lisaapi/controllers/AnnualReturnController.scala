@@ -92,7 +92,7 @@ class AnnualReturnController @Inject()(
     }
     auditService.audit(
       auditType = auditType,
-      path = s"/manager/$lisaManager/accounts/$accountId/returns",
+      path = s"/manager/$lisaManager/accounts/$accountId/events/annual-returns",
       auditData = auditData ++ Map(ZREF -> lisaManager, ACCOUNTID -> accountId, "eventType" -> "Statutory Submission")
     )
   }

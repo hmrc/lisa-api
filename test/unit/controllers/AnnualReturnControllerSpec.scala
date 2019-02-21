@@ -281,7 +281,7 @@ class AnnualReturnControllerSpec extends PlaySpec
           await(res)
           verify(mockAuditService).audit(
             auditType = MatcherEquals("lifeEventRequested"),
-            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/returns"),
+            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/events/annual-returns"),
             auditData = MatcherEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountId" -> accountId,
@@ -310,7 +310,7 @@ class AnnualReturnControllerSpec extends PlaySpec
           await(res)
           verify(mockAuditService).audit(
             auditType = MatcherEquals("lifeEventNotRequested"),
-            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/returns"),
+            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/events/annual-returns"),
             auditData = MatcherEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountId" -> accountId,
@@ -334,7 +334,7 @@ class AnnualReturnControllerSpec extends PlaySpec
           await(res)
           verify(mockAuditService).audit(
             auditType = MatcherEquals("lifeEventNotRequested"),
-            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/returns"),
+            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/events/annual-returns"),
             auditData = MatcherEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountId" -> accountId,
@@ -359,7 +359,7 @@ class AnnualReturnControllerSpec extends PlaySpec
           await(res)
           verify(mockAuditService).audit(
             auditType = MatcherEquals("lifeEventNotRequested"),
-            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/returns"),
+            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/events/annual-returns"),
             auditData = MatcherEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountId" -> accountId,
