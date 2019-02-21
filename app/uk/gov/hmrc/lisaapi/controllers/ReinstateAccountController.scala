@@ -88,7 +88,7 @@ class ReinstateAccountController @Inject() (
   }
 
   private def getReinstateEndpointUrl(lisaManagerReferenceNumber: String, accountID: String): String = {
-    s"/manager/$lisaManagerReferenceNumber/accounts/$accountID/reinstate"
+    s"/manager/$lisaManagerReferenceNumber/reinstate-account"
   }
 
   private def processReinstateFailure(lisaManager: String, accountId: String, err: ErrorResponse, message: Option[String] = None)
