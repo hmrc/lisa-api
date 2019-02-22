@@ -125,6 +125,9 @@ class TransactionService @Inject()(desConnector: DesConnector)(implicit ec: Exec
           paymentStatus = TransactionPaymentStatus.PENDING
         )
       }
+      case error: DesFailureResponse if error.code == "COULD_NOT_PROCESS" => {
+        GetTransactionCouldNotProcessResponse
+      }
       case error: DesFailureResponse => {
         Logger.warn(s"Get collected transaction returned error: ${error.code} from ETMP")
 
@@ -167,6 +170,9 @@ class TransactionService @Inject()(desConnector: DesConnector)(implicit ec: Exec
           paymentStatus = TransactionPaymentStatus.PENDING,
           bonusDueForPeriod = bonusDueForPeriod
         )
+      }
+      case error: DesFailureResponse if error.code == "COULD_NOT_PROCESS" => {
+        GetTransactionCouldNotProcessResponse
       }
       case error: DesFailureResponse => {
         Logger.warn(s"Get paid transaction returned error: ${error.code} from ETMP")

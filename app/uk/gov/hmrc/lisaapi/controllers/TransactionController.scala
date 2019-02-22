@@ -68,7 +68,8 @@ class TransactionController @Inject() (
 
                 val errors = Map[GetTransactionResponse, ErrorResponse] (
                   GetTransactionAccountNotFoundResponse -> ErrorAccountNotFound,
-                  GetTransactionServiceUnavailableResponse -> ErrorServiceUnavailable
+                  GetTransactionServiceUnavailableResponse -> ErrorServiceUnavailable,
+                  GetTransactionCouldNotProcessResponse -> ErrorCouldNotProcessWithdrawalRefund
                 )
                 val error = errors.getOrElse(res, ErrorInternalServerError)
 
