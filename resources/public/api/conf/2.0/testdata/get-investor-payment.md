@@ -18,7 +18,7 @@
   "paymentStatus": "Paid",
   "paymentDate": "2017-06-20",
   "paymentAmount": 1000,
-  "paymentReference": "002630000993"
+  "paymentReference": "0000002630000993"
 }
 </pre>
             </td>
