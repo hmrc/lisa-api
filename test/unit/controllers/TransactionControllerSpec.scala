@@ -138,7 +138,7 @@ class TransactionControllerSpec extends PlaySpec
     }
 
     "return 403 forbidden" when {
-      "the service returns transaction could not process" in {
+      "the service returns transaction could not process for v2" in {
         when(mockService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionCouldNotProcessResponse))
 
         val res = SUT.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV2))
@@ -210,6 +210,15 @@ class TransactionControllerSpec extends PlaySpec
           thenReturn(Future.successful(GetTransactionServiceUnavailableResponse))
 
         val res = SUT.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV2))
+
+        status(res) mustBe SERVICE_UNAVAILABLE
+
+        (contentAsJson(res) \ "code").as[String] mustBe "SERVER_ERROR"
+      }
+      "the service returns transaction could not process for v1" in {
+        when(mockService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionCouldNotProcessResponse))
+
+        val res = SUT.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV1))
 
         status(res) mustBe SERVICE_UNAVAILABLE
 
