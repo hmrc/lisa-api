@@ -132,7 +132,7 @@
             </td>
        </tr>
        <tr>
-            <td><p>Charge refund has been cancelled by HMRC</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 0000000403</p></td>
+            <td><p>Request to refund Withdrawal charge has been cancelled</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 0000000403</p></td>
             <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
 <pre class="code--block">
 {
