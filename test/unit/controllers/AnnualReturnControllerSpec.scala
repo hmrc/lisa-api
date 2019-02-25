@@ -51,6 +51,7 @@ class AnnualReturnControllerSpec extends PlaySpec
 
     when(mockAuthCon.authorise[Option[String]](any(),any())(any(), any())).thenReturn(Future(Some("1234")))
     when(mockValidator.validate(any())).thenReturn(Nil)
+    when(mockAppContext.endpointIsDisabled(any())).thenReturn(false)
   }
 
   "Submit annual return" must {
