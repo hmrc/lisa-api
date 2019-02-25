@@ -164,7 +164,7 @@ class WithdrawalController @Inject() (
 
         auditService.audit(
           auditType = "withdrawalChargeRequested",
-          path = getEndpointUrl(lisaManager, accountId),
+          path = endpointUrl(lisaManager, accountId),
           auditData = createAuditData(lisaManager, accountId, req) + (NOTIFICATION -> "no")
         )
 
@@ -174,7 +174,7 @@ class WithdrawalController @Inject() (
 
         auditService.audit(
           auditType = "withdrawalChargeRequested",
-          path = getEndpointUrl(lisaManager, accountId),
+          path = endpointUrl(lisaManager, accountId),
           auditData = createAuditData(lisaManager, accountId, req) + (NOTIFICATION -> "yes")
         )
 
@@ -184,7 +184,7 @@ class WithdrawalController @Inject() (
 
         auditService.audit(
           auditType = "withdrawalChargeRequested",
-          path = getEndpointUrl(lisaManager, accountId),
+          path = endpointUrl(lisaManager, accountId),
           auditData = createAuditData(lisaManager, accountId, req)
         )
 
@@ -222,7 +222,7 @@ class WithdrawalController @Inject() (
                           (implicit hc: HeaderCarrier) = {
     auditService.audit(
       auditType = "withdrawalChargeNotRequested",
-      path = getEndpointUrl(lisaManager, accountId),
+      path = endpointUrl(lisaManager, accountId),
       auditData = createAuditData(lisaManager, accountId, req) ++ Map("reasonNotRequested" -> failureReason)
     )
   }
@@ -232,7 +232,7 @@ class WithdrawalController @Inject() (
       "accountId" -> accountId)
   }
 
-  private def getEndpointUrl(lisaManager: String, accountId: String): String = {
+  private def endpointUrl(lisaManager: String, accountId: String): String = {
     s"/manager/$lisaManager/accounts/$accountId/withdrawal-charges"
   }
 }

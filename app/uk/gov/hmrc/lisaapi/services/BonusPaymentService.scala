@@ -36,14 +36,10 @@ class BonusPaymentService @Inject()(desConnector: DesConnector)(implicit ec: Exe
       case successResponse: DesTransactionResponse => {
         Logger.debug("Matched RequestBonusPaymentSuccessResponse and the message is " + successResponse.message)
 
-        if (request.bonuses.claimReason == "Superseded Bonus") {
-          RequestBonusPaymentSupersededResponse(successResponse.transactionID)
-        }
-        else {
-          successResponse.message match {
-            case Some("Late") => RequestBonusPaymentLateResponse(successResponse.transactionID)
-            case _ => RequestBonusPaymentOnTimeResponse(successResponse.transactionID)
-          }
+        (request.bonuses.claimReason, successResponse.message) match {
+          case ("Superseded Bonus", _) => RequestBonusPaymentSupersededResponse(successResponse.transactionID)
+          case (_, Some("Late")) => RequestBonusPaymentLateResponse(successResponse.transactionID)
+          case (_, _) => RequestBonusPaymentOnTimeResponse(successResponse.transactionID)
         }
       }
       case conflictResponse: DesTransactionExistResponse => {

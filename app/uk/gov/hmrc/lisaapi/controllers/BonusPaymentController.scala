@@ -226,7 +226,7 @@ class BonusPaymentController @Inject()(
 
         auditService.audit(
           auditType = "bonusPaymentRequested",
-          path = getEndpointUrl(lisaManager, accountId),
+          path = endpointUrl(lisaManager, accountId),
           auditData = createAuditData(lisaManager, accountId, req) + (NOTIFICATION -> "no")
         )
 
@@ -236,7 +236,7 @@ class BonusPaymentController @Inject()(
 
         auditService.audit(
           auditType = "bonusPaymentRequested",
-          path = getEndpointUrl(lisaManager, accountId),
+          path = endpointUrl(lisaManager, accountId),
           auditData = createAuditData(lisaManager, accountId, req) + (NOTIFICATION -> "yes")
         )
 
@@ -246,7 +246,7 @@ class BonusPaymentController @Inject()(
 
         auditService.audit(
           auditType = "bonusPaymentRequested",
-          path = getEndpointUrl(lisaManager, accountId),
+          path = endpointUrl(lisaManager, accountId),
           auditData = createAuditData(lisaManager, accountId, req)
         )
 
@@ -309,7 +309,7 @@ class BonusPaymentController @Inject()(
                           (implicit hc: HeaderCarrier) = {
     auditService.audit(
       auditType = "bonusPaymentNotRequested",
-      path = getEndpointUrl(lisaManager, accountId),
+      path = endpointUrl(lisaManager, accountId),
       auditData = createAuditData(lisaManager, accountId, req) ++ Map("reasonNotRequested" -> failureReason)
     )
   }
@@ -323,7 +323,7 @@ class BonusPaymentController @Inject()(
     }
   }
 
-  private def getEndpointUrl(lisaManager: String, accountId: String): String = {
+  private def endpointUrl(lisaManager: String, accountId: String): String = {
     s"/manager/$lisaManager/accounts/$accountId/transactions"
   }
 }

@@ -46,18 +46,24 @@ trait APIVersioning {
   def validateHeader(): ActionBuilder[Request] = new ActionBuilder[Request] {
     override def invokeBlock[A](request: Request[A], block: Request[A] => Future[Result]) = {
       extractAcceptHeader(request) match {
-        case Some(AcceptHeader(version, _)) if version == "2.0" && !v2endpointsEnabled =>
-          Logger.info(s"Request accept header has invalid version: $version")
-          Future.successful(ErrorAcceptHeaderVersionInvalid.asResult)
-        case Some(AcceptHeader(version, content)) if validateVersion(version) && validateContentType(content) =>
-          block(request)
-        case Some(AcceptHeader(version, _)) if !validateVersion(version) =>
-          Logger.info(s"Request accept header has invalid version: $version")
-          Future.successful(ErrorAcceptHeaderVersionInvalid.asResult)
-        case Some(AcceptHeader(_, content)) if !validateContentType(content) =>
-          Logger.info(s"Request accept header has invalid content type: $content")
-          Future.successful(ErrorAcceptHeaderContentInvalid.asResult)
-        case None | _ =>
+        case Some(AcceptHeader(version, content)) => {
+          val version2NotEnabled = version == "2.0" && !v2endpointsEnabled
+          if (version2NotEnabled) {
+            Logger.info(s"Request accept header has invalid version: $version")
+            Future.successful(ErrorAcceptHeaderVersionInvalid.asResult)
+          } else {
+            (validateVersion(version), validateContentType(content)) match {
+              case (true, true) => block(request)
+              case (false, _) =>
+                Logger.info(s"Request accept header has invalid version: $version")
+                Future.successful(ErrorAcceptHeaderVersionInvalid.asResult)
+              case (_, false) =>
+                Logger.info(s"Request accept header has invalid content type: $content")
+                Future.successful(ErrorAcceptHeaderContentInvalid.asResult)
+            }
+          }
+        }
+        case _ =>
           Logger.info("Request accept header is missing or invalid")
           Future.successful(ErrorAcceptHeaderInvalid.asResult)
       }
