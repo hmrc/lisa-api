@@ -29,7 +29,8 @@
         "Collected",
         "Cancelled",
         "Void",
-        "Superseded"
+        "Superseded",
+        "Charge refund cancelled"
       ],
       "example": "Paid"
     },

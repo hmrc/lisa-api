@@ -49,7 +49,14 @@ class TransactionController @Inject() (
                 lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.TRANSACTION)
 
                 withApiVersion {
-                  case Some(VERSION_1) => Future.successful(Ok(Json.toJson(success.copy(transactionType = None, supersededBy = None))))
+                  case Some(VERSION_1) => {
+                    if (success.paymentStatus == TransactionPaymentStatus.REFUND_CANCELLED) {
+                      Future.successful(ErrorInternalServerError.asResult)
+                    }
+                    else {
+                      Future.successful(Ok(Json.toJson(success.copy(transactionType = None, supersededBy = None))))
+                    }
+                  }
                   case Some(VERSION_2) => Future.successful(Ok(Json.toJson(success.copy(bonusDueForPeriod = None))))
                 }
               }
@@ -66,28 +73,14 @@ class TransactionController @Inject() (
               case res: GetTransactionResponse => {
                 Logger.debug("Matched an error")
 
-                withApiVersion {
-                  case Some(VERSION_1) => {
-                    val errorResponse = v1Errors.applyOrElse(res, { _: GetTransactionResponse =>
-                      Logger.debug(s"Matched an unexpected response: $res, returning a 500 error")
-                      ErrorInternalServerError
-                    })
+                val errorResponse = errors.applyOrElse(res, { _: GetTransactionResponse =>
+                  Logger.debug(s"Matched an unexpected response: $res, returning a 500 error")
+                  ErrorInternalServerError
+                })
 
-                    lisaMetrics.incrementMetrics(startTime, errorResponse.httpStatusCode, LisaMetricKeys.TRANSACTION)
+                lisaMetrics.incrementMetrics(startTime, errorResponse.httpStatusCode, LisaMetricKeys.TRANSACTION)
 
-                    Future.successful(errorResponse.asResult)
-                  }
-                  case Some(VERSION_2) => {
-                    val errorResponse = v2Errors.applyOrElse(res, { _: GetTransactionResponse =>
-                      Logger.debug(s"Matched an unexpected response: $res, returning a 500 error")
-                      ErrorInternalServerError
-                    })
-
-                    lisaMetrics.incrementMetrics(startTime, errorResponse.httpStatusCode, LisaMetricKeys.TRANSACTION)
-
-                    Future.successful(errorResponse.asResult)
-                  }
-                }
+                Future.successful(errorResponse.asResult)
               }
             }
           }
@@ -95,17 +88,9 @@ class TransactionController @Inject() (
       }
     }
 
-  private val commonErrors: PartialFunction[GetTransactionResponse, ErrorResponse] = {
+  private val errors: PartialFunction[GetTransactionResponse, ErrorResponse] = {
     case GetTransactionAccountNotFoundResponse => ErrorAccountNotFound
     case GetTransactionServiceUnavailableResponse => ErrorServiceUnavailable
   }
-
-  private val v1Errors: PartialFunction[GetTransactionResponse, ErrorResponse] = commonErrors.orElse({
-    case GetTransactionCouldNotProcessResponse => ErrorServiceUnavailable
-  })
-
-  private val v2Errors: PartialFunction[GetTransactionResponse, ErrorResponse] = commonErrors.orElse({
-    case GetTransactionCouldNotProcessResponse => ErrorCouldNotProcessWithdrawalRefund
-  })
 
 }
