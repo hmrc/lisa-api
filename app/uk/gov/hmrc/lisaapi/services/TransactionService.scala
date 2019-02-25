@@ -96,7 +96,7 @@ class TransactionService @Inject()(desConnector: DesConnector)(implicit ec: Exec
 
     transaction map {
       case DesUnavailableResponse => GetTransactionServiceUnavailableResponse
-      case collected: DesGetTransactionCollected => {
+      case collected: DesGetTransactionPaid => {
         GetTransactionSuccessResponse(
           transactionId = transactionId,
           paymentStatus = TransactionPaymentStatus.COLLECTED,
@@ -106,7 +106,7 @@ class TransactionService @Inject()(desConnector: DesConnector)(implicit ec: Exec
           transactionType = Some(TransactionPaymentType.DEBT)
         )
       }
-      case due: DesGetTransactionDue => {
+      case due: DesGetTransactionPending => {
         GetTransactionSuccessResponse(
           transactionId = transactionId,
           paymentStatus = TransactionPaymentStatus.DUE,

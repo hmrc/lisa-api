@@ -138,7 +138,7 @@ class TransactionServiceSpec extends PlaySpec
     }
 
     "return a Due transaction" when {
-      "ITMP returns a Collected status and ETMP returns a Due status" in {
+      "ITMP returns a Collected status and ETMP returns a Pending status" in {
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
           thenReturn(Future.successful(GetWithdrawalResponse(
             new DateTime("2018-05-06"),
@@ -156,7 +156,7 @@ class TransactionServiceSpec extends PlaySpec
           )))
 
         when(mockDesConnector.getTransaction(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesGetTransactionDue(new DateTime("2000-01-01"))))
+          thenReturn(Future.successful(DesGetTransactionPending(new DateTime("2000-01-01"))))
 
         val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
 
@@ -273,7 +273,7 @@ class TransactionServiceSpec extends PlaySpec
     }
 
     "return a Collected transaction" when {
-      "ITMP returns a Collected status and ETMP returns a Collected status" in {
+      "ITMP returns a Collected status and ETMP returns a Paid status" in {
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
           thenReturn(Future.successful(GetWithdrawalResponse(
             new DateTime("2018-05-06"),
@@ -291,7 +291,7 @@ class TransactionServiceSpec extends PlaySpec
           )))
 
         when(mockDesConnector.getTransaction(any(), any(), any())(any())).
-          thenReturn(Future.successful(des.DesGetTransactionCollected(new DateTime("2000-01-01"), "XREF", 25)))
+          thenReturn(Future.successful(des.DesGetTransactionPaid(new DateTime("2000-01-01"), "XREF", 25)))
 
         val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
 
