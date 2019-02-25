@@ -79,17 +79,13 @@ class TransactionService @Inject()(desConnector: DesConnector)(implicit ec: Exec
           supersededBy = itmpResponse.supersededBy
         ))
       }
-      case TransactionPaymentStatus.PAID => {
+      case TransactionPaymentStatus.PAID =>
         handlePaidTransaction(lisaManager, accountId, transactionId, itmpResponse.getBonusDueForPeriod)
-      }
-      case TransactionPaymentStatus.COLLECTED => {
+      case TransactionPaymentStatus.COLLECTED =>
         handleCollectedTransaction(lisaManager, accountId, transactionId)
-      }
-      case _ => {
+      case _ =>
         Logger.warn(s"Unexpected status: ${itmpResponse.paymentStatus}, returning an error")
-
         Future.successful(GetTransactionErrorResponse)
-      }
     }
   }
 
@@ -119,17 +115,7 @@ class TransactionService @Inject()(desConnector: DesConnector)(implicit ec: Exec
           transactionType = Some(TransactionPaymentType.DEBT)
         )
       }
-      case error: DesFailureResponse if error.code == "NOT_FOUND" => {
-        GetTransactionSuccessResponse(
-          transactionId = transactionId,
-          paymentStatus = TransactionPaymentStatus.PENDING
-        )
-      }
-      case error: DesFailureResponse => {
-        Logger.warn(s"Get collected transaction returned error: ${error.code} from ETMP")
-
-        GetTransactionErrorResponse
-      }
+      case error: DesFailureResponse => getFailureResponse(error.code, transactionId)
     }
   }
 
@@ -161,18 +147,22 @@ class TransactionService @Inject()(desConnector: DesConnector)(implicit ec: Exec
           bonusDueForPeriod = bonusDueForPeriod
         )
       }
-      case error: DesFailureResponse if error.code == "NOT_FOUND" => {
+      case error: DesFailureResponse => getFailureResponse(error.code, transactionId, bonusDueForPeriod)
+    }
+  }
+
+  private def getFailureResponse(errorCode: String, transactionId: String, bonusDueForPeriod: Option[Amount] = None): GetTransactionResponse = {
+    errorCode match {
+      case "NOT_FOUND" =>
         GetTransactionSuccessResponse(
           transactionId = transactionId,
           paymentStatus = TransactionPaymentStatus.PENDING,
           bonusDueForPeriod = bonusDueForPeriod
         )
-      }
-      case error: DesFailureResponse => {
-        Logger.warn(s"Get paid transaction returned error: ${error.code} from ETMP")
-
+      case "COULD_NOT_PROCESS" => GetTransactionCouldNotProcessResponse
+      case _ =>
+        Logger.warn(s"Get collected transaction returned error: $errorCode from ETMP")
         GetTransactionErrorResponse
-      }
     }
   }
 

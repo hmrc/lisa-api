@@ -137,6 +137,19 @@ class TransactionControllerSpec extends PlaySpec
       }
     }
 
+    "return 403 forbidden" when {
+      "the service returns transaction could not process for v2" in {
+        when(mockService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionCouldNotProcessResponse))
+
+        val res = SUT.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV2))
+
+        status(res) mustBe FORBIDDEN
+
+        (contentAsJson(res) \ "code").as[String] mustBe "COULD_NOT_PROCESS_WITHDRAWAL_CHARGE_REFUND"
+        (contentAsJson(res) \ "message").as[String] mustBe "Charge refund has been cancelled by HMRC"
+      }
+    }
+
     "return 404 not found" when {
       "the service returns account not found" in {
         when(mockService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionAccountNotFoundResponse))
@@ -197,6 +210,15 @@ class TransactionControllerSpec extends PlaySpec
           thenReturn(Future.successful(GetTransactionServiceUnavailableResponse))
 
         val res = SUT.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV2))
+
+        status(res) mustBe SERVICE_UNAVAILABLE
+
+        (contentAsJson(res) \ "code").as[String] mustBe "SERVER_ERROR"
+      }
+      "the service returns transaction could not process for v1" in {
+        when(mockService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionCouldNotProcessResponse))
+
+        val res = SUT.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV1))
 
         status(res) mustBe SERVICE_UNAVAILABLE
 

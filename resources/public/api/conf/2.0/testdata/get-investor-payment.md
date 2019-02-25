@@ -18,7 +18,7 @@
   "paymentStatus": "Paid",
   "paymentDate": "2017-06-20",
   "paymentAmount": 1000,
-  "paymentReference": "002630000993"
+  "paymentReference": "0000002630000993"
 }
 </pre>
             </td>
@@ -127,6 +127,17 @@
 {
   "code": "BAD_REQUEST",
   "message": "accountId in the URL is in the wrong format"
+}
+</pre>
+            </td>
+       </tr>
+       <tr>
+            <td><p>Request to refund Withdrawal charge has been cancelled</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 0000000403</p></td>
+            <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
+<pre class="code--block">
+{
+  "code": "COULD_NOT_PROCESS_WITHDRAWAL_CHARGE_REFUND",
+  "message": "Charge refund has been cancelled by HMRC"
 }
 </pre>
             </td>

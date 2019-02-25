@@ -328,6 +328,28 @@ class TransactionServiceSpec extends PlaySpec
       }
     }
 
+    "return a Could Not Process error" when {
+      "ETMP returns a Could Not Process error" in {
+        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
+          thenReturn(Future.successful(GetBonusResponse(
+            lifeEventId = None,
+            periodStartDate = new DateTime("2001-01-01"),
+            periodEndDate = new DateTime("2002-01-01"),
+            htbTransfer = None,
+            inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
+            bonuses = Bonuses(1.0, 1.0, None, "X"),
+            creationDate = new DateTime("2000-01-01"),
+            paymentStatus = TransactionPaymentStatus.PAID)))
+
+        when(mockDesConnector.getTransaction(any(), any(), any())(any())).
+          thenReturn(Future.successful(DesFailureResponse("COULD_NOT_PROCESS")))
+
+        val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
+
+        result mustBe GetTransactionCouldNotProcessResponse
+      }
+    }
+
     "return a Service Unavailable error" when {
       "ITMP returns a 503" in {
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
