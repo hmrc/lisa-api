@@ -51,6 +51,7 @@ class AnnualReturnControllerSpec extends PlaySpec
 
     when(mockAuthCon.authorise[Option[String]](any(),any())(any(), any())).thenReturn(Future(Some("1234")))
     when(mockValidator.validate(any())).thenReturn(Nil)
+    when(mockAppContext.endpointIsDisabled(any())).thenReturn(false)
   }
 
   "Submit annual return" must {
@@ -281,7 +282,7 @@ class AnnualReturnControllerSpec extends PlaySpec
           await(res)
           verify(mockAuditService).audit(
             auditType = MatcherEquals("lifeEventRequested"),
-            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/returns"),
+            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/events/annual-returns"),
             auditData = MatcherEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountId" -> accountId,
@@ -310,7 +311,7 @@ class AnnualReturnControllerSpec extends PlaySpec
           await(res)
           verify(mockAuditService).audit(
             auditType = MatcherEquals("lifeEventNotRequested"),
-            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/returns"),
+            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/events/annual-returns"),
             auditData = MatcherEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountId" -> accountId,
@@ -334,7 +335,7 @@ class AnnualReturnControllerSpec extends PlaySpec
           await(res)
           verify(mockAuditService).audit(
             auditType = MatcherEquals("lifeEventNotRequested"),
-            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/returns"),
+            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/events/annual-returns"),
             auditData = MatcherEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountId" -> accountId,
@@ -359,7 +360,7 @@ class AnnualReturnControllerSpec extends PlaySpec
           await(res)
           verify(mockAuditService).audit(
             auditType = MatcherEquals("lifeEventNotRequested"),
-            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/returns"),
+            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/events/annual-returns"),
             auditData = MatcherEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountId" -> accountId,

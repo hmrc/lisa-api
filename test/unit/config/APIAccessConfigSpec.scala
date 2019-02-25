@@ -29,7 +29,7 @@ class APIAccessConfigSpec extends PlaySpec with MockitoSugar {
   val mockConfiguration = mock[Configuration]
   val apiAccessConfigMocked = APIAccessConfig(Some(mockConfiguration))
 
-    "APIAccessConfig created with no Configuration" should {
+  "APIAccessConfig created with no Configuration" should {
     "return private for type" in {
       apiAccessConfigNone.accessType must be ("PUBLIC")
     }

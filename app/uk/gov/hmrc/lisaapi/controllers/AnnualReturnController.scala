@@ -43,7 +43,7 @@ class AnnualReturnController @Inject()(
 
   override val validateVersion: String => Boolean = _ == "2.0"
 
-  def submitReturn(lisaManager: String, accountId: String): Action[AnyContent] = validateHeader().async {
+  def submitReturn(lisaManager: String, accountId: String): Action[AnyContent] = (validateHeader() andThen isEndpointEnabled("annual-returns")).async {
     implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
 
@@ -92,7 +92,7 @@ class AnnualReturnController @Inject()(
     }
     auditService.audit(
       auditType = auditType,
-      path = s"/manager/$lisaManager/accounts/$accountId/returns",
+      path = s"/manager/$lisaManager/accounts/$accountId/events/annual-returns",
       auditData = auditData ++ Map(ZREF -> lisaManager, ACCOUNTID -> accountId, "eventType" -> "Statutory Submission")
     )
   }

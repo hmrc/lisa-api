@@ -242,7 +242,7 @@ class PropertyPurchaseController @Inject() (
                                 (implicit hc: HeaderCarrier) = {
     auditService.audit(
       auditType = if (success) "fundReleaseReported" else "fundReleaseNotReported",
-      path = s"/manager/$lisaManager/accounts/$accountId/property-purchase",
+      path = s"/manager/$lisaManager/accounts/$accountId/events/fund-releases",
       auditData = req.toStringMap ++ Map(
         "lisaManagerReferenceNumber" -> lisaManager,
         "accountID" -> accountId
@@ -258,7 +258,7 @@ class PropertyPurchaseController @Inject() (
                                 (implicit hc: HeaderCarrier) = {
     auditService.audit(
       auditType = if (success) "extensionReported" else "extensionNotReported",
-      path = s"/manager/$lisaManager/accounts/$accountId/property-purchase/extension",
+      path = s"/manager/$lisaManager/accounts/$accountId/events/purchase-extensions",
       auditData = req.toStringMap ++ Map(
         "lisaManagerReferenceNumber" -> lisaManager,
         "accountID" -> accountId
@@ -274,7 +274,7 @@ class PropertyPurchaseController @Inject() (
                             (implicit hc: HeaderCarrier) = {
     auditService.audit(
       auditType = if (success) "purchaseOutcomeReported" else "purchaseOutcomeNotReported",
-      path = s"/manager/$lisaManager/accounts/$accountId/property-purchase/outcome",
+      path = s"/manager/$lisaManager/accounts/$accountId/events/purchase-outcomes",
       auditData = req.toStringMap ++ Map(
         "lisaManagerReferenceNumber" -> lisaManager,
         "accountID" -> accountId
