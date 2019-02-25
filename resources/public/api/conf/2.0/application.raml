@@ -1849,18 +1849,6 @@ types:
                                          "code" : "UNAUTHORIZED",
                                          "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
                                        }
-                           403:
-                            body:
-                              application/json:
-                                type: !include schemas/ErrorCodes.schema.json
-                                examples:
-                                  couldNotProcess:
-                                    description: Charge refund has been cancelled by HMRC
-                                    value: |
-                                      {
-                                        "code" : "COULD_NOT_PROCESS_WITHDRAWAL_CHARGE_REFUND",
-                                        "message" : "Charge refund has been cancelled by HMRC"
-                                      }
                            404:
                              body:
                                application/json:

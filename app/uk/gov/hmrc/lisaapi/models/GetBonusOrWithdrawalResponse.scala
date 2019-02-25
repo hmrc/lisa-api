@@ -291,6 +291,7 @@ object TransactionPaymentStatus {
   // payment
   val PENDING = "Pending"
   val PAID = "Paid"
+  val REFUND_CANCELLED = "Charge refund cancelled"
 
   // debt
   val DUE = "Due"

@@ -26,7 +26,6 @@ case object GetTransactionErrorResponse extends GetTransactionResponse
 case object GetTransactionTransactionNotFoundResponse extends GetTransactionResponse
 case object GetTransactionAccountNotFoundResponse extends GetTransactionResponse
 case object GetTransactionServiceUnavailableResponse extends GetTransactionResponse
-case object GetTransactionCouldNotProcessResponse extends GetTransactionResponse
 
 case class GetTransactionSuccessResponse(transactionId: TransactionId,
                                          transactionType: Option[String] = None,

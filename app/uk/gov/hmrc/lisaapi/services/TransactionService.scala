@@ -121,7 +121,10 @@ class TransactionService @Inject()(desConnector: DesConnector)(implicit ec: Exec
           paymentStatus = TransactionPaymentStatus.DUE
         )
       }
-      case error: DesFailureResponse => getFailureResponse(error.code, transactionId)
+      case error: DesFailureResponse => {
+        Logger.warn(s"Get collected transaction returned error: ${error.code} from ETMP")
+        GetTransactionErrorResponse
+      }
     }
   }
 
@@ -153,22 +156,24 @@ class TransactionService @Inject()(desConnector: DesConnector)(implicit ec: Exec
           bonusDueForPeriod = bonusDueForPeriod
         )
       }
-      case error: DesFailureResponse => getFailureResponse(error.code, transactionId, bonusDueForPeriod)
-    }
-  }
-
-  private def getFailureResponse(errorCode: String, transactionId: String, bonusDueForPeriod: Option[Amount] = None): GetTransactionResponse = {
-    errorCode match {
-      case "NOT_FOUND" =>
+      case error: DesFailureResponse if error.code == "COULD_NOT_PROCESS" => {
+        GetTransactionSuccessResponse(
+          transactionId = transactionId,
+          paymentStatus = TransactionPaymentStatus.REFUND_CANCELLED,
+          transactionType = Some(TransactionPaymentType.PAYMENT)
+        )
+      }
+      case error: DesFailureResponse if error.code == "NOT_FOUND" => {
         GetTransactionSuccessResponse(
           transactionId = transactionId,
           paymentStatus = TransactionPaymentStatus.PENDING,
           bonusDueForPeriod = bonusDueForPeriod
         )
-      case "COULD_NOT_PROCESS" => GetTransactionCouldNotProcessResponse
-      case _ =>
-        Logger.warn(s"Get collected transaction returned error: $errorCode from ETMP")
+      }
+      case error: DesFailureResponse => {
+        Logger.warn(s"Get paid transaction returned error: ${error.code} from ETMP")
         GetTransactionErrorResponse
+      }
     }
   }
 

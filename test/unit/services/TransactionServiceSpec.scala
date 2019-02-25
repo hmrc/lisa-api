@@ -306,6 +306,32 @@ class TransactionServiceSpec extends PlaySpec
       }
     }
 
+    "return a Charge refund cancelled transaction" when {
+      "ITMP returns a Paid status and ETMP returns a COULD_NOT_PROCESS error" in {
+        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
+          thenReturn(Future.successful(GetBonusResponse(
+            lifeEventId = None,
+            periodStartDate = new DateTime("2001-01-01"),
+            periodEndDate = new DateTime("2002-01-01"),
+            htbTransfer = None,
+            inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
+            bonuses = Bonuses(1.0, 1.0, None, "X"),
+            creationDate = new DateTime("2000-01-01"),
+            paymentStatus = TransactionPaymentStatus.PAID)))
+
+        when(mockDesConnector.getTransaction(any(), any(), any())(any())).
+          thenReturn(Future.successful(DesFailureResponse("COULD_NOT_PROCESS")))
+
+        val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
+
+        result mustBe GetTransactionSuccessResponse(
+          transactionId = "12345",
+          paymentStatus = "Charge refund cancelled",
+          transactionType = Some("Payment")
+        )
+      }
+    }
+
     "return a Transaction Not Found error" when {
       "ITMP returns a Transaction Not Found error" in {
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
@@ -325,28 +351,6 @@ class TransactionServiceSpec extends PlaySpec
         val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
 
         result mustBe GetTransactionAccountNotFoundResponse
-      }
-    }
-
-    "return a Could Not Process error" when {
-      "ETMP returns a Could Not Process error" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
-          thenReturn(Future.successful(GetBonusResponse(
-            lifeEventId = None,
-            periodStartDate = new DateTime("2001-01-01"),
-            periodEndDate = new DateTime("2002-01-01"),
-            htbTransfer = None,
-            inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
-            bonuses = Bonuses(1.0, 1.0, None, "X"),
-            creationDate = new DateTime("2000-01-01"),
-            paymentStatus = TransactionPaymentStatus.PAID)))
-
-        when(mockDesConnector.getTransaction(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("COULD_NOT_PROCESS")))
-
-        val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
-
-        result mustBe GetTransactionCouldNotProcessResponse
       }
     }
 
