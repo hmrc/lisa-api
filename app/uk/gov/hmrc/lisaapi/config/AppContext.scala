@@ -40,9 +40,7 @@ class AppContext @Inject()(
 
   override protected def mode = environment.mode
 
-  def endpointIsEnabled(endpoint: String): Boolean = {
-    val endpointIsDisabled = runModeConfiguration.getStringList("api.disabledEndpoints").fold(false)(list => list.contains(endpoint))
-
-    !endpointIsDisabled
+  def endpointIsDisabled(endpoint: String): Boolean = {
+    runModeConfiguration.getStringList("api.disabledEndpoints").fold(false)(list => list.contains(endpoint))
   }
 }

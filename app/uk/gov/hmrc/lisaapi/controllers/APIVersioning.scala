@@ -33,12 +33,12 @@ trait APIVersioning {
 
   def isEndpointEnabled(endpoint: String): ActionBuilder[Request] = new ActionBuilder[Request] {
     override def invokeBlock[A](request: Request[A], block: Request[A] => Future[Result]): Future[Result] = {
-      if (appContext.endpointIsEnabled(endpoint)) {
-        block(request)
-      }
-      else {
+      if (appContext.endpointIsDisabled(endpoint)) {
         Logger.info(s"User attempted to use an endpoint which is not available ($endpoint)")
         Future.successful(ErrorNotImplemented.asResult)
+      }
+      else {
+        block(request)
       }
     }
   }

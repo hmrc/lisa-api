@@ -30,24 +30,24 @@ class AppContextSpec extends PlaySpec with MockitoSugar {
   val mockConfiguration = mock[Configuration]
   val SUT = new AppContext(mockConfiguration, mockEnvironment)
 
-  "endpointIsEnabled" must {
+  "endpointIsDisabled" must {
 
-    "return true if there are no disabled endpoints in the config" in {
+    "return false if there are no disabled endpoints in the config" in {
       when(mockConfiguration.getStringList(any())).thenReturn(None)
 
-      SUT.endpointIsEnabled("test1") mustBe true
+      SUT.endpointIsDisabled("test1") mustBe false
     }
 
-    "return true if the named endpoint isn't in the disabled list" in {
+    "return false if the named endpoint isn't in the disabled list" in {
       when(mockConfiguration.getStringList(any())).thenReturn(Some(List[String]("test1").asJava))
 
-      SUT.endpointIsEnabled("test2") mustBe true
+      SUT.endpointIsDisabled("test2") mustBe false
     }
 
-    "return false if the named endpoint is in the disabled list" in {
+    "return true if the named endpoint is in the disabled list" in {
       when(mockConfiguration.getStringList(any())).thenReturn(Some(List[String]("test1", "test2", "test3").asJava))
 
-      SUT.endpointIsEnabled("test3") mustBe false
+      SUT.endpointIsDisabled("test3") mustBe true
     }
 
   }
