@@ -108,33 +108,6 @@ class TransactionServiceSpec extends PlaySpec
           bonusDueForPeriod = Some(1.0)
         )
       }
-      "ITMP returns a Collected status and ETMP returns a Not Found error" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
-          thenReturn(Future.successful(GetWithdrawalResponse(
-            new DateTime("2018-05-06"),
-            new DateTime("2018-06-05"),
-            Some(100),
-            100,
-            25,
-            0,
-            true,
-            "Regular withdrawal",
-            None,
-            None,
-            "Collected",
-            new DateTime("2018-06-21")
-          )))
-
-        when(mockDesConnector.getTransaction(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("NOT_FOUND")))
-
-        val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
-
-        result mustBe GetTransactionSuccessResponse(
-          transactionId = "12345",
-          paymentStatus = "Pending"
-        )
-      }
     }
 
     "return a Due transaction" when {
@@ -165,6 +138,33 @@ class TransactionServiceSpec extends PlaySpec
           paymentStatus = "Due",
           paymentDueDate = Some(new DateTime("2000-01-01")),
           transactionType = Some("Debt")
+        )
+      }
+      "ITMP returns a Collected status and ETMP returns a Not Found error" in {
+        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
+          thenReturn(Future.successful(GetWithdrawalResponse(
+            new DateTime("2018-05-06"),
+            new DateTime("2018-06-05"),
+            Some(100),
+            100,
+            25,
+            0,
+            true,
+            "Regular withdrawal",
+            None,
+            None,
+            "Collected",
+            new DateTime("2018-06-21")
+          )))
+
+        when(mockDesConnector.getTransaction(any(), any(), any())(any())).
+          thenReturn(Future.successful(DesFailureResponse("NOT_FOUND")))
+
+        val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
+
+        result mustBe GetTransactionSuccessResponse(
+          transactionId = "12345",
+          paymentStatus = "Due"
         )
       }
     }

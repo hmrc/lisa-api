@@ -115,6 +115,12 @@ class TransactionService @Inject()(desConnector: DesConnector)(implicit ec: Exec
           transactionType = Some(TransactionPaymentType.DEBT)
         )
       }
+      case error: DesFailureResponse if error.code == "NOT_FOUND" => {
+        GetTransactionSuccessResponse(
+          transactionId = transactionId,
+          paymentStatus = TransactionPaymentStatus.DUE
+        )
+      }
       case error: DesFailureResponse => getFailureResponse(error.code, transactionId)
     }
   }
