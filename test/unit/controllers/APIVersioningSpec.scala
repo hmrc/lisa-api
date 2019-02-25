@@ -88,18 +88,13 @@ class APIVersioningSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
 
   "The isEndpointEnabled function" must {
     "allow execution if the appContext returns that the endpoint is enabled" in {
-      val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(Helpers.GET, "/").withHeaders((ACCEPT, "application/vnd.hmrc.2.0+json"))
-
       when(mockAppContext.endpointIsEnabled("test")).thenReturn(true)
-
+      val request = FakeRequest(Helpers.GET, "/").withHeaders((ACCEPT, "application/vnd.hmrc.2.0+json"))
       isEndpointEnabledTest(request) mustBe Results.Ok
-
     }
     "return a not implemented error if the appContext returns that the endpoint is not enabled" in {
-      val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(Helpers.GET, "/").withHeaders((ACCEPT, "application/vnd.hmrc.2.0+json"))
-
       when(mockAppContext.endpointIsEnabled("test")).thenReturn(false)
-
+      val request = FakeRequest(Helpers.GET, "/").withHeaders((ACCEPT, "application/vnd.hmrc.2.0+json"))
       isEndpointEnabledTest(request) mustBe ErrorNotImplemented.asResult
     }
   }
