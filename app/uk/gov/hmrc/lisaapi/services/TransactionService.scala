@@ -64,7 +64,6 @@ class TransactionService @Inject()(desConnector: DesConnector)(implicit ec: Exec
            TransactionPaymentStatus.DUE |
            TransactionPaymentStatus.VOID |
            TransactionPaymentStatus.CANCELLED => {
-
         Future.successful(GetTransactionSuccessResponse(
           transactionId = transactionId,
           paymentStatus = itmpResponse.paymentStatus,
@@ -72,7 +71,6 @@ class TransactionService @Inject()(desConnector: DesConnector)(implicit ec: Exec
         ))
       }
       case TransactionPaymentStatus.SUPERSEDED => {
-
         Future.successful(GetTransactionSuccessResponse(
           transactionId = transactionId,
           paymentStatus = itmpResponse.paymentStatus,
@@ -115,15 +113,19 @@ class TransactionService @Inject()(desConnector: DesConnector)(implicit ec: Exec
           transactionType = Some(TransactionPaymentType.DEBT)
         )
       }
-      case error: DesFailureResponse if error.code == "NOT_FOUND" => {
-        GetTransactionSuccessResponse(
-          transactionId = transactionId,
-          paymentStatus = TransactionPaymentStatus.DUE
-        )
-      }
       case error: DesFailureResponse => {
-        Logger.warn(s"Get collected transaction returned error: ${error.code} from ETMP")
-        GetTransactionErrorResponse
+        error.code match {
+          case "NOT_FOUND" => {
+            GetTransactionSuccessResponse(
+              transactionId = transactionId,
+              paymentStatus = TransactionPaymentStatus.DUE
+            )
+          }
+          case _ => {
+            Logger.warn(s"Get collected transaction returned error: ${error.code} from ETMP")
+            GetTransactionErrorResponse
+          }
+        }
       }
     }
   }
@@ -131,9 +133,7 @@ class TransactionService @Inject()(desConnector: DesConnector)(implicit ec: Exec
   private def handlePaidTransaction(lisaManager: String, accountId: String, transactionId: String, bonusDueForPeriod: Option[Amount])
                                    (implicit hc: HeaderCarrier): Future[GetTransactionResponse] = {
 
-    val transaction: Future[DesResponse] = desConnector.getTransaction(lisaManager, accountId, transactionId)
-
-    transaction map {
+    desConnector.getTransaction(lisaManager, accountId, transactionId) map {
       case DesUnavailableResponse => GetTransactionServiceUnavailableResponse
       case paid: DesGetTransactionPaid => {
         GetTransactionSuccessResponse(
@@ -156,25 +156,28 @@ class TransactionService @Inject()(desConnector: DesConnector)(implicit ec: Exec
           bonusDueForPeriod = bonusDueForPeriod
         )
       }
-      case error: DesFailureResponse if error.code == "COULD_NOT_PROCESS" => {
-        GetTransactionSuccessResponse(
-          transactionId = transactionId,
-          paymentStatus = TransactionPaymentStatus.REFUND_CANCELLED,
-          transactionType = Some(TransactionPaymentType.PAYMENT)
-        )
-      }
-      case error: DesFailureResponse if error.code == "NOT_FOUND" => {
-        GetTransactionSuccessResponse(
-          transactionId = transactionId,
-          paymentStatus = TransactionPaymentStatus.PENDING,
-          bonusDueForPeriod = bonusDueForPeriod
-        )
-      }
       case error: DesFailureResponse => {
-        Logger.warn(s"Get paid transaction returned error: ${error.code} from ETMP")
-        GetTransactionErrorResponse
+        error.code match {
+          case "COULD_NOT_PROCESS" => {
+            GetTransactionSuccessResponse(
+              transactionId = transactionId,
+              paymentStatus = TransactionPaymentStatus.REFUND_CANCELLED,
+              transactionType = Some(TransactionPaymentType.PAYMENT)
+            )
+          }
+          case "NOT_FOUND" => {
+            GetTransactionSuccessResponse(
+              transactionId = transactionId,
+              paymentStatus = TransactionPaymentStatus.PENDING,
+              bonusDueForPeriod = bonusDueForPeriod
+            )
+          }
+          case _ => {
+            Logger.warn(s"Get paid transaction returned error: ${error.code} from ETMP")
+            GetTransactionErrorResponse
+          }
+        }
       }
     }
   }
-
 }
