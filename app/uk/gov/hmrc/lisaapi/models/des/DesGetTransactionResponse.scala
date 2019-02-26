@@ -27,7 +27,7 @@ case class DesGetTransactionPending(paymentDueDate: DateTime) extends DesGetTran
 case class DesGetTransactionPaid(paymentDate: DateTime, paymentReference: String, paymentAmount: Amount) extends DesGetTransactionResponse
 
 object DesGetTransactionResponse {
-  implicit val pendingReads: Reads[DesGetTransactionPending] = (JsPath \ "paymentDueDate").
+  implicit val pendingReads: Reads[DesGetTransactionPending] = (JsPath \ "paymentDate").
     read(JsonReads.isoDate).map {dateString => DesGetTransactionPending(new DateTime(dateString))}
 
   implicit val paidReads: Reads[DesGetTransactionPaid] = (

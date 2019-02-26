@@ -1062,7 +1062,7 @@ class DesConnectorSpec extends PlaySpec
                 responseJson = Some(Json.parse(
                   """{
                     |    "paymentStatus": "PENDING",
-                    |    "paymentDueDate": "2000-01-01"
+                    |    "paymentDate": "2000-01-01"
                     |}""".stripMargin))
               )
             )
