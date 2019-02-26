@@ -24,7 +24,7 @@ import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.services.TransactionService
+import uk.gov.hmrc.lisaapi.services.{AuditService, TransactionService}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -32,6 +32,7 @@ class TransactionController @Inject() (
                                         val authConnector: AuthConnector,
                                         val appContext: AppContext,
                                         service: TransactionService,
+                                        auditService: AuditService,
                                         val lisaMetrics: LisaMetrics
                                       )(implicit ec: ExecutionContext) extends LisaController {
 

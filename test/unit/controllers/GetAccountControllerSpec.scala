@@ -19,7 +19,7 @@ package unit.controllers
 import org.joda.time.DateTime
 import org.mockito.Matchers.{any, eq => matchersEquals}
 import org.mockito.Mockito.{reset, verify, when}
-import org.scalatest.{BeforeAndAfter, BeforeAndAfterEach}
+import org.scalatest.BeforeAndAfter
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.JsObject

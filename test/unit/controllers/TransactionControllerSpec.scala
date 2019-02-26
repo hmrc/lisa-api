@@ -17,7 +17,7 @@
 package unit.controllers
 
 import org.joda.time.DateTime
-import org.mockito.Matchers._
+import org.mockito.Matchers.{any, eq => matchersEquals}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.{BeforeAndAfter, MustMatchers}
@@ -30,10 +30,10 @@ import uk.gov.hmrc.api.controllers.ErrorAcceptHeaderInvalid
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.config.AppContext
-import uk.gov.hmrc.lisaapi.controllers.{ErrorBadRequestAccountId, ErrorBadRequestLmrn, TransactionController}
+import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountNotFound, ErrorBadRequestAccountId, ErrorBadRequestLmrn, ErrorBonusPaymentTransactionNotFound, ErrorInternalServerError, ErrorServiceUnavailable, ErrorTransactionNotFound, TransactionController}
 import uk.gov.hmrc.lisaapi.metrics.LisaMetrics
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.services.TransactionService
+import uk.gov.hmrc.lisaapi.services.{AuditService, TransactionService}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -52,6 +52,7 @@ class TransactionControllerSpec extends PlaySpec
   val transactionId = "67890"
 
   before {
+    reset(mockAuditService)
     when(mockAuthCon.authorise[Option[String]](any(),any())(any(), any())).thenReturn(Future(Some("1234")))
   }
 
@@ -216,14 +217,160 @@ class TransactionControllerSpec extends PlaySpec
       }
     }
 
+    "audit getTransactionReported" when {
+      "data is returned from the service for v1" in {
+        when(mockService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionSuccessResponse(
+          transactionId = transactionId,
+          transactionType = Some("Payment"),
+          paymentStatus = "Paid",
+          paymentDate = Some(new DateTime("2017-06-20")),
+          paymentAmount = Some(1.0),
+          paymentReference = Some("ref"),
+          supersededBy = Some("0000012345"),
+          bonusDueForPeriod = Some(1.0)
+        )))
+        val res = SUT.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV1))
+        await(res)
+        verify(mockAuditService).audit(
+          auditType = matchersEquals("getAccountNotReported"),
+          path = matchersEquals(s"/manager/$lmrn/accounts/$accountId/transactions/$transactionId/payments"),
+          auditData = matchersEquals(Map(
+            "lmrnReferenceNumber" -> lmrn,
+            "accountId" -> accountId,
+            "transactionId" -> transactionId
+          )))(any())
+      }
+      "data is returned from the service for v2" in {
+        when(mockService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionSuccessResponse(
+          transactionId = transactionId,
+          transactionType = Some("Payment"),
+          paymentStatus = "Paid",
+          paymentDate = Some(new DateTime("2017-06-20")),
+          paymentAmount = Some(1.0),
+          paymentReference = Some("ref"),
+          supersededBy = Some("0000012345"),
+          bonusDueForPeriod = Some(1.0)
+        )))
+
+        val res = SUT.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV2))
+        await(res)
+        verify(mockAuditService).audit(
+          auditType = matchersEquals("getAccountNotReported"),
+          path = matchersEquals(s"/manager/$lmrn/accounts/$accountId/transactions/$transactionId/payments"),
+          auditData = matchersEquals(Map(
+            "lmrnReferenceNumber" -> lmrn,
+            "accountId" -> accountId,
+            "transactionId" -> transactionId
+          )))(any())
+      }
+    }
+
+    "audit getTransactionNotReported" when {
+      "the service returns account not found" in {
+        when(mockService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionAccountNotFoundResponse))
+
+        val res = SUT.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV2))
+        await(res)
+        verify(mockAuditService).audit(
+          auditType = matchersEquals("getAccountNotReported"),
+          path = matchersEquals(s"/manager/$lmrn/accounts/$accountId/transactions/$transactionId/payments"),
+          auditData = matchersEquals(Map(
+            "lmrnReferenceNumber" -> lmrn,
+            "accountId" -> accountId,
+            "transactionId" -> transactionId,
+            "reasonNotReported" -> ErrorAccountNotFound.errorCode
+          )))(any())
+      }
+      "the service returns transaction not found for v1" in {
+        when(mockService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionTransactionNotFoundResponse))
+
+        val res = SUT.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV1))
+        await(res)
+        verify(mockAuditService).audit(
+          auditType = matchersEquals("getAccountNotReported"),
+          path = matchersEquals(s"/manager/$lmrn/accounts/$accountId/transactions/$transactionId/payments"),
+          auditData = matchersEquals(Map(
+            "lmrnReferenceNumber" -> lmrn,
+            "accountId" -> accountId,
+            "transactionId" -> transactionId,
+            "reasonNotReported" -> ErrorBonusPaymentTransactionNotFound.errorCode
+          )))(any())
+      }
+      "the service returns transaction not found for v2" in {
+        when(mockService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionTransactionNotFoundResponse))
+
+        val res = SUT.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV2))
+        await(res)
+        verify(mockAuditService).audit(
+          auditType = matchersEquals("getAccountNotReported"),
+          path = matchersEquals(s"/manager/$lmrn/accounts/$accountId/transactions/$transactionId/payments"),
+          auditData = matchersEquals(Map(
+            "lmrnReferenceNumber" -> lmrn,
+            "accountId" -> accountId,
+            "transactionId" -> transactionId,
+            "reasonNotReported" -> ErrorTransactionNotFound.errorCode
+          )))(any())
+      }
+      "the service returns an error" in {
+        when(mockService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionErrorResponse))
+
+        val res = SUT.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV2))
+        await(res)
+        verify(mockAuditService).audit(
+          auditType = matchersEquals("getAccountNotReported"),
+          path = matchersEquals(s"/manager/$lmrn/accounts/$accountId/transactions/$transactionId/payments"),
+          auditData = matchersEquals(Map(
+            "lmrnReferenceNumber" -> lmrn,
+            "accountId" -> accountId,
+            "transactionId" -> transactionId,
+            "reasonNotReported" -> ErrorInternalServerError.errorCode
+          )))(any())
+      }
+      "a charge refund cancelled is returned for api v1" in {
+        when(mockService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionSuccessResponse(
+          transactionId = "1234",
+          paymentStatus = "Charge refund cancelled"
+        )))
+
+        val res = SUT.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV1))
+        await(res)
+        verify(mockAuditService).audit(
+          auditType = matchersEquals("getAccountNotReported"),
+          path = matchersEquals(s"/manager/$lmrn/accounts/$accountId/transactions/$transactionId/payments"),
+          auditData = matchersEquals(Map(
+            "lmrnReferenceNumber" -> lmrn,
+            "accountId" -> accountId,
+            "transactionId" -> transactionId,
+            "reasonNotReported" -> ErrorInternalServerError.errorCode
+          )))(any())
+      }
+      "the service returns a GetTransactionServiceUnavailableResponse" in {
+        when(mockService.getTransaction(any(), any(), any())(any())).
+          thenReturn(Future.successful(GetTransactionServiceUnavailableResponse))
+
+        val res = SUT.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV2))
+        await(res)
+        verify(mockAuditService).audit(
+          auditType = matchersEquals("getAccountNotReported"),
+          path = matchersEquals(s"/manager/$lmrn/accounts/$accountId/transactions/$transactionId/payments"),
+          auditData = matchersEquals(Map(
+            "lmrnReferenceNumber" -> lmrn,
+            "accountId" -> accountId,
+            "transactionId" -> transactionId,
+            "reasonNotReported" -> ErrorServiceUnavailable.errorCode
+          )))(any())
+      }
+    }
+
   }
 
   val mockService: TransactionService = mock[TransactionService]
+  val mockAuditService: AuditService = mock[AuditService]
   val mockAuthCon: AuthConnector = mock[AuthConnector]
   val mockAppContext: AppContext = mock[AppContext]
   val mockLisaMetrics: LisaMetrics = mock[LisaMetrics]
 
-  val SUT = new TransactionController(mockAuthCon, mockAppContext, mockService, mockLisaMetrics) {
+  val SUT = new TransactionController(mockAuthCon, mockAppContext, mockService, mockAuditService, mockLisaMetrics) {
     override lazy val v2endpointsEnabled = true
   }
 
