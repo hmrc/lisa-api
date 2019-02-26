@@ -20,14 +20,17 @@ import com.google.inject.Inject
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
+import uk.gov.hmrc.lisaapi.services.AuditService
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class DiscoverController @Inject()(
                                     val authConnector: AuthConnector,
                                     val appContext: AppContext,
+                                    auditService: AuditService,
                                     val lisaMetrics: LisaMetrics)
                                   (implicit ec: ExecutionContext)
   extends LisaController {
@@ -42,6 +45,12 @@ class DiscoverController @Inject()(
           case Some(VERSION_1) => Future.successful(Ok(Json.parse(v1(lisaManagerReferenceNumber))))
           case Some(VERSION_2) => Future.successful(Ok(Json.parse(v2(lisaManagerReferenceNumber))))
         }
+
+        auditService.audit(
+          auditType = "endpointsDiscovered",
+          path = s"/manager/$lisaManagerReferenceNumber",
+          auditData = Map("lisaManagerReferenceNumber" -> lisaManagerReferenceNumber)
+        )
 
         lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.DISCOVER)
         result
