@@ -232,10 +232,10 @@ class TransactionControllerSpec extends PlaySpec
         val res = SUT.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV1))
         await(res)
         verify(mockAuditService).audit(
-          auditType = matchersEquals("getAccountNotReported"),
+          auditType = matchersEquals("getTransactionReported"),
           path = matchersEquals(s"/manager/$lmrn/accounts/$accountId/transactions/$transactionId/payments"),
           auditData = matchersEquals(Map(
-            "lmrnReferenceNumber" -> lmrn,
+            "lisaManagerReferenceNumber" -> lmrn,
             "accountId" -> accountId,
             "transactionId" -> transactionId
           )))(any())
@@ -255,10 +255,10 @@ class TransactionControllerSpec extends PlaySpec
         val res = SUT.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV2))
         await(res)
         verify(mockAuditService).audit(
-          auditType = matchersEquals("getAccountNotReported"),
+          auditType = matchersEquals("getTransactionReported"),
           path = matchersEquals(s"/manager/$lmrn/accounts/$accountId/transactions/$transactionId/payments"),
           auditData = matchersEquals(Map(
-            "lmrnReferenceNumber" -> lmrn,
+            "lisaManagerReferenceNumber" -> lmrn,
             "accountId" -> accountId,
             "transactionId" -> transactionId
           )))(any())
@@ -272,10 +272,10 @@ class TransactionControllerSpec extends PlaySpec
         val res = SUT.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV2))
         await(res)
         verify(mockAuditService).audit(
-          auditType = matchersEquals("getAccountNotReported"),
+          auditType = matchersEquals("getTransactionNotReported"),
           path = matchersEquals(s"/manager/$lmrn/accounts/$accountId/transactions/$transactionId/payments"),
           auditData = matchersEquals(Map(
-            "lmrnReferenceNumber" -> lmrn,
+            "lisaManagerReferenceNumber" -> lmrn,
             "accountId" -> accountId,
             "transactionId" -> transactionId,
             "reasonNotReported" -> ErrorAccountNotFound.errorCode
@@ -287,10 +287,10 @@ class TransactionControllerSpec extends PlaySpec
         val res = SUT.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV1))
         await(res)
         verify(mockAuditService).audit(
-          auditType = matchersEquals("getAccountNotReported"),
+          auditType = matchersEquals("getTransactionNotReported"),
           path = matchersEquals(s"/manager/$lmrn/accounts/$accountId/transactions/$transactionId/payments"),
           auditData = matchersEquals(Map(
-            "lmrnReferenceNumber" -> lmrn,
+            "lisaManagerReferenceNumber" -> lmrn,
             "accountId" -> accountId,
             "transactionId" -> transactionId,
             "reasonNotReported" -> ErrorBonusPaymentTransactionNotFound.errorCode
@@ -302,10 +302,10 @@ class TransactionControllerSpec extends PlaySpec
         val res = SUT.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV2))
         await(res)
         verify(mockAuditService).audit(
-          auditType = matchersEquals("getAccountNotReported"),
+          auditType = matchersEquals("getTransactionNotReported"),
           path = matchersEquals(s"/manager/$lmrn/accounts/$accountId/transactions/$transactionId/payments"),
           auditData = matchersEquals(Map(
-            "lmrnReferenceNumber" -> lmrn,
+            "lisaManagerReferenceNumber" -> lmrn,
             "accountId" -> accountId,
             "transactionId" -> transactionId,
             "reasonNotReported" -> ErrorTransactionNotFound.errorCode
@@ -317,10 +317,10 @@ class TransactionControllerSpec extends PlaySpec
         val res = SUT.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV2))
         await(res)
         verify(mockAuditService).audit(
-          auditType = matchersEquals("getAccountNotReported"),
+          auditType = matchersEquals("getTransactionNotReported"),
           path = matchersEquals(s"/manager/$lmrn/accounts/$accountId/transactions/$transactionId/payments"),
           auditData = matchersEquals(Map(
-            "lmrnReferenceNumber" -> lmrn,
+            "lisaManagerReferenceNumber" -> lmrn,
             "accountId" -> accountId,
             "transactionId" -> transactionId,
             "reasonNotReported" -> ErrorInternalServerError.errorCode
@@ -335,10 +335,10 @@ class TransactionControllerSpec extends PlaySpec
         val res = SUT.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV1))
         await(res)
         verify(mockAuditService).audit(
-          auditType = matchersEquals("getAccountNotReported"),
+          auditType = matchersEquals("getTransactionNotReported"),
           path = matchersEquals(s"/manager/$lmrn/accounts/$accountId/transactions/$transactionId/payments"),
           auditData = matchersEquals(Map(
-            "lmrnReferenceNumber" -> lmrn,
+            "lisaManagerReferenceNumber" -> lmrn,
             "accountId" -> accountId,
             "transactionId" -> transactionId,
             "reasonNotReported" -> ErrorInternalServerError.errorCode
@@ -351,10 +351,10 @@ class TransactionControllerSpec extends PlaySpec
         val res = SUT.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV2))
         await(res)
         verify(mockAuditService).audit(
-          auditType = matchersEquals("getAccountNotReported"),
+          auditType = matchersEquals("getTransactionNotReported"),
           path = matchersEquals(s"/manager/$lmrn/accounts/$accountId/transactions/$transactionId/payments"),
           auditData = matchersEquals(Map(
-            "lmrnReferenceNumber" -> lmrn,
+            "lisaManagerReferenceNumber" -> lmrn,
             "accountId" -> accountId,
             "transactionId" -> transactionId,
             "reasonNotReported" -> ErrorServiceUnavailable.errorCode
