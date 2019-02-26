@@ -137,7 +137,9 @@ class TransactionServiceSpec extends PlaySpec
           transactionId = "12345",
           paymentStatus = "Due",
           paymentDueDate = Some(new DateTime("2000-01-01")),
-          transactionType = Some("Debt")
+          transactionType = Some("Debt"),
+          paymentReference = Some("YREF"),
+          paymentAmount = Some(30)
         )
       }
       "ITMP returns a Collected status and ETMP returns a Not Found error" in {
