@@ -28,7 +28,7 @@ case class DesGetTransactionPaid(paymentDate: DateTime, paymentReference: String
 
 object DesGetTransactionResponse {
   implicit val pendingReads: Reads[DesGetTransactionPending] = (
-    (JsPath \ "paymentDueDate").read(JsonReads.isoDate).map(new DateTime(_)) and
+    (JsPath \ "paymentDate").read(JsonReads.isoDate).map(new DateTime(_)) and
       (JsPath \ "paymentReference").readNullable[String] and
       (JsPath \ "paymentAmount").readNullable[Amount]
     )(DesGetTransactionPending.apply _)
