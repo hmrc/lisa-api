@@ -1062,7 +1062,9 @@ class DesConnectorSpec extends PlaySpec
                 responseJson = Some(Json.parse(
                   """{
                     |    "paymentStatus": "PENDING",
-                    |    "paymentDueDate": "2000-01-01"
+                    |    "paymentDueDate": "2000-01-01",
+                    |    "paymentReference": "002630000994",
+                    |    "paymentAmount": 2.00
                     |}""".stripMargin))
               )
             )
@@ -1070,7 +1072,9 @@ class DesConnectorSpec extends PlaySpec
 
         doRetrieveTransactionRequest { response =>
           response mustBe DesGetTransactionPending(
-            paymentDueDate = new DateTime("2000-01-01")
+            paymentDueDate = new DateTime("2000-01-01"),
+            paymentReference = "002630000994",
+            paymentAmount = 2.0
           )
         }
       }
