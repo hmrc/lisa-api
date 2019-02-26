@@ -26,7 +26,7 @@ import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models.{GetBulkPaymentNotFoundResponse, GetBulkPaymentServiceUnavailableResponse, GetBulkPaymentSuccessResponse}
-import uk.gov.hmrc.lisaapi.services.{BulkPaymentService, CurrentDateService}
+import uk.gov.hmrc.lisaapi.services.{AuditService, BulkPaymentService, CurrentDateService}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -35,6 +35,7 @@ class BulkPaymentController @Inject()(
                                        val appContext: AppContext,
                                        currentDateService: CurrentDateService,
                                        service: BulkPaymentService,
+                                       auditService: AuditService,
                                        val lisaMetrics: LisaMetrics
                                      )(implicit ec: ExecutionContext) extends LisaController {
 

@@ -17,7 +17,7 @@
 package unit.controllers
 
 import org.joda.time.DateTime
-import org.mockito.Matchers._
+import org.mockito.Matchers.{any, eq => matchersEquals}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 import org.scalatest.mock.MockitoSugar
@@ -31,7 +31,7 @@ import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.controllers._
 import uk.gov.hmrc.lisaapi.metrics.LisaMetrics
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.services.{BulkPaymentService, CurrentDateService}
+import uk.gov.hmrc.lisaapi.services.{AuditService, BulkPaymentService, CurrentDateService}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -48,6 +48,7 @@ class BulkPaymentControllerSpec extends PlaySpec
   val lmrn = "Z123456"
 
   before {
+    reset(mockAuditService)
     when(mockAuthCon.authorise[Option[String]](any(),any())(any(), any())).
       thenReturn(Future(Some("1234")))
 
@@ -280,6 +281,23 @@ class BulkPaymentControllerSpec extends PlaySpec
 
   }
 
+  "audit getBulkPaymentReported" when {
+    "the service returns a GetBulkPaymentSuccessResponse" in {
+      when(mockService.getBulkPayment(any(), any(), any())(any())).
+        thenReturn(Future.successful(successResponse))
+
+      val oneYearInFuture = new DateTime(validDate).plusYears(1).toString("yyyy-MM-dd")
+      val result = SUT.getBulkPayment(lmrn, validDate, oneYearInFuture).
+        apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
+
+      await(result)
+    }
+  }
+
+  "audit getBulkPaymentNotReported" when {
+
+  }
+
   val successResponse: GetBulkPaymentSuccessResponse = GetBulkPaymentSuccessResponse(
     lmrn,
     List(
@@ -289,12 +307,13 @@ class BulkPaymentControllerSpec extends PlaySpec
   )
 
   val mockService: BulkPaymentService = mock[BulkPaymentService]
+  val mockAuditService: AuditService = mock[AuditService]
   val mockAuthCon: AuthConnector = mock[AuthConnector]
   val mockCurrentDateService: CurrentDateService = mock[CurrentDateService]
   val mockAppContext: AppContext = mock[AppContext]
   val mockLisaMetrics: LisaMetrics = mock[LisaMetrics]
 
-  val SUT = new BulkPaymentController(mockAuthCon, mockAppContext, mockCurrentDateService, mockService, mockLisaMetrics) {
+  val SUT = new BulkPaymentController(mockAuthCon, mockAppContext, mockCurrentDateService, mockService, mockAuditService, mockLisaMetrics) {
     override lazy val v2endpointsEnabled = true
   }
 
