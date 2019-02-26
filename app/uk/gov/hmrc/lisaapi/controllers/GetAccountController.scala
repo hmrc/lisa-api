@@ -41,6 +41,14 @@ class GetAccountController @Inject()(
       withEnrolment(lisaManager) { (_) =>
         service.getAccount(lisaManager, accountId).map {
           case response: GetLisaAccountSuccessResponse =>
+            auditService.audit(
+              auditType = "getAccountReported",
+              path = getEndpointUrl(lisaManager, accountId),
+              auditData = Map(
+                ZREF -> lisaManager,
+                "accountId" -> accountId
+              )
+            )
             lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.ACCOUNT)
             Ok(Json.toJson(response))
 
@@ -58,5 +66,9 @@ class GetAccountController @Inject()(
         }
       }
     }
+
+  private def getEndpointUrl(lisaManagerReferenceNumber: String, accountId: String): String = {
+    s"/manager/$lisaManagerReferenceNumber/accounts/$accountId"
+  }
 
 }
