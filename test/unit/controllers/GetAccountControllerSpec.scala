@@ -210,7 +210,6 @@ class GetAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPer
 
     "audit an getAccountReported event" when {
       "submitted a valid get account request" in {
-        reset(mockAuditService)
         when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(
           GetLisaAccountSuccessResponse(
             investorId = "9876543210",
@@ -224,6 +223,7 @@ class GetAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPer
             transferAccount = None)
         ))
         doSyncGetAccountDetailsRequest(res => {
+          await(res)
           verify(mockAuditService).audit(
             auditType = matchersEquals("getAccountReported"),
             path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId"),
@@ -239,39 +239,42 @@ class GetAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPer
       "the account does not exist" in {
         when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountDoesNotExistResponse))
         doSyncGetAccountDetailsRequest(res => {
+          await(res)
           verify(mockAuditService).audit(
             auditType = matchersEquals("getAccountNotReported"),
             path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId"),
             auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountId" -> accountId,
-              "reasonNotCreated" -> "INVESTOR_ACCOUNTID_NOT_FOUND"
+              "reasonNotReported" -> "INVESTOR_ACCOUNTID_NOT_FOUND"
             )))(any())
         })
       }
       "there is a service unavailable error" in {
         when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountServiceUnavailable))
         doSyncGetAccountDetailsRequest(res => {
+          await(res)
           verify(mockAuditService).audit(
             auditType = matchersEquals("getAccountNotReported"),
             path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId"),
             auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountId" -> accountId,
-              "reasonNotCreated" -> "SERVER_ERROR"
+              "reasonNotReported" -> "SERVER_ERROR"
             )))(any())
         })
       }
       "there is an internal server error" in {
         when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountErrorResponse))
         doSyncGetAccountDetailsRequest(res => {
+          await(res)
           verify(mockAuditService).audit(
             auditType = matchersEquals("getAccountNotReported"),
             path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId"),
             auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountId" -> accountId,
-              "reasonNotCreated" -> "INTERNAL_SERVER_ERROR"
+              "reasonNotReported" -> "INTERNAL_SERVER_ERROR"
             )))(any())
         })
       }

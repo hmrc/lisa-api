@@ -53,14 +53,41 @@ class GetAccountController @Inject()(
             Ok(Json.toJson(response))
 
           case GetLisaAccountDoesNotExistResponse =>
+            auditService.audit(
+              auditType = "getAccountNotReported",
+              path = getEndpointUrl(lisaManager, accountId),
+              auditData = Map(
+                ZREF -> lisaManager,
+                "accountId" -> accountId,
+                "reasonNotReported" -> ErrorAccountNotFound.errorCode
+              )
+            )
             lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.ACCOUNT)
             NotFound(Json.toJson(ErrorAccountNotFound))
 
           case GetLisaAccountServiceUnavailable =>
+            auditService.audit(
+              auditType = "getAccountNotReported",
+              path = getEndpointUrl(lisaManager, accountId),
+              auditData = Map(
+                ZREF -> lisaManager,
+                "accountId" -> accountId,
+                "reasonNotReported" -> ErrorServiceUnavailable.errorCode
+              )
+            )
             lisaMetrics.incrementMetrics(startTime, SERVICE_UNAVAILABLE, LisaMetricKeys.ACCOUNT)
             ServiceUnavailable(Json.toJson(ErrorServiceUnavailable))
 
           case _ =>
+            auditService.audit(
+              auditType = "getAccountNotReported",
+              path = getEndpointUrl(lisaManager, accountId),
+              auditData = Map(
+                ZREF -> lisaManager,
+                "accountId" -> accountId,
+                "reasonNotReported" -> ErrorInternalServerError.errorCode
+              )
+            )
             lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.ACCOUNT)
             InternalServerError(Json.toJson(ErrorInternalServerError))
         }
