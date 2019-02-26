@@ -18,7 +18,7 @@
   "paymentStatus": "Paid",
   "paymentDate": "2017-06-20",
   "paymentAmount": 1000,
-  "paymentReference": "002630000993"
+  "paymentReference": "0000002630000993"
 }
 </pre>
             </td>
@@ -108,6 +108,18 @@
 }
 </pre>
             </td>
+       </tr>
+       <tr>
+            <td><p>Request to refund withdrawal charge has been cancelled</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 0000000403</p></td>
+            <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
+<pre class="code--block">
+{
+  "transactionId": "0000000403",
+  "transactionType": "Payment",
+  "paymentStatus": "Charge refund cancelled"
+}
+</pre>
+            </td>
         </tr>
         <tr>
             <td><p>Request with a valid account ID and Transaction ID, but an invalid LISA Manager reference number</p><p class="code--block">lisaManagerReferenceNumber: 123456<br>accountId: 1234567890<br>transactionId: 0123456789</p></td>
@@ -130,7 +142,7 @@
 }
 </pre>
             </td>
-        </tr>
+       </tr>
         <tr>
             <td><p>Request for a transaction that does not exist</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 0000000404</p></td>
             <td><p>HTTP status: <code class="code--slim">404 (Not Found)</code></p>

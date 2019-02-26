@@ -64,7 +64,6 @@ class TransactionService @Inject()(desConnector: DesConnector)(implicit ec: Exec
            TransactionPaymentStatus.DUE |
            TransactionPaymentStatus.VOID |
            TransactionPaymentStatus.CANCELLED => {
-
         Future.successful(GetTransactionSuccessResponse(
           transactionId = transactionId,
           paymentStatus = itmpResponse.paymentStatus,
@@ -72,24 +71,19 @@ class TransactionService @Inject()(desConnector: DesConnector)(implicit ec: Exec
         ))
       }
       case TransactionPaymentStatus.SUPERSEDED => {
-
         Future.successful(GetTransactionSuccessResponse(
           transactionId = transactionId,
           paymentStatus = itmpResponse.paymentStatus,
           supersededBy = itmpResponse.supersededBy
         ))
       }
-      case TransactionPaymentStatus.PAID => {
+      case TransactionPaymentStatus.PAID =>
         handlePaidTransaction(lisaManager, accountId, transactionId, itmpResponse.getBonusDueForPeriod)
-      }
-      case TransactionPaymentStatus.COLLECTED => {
+      case TransactionPaymentStatus.COLLECTED =>
         handleCollectedTransaction(lisaManager, accountId, transactionId)
-      }
-      case _ => {
+      case _ =>
         Logger.warn(s"Unexpected status: ${itmpResponse.paymentStatus}, returning an error")
-
         Future.successful(GetTransactionErrorResponse)
-      }
     }
   }
 
@@ -100,7 +94,7 @@ class TransactionService @Inject()(desConnector: DesConnector)(implicit ec: Exec
 
     transaction map {
       case DesUnavailableResponse => GetTransactionServiceUnavailableResponse
-      case collected: DesGetTransactionCollected => {
+      case collected: DesGetTransactionPaid => {
         GetTransactionSuccessResponse(
           transactionId = transactionId,
           paymentStatus = TransactionPaymentStatus.COLLECTED,
@@ -110,7 +104,7 @@ class TransactionService @Inject()(desConnector: DesConnector)(implicit ec: Exec
           transactionType = Some(TransactionPaymentType.DEBT)
         )
       }
-      case due: DesGetTransactionDue => {
+      case due: DesGetTransactionPending => {
         GetTransactionSuccessResponse(
           transactionId = transactionId,
           paymentStatus = TransactionPaymentStatus.DUE,
@@ -119,16 +113,19 @@ class TransactionService @Inject()(desConnector: DesConnector)(implicit ec: Exec
           transactionType = Some(TransactionPaymentType.DEBT)
         )
       }
-      case error: DesFailureResponse if error.code == "NOT_FOUND" => {
-        GetTransactionSuccessResponse(
-          transactionId = transactionId,
-          paymentStatus = TransactionPaymentStatus.PENDING
-        )
-      }
       case error: DesFailureResponse => {
-        Logger.warn(s"Get collected transaction returned error: ${error.code} from ETMP")
-
-        GetTransactionErrorResponse
+        error.code match {
+          case "NOT_FOUND" => {
+            GetTransactionSuccessResponse(
+              transactionId = transactionId,
+              paymentStatus = TransactionPaymentStatus.DUE
+            )
+          }
+          case _ => {
+            Logger.warn(s"Get collected transaction returned error: ${error.code} from ETMP")
+            GetTransactionErrorResponse
+          }
+        }
       }
     }
   }
@@ -136,9 +133,7 @@ class TransactionService @Inject()(desConnector: DesConnector)(implicit ec: Exec
   private def handlePaidTransaction(lisaManager: String, accountId: String, transactionId: String, bonusDueForPeriod: Option[Amount])
                                    (implicit hc: HeaderCarrier): Future[GetTransactionResponse] = {
 
-    val transaction: Future[DesResponse] = desConnector.getTransaction(lisaManager, accountId, transactionId)
-
-    transaction map {
+    desConnector.getTransaction(lisaManager, accountId, transactionId) map {
       case DesUnavailableResponse => GetTransactionServiceUnavailableResponse
       case paid: DesGetTransactionPaid => {
         GetTransactionSuccessResponse(
@@ -161,19 +156,28 @@ class TransactionService @Inject()(desConnector: DesConnector)(implicit ec: Exec
           bonusDueForPeriod = bonusDueForPeriod
         )
       }
-      case error: DesFailureResponse if error.code == "NOT_FOUND" => {
-        GetTransactionSuccessResponse(
-          transactionId = transactionId,
-          paymentStatus = TransactionPaymentStatus.PENDING,
-          bonusDueForPeriod = bonusDueForPeriod
-        )
-      }
       case error: DesFailureResponse => {
-        Logger.warn(s"Get paid transaction returned error: ${error.code} from ETMP")
-
-        GetTransactionErrorResponse
+        error.code match {
+          case "COULD_NOT_PROCESS" => {
+            GetTransactionSuccessResponse(
+              transactionId = transactionId,
+              paymentStatus = TransactionPaymentStatus.REFUND_CANCELLED,
+              transactionType = Some(TransactionPaymentType.PAYMENT)
+            )
+          }
+          case "NOT_FOUND" => {
+            GetTransactionSuccessResponse(
+              transactionId = transactionId,
+              paymentStatus = TransactionPaymentStatus.PENDING,
+              bonusDueForPeriod = bonusDueForPeriod
+            )
+          }
+          case _ => {
+            Logger.warn(s"Get paid transaction returned error: ${error.code} from ETMP")
+            GetTransactionErrorResponse
+          }
+        }
       }
     }
   }
-
 }

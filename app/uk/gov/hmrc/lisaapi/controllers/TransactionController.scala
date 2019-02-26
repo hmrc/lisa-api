@@ -49,7 +49,14 @@ class TransactionController @Inject() (
                 lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.TRANSACTION)
 
                 withApiVersion {
-                  case Some(VERSION_1) => Future.successful(Ok(Json.toJson(success.copy(transactionType = None, supersededBy = None))))
+                  case Some(VERSION_1) => {
+                    if (success.paymentStatus == TransactionPaymentStatus.REFUND_CANCELLED) {
+                      Future.successful(ErrorInternalServerError.asResult)
+                    }
+                    else {
+                      Future.successful(Ok(Json.toJson(success.copy(transactionType = None, supersededBy = None))))
+                    }
+                  }
                   case Some(VERSION_2) => Future.successful(Ok(Json.toJson(success.copy(bonusDueForPeriod = None))))
                 }
               }
@@ -66,20 +73,24 @@ class TransactionController @Inject() (
               case res: GetTransactionResponse => {
                 Logger.debug("Matched an error")
 
-                val errors = Map[GetTransactionResponse, ErrorResponse] (
-                  GetTransactionAccountNotFoundResponse -> ErrorAccountNotFound,
-                  GetTransactionServiceUnavailableResponse -> ErrorServiceUnavailable
-                )
-                val error = errors.getOrElse(res, ErrorInternalServerError)
+                val errorResponse = errors.applyOrElse(res, { _: GetTransactionResponse =>
+                  Logger.debug(s"Matched an unexpected response: $res, returning a 500 error")
+                  ErrorInternalServerError
+                })
 
-                lisaMetrics.incrementMetrics(startTime, error.httpStatusCode, LisaMetricKeys.TRANSACTION)
+                lisaMetrics.incrementMetrics(startTime, errorResponse.httpStatusCode, LisaMetricKeys.TRANSACTION)
 
-                Future.successful(error.asResult)
+                Future.successful(errorResponse.asResult)
               }
             }
           }
         }
       }
     }
+
+  private val errors: PartialFunction[GetTransactionResponse, ErrorResponse] = {
+    case GetTransactionAccountNotFoundResponse => ErrorAccountNotFound
+    case GetTransactionServiceUnavailableResponse => ErrorServiceUnavailable
+  }
 
 }

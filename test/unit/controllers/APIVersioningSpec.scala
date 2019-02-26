@@ -16,6 +16,7 @@
 
 package unit.controllers
 
+import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.http.HeaderNames.ACCEPT
@@ -23,7 +24,7 @@ import play.api.mvc._
 import play.api.test.{FakeApplication, FakeRequest}
 import play.test.Helpers
 import uk.gov.hmrc.lisaapi.config.AppContext
-import uk.gov.hmrc.lisaapi.controllers.{APIVersioning, ErrorAcceptHeaderContentInvalid, ErrorAcceptHeaderInvalid, ErrorAcceptHeaderVersionInvalid}
+import uk.gov.hmrc.lisaapi.controllers.{APIVersioning, ErrorAcceptHeaderContentInvalid, ErrorAcceptHeaderInvalid, ErrorAcceptHeaderVersionInvalid, ErrorNotImplemented}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
@@ -85,12 +86,27 @@ class APIVersioningSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
 
   }
 
+  "The isEndpointEnabled function" must {
+    "allow execution if the appContext returns that the endpoint is not disabled" in {
+      when(mockAppContext.endpointIsDisabled("test")).thenReturn(false)
+      val request = FakeRequest(Helpers.GET, "/").withHeaders((ACCEPT, "application/vnd.hmrc.2.0+json"))
+      isEndpointEnabledTest(request) mustBe Results.Ok
+    }
+    "return a not implemented error if the appContext returns that the endpoint is disabled" in {
+      when(mockAppContext.endpointIsDisabled("test")).thenReturn(true)
+      val request = FakeRequest(Helpers.GET, "/").withHeaders((ACCEPT, "application/vnd.hmrc.2.0+json"))
+      isEndpointEnabledTest(request) mustBe ErrorNotImplemented.asResult
+    }
+  }
+
+  val mockAppContext = mock[AppContext]
+
   object APIVersioningImpl extends APIVersioning {
     override val validateVersion: String => Boolean = List("1.0", "2.0") contains _
     override val validateContentType: String => Boolean = _ == "json"
     override lazy val v2endpointsEnabled: Boolean = true
 
-    override protected def appContext: AppContext = ???
+    override protected def appContext: AppContext = mockAppContext
   }
 
   object APIVersioningImplV2Disabled extends APIVersioning {
@@ -98,7 +114,7 @@ class APIVersioningSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
     override val validateContentType: String => Boolean = _ == "json"
     override lazy val v2endpointsEnabled: Boolean = false
 
-    override protected def appContext: AppContext = ???
+    override protected def appContext: AppContext = mockAppContext
   }
 
   def withApiVersionTest[A](request: Request[A]): Result = {
@@ -110,6 +126,14 @@ class APIVersioningSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
 
   def validateHeaderTest[A](request: Request[A]): Result = {
     val builder = APIVersioningImpl.validateHeader()
+    val response = builder.invokeBlock[A](
+      request,
+      (_) => Future.successful(Results.Ok))
+    Await.result(response, 100 millis)
+  }
+
+  def isEndpointEnabledTest[A](request: Request[A]): Result = {
+    val builder = APIVersioningImpl.isEndpointEnabled("test")
     val response = builder.invokeBlock[A](
       request,
       (_) => Future.successful(Results.Ok))

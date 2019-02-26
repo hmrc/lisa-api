@@ -189,6 +189,18 @@ class TransactionControllerSpec extends PlaySpec
 
         (contentAsJson(res) \ "code").as[String] mustBe "INTERNAL_SERVER_ERROR"
       }
+      "a charge refund cancelled is returned for api v1" in {
+        when(mockService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionSuccessResponse(
+          transactionId = "1234",
+          paymentStatus = "Charge refund cancelled"
+        )))
+
+        val res = SUT.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV1))
+
+        status(res) mustBe INTERNAL_SERVER_ERROR
+
+        (contentAsJson(res) \ "code").as[String] mustBe "INTERNAL_SERVER_ERROR"
+      }
     }
 
     "return 503 service unavailable" when {

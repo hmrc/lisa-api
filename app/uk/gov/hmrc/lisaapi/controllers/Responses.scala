@@ -92,7 +92,7 @@ case object ErrorBadRequestStartBefore6April2017 extends ErrorResponse(403, "FOR
 case object ErrorBadRequestOverYearBetweenStartAndEnd extends ErrorResponse(403, "FORBIDDEN", "endDate cannot be more than a year after startDate")
 // end
 
-case object ErrorNotImplemented extends ErrorResponse(501, "NOT_IMPLEMENTED", "Not implemented")
+case object ErrorNotImplemented extends ErrorResponse(501, "NOT_IMPLEMENTED", "API not implemented/deployed")
 
 case object ErrorUnauthorized extends ErrorResponse(401, "UNAUTHORIZED", "Bearer token is missing or not authorized")
 
@@ -183,6 +183,7 @@ case object ErrorWithdrawalSupersededOutcomeError extends ErrorResponse(403, "SU
 
 case object ErrorWithdrawalTimescalesExceeded extends ErrorResponse(403, "WITHDRAWAL_CHARGE_TIMESCALES_EXCEEDED", "The timescale for reporting a withdrawal charge has passed. The claim period lasts for 6 years and 14 days")
 
+case object ErrorCouldNotProcessWithdrawalRefund extends ErrorResponse(403, "COULD_NOT_PROCESS_WITHDRAWAL_CHARGE_REFUND", "Charge refund has been cancelled by HMRC")
 
 case class ErrorLifeEventAlreadyExists(lifeEventId: String) extends ErrorResponseWithLifeEventId(409, "LIFE_EVENT_ALREADY_EXISTS", "The investor’s life event has already been reported", lifeEventId)
 case object ErrorLifeEventMismatch extends ErrorResponse(403, "SUPERSEDED_LIFE_EVENT_MISMATCH_ERROR", "originalLifeEventId and the originalEventDate do not match the information in the original request")

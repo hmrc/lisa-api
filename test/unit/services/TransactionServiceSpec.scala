@@ -108,6 +108,38 @@ class TransactionServiceSpec extends PlaySpec
           bonusDueForPeriod = Some(1.0)
         )
       }
+    }
+
+    "return a Due transaction" when {
+      "ITMP returns a Collected status and ETMP returns a Pending status" in {
+        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
+          thenReturn(Future.successful(GetWithdrawalResponse(
+            new DateTime("2018-05-06"),
+            new DateTime("2018-06-05"),
+            Some(100),
+            100,
+            25,
+            0,
+            true,
+            "Regular withdrawal",
+            None,
+            None,
+            "Collected",
+            new DateTime("2018-06-21")
+          )))
+
+        when(mockDesConnector.getTransaction(any(), any(), any())(any())).
+          thenReturn(Future.successful(DesGetTransactionPending(new DateTime("2000-01-01"))))
+
+        val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
+
+        result mustBe GetTransactionSuccessResponse(
+          transactionId = "12345",
+          paymentStatus = "Due",
+          paymentDueDate = Some(new DateTime("2000-01-01")),
+          transactionType = Some("Debt")
+        )
+      }
       "ITMP returns a Collected status and ETMP returns a Not Found error" in {
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
           thenReturn(Future.successful(GetWithdrawalResponse(
@@ -132,39 +164,7 @@ class TransactionServiceSpec extends PlaySpec
 
         result mustBe GetTransactionSuccessResponse(
           transactionId = "12345",
-          paymentStatus = "Pending"
-        )
-      }
-    }
-
-    "return a Due transaction" when {
-      "ITMP returns a Collected status and ETMP returns a Due status" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
-          thenReturn(Future.successful(GetWithdrawalResponse(
-            new DateTime("2018-05-06"),
-            new DateTime("2018-06-05"),
-            Some(100),
-            100,
-            25,
-            0,
-            true,
-            "Regular withdrawal",
-            None,
-            None,
-            "Collected",
-            new DateTime("2018-06-21")
-          )))
-
-        when(mockDesConnector.getTransaction(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesGetTransactionDue(new DateTime("2000-01-01"))))
-
-        val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
-
-        result mustBe GetTransactionSuccessResponse(
-          transactionId = "12345",
-          paymentStatus = "Due",
-          paymentDueDate = Some(new DateTime("2000-01-01")),
-          transactionType = Some("Debt")
+          paymentStatus = "Due"
         )
       }
     }
@@ -273,7 +273,7 @@ class TransactionServiceSpec extends PlaySpec
     }
 
     "return a Collected transaction" when {
-      "ITMP returns a Collected status and ETMP returns a Collected status" in {
+      "ITMP returns a Collected status and ETMP returns a Paid status" in {
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
           thenReturn(Future.successful(GetWithdrawalResponse(
             new DateTime("2018-05-06"),
@@ -291,7 +291,7 @@ class TransactionServiceSpec extends PlaySpec
           )))
 
         when(mockDesConnector.getTransaction(any(), any(), any())(any())).
-          thenReturn(Future.successful(des.DesGetTransactionCollected(new DateTime("2000-01-01"), "XREF", 25)))
+          thenReturn(Future.successful(des.DesGetTransactionPaid(new DateTime("2000-01-01"), "XREF", 25)))
 
         val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
 
@@ -302,6 +302,32 @@ class TransactionServiceSpec extends PlaySpec
           paymentReference = Some("XREF"),
           paymentAmount = Some(25),
           transactionType = Some("Debt")
+        )
+      }
+    }
+
+    "return a Charge refund cancelled transaction" when {
+      "ITMP returns a Paid status and ETMP returns a COULD_NOT_PROCESS error" in {
+        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
+          thenReturn(Future.successful(GetBonusResponse(
+            lifeEventId = None,
+            periodStartDate = new DateTime("2001-01-01"),
+            periodEndDate = new DateTime("2002-01-01"),
+            htbTransfer = None,
+            inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
+            bonuses = Bonuses(1.0, 1.0, None, "X"),
+            creationDate = new DateTime("2000-01-01"),
+            paymentStatus = TransactionPaymentStatus.PAID)))
+
+        when(mockDesConnector.getTransaction(any(), any(), any())(any())).
+          thenReturn(Future.successful(DesFailureResponse("COULD_NOT_PROCESS")))
+
+        val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
+
+        result mustBe GetTransactionSuccessResponse(
+          transactionId = "12345",
+          paymentStatus = "Charge refund cancelled",
+          transactionType = Some("Payment")
         )
       }
     }

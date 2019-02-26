@@ -3,6 +3,6 @@
   "transactionType": "Payment",
   "paymentStatus": "Paid",
   "paymentDate": "2017-05-20",
-  "paymentReference": "002630000993",
+  "paymentReference": "0000002630000993",
   "paymentAmount": 1000
 }

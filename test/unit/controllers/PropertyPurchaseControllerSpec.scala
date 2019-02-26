@@ -127,7 +127,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
           await(res)
           verify(mockAuditService).audit(
             auditType = matchersEquals("fundReleaseReported"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/property-purchase"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/fund-releases"),
             auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountID" -> accountId,
@@ -146,7 +146,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
           await(res)
           verify(mockAuditService).audit(
             auditType = matchersEquals("fundReleaseReported"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/property-purchase"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/fund-releases"),
             auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountID" -> accountId,
@@ -169,7 +169,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
           await(res)
           verify(mockAuditService).audit(
             auditType = matchersEquals("fundReleaseNotReported"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/property-purchase"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/fund-releases"),
             auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountID" -> accountId,
@@ -190,7 +190,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
           await(res)
           verify(mockAuditService).audit(
             auditType = matchersEquals("fundReleaseNotReported"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/property-purchase"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/fund-releases"),
             auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountID" -> accountId,
@@ -410,7 +410,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
           await(res)
           verify(mockAuditService).audit(
             auditType = matchersEquals("extensionReported"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/property-purchase/extension"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/purchase-extensions"),
             auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountID" -> accountId,
@@ -427,7 +427,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
           await(res)
           verify(mockAuditService).audit(
             auditType = matchersEquals("extensionReported"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/property-purchase/extension"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/purchase-extensions"),
             auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountID" -> accountId,
@@ -450,7 +450,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
           await(res)
           verify(mockAuditService).audit(
             auditType = matchersEquals("extensionNotReported"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/property-purchase/extension"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/purchase-extensions"),
             auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountID" -> accountId,
@@ -469,7 +469,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
           await(res)
           verify(mockAuditService).audit(
             auditType = matchersEquals("extensionNotReported"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/property-purchase/extension"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/purchase-extensions"),
             auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountID" -> accountId,
@@ -707,7 +707,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
           await(res)
           verify(mockAuditService).audit(
             auditType = matchersEquals("purchaseOutcomeReported"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/property-purchase/outcome"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/purchase-outcomes"),
             auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountID" -> accountId,
@@ -725,7 +725,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
           await(res)
           verify(mockAuditService).audit(
             auditType = matchersEquals("purchaseOutcomeReported"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/property-purchase/outcome"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/purchase-outcomes"),
             auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountID" -> accountId,
@@ -749,7 +749,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
           await(res)
           verify(mockAuditService).audit(
             auditType = matchersEquals("purchaseOutcomeNotReported"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/property-purchase/outcome"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/purchase-outcomes"),
             auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountID" -> accountId,
@@ -769,7 +769,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
           await(res)
           verify(mockAuditService).audit(
             auditType = matchersEquals("purchaseOutcomeNotReported"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/property-purchase/outcome"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/purchase-outcomes"),
             auditData = matchersEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountID" -> accountId,

@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.lisaapi.config
 
-
 import com.google.inject.Inject
 import play.api.{Configuration, Environment}
 import uk.gov.hmrc.play.config.ServicesConfig
@@ -40,4 +39,8 @@ class AppContext @Inject()(
   lazy val v2endpointsEnabled = runModeConfiguration.getBoolean("api.endpointsEnabledv2").getOrElse(throw new RuntimeException(s"Missing key api.endpointsEnabledv2"))
 
   override protected def mode = environment.mode
+
+  def endpointIsDisabled(endpoint: String): Boolean = {
+    runModeConfiguration.getStringList("api.disabledEndpoints").fold(false)(list => list.contains(endpoint))
+  }
 }
