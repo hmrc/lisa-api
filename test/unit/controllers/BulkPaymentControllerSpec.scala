@@ -291,6 +291,13 @@ class BulkPaymentControllerSpec extends PlaySpec
         apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
 
       await(result)
+
+      verify(mockAuditService).audit(
+        auditType = matchersEquals("getBulkPaymentReported"),
+        path = matchersEquals(s"/manager/$lmrn/payments"),
+        auditData = matchersEquals(Map(
+          "lisaManagerReferenceNumber" -> lmrn
+        )))(any())
     }
   }
 
