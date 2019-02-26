@@ -110,8 +110,8 @@ class TransactionService @Inject()(desConnector: DesConnector)(implicit ec: Exec
           paymentStatus = TransactionPaymentStatus.DUE,
           paymentDueDate = Some(due.paymentDueDate),
           transactionType = Some(TransactionPaymentType.DEBT),
-          paymentAmount = Some(due.paymentAmount),
-          paymentReference = Some(due.paymentReference)
+          paymentAmount = due.paymentAmount,
+          paymentReference = due.paymentReference
         )
       }
       case error: DesFailureResponse => {
