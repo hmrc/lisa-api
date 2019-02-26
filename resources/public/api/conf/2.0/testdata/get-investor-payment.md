@@ -77,7 +77,9 @@
   "transactionId": "2345678902",
   "transactionType": "Debt",
   "paymentStatus": "Due",
-  "paymentDueDate": "2018-01-20"
+  "paymentDueDate": "2018-01-20",
+  "paymentAmount": 200,
+  "paymentReference": "002630000993"
 }
 </pre>
             </td>

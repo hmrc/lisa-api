@@ -73,7 +73,7 @@ class TransactionServiceSpec extends PlaySpec
             paymentStatus = "Paid")))
 
         when(mockDesConnector.getTransaction(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesGetTransactionPending(new DateTime("2000-01-01"))))
+          thenReturn(Future.successful(DesGetTransactionPending(new DateTime("2000-01-01"), None, None)))
 
         val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
 
@@ -129,7 +129,7 @@ class TransactionServiceSpec extends PlaySpec
           )))
 
         when(mockDesConnector.getTransaction(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesGetTransactionPending(new DateTime("2000-01-01"))))
+          thenReturn(Future.successful(DesGetTransactionPending(new DateTime("2000-01-01"), Some("YREF"), Some(30))))
 
         val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
 
@@ -137,7 +137,9 @@ class TransactionServiceSpec extends PlaySpec
           transactionId = "12345",
           paymentStatus = "Due",
           paymentDueDate = Some(new DateTime("2000-01-01")),
-          transactionType = Some("Debt")
+          transactionType = Some("Debt"),
+          paymentReference = Some("YREF"),
+          paymentAmount = Some(30)
         )
       }
       "ITMP returns a Collected status and ETMP returns a Not Found error" in {

@@ -23,12 +23,15 @@ import uk.gov.hmrc.lisaapi.models.{Amount, JsonReads}
 
 trait DesGetTransactionResponse extends DesResponse
 
-case class DesGetTransactionPending(paymentDueDate: DateTime) extends DesGetTransactionResponse
+case class DesGetTransactionPending(paymentDueDate: DateTime, paymentReference: Option[String] = None, paymentAmount: Option[Amount] = None) extends DesGetTransactionResponse
 case class DesGetTransactionPaid(paymentDate: DateTime, paymentReference: String, paymentAmount: Amount) extends DesGetTransactionResponse
 
 object DesGetTransactionResponse {
-  implicit val pendingReads: Reads[DesGetTransactionPending] = (JsPath \ "paymentDueDate").
-    read(JsonReads.isoDate).map {dateString => DesGetTransactionPending(new DateTime(dateString))}
+  implicit val pendingReads: Reads[DesGetTransactionPending] = (
+    (JsPath \ "paymentDate").read(JsonReads.isoDate).map(new DateTime(_)) and
+      (JsPath \ "paymentReference").readNullable[String] and
+      (JsPath \ "paymentAmount").readNullable[Amount]
+    )(DesGetTransactionPending.apply _)
 
   implicit val paidReads: Reads[DesGetTransactionPaid] = (
     (JsPath \ "paymentDate").read(JsonReads.isoDate).map(new DateTime(_)) and
