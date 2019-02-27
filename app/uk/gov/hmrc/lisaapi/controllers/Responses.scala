@@ -92,7 +92,7 @@ case object ErrorBadRequestStartBefore6April2017 extends ErrorResponse(403, "FOR
 case object ErrorBadRequestOverYearBetweenStartAndEnd extends ErrorResponse(403, "FORBIDDEN", "endDate cannot be more than a year after startDate")
 // end
 
-case object ErrorNotImplemented extends ErrorResponse(501, "NOT_IMPLEMENTED", "API not implemented/deployed")
+case object ErrorApiNotAvailable extends ErrorResponse(501, "API_NOT_AVAILABLE", "This API is currently not available")
 
 case object ErrorUnauthorized extends ErrorResponse(401, "UNAUTHORIZED", "Bearer token is missing or not authorized")
 
