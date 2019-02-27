@@ -96,29 +96,99 @@ class BonusPaymentController @Inject()(
         withApiVersion {
           case Some(VERSION_1) => {
             if (response.bonuses.claimReason == "Superseded Bonus") {
+              auditService.audit(
+                auditType = "getBonusPaymentNotReported",
+                path = getEndpointUrl(lisaManager, accountId, transactionId),
+                auditData = Map(
+                  ZREF -> lisaManager,
+                  "accountId" -> accountId,
+                  "transactionId" -> transactionId,
+                  "reasonNotReported" -> ErrorInternalServerError.errorCode
+                )
+              )
               Logger.warn(s"API v1 received a superseded bonus claim. ID was $transactionId")
               Future.successful(InternalServerError(Json.toJson(ErrorInternalServerError)))
             }
             else {
+              auditService.audit(
+                auditType = "getBonusPaymentReported",
+                path = getEndpointUrl(lisaManager, accountId, transactionId),
+                auditData = Map(
+                  ZREF -> lisaManager,
+                  "accountId" -> accountId,
+                  "transactionId" -> transactionId
+                )
+              )
               Future.successful(Ok(Json.toJson(response.copy(supersededBy = None))))
             }
           }
-          case Some(VERSION_2) => Future.successful(Ok(Json.toJson(response)))
+          case Some(VERSION_2) => {
+            auditService.audit(
+              auditType = "getBonusPaymentReported",
+              path = getEndpointUrl(lisaManager, accountId, transactionId),
+              auditData = Map(
+                ZREF -> lisaManager,
+                "accountId" -> accountId,
+                "transactionId" -> transactionId
+              )
+            )
+            Future.successful(Ok(Json.toJson(response)))
+          }
         }
 
       case _: GetWithdrawalResponse | GetBonusOrWithdrawalTransactionNotFoundResponse =>
+        auditService.audit(
+          auditType = "getBonusPaymentNotReported",
+          path = getEndpointUrl(lisaManager, accountId, transactionId),
+          auditData = Map(
+            ZREF -> lisaManager,
+            "accountId" -> accountId,
+            "transactionId" -> transactionId,
+            "reasonNotReported" -> ErrorBonusPaymentTransactionNotFound.errorCode
+          )
+        )
         lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.BONUS_PAYMENT)
         Future.successful(NotFound(Json.toJson(ErrorBonusPaymentTransactionNotFound)))
 
       case GetBonusOrWithdrawalInvestorNotFoundResponse =>
+        auditService.audit(
+          auditType = "getBonusPaymentNotReported",
+          path = getEndpointUrl(lisaManager, accountId, transactionId),
+          auditData = Map(
+            ZREF -> lisaManager,
+            "accountId" -> accountId,
+            "transactionId" -> transactionId,
+            "reasonNotReported" -> ErrorAccountNotFound.errorCode
+          )
+        )
         lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.BONUS_PAYMENT)
         Future.successful(NotFound(Json.toJson(ErrorAccountNotFound)))
 
       case GetBonusOrWithdrawalServiceUnavailableResponse =>
+        auditService.audit(
+          auditType = "getBonusPaymentNotReported",
+          path = getEndpointUrl(lisaManager, accountId, transactionId),
+          auditData = Map(
+            ZREF -> lisaManager,
+            "accountId" -> accountId,
+            "transactionId" -> transactionId,
+            "reasonNotReported" -> ErrorServiceUnavailable.errorCode
+          )
+        )
         lisaMetrics.incrementMetrics(startTime, SERVICE_UNAVAILABLE, LisaMetricKeys.BONUS_PAYMENT)
         Future.successful(ServiceUnavailable(Json.toJson(ErrorServiceUnavailable)))
 
       case _ =>
+        auditService.audit(
+          auditType = "getBonusPaymentNotReported",
+          path = getEndpointUrl(lisaManager, accountId, transactionId),
+          auditData = Map(
+            ZREF -> lisaManager,
+            "accountId" -> accountId,
+            "transactionId" -> transactionId,
+            "reasonNotReported" -> ErrorInternalServerError.errorCode
+          )
+        )
         lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.BONUS_PAYMENT)
         Future.successful(InternalServerError(Json.toJson(ErrorInternalServerError)))
     }
@@ -325,5 +395,9 @@ class BonusPaymentController @Inject()(
 
   private def endpointUrl(lisaManager: String, accountId: String): String = {
     s"/manager/$lisaManager/accounts/$accountId/transactions"
+  }
+
+  private def getEndpointUrl(lisaManager: String, accountId: String, transactionId: String): String = {
+    s"/manager/$lisaManager/accounts/$accountId/transactions/$transactionId"
   }
 }

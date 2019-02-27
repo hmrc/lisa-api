@@ -45,6 +45,7 @@ class BonusPaymentControllerSpec extends PlaySpec
   with MockitoSugar
   with OneAppPerSuite
   with BeforeAndAfterEach
+  with BeforeAndAfter
   with LisaConstants {
 
   case object TestBonusPaymentResponse extends RequestBonusPaymentResponse
@@ -1015,7 +1016,8 @@ class BonusPaymentControllerSpec extends PlaySpec
         ))
 
         doGetBonusPaymentTransactionRequest(
-          _ => {
+          res => {
+            await(res)
             verify(mockAuditService).audit(
               auditType = MatcherEquals("getBonusPaymentReported"),
               path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions/$transactionId"),
@@ -1025,36 +1027,6 @@ class BonusPaymentControllerSpec extends PlaySpec
                 "transactionId" -> transactionId
               ))
             )(any())
-//            status(res) mustBe OK
-//            contentAsJson(res) mustBe Json.obj(
-//              "lifeEventId" -> "1234567891",
-//              "periodStartDate" -> "2017-04-06",
-//              "periodEndDate" -> "2017-05-05",
-//              "htbTransfer" -> Json.obj(
-//                "htbTransferInForPeriod" -> 0,
-//                "htbTransferTotalYTD" -> 10
-//              ),
-//              "inboundPayments" -> Json.obj(
-//                "newSubsForPeriod" -> 4000,
-//                "newSubsYTD" -> 4000,
-//                "totalSubsForPeriod" -> 4000,
-//                "totalSubsYTD" -> 4000
-//              ),
-//              "bonuses" -> Json.obj(
-//                "bonusDueForPeriod" -> 1000,
-//                "totalBonusDueYTD" -> 1000,
-//                "bonusPaidYTD" -> 1000,
-//                "claimReason" -> "Life Event"
-//              ),
-//              "supersede" -> Json.obj(
-//                "automaticRecoveryAmount" -> 100,
-//                "originalTransactionId" -> "1234567890",
-//                "originalBonusDueForPeriod" -> 1100,
-//                "transactionResult" -> -100,
-//                "reason" -> "Bonus recovery"
-//              ),
-//              "supersededBy" -> "1234567892"
-//            )
           }
         )
       }
@@ -1073,7 +1045,8 @@ class BonusPaymentControllerSpec extends PlaySpec
         ))
 
         doGetBonusPaymentTransactionRequest(
-          _ => {
+          res => {
+            await(res)
             verify(mockAuditService).audit(
               auditType = MatcherEquals("getBonusPaymentReported"),
               path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions/$transactionId"),
@@ -1083,28 +1056,6 @@ class BonusPaymentControllerSpec extends PlaySpec
                 "transactionId" -> transactionId
               ))
             )(any())
-//            status(res) mustBe OK
-//            contentAsJson(res) mustBe Json.obj(
-//              "lifeEventId" -> "1234567891",
-//              "periodStartDate" -> "2017-04-06",
-//              "periodEndDate" -> "2017-05-05",
-//              "htbTransfer" -> Json.obj(
-//                "htbTransferInForPeriod" -> 0,
-//                "htbTransferTotalYTD" -> 10
-//              ),
-//              "inboundPayments" -> Json.obj(
-//                "newSubsForPeriod" -> 4000,
-//                "newSubsYTD" -> 4000,
-//                "totalSubsForPeriod" -> 4000,
-//                "totalSubsYTD" -> 4000
-//              ),
-//              "bonuses" -> Json.obj(
-//                "bonusDueForPeriod" -> 1000,
-//                "totalBonusDueYTD" -> 1000,
-//                "bonusPaidYTD" -> 1000,
-//                "claimReason" -> "Life Event"
-//              )
-//            )
           },
           acceptHeaderV1
         )
@@ -1114,7 +1065,8 @@ class BonusPaymentControllerSpec extends PlaySpec
     "audit getBonusPaymentNotReported" when {
       "given an investor id not found" in {
         when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusOrWithdrawalInvestorNotFoundResponse))
-        doGetBonusPaymentTransactionRequest(_ => {
+        doGetBonusPaymentTransactionRequest(res => {
+          await(res)
           verify(mockAuditService).audit(
             auditType = MatcherEquals("getBonusPaymentNotReported"),
             path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions/$transactionId"),
@@ -1125,15 +1077,12 @@ class BonusPaymentControllerSpec extends PlaySpec
               "reasonNotReported" -> ErrorAccountNotFound.errorCode
             ))
           )(any())
-//          status(res) mustBe (NOT_FOUND)
-//          val json = contentAsJson(res)
-//          (json \ "code").as[String] mustBe ErrorAccountNotFound.errorCode
-//          (json \ "message").as[String] mustBe ErrorAccountNotFound.message
         })
       }
       "given a transaction not found error from the connector" in {
         when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusOrWithdrawalTransactionNotFoundResponse))
-        doGetBonusPaymentTransactionRequest(_ => {
+        doGetBonusPaymentTransactionRequest(res => {
+          await(res)
           verify(mockAuditService).audit(
             auditType = MatcherEquals("getBonusPaymentNotReported"),
             path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions/$transactionId"),
@@ -1144,10 +1093,6 @@ class BonusPaymentControllerSpec extends PlaySpec
               "reasonNotReported" -> ErrorBonusPaymentTransactionNotFound.errorCode
             ))
           )(any())
-//          status(res) mustBe (NOT_FOUND)
-//          val json = contentAsJson(res)
-//          (json \ "code").as[String] mustBe ErrorBonusPaymentTransactionNotFound.errorCode
-//          (json \ "message").as[String] mustBe ErrorBonusPaymentTransactionNotFound.message
         })
       }
       "given a withdrawal charge transaction from the connector" in {
@@ -1165,7 +1110,8 @@ class BonusPaymentControllerSpec extends PlaySpec
           "Collected",
           new DateTime("2017-06-19")
         )))
-        doGetBonusPaymentTransactionRequest(_ => {
+        doGetBonusPaymentTransactionRequest(res => {
+          await(res)
           verify(mockAuditService).audit(
             auditType = MatcherEquals("getBonusPaymentNotReported"),
             path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions/$transactionId"),
@@ -1176,15 +1122,12 @@ class BonusPaymentControllerSpec extends PlaySpec
               "reasonNotReported" -> ErrorBonusPaymentTransactionNotFound.errorCode
             ))
           )(any())
-//          status(res) mustBe (NOT_FOUND)
-//          val json = contentAsJson(res)
-//          (json \ "code").as[String] mustBe ErrorBonusPaymentTransactionNotFound.errorCode
-//          (json \ "message").as[String] mustBe ErrorBonusPaymentTransactionNotFound.message
         })
       }
       "an error is returned from the service layer" in {
         when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusOrWithdrawalErrorResponse))
-        doGetBonusPaymentTransactionRequest(_ => {
+        doGetBonusPaymentTransactionRequest(res => {
+          await(res)
           verify(mockAuditService).audit(
             auditType = MatcherEquals("getBonusPaymentNotReported"),
             path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions/$transactionId"),
@@ -1195,7 +1138,6 @@ class BonusPaymentControllerSpec extends PlaySpec
               "reasonNotReported" -> "INTERNAL_SERVER_ERROR"
             ))
           )(any())
-//          contentAsJson(res) mustBe internalServerError
         })
       }
       "given an api version of 1 for a request which supersedes another" in {
@@ -1212,8 +1154,9 @@ class BonusPaymentControllerSpec extends PlaySpec
           new DateTime("2017-05-20"))
         ))
 
-        doGetBonusPaymentTransactionRequest(_ => {
-            verify(mockAuditService).audit(
+        doGetBonusPaymentTransactionRequest(res => {
+          await(res)
+          verify(mockAuditService).audit(
               auditType = MatcherEquals("getBonusPaymentNotReported"),
               path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions/$transactionId"),
               auditData = MatcherEquals(Map(
@@ -1223,8 +1166,6 @@ class BonusPaymentControllerSpec extends PlaySpec
                 "reasonNotReported" -> "INTERNAL_SERVER_ERROR"
               ))
             )(any())
-//            status(res) mustBe INTERNAL_SERVER_ERROR
-//            contentAsJson(res) mustBe internalServerError
           },
           acceptHeaderV1
         )
@@ -1233,7 +1174,8 @@ class BonusPaymentControllerSpec extends PlaySpec
         when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).
           thenReturn(Future.successful(GetBonusOrWithdrawalServiceUnavailableResponse))
 
-        doGetBonusPaymentTransactionRequest(_ => {
+        doGetBonusPaymentTransactionRequest(res => {
+          await(res)
           verify(mockAuditService).audit(
             auditType = MatcherEquals("getBonusPaymentNotReported"),
             path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions/$transactionId"),
@@ -1244,8 +1186,6 @@ class BonusPaymentControllerSpec extends PlaySpec
               "reasonNotReported" -> "SERVER_ERROR"
             ))
           )(any())
-//          status(res) mustBe SERVICE_UNAVAILABLE
-//          (contentAsJson(res) \ "code").as[String] mustBe "SERVER_ERROR"
         })
       }
     }
