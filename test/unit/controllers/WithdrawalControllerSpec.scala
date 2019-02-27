@@ -17,8 +17,8 @@
 package unit.controllers
 
 import org.joda.time.DateTime
-import org.mockito.Matchers.any
-import org.mockito.Mockito.{reset, when}
+import org.mockito.Matchers.{eq => MatcherEquals, any}
+import org.mockito.Mockito.{reset, verify, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
@@ -443,6 +443,157 @@ class WithdrawalControllerSpec extends PlaySpec
         status(res) mustBe SERVICE_UNAVAILABLE
         (contentAsJson(res) \ "code").as[String] mustBe "SERVER_ERROR"
       })
+    }
+
+    "audit getWithdrawalChargeReported" when {
+      "given a successful response" in {
+        when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetWithdrawalResponse(
+          periodStartDate = new DateTime("2017-05-06"),
+          periodEndDate = new DateTime("2017-06-05"),
+          automaticRecoveryAmount = Some(250),
+          withdrawalAmount = 2000,
+          withdrawalChargeAmount = 500,
+          withdrawalChargeAmountYtd = 500,
+          fundsDeductedDuringWithdrawal = true,
+          withdrawalReason = "Superseded withdrawal",
+          supersededBy = Some("1234567892"),
+          supersede = Some(WithdrawalSuperseded("1234567890", 250, 250, "Additional withdrawal")),
+          paymentStatus = "Collected",
+          creationDate = new DateTime("2017-06-19")
+        )))
+
+        doGetRequest(res => {
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = MatcherEquals("getWithdrawalChargeReported"),
+            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/withdrawal-charges/$transactionId"),
+            auditData = MatcherEquals(Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountId" -> accountId,
+              "transactionId" -> transactionId
+            ))
+          )(any())
+        })
+      }
+    }
+
+    "audit getWithdrawalChargeNotReported" when {
+      "given an investor id is not found" in {
+        when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusOrWithdrawalInvestorNotFoundResponse))
+        doGetRequest(res => {
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = MatcherEquals("getWithdrawalChargeReported"),
+            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/withdrawal-charges/$transactionId"),
+            auditData = MatcherEquals(Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountId" -> accountId,
+              "transactionId" -> transactionId,
+              "reasonNotReported" -> ErrorAccountNotFound.errorCode
+            ))
+          )(any())
+        })
+      }
+      "given a transaction not found error from the connector" in {
+        when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusOrWithdrawalTransactionNotFoundResponse))
+        doGetRequest(res => {
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = MatcherEquals("getWithdrawalChargeReported"),
+            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/withdrawal-charges/$transactionId"),
+            auditData = MatcherEquals(Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountId" -> accountId,
+              "transactionId" -> transactionId,
+              "reasonNotReported" -> ErrorWithdrawalNotFound.errorCode
+            ))
+          )(any())
+        })
+      }
+
+      "given a withdrawal charge transaction from the connector" in {
+        when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusResponse(
+          Some("1234567891"),
+          new DateTime("2017-04-06"),
+          new DateTime("2017-05-05"),
+          Some(HelpToBuyTransfer(0, 10)),
+          InboundPayments(Some(4000), 4000, 4000, 4000),
+          Bonuses(1000, 1000, Some(1000), "Life Event"),
+          Some("1234567892"),
+          Some(BonusRecovery(100, "1234567890", 1100, -100)),
+          "Paid",
+          new DateTime("2017-05-20"))
+        ))
+
+        doGetRequest(res => {
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = MatcherEquals("getWithdrawalChargeReported"),
+            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/withdrawal-charges/$transactionId"),
+            auditData = MatcherEquals(Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountId" -> accountId,
+              "transactionId" -> transactionId,
+              "reasonNotReported" -> ErrorWithdrawalNotFound.errorCode
+            ))
+          )(any())
+        })
+      }
+      "attempting to use the v1 of the api" in {
+        doGetRequest(
+          res => {
+            await(res)
+            verify(mockAuditService).audit(
+              auditType = MatcherEquals("getWithdrawalChargeReported"),
+              path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/withdrawal-charges/$transactionId"),
+              auditData = MatcherEquals(Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "accountId" -> accountId,
+                "transactionId" -> transactionId,
+                "reasonNotReported" -> "ACCEPT_HEADER_INVALID"
+              ))
+            )(any())
+          },
+          header = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
+        )
+      }
+      "given a internal server error response" in {
+        when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).
+          thenReturn(Future.successful(GetBonusOrWithdrawalErrorResponse))
+
+        doGetRequest(res => {
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = MatcherEquals("getWithdrawalChargeReported"),
+            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/withdrawal-charges/$transactionId"),
+            auditData = MatcherEquals(Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountId" -> accountId,
+              "transactionId" -> transactionId,
+              "reasonNotReported" -> "INTERNAL_SERVER_ERROR"
+            ))
+          )(any())
+        })
+      }
+
+      "given a service unavailable response" in {
+        when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).
+          thenReturn(Future.successful(GetBonusOrWithdrawalServiceUnavailableResponse))
+
+        doGetRequest(res => {
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = MatcherEquals("getWithdrawalChargeNotReported"),
+            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions/$transactionId"),
+            auditData = MatcherEquals(Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountId" -> accountId,
+              "transactionId" -> transactionId,
+              "reasonNotReported" -> "SERVER_ERROR"
+            ))
+          )(any())
+        })
+      }
     }
 
   }
