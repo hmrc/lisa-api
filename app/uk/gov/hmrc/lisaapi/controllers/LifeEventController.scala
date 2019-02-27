@@ -114,7 +114,7 @@ class LifeEventController @Inject()(
                      (implicit hc: HeaderCarrier) = {
     auditService.audit(
       auditType = if (success) "lifeEventReported" else "lifeEventNotReported",
-      path = getEndpointUrl(lisaManager, accountId),
+      path = endpointUrl(lisaManager, accountId),
       auditData = req.toStringMap ++ Map(
         "lisaManagerReferenceNumber" -> lisaManager,
         "accountID" -> accountId
@@ -140,7 +140,7 @@ class LifeEventController @Inject()(
     }
   }
 
-  private def getEndpointUrl(lisaManager: String, accountId: String): String = {
+  private def endpointUrl(lisaManager: String, accountId: String): String = {
     s"/manager/$lisaManager/accounts/$accountId/events"
   }
 

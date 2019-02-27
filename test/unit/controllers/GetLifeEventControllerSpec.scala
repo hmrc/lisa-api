@@ -17,7 +17,7 @@
 package unit.controllers
 
 import org.joda.time.DateTime
-import org.mockito.Matchers._
+import org.mockito.Matchers.{any, eq => matchersEquals}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 import org.scalatest.mock.MockitoSugar
@@ -31,7 +31,7 @@ import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountNotFound, GetLifeEventController}
 import uk.gov.hmrc.lisaapi.metrics.LisaMetrics
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.services.LifeEventService
+import uk.gov.hmrc.lisaapi.services.{AuditService, LifeEventService}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -45,6 +45,7 @@ class GetLifeEventControllerSpec extends PlaySpec with MockitoSugar with BeforeA
   val eventId = "1234567890"
 
   before {
+    reset(mockAuditService)
     when(mockAuthCon.authorise[Option[String]](any(),any())(any(), any())).thenReturn(Future(Some("1234")))
   }
 
@@ -85,14 +86,51 @@ class GetLifeEventControllerSpec extends PlaySpec with MockitoSugar with BeforeA
 
     }
 
+    "audit getLifeEventReported" when {
+      "given a successful response from the service layer" in {
+        val annualReturn = GetLifeEventItem("12345", "STATUTORY_SUBMISSION", new DateTime("2018-01-01"))
+        when(mockService.getLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(Right(List(annualReturn))))
+
+        val res = SUT.getLifeEvent(lisaManager, accountId, eventId).apply(FakeRequest().withHeaders(acceptHeaderV2))
+        await(res)
+        verify(mockAuditService).audit(
+          auditType = matchersEquals("getLifeEventReported"),
+          path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/$eventId"),
+          auditData = matchersEquals(Map(
+            "lisaManagerReferenceNumber" -> lisaManager,
+            "accountId" -> accountId,
+            "lifeEventId" -> eventId
+          )))(any())
+      }
+    }
+
+    "audit getLifeEventNotReported" when {
+      "given an error response from the service layer" in {
+        when(mockService.getLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(Left(ErrorAccountNotFound)))
+
+        val res = SUT.getLifeEvent(lisaManager, accountId, eventId).apply(FakeRequest().withHeaders(acceptHeaderV2))
+        await(res)
+        verify(mockAuditService).audit(
+          auditType = matchersEquals("getLifeEventNotReported"),
+          path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/$eventId"),
+          auditData = matchersEquals(Map(
+            "lisaManagerReferenceNumber" -> lisaManager,
+            "accountId" -> accountId,
+            "lifeEventId" -> eventId,
+            "reasonNotReported" -> ErrorAccountNotFound.errorCode
+          )))(any())
+      }
+    }
+
   }
 
   val mockAuthCon: AuthConnector = mock[AuthConnector]
   val mockAppContext: AppContext = mock[AppContext]
   val mockLisaMetrics: LisaMetrics = mock[LisaMetrics]
   val mockService: LifeEventService = mock[LifeEventService]
+  val mockAuditService: AuditService = mock[AuditService]
 
-  val SUT = new GetLifeEventController(mockAuthCon, mockAppContext, mockLisaMetrics, mockService) {
+  val SUT = new GetLifeEventController(mockAuthCon, mockAppContext, mockLisaMetrics, mockService, mockAuditService) {
     override lazy val v2endpointsEnabled = true
   }
 

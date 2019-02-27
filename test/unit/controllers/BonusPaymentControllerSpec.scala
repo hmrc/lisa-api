@@ -45,6 +45,7 @@ class BonusPaymentControllerSpec extends PlaySpec
   with MockitoSugar
   with OneAppPerSuite
   with BeforeAndAfterEach
+  with BeforeAndAfter
   with LisaConstants {
 
   case object TestBonusPaymentResponse extends RequestBonusPaymentResponse
@@ -995,6 +996,196 @@ class BonusPaymentControllerSpec extends PlaySpec
         doGetBonusPaymentTransactionRequest(res => {
           status(res) mustBe SERVICE_UNAVAILABLE
           (contentAsJson(res) \ "code").as[String] mustBe "SERVER_ERROR"
+        })
+      }
+    }
+
+    "audit getBonusPaymentReported" when {
+      "given an api version of 2" in {
+        when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusResponse(
+          Some("1234567891"),
+          new DateTime("2017-04-06"),
+          new DateTime("2017-05-05"),
+          Some(HelpToBuyTransfer(0f, 10f)),
+          InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
+          Bonuses(1000f, 1000f, Some(1000f), "Life Event"),
+          Some("1234567892"),
+          Some(BonusRecovery(100, "1234567890", 1100, -100)),
+          "Paid",
+          new DateTime("2017-05-20"))
+        ))
+
+        doGetBonusPaymentTransactionRequest(
+          res => {
+            await(res)
+            verify(mockAuditService).audit(
+              auditType = MatcherEquals("getBonusPaymentReported"),
+              path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions/$transactionId"),
+              auditData = MatcherEquals(Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "accountId" -> accountId,
+                "transactionId" -> transactionId
+              ))
+            )(any())
+          }
+        )
+      }
+      "given an api version of 1 for a request which has been superseded" in {
+        when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusResponse(
+          Some("1234567891"),
+          new DateTime("2017-04-06"),
+          new DateTime("2017-05-05"),
+          Some(HelpToBuyTransfer(0f, 10f)),
+          InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
+          Bonuses(1000f, 1000f, Some(1000f), "Life Event"),
+          Some("1234567892"),
+          None,
+          "Paid",
+          new DateTime("2017-05-20"))
+        ))
+
+        doGetBonusPaymentTransactionRequest(
+          res => {
+            await(res)
+            verify(mockAuditService).audit(
+              auditType = MatcherEquals("getBonusPaymentReported"),
+              path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions/$transactionId"),
+              auditData = MatcherEquals(Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "accountId" -> accountId,
+                "transactionId" -> transactionId
+              ))
+            )(any())
+          },
+          acceptHeaderV1
+        )
+      }
+    }
+
+    "audit getBonusPaymentNotReported" when {
+      "given an investor id not found" in {
+        when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusOrWithdrawalInvestorNotFoundResponse))
+        doGetBonusPaymentTransactionRequest(res => {
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = MatcherEquals("getBonusPaymentNotReported"),
+            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions/$transactionId"),
+            auditData = MatcherEquals(Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountId" -> accountId,
+              "transactionId" -> transactionId,
+              "reasonNotReported" -> ErrorAccountNotFound.errorCode
+            ))
+          )(any())
+        })
+      }
+      "given a transaction not found error from the connector" in {
+        when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusOrWithdrawalTransactionNotFoundResponse))
+        doGetBonusPaymentTransactionRequest(res => {
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = MatcherEquals("getBonusPaymentNotReported"),
+            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions/$transactionId"),
+            auditData = MatcherEquals(Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountId" -> accountId,
+              "transactionId" -> transactionId,
+              "reasonNotReported" -> ErrorBonusPaymentTransactionNotFound.errorCode
+            ))
+          )(any())
+        })
+      }
+      "given a withdrawal charge transaction from the connector" in {
+        when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetWithdrawalResponse(
+          new DateTime("2017-05-06"),
+          new DateTime("2017-06-05"),
+          None,
+          1000,
+          250,
+          250,
+          true,
+          "",
+          None,
+          None,
+          "Collected",
+          new DateTime("2017-06-19")
+        )))
+        doGetBonusPaymentTransactionRequest(res => {
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = MatcherEquals("getBonusPaymentNotReported"),
+            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions/$transactionId"),
+            auditData = MatcherEquals(Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountId" -> accountId,
+              "transactionId" -> transactionId,
+              "reasonNotReported" -> ErrorBonusPaymentTransactionNotFound.errorCode
+            ))
+          )(any())
+        })
+      }
+      "an error is returned from the service layer" in {
+        when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusOrWithdrawalErrorResponse))
+        doGetBonusPaymentTransactionRequest(res => {
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = MatcherEquals("getBonusPaymentNotReported"),
+            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions/$transactionId"),
+            auditData = MatcherEquals(Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountId" -> accountId,
+              "transactionId" -> transactionId,
+              "reasonNotReported" -> "INTERNAL_SERVER_ERROR"
+            ))
+          )(any())
+        })
+      }
+      "given an api version of 1 for a request which supersedes another" in {
+        when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusResponse(
+          Some("1234567891"),
+          new DateTime("2017-04-06"),
+          new DateTime("2017-05-05"),
+          Some(HelpToBuyTransfer(0f, 10f)),
+          InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
+          Bonuses(1000f, 1000f, Some(1000f), "Superseded Bonus"),
+          Some("1234567892"),
+          Some(BonusRecovery(100, "1234567890", 1100, -100)),
+          "Paid",
+          new DateTime("2017-05-20"))
+        ))
+
+        doGetBonusPaymentTransactionRequest(res => {
+          await(res)
+          verify(mockAuditService).audit(
+              auditType = MatcherEquals("getBonusPaymentNotReported"),
+              path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions/$transactionId"),
+              auditData = MatcherEquals(Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "accountId" -> accountId,
+                "transactionId" -> transactionId,
+                "reasonNotReported" -> "INTERNAL_SERVER_ERROR"
+              ))
+            )(any())
+          },
+          acceptHeaderV1
+        )
+      }
+      "GetBonusOrWithdrawalServiceUnavailableResponse is returned from the service layer" in {
+        when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).
+          thenReturn(Future.successful(GetBonusOrWithdrawalServiceUnavailableResponse))
+
+        doGetBonusPaymentTransactionRequest(res => {
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = MatcherEquals("getBonusPaymentNotReported"),
+            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions/$transactionId"),
+            auditData = MatcherEquals(Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountId" -> accountId,
+              "transactionId" -> transactionId,
+              "reasonNotReported" -> "SERVER_ERROR"
+            ))
+          )(any())
         })
       }
     }

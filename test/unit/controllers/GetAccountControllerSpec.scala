@@ -17,9 +17,9 @@
 package unit.controllers
 
 import org.joda.time.DateTime
-import org.mockito.Matchers.any
-import org.mockito.Mockito.when
-import org.scalatest.BeforeAndAfterEach
+import org.mockito.Matchers.{any, eq => matchersEquals}
+import org.mockito.Mockito.{reset, verify, when}
+import org.scalatest.BeforeAndAfter
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.JsObject
@@ -38,7 +38,7 @@ import uk.gov.hmrc.lisaapi.services.{AccountService, AuditService}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class GetAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite with BeforeAndAfterEach {
+class GetAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite with BeforeAndAfter {
 
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
   val lisaManager = "Z019283"
@@ -47,6 +47,10 @@ class GetAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPer
 
   val validDate = "2017-04-06"
   val invalidDate = "2015-04-05"
+
+  before {
+    reset(mockAuditService)
+  }
 
   "The Get Account Details endpoint" must {
 
@@ -204,6 +208,78 @@ class GetAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPer
       }
     }
 
+    "audit an getAccountReported event" when {
+      "submitted a valid get account request" in {
+        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(
+          GetLisaAccountSuccessResponse(
+            investorId = "9876543210",
+            accountId = accountId,
+            creationReason = "New",
+            firstSubscriptionDate = new DateTime(validDate),
+            accountStatus = "CLOSED",
+            subscriptionStatus = "ACTIVE",
+            accountClosureReason = Some("All funds withdrawn"),
+            closureDate = Some(new DateTime(validDate)),
+            transferAccount = None)
+        ))
+        doSyncGetAccountDetailsRequest(res => {
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = matchersEquals("getAccountReported"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId"),
+            auditData = matchersEquals(Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountId" -> accountId
+            )))(any())
+        })
+      }
+    }
+
+    "audit an getAccountNotReported event" when {
+      "the account does not exist" in {
+        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountDoesNotExistResponse))
+        doSyncGetAccountDetailsRequest(res => {
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = matchersEquals("getAccountNotReported"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId"),
+            auditData = matchersEquals(Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountId" -> accountId,
+              "reasonNotReported" -> "INVESTOR_ACCOUNTID_NOT_FOUND"
+            )))(any())
+        })
+      }
+      "there is a service unavailable error" in {
+        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountServiceUnavailable))
+        doSyncGetAccountDetailsRequest(res => {
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = matchersEquals("getAccountNotReported"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId"),
+            auditData = matchersEquals(Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountId" -> accountId,
+              "reasonNotReported" -> "SERVER_ERROR"
+            )))(any())
+        })
+      }
+      "there is an internal server error" in {
+        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountErrorResponse))
+        doSyncGetAccountDetailsRequest(res => {
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = matchersEquals("getAccountNotReported"),
+            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId"),
+            auditData = matchersEquals(Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountId" -> accountId,
+              "reasonNotReported" -> "INTERNAL_SERVER_ERROR"
+            )))(any())
+        })
+      }
+    }
+
   }
 
   def doSyncGetAccountDetailsRequest(callback: (Future[Result]) => Unit) {
@@ -212,8 +288,8 @@ class GetAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPer
   }
 
   val mockService: AccountService = mock[AccountService]
-  val mockAuditService: AuditService = mock[AuditService]
   val mockAppContext: AppContext = mock[AppContext]
+  val mockAuditService: AuditService = mock[AuditService]
   val mockLisaMetrics: LisaMetrics = mock[LisaMetrics]
   val SUT = new GetAccountController(mockAuthCon, mockAppContext, mockService, mockAuditService, mockLisaMetrics) {
     override lazy val v2endpointsEnabled = true
