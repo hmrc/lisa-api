@@ -24,7 +24,7 @@ import play.api.mvc._
 import play.api.test.{FakeApplication, FakeRequest}
 import play.test.Helpers
 import uk.gov.hmrc.lisaapi.config.AppContext
-import uk.gov.hmrc.lisaapi.controllers.{APIVersioning, ErrorAcceptHeaderContentInvalid, ErrorAcceptHeaderInvalid, ErrorAcceptHeaderVersionInvalid, ErrorNotImplemented}
+import uk.gov.hmrc.lisaapi.controllers.{APIVersioning, ErrorAcceptHeaderContentInvalid, ErrorAcceptHeaderInvalid, ErrorAcceptHeaderVersionInvalid, ErrorApiNotAvailable}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
@@ -95,7 +95,7 @@ class APIVersioningSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
     "return a not implemented error if the appContext returns that the endpoint is disabled" in {
       when(mockAppContext.endpointIsDisabled("test")).thenReturn(true)
       val request = FakeRequest(Helpers.GET, "/").withHeaders((ACCEPT, "application/vnd.hmrc.2.0+json"))
-      isEndpointEnabledTest(request) mustBe ErrorNotImplemented.asResult
+      isEndpointEnabledTest(request) mustBe ErrorApiNotAvailable.asResult
     }
   }
 
