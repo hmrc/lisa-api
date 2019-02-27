@@ -310,7 +310,7 @@ class BonusPaymentControllerSpec extends PlaySpec
         doRequest(validBonusPaymentJson)  { res =>
           status(res) mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "ACCOUNT_ERROR_NO_SUBSCRIPTIONS_THIS_TAX_YEAR"
-          (contentAsJson(res) \ "message").as[String] mustBe "A bonus payment is not possible because the account has no subscriptions for that tax year"
+          (contentAsJson(res) \ "message").as[String] mustBe "This account is not eligible for a bonus payment because the investor already has another LISA account"
         }
 
       }
