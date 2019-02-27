@@ -49,6 +49,12 @@ class BulkPaymentController @Inject()(
 
             response flatMap {
               case s: GetBulkPaymentSuccessResponse => {
+                auditService.audit(
+                  auditType = "getBulkPaymentReported",
+                  path = getEndpointUrl(lisaManager),
+                  auditData = Map(
+                    "lisaManagerReferenceNumber" -> lisaManager
+                  ))
                 lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.TRANSACTION)
                 withApiVersion {
                   case Some(VERSION_1) => Future.successful(transformV1Response(Json.toJson(s)))
@@ -158,6 +164,10 @@ class BulkPaymentController @Inject()(
         None
       }
     }
+  }
+
+  private def getEndpointUrl(lisaManagerReferenceNumber: String): String = {
+    s"/manager/$lisaManagerReferenceNumber/payments"
   }
 
 }
