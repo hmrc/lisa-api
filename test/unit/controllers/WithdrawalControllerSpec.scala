@@ -483,7 +483,7 @@ class WithdrawalControllerSpec extends PlaySpec
         doGetRequest(res => {
           await(res)
           verify(mockAuditService).audit(
-            auditType = MatcherEquals("getWithdrawalChargeReported"),
+            auditType = MatcherEquals("getWithdrawalChargeNotReported"),
             path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/withdrawal-charges/$transactionId"),
             auditData = MatcherEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
@@ -499,7 +499,7 @@ class WithdrawalControllerSpec extends PlaySpec
         doGetRequest(res => {
           await(res)
           verify(mockAuditService).audit(
-            auditType = MatcherEquals("getWithdrawalChargeReported"),
+            auditType = MatcherEquals("getWithdrawalChargeNotReported"),
             path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/withdrawal-charges/$transactionId"),
             auditData = MatcherEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
@@ -528,7 +528,7 @@ class WithdrawalControllerSpec extends PlaySpec
         doGetRequest(res => {
           await(res)
           verify(mockAuditService).audit(
-            auditType = MatcherEquals("getWithdrawalChargeReported"),
+            auditType = MatcherEquals("getWithdrawalChargeNotReported"),
             path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/withdrawal-charges/$transactionId"),
             auditData = MatcherEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
@@ -539,24 +539,6 @@ class WithdrawalControllerSpec extends PlaySpec
           )(any())
         })
       }
-      "attempting to use the v1 of the api" in {
-        doGetRequest(
-          res => {
-            await(res)
-            verify(mockAuditService).audit(
-              auditType = MatcherEquals("getWithdrawalChargeReported"),
-              path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/withdrawal-charges/$transactionId"),
-              auditData = MatcherEquals(Map(
-                "lisaManagerReferenceNumber" -> lisaManager,
-                "accountId" -> accountId,
-                "transactionId" -> transactionId,
-                "reasonNotReported" -> "ACCEPT_HEADER_INVALID"
-              ))
-            )(any())
-          },
-          header = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
-        )
-      }
       "given a internal server error response" in {
         when(mockGetService.getBonusOrWithdrawal(any(), any(), any())(any())).
           thenReturn(Future.successful(GetBonusOrWithdrawalErrorResponse))
@@ -564,7 +546,7 @@ class WithdrawalControllerSpec extends PlaySpec
         doGetRequest(res => {
           await(res)
           verify(mockAuditService).audit(
-            auditType = MatcherEquals("getWithdrawalChargeReported"),
+            auditType = MatcherEquals("getWithdrawalChargeNotReported"),
             path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/withdrawal-charges/$transactionId"),
             auditData = MatcherEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
@@ -584,7 +566,7 @@ class WithdrawalControllerSpec extends PlaySpec
           await(res)
           verify(mockAuditService).audit(
             auditType = MatcherEquals("getWithdrawalChargeNotReported"),
-            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions/$transactionId"),
+            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/withdrawal-charges/$transactionId"),
             auditData = MatcherEquals(Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountId" -> accountId,

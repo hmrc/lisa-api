@@ -90,26 +90,85 @@ class WithdrawalController @Inject() (
 
     getService.getBonusOrWithdrawal(lisaManager, accountId, transactionId).map {
       case response: GetWithdrawalResponse =>
+        auditService.audit(
+          auditType = "getWithdrawalChargeReported",
+          path = getEndpointUrl(lisaManager, accountId, transactionId),
+          auditData = Map(
+            ZREF -> lisaManager,
+            "accountId" -> accountId,
+            "transactionId" -> transactionId
+          )
+        )
         lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.WITHDRAWAL_CHARGE)
         Ok(Json.toJson(response))
 
       case _: GetBonusResponse =>
+        auditService.audit(
+          auditType = "getWithdrawalChargeNotReported",
+          path = getEndpointUrl(lisaManager, accountId, transactionId),
+          auditData = Map(
+            ZREF -> lisaManager,
+            "accountId" -> accountId,
+            "transactionId" -> transactionId,
+            "reasonNotReported" -> ErrorWithdrawalNotFound.errorCode
+          )
+        )
         lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.WITHDRAWAL_CHARGE)
         NotFound(Json.toJson(ErrorWithdrawalNotFound))
 
       case GetBonusOrWithdrawalTransactionNotFoundResponse =>
+        auditService.audit(
+          auditType = "getWithdrawalChargeNotReported",
+          path = getEndpointUrl(lisaManager, accountId, transactionId),
+          auditData = Map(
+            ZREF -> lisaManager,
+            "accountId" -> accountId,
+            "transactionId" -> transactionId,
+            "reasonNotReported" -> ErrorWithdrawalNotFound.errorCode
+          )
+        )
         lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.WITHDRAWAL_CHARGE)
         NotFound(Json.toJson(ErrorWithdrawalNotFound))
 
       case GetBonusOrWithdrawalInvestorNotFoundResponse =>
+        auditService.audit(
+          auditType = "getWithdrawalChargeNotReported",
+          path = getEndpointUrl(lisaManager, accountId, transactionId),
+          auditData = Map(
+            ZREF -> lisaManager,
+            "accountId" -> accountId,
+            "transactionId" -> transactionId,
+            "reasonNotReported" -> ErrorAccountNotFound.errorCode
+          )
+        )
         lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.WITHDRAWAL_CHARGE)
         NotFound(Json.toJson(ErrorAccountNotFound))
 
       case GetBonusOrWithdrawalServiceUnavailableResponse =>
+        auditService.audit(
+          auditType = "getWithdrawalChargeNotReported",
+          path = getEndpointUrl(lisaManager, accountId, transactionId),
+          auditData = Map(
+            ZREF -> lisaManager,
+            "accountId" -> accountId,
+            "transactionId" -> transactionId,
+            "reasonNotReported" -> ErrorServiceUnavailable.errorCode
+          )
+        )
         lisaMetrics.incrementMetrics(startTime, SERVICE_UNAVAILABLE, LisaMetricKeys.WITHDRAWAL_CHARGE)
         ServiceUnavailable(Json.toJson(ErrorServiceUnavailable))
 
       case _ =>
+        auditService.audit(
+          auditType = "getWithdrawalChargeNotReported",
+          path = getEndpointUrl(lisaManager, accountId, transactionId),
+          auditData = Map(
+            ZREF -> lisaManager,
+            "accountId" -> accountId,
+            "transactionId" -> transactionId,
+            "reasonNotReported" -> ErrorInternalServerError.errorCode
+          )
+        )
         lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.WITHDRAWAL_CHARGE)
         InternalServerError(Json.toJson(ErrorInternalServerError))
     }
@@ -234,5 +293,9 @@ class WithdrawalController @Inject() (
 
   private def endpointUrl(lisaManager: String, accountId: String): String = {
     s"/manager/$lisaManager/accounts/$accountId/withdrawal-charges"
+  }
+
+  private def getEndpointUrl(lisaManager: String, accountId: String, transactionId: String): String = {
+    s"/manager/$lisaManager/accounts/$accountId/withdrawal-charges/$transactionId"
   }
 }
