@@ -302,18 +302,6 @@ class BulkPaymentControllerSpec extends PlaySpec
   }
 
   "audit getBulkPaymentNotReported" when {
-    "the lisa manager reference number is invalid" in {
-      val result = SUT.getBulkPayment("Z1234567", validDate, validDate).
-        apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
-      await(result)
-
-      verify(mockAuditService).audit(
-        auditType = matchersEquals("getBulkPaymentNotReported"),
-        path = matchersEquals(s"/manager/$lmrn/payments"),
-        auditData = matchersEquals(Map(
-          "lisaManagerReferenceNumber" -> lmrn
-        )))(any())
-    }
     "the startDate parameter is in the wrong format" in {
       val result = SUT.getBulkPayment(lmrn, invalidDate, validDate).
         apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
@@ -323,7 +311,8 @@ class BulkPaymentControllerSpec extends PlaySpec
         auditType = matchersEquals("getBulkPaymentNotReported"),
         path = matchersEquals(s"/manager/$lmrn/payments"),
         auditData = matchersEquals(Map(
-          "lisaManagerReferenceNumber" -> lmrn
+          "lisaManagerReferenceNumber" -> lmrn,
+          "reasonNotReported" -> ErrorBadRequestStart.errorCode
         )))(any())
     }
     "the endDate parameter is in the wrong format" in {
@@ -335,7 +324,8 @@ class BulkPaymentControllerSpec extends PlaySpec
         auditType = matchersEquals("getBulkPaymentNotReported"),
         path = matchersEquals(s"/manager/$lmrn/payments"),
         auditData = matchersEquals(Map(
-          "lisaManagerReferenceNumber" -> lmrn
+          "lisaManagerReferenceNumber" -> lmrn,
+          "reasonNotReported" -> ErrorBadRequestEnd.errorCode
         )))(any())
     }
     "the startDate and endDate parameters are invalid" in {
@@ -347,7 +337,8 @@ class BulkPaymentControllerSpec extends PlaySpec
         auditType = matchersEquals("getBulkPaymentNotReported"),
         path = matchersEquals(s"/manager/$lmrn/payments"),
         auditData = matchersEquals(Map(
-          "lisaManagerReferenceNumber" -> lmrn
+          "lisaManagerReferenceNumber" -> lmrn,
+          "reasonNotReported" -> ErrorBadRequestStartEnd.errorCode
         )))(any())
     }
     "the endDate parameter is in the future" in {
@@ -360,7 +351,8 @@ class BulkPaymentControllerSpec extends PlaySpec
         auditType = matchersEquals("getBulkPaymentNotReported"),
         path = matchersEquals(s"/manager/$lmrn/payments"),
         auditData = matchersEquals(Map(
-          "lisaManagerReferenceNumber" -> lmrn
+          "lisaManagerReferenceNumber" -> lmrn,
+          "reasonNotReported" -> ErrorBadRequestEndInFuture.errorCode
         )))(any())
     }
     "the endDate is before the startDate" in {
@@ -373,7 +365,8 @@ class BulkPaymentControllerSpec extends PlaySpec
         auditType = matchersEquals("getBulkPaymentNotReported"),
         path = matchersEquals(s"/manager/$lmrn/payments"),
         auditData = matchersEquals(Map(
-          "lisaManagerReferenceNumber" -> lmrn
+          "lisaManagerReferenceNumber" -> lmrn,
+          "reasonNotReported" -> ErrorBadRequestEndBeforeStart.errorCode
         )))(any())
     }
     "the startDate is before 6 April 2017" in {
@@ -385,7 +378,8 @@ class BulkPaymentControllerSpec extends PlaySpec
         auditType = matchersEquals("getBulkPaymentNotReported"),
         path = matchersEquals(s"/manager/$lmrn/payments"),
         auditData = matchersEquals(Map(
-          "lisaManagerReferenceNumber" -> lmrn
+          "lisaManagerReferenceNumber" -> lmrn,
+          "reasonNotReported" -> ErrorBadRequestStartBefore6April2017.errorCode
         )))(any())
     }
     "there's more than a year between startDate and endDate" in {
@@ -398,7 +392,8 @@ class BulkPaymentControllerSpec extends PlaySpec
         auditType = matchersEquals("getBulkPaymentNotReported"),
         path = matchersEquals(s"/manager/$lmrn/payments"),
         auditData = matchersEquals(Map(
-          "lisaManagerReferenceNumber" -> lmrn
+          "lisaManagerReferenceNumber" -> lmrn,
+          "reasonNotReported" -> ErrorBadRequestOverYearBetweenStartAndEnd.errorCode
         )))(any())
     }
     "the service returns a GetBulkPaymentNotFoundResponse" in {
@@ -413,7 +408,8 @@ class BulkPaymentControllerSpec extends PlaySpec
         auditType = matchersEquals("getBulkPaymentNotReported"),
         path = matchersEquals(s"/manager/$lmrn/payments"),
         auditData = matchersEquals(Map(
-          "lisaManagerReferenceNumber" -> lmrn
+          "lisaManagerReferenceNumber" -> lmrn,
+          "reasonNotReported" -> "TRANSACTION_NOT_FOUND"
         )))(any())
     }
     "the service return a GetBulkPaymentErrorResponse" in {
@@ -428,7 +424,8 @@ class BulkPaymentControllerSpec extends PlaySpec
         auditType = matchersEquals("getBulkPaymentNotReported"),
         path = matchersEquals(s"/manager/$lmrn/payments"),
         auditData = matchersEquals(Map(
-          "lisaManagerReferenceNumber" -> lmrn
+          "lisaManagerReferenceNumber" -> lmrn,
+          "reasonNotReported" -> "INTERNAL_SERVER_ERROR"
         )))(any())
     }
     "the service return a GetBulkPaymentServiceUnavailableResponse" in {
@@ -443,7 +440,8 @@ class BulkPaymentControllerSpec extends PlaySpec
         auditType = matchersEquals("getBulkPaymentNotReported"),
         path = matchersEquals(s"/manager/$lmrn/payments"),
         auditData = matchersEquals(Map(
-          "lisaManagerReferenceNumber" -> lmrn
+          "lisaManagerReferenceNumber" -> lmrn,
+          "reasonNotReported" -> "SERVER_ERROR"
         )))(any())
     }
   }

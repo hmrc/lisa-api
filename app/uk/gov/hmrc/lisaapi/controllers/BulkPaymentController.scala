@@ -23,6 +23,7 @@ import play.api.libs.json.Reads.of
 import play.api.libs.json._
 import play.api.mvc.{Action, AnyContent, Result}
 import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models.{GetBulkPaymentNotFoundResponse, GetBulkPaymentServiceUnavailableResponse, GetBulkPaymentSuccessResponse}
@@ -44,7 +45,7 @@ class BulkPaymentController @Inject()(
       implicit val startTime: Long = System.currentTimeMillis()
       withValidLMRN(lisaManager) { () =>
         withEnrolment(lisaManager) { _ =>
-          withValidDates(startDate, endDate) { (start, end) =>
+          withValidDates(startDate, endDate, lisaManager) { (start, end) =>
             val response = service.getBulkPayment(lisaManager, start, end)
 
             response flatMap {
@@ -64,12 +65,46 @@ class BulkPaymentController @Inject()(
               case GetBulkPaymentNotFoundResponse => {
                 lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.TRANSACTION)
                 withApiVersion {
-                  case Some(VERSION_1) => Future.successful(NotFound(Json.toJson(ErrorBulkTransactionNotFoundV1)))
-                  case Some(VERSION_2) => Future.successful(NotFound(Json.toJson(ErrorBulkTransactionNotFoundV2)))
+                  case Some(VERSION_1) => {
+                    auditService.audit(
+                      auditType = "getBulkPaymentNotReported",
+                      path = getEndpointUrl(lisaManager),
+                      auditData = Map(
+                        "lisaManagerReferenceNumber" -> lisaManager,
+                        "reasonNotReported" -> ErrorBulkTransactionNotFoundV1.errorCode
+                      ))
+                    Future.successful(NotFound(Json.toJson(ErrorBulkTransactionNotFoundV1)))
+                  }
+                  case Some(VERSION_2) => {
+                    auditService.audit(
+                      auditType = "getBulkPaymentNotReported",
+                      path = getEndpointUrl(lisaManager),
+                      auditData = Map(
+                        "lisaManagerReferenceNumber" -> lisaManager,
+                        "reasonNotReported" -> ErrorBulkTransactionNotFoundV2.errorCode
+                      ))
+                    Future.successful(NotFound(Json.toJson(ErrorBulkTransactionNotFoundV2)))
+                  }
                 }
               }
-              case GetBulkPaymentServiceUnavailableResponse => Future.successful(ErrorServiceUnavailable.asResult)
+              case GetBulkPaymentServiceUnavailableResponse => {
+                auditService.audit(
+                  auditType = "getBulkPaymentNotReported",
+                  path = getEndpointUrl(lisaManager),
+                  auditData = Map(
+                    "lisaManagerReferenceNumber" -> lisaManager,
+                    "reasonNotReported" -> ErrorServiceUnavailable.errorCode
+                  ))
+                Future.successful(ErrorServiceUnavailable.asResult)
+              }
               case _ => {
+                auditService.audit(
+                  auditType = "getBulkPaymentNotReported",
+                  path = getEndpointUrl(lisaManager),
+                  auditData = Map(
+                    "lisaManagerReferenceNumber" -> lisaManager,
+                    "reasonNotReported" -> ErrorInternalServerError.errorCode
+                  ))
                 lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.TRANSACTION)
                 Future.successful(InternalServerError(Json.toJson(ErrorInternalServerError)))
               }
@@ -94,55 +129,104 @@ class BulkPaymentController @Inject()(
     )
   }
 
-  private def withValidDates(startDate: String, endDate: String)
+  private def withValidDates(startDate: String, endDate: String, lisaManager: String)
                             (success: (DateTime, DateTime) => Future[Result])
-                            (implicit startTime: Long): Future[Result] = {
+                            (implicit hc: HeaderCarrier, startTime: Long): Future[Result] = {
 
     val start = parseDate(startDate)
     val end = parseDate(endDate)
 
     (start, end) match {
       case (Some(s), Some(e)) => {
-        withDatesWithinBusinessRules(s, e) { () =>
+        withDatesWithinBusinessRules(s, e, lisaManager) { () =>
           success(s, e)
         }
       }
       case (None, Some(_)) =>
+        auditService.audit(
+          auditType = "getBulkPaymentNotReported",
+          path = getEndpointUrl(lisaManager),
+          auditData = Map(
+            "lisaManagerReferenceNumber" -> lisaManager,
+            "reasonNotReported" -> ErrorBadRequestStart.errorCode
+          ))
         lisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.TRANSACTION)
         Future.successful(BadRequest(Json.toJson(ErrorBadRequestStart)))
       case (Some(_), None) =>
+        auditService.audit(
+          auditType = "getBulkPaymentNotReported",
+          path = getEndpointUrl(lisaManager),
+          auditData = Map(
+            "lisaManagerReferenceNumber" -> lisaManager,
+            "reasonNotReported" -> ErrorBadRequestEnd.errorCode
+          ))
         lisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.TRANSACTION)
         Future.successful(BadRequest(Json.toJson(ErrorBadRequestEnd)))
       case _ =>
+        auditService.audit(
+          auditType = "getBulkPaymentNotReported",
+          path = getEndpointUrl(lisaManager),
+          auditData = Map(
+            "lisaManagerReferenceNumber" -> lisaManager,
+            "reasonNotReported" -> ErrorBadRequestStartEnd.errorCode
+          ))
         lisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.TRANSACTION)
         Future.successful(BadRequest(Json.toJson(ErrorBadRequestStartEnd)))
     }
   }
 
-  private def withDatesWithinBusinessRules(startDate: DateTime, endDate: DateTime)
+  private def withDatesWithinBusinessRules(startDate: DateTime, endDate: DateTime, lisaManager: String)
                                           (success: () => Future[Result])
-                                          (implicit startTime: Long): Future[Result] = {
+                                          (implicit hc: HeaderCarrier, startTime: Long): Future[Result] = {
 
     // end date is in the future
     if (endDate.isAfter(currentDateService.now())) {
+      auditService.audit(
+        auditType = "getBulkPaymentNotReported",
+        path = getEndpointUrl(lisaManager),
+        auditData = Map(
+          "lisaManagerReferenceNumber" -> lisaManager,
+          "reasonNotReported" -> ErrorBadRequestEndInFuture.errorCode
+        ))
       lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.TRANSACTION)
       Future.successful(Forbidden(Json.toJson(ErrorBadRequestEndInFuture)))
     }
 
     // end date is before start date
     else if (endDate.isBefore(startDate)) {
+      auditService.audit(
+        auditType = "getBulkPaymentNotReported",
+        path = getEndpointUrl(lisaManager),
+        auditData = Map(
+          "lisaManagerReferenceNumber" -> lisaManager,
+          "reasonNotReported" -> ErrorBadRequestEndBeforeStart.errorCode
+        ))
       lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.TRANSACTION)
       Future.successful(Forbidden(Json.toJson(ErrorBadRequestEndBeforeStart)))
     }
 
     // start date is before 6 april 2017
     else if (startDate.isBefore(LISA_START_DATE)) {
+      auditService.audit(
+        auditType = "getBulkPaymentNotReported",
+        path = getEndpointUrl(lisaManager),
+        auditData = Map(
+          "lisaManagerReferenceNumber" -> lisaManager,
+          "reasonNotReported" -> ErrorBadRequestStartBefore6April2017.errorCode
+        ))
       lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.TRANSACTION)
       Future.successful(Forbidden(Json.toJson(ErrorBadRequestStartBefore6April2017)))
     }
 
     // there's more than a year between start date and end date
     else if (endDate.isAfter(startDate.plusYears(1))) {
+      auditService.audit(
+        auditType = "getBulkPaymentNotReported",
+        path = getEndpointUrl(lisaManager),
+        auditData = Map(
+          "lisaManagerReferenceNumber" -> lisaManager,
+          "reasonNotReported" -> ErrorBadRequestOverYearBetweenStartAndEnd.errorCode
+        ))
       lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.TRANSACTION)
       Future.successful(Forbidden(Json.toJson(ErrorBadRequestOverYearBetweenStartAndEnd)))
     }
