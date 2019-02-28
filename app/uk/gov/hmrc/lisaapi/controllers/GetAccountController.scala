@@ -20,6 +20,7 @@ import com.google.inject.Inject
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models.{GetLisaAccountDoesNotExistResponse, GetLisaAccountServiceUnavailable, GetLisaAccountSuccessResponse}
@@ -41,60 +42,44 @@ class GetAccountController @Inject()(
       withEnrolment(lisaManager) { (_) =>
         service.getAccount(lisaManager, accountId).map {
           case response: GetLisaAccountSuccessResponse =>
-            auditService.audit(
-              auditType = "getAccountReported",
-              path = getEndpointUrl(lisaManager, accountId),
-              auditData = Map(
-                ZREF -> lisaManager,
-                "accountId" -> accountId
-              )
-            )
+            getAccountAudit(lisaManager, accountId)
             lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.ACCOUNT)
             Ok(Json.toJson(response))
-
           case GetLisaAccountDoesNotExistResponse =>
-            auditService.audit(
-              auditType = "getAccountNotReported",
-              path = getEndpointUrl(lisaManager, accountId),
-              auditData = Map(
-                ZREF -> lisaManager,
-                "accountId" -> accountId,
-                "reasonNotReported" -> ErrorAccountNotFound.errorCode
-              )
-            )
+            getAccountAudit(lisaManager, accountId, Some(ErrorAccountNotFound.errorCode))
             lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.ACCOUNT)
             NotFound(Json.toJson(ErrorAccountNotFound))
-
           case GetLisaAccountServiceUnavailable =>
-            auditService.audit(
-              auditType = "getAccountNotReported",
-              path = getEndpointUrl(lisaManager, accountId),
-              auditData = Map(
-                ZREF -> lisaManager,
-                "accountId" -> accountId,
-                "reasonNotReported" -> ErrorServiceUnavailable.errorCode
-              )
-            )
+            getAccountAudit(lisaManager, accountId, Some(ErrorServiceUnavailable.errorCode))
             lisaMetrics.incrementMetrics(startTime, SERVICE_UNAVAILABLE, LisaMetricKeys.ACCOUNT)
             ServiceUnavailable(Json.toJson(ErrorServiceUnavailable))
-
           case _ =>
-            auditService.audit(
-              auditType = "getAccountNotReported",
-              path = getEndpointUrl(lisaManager, accountId),
-              auditData = Map(
-                ZREF -> lisaManager,
-                "accountId" -> accountId,
-                "reasonNotReported" -> ErrorInternalServerError.errorCode
-              )
-            )
+            getAccountAudit(lisaManager, accountId, Some(ErrorInternalServerError.errorCode))
             lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.ACCOUNT)
             InternalServerError(Json.toJson(ErrorInternalServerError))
         }
       }
     }
 
-  private def getEndpointUrl(lisaManagerReferenceNumber: String, accountId: String): String = {
+  private def getAccountAudit(lisaManager: String, accountId: String, failureReason: Option[String] = None)
+                                 (implicit hc: HeaderCarrier) = {
+    val path = getAccountEndpointUrl(lisaManager, accountId)
+    val auditData = Map(ZREF -> lisaManager, "accountId" -> accountId)
+
+    failureReason map { reason =>
+      auditService.audit(
+        auditType = "getAccountNotReported",
+        path = path,
+        auditData = auditData ++ Map("reasonNotReported" -> reason)
+      )
+    } getOrElse auditService.audit(
+      auditType = "getAccountReported",
+      path = path,
+      auditData = auditData
+    )
+  }
+
+  private def getAccountEndpointUrl(lisaManagerReferenceNumber: String, accountId: String): String = {
     s"/manager/$lisaManagerReferenceNumber/accounts/$accountId"
   }
 
