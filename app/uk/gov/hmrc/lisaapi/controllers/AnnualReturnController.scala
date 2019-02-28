@@ -23,7 +23,6 @@ import play.api.mvc.{Action, AnyContent, Result}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.config.AppContext
-import uk.gov.hmrc.lisaapi.{LisaConstants, models}
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, LifeEventService}
@@ -86,10 +85,10 @@ class AnnualReturnController @Inject()(
 
   private def audit(lisaManager: String, accountId: String, req: AnnualReturn, failureCode: Option[String] = None)
                    (implicit hc: HeaderCarrier) = {
-    val (auditType, auditData) = failureCode match {
-      case Some(code) => ("lifeEventNotRequested", req.toStringMap ++ Map("reasonNotRequested" -> code))
-      case _ => ("lifeEventRequested", req.toStringMap)
-    }
+    val (auditType, auditData) = failureCode map { code =>
+      ("lifeEventNotRequested", req.toStringMap ++ Map("reasonNotRequested" -> code))
+    } getOrElse ("lifeEventRequested", req.toStringMap)
+
     auditService.audit(
       auditType = auditType,
       path = s"/manager/$lisaManager/accounts/$accountId/events/annual-returns",

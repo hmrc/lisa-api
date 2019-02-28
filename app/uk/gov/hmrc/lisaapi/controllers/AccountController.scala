@@ -58,7 +58,7 @@ class AccountController @Inject()(
         case transferRequest: CreateLisaAccountTransferRequest => processAccountTransfer(lisaManager, transferRequest)
       },
         Some(
-          (errors) => {
+          errors => {
             Logger.info("The errors are " + errors.toString())
 
             val transferAccountDataNotProvided = errors.count {
@@ -81,9 +81,7 @@ class AccountController @Inject()(
       )
     }
 
-  private def hasAccountTransferData(js: JsObject): Boolean = {
-    js.keys.contains("transferAccount")
-  }
+  private def hasAccountTransferData(js: JsObject): Boolean = js.keys.contains("transferAccount")
 
   private def processAccountCreation(lisaManager: String, creationRequest: CreateLisaAccountCreationRequest)
                                     (implicit hc: HeaderCarrier, startTime: Long) = {
