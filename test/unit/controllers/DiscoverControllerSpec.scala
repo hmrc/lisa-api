@@ -16,8 +16,8 @@
 
 package unit.controllers
 
-import org.mockito.Matchers.{any, eq => matchersEquals}
-import org.mockito.Mockito.{reset, verify, when}
+import org.mockito.Matchers.any
+import org.mockito.Mockito.when
 import org.scalatest.BeforeAndAfter
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
@@ -28,7 +28,6 @@ import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.controllers.{DiscoverController, ErrorAcceptHeaderInvalid, ErrorBadRequestLmrn}
 import uk.gov.hmrc.lisaapi.metrics.LisaMetrics
-import uk.gov.hmrc.lisaapi.services.AuditService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -36,7 +35,6 @@ import scala.concurrent.Future
 class DiscoverControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite with BeforeAndAfter {
 
   before {
-    reset(mockAuditService)
     when(mockAuthConnector.authorise[Option[String]](any(),any())(any(), any())).thenReturn(Future.successful(Some("1234")))
   }
 
@@ -101,41 +99,13 @@ class DiscoverControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSu
 
     }
 
-    "audit endpointsDiscovered" when {
-      "in v1" in {
-        val lisaManager = "Z019283"
-        val res = SUT.discover(lisaManager).apply(FakeRequest(Helpers.GET, "/").withHeaders(v1))
-        await(res)
-        verify(mockAuditService).audit(
-          auditType = matchersEquals("endpointsDiscovered"),
-          path = matchersEquals(s"/manager/$lisaManager"),
-          auditData = matchersEquals(Map(
-            "lisaManagerReferenceNumber" -> lisaManager
-          ))
-        )(any())
-      }
-      "in v2" in {
-        val lisaManager = "Z019283"
-        val res = SUT.discover(lisaManager).apply(FakeRequest(Helpers.GET, "/").withHeaders(v2))
-        await(res)
-        verify(mockAuditService).audit(
-          auditType = matchersEquals("endpointsDiscovered"),
-          path = matchersEquals(s"/manager/$lisaManager"),
-          auditData = matchersEquals(Map(
-            "lisaManagerReferenceNumber" -> lisaManager
-          ))
-        )(any())
-      }
-    }
-
   }
 
   val mockAuthConnector: AuthConnector = mock[AuthConnector]
   val mockAppContext: AppContext = mock[AppContext]
-  val mockAuditService: AuditService = mock[AuditService]
   val mockLisaMetrics: LisaMetrics = mock[LisaMetrics]
 
-  val SUT = new DiscoverController(mockAuthConnector, mockAppContext, mockAuditService, mockLisaMetrics) {
+  val SUT = new DiscoverController(mockAuthConnector, mockAppContext, mockLisaMetrics) {
     override lazy val v2endpointsEnabled = true
   }
 }
