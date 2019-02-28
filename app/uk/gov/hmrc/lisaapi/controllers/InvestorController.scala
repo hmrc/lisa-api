@@ -82,7 +82,7 @@ class InvestorController @Inject()(
   private def error(lisaManager: String, createRequest: CreateLisaInvestorRequest, response: ErrorResponse)
                    (implicit hc: HeaderCarrier, startTime: Long) = {
     val additionalAuditData = response match {
-      case res: ErrorResponseWithId => Some(("investorID" -> res.id))
+      case res: ErrorResponseWithId => Some("investorID" -> res.id)
       case _ => None
     }
 

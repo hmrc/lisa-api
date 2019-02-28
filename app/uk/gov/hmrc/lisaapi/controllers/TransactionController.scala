@@ -42,7 +42,7 @@ class TransactionController @Inject() (
       implicit val startTime: Long = System.currentTimeMillis()
 
       withValidLMRN(lisaManager) { () =>
-        withEnrolment(lisaManager) { (_) =>
+        withEnrolment(lisaManager) { _ =>
           withValidAccountId(accountId) { () =>
             service.getTransaction(lisaManager, accountId, transactionId) flatMap {
               case success: GetTransactionSuccessResponse =>
