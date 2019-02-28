@@ -45,16 +45,14 @@ class GetLifeEventController @Inject()(
       withValidAccountId(accountId) { () =>
         withEnrolment(lisaManager) { (_) =>
           service.getLifeEvent(lisaManager, accountId, lifeEventId) map {
-            case Left(error) => {
+            case Left(error) =>
               getLifeEventAudit(lisaManager, accountId, lifeEventId, Some(error.errorCode))
               lisaMetrics.incrementMetrics(startTime, error.httpStatusCode, LisaMetricKeys.EVENT)
               error.asResult
-            }
-            case Right(success) => {
+            case Right(success) =>
               getLifeEventAudit(lisaManager, accountId, lifeEventId)
               lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.EVENT)
               Ok(Json.toJson(success))
-            }
           }
         }
       }

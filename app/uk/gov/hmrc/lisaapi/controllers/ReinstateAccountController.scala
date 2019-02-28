@@ -52,7 +52,7 @@ class ReinstateAccountController @Inject() (
                                      (implicit hc: HeaderCarrier, startTime: Long) = {
 
     service.reinstateAccountService(lisaManager, accountId).map {
-      case _: ReinstateLisaAccountSuccessResponse => {
+      case _: ReinstateLisaAccountSuccessResponse =>
         auditService.audit(
           auditType = "accountReinstated",
           path = getReinstateEndpointUrl(lisaManager, accountId),
@@ -61,7 +61,6 @@ class ReinstateAccountController @Inject() (
         lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.REINSTATE)
         val data = ApiResponseData(message = "This account has been reinstated", accountId = Some(accountId))
         Ok(Json.toJson(ApiResponse(data = Some(data), success = true, status = OK)))
-      }
       case ReinstateLisaAccountAlreadyClosedResponse =>
         val message = Some("You cannot reinstate this account because it was closed with a closure reason of transferred out")
         processReinstateFailure(lisaManager, accountId, ErrorAccountAlreadyClosed, message)
@@ -79,17 +78,15 @@ class ReinstateAccountController @Inject() (
       case ReinstateLisaAccountErrorResponse =>
         processReinstateFailure(lisaManager, accountId, ErrorInternalServerError)
     } recover {
-      case _:Exception  => {
+      case _:Exception  =>
         Logger.error(s"ReinstateAccountController: reinstateAccount: An error occurred returning internal server error")
         lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.REINSTATE)
         ErrorInternalServerError.asResult
-      }
     }
   }
 
-  private def getReinstateEndpointUrl(lisaManagerReferenceNumber: String, accountID: String): String = {
+  private def getReinstateEndpointUrl(lisaManagerReferenceNumber: String, accountID: String): String =
     s"/manager/$lisaManagerReferenceNumber/reinstate-account"
-  }
 
   private def processReinstateFailure(lisaManager: String, accountId: String, err: ErrorResponse, message: Option[String] = None)
                                      (implicit hc: HeaderCarrier, startTime: Long): Result = {
@@ -104,14 +101,7 @@ class ReinstateAccountController @Inject() (
     )
 
     lisaMetrics.incrementMetrics(startTime, err.httpStatusCode, LisaMetricKeys.REINSTATE)
-
-    val msg = message match {
-      case Some(text) => text
-      case None => err.message
-    }
-
-    val data = ApiResponseData(code = Some(err.errorCode), message = msg)
-
+    val data = ApiResponseData(code = Some(err.errorCode), message = message.getOrElse(err.message))
     Status(err.httpStatusCode).apply(Json.toJson(Some(data)))
   }
 

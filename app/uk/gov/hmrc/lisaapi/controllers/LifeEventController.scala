@@ -50,38 +50,31 @@ class LifeEventController @Inject()(
               Logger.debug("Entering LifeEvent Controller and the response is " + res.toString)
 
               res match {
-                case ReportLifeEventSuccessResponse(lifeEventId) => {
+                case ReportLifeEventSuccessResponse(lifeEventId) =>
                   Logger.debug("Matched Valid Response ")
                   doAudit(lisaManager, accountId, req, true)
                   lisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.EVENT)
                   val data = ApiResponseData(message = "Life event created", lifeEventId = Some(lifeEventId))
                   Future.successful(Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED))))
-                }
-                case res: ReportLifeEventResponse => {
+                case res: ReportLifeEventResponse =>
                   withApiVersion {
-                    case Some(VERSION_1) => {
+                    case Some(VERSION_1) =>
                       val errorResponse = v1errors.applyOrElse(res, { _: ReportLifeEventResponse =>
                         Logger.debug(s"Matched an unexpected response: $res, returning a 500 error")
                         ErrorInternalServerError
                       })
-
                       Future.successful(error(errorResponse, lisaManager, accountId, req))
-                    }
-                    case Some(VERSION_2) => {
+                    case Some(VERSION_2) =>
                       val errorResponse = v2errors.applyOrElse(res, { _: ReportLifeEventResponse =>
                         Logger.debug(s"Matched an unexpected response: $res, returning a 500 error")
                         ErrorInternalServerError
                       })
-
                       Future.successful(error(errorResponse, lisaManager, accountId, req))
-                    }
                   }
-                }
               }
             }
           }
-        },
-        lisaManager = lisaManager
+        }, lisaManager = lisaManager
       )
     }
 
@@ -114,7 +107,7 @@ class LifeEventController @Inject()(
                      (implicit hc: HeaderCarrier) = {
     auditService.audit(
       auditType = if (success) "lifeEventReported" else "lifeEventNotReported",
-      path = endpointUrl(lisaManager, accountId),
+      path = reportLifeEventEndpointUrl(lisaManager, accountId),
       auditData = req.toStringMap ++ Map(
         "lisaManagerReferenceNumber" -> lisaManager,
         "accountID" -> accountId
@@ -134,14 +127,12 @@ class LifeEventController @Inject()(
       Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
         ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("eventDate"), Some("/eventDate"))
       )))))
-    }
-    else {
+    } else {
       success()
     }
   }
 
-  private def endpointUrl(lisaManager: String, accountId: String): String = {
+  private def reportLifeEventEndpointUrl(lisaManager: String, accountId: String): String =
     s"/manager/$lisaManager/accounts/$accountId/events"
-  }
 
 }

@@ -95,8 +95,7 @@ class UpdateSubscriptionController @Inject() (
       Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
         ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("firstSubscriptionDate"), Some("/firstSubscriptionDate"))
       )))))
-    }
-    else {
+    } else {
       success()
     }
   }
