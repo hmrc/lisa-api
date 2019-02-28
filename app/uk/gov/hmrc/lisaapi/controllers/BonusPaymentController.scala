@@ -98,7 +98,7 @@ class BonusPaymentController @Inject()(
             if (response.bonuses.claimReason == "Superseded Bonus") {
               auditService.audit(
                 auditType = "getBonusPaymentNotReported",
-                path = getEndpointUrl(lisaManager, accountId, transactionId),
+                path = getBonusPaymentEndpointUrl(lisaManager, accountId, transactionId),
                 auditData = Map(
                   ZREF -> lisaManager,
                   "accountId" -> accountId,
@@ -112,7 +112,7 @@ class BonusPaymentController @Inject()(
             else {
               auditService.audit(
                 auditType = "getBonusPaymentReported",
-                path = getEndpointUrl(lisaManager, accountId, transactionId),
+                path = getBonusPaymentEndpointUrl(lisaManager, accountId, transactionId),
                 auditData = Map(
                   ZREF -> lisaManager,
                   "accountId" -> accountId,
@@ -125,7 +125,7 @@ class BonusPaymentController @Inject()(
           case Some(VERSION_2) => {
             auditService.audit(
               auditType = "getBonusPaymentReported",
-              path = getEndpointUrl(lisaManager, accountId, transactionId),
+              path = getBonusPaymentEndpointUrl(lisaManager, accountId, transactionId),
               auditData = Map(
                 ZREF -> lisaManager,
                 "accountId" -> accountId,
@@ -139,7 +139,7 @@ class BonusPaymentController @Inject()(
       case _: GetWithdrawalResponse | GetBonusOrWithdrawalTransactionNotFoundResponse =>
         auditService.audit(
           auditType = "getBonusPaymentNotReported",
-          path = getEndpointUrl(lisaManager, accountId, transactionId),
+          path = getBonusPaymentEndpointUrl(lisaManager, accountId, transactionId),
           auditData = Map(
             ZREF -> lisaManager,
             "accountId" -> accountId,
@@ -153,7 +153,7 @@ class BonusPaymentController @Inject()(
       case GetBonusOrWithdrawalInvestorNotFoundResponse =>
         auditService.audit(
           auditType = "getBonusPaymentNotReported",
-          path = getEndpointUrl(lisaManager, accountId, transactionId),
+          path = getBonusPaymentEndpointUrl(lisaManager, accountId, transactionId),
           auditData = Map(
             ZREF -> lisaManager,
             "accountId" -> accountId,
@@ -167,7 +167,7 @@ class BonusPaymentController @Inject()(
       case GetBonusOrWithdrawalServiceUnavailableResponse =>
         auditService.audit(
           auditType = "getBonusPaymentNotReported",
-          path = getEndpointUrl(lisaManager, accountId, transactionId),
+          path = getBonusPaymentEndpointUrl(lisaManager, accountId, transactionId),
           auditData = Map(
             ZREF -> lisaManager,
             "accountId" -> accountId,
@@ -181,7 +181,7 @@ class BonusPaymentController @Inject()(
       case _ =>
         auditService.audit(
           auditType = "getBonusPaymentNotReported",
-          path = getEndpointUrl(lisaManager, accountId, transactionId),
+          path = getBonusPaymentEndpointUrl(lisaManager, accountId, transactionId),
           auditData = Map(
             ZREF -> lisaManager,
             "accountId" -> accountId,
@@ -296,7 +296,7 @@ class BonusPaymentController @Inject()(
 
         auditService.audit(
           auditType = "bonusPaymentRequested",
-          path = endpointUrl(lisaManager, accountId),
+          path = requestBonusPaymentEndpointUrl(lisaManager, accountId),
           auditData = createAuditData(lisaManager, accountId, req) + (NOTIFICATION -> "no")
         )
 
@@ -306,7 +306,7 @@ class BonusPaymentController @Inject()(
 
         auditService.audit(
           auditType = "bonusPaymentRequested",
-          path = endpointUrl(lisaManager, accountId),
+          path = requestBonusPaymentEndpointUrl(lisaManager, accountId),
           auditData = createAuditData(lisaManager, accountId, req) + (NOTIFICATION -> "yes")
         )
 
@@ -316,7 +316,7 @@ class BonusPaymentController @Inject()(
 
         auditService.audit(
           auditType = "bonusPaymentRequested",
-          path = endpointUrl(lisaManager, accountId),
+          path = requestBonusPaymentEndpointUrl(lisaManager, accountId),
           auditData = createAuditData(lisaManager, accountId, req)
         )
 
@@ -379,7 +379,7 @@ class BonusPaymentController @Inject()(
                           (implicit hc: HeaderCarrier) = {
     auditService.audit(
       auditType = "bonusPaymentNotRequested",
-      path = endpointUrl(lisaManager, accountId),
+      path = requestBonusPaymentEndpointUrl(lisaManager, accountId),
       auditData = createAuditData(lisaManager, accountId, req) ++ Map("reasonNotRequested" -> failureReason)
     )
   }
@@ -393,11 +393,9 @@ class BonusPaymentController @Inject()(
     }
   }
 
-  private def endpointUrl(lisaManager: String, accountId: String): String = {
+  private def requestBonusPaymentEndpointUrl(lisaManager: String, accountId: String): String =
     s"/manager/$lisaManager/accounts/$accountId/transactions"
-  }
 
-  private def getEndpointUrl(lisaManager: String, accountId: String, transactionId: String): String = {
+  private def getBonusPaymentEndpointUrl(lisaManager: String, accountId: String, transactionId: String): String =
     s"/manager/$lisaManager/accounts/$accountId/transactions/$transactionId"
-  }
 }

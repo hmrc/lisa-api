@@ -262,8 +262,7 @@ class AccountController @Inject()(
     Status(status).apply(Json.toJson(e))
   }
 
-  private def getCreateOrTransferEndpointUrl(lisaManagerReferenceNumber: String): String = {
+  private def getCreateOrTransferEndpointUrl(lisaManagerReferenceNumber: String): String =
     s"/manager/$lisaManagerReferenceNumber/accounts"
-  }
 
 }
