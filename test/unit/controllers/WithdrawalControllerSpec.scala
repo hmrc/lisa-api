@@ -323,6 +323,439 @@ class WithdrawalControllerSpec extends PlaySpec
 
     }
 
+    "audit withdrawalChargeRequested" when {
+      "given a ReportWithdrawalChargeOnTimeResponse from the service layer" in {
+        when(mockPostService.reportWithdrawalCharge(any(), any(), any())(any())).
+          thenReturn(Future.successful(ReportWithdrawalChargeOnTimeResponse("1928374")))
+
+        doRequest(validWithdrawalJson) { res =>
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = MatcherEquals("withdrawalChargeRequested"),
+            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/withdrawal-charges"),
+            auditData = MatcherEquals(Map(
+              "originalTransactionId" -> "2345678901",
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountId" -> accountId,
+              "transactionResult" -> "250.00",
+              "claimPeriodStartDate" -> "2017-12-06",
+              "claimPeriodEndDate" -> "2018-01-05",
+              "withdrawalAmount" -> "2000.00",
+              "originalWithdrawalChargeAmount" -> "250.00",
+              "withdrawalChargeAmount" -> "500.00",
+              "withdrawalChargeAmountYTD" -> "750.00",
+              "fundsDeductedDuringWithdrawal" -> "true",
+              "automaticRecoveryAmount" -> "250.00",
+              "lateNotification" -> "no"
+            ))
+          )(any())
+        }
+      }
+      "given a ReportWithdrawalChargeLateResponse from the service layer" in {
+        when(mockPostService.reportWithdrawalCharge(any(), any(), any())(any())).
+          thenReturn(Future.successful(ReportWithdrawalChargeLateResponse("1928374")))
+
+        doRequest(validWithdrawalJson) { res =>
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = MatcherEquals("withdrawalChargeRequested"),
+            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/withdrawal-charges"),
+            auditData = MatcherEquals(Map(
+              "originalTransactionId" -> "2345678901",
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountId" -> accountId,
+              "transactionResult" -> "250.00",
+              "claimPeriodStartDate" -> "2017-12-06",
+              "claimPeriodEndDate" -> "2018-01-05",
+              "withdrawalAmount" -> "2000.00",
+              "originalWithdrawalChargeAmount" -> "250.00",
+              "withdrawalChargeAmount" -> "500.00",
+              "withdrawalChargeAmountYTD" -> "750.00",
+              "fundsDeductedDuringWithdrawal" -> "true",
+              "automaticRecoveryAmount" -> "250.00",
+              "lateNotification" -> "yes"
+            ))
+          )(any())
+        }
+      }
+      "given a ReportWithdrawalChargeSupersededResponse from the service layer" in {
+        when(mockPostService.reportWithdrawalCharge(any(), any(), any())(any())).
+          thenReturn(Future.successful(ReportWithdrawalChargeSupersededResponse("1928374")))
+
+        doRequest(validWithdrawalJson) { res =>
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = MatcherEquals("withdrawalChargeRequested"),
+            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/withdrawal-charges"),
+            auditData = MatcherEquals(Map(
+              "originalTransactionId" -> "2345678901",
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountId" -> accountId,
+              "transactionResult" -> "250.00",
+              "claimPeriodStartDate" -> "2017-12-06",
+              "claimPeriodEndDate" -> "2018-01-05",
+              "withdrawalAmount" -> "2000.00",
+              "originalWithdrawalChargeAmount" -> "250.00",
+              "withdrawalChargeAmount" -> "500.00",
+              "withdrawalChargeAmountYTD" -> "750.00",
+              "fundsDeductedDuringWithdrawal" -> "true",
+              "automaticRecoveryAmount" -> "250.00"
+            ))
+          )(any())
+        }
+      }
+    }
+
+    "audit withdrawalChargeNotRequested" when {
+      "given a ReportWithdrawalChargeAccountClosed from the service layer" in {
+        when(mockPostService.reportWithdrawalCharge(any(), any(), any())(any())).
+          thenReturn(Future.successful(ReportWithdrawalChargeAccountCancelled))
+
+        doRequest(validWithdrawalJson) { res =>
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = MatcherEquals("withdrawalChargeNotRequested"),
+            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/withdrawal-charges"),
+            auditData = MatcherEquals(Map(
+              "originalTransactionId" -> "2345678901",
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountId" -> accountId,
+              "transactionResult" -> "250.00",
+              "claimPeriodStartDate" -> "2017-12-06",
+              "claimPeriodEndDate" -> "2018-01-05",
+              "withdrawalAmount" -> "2000.00",
+              "originalWithdrawalChargeAmount" -> "250.00",
+              "withdrawalChargeAmount" -> "500.00",
+              "withdrawalChargeAmountYTD" -> "750.00",
+              "fundsDeductedDuringWithdrawal" -> "true",
+              "automaticRecoveryAmount" -> "250.00",
+              "reasonNotRequested" -> ErrorAccountAlreadyCancelled.errorCode
+            ))
+          )(any())
+        }
+      }
+      "given a ReportWithdrawalChargeAccountVoid from the service layer" in {
+        when(mockPostService.reportWithdrawalCharge(any(), any(), any())(any())).
+          thenReturn(Future.successful(ReportWithdrawalChargeAccountVoid))
+
+        doRequest(validWithdrawalJson) { res =>
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = MatcherEquals("withdrawalChargeNotRequested"),
+            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/withdrawal-charges"),
+            auditData = MatcherEquals(Map(
+              "originalTransactionId" -> "2345678901",
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountId" -> accountId,
+              "transactionResult" -> "250.00",
+              "claimPeriodStartDate" -> "2017-12-06",
+              "claimPeriodEndDate" -> "2018-01-05",
+              "withdrawalAmount" -> "2000.00",
+              "originalWithdrawalChargeAmount" -> "250.00",
+              "withdrawalChargeAmount" -> "500.00",
+              "withdrawalChargeAmountYTD" -> "750.00",
+              "fundsDeductedDuringWithdrawal" -> "true",
+              "automaticRecoveryAmount" -> "250.00",
+              "reasonNotRequested" -> ErrorAccountAlreadyVoided.errorCode
+            ))
+          )(any())
+        }
+      }
+      "given a ReportWithdrawalChargeAccountCancelled from the service layer" in {
+        when(mockPostService.reportWithdrawalCharge(any(), any(), any())(any())).
+          thenReturn(Future.successful(ReportWithdrawalChargeAccountCancelled))
+
+        doRequest(validWithdrawalJson) { res =>
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = MatcherEquals("withdrawalChargeNotRequested"),
+            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/withdrawal-charges"),
+            auditData = MatcherEquals(Map(
+              "originalTransactionId" -> "2345678901",
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountId" -> accountId,
+              "transactionResult" -> "250.00",
+              "claimPeriodStartDate" -> "2017-12-06",
+              "claimPeriodEndDate" -> "2018-01-05",
+              "withdrawalAmount" -> "2000.00",
+              "originalWithdrawalChargeAmount" -> "250.00",
+              "withdrawalChargeAmount" -> "500.00",
+              "withdrawalChargeAmountYTD" -> "750.00",
+              "fundsDeductedDuringWithdrawal" -> "true",
+              "automaticRecoveryAmount" -> "250.00",
+              "reasonNotRequested" -> ErrorAccountAlreadyCancelled.errorCode
+            ))
+          )(any())
+        }
+      }
+      "given a ReportWithdrawalChargeReportingError from the service layer" in {
+        when(mockPostService.reportWithdrawalCharge(any(), any(), any())(any())).
+          thenReturn(Future.successful(ReportWithdrawalChargeReportingError))
+
+        doRequest(validWithdrawalJson) { res =>
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = MatcherEquals("withdrawalChargeNotRequested"),
+            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/withdrawal-charges"),
+            auditData = MatcherEquals(Map(
+              "originalTransactionId" -> "2345678901",
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountId" -> accountId,
+              "transactionResult" -> "250.00",
+              "claimPeriodStartDate" -> "2017-12-06",
+              "claimPeriodEndDate" -> "2018-01-05",
+              "withdrawalAmount" -> "2000.00",
+              "originalWithdrawalChargeAmount" -> "250.00",
+              "withdrawalChargeAmount" -> "500.00",
+              "withdrawalChargeAmountYTD" -> "750.00",
+              "fundsDeductedDuringWithdrawal" -> "true",
+              "automaticRecoveryAmount" -> "250.00",
+              "reasonNotRequested" -> "WITHDRAWAL_REPORTING_ERROR"
+            ))
+          )(any())
+        }
+      }
+      "given a ReportWithdrawalChargeAlreadySuperseded from the service layer" in {
+        when(mockPostService.reportWithdrawalCharge(any(), any(), any())(any())).
+          thenReturn(Future.successful(ReportWithdrawalChargeAlreadySuperseded(transactionId)))
+
+        doRequest(validWithdrawalJson) { res =>
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = MatcherEquals("withdrawalChargeNotRequested"),
+            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/withdrawal-charges"),
+            auditData = MatcherEquals(Map(
+              "originalTransactionId" -> "2345678901",
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountId" -> accountId,
+              "transactionResult" -> "250.00",
+              "claimPeriodStartDate" -> "2017-12-06",
+              "claimPeriodEndDate" -> "2018-01-05",
+              "withdrawalAmount" -> "2000.00",
+              "originalWithdrawalChargeAmount" -> "250.00",
+              "withdrawalChargeAmount" -> "500.00",
+              "withdrawalChargeAmountYTD" -> "750.00",
+              "fundsDeductedDuringWithdrawal" -> "true",
+              "automaticRecoveryAmount" -> "250.00",
+              "reasonNotRequested" -> "WITHDRAWAL_CHARGE_ALREADY_SUPERSEDED"
+            ))
+          )(any())
+        }
+      }
+      "given a ReportWithdrawalChargeSupersedeAmountMismatch from the service layer" in {
+        when(mockPostService.reportWithdrawalCharge(any(), any(), any())(any())).
+          thenReturn(Future.successful(ReportWithdrawalChargeSupersedeAmountMismatch))
+
+        doRequest(validWithdrawalJson) { res =>
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = MatcherEquals("withdrawalChargeNotRequested"),
+            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/withdrawal-charges"),
+            auditData = MatcherEquals(Map(
+              "originalTransactionId" -> "2345678901",
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountId" -> accountId,
+              "transactionResult" -> "250.00",
+              "claimPeriodStartDate" -> "2017-12-06",
+              "claimPeriodEndDate" -> "2018-01-05",
+              "withdrawalAmount" -> "2000.00",
+              "originalWithdrawalChargeAmount" -> "250.00",
+              "withdrawalChargeAmount" -> "500.00",
+              "withdrawalChargeAmountYTD" -> "750.00",
+              "fundsDeductedDuringWithdrawal" -> "true",
+              "automaticRecoveryAmount" -> "250.00",
+              "reasonNotRequested" -> "SUPERSEDED_WITHDRAWAL_CHARGE_ID_AMOUNT_MISMATCH"
+            ))
+          )(any())
+        }
+      }
+      "given a ReportWithdrawalChargeSupersedeOutcomeError from the service layer" in {
+        when(mockPostService.reportWithdrawalCharge(any(), any(), any())(any())).
+          thenReturn(Future.successful(ReportWithdrawalChargeSupersedeOutcomeError))
+
+        doRequest(validWithdrawalJson) { res =>
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = MatcherEquals("withdrawalChargeNotRequested"),
+            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/withdrawal-charges"),
+            auditData = MatcherEquals(Map(
+              "originalTransactionId" -> "2345678901",
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountId" -> accountId,
+              "transactionResult" -> "250.00",
+              "claimPeriodStartDate" -> "2017-12-06",
+              "claimPeriodEndDate" -> "2018-01-05",
+              "withdrawalAmount" -> "2000.00",
+              "originalWithdrawalChargeAmount" -> "250.00",
+              "withdrawalChargeAmount" -> "500.00",
+              "withdrawalChargeAmountYTD" -> "750.00",
+              "fundsDeductedDuringWithdrawal" -> "true",
+              "automaticRecoveryAmount" -> "250.00",
+              "reasonNotRequested" -> "SUPERSEDED_WITHDRAWAL_CHARGE_OUTCOME_ERROR"
+            ))
+          )(any())
+        }
+      }
+      "the claimPeriodEndDate is more than 6 years and 14 days in the past" in {
+        val now = new DateTime("2050-01-20")
+
+        when(mockDateTimeService.now()).thenReturn(now)
+
+        val testEndDate = now.minusYears(6).withDayOfMonth(5)
+        val testStartDate = testEndDate.minusMonths(1).plusDays(1)
+
+        val validWithdrawalCharge = Json.parse(validWithdrawalJson).as[SupersededWithdrawalChargeRequest]
+        val request = validWithdrawalCharge.copy(claimPeriodStartDate = testStartDate, claimPeriodEndDate = testEndDate)
+        val requestJson = Json.toJson(request).toString()
+
+        doRequest(requestJson) { res =>
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = MatcherEquals("withdrawalChargeNotRequested"),
+            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/withdrawal-charges"),
+            auditData = MatcherEquals(Map(
+              "originalTransactionId" -> "2345678901",
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountId" -> accountId,
+              "transactionResult" -> "250",
+              "claimPeriodStartDate" -> "2043-12-06",
+              "claimPeriodEndDate" -> "2044-01-05",
+              "withdrawalAmount" -> "2000",
+              "originalWithdrawalChargeAmount" -> "250",
+              "withdrawalChargeAmount" -> "500",
+              "withdrawalChargeAmountYTD" -> "750",
+              "fundsDeductedDuringWithdrawal" -> "true",
+              "automaticRecoveryAmount" -> "250",
+              "reasonNotRequested" -> ErrorWithdrawalTimescalesExceeded.errorCode
+            ))
+          )(any())
+        }
+      }
+      "the json request fails business validation" in {
+        val errors = List(
+          ErrorValidation(
+            DATE_ERROR,
+            "The claimPeriodStartDate must be the 6th day of the month",
+            Some("/claimPeriodStartDate")
+          ),
+          ErrorValidation(
+            DATE_ERROR,
+            "The claimPeriodEndDate must be the 5th day of the month which occurs after the claimPeriodStartDate",
+            Some("/claimPeriodEndDate")
+          )
+        )
+
+        when(mockValidator.validate(any())).thenReturn(errors)
+
+        val validWithdrawalCharge = Json.parse(validWithdrawalJson).as[SupersededWithdrawalChargeRequest]
+        val requestJson = Json.toJson(validWithdrawalCharge).toString()
+
+        doRequest(requestJson) { res =>
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = MatcherEquals("withdrawalChargeNotRequested"),
+            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/withdrawal-charges"),
+            auditData = MatcherEquals(Map(
+              "originalTransactionId" -> "2345678901",
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountId" -> accountId,
+              "transactionResult" -> "250",
+              "claimPeriodStartDate" -> "2017-12-06",
+              "claimPeriodEndDate" -> "2018-01-05",
+              "withdrawalAmount" -> "2000",
+              "originalWithdrawalChargeAmount" -> "250",
+              "withdrawalChargeAmount" -> "500",
+              "withdrawalChargeAmountYTD" -> "750",
+              "fundsDeductedDuringWithdrawal" -> "true",
+              "automaticRecoveryAmount" -> "250",
+              "reasonNotRequested" -> "FORBIDDEN"
+            ))
+          )(any())
+        }
+      }
+      "given a ReportWithdrawalChargeAccountNotFound from the service layer" in {
+        when(mockPostService.reportWithdrawalCharge(any(), any(), any())(any())).
+          thenReturn(Future.successful(ReportWithdrawalChargeAccountNotFound))
+
+        doRequest(validWithdrawalJson) { res =>
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = MatcherEquals("withdrawalChargeNotRequested"),
+            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/withdrawal-charges"),
+            auditData = MatcherEquals(Map(
+              "originalTransactionId" -> "2345678901",
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountId" -> accountId,
+              "transactionResult" -> "250.00",
+              "claimPeriodStartDate" -> "2017-12-06",
+              "claimPeriodEndDate" -> "2018-01-05",
+              "withdrawalAmount" -> "2000.00",
+              "originalWithdrawalChargeAmount" -> "250.00",
+              "withdrawalChargeAmount" -> "500.00",
+              "withdrawalChargeAmountYTD" -> "750.00",
+              "fundsDeductedDuringWithdrawal" -> "true",
+              "automaticRecoveryAmount" -> "250.00",
+              "reasonNotRequested" -> ErrorAccountNotFound.errorCode
+            ))
+          )(any())
+        }
+      }
+      "given a ReportWithdrawalChargeAlreadyExists from the service layer" in {
+        when(mockPostService.reportWithdrawalCharge(any(), any(), any())(any())).
+          thenReturn(Future.successful(ReportWithdrawalChargeAlreadyExists(transactionId)))
+
+        doRequest(validWithdrawalJson) { res =>
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = MatcherEquals("withdrawalChargeNotRequested"),
+            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/withdrawal-charges"),
+            auditData = MatcherEquals(Map(
+              "originalTransactionId" -> "2345678901",
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountId" -> accountId,
+              "transactionResult" -> "250.00",
+              "claimPeriodStartDate" -> "2017-12-06",
+              "claimPeriodEndDate" -> "2018-01-05",
+              "withdrawalAmount" -> "2000.00",
+              "originalWithdrawalChargeAmount" -> "250.00",
+              "withdrawalChargeAmount" -> "500.00",
+              "withdrawalChargeAmountYTD" -> "750.00",
+              "fundsDeductedDuringWithdrawal" -> "true",
+              "automaticRecoveryAmount" -> "250.00",
+              "reasonNotRequested" -> "WITHDRAWAL_CHARGE_ALREADY_EXISTS"
+            ))
+          )(any())
+        }
+      }
+      "given a RequestWithdrawalChargeError from the service layer" in {
+        when(mockPostService.reportWithdrawalCharge(any(), any(), any())(any())).
+          thenReturn(Future.successful(ReportWithdrawalChargeError))
+
+        doRequest(validWithdrawalJson) { res =>
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = MatcherEquals("withdrawalChargeNotRequested"),
+            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/withdrawal-charges"),
+            auditData = MatcherEquals(Map(
+              "originalTransactionId" -> "2345678901",
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountId" -> accountId,
+              "transactionResult" -> "250.00",
+              "claimPeriodStartDate" -> "2017-12-06",
+              "claimPeriodEndDate" -> "2018-01-05",
+              "withdrawalAmount" -> "2000.00",
+              "originalWithdrawalChargeAmount" -> "250.00",
+              "withdrawalChargeAmount" -> "500.00",
+              "withdrawalChargeAmountYTD" -> "750.00",
+              "fundsDeductedDuringWithdrawal" -> "true",
+              "automaticRecoveryAmount" -> "250.00",
+              "reasonNotRequested" -> "INTERNAL_SERVER_ERROR"
+            ))
+          )(any())
+        }
+      }
+    }
+
   }
 
   "the GET withdrawal charge endpoint" must {
