@@ -49,7 +49,7 @@ class CloseAccountController @Inject()(
               case CloseLisaAccountSuccessResponse(`accountId`) =>
                 auditService.audit(
                   auditType = "accountClosed",
-                  path = getCloseEndpointUrl(lisaManager, accountId),
+                  path = closeEndpointUrl(lisaManager, accountId),
                   auditData = requestData.toStringMap ++ Map(
                     ZREF -> lisaManager,
                     "accountId" -> accountId
@@ -83,7 +83,7 @@ class CloseAccountController @Inject()(
     if (req.closureDate.isBefore(LISA_START_DATE)) {
       auditService.audit(
         auditType = "accountNotClosed",
-        path = getCloseEndpointUrl(lisaManager, accountId),
+        path = closeEndpointUrl(lisaManager, accountId),
         auditData = req.toStringMap ++ Map(ZREF -> lisaManager,
           "accountId" -> accountId,
           "reasonNotClosed" -> "FORBIDDEN")
@@ -106,7 +106,7 @@ class CloseAccountController @Inject()(
 
     auditService.audit(
       auditType = "accountNotClosed",
-      path = getCloseEndpointUrl(lisaManager, accountId),
+      path = closeEndpointUrl(lisaManager, accountId),
       auditData = request.toStringMap ++ Map(
         ZREF -> lisaManager,
         "accountId" -> accountId,
@@ -128,7 +128,7 @@ class CloseAccountController @Inject()(
     CloseLisaAccountServiceUnavailable -> ErrorServiceUnavailable
   )
 
-  private def getCloseEndpointUrl(lisaManagerReferenceNumber: String, accountID: String): String = {
+  private def closeEndpointUrl(lisaManagerReferenceNumber: String, accountID: String): String = {
     s"/manager/$lisaManagerReferenceNumber/accounts/$accountID/close-account"
   }
 

@@ -124,59 +124,29 @@ class BulkPaymentController @Inject()(
   private def withDatesWithinBusinessRules(startDate: DateTime, endDate: DateTime, lisaManager: String)
                                           (success: () => Future[Result])
                                           (implicit hc: HeaderCarrier, startTime: Long): Future[Result] = {
-
-    // end date is in the future
     if (endDate.isAfter(currentDateService.now())) {
-      auditService.audit(
-        auditType = "getBulkPaymentNotReported",
-        path = getBulkPaymentEndpointUrl(lisaManager),
-        auditData = Map(
-          "lisaManagerReferenceNumber" -> lisaManager,
-          "reasonNotReported" -> ErrorBadRequestEndInFuture.errorCode
-        ))
+      // end date is in the future
+      getBulkPaymentAudit(lisaManager, Some(ErrorBadRequestEndInFuture.errorCode))
       lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.TRANSACTION)
       Future.successful(Forbidden(Json.toJson(ErrorBadRequestEndInFuture)))
-    }
-
-    // end date is before start date
-    else if (endDate.isBefore(startDate)) {
-      auditService.audit(
-        auditType = "getBulkPaymentNotReported",
-        path = getBulkPaymentEndpointUrl(lisaManager),
-        auditData = Map(
-          "lisaManagerReferenceNumber" -> lisaManager,
-          "reasonNotReported" -> ErrorBadRequestEndBeforeStart.errorCode
-        ))
-      getBulkPaymentAudit(lisaManager, Some(ErrorBadRequestOverYearBetweenStartAndEnd.errorCode))
+    } else if (endDate.isBefore(startDate)) {
+      // end date is before start date
+      getBulkPaymentAudit(lisaManager, Some(ErrorBadRequestEndBeforeStart.errorCode))
       lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.TRANSACTION)
       Future.successful(Forbidden(Json.toJson(ErrorBadRequestEndBeforeStart)))
-    }
-
-    // start date is before 6 april 2017
-    else if (startDate.isBefore(LISA_START_DATE)) {
-      auditService.audit(
-        auditType = "getBulkPaymentNotReported",
-        path = getBulkPaymentEndpointUrl(lisaManager),
-        auditData = Map(
-          "lisaManagerReferenceNumber" -> lisaManager,
-          "reasonNotReported" -> ErrorBadRequestStartBefore6April2017.errorCode
-        ))
-      getBulkPaymentAudit(lisaManager, Some(ErrorBadRequestOverYearBetweenStartAndEnd.errorCode))
+    } else if (startDate.isBefore(LISA_START_DATE)) {
+      // start date is before 6 april 2017
+      getBulkPaymentAudit(lisaManager, Some(ErrorBadRequestStartBefore6April2017.errorCode))
       lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.TRANSACTION)
       Future.successful(Forbidden(Json.toJson(ErrorBadRequestStartBefore6April2017)))
-    }
-
-    // there's more than a year between start date and end date
-    else if (endDate.isAfter(startDate.plusYears(1))) {
+    } else if (endDate.isAfter(startDate.plusYears(1))) {
+      // there's more than a year between start date and end date
       getBulkPaymentAudit(lisaManager, Some(ErrorBadRequestOverYearBetweenStartAndEnd.errorCode))
       lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.TRANSACTION)
       Future.successful(Forbidden(Json.toJson(ErrorBadRequestOverYearBetweenStartAndEnd)))
-    }
-
-    else {
+    } else {
       success()
     }
-
   }
 
   private def getBulkPaymentAudit(lisaManager: String, failureReason: Option[String] = None)
