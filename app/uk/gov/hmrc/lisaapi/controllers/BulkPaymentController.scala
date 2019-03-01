@@ -124,29 +124,27 @@ class BulkPaymentController @Inject()(
   private def withDatesWithinBusinessRules(startDate: DateTime, endDate: DateTime, lisaManager: String)
                                           (success: () => Future[Result])
                                           (implicit hc: HeaderCarrier, startTime: Long): Future[Result] = {
-    if (endDate.isAfter(currentDateService.now())) {
-      // end date is in the future
-      getBulkPaymentAudit(lisaManager, Some(ErrorBadRequestEndInFuture.errorCode))
-      lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.TRANSACTION)
-      Future.successful(Forbidden(Json.toJson(ErrorBadRequestEndInFuture)))
-    } else if (endDate.isBefore(startDate)) {
-      // end date is before start date
-      getBulkPaymentAudit(lisaManager, Some(ErrorBadRequestEndBeforeStart.errorCode))
-      lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.TRANSACTION)
-      Future.successful(Forbidden(Json.toJson(ErrorBadRequestEndBeforeStart)))
-    } else if (startDate.isBefore(LISA_START_DATE)) {
-      // start date is before 6 april 2017
-      getBulkPaymentAudit(lisaManager, Some(ErrorBadRequestStartBefore6April2017.errorCode))
-      lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.TRANSACTION)
-      Future.successful(Forbidden(Json.toJson(ErrorBadRequestStartBefore6April2017)))
-    } else if (endDate.isAfter(startDate.plusYears(1))) {
-      // there's more than a year between start date and end date
-      getBulkPaymentAudit(lisaManager, Some(ErrorBadRequestOverYearBetweenStartAndEnd.errorCode))
-      lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.TRANSACTION)
-      Future.successful(Forbidden(Json.toJson(ErrorBadRequestOverYearBetweenStartAndEnd)))
+    val endInFutureError = endDate.isAfter(currentDateService.now())
+    val endBeforeStartError = endDate.isBefore(startDate)
+    val startBefore6April2017Error = startDate.isBefore(LISA_START_DATE)
+    val overYearBetweenStartAndEndError = endDate.isAfter(startDate.plusYears(1))
+
+    val errorResponse: Option[ErrorResponse] = if (endInFutureError) {
+      Some(ErrorBadRequestEndInFuture)
+    } else if (endBeforeStartError) {
+      Some(ErrorBadRequestEndBeforeStart)
+    } else if (startBefore6April2017Error) {
+      Some(ErrorBadRequestStartBefore6April2017)
+    } else if (overYearBetweenStartAndEndError) {
+      Some(ErrorBadRequestOverYearBetweenStartAndEnd)
     } else {
-      success()
+      None
     }
+    errorResponse map { error =>
+      getBulkPaymentAudit(lisaManager, Some(error.errorCode))
+      lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.TRANSACTION)
+      Future.successful(Forbidden(Json.toJson(error)))
+    } getOrElse success()
   }
 
   private def getBulkPaymentAudit(lisaManager: String, failureReason: Option[String] = None)
