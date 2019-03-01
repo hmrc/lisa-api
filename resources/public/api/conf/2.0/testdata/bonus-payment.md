@@ -893,7 +893,7 @@
         </tr>
         <tr>
             <td>
-              <p>A bonus claim for an account with no subscriptions in the given tax year</p>
+              <p>This account is not eligible for a bonus payment because the investor already has another LISA account</p>
               <p class="code--block">
                 <strong>lisaManagerReferenceNumber:</strong><br>
                 <a href="#testing">Use your test user profile</a><br>
@@ -933,7 +933,7 @@
 <pre class ="code--block">
 {
   "code": "ACCOUNT_ERROR_NO_SUBSCRIPTIONS_THIS_TAX_YEAR",
-  "message": "A bonus payment is not possible because the account has no subscriptions for that tax year"
+  "message": "This account is not eligible for a bonus payment because the investor already has another LISA account"
 }
 </pre>
             </td>

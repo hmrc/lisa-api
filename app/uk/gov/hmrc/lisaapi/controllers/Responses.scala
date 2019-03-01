@@ -173,7 +173,7 @@ case object ErrorBonusClaimTimescaleExceeded extends ErrorResponse(403, "BONUS_C
 
 case object ErrorBonusHelpToBuyNotApplicable extends ErrorResponse(403, "HELP_TO_BUY_NOT_APPLICABLE", "Help to buy is only applicable for claims within the 2017-18 tax year")
 
-case object ErrorNoSubscriptions extends ErrorResponse(403, "ACCOUNT_ERROR_NO_SUBSCRIPTIONS_THIS_TAX_YEAR", "A bonus payment is not possible because the account has no subscriptions for that tax year")
+case object ErrorNoSubscriptions extends ErrorResponse(403, "ACCOUNT_ERROR_NO_SUBSCRIPTIONS_THIS_TAX_YEAR", "This account is not eligible for a bonus payment because the investor already has another LISA account")
 
 case object ErrorWithdrawalReportingError extends ErrorResponse(403, "WITHDRAWAL_REPORTING_ERROR", "The withdrawal charge does not equal 25% of the withdrawal amount")
 
