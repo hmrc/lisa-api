@@ -80,7 +80,7 @@ class BonusPaymentController @Inject()(
       implicit val startTime: Long = System.currentTimeMillis()
 
       withValidLMRN(lisaManager) { () =>
-        withEnrolment(lisaManager) { (_) =>
+        withEnrolment(lisaManager) { _ =>
           withValidAccountId(accountId) { () =>
             processGetBonusPayment(lisaManager, accountId, transactionId)
           }
@@ -99,8 +99,7 @@ class BonusPaymentController @Inject()(
               getBonusPaymentAudit(lisaManager, accountId, transactionId, Some(ErrorInternalServerError.errorCode))
               Logger.warn(s"API v1 received a superseded bonus claim. ID was $transactionId")
               Future.successful(InternalServerError(Json.toJson(ErrorInternalServerError)))
-            }
-            else {
+            } else {
               getBonusPaymentAudit(lisaManager, accountId, transactionId)
               Future.successful(Ok(Json.toJson(response.copy(supersededBy = None))))
             }
@@ -178,7 +177,7 @@ class BonusPaymentController @Inject()(
     (data.bonuses.claimReason, data.lifeEventId) match {
       case ("Life Event", None) =>
         handleLifeEventNotProvided(lisaManager, accountId, data)
-      case _ => {
+      case _ =>
         val errors = validator.validate(data)
 
         if (errors.isEmpty) {
@@ -187,15 +186,13 @@ class BonusPaymentController @Inject()(
               callback()
             }
           }
-        }
-        else {
+        } else {
           requestBonusPaymentFailureAudit(lisaManager, accountId, data, "FORBIDDEN")
 
           lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.BONUS_PAYMENT)
 
           Future.successful(Forbidden(Json.toJson(ErrorForbidden(errors.toList))))
         }
-      }
     }
   }
 
@@ -210,8 +207,7 @@ class BonusPaymentController @Inject()(
 
     if (claimCanStillBeMade) {
       callback()
-    }
-    else {
+    } else {
       requestBonusPaymentFailureAudit(lisaManager, accountId, data, ErrorBonusClaimTimescaleExceeded.errorCode)
 
       lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.BONUS_PAYMENT)
@@ -227,7 +223,7 @@ class BonusPaymentController @Inject()(
 
     data.htbTransfer match {
       case None => callback()
-      case Some(htb) => {
+      case Some(htb) =>
         val htbFiguresSubmitted = htb.htbTransferInForPeriod > 0 || htb.htbTransferTotalYTD > 0
         val lastValidHtbStartDate = new DateTime("2018-03-06")
 
@@ -237,11 +233,9 @@ class BonusPaymentController @Inject()(
           lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.BONUS_PAYMENT)
 
           Future.successful(Forbidden(Json.toJson(ErrorBonusHelpToBuyNotApplicable)))
-        }
-        else {
+        } else {
           callback()
         }
-      }
     }
   }
 

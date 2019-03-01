@@ -51,8 +51,7 @@ class AccountController @Inject()(
             lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.ACCOUNT)
 
             Future.successful(Forbidden(toJson(ErrorTransferAccountDataProvided)))
-          }
-          else {
+          } else {
             processAccountCreation(lisaManager, createRequest)
           }
         case transferRequest: CreateLisaAccountTransferRequest => processAccountTransfer(lisaManager, transferRequest)
@@ -70,8 +69,7 @@ class AccountController @Inject()(
               lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.ACCOUNT)
 
               Future.successful(Forbidden(toJson(ErrorTransferAccountDataNotProvided)))
-            }
-            else {
+            } else {
               lisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.ACCOUNT)
 
               Future.successful(BadRequest(toJson(ErrorBadRequest(errorConverter.convert(errors)))))
@@ -188,8 +186,7 @@ class AccountController @Inject()(
       Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
         ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("firstSubscriptionDate"), Some("/firstSubscriptionDate"))
       )))))
-    }
-    else {
+    } else {
       success()
     }
   }
@@ -198,15 +195,13 @@ class AccountController @Inject()(
                                       (success: () => Future[Result])
                                       (implicit hc: HeaderCarrier, startTime: Long): Future[Result] = {
 
-    if (
-      transferRequest.firstSubscriptionDate.isBefore(LISA_START_DATE) ||
+    if (transferRequest.firstSubscriptionDate.isBefore(LISA_START_DATE) ||
         transferRequest.transferAccount.transferInDate.isBefore(LISA_START_DATE)) {
 
       def firstSubscriptionDateError(request: CreateLisaAccountTransferRequest) = {
         if (transferRequest.firstSubscriptionDate.isBefore(LISA_START_DATE)) {
           Some(ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("firstSubscriptionDate"), Some("/firstSubscriptionDate")))
-        }
-        else {
+        } else {
           None
         }
       }
@@ -214,15 +209,12 @@ class AccountController @Inject()(
       def transferInDateError(request: CreateLisaAccountTransferRequest) = {
         if (transferRequest.transferAccount.transferInDate.isBefore(LISA_START_DATE)) {
           Some(ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("transferInDate"), Some("/transferAccount/transferInDate")))
-        }
-        else {
+        } else {
           None
         }
       }
 
-      val errors = List(firstSubscriptionDateError(transferRequest), transferInDateError(transferRequest)).
-        filter(_.isDefined).
-        map(_.get)
+      val errors = List(firstSubscriptionDateError(transferRequest), transferInDateError(transferRequest)).filter(_.isDefined).map(_.get)
 
       auditService.audit(
         auditType = "accountNotTransferred",
@@ -234,8 +226,7 @@ class AccountController @Inject()(
       lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.ACCOUNT)
 
       Future.successful(Forbidden(Json.toJson(ErrorForbidden(errors))))
-    }
-    else {
+    } else {
       success()
     }
   }
