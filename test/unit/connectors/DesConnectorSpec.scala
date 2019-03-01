@@ -1053,7 +1053,7 @@ class DesConnectorSpec extends PlaySpec
     }
 
     "return a success response" when {
-      "the DES response is a valid Pending transaction" in {
+      "the DES response is a valid collected Pending transaction" in {
         when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
@@ -1062,7 +1062,9 @@ class DesConnectorSpec extends PlaySpec
                 responseJson = Some(Json.parse(
                   """{
                     |    "paymentStatus": "PENDING",
-                    |    "paymentDueDate": "2000-01-01"
+                    |    "paymentDate": "2000-01-01",
+                    |    "paymentReference": "002630000994",
+                    |    "paymentAmount": 2.00
                     |}""".stripMargin))
               )
             )
@@ -1070,7 +1072,32 @@ class DesConnectorSpec extends PlaySpec
 
         doRetrieveTransactionRequest { response =>
           response mustBe DesGetTransactionPending(
-            paymentDueDate = new DateTime("2000-01-01")
+            paymentDueDate = new DateTime("2000-01-01"),
+            paymentReference = Some("002630000994"),
+            paymentAmount = Some(2.0)
+          )
+        }
+      }
+      "the DES response is a valid paid Pending transaction" in {
+        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = OK,
+                responseJson = Some(Json.parse(
+                  """{
+                    |    "paymentStatus": "PENDING",
+                    |    "paymentDate": "2000-01-01"
+                    |}""".stripMargin))
+              )
+            )
+          )
+
+        doRetrieveTransactionRequest { response =>
+          response mustBe DesGetTransactionPending(
+            paymentDueDate = new DateTime("2000-01-01"),
+            paymentReference = None,
+            paymentAmount = None
           )
         }
       }

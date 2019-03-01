@@ -933,7 +933,7 @@
 <pre class ="code--block">
 {
   "code": "ACCOUNT_ERROR_NO_SUBSCRIPTIONS_THIS_TAX_YEAR",
-  "message": "A bonus payment is not possible because the account has no subscriptions for that tax year"
+  "message": "This account is not eligible for a bonus payment because the investor already has another LISA account"
 }
 </pre>
             </td>

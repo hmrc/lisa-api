@@ -17,7 +17,7 @@
 package unit.controllers
 
 import org.joda.time.DateTime
-import org.mockito.Matchers._
+import org.mockito.Matchers.{any, eq => matchersEquals}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 import org.scalatest.mock.MockitoSugar
@@ -31,7 +31,7 @@ import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.controllers._
 import uk.gov.hmrc.lisaapi.metrics.LisaMetrics
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.services.{BulkPaymentService, CurrentDateService}
+import uk.gov.hmrc.lisaapi.services.{AuditService, BulkPaymentService, CurrentDateService}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -48,6 +48,7 @@ class BulkPaymentControllerSpec extends PlaySpec
   val lmrn = "Z123456"
 
   before {
+    reset(mockAuditService)
     when(mockAuthCon.authorise[Option[String]](any(),any())(any(), any())).
       thenReturn(Future(Some("1234")))
 
@@ -280,6 +281,171 @@ class BulkPaymentControllerSpec extends PlaySpec
 
   }
 
+  "audit getBulkPaymentReported" when {
+    "the service returns a GetBulkPaymentSuccessResponse" in {
+      when(mockService.getBulkPayment(any(), any(), any())(any())).
+        thenReturn(Future.successful(successResponse))
+
+      val oneYearInFuture = new DateTime(validDate).plusYears(1).toString("yyyy-MM-dd")
+      val result = SUT.getBulkPayment(lmrn, validDate, oneYearInFuture).
+        apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
+
+      await(result)
+
+      verify(mockAuditService).audit(
+        auditType = matchersEquals("getBulkPaymentReported"),
+        path = matchersEquals(s"/manager/$lmrn/payments"),
+        auditData = matchersEquals(Map(
+          "lisaManagerReferenceNumber" -> lmrn
+        )))(any())
+    }
+  }
+
+  "audit getBulkPaymentNotReported" when {
+    "the startDate parameter is in the wrong format" in {
+      val result = SUT.getBulkPayment(lmrn, invalidDate, validDate).
+        apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
+      await(result)
+
+      verify(mockAuditService).audit(
+        auditType = matchersEquals("getBulkPaymentNotReported"),
+        path = matchersEquals(s"/manager/$lmrn/payments"),
+        auditData = matchersEquals(Map(
+          "lisaManagerReferenceNumber" -> lmrn,
+          "reasonNotReported" -> ErrorBadRequestStart.errorCode
+        )))(any())
+    }
+    "the endDate parameter is in the wrong format" in {
+      val result = SUT.getBulkPayment(lmrn, validDate, invalidDate).
+        apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
+      await(result)
+
+      verify(mockAuditService).audit(
+        auditType = matchersEquals("getBulkPaymentNotReported"),
+        path = matchersEquals(s"/manager/$lmrn/payments"),
+        auditData = matchersEquals(Map(
+          "lisaManagerReferenceNumber" -> lmrn,
+          "reasonNotReported" -> ErrorBadRequestEnd.errorCode
+        )))(any())
+    }
+    "the startDate and endDate parameters are invalid" in {
+      val result = SUT.getBulkPayment(lmrn, invalidDate, invalidDate).
+        apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
+      await(result)
+
+      verify(mockAuditService).audit(
+        auditType = matchersEquals("getBulkPaymentNotReported"),
+        path = matchersEquals(s"/manager/$lmrn/payments"),
+        auditData = matchersEquals(Map(
+          "lisaManagerReferenceNumber" -> lmrn,
+          "reasonNotReported" -> ErrorBadRequestStartEnd.errorCode
+        )))(any())
+    }
+    "the endDate parameter is in the future" in {
+      val futureDate = currentDate.plusDays(1).toString("yyyy-MM-dd")
+      val result = SUT.getBulkPayment(lmrn, validDate, futureDate).
+        apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
+      await(result)
+
+      verify(mockAuditService).audit(
+        auditType = matchersEquals("getBulkPaymentNotReported"),
+        path = matchersEquals(s"/manager/$lmrn/payments"),
+        auditData = matchersEquals(Map(
+          "lisaManagerReferenceNumber" -> lmrn,
+          "reasonNotReported" -> ErrorBadRequestEndInFuture.errorCode
+        )))(any())
+    }
+    "the endDate is before the startDate" in {
+      val beforeDate = new DateTime(validDate).minusDays(1).toString("yyyy-MM-dd")
+      val result = SUT.getBulkPayment(lmrn, validDate, beforeDate).
+        apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
+      await(result)
+
+      verify(mockAuditService).audit(
+        auditType = matchersEquals("getBulkPaymentNotReported"),
+        path = matchersEquals(s"/manager/$lmrn/payments"),
+        auditData = matchersEquals(Map(
+          "lisaManagerReferenceNumber" -> lmrn,
+          "reasonNotReported" -> ErrorBadRequestEndBeforeStart.errorCode
+        )))(any())
+    }
+    "the startDate is before 6 April 2017" in {
+      val result = SUT.getBulkPayment(lmrn, "2017-04-05", validDate).
+        apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
+      await(result)
+
+      verify(mockAuditService).audit(
+        auditType = matchersEquals("getBulkPaymentNotReported"),
+        path = matchersEquals(s"/manager/$lmrn/payments"),
+        auditData = matchersEquals(Map(
+          "lisaManagerReferenceNumber" -> lmrn,
+          "reasonNotReported" -> ErrorBadRequestStartBefore6April2017.errorCode
+        )))(any())
+    }
+    "there's more than a year between startDate and endDate" in {
+      val futureDate = new DateTime(validDate).plusYears(1).plusDays(1).toString("yyyy-MM-dd")
+      val result = SUT.getBulkPayment(lmrn, validDate, futureDate).
+        apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
+      await(result)
+
+      verify(mockAuditService).audit(
+        auditType = matchersEquals("getBulkPaymentNotReported"),
+        path = matchersEquals(s"/manager/$lmrn/payments"),
+        auditData = matchersEquals(Map(
+          "lisaManagerReferenceNumber" -> lmrn,
+          "reasonNotReported" -> ErrorBadRequestOverYearBetweenStartAndEnd.errorCode
+        )))(any())
+    }
+    "the service returns a GetBulkPaymentNotFoundResponse" in {
+      when(mockService.getBulkPayment(any(), any(), any())(any())).
+        thenReturn(Future.successful(GetBulkPaymentNotFoundResponse))
+
+      val result = SUT.getBulkPayment(lmrn, validDate, validDate).
+        apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
+      await(result)
+
+      verify(mockAuditService).audit(
+        auditType = matchersEquals("getBulkPaymentNotReported"),
+        path = matchersEquals(s"/manager/$lmrn/payments"),
+        auditData = matchersEquals(Map(
+          "lisaManagerReferenceNumber" -> lmrn,
+          "reasonNotReported" -> "TRANSACTION_NOT_FOUND"
+        )))(any())
+    }
+    "the service return a GetBulkPaymentErrorResponse" in {
+      when(mockService.getBulkPayment(any(), any(), any())(any())).
+        thenReturn(Future.successful(GetBulkPaymentErrorResponse))
+
+      val result = SUT.getBulkPayment(lmrn, validDate, validDate).
+        apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
+      await(result)
+
+      verify(mockAuditService).audit(
+        auditType = matchersEquals("getBulkPaymentNotReported"),
+        path = matchersEquals(s"/manager/$lmrn/payments"),
+        auditData = matchersEquals(Map(
+          "lisaManagerReferenceNumber" -> lmrn,
+          "reasonNotReported" -> "INTERNAL_SERVER_ERROR"
+        )))(any())
+    }
+    "the service return a GetBulkPaymentServiceUnavailableResponse" in {
+      when(mockService.getBulkPayment(any(), any(), any())(any())).
+        thenReturn(Future.successful(GetBulkPaymentServiceUnavailableResponse))
+
+      val result = SUT.getBulkPayment(lmrn, validDate, validDate).
+        apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
+      await(result)
+
+      verify(mockAuditService).audit(
+        auditType = matchersEquals("getBulkPaymentNotReported"),
+        path = matchersEquals(s"/manager/$lmrn/payments"),
+        auditData = matchersEquals(Map(
+          "lisaManagerReferenceNumber" -> lmrn,
+          "reasonNotReported" -> "SERVER_ERROR"
+        )))(any())
+    }
+  }
+
   val successResponse: GetBulkPaymentSuccessResponse = GetBulkPaymentSuccessResponse(
     lmrn,
     List(
@@ -289,12 +455,13 @@ class BulkPaymentControllerSpec extends PlaySpec
   )
 
   val mockService: BulkPaymentService = mock[BulkPaymentService]
+  val mockAuditService: AuditService = mock[AuditService]
   val mockAuthCon: AuthConnector = mock[AuthConnector]
   val mockCurrentDateService: CurrentDateService = mock[CurrentDateService]
   val mockAppContext: AppContext = mock[AppContext]
   val mockLisaMetrics: LisaMetrics = mock[LisaMetrics]
 
-  val SUT = new BulkPaymentController(mockAuthCon, mockAppContext, mockCurrentDateService, mockService, mockLisaMetrics) {
+  val SUT = new BulkPaymentController(mockAuthCon, mockAppContext, mockCurrentDateService, mockService, mockAuditService, mockLisaMetrics) {
     override lazy val v2endpointsEnabled = true
   }
 

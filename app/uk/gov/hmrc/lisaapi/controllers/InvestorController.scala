@@ -63,7 +63,7 @@ class InvestorController @Inject()(
                      (implicit hc: HeaderCarrier, startTime: Long) = {
     auditService.audit(
       auditType = "investorCreated",
-      path = getEndpointUrl(lisaManager),
+      path = endpointUrl(lisaManager),
       auditData = Map(
         ZREF -> lisaManager,
         "investorNINO" -> createRequest.investorNINO,
@@ -88,7 +88,7 @@ class InvestorController @Inject()(
 
     auditService.audit(
       auditType = "investorNotCreated",
-      path = getEndpointUrl(lisaManager),
+      path = endpointUrl(lisaManager),
       auditData = Map(
         ZREF -> lisaManager,
         "investorNINO" -> createRequest.investorNINO,
@@ -108,7 +108,7 @@ class InvestorController @Inject()(
     CreateLisaInvestorErrorResponse -> ErrorInternalServerError
   )
 
-  private def getEndpointUrl(lisaManagerReferenceNumber: String):String = {
+  private def endpointUrl(lisaManagerReferenceNumber: String):String = {
     s"/manager/$lisaManagerReferenceNumber/investors"
   }
 

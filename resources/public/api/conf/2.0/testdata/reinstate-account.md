@@ -129,7 +129,7 @@
             <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
 <pre class="code--block">
 {
-  "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED",
+  "code": "INVESTOR_ACCOUNT_ALREADY_CANCELLED",
   "message": "You cannot reinstate this account because it was closed with a closure reason of cancellation"
 }
 </pre>

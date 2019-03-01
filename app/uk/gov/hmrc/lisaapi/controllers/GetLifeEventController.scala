@@ -22,7 +22,7 @@ import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
-import uk.gov.hmrc.lisaapi.services.LifeEventService
+import uk.gov.hmrc.lisaapi.services.{AuditService, LifeEventService}
 
 import scala.concurrent.ExecutionContext
 
@@ -30,7 +30,8 @@ class GetLifeEventController @Inject()(
                                         val authConnector: AuthConnector,
                                         val appContext: AppContext,
                                         val lisaMetrics: LisaMetrics,
-                                        val service: LifeEventService)
+                                        val service: LifeEventService,
+                                        auditService: AuditService)
                                       (implicit ec: ExecutionContext)
   extends LisaController {
 
@@ -44,10 +45,29 @@ class GetLifeEventController @Inject()(
         withEnrolment(lisaManager) { (_) =>
           service.getLifeEvent(lisaManager, accountId, lifeEventId) map {
             case Left(error) => {
+              auditService.audit(
+                auditType = "getLifeEventNotReported",
+                path = getEndpointUrl(lisaManager, accountId, lifeEventId),
+                auditData = Map(
+                  ZREF -> lisaManager,
+                  "accountId" -> accountId,
+                  "lifeEventId" -> lifeEventId,
+                  "reasonNotReported" -> error.errorCode
+                )
+              )
               lisaMetrics.incrementMetrics(startTime, error.httpStatusCode, LisaMetricKeys.EVENT)
               error.asResult
             }
             case Right(success) => {
+              auditService.audit(
+                auditType = "getLifeEventReported",
+                path = getEndpointUrl(lisaManager, accountId, lifeEventId),
+                auditData = Map(
+                  ZREF -> lisaManager,
+                  "accountId" -> accountId,
+                  "lifeEventId" -> lifeEventId
+                )
+              )
               lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.EVENT)
               Ok(Json.toJson(success))
             }
@@ -55,6 +75,10 @@ class GetLifeEventController @Inject()(
         }
       }
     }
+  }
+
+  private def getEndpointUrl(lisaManagerReferenceNumber: String, accountId: String, lifeEventId: String): String = {
+    s"/manager/$lisaManagerReferenceNumber/accounts/$accountId/events/$lifeEventId"
   }
 
 }

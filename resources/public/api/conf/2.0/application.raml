@@ -385,7 +385,7 @@ types:
                               description: You cannot reinstate this account because it was closed with a closure reason of cancellation
                               value: |
                                 {
-                                  "code" : "INVESTOR_ACCOUNT_ALREADY_CLOSED",
+                                  "code" : "INVESTOR_ACCOUNT_ALREADY_CANCELLED",
                                   "message" : "You cannot reinstate this account because it was closed with a closure reason of cancellation"
                                 }
                             accountVoided:
@@ -790,7 +790,9 @@ types:
                     post:
                       is: [headers.acceptHeader, headers.contentHeader]
                       displayName: "[Sandbox only] Send an annual return of information"
-                      description: "**This API is not currently available in Production.** Report details to HMRC about LISA accounts you managed in the last tax year. You can also correct a previous return of information. You cannot send or correct a return of information if the investor account is cancelled or void."
+                      description: "##This API is currently not available in Production.
+
+                        Report details to HMRC about LISA accounts you managed in the last tax year. You can also correct a previous return of information. You cannot send or correct a return of information if the investor account is cancelled or void."
                       (annotations.scope): "write:lisa"
                       (annotations.sandboxData): !include testdata/annual-return.md
                       securedBy: [ sec.oauth_2_0: { scopes: [ "write:lisa" ] } ]
@@ -1687,7 +1689,7 @@ types:
                                 value: |
                                   {
                                     "code": "ACCOUNT_ERROR_NO_SUBSCRIPTIONS_THIS_TAX_YEAR",
-                                    "message": "A bonus payment is not possible because the account has no subscriptions for that tax year"
+                                    "message": "This account is not eligible for a bonus payment because the investor already has another LISA account"
                                   }
                       404:
                         body:
