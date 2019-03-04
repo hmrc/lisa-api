@@ -190,28 +190,22 @@ class AccountController @Inject()(
   private def hasValidDatesForTransfer(lisaManager: String, transferRequest: CreateLisaAccountTransferRequest)
                                       (success: () => Future[Result])
                                       (implicit hc: HeaderCarrier, startTime: Long): Future[Result] = {
-
-    if (transferRequest.firstSubscriptionDate.isBefore(LISA_START_DATE) ||
-        transferRequest.transferAccount.transferInDate.isBefore(LISA_START_DATE)) {
-
-      def firstSubscriptionDateError(request: CreateLisaAccountTransferRequest) = {
-        if (transferRequest.firstSubscriptionDate.isBefore(LISA_START_DATE)) {
-          Some(ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("firstSubscriptionDate"), Some("/firstSubscriptionDate")))
-        } else {
-          None
-        }
+    val firstSubscriptionDateError =
+      if (transferRequest.firstSubscriptionDate.isBefore(LISA_START_DATE)) {
+        Some(ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("firstSubscriptionDate"), Some("/firstSubscriptionDate")))
+      } else {
+        None
+      }
+    val transferInDateError =
+      if (transferRequest.transferAccount.transferInDate.isBefore(LISA_START_DATE)) {
+        Some(ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("transferInDate"), Some("/transferAccount/transferInDate")))
+      } else {
+        None
       }
 
-      def transferInDateError(request: CreateLisaAccountTransferRequest) = {
-        if (transferRequest.transferAccount.transferInDate.isBefore(LISA_START_DATE)) {
-          Some(ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("transferInDate"), Some("/transferAccount/transferInDate")))
-        } else {
-          None
-        }
-      }
+    val errors = List(firstSubscriptionDateError, transferInDateError).flatten
 
-      val errors = List(firstSubscriptionDateError(transferRequest), transferInDateError(transferRequest)).filter(_.isDefined).map(_.get)
-
+    if (errors.nonEmpty) {
       auditService.audit(
         auditType = "accountNotTransferred",
         path = getCreateOrTransferEndpointUrl(lisaManager),
