@@ -274,23 +274,12 @@ class BonusPaymentController @Inject()(
                            (implicit hc: HeaderCarrier, request: Request[AnyContent], startTime: Long) = {
     Logger.debug("Matched failure response")
 
-    val response: ErrorResponse = errorResponse match {
-      case e: RequestBonusPaymentClaimAlreadyExists =>
-        getAPIVersionFromRequest(request) match {
-          case Some(VERSION_1) => ErrorInternalServerError
-          case Some(VERSION_2) => ErrorBonusClaimAlreadyExists(e.transactionId)
-        }
-      case e: RequestBonusPaymentAlreadySuperseded =>
-        getAPIVersionFromRequest(request) match {
-          case Some(VERSION_1) => ErrorInternalServerError
-          case Some(VERSION_2) => ErrorBonusClaimAlreadySuperseded(e.transactionId)
-        }
-      case RequestBonusPaymentServiceUnavailable => ErrorServiceUnavailable
-      case _ =>
-        getAPIVersionFromRequest(request) match {
-          case Some(VERSION_1) => requestBonusErrorsV1.getOrElse(errorResponse, ErrorInternalServerError)
-          case Some(VERSION_2) => requestBonusErrorsV2.getOrElse(errorResponse, ErrorInternalServerError)
-        }
+    val response: ErrorResponse = (errorResponse, getAPIVersionFromRequest(request)) match {
+      case(e: RequestBonusPaymentClaimAlreadyExists, Some(VERSION_2)) => ErrorBonusClaimAlreadyExists(e.transactionId)
+      case(e: RequestBonusPaymentAlreadySuperseded, Some(VERSION_2)) => ErrorBonusClaimAlreadySuperseded(e.transactionId)
+      case (RequestBonusPaymentServiceUnavailable, _) => ErrorServiceUnavailable
+      case (_, Some(VERSION_1)) => requestBonusErrorsV1.getOrElse(errorResponse, ErrorInternalServerError)
+      case (_, Some(VERSION_2)) => requestBonusErrorsV2.getOrElse(errorResponse, ErrorInternalServerError)
     }
     requestBonusPaymentFailureAudit(lisaManager, accountId, req, response.errorCode)
     lisaMetrics.incrementMetrics(startTime, response.httpStatusCode, LisaMetricKeys.BONUS_PAYMENT)
