@@ -124,27 +124,23 @@ class BulkPaymentController @Inject()(
   private def withDatesWithinBusinessRules(startDate: DateTime, endDate: DateTime, lisaManager: String)
                                           (success: () => Future[Result])
                                           (implicit hc: HeaderCarrier, startTime: Long): Future[Result] = {
-    val endInFutureError = endDate.isAfter(currentDateService.now())
-    val endBeforeStartError = endDate.isBefore(startDate)
-    val startBefore6April2017Error = startDate.isBefore(LISA_START_DATE)
-    val overYearBetweenStartAndEndError = endDate.isAfter(startDate.plusYears(1))
+    val endInFutureError = Option(endDate.isAfter(currentDateService.now()))
+      .collect { case true => ErrorBadRequestEndInFuture}
+    val endBeforeStartError = Option(endDate.isBefore(startDate))
+      .collect { case true => ErrorBadRequestEndBeforeStart}
+    val startBefore6April2017Error = Option(startDate.isBefore(LISA_START_DATE))
+      .collect { case true => ErrorBadRequestStartBefore6April2017}
+    val overYearBetweenStartAndEndError = Option(endDate.isAfter(startDate.plusYears(1)))
+      .collect { case true => ErrorBadRequestOverYearBetweenStartAndEnd}
 
-    val errorResponse: Option[ErrorResponse] = if (endInFutureError) {
-      Some(ErrorBadRequestEndInFuture)
-    } else if (endBeforeStartError) {
-      Some(ErrorBadRequestEndBeforeStart)
-    } else if (startBefore6April2017Error) {
-      Some(ErrorBadRequestStartBefore6April2017)
-    } else if (overYearBetweenStartAndEndError) {
-      Some(ErrorBadRequestOverYearBetweenStartAndEnd)
-    } else {
-      None
-    }
-    errorResponse map { error =>
-      getBulkPaymentAudit(lisaManager, Some(error.errorCode))
+    val errors = List(endInFutureError, endBeforeStartError, startBefore6April2017Error, overYearBetweenStartAndEndError).flatten
+    if (errors.nonEmpty) {
+      getBulkPaymentAudit(lisaManager, Some(errors.head.errorCode))
       lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.TRANSACTION)
-      Future.successful(Forbidden(Json.toJson(error)))
-    } getOrElse success()
+      Future.successful(Forbidden(Json.toJson(errors.head)))
+    } else {
+      success()
+    }
   }
 
   private def getBulkPaymentAudit(lisaManager: String, failureReason: Option[String] = None)
