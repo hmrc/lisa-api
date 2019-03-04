@@ -236,10 +236,8 @@ class WithdrawalController @Inject() (
     )
   }
 
-  private def createReportWithdrawalChargeAuditData(lisaManager: String, accountId: String, req: ReportWithdrawalChargeRequest): Map[String, String] = {
-    req.toStringMap ++ Map(ZREF -> lisaManager,
-      "accountId" -> accountId)
-  }
+  private def createReportWithdrawalChargeAuditData(lisaManager: String, accountId: String, req: ReportWithdrawalChargeRequest): Map[String, String] =
+    req.toStringMap ++ Map(ZREF -> lisaManager, "accountId" -> accountId)
 
   private def reportWithdrawalChargeEndpointUrl(lisaManager: String, accountId: String): String =
     s"/manager/$lisaManager/accounts/$accountId/withdrawal-charges"

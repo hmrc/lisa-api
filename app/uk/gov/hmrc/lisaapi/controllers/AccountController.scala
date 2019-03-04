@@ -60,12 +60,12 @@ class AccountController @Inject()(
           errors => {
             Logger.info("The errors are " + errors.toString())
 
-            val transferAccountDataNotProvided = errors.count {
+            val transferAccountDataNotProvided = errors.exists {
               case (path: JsPath, errors: Seq[ValidationError]) =>
                 path.toString().contains("/transferAccount") && errors.contains(ValidationError("error.path.missing"))
             }
 
-            if (transferAccountDataNotProvided > 0) {
+            if (transferAccountDataNotProvided) {
               lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.ACCOUNT)
 
               Future.successful(Forbidden(toJson(ErrorTransferAccountDataNotProvided)))
