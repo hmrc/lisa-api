@@ -190,19 +190,10 @@ class AccountController @Inject()(
   private def hasValidDatesForTransfer(lisaManager: String, transferRequest: CreateLisaAccountTransferRequest)
                                       (success: () => Future[Result])
                                       (implicit hc: HeaderCarrier, startTime: Long): Future[Result] = {
-    val firstSubscriptionDateError =
-      if (transferRequest.firstSubscriptionDate.isBefore(LISA_START_DATE)) {
-        Some(ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("firstSubscriptionDate"), Some("/firstSubscriptionDate")))
-      } else {
-        None
-      }
-    val transferInDateError =
-      if (transferRequest.transferAccount.transferInDate.isBefore(LISA_START_DATE)) {
-        Some(ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("transferInDate"), Some("/transferAccount/transferInDate")))
-      } else {
-        None
-      }
-
+    val firstSubscriptionDateError = Option(transferRequest.firstSubscriptionDate.isBefore(LISA_START_DATE))
+      .collect { case true => ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("firstSubscriptionDate"), Some("/firstSubscriptionDate")) }
+    val transferInDateError = Option(transferRequest.transferAccount.transferInDate.isBefore(LISA_START_DATE))
+      .collect { case true => ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("transferInDate"), Some("/transferAccount/transferInDate")) }
     val errors = List(firstSubscriptionDateError, transferInDateError).flatten
 
     if (errors.nonEmpty) {

@@ -117,8 +117,7 @@ class AnnualReturnController @Inject()(
 
     if (errors.isEmpty) {
       callback()
-    }
-    else {
+    } else {
       audit(lisaManager, accountId, req, Some("FORBIDDEN"))
       lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.WITHDRAWAL_CHARGE)
       Future.successful(Forbidden(Json.toJson(ErrorForbidden(errors.toList))))
