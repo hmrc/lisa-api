@@ -220,23 +220,20 @@ class BonusPaymentController @Inject()(
                           (lisaManager: String, accountId: String)
                           (callback: () => Future[Result])
                           (implicit hc: HeaderCarrier, startTime: Long) = {
+    val lastValidHtbStartDate = new DateTime("2018-03-06")
 
-    data.htbTransfer match {
-      case None => callback()
-      case Some(htb) =>
-        val htbFiguresSubmitted = htb.htbTransferInForPeriod > 0 || htb.htbTransferTotalYTD > 0
-        val lastValidHtbStartDate = new DateTime("2018-03-06")
-
-        if (htbFiguresSubmitted && data.periodStartDate.isAfter(lastValidHtbStartDate)) {
-          requestBonusPaymentFailureAudit(lisaManager, accountId, data, ErrorBonusHelpToBuyNotApplicable.errorCode)
-
-          lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.BONUS_PAYMENT)
-
-          Future.successful(Forbidden(Json.toJson(ErrorBonusHelpToBuyNotApplicable)))
-        } else {
-          callback()
-        }
+    val htbResponse = for {
+      htb <- data.htbTransfer
+      htbFiguresSubmitted <- Some(htb.htbTransferInForPeriod > 0 || htb.htbTransferTotalYTD > 0)
+      error <- Option(htbFiguresSubmitted && data.periodStartDate.isAfter(lastValidHtbStartDate))
+        .collect { case true => ErrorBonusHelpToBuyNotApplicable }
+    } yield {
+      requestBonusPaymentFailureAudit(lisaManager, accountId, data, error.errorCode)
+      lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.BONUS_PAYMENT)
+      Future.successful(Forbidden(Json.toJson(error)))
     }
+
+    htbResponse.getOrElse(callback())
   }
 
   private def handleSuccess(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest, resp: RequestBonusPaymentSuccessResponse)
