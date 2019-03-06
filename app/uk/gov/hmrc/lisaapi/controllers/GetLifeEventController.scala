@@ -46,11 +46,11 @@ class GetLifeEventController @Inject()(
         withEnrolment(lisaManager) { _ =>
           service.getLifeEvent(lisaManager, accountId, lifeEventId) map {
             case Left(error) =>
-              getLifeEventAudit(lisaManager, accountId, lifeEventId, Some(error.errorCode))
+              auditGetLifeEvent(lisaManager, accountId, lifeEventId, Some(error.errorCode))
               lisaMetrics.incrementMetrics(startTime, error.httpStatusCode, LisaMetricKeys.EVENT)
               error.asResult
             case Right(success) =>
-              getLifeEventAudit(lisaManager, accountId, lifeEventId)
+              auditGetLifeEvent(lisaManager, accountId, lifeEventId)
               lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.EVENT)
               Ok(Json.toJson(success))
           }
@@ -59,7 +59,7 @@ class GetLifeEventController @Inject()(
     }
   }
 
-  private def getLifeEventAudit(lisaManager: String, accountId: String, lifeEventId: String, failureReason: Option[String] = None)
+  private def auditGetLifeEvent(lisaManager: String, accountId: String, lifeEventId: String, failureReason: Option[String] = None)
                                   (implicit hc: HeaderCarrier) = {
     val path = getLifeEventEndpointUrl(lisaManager, accountId, lifeEventId)
     val auditData = Map(

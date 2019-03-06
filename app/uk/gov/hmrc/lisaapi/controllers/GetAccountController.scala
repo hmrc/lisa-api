@@ -42,26 +42,26 @@ class GetAccountController @Inject()(
       withEnrolment(lisaManager) { (_) =>
         service.getAccount(lisaManager, accountId).map {
           case response: GetLisaAccountSuccessResponse =>
-            getAccountAudit(lisaManager, accountId)
+            auditGetAccount(lisaManager, accountId)
             lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.ACCOUNT)
             Ok(Json.toJson(response))
           case GetLisaAccountDoesNotExistResponse =>
-            getAccountAudit(lisaManager, accountId, Some(ErrorAccountNotFound.errorCode))
+            auditGetAccount(lisaManager, accountId, Some(ErrorAccountNotFound.errorCode))
             lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.ACCOUNT)
             NotFound(Json.toJson(ErrorAccountNotFound))
           case GetLisaAccountServiceUnavailable =>
-            getAccountAudit(lisaManager, accountId, Some(ErrorServiceUnavailable.errorCode))
+            auditGetAccount(lisaManager, accountId, Some(ErrorServiceUnavailable.errorCode))
             lisaMetrics.incrementMetrics(startTime, SERVICE_UNAVAILABLE, LisaMetricKeys.ACCOUNT)
             ServiceUnavailable(Json.toJson(ErrorServiceUnavailable))
           case _ =>
-            getAccountAudit(lisaManager, accountId, Some(ErrorInternalServerError.errorCode))
+            auditGetAccount(lisaManager, accountId, Some(ErrorInternalServerError.errorCode))
             lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.ACCOUNT)
             InternalServerError(Json.toJson(ErrorInternalServerError))
         }
       }
     }
 
-  private def getAccountAudit(lisaManager: String, accountId: String, failureReason: Option[String] = None)
+  private def auditGetAccount(lisaManager: String, accountId: String, failureReason: Option[String] = None)
                                  (implicit hc: HeaderCarrier) = {
     val path = getAccountEndpointUrl(lisaManager, accountId)
     val auditData = Map(ZREF -> lisaManager, "accountId" -> accountId)

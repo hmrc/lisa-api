@@ -52,7 +52,7 @@ class LifeEventController @Inject()(
               res match {
                 case ReportLifeEventSuccessResponse(lifeEventId) =>
                   Logger.debug("Matched Valid Response ")
-                  doAudit(lisaManager, accountId, req, success = true)
+                  auditReportLifeEvent(lisaManager, accountId, req, success = true)
                   lisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.EVENT)
                   val data = ApiResponseData(message = "Life event created", lifeEventId = Some(lifeEventId))
                   Future.successful(Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED))))
@@ -98,12 +98,12 @@ class LifeEventController @Inject()(
   private def error(e: ErrorResponse, lisaManager: String, accountId: String, req: ReportLifeEventRequest)
                    (implicit hc: HeaderCarrier, startTime: Long): Result = {
     Logger.debug("Matched an error response")
-    doAudit(lisaManager, accountId, req, success = false, Map("reasonNotReported" -> e.errorCode))
+    auditReportLifeEvent(lisaManager, accountId, req, success = false, Map("reasonNotReported" -> e.errorCode))
     lisaMetrics.incrementMetrics(startTime, e.httpStatusCode, LisaMetricKeys.EVENT)
     e.asResult
   }
 
-  private def doAudit(lisaManager: String, accountId: String, req: ReportLifeEventRequest, success: Boolean, extraData: Map[String, String] = Map())
+  private def auditReportLifeEvent(lisaManager: String, accountId: String, req: ReportLifeEventRequest, success: Boolean, extraData: Map[String, String] = Map())
                      (implicit hc: HeaderCarrier) = {
     auditService.audit(
       auditType = if (success) "lifeEventReported" else "lifeEventNotReported",
@@ -121,7 +121,7 @@ class LifeEventController @Inject()(
     if (req.eventDate.isBefore(LISA_START_DATE)) {
       Logger.debug("Life event not reported - invalid event date")
 
-      doAudit(lisaManager, accountId, req, success = false, Map("reasonNotReported" -> "FORBIDDEN"))
+      auditReportLifeEvent(lisaManager, accountId, req, success = false, Map("reasonNotReported" -> "FORBIDDEN"))
       lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.EVENT)
 
       Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(

@@ -52,14 +52,14 @@ class TransactionController @Inject() (
                 withApiVersion {
                   case Some(VERSION_1) =>
                     if (success.paymentStatus == TransactionPaymentStatus.REFUND_CANCELLED) {
-                      getTransactionAudit(lisaManager, accountId, transactionId, Some(ErrorInternalServerError.errorCode))
+                      auditGetTransaction(lisaManager, accountId, transactionId, Some(ErrorInternalServerError.errorCode))
                       Future.successful(ErrorInternalServerError.asResult)
                     } else {
-                      getTransactionAudit(lisaManager, accountId, transactionId)
+                      auditGetTransaction(lisaManager, accountId, transactionId)
                       Future.successful(Ok(Json.toJson(success.copy(transactionType = None, supersededBy = None))))
                     }
                   case Some(VERSION_2) =>
-                    getTransactionAudit(lisaManager, accountId, transactionId)
+                    auditGetTransaction(lisaManager, accountId, transactionId)
                     Future.successful(Ok(Json.toJson(success.copy(bonusDueForPeriod = None))))
                 }
               case GetTransactionTransactionNotFoundResponse =>
@@ -68,10 +68,10 @@ class TransactionController @Inject() (
 
                 withApiVersion {
                   case Some(VERSION_1) =>
-                    getTransactionAudit(lisaManager, accountId, transactionId, Some(ErrorBonusPaymentTransactionNotFound.errorCode))
+                    auditGetTransaction(lisaManager, accountId, transactionId, Some(ErrorBonusPaymentTransactionNotFound.errorCode))
                     Future.successful(ErrorBonusPaymentTransactionNotFound.asResult)
                   case Some(VERSION_2) =>
-                    getTransactionAudit(lisaManager, accountId, transactionId, Some(ErrorTransactionNotFound.errorCode))
+                    auditGetTransaction(lisaManager, accountId, transactionId, Some(ErrorTransactionNotFound.errorCode))
                     Future.successful(ErrorTransactionNotFound.asResult)
                 }
               case res: GetTransactionResponse =>
@@ -80,7 +80,7 @@ class TransactionController @Inject() (
                   Logger.debug(s"Matched an unexpected response: $res, returning a 500 error")
                   ErrorInternalServerError
                 })
-                getTransactionAudit(lisaManager, accountId, transactionId, Some(errorResponse.errorCode))
+                auditGetTransaction(lisaManager, accountId, transactionId, Some(errorResponse.errorCode))
                 lisaMetrics.incrementMetrics(startTime, errorResponse.httpStatusCode, LisaMetricKeys.TRANSACTION)
                 Future.successful(errorResponse.asResult)
             }
@@ -94,7 +94,7 @@ class TransactionController @Inject() (
     case GetTransactionServiceUnavailableResponse => ErrorServiceUnavailable
   }
 
-  private def getTransactionAudit(lisaManager: String, accountId: String, transactionId: String, failureReason: Option[String] = None)
+  private def auditGetTransaction(lisaManager: String, accountId: String, transactionId: String, failureReason: Option[String] = None)
                                   (implicit hc: HeaderCarrier) = {
     val path = getTransactionEndpointUrl(lisaManager, accountId, transactionId)
     val auditData = Map(

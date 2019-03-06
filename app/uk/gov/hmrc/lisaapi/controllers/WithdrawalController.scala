@@ -90,33 +90,33 @@ class WithdrawalController @Inject() (
 
     getService.getBonusOrWithdrawal(lisaManager, accountId, transactionId).map {
       case response: GetWithdrawalResponse =>
-        getWithdrawalChargeAudit(lisaManager, accountId, transactionId)
+        auditGetWithdrawalCharge(lisaManager, accountId, transactionId)
         lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.WITHDRAWAL_CHARGE)
         Ok(Json.toJson(response))
       case _: GetBonusResponse =>
-        getWithdrawalChargeAudit(lisaManager, accountId, transactionId, Some(ErrorWithdrawalNotFound.errorCode))
+        auditGetWithdrawalCharge(lisaManager, accountId, transactionId, Some(ErrorWithdrawalNotFound.errorCode))
         lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.WITHDRAWAL_CHARGE)
         NotFound(Json.toJson(ErrorWithdrawalNotFound))
       case GetBonusOrWithdrawalTransactionNotFoundResponse =>
-        getWithdrawalChargeAudit(lisaManager, accountId, transactionId, Some(ErrorWithdrawalNotFound.errorCode))
+        auditGetWithdrawalCharge(lisaManager, accountId, transactionId, Some(ErrorWithdrawalNotFound.errorCode))
         lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.WITHDRAWAL_CHARGE)
         NotFound(Json.toJson(ErrorWithdrawalNotFound))
       case GetBonusOrWithdrawalInvestorNotFoundResponse =>
-        getWithdrawalChargeAudit(lisaManager, accountId, transactionId, Some(ErrorAccountNotFound.errorCode))
+        auditGetWithdrawalCharge(lisaManager, accountId, transactionId, Some(ErrorAccountNotFound.errorCode))
         lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.WITHDRAWAL_CHARGE)
         NotFound(Json.toJson(ErrorAccountNotFound))
       case GetBonusOrWithdrawalServiceUnavailableResponse =>
-        getWithdrawalChargeAudit(lisaManager, accountId, transactionId, Some(ErrorServiceUnavailable.errorCode))
+        auditGetWithdrawalCharge(lisaManager, accountId, transactionId, Some(ErrorServiceUnavailable.errorCode))
         lisaMetrics.incrementMetrics(startTime, SERVICE_UNAVAILABLE, LisaMetricKeys.WITHDRAWAL_CHARGE)
         ServiceUnavailable(Json.toJson(ErrorServiceUnavailable))
       case _ =>
-        getWithdrawalChargeAudit(lisaManager, accountId, transactionId, Some(ErrorInternalServerError.errorCode))
+        auditGetWithdrawalCharge(lisaManager, accountId, transactionId, Some(ErrorInternalServerError.errorCode))
         lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.WITHDRAWAL_CHARGE)
         InternalServerError(Json.toJson(ErrorInternalServerError))
     }
   }
 
-  private def getWithdrawalChargeAudit(lisaManager: String, accountId: String, transactionId: String, failureReason: Option[String] = None)
+  private def auditGetWithdrawalCharge(lisaManager: String, accountId: String, transactionId: String, failureReason: Option[String] = None)
                                   (implicit hc: HeaderCarrier) = {
     val path = getWithdrawalChargeEndpointUrl(lisaManager, accountId, transactionId)
     val auditData = Map(
@@ -148,7 +148,7 @@ class WithdrawalController @Inject() (
     if (claimCanStillBeMade) {
       callback()
     } else {
-      reportWithdrawalChargeAuditFailure(lisaManager, accountId, data, ErrorWithdrawalTimescalesExceeded.errorCode)
+      auditReportWithdrawalChargeFailure(lisaManager, accountId, data, ErrorWithdrawalTimescalesExceeded.errorCode)
 
       lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.WITHDRAWAL_CHARGE)
 
@@ -164,7 +164,7 @@ class WithdrawalController @Inject() (
     if (errors.isEmpty) {
       callback()
     } else {
-      reportWithdrawalChargeAuditFailure(lisaManager, accountId, data, "FORBIDDEN")
+      auditReportWithdrawalChargeFailure(lisaManager, accountId, data, "FORBIDDEN")
 
       lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.WITHDRAWAL_CHARGE)
 
@@ -209,7 +209,7 @@ class WithdrawalController @Inject() (
                            (implicit hc: HeaderCarrier, startTime: Long) = {
     val error = errorOutcomes.applyOrElse(errorResponse, {_ : ReportWithdrawalChargeErrorResponse => ErrorInternalServerError})
 
-    reportWithdrawalChargeAuditFailure(lisaManager, accountId, req, error.errorCode)
+    auditReportWithdrawalChargeFailure(lisaManager, accountId, req, error.errorCode)
     lisaMetrics.incrementMetrics(startTime, error.httpStatusCode, LisaMetricKeys.WITHDRAWAL_CHARGE)
 
     error.asResult
@@ -227,7 +227,7 @@ class WithdrawalController @Inject() (
     case ReportWithdrawalChargeAccountCancelled => ErrorAccountAlreadyCancelled
   }
 
-  private def reportWithdrawalChargeAuditFailure(lisaManager: String, accountId: String, req: ReportWithdrawalChargeRequest, failureReason: String)
+  private def auditReportWithdrawalChargeFailure(lisaManager: String, accountId: String, req: ReportWithdrawalChargeRequest, failureReason: String)
                           (implicit hc: HeaderCarrier) = {
     auditService.audit(
       auditType = "withdrawalChargeNotRequested",

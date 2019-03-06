@@ -49,7 +49,7 @@ class UpdateSubscriptionController @Inject() (
             result match {
               case success: UpdateSubscriptionSuccessResponse =>
                 Logger.debug("First Subscription date updated")
-                doAudit(lisaManager, accountId, updateSubsRequest, "firstSubscriptionDateUpdated")
+                auditUpdateSubscription(lisaManager, accountId, updateSubsRequest, "firstSubscriptionDateUpdated")
                 val data = ApiResponseData(message = success.message, code = Some(success.code), accountId = Some(accountId))
                 lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.UPDATE_SUBSCRIPTION)
                 Ok(Json.toJson(ApiResponse(data = Some(data), success = true, status = OK)))
@@ -76,7 +76,7 @@ class UpdateSubscriptionController @Inject() (
   private def error(e: ErrorResponse, lisaManager: String, accountId: String, req: UpdateSubscriptionRequest)
                    (implicit hc: HeaderCarrier, startTime: Long): Result = {
     Logger.debug("Matched an error")
-    doAudit(lisaManager, accountId, req, "firstSubscriptionDateNotUpdated", Map("reasonNotUpdated" -> e.errorCode))
+    auditUpdateSubscription(lisaManager, accountId, req, "firstSubscriptionDateNotUpdated", Map("reasonNotUpdated" -> e.errorCode))
     lisaMetrics.incrementMetrics(startTime, e.httpStatusCode, LisaMetricKeys.UPDATE_SUBSCRIPTION)
     e.asResult
   }
@@ -88,7 +88,7 @@ class UpdateSubscriptionController @Inject() (
     if (updateSubsRequest.firstSubscriptionDate.isBefore(LISA_START_DATE)) {
       Logger.debug("First Subscription date not updated - failed business rule validation")
 
-      doAudit(lisaManager, accountId, updateSubsRequest, "firstSubscriptionDateNotUpdated", Map("reasonNotUpdated" -> "FORBIDDEN"))
+      auditUpdateSubscription(lisaManager, accountId, updateSubsRequest, "firstSubscriptionDateNotUpdated", Map("reasonNotUpdated" -> "FORBIDDEN"))
 
       lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.UPDATE_SUBSCRIPTION)
 
@@ -100,7 +100,7 @@ class UpdateSubscriptionController @Inject() (
     }
   }
 
-  private def doAudit(lisaManager: String,
+  private def auditUpdateSubscription(lisaManager: String,
                       accountId: String,
                       updateSubsRequest: UpdateSubscriptionRequest,
                       auditType: String,
