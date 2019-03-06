@@ -126,20 +126,23 @@ class BulkPaymentController @Inject()(
   private def withDatesWithinBusinessRules(startDate: DateTime, endDate: DateTime, lisaManager: String)
                                           (success: () => Future[Result])
                                           (implicit hc: HeaderCarrier, startTime: Long): Future[Result] = {
-    val errorBooleans: ListMap[ErrorResponse, Boolean] = ListMap[ErrorResponse, Boolean](
-      ErrorBadRequestEndInFuture -> endDate.isAfter(currentDateService.now()),
-      ErrorBadRequestEndBeforeStart -> endDate.isBefore(startDate),
-      ErrorBadRequestStartBefore6April2017 -> startDate.isBefore(LISA_START_DATE),
-      ErrorBadRequestOverYearBetweenStartAndEnd -> endDate.isAfter(startDate.plusYears(1))
-    )
+    val errorResponse: Option[ErrorResponse] = if (endDate.isAfter(currentDateService.now())) {
+      Some(ErrorBadRequestEndInFuture)
+    } else if (endDate.isBefore(startDate)) {
+      Some(ErrorBadRequestEndBeforeStart)
+    } else if (startDate.isBefore(LISA_START_DATE)) {
+      Some(ErrorBadRequestStartBefore6April2017)
+    } else if (endDate.isAfter(startDate.plusYears(1))) {
+      Some(ErrorBadRequestOverYearBetweenStartAndEnd)
+    } else {
+      None
+    }
 
-    val errorResponse = errorBooleans.find(errorBool => errorBool._2)
-
-    errorResponse.map(error => {
-      getBulkPaymentAudit(lisaManager, Some(error._1.errorCode))
+    errorResponse.map{ error =>
+      getBulkPaymentAudit(lisaManager, Some(error.errorCode))
       lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.TRANSACTION)
-      Future.successful(Forbidden(Json.toJson(error._1)))
-    }) getOrElse success()
+      Future.successful(Forbidden(Json.toJson(error)))
+    }.getOrElse(success())
   }
 
   private def getBulkPaymentAudit(lisaManager: String, failureReason: Option[String] = None)
