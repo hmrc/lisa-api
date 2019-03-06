@@ -29,6 +29,8 @@ import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models.{GetBulkPaymentNotFoundResponse, GetBulkPaymentServiceUnavailableResponse, GetBulkPaymentSuccessResponse}
 import uk.gov.hmrc.lisaapi.services.{AuditService, BulkPaymentService, CurrentDateService}
 
+import scala.collection.immutable.ListMap
+import scala.collection.mutable
 import scala.concurrent.{ExecutionContext, Future}
 
 class BulkPaymentController @Inject()(
@@ -124,23 +126,20 @@ class BulkPaymentController @Inject()(
   private def withDatesWithinBusinessRules(startDate: DateTime, endDate: DateTime, lisaManager: String)
                                           (success: () => Future[Result])
                                           (implicit hc: HeaderCarrier, startTime: Long): Future[Result] = {
-    val endInFutureError = Option(endDate.isAfter(currentDateService.now()))
-      .collect { case true => ErrorBadRequestEndInFuture}
-    val endBeforeStartError = Option(endDate.isBefore(startDate))
-      .collect { case true => ErrorBadRequestEndBeforeStart}
-    val startBefore6April2017Error = Option(startDate.isBefore(LISA_START_DATE))
-      .collect { case true => ErrorBadRequestStartBefore6April2017}
-    val overYearBetweenStartAndEndError = Option(endDate.isAfter(startDate.plusYears(1)))
-      .collect { case true => ErrorBadRequestOverYearBetweenStartAndEnd}
+    val errorBooleans: ListMap[ErrorResponse, Boolean] = ListMap[ErrorResponse, Boolean](
+      ErrorBadRequestEndInFuture -> endDate.isAfter(currentDateService.now()),
+      ErrorBadRequestEndBeforeStart -> endDate.isBefore(startDate),
+      ErrorBadRequestStartBefore6April2017 -> startDate.isBefore(LISA_START_DATE),
+      ErrorBadRequestOverYearBetweenStartAndEnd -> endDate.isAfter(startDate.plusYears(1))
+    )
 
-    val errors = List(endInFutureError, endBeforeStartError, startBefore6April2017Error, overYearBetweenStartAndEndError).flatten
-    if (errors.nonEmpty) {
-      getBulkPaymentAudit(lisaManager, Some(errors.head.errorCode))
+    val errorResponse = errorBooleans.find(errorBool => errorBool._2)
+
+    errorResponse.map(error => {
+      getBulkPaymentAudit(lisaManager, Some(error._1.errorCode))
       lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.TRANSACTION)
-      Future.successful(Forbidden(Json.toJson(errors.head)))
-    } else {
-      success()
-    }
+      Future.successful(Forbidden(Json.toJson(error._1)))
+    }) getOrElse success()
   }
 
   private def getBulkPaymentAudit(lisaManager: String, failureReason: Option[String] = None)
