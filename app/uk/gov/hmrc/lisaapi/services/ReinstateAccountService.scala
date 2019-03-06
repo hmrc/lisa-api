@@ -28,30 +28,24 @@ import scala.concurrent.{ExecutionContext, Future}
 class ReinstateAccountService @Inject()(desConnector: DesConnector)(implicit ec: ExecutionContext) {
 
   def reinstateAccountService(lisaManager: String, accountId: AccountId)(implicit hc: HeaderCarrier): Future[ReinstateLisaAccountResponse] = {
-    val response = desConnector.reinstateAccount(lisaManager, accountId)
-
-    response map {
-      case successResponse: DesReinstateAccountSuccessResponse => {
+    desConnector.reinstateAccount(lisaManager, accountId) map {
+      case successResponse: DesReinstateAccountSuccessResponse =>
         Logger.debug("Reinstate account success response")
         ReinstateLisaAccountSuccessResponse(successResponse.code, successResponse.reason)
-      }
-      case DesUnavailableResponse => {
+      case DesUnavailableResponse =>
         Logger.debug("Reinstate account returned service unavailable")
         ReinstateLisaAccountServiceUnavailableResponse
-      }
-      case failureResponse: DesFailureResponse => {
+      case failureResponse: DesFailureResponse =>
         failureResponse.code match {
           case "INVESTOR_ACCOUNT_ALREADY_CLOSED" => ReinstateLisaAccountAlreadyClosedResponse
           case "INVESTOR_ACCOUNTID_NOT_FOUND" => ReinstateLisaAccountNotFoundResponse
           case "INVESTOR_ACCOUNT_ALREADY_CANCELLED" => ReinstateLisaAccountAlreadyCancelledResponse
           case "INVESTOR_ACCOUNT_ALREADY_OPEN" => ReinstateLisaAccountAlreadyOpenResponse
           case "INVESTOR_COMPLIANCE_CHECK_FAILED" => ReinstateLisaAccountInvestorComplianceCheckFailedResponse
-          case _ => {
+          case _ =>
             Logger.warn(s"Reinstate account returned error ${failureResponse.code}")
             ReinstateLisaAccountErrorResponse
-          }
         }
-      }
     }
   }
 }

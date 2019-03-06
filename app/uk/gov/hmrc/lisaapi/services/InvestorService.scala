@@ -28,21 +28,17 @@ import scala.concurrent.{ExecutionContext, Future}
 class InvestorService @Inject()(desConnector: DesConnector)(implicit ec: ExecutionContext)  {
 
   def createInvestor(lisaManager: String, request: CreateLisaInvestorRequest)(implicit hc: HeaderCarrier) : Future[CreateLisaInvestorResponse] = {
-    val response = desConnector.createInvestor(lisaManager, request)
-
-    response map {
+    desConnector.createInvestor(lisaManager, request) map {
       case successResponse: CreateLisaInvestorSuccessResponse => successResponse
       case existsResponse: CreateLisaInvestorAlreadyExistsResponse => existsResponse
       case DesUnavailableResponse => CreateLisaInvestorServiceUnavailableResponse
-      case error: DesFailureResponse => {
+      case error: DesFailureResponse =>
         error.code match {
           case "INVESTOR_NOT_FOUND" => CreateLisaInvestorInvestorNotFoundResponse
-          case _ => {
+          case _ =>
             Logger.warn(s"Create investor returned error code ${error.code}")
             CreateLisaInvestorErrorResponse
-          }
         }
-      }
     }
   }
 

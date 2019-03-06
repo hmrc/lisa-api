@@ -30,24 +30,20 @@ class BulkPaymentService @Inject()(desConnector: DesConnector)(implicit ec: Exec
 
   def getBulkPayment(lisaManager: String, startDate: DateTime, endDate: DateTime)
                     (implicit hc: HeaderCarrier): Future[GetBulkPaymentResponse] = {
-    val response = desConnector.getBulkPayment(lisaManager, startDate, endDate)
-
-    response map {
+    desConnector.getBulkPayment(lisaManager, startDate, endDate) map {
       case GetBulkPaymentNotFoundResponse => GetBulkPaymentNotFoundResponse
       case s: GetBulkPaymentSuccessResponse if s.payments.isEmpty => GetBulkPaymentNotFoundResponse
       case s: GetBulkPaymentSuccessResponse => s
       case DesUnavailableResponse => GetBulkPaymentServiceUnavailableResponse
-      case f: DesFailureResponse => {
+      case f: DesFailureResponse =>
         f.code match {
           case "NOT_FOUND" |
                "INVALID_CALCULATEACCRUEDINTEREST" |
                "INVALID_CUSTOMERPAYMENTINFORMATION" => GetBulkPaymentNotFoundResponse
-          case _ => {
+          case _ =>
             Logger.warn(s"Get bulk payment returned error: ${f.code}")
             GetBulkPaymentErrorResponse
-          }
         }
-      }
     }
   }
 

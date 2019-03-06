@@ -27,40 +27,31 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class WithdrawalService @Inject()(desConnector: DesConnector)(implicit ec: ExecutionContext) {
 
-  // scalastyle:off cyclomatic.complexity
   def reportWithdrawalCharge(lisaManager: String, accountId: String, request: ReportWithdrawalChargeRequest)
                             (implicit hc: HeaderCarrier): Future[ReportWithdrawalChargeResponse] = {
-    val response = desConnector.reportWithdrawalCharge(lisaManager, accountId, request)
-
-    response map {
-      case successResponse: DesTransactionResponse => {
+    desConnector.reportWithdrawalCharge(lisaManager, accountId, request) map {
+      case successResponse: DesTransactionResponse =>
         Logger.debug("Matched ReportWithdrawalChargeSuccessResponse and the message is " + successResponse.message)
-
         request match {
-          case _: RegularWithdrawalChargeRequest => {
-            successResponse.message match {
-              case Some("Late") => ReportWithdrawalChargeLateResponse(successResponse.transactionID)
-              case _ => ReportWithdrawalChargeOnTimeResponse(successResponse.transactionID)
+          case _: RegularWithdrawalChargeRequest =>
+            if (successResponse.message.contains("Late")) {
+              ReportWithdrawalChargeLateResponse(successResponse.transactionID)
+            } else {
+              ReportWithdrawalChargeOnTimeResponse(successResponse.transactionID)
             }
-          }
-          case _: SupersededWithdrawalChargeRequest => {
+          case _: SupersededWithdrawalChargeRequest =>
             ReportWithdrawalChargeSupersededResponse(successResponse.transactionID)
-          }
         }
-      }
-      case DesUnavailableResponse => {
+      case DesUnavailableResponse =>
         Logger.debug("Matched DesUnavailableResponse")
         ReportWithdrawalChargeServiceUnavailable
-      }
-      case alreadyExistsResponse: DesWithdrawalChargeAlreadyExistsResponse => {
+      case alreadyExistsResponse: DesWithdrawalChargeAlreadyExistsResponse =>
         Logger.debug("Matched DesWithdrawalChargeAlreadyExistsResponse and the code is " + alreadyExistsResponse.code)
         ReportWithdrawalChargeAlreadyExists(alreadyExistsResponse.investorTransactionID)
-      }
-      case alreadySupersededResponse: DesWithdrawalChargeAlreadySupersededResponse => {
+      case alreadySupersededResponse: DesWithdrawalChargeAlreadySupersededResponse =>
         Logger.debug("Matched DesWithdrawalChargeAlreadySupersededResponse and the code is " + alreadySupersededResponse.code)
         ReportWithdrawalChargeAlreadySuperseded(alreadySupersededResponse.supersededTransactionByID)
-      }
-      case failureResponse: DesFailureResponse => {
+      case failureResponse: DesFailureResponse =>
         Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
 
         failureResponse.code match {
@@ -70,12 +61,10 @@ class WithdrawalService @Inject()(desConnector: DesConnector)(implicit ec: Execu
           case "WITHDRAWAL_REPORTING_ERROR" => ReportWithdrawalChargeReportingError
           case "SUPERSEDING_TRANSACTION_ID_AMOUNT_MISMATCH" => ReportWithdrawalChargeSupersedeAmountMismatch
           case "SUPERSEDING_TRANSACTION_OUTCOME_ERROR" => ReportWithdrawalChargeSupersedeOutcomeError
-          case _ => {
+          case _ =>
             Logger.warn(s"Request bonus payment returned error: ${failureResponse.code}")
             ReportWithdrawalChargeError
-          }
         }
-      }
     }
   }
 }
