@@ -49,7 +49,7 @@ class UpdateSubscriptionController @Inject() (
             result match {
               case success: UpdateSubscriptionSuccessResponse =>
                 Logger.debug("First Subscription date updated")
-                auditUpdateSubscription(lisaManager, accountId, updateSubsRequest, "firstSubscriptionDateUpdated")
+                auditUpdateSubscription(lisaManager, accountId, updateSubsRequest)
                 val data = ApiResponseData(message = success.message, code = Some(success.code), accountId = Some(accountId))
                 lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.UPDATE_SUBSCRIPTION)
                 Ok(Json.toJson(ApiResponse(data = Some(data), success = true, status = OK)))
@@ -76,7 +76,7 @@ class UpdateSubscriptionController @Inject() (
   private def error(e: ErrorResponse, lisaManager: String, accountId: String, req: UpdateSubscriptionRequest)
                    (implicit hc: HeaderCarrier, startTime: Long): Result = {
     Logger.debug("Matched an error")
-    auditUpdateSubscription(lisaManager, accountId, req, "firstSubscriptionDateNotUpdated", Map("reasonNotUpdated" -> e.errorCode))
+    auditUpdateSubscription(lisaManager, accountId, req, Some(e.errorCode))
     lisaMetrics.incrementMetrics(startTime, e.httpStatusCode, LisaMetricKeys.UPDATE_SUBSCRIPTION)
     e.asResult
   }
@@ -88,7 +88,7 @@ class UpdateSubscriptionController @Inject() (
     if (updateSubsRequest.firstSubscriptionDate.isBefore(LISA_START_DATE)) {
       Logger.debug("First Subscription date not updated - failed business rule validation")
 
-      auditUpdateSubscription(lisaManager, accountId, updateSubsRequest, "firstSubscriptionDateNotUpdated", Map("reasonNotUpdated" -> "FORBIDDEN"))
+      auditUpdateSubscription(lisaManager, accountId, updateSubsRequest, Some("FORBIDDEN"))
 
       lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.UPDATE_SUBSCRIPTION)
 
@@ -101,19 +101,27 @@ class UpdateSubscriptionController @Inject() (
   }
 
   private def auditUpdateSubscription(lisaManager: String,
-                      accountId: String,
-                      updateSubsRequest: UpdateSubscriptionRequest,
-                      auditType: String,
-                      extraData: Map[String, String] = Map())
+                                      accountId: String,
+                                      updateSubsRequest: UpdateSubscriptionRequest,
+                                      failureReason: Option[String] = None)
                      (implicit hc: HeaderCarrier) = {
-    auditService.audit(
-      auditType = auditType,
-      path = s"/manager/$lisaManager/accounts/$accountId/update-subscription",
-      auditData = Map(
+    val path = s"/manager/$lisaManager/accounts/$accountId/update-subscription"
+    val auditData = Map(
       "lisaManagerReferenceNumber" -> lisaManager,
       "accountID" -> accountId,
       "firstSubscriptionDate" -> updateSubsRequest.firstSubscriptionDate.toString("yyyy-MM-dd")
-      ) ++ extraData
+    )
+
+    failureReason map { reason =>
+      auditService.audit(
+        auditType = "firstSubscriptionDateNotUpdated",
+        path = path,
+        auditData = auditData ++ Map("reasonNotUpdated" -> reason)
+      )
+    } getOrElse auditService.audit(
+      auditType = "firstSubscriptionDateUpdated",
+      path = path,
+      auditData = auditData
     )
   }
 
