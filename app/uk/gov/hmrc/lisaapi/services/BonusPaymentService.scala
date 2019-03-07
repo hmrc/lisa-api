@@ -48,22 +48,24 @@ class BonusPaymentService @Inject()(desConnector: DesConnector)(implicit ec: Exe
         RequestBonusPaymentServiceUnavailable
       case failureResponse: DesFailureResponse =>
         Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
-        failureResponse.code match {
-          case "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID" => RequestBonusPaymentAccountClosedOrVoid
-          case "INVESTOR_ACCOUNT_ALREADY_CLOSED" => RequestBonusPaymentAccountClosed
-          case "INVESTOR_ACCOUNT_ALREADY_CANCELLED" => RequestBonusPaymentAccountCancelled
-          case "INVESTOR_ACCOUNT_ALREADY_VOID" => RequestBonusPaymentAccountVoid
-          case "LIFE_EVENT_NOT_FOUND" => RequestBonusPaymentLifeEventNotFound
-          case "BONUS_CLAIM_ERROR" => RequestBonusPaymentBonusClaimError
-          case "INVESTOR_ACCOUNTID_NOT_FOUND" => RequestBonusPaymentAccountNotFound
-          case "SUPERSEDING_TRANSACTION_ID_AMOUNT_MISMATCH" => RequestBonusPaymentSupersededAmountMismatch
-          case "SUPERSEDING_TRANSACTION_OUTCOME_ERROR" => RequestBonusPaymentSupersededOutcomeError
-          case "ACCOUNT_ERROR_NO_SUBSCRIPTIONS_THIS_TAX_YEAR" => RequestBonusPaymentNoSubscriptions
-          case _ =>
-            Logger.warn(s"Request bonus payment returned error: ${failureResponse.code}")
-            RequestBonusPaymentError
-        }
+        desFailures.getOrElse(failureResponse.code, {
+          Logger.warn(s"Request bonus payment returned error: ${failureResponse.code}")
+          RequestBonusPaymentError
+        })
     }
   }
+
+  private val desFailures = Map[String, RequestBonusPaymentErrorResponse](
+    "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID" -> RequestBonusPaymentAccountClosedOrVoid,
+  "INVESTOR_ACCOUNT_ALREADY_CLOSED" -> RequestBonusPaymentAccountClosed,
+  "INVESTOR_ACCOUNT_ALREADY_CANCELLED" -> RequestBonusPaymentAccountCancelled,
+  "INVESTOR_ACCOUNT_ALREADY_VOID" -> RequestBonusPaymentAccountVoid,
+  "LIFE_EVENT_NOT_FOUND" -> RequestBonusPaymentLifeEventNotFound,
+  "BONUS_CLAIM_ERROR" -> RequestBonusPaymentBonusClaimError,
+  "INVESTOR_ACCOUNTID_NOT_FOUND" -> RequestBonusPaymentAccountNotFound,
+  "SUPERSEDING_TRANSACTION_ID_AMOUNT_MISMATCH" -> RequestBonusPaymentSupersededAmountMismatch,
+  "SUPERSEDING_TRANSACTION_OUTCOME_ERROR" -> RequestBonusPaymentSupersededOutcomeError,
+  "ACCOUNT_ERROR_NO_SUBSCRIPTIONS_THIS_TAX_YEAR" -> RequestBonusPaymentNoSubscriptions
+  )
 
 }
