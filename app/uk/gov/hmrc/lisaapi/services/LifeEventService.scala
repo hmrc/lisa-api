@@ -33,47 +33,35 @@ class LifeEventService @Inject()(desConnector: DesConnector)(implicit ec: Execut
 
   def reportLifeEvent(lisaManager: String, accountId: String, request: ReportLifeEventRequestBase)
                      (implicit hc: HeaderCarrier): Future[ReportLifeEventResponse] = {
-    val response = desConnector.reportLifeEvent(lisaManager, accountId, request)
-
-    response map {
-      case successResponse: DesLifeEventResponse => {
+    desConnector.reportLifeEvent(lisaManager, accountId, request) map {
+      case successResponse: DesLifeEventResponse =>
         Logger.debug("Matched DesLifeEventResponse")
         ReportLifeEventSuccessResponse(successResponse.lifeEventID)
-      }
-      case DesUnavailableResponse => {
+      case DesUnavailableResponse =>
         Logger.debug("Matched DesUnavailableResponse")
         ReportLifeEventServiceUnavailableResponse
-      }
-      case failureResponse: DesFailureResponse => {
+      case failureResponse: DesFailureResponse =>
         Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
-
         postErrors.applyOrElse((failureResponse.code, failureResponse), { _:(String, DesFailureResponse) =>
           Logger.warn(s"Report life event returned error: ${failureResponse.code}")
           ReportLifeEventErrorResponse
         })
-      }
     }
   }
 
   def getLifeEvent(lisaManager: String, accountId: String, lifeEventId: LifeEventId)
                   (implicit hc: HeaderCarrier): Future[Either[ErrorResponse, Seq[GetLifeEventItem]]] = {
-    val response = desConnector.getLifeEvent(lisaManager, accountId, lifeEventId)
-
-    response map {
-      case Right(successResponse) => {
+    desConnector.getLifeEvent(lisaManager, accountId, lifeEventId) map {
+      case Right(successResponse) =>
         Logger.debug("Matched ReportLifeEventRequestBase")
         Right(successResponse)
-      }
-      case Left(failureResponse) => {
+      case Left(failureResponse) =>
         Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
-
         val error = getErrors.getOrElse(failureResponse.code, {
           Logger.warn(s"Report life event returned error: ${failureResponse.code}")
           ErrorInternalServerError
         })
-
         Left(error)
-      }
     }
   }
 
@@ -84,26 +72,21 @@ class LifeEventService @Inject()(desConnector: DesConnector)(implicit ec: Execut
   )
 
   private val postErrors: PartialFunction[(String, DesFailureResponse), ReportLifeEventResponse] = {
-    case ("LIFE_EVENT_ALREADY_EXISTS", res) => {
+    case ("LIFE_EVENT_ALREADY_EXISTS", res) =>
       val lifeEventId = extractLifeEventIdFromReason(res.reason, "^The investor’s life event id (\\d{10}) has already been reported\\.$".r)
       ReportLifeEventAlreadyExistsResponse(lifeEventId)
-    }
-    case ("SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED", res) => {
+    case ("SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED", res) =>
       val lifeEventId = extractLifeEventIdFromReason(res.reason, "^The life event id (\\d{10}) has already been superseded\\.$".r)
       ReportLifeEventAlreadySupersededResponse(lifeEventId)
-    }
-    case ("PURCHASE_EXTENSION_1_LIFE_EVENT_ALREADY_APPROVED", res) => {
+    case ("PURCHASE_EXTENSION_1_LIFE_EVENT_ALREADY_APPROVED", res) =>
       val lifeEventId = extractLifeEventIdFromReason(res.reason, "^Extension 1 life event (\\d{10}) has already been recorded for this account\\.$".r)
       ReportLifeEventExtensionOneAlreadyApprovedResponse(lifeEventId)
-    }
-    case ("PURCHASE_EXTENSION_2_LIFE_EVENT_ALREADY_APPROVED", res) => {
+    case ("PURCHASE_EXTENSION_2_LIFE_EVENT_ALREADY_APPROVED", res) =>
       val lifeEventId = extractLifeEventIdFromReason(res.reason, "^Extension 2 life event (\\d{10}) has already been recorded for this account\\.$".r)
       ReportLifeEventExtensionTwoAlreadyApprovedResponse(lifeEventId)
-    }
-    case ("FUND_RELEASE_LIFE_EVENT_ID_SUPERSEDED", res) => {
+    case ("FUND_RELEASE_LIFE_EVENT_ID_SUPERSEDED", res) =>
       val lifeEventId = extractLifeEventIdFromReason(res.reason, "^The fund release life event id (\\d{10}) in the request has been superseded\\.$".r)
       ReportLifeEventFundReleaseSupersededResponse(lifeEventId)
-    }
     case ("LIFE_EVENT_INAPPROPRIATE", _) => ReportLifeEventInappropriateResponse
     case ("INVESTOR_ACCOUNTID_NOT_FOUND", _) => ReportLifeEventAccountNotFoundResponse
     case ("INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID", _) => ReportLifeEventAccountClosedOrVoidResponse
@@ -117,8 +100,7 @@ class LifeEventService @Inject()(desConnector: DesConnector)(implicit ec: Execut
     case ("PURCHASE_EXTENSION_1_LIFE_EVENT_NOT_YET_APPROVED", _) => ReportLifeEventExtensionOneNotYetApprovedResponse
   }
 
-  private def extractLifeEventIdFromReason(reason: String, regex: Regex) = {
+  private def extractLifeEventIdFromReason(reason: String, regex: Regex) =
     regex.findFirstMatchIn(reason).get.group(1)
-  }
 
 }

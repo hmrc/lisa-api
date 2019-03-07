@@ -42,8 +42,7 @@ trait LisaController extends BaseController with LisaConstants with AuthorisedFu
   protected def withValidLMRN(lisaManager: String)(success: () => Future[Result])(implicit request: Request[AnyContent], startTime: Long): Future[Result] = {
     if (lisaManager.matches("^Z([0-9]{4}|[0-9]{6})$")) {
       success()
-    }
-    else {
+    } else {
       lisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.getMetricKey(request.uri))
       Future.successful(BadRequest(toJson(ErrorBadRequestLmrn)))
     }
@@ -52,15 +51,14 @@ trait LisaController extends BaseController with LisaConstants with AuthorisedFu
   protected def withValidAccountId(accountId: String)(success: () => Future[Result])(implicit request: Request[AnyContent], startTime: Long): Future[Result] = {
     if (accountId.matches("^[a-zA-Z0-9 :/-]{1,20}$")) {
       success()
-    }
-    else {
+    } else {
       lisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.getMetricKey(request.uri))
       Future.successful(BadRequest(toJson(ErrorBadRequestAccountId)))
     }
   }
 
   protected def withEnrolment(lisaManager: String)
-                             (callback: (Option[String]) => Future[Result])
+                             (callback: Option[String] => Future[Result])
                              (implicit request: Request[AnyContent], startTime: Long, ec: ExecutionContext): Future[Result] = {
     authorised(Enrolment("HMRC-LISA-ORG").withIdentifier("ZREF", lisaManager)).retrieve(internalId) {id =>
       callback(id)
@@ -70,8 +68,8 @@ trait LisaController extends BaseController with LisaConstants with AuthorisedFu
   }
 
   protected def withValidJson[T](
-                                  success: (T) => Future[Result],
-                                  invalid: Option[(Seq[(JsPath, Seq[ValidationError])]) => Future[Result]] = None,
+                                  success: T => Future[Result],
+                                  invalid: Option[Seq[(JsPath, Seq[ValidationError])] => Future[Result]] = None,
                                   lisaManager: String
                                 )(implicit request: Request[AnyContent], reads: Reads[T], startTime: Long, ec: ExecutionContext): Future[Result] = {
 
@@ -79,27 +77,20 @@ trait LisaController extends BaseController with LisaConstants with AuthorisedFu
       request.body.asJson match {
         case Some(json) =>
           Try(json.validate[T]) match {
-            case Success(JsSuccess(payload, _)) => {
+            case Success(JsSuccess(payload, _)) =>
               Try(success(payload)) match {
                 case Success(result) => result
-                case Failure(ex: Exception) => {
+                case Failure(ex: Exception) =>
                   Logger.error(s"LisaController An error occurred in Json payload validation ${ex.getMessage}")
                   lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.getMetricKey(request.uri))
-
                   Future.successful(InternalServerError(toJson(ErrorInternalServerError)))
-                }
               }
-            }
-            case Success(JsError(errors)) => {
-              invalid match {
-                case Some(invalidCallback) => invalidCallback(errors)
-                case None => {
-                  lisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.getMetricKey(request.uri))
-                  Logger.error(s"The errors are ${errors.toString()}")
-                  Future.successful(BadRequest(toJson(ErrorBadRequest(errorConverter.convert(errors)))))
-                }
+            case Success(JsError(errors)) =>
+              invalid map { _(errors)} getOrElse {
+                lisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.getMetricKey(request.uri))
+                Logger.error(s"The errors are ${errors.toString()}")
+                Future.successful(BadRequest(toJson(ErrorBadRequest(errorConverter.convert(errors)))))
               }
-            }
             case Failure(e) =>
               Logger.error(s"LisaController: An error occurred in lisa-api due to ${e.getMessage} returning internal server error")
               lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.getMetricKey(request.uri))

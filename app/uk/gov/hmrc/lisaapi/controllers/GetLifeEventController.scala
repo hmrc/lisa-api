@@ -20,6 +20,7 @@ import com.google.inject.Inject
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.services.{AuditService, LifeEventService}
@@ -42,43 +43,45 @@ class GetLifeEventController @Inject()(
 
     withValidLMRN(lisaManager) { () =>
       withValidAccountId(accountId) { () =>
-        withEnrolment(lisaManager) { (_) =>
+        withEnrolment(lisaManager) { _ =>
           service.getLifeEvent(lisaManager, accountId, lifeEventId) map {
-            case Left(error) => {
-              auditService.audit(
-                auditType = "getLifeEventNotReported",
-                path = getEndpointUrl(lisaManager, accountId, lifeEventId),
-                auditData = Map(
-                  ZREF -> lisaManager,
-                  "accountId" -> accountId,
-                  "lifeEventId" -> lifeEventId,
-                  "reasonNotReported" -> error.errorCode
-                )
-              )
+            case Left(error) =>
+              auditGetLifeEvent(lisaManager, accountId, lifeEventId, Some(error.errorCode))
               lisaMetrics.incrementMetrics(startTime, error.httpStatusCode, LisaMetricKeys.EVENT)
               error.asResult
-            }
-            case Right(success) => {
-              auditService.audit(
-                auditType = "getLifeEventReported",
-                path = getEndpointUrl(lisaManager, accountId, lifeEventId),
-                auditData = Map(
-                  ZREF -> lisaManager,
-                  "accountId" -> accountId,
-                  "lifeEventId" -> lifeEventId
-                )
-              )
+            case Right(success) =>
+              auditGetLifeEvent(lisaManager, accountId, lifeEventId)
               lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.EVENT)
               Ok(Json.toJson(success))
-            }
           }
         }
       }
     }
   }
 
-  private def getEndpointUrl(lisaManagerReferenceNumber: String, accountId: String, lifeEventId: String): String = {
-    s"/manager/$lisaManagerReferenceNumber/accounts/$accountId/events/$lifeEventId"
+  private def auditGetLifeEvent(lisaManager: String, accountId: String, lifeEventId: String, failureReason: Option[String] = None)
+                                  (implicit hc: HeaderCarrier) = {
+    val path = getLifeEventEndpointUrl(lisaManager, accountId, lifeEventId)
+    val auditData = Map(
+      ZREF -> lisaManager,
+      "accountId" -> accountId,
+      "lifeEventId" -> lifeEventId
+    )
+
+    failureReason map { reason =>
+      auditService.audit(
+        auditType = "getLifeEventNotReported",
+        path = path,
+        auditData = auditData ++ Map("reasonNotReported" -> reason)
+      )
+    } getOrElse auditService.audit(
+      auditType = "getLifeEventReported",
+      path = path,
+      auditData = auditData
+    )
   }
+
+  private def getLifeEventEndpointUrl(lisaManagerReferenceNumber: String, accountId: String, lifeEventId: String): String =
+    s"/manager/$lisaManagerReferenceNumber/accounts/$accountId/events/$lifeEventId"
 
 }

@@ -63,7 +63,7 @@ class InvestorController @Inject()(
                      (implicit hc: HeaderCarrier, startTime: Long) = {
     auditService.audit(
       auditType = "investorCreated",
-      path = endpointUrl(lisaManager),
+      path = investorEndpointUrl(lisaManager),
       auditData = Map(
         ZREF -> lisaManager,
         "investorNINO" -> createRequest.investorNINO,
@@ -82,13 +82,13 @@ class InvestorController @Inject()(
   private def error(lisaManager: String, createRequest: CreateLisaInvestorRequest, response: ErrorResponse)
                    (implicit hc: HeaderCarrier, startTime: Long) = {
     val additionalAuditData = response match {
-      case res: ErrorResponseWithId => Some(("investorID" -> res.id))
+      case res: ErrorResponseWithId => Some("investorID" -> res.id)
       case _ => None
     }
 
     auditService.audit(
       auditType = "investorNotCreated",
-      path = endpointUrl(lisaManager),
+      path = investorEndpointUrl(lisaManager),
       auditData = Map(
         ZREF -> lisaManager,
         "investorNINO" -> createRequest.investorNINO,
@@ -108,8 +108,7 @@ class InvestorController @Inject()(
     CreateLisaInvestorErrorResponse -> ErrorInternalServerError
   )
 
-  private def endpointUrl(lisaManagerReferenceNumber: String):String = {
+  private def investorEndpointUrl(lisaManagerReferenceNumber: String):String =
     s"/manager/$lisaManagerReferenceNumber/investors"
-  }
 
 }

@@ -30,31 +30,22 @@ class BonusOrWithdrawalService @Inject()(desConnector: DesConnector)(implicit ec
   def getBonusOrWithdrawal(lisaManager: String, accountId: String, transactionId: String)
                           (implicit hc: HeaderCarrier): Future[GetBonusOrWithdrawalResponse] = {
 
-    val response: Future[DesResponse] = desConnector.getBonusOrWithdrawal(lisaManager, accountId, transactionId)
-
-    response map {
-      case successResponse: GetBonusOrWithdrawalResponse => {
+    desConnector.getBonusOrWithdrawal(lisaManager, accountId, transactionId) map {
+      case successResponse: GetBonusOrWithdrawalResponse =>
         Logger.debug("Matched GetBonusOrWithdrawalResponse")
-
         successResponse
-      }
-      case DesUnavailableResponse => {
+      case DesUnavailableResponse =>
         Logger.debug("Matched DesUnavailableResponse")
-
         GetBonusOrWithdrawalServiceUnavailableResponse
-      }
-      case failureResponse: DesFailureResponse => {
+      case failureResponse: DesFailureResponse =>
         Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
-
         failureResponse.code match {
           case "TRANSACTION_ID_NOT_FOUND" => GetBonusOrWithdrawalTransactionNotFoundResponse
           case "INVESTOR_ACCOUNTID_NOT_FOUND" => GetBonusOrWithdrawalInvestorNotFoundResponse
-          case _ => {
+          case _ =>
             Logger.warn(s"Get bonus payment or withdrawal returned error: ${failureResponse.code}")
             GetBonusOrWithdrawalErrorResponse
-          }
         }
-      }
     }
   }
 }
