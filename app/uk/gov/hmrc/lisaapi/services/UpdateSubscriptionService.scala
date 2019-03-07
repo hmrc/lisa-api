@@ -27,14 +27,16 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class UpdateSubscriptionService @Inject()(desConnector: DesConnector)(implicit ec: ExecutionContext) {
 
-  def updateSubscription(lisaManager: String, accountId: String, request: UpdateSubscriptionRequest)(implicit hc: HeaderCarrier): Future[UpdateSubscriptionResponse] = {
+  def updateSubscription(lisaManager: String, accountId: String, request: UpdateSubscriptionRequest)
+                        (implicit hc: HeaderCarrier): Future[UpdateSubscriptionResponse] = {
     desConnector.updateFirstSubDate(lisaManager, accountId, request) map {
       case successResponse: DesUpdateSubscriptionSuccessResponse =>
         Logger.debug("Update subscription success response")
         if (successResponse.code == "SUCCESS") {
           UpdateSubscriptionSuccessResponse("UPDATED", "Successfully updated the firstSubscriptionDate for the LISA account")
         } else {
-          val voidMsg = "Successfully updated the firstSubscriptionDate for the LISA account and changed the account status to void because the investor has another account with an earlier firstSubscriptionDate"
+          val voidMsg = "Successfully updated the firstSubscriptionDate for the LISA account and changed" +
+            " the account status to void because the investor has another account with an earlier firstSubscriptionDate"
           UpdateSubscriptionSuccessResponse("UPDATED_AND_ACCOUNT_VOID", voidMsg)
         }
       case DesUnavailableResponse =>
@@ -42,16 +44,18 @@ class UpdateSubscriptionService @Inject()(desConnector: DesConnector)(implicit e
         UpdateSubscriptionServiceUnavailableResponse
       case failureResponse: DesFailureResponse =>
         Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
-        failureResponse.code match {
-          case "INVESTOR_ACCOUNTID_NOT_FOUND" => UpdateSubscriptionAccountNotFoundResponse
-          case "INVESTOR_ACCOUNT_ALREADY_CLOSED" => UpdateSubscriptionAccountClosedResponse
-          case "INVESTOR_ACCOUNT_ALREADY_CANCELLED" => UpdateSubscriptionAccountCancelledResponse
-          case "INVESTOR_ACCOUNT_ALREADY_VOID" => UpdateSubscriptionAccountVoidedResponse
-          case _ =>
-            Logger.warn(s"Update date of first subscription returned error: ${failureResponse.code}")
-            UpdateSubscriptionErrorResponse
-        }
+        desFailures.getOrElse(failureResponse.code, {
+          Logger.warn(s"Update date of first subscription returned error: ${failureResponse.code}")
+          UpdateSubscriptionErrorResponse
+        })
     }
   }
+
+  private val desFailures = Map[String, UpdateSubscriptionResponse](
+  "INVESTOR_ACCOUNTID_NOT_FOUND" -> UpdateSubscriptionAccountNotFoundResponse,
+  "INVESTOR_ACCOUNT_ALREADY_CLOSED" -> UpdateSubscriptionAccountClosedResponse,
+  "INVESTOR_ACCOUNT_ALREADY_CANCELLED" -> UpdateSubscriptionAccountCancelledResponse,
+  "INVESTOR_ACCOUNT_ALREADY_VOID" -> UpdateSubscriptionAccountVoidedResponse
+  )
 }
 
