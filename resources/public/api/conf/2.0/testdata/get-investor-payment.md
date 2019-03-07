@@ -18,7 +18,7 @@
   "paymentStatus": "Paid",
   "paymentDate": "2017-06-20",
   "paymentAmount": 1000,
-  "paymentReference": "0000002630000993"
+  "paymentReference": "002630000993"
 }
 </pre>
             </td>
@@ -79,7 +79,7 @@
   "paymentStatus": "Due",
   "paymentDueDate": "2018-01-20",
   "paymentAmount": 200,
-  "paymentReference": "002630000993"
+  "paymentReference": "0000002630000993"
 }
 </pre>
             </td>
@@ -94,7 +94,7 @@
   "paymentStatus": "Collected",
   "paymentDate": "2018-02-20",
   "paymentAmount": 250,
-  "paymentReference": "002630000994"
+  "paymentReference": "0000002630000994"
 }
 </pre>
             </td>
