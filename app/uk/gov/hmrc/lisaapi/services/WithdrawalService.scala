@@ -53,18 +53,19 @@ class WithdrawalService @Inject()(desConnector: DesConnector)(implicit ec: Execu
         ReportWithdrawalChargeAlreadySuperseded(alreadySupersededResponse.supersededTransactionByID)
       case failureResponse: DesFailureResponse =>
         Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
-
-        failureResponse.code match {
-          case "INVESTOR_ACCOUNTID_NOT_FOUND" => ReportWithdrawalChargeAccountNotFound
-          case "INVESTOR_ACCOUNT_ALREADY_VOID" => ReportWithdrawalChargeAccountVoid
-          case "INVESTOR_ACCOUNT_ALREADY_CANCELLED" => ReportWithdrawalChargeAccountCancelled
-          case "WITHDRAWAL_REPORTING_ERROR" => ReportWithdrawalChargeReportingError
-          case "SUPERSEDING_TRANSACTION_ID_AMOUNT_MISMATCH" => ReportWithdrawalChargeSupersedeAmountMismatch
-          case "SUPERSEDING_TRANSACTION_OUTCOME_ERROR" => ReportWithdrawalChargeSupersedeOutcomeError
-          case _ =>
-            Logger.warn(s"Request bonus payment returned error: ${failureResponse.code}")
-            ReportWithdrawalChargeError
-        }
+        desFailures.getOrElse(failureResponse.code, {
+          Logger.warn(s"Request bonus payment returned error: ${failureResponse.code}")
+          ReportWithdrawalChargeError
+        })
     }
   }
+
+  private val desFailures = Map[String, ReportWithdrawalChargeErrorResponse](
+    "INVESTOR_ACCOUNTID_NOT_FOUND" -> ReportWithdrawalChargeAccountNotFound,
+    "INVESTOR_ACCOUNT_ALREADY_VOID" -> ReportWithdrawalChargeAccountVoid,
+    "INVESTOR_ACCOUNT_ALREADY_CANCELLED" -> ReportWithdrawalChargeAccountCancelled,
+    "WITHDRAWAL_REPORTING_ERROR" -> ReportWithdrawalChargeReportingError,
+    "SUPERSEDING_TRANSACTION_ID_AMOUNT_MISMATCH" -> ReportWithdrawalChargeSupersedeAmountMismatch,
+    "SUPERSEDING_TRANSACTION_OUTCOME_ERROR" -> ReportWithdrawalChargeSupersedeOutcomeError
+  )
 }
