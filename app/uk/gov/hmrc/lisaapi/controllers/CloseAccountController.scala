@@ -19,7 +19,7 @@ package uk.gov.hmrc.lisaapi.controllers
 import com.google.inject.Inject
 import play.api.Logger
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent, Result}
+import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.config.AppContext
@@ -36,8 +36,9 @@ class CloseAccountController @Inject()(
                                         val appContext: AppContext,
                                         auditService: AuditService,
                                         service: AccountService,
-                                        val lisaMetrics: LisaMetrics
-                                      )(implicit ec: ExecutionContext) extends LisaController {
+                                        val lisaMetrics: LisaMetrics,
+                                        cc: ControllerComponents
+                                      )(implicit ec: ExecutionContext) extends LisaController(cc: ControllerComponents) {
 
   def closeLisaAccount(lisaManager: String, accountId: String): Action[AnyContent] =
     (validateHeader() andThen validateLMRN(lisaManager) andThen validateAccountId(accountId)).async { implicit request =>

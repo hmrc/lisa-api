@@ -20,7 +20,7 @@ import com.google.inject.Inject
 import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.json.{Json, Reads}
-import play.api.mvc.{Action, AnyContent, Request, Result}
+import play.api.mvc._
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.config.AppContext
@@ -40,8 +40,9 @@ class BonusPaymentController @Inject()(
                                         auditService: AuditService,
                                         validator: BonusPaymentValidator,
                                         dateTimeService: CurrentDateService,
-                                        val lisaMetrics: LisaMetrics
-                                      )(implicit ec: ExecutionContext) extends LisaController {
+                                        val lisaMetrics: LisaMetrics,
+                                        cc: ControllerComponents
+                                      )(implicit ec: ExecutionContext) extends LisaController(cc: ControllerComponents) {
 
   private val requestBonusErrors = Map[RequestBonusPaymentErrorResponse, ErrorResponse](
     RequestBonusPaymentBonusClaimError -> ErrorBonusClaimError,

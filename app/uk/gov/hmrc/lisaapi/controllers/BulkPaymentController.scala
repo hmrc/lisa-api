@@ -21,7 +21,7 @@ import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import play.api.libs.json.Reads.of
 import play.api.libs.json._
-import play.api.mvc.{Action, AnyContent, Result}
+import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.config.AppContext
@@ -39,8 +39,9 @@ class BulkPaymentController @Inject()(
                                        currentDateService: CurrentDateService,
                                        service: BulkPaymentService,
                                        auditService: AuditService,
-                                       val lisaMetrics: LisaMetrics
-                                     )(implicit ec: ExecutionContext) extends LisaController {
+                                       val lisaMetrics: LisaMetrics,
+                                       cc: ControllerComponents
+                                     )(implicit ec: ExecutionContext) extends LisaController(cc: ControllerComponents) {
 
   def getBulkPayment(lisaManager: String, startDate: String, endDate: String): Action[AnyContent] =
     validateHeader().async { implicit request =>

@@ -18,6 +18,7 @@ package uk.gov.hmrc.lisaapi.config
 
 import com.google.inject.Inject
 import play.api.{Configuration, Environment}
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.config.ServicesConfig
 
 class AppContext @Inject()(

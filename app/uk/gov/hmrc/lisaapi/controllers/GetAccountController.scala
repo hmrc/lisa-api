@@ -18,7 +18,7 @@ package uk.gov.hmrc.lisaapi.controllers
 
 import com.google.inject.Inject
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent}
+import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.config.AppContext
@@ -32,9 +32,9 @@ class GetAccountController @Inject()(
                                       val appContext: AppContext,
                                       service: AccountService,
                                       auditService: AuditService,
-                                      val lisaMetrics: LisaMetrics
-                                    )
-  extends LisaController {
+                                      val lisaMetrics: LisaMetrics,
+                                      cc: ControllerComponents
+                                    ) extends LisaController(cc: ControllerComponents) {
 
   def getAccountDetails(lisaManager: String, accountId: String): Action[AnyContent] =
     (validateHeader() andThen validateLMRN(lisaManager) andThen validateAccountId(accountId)).async { implicit request =>

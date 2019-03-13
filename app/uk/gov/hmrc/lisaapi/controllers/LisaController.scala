@@ -26,12 +26,12 @@ import uk.gov.hmrc.auth.core.{AuthorisationException, AuthorisedFunctions, Enrol
 import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.utils.ErrorConverter
-import uk.gov.hmrc.play.bootstrap.controller.BaseController
+import uk.gov.hmrc.play.bootstrap.controller.BackendController
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 
-trait LisaController extends BaseController with LisaConstants with AuthorisedFunctions with APIVersioning with LisaActions {
+case class LisaController(cc: ControllerComponents) extends BackendController(cc: ControllerComponents) with LisaConstants with AuthorisedFunctions with APIVersioning with LisaActions {
 
   override val validateVersion: String => Boolean = str => str == "1.0" || str == "2.0"
   override val validateContentType: String => Boolean = _ == "json"

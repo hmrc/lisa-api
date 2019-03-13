@@ -18,7 +18,7 @@ package uk.gov.hmrc.lisaapi.controllers
 
 import com.google.inject.Inject
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent}
+import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
@@ -28,9 +28,9 @@ import scala.concurrent.{ExecutionContext, Future}
 class DiscoverController @Inject()(
                                     val authConnector: AuthConnector,
                                     val appContext: AppContext,
-                                    val lisaMetrics: LisaMetrics)
-                                  (implicit ec: ExecutionContext)
-  extends LisaController {
+                                    val lisaMetrics: LisaMetrics,
+                                    cc: ControllerComponents
+                                  )(implicit ec: ExecutionContext) extends LisaController(cc: ControllerComponents) {
 
   def discover(lisaManagerReferenceNumber: String): Action[AnyContent] =
     (validateHeader andThen

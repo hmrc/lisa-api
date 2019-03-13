@@ -18,7 +18,7 @@ package uk.gov.hmrc.lisaapi.controllers
 
 import com.google.inject.Inject
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent}
+import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.config.AppContext
@@ -32,9 +32,9 @@ class GetLifeEventController @Inject()(
                                         val appContext: AppContext,
                                         val lisaMetrics: LisaMetrics,
                                         val service: LifeEventService,
-                                        auditService: AuditService)
-                                      (implicit ec: ExecutionContext)
-  extends LisaController {
+                                        auditService: AuditService,
+                                        cc: ControllerComponents
+                                      )(implicit ec: ExecutionContext) extends LisaController(cc: ControllerComponents) {
 
   override val validateVersion: String => Boolean = _ == "2.0"
 
