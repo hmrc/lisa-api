@@ -15,9 +15,7 @@
  */
 
 package uk.gov.hmrc.lisaapi.controllers
-
 import play.api.Logger
-import play.api.data.validation.ValidationError
 import play.api.libs.json.Json.toJson
 import play.api.libs.json._
 import play.api.mvc._
@@ -69,7 +67,7 @@ case class LisaController(cc: ControllerComponents) extends BackendController(cc
 
   protected def withValidJson[T](
                                   success: T => Future[Result],
-                                  invalid: Option[Seq[(JsPath, Seq[ValidationError])] => Future[Result]] = None,
+                                  invalid: Option[Seq[(JsPath, Seq[JsonValidationError])] => Future[Result]] = None,
                                   lisaManager: String
                                 )(implicit request: Request[AnyContent], reads: Reads[T], startTime: Long, ec: ExecutionContext): Future[Result] = {
 
