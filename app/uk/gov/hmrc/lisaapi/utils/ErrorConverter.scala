@@ -16,13 +16,12 @@
 
 package uk.gov.hmrc.lisaapi.utils
 
-import play.api.data.validation.ValidationError
-import play.api.libs.json.JsPath
+import play.api.libs.json.{JsPath, JsonValidationError}
 import uk.gov.hmrc.lisaapi.controllers.ErrorValidation
 
 trait ErrorConverter {
 
-  def convert(error: Seq[(JsPath, Seq[ValidationError])]):List[ErrorValidation] = {
+  def convert(error: Seq[(JsPath, Seq[JsonValidationError])]):List[ErrorValidation] = {
     error.map(e => {
       val details = getErrorDetails(e._2.head.message)
 
