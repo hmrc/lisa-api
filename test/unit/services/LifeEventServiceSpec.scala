@@ -217,7 +217,7 @@ class LifeEventServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuit
     "return a Right with a Seq GetLifeEventItem" when {
 
       "a Seq GetLifeEventItem is returned" in {
-        val success = List(GetLifeEventItem("12345", "STATUTORY_SUBMISSION", new LocalDate("2018-01-01")))
+        val success = List(GetLifeEventItem("12345", "STATUTORY_SUBMISSION", LocalDate.parse("2018-01-01")))
 
         when(mockDesConnector.getLifeEvent(any(), any(), any())(any())).
           thenReturn(Future.successful(Right(success)))
