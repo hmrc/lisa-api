@@ -28,13 +28,18 @@ import uk.gov.hmrc.lisaapi.services.{AuditService, LifeEventService}
 import scala.concurrent.ExecutionContext
 
 class GetLifeEventController @Inject()(
-                                        val authConnector: AuthConnector,
-                                        val appContext: AppContext,
-                                        val lisaMetrics: LisaMetrics,
+                                        authConnector: AuthConnector,
+                                        appContext: AppContext,
+                                        lisaMetrics: LisaMetrics,
                                         val service: LifeEventService,
                                         auditService: AuditService,
                                         cc: ControllerComponents
-                                      )(implicit ec: ExecutionContext) extends LisaController(cc: ControllerComponents) {
+                                      )(implicit ec: ExecutionContext) extends LisaController(
+  cc: ControllerComponents,
+  lisaMetrics: LisaMetrics,
+  appContext: AppContext,
+  authConnector: AuthConnector
+) {
 
   override val validateVersion: String => Boolean = _ == "2.0"
 

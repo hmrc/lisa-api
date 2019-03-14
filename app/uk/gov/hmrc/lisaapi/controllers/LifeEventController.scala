@@ -31,13 +31,18 @@ import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
 import scala.concurrent.{ExecutionContext, Future}
 
 class LifeEventController @Inject()(
-                                     val authConnector: AuthConnector,
-                                     val appContext: AppContext,
+                                     authConnector: AuthConnector,
+                                     appContext: AppContext,
                                      service: LifeEventService,
                                      auditService: AuditService,
-                                     val lisaMetrics: LisaMetrics,
+                                     lisaMetrics: LisaMetrics,
                                      cc: ControllerComponents
-                                   )(implicit ec: ExecutionContext) extends LisaController(cc: ControllerComponents) {
+                                   )(implicit ec: ExecutionContext) extends LisaController(
+  cc: ControllerComponents,
+  lisaMetrics: LisaMetrics,
+  appContext: AppContext,
+  authConnector: AuthConnector
+) {
 
   def reportLisaLifeEvent(lisaManager: String, accountId: String): Action[AnyContent] =
     (validateHeader() andThen validateLMRN(lisaManager) andThen validateAccountId(accountId)).async { implicit request =>

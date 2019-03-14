@@ -28,13 +28,18 @@ import uk.gov.hmrc.lisaapi.services.{AccountService, AuditService}
 import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext._
 
 class GetAccountController @Inject()(
-                                      val authConnector: AuthConnector,
-                                      val appContext: AppContext,
+                                      authConnector: AuthConnector,
+                                      appContext: AppContext,
                                       service: AccountService,
                                       auditService: AuditService,
-                                      val lisaMetrics: LisaMetrics,
+                                      lisaMetrics: LisaMetrics,
                                       cc: ControllerComponents
-                                    ) extends LisaController(cc: ControllerComponents) {
+                                    ) extends LisaController(
+  cc: ControllerComponents,
+  lisaMetrics: LisaMetrics,
+  appContext: AppContext,
+  authConnector: AuthConnector
+) {
 
   def getAccountDetails(lisaManager: String, accountId: String): Action[AnyContent] =
     (validateHeader() andThen validateLMRN(lisaManager) andThen validateAccountId(accountId)).async { implicit request =>

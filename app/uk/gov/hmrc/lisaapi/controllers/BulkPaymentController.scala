@@ -34,14 +34,19 @@ import scala.collection.mutable
 import scala.concurrent.{ExecutionContext, Future}
 
 class BulkPaymentController @Inject()(
-                                       val authConnector: AuthConnector,
-                                       val appContext: AppContext,
+                                       authConnector: AuthConnector,
+                                       appContext: AppContext,
                                        currentDateService: CurrentDateService,
                                        service: BulkPaymentService,
                                        auditService: AuditService,
-                                       val lisaMetrics: LisaMetrics,
+                                       lisaMetrics: LisaMetrics,
                                        cc: ControllerComponents
-                                     )(implicit ec: ExecutionContext) extends LisaController(cc: ControllerComponents) {
+                                     )(implicit ec: ExecutionContext) extends LisaController(
+  cc: ControllerComponents,
+  lisaMetrics: LisaMetrics,
+  appContext: AppContext,
+  authConnector: AuthConnector
+) {
 
   def getBulkPayment(lisaManager: String, startDate: String, endDate: String): Action[AnyContent] =
     validateHeader().async { implicit request =>

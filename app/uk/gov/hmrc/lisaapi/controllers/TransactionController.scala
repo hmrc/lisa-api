@@ -30,13 +30,18 @@ import uk.gov.hmrc.lisaapi.services.{AuditService, TransactionService}
 import scala.concurrent.{ExecutionContext, Future}
 
 class TransactionController @Inject() (
-                                        val authConnector: AuthConnector,
-                                        val appContext: AppContext,
+                                        authConnector: AuthConnector,
+                                        appContext: AppContext,
                                         service: TransactionService,
                                         auditService: AuditService,
-                                        val lisaMetrics: LisaMetrics,
+                                        lisaMetrics: LisaMetrics,
                                         cc: ControllerComponents
-                                      )(implicit ec: ExecutionContext) extends LisaController(cc: ControllerComponents) {
+                                      )(implicit ec: ExecutionContext) extends LisaController(
+  cc: ControllerComponents,
+  lisaMetrics: LisaMetrics,
+  appContext: AppContext,
+  authConnector: AuthConnector
+) {
 
   def getTransaction(lisaManager: String, accountId: String, transactionId: String): Action[AnyContent] =
     validateHeader().async { implicit request =>

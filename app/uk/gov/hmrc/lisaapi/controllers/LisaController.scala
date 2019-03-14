@@ -20,8 +20,9 @@ import play.api.libs.json.Json.toJson
 import play.api.libs.json._
 import play.api.mvc._
 import uk.gov.hmrc.auth.core.retrieve.Retrievals.internalId
-import uk.gov.hmrc.auth.core.{AuthorisationException, AuthorisedFunctions, Enrolment, InsufficientEnrolments}
+import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.lisaapi.LisaConstants
+import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.utils.ErrorConverter
 import uk.gov.hmrc.play.bootstrap.controller.BackendController
@@ -29,13 +30,16 @@ import uk.gov.hmrc.play.bootstrap.controller.BackendController
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 
-case class LisaController(cc: ControllerComponents) extends BackendController(cc: ControllerComponents) with LisaConstants with AuthorisedFunctions with APIVersioning with LisaActions {
+abstract case class LisaController(
+                                    cc: ControllerComponents,
+                                    lisaMetrics: LisaMetrics,
+                                    appContext: AppContext,
+                                    authConnector: AuthConnector
+                                  ) extends BackendController(cc: ControllerComponents) with LisaConstants with AuthorisedFunctions with APIVersioning with LisaActions {
 
   override val validateVersion: String => Boolean = str => str == "1.0" || str == "2.0"
   override val validateContentType: String => Boolean = _ == "json"
   lazy val errorConverter: ErrorConverter = ErrorConverter
-
-  def lisaMetrics: LisaMetrics
 
   protected def withValidLMRN(lisaManager: String)(success: () => Future[Result])(implicit request: Request[AnyContent], startTime: Long): Future[Result] = {
     if (lisaManager.matches("^Z([0-9]{4}|[0-9]{6})$")) {

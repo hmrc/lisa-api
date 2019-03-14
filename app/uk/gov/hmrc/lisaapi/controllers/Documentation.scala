@@ -18,7 +18,7 @@ package uk.gov.hmrc.lisaapi.controllers
 
 import com.google.inject.Inject
 import controllers.Assets
-import play.api.http.{HttpErrorHandler, LazyHttpErrorHandler}
+import play.api.http.HttpErrorHandler
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.api.controllers.DocumentationController
 import uk.gov.hmrc.lisaapi.config.AppContext

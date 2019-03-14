@@ -34,13 +34,18 @@ import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext._
 import scala.concurrent.Future
 
 class AccountController @Inject()(
-                                   val authConnector: AuthConnector,
-                                   val appContext: AppContext,
+                                   authConnector: AuthConnector,
+                                   appContext: AppContext,
                                    service: AccountService,
                                    auditService: AuditService,
-                                   val lisaMetrics: LisaMetrics,
+                                   lisaMetrics: LisaMetrics,
                                    cc: ControllerComponents
-                                 ) extends LisaController(cc: ControllerComponents) {
+                                 ) extends LisaController(
+  cc: ControllerComponents,
+  lisaMetrics: LisaMetrics,
+  appContext: AppContext,
+  authConnector: AuthConnector
+) {
 
   def createOrTransferLisaAccount(lisaManager: String): Action[AnyContent] =
     (validateHeader() andThen validateLMRN(lisaManager)).async { implicit request =>

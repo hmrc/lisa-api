@@ -33,16 +33,21 @@ import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
 import scala.concurrent.{ExecutionContext, Future}
 
 class BonusPaymentController @Inject()(
-                                        val authConnector: AuthConnector,
-                                        val appContext: AppContext,
+                                        authConnector: AuthConnector,
+                                        appContext: AppContext,
                                         getService: BonusOrWithdrawalService,
                                         postService: BonusPaymentService,
                                         auditService: AuditService,
                                         validator: BonusPaymentValidator,
                                         dateTimeService: CurrentDateService,
-                                        val lisaMetrics: LisaMetrics,
+                                        lisaMetrics: LisaMetrics,
                                         cc: ControllerComponents
-                                      )(implicit ec: ExecutionContext) extends LisaController(cc: ControllerComponents) {
+                                      )(implicit ec: ExecutionContext) extends LisaController(
+  cc: ControllerComponents,
+  lisaMetrics: LisaMetrics,
+  appContext: AppContext,
+  authConnector: AuthConnector
+) {
 
   private val requestBonusErrors = Map[RequestBonusPaymentErrorResponse, ErrorResponse](
     RequestBonusPaymentBonusClaimError -> ErrorBonusClaimError,

@@ -391,6 +391,4 @@ class DesConnector @Inject()(
         }
     }
   }
-
-  override protected def mode = environment.mode
 }

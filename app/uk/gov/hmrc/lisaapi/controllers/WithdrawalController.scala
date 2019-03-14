@@ -32,16 +32,21 @@ import uk.gov.hmrc.lisaapi.utils.WithdrawalChargeValidator
 import scala.concurrent.{ExecutionContext, Future}
 
 class WithdrawalController @Inject() (
-                                       val authConnector: AuthConnector,
-                                       val appContext: AppContext,
+                                       authConnector: AuthConnector,
+                                       appContext: AppContext,
                                        postService: WithdrawalService,
                                        getService: BonusOrWithdrawalService,
                                        auditService: AuditService,
                                        validator: WithdrawalChargeValidator,
                                        dateTimeService: CurrentDateService,
-                                       val lisaMetrics: LisaMetrics,
+                                       lisaMetrics: LisaMetrics,
                                        cc: ControllerComponents
-                                     )(implicit ec: ExecutionContext) extends LisaController(cc: ControllerComponents) {
+                                     )(implicit ec: ExecutionContext) extends LisaController(
+  cc: ControllerComponents,
+  lisaMetrics: LisaMetrics,
+  appContext: AppContext,
+  authConnector: AuthConnector
+) {
 
   override val validateVersion: String => Boolean = _ == "2.0"
 

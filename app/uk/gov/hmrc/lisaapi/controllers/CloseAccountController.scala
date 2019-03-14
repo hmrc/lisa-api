@@ -32,13 +32,18 @@ import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
 import scala.concurrent.{ExecutionContext, Future}
 
 class CloseAccountController @Inject()(
-                                        val authConnector: AuthConnector,
-                                        val appContext: AppContext,
+                                        authConnector: AuthConnector,
+                                        appContext: AppContext,
                                         auditService: AuditService,
                                         service: AccountService,
-                                        val lisaMetrics: LisaMetrics,
+                                        lisaMetrics: LisaMetrics,
                                         cc: ControllerComponents
-                                      )(implicit ec: ExecutionContext) extends LisaController(cc: ControllerComponents) {
+                                      )(implicit ec: ExecutionContext) extends LisaController(
+  cc: ControllerComponents,
+  lisaMetrics: LisaMetrics,
+  appContext: AppContext,
+  authConnector: AuthConnector
+) {
 
   def closeLisaAccount(lisaManager: String, accountId: String): Action[AnyContent] =
     (validateHeader() andThen validateLMRN(lisaManager) andThen validateAccountId(accountId)).async { implicit request =>

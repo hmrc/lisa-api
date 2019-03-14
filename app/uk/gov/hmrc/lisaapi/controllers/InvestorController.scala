@@ -30,13 +30,18 @@ import uk.gov.hmrc.lisaapi.services.{AuditService, InvestorService}
 import scala.concurrent.ExecutionContext
 
 class InvestorController @Inject()(
-                                    val authConnector: AuthConnector,
-                                    val appContext: AppContext,
+                                    authConnector: AuthConnector,
+                                    appContext: AppContext,
                                     service: InvestorService,
                                     auditService: AuditService,
-                                    val lisaMetrics: LisaMetrics,
+                                    lisaMetrics: LisaMetrics,
                                     cc: ControllerComponents
-                                  )(implicit ec: ExecutionContext) extends LisaController(cc: ControllerComponents) {
+                                  )(implicit ec: ExecutionContext) extends LisaController(
+  cc: ControllerComponents,
+  lisaMetrics: LisaMetrics,
+  appContext: AppContext,
+  authConnector: AuthConnector
+) {
 
   def createLisaInvestor(lisaManager: String): Action[AnyContent] = (validateHeader() andThen validateLMRN(lisaManager)).async { implicit request =>
     implicit val startTime: Long = System.currentTimeMillis()

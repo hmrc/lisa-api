@@ -32,14 +32,19 @@ import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext._
 import scala.concurrent.Future
 
 class AnnualReturnController @Inject()(
-                                       val authConnector: AuthConnector,
-                                       val appContext: AppContext,
+                                       authConnector: AuthConnector,
+                                       appContext: AppContext,
                                        service: LifeEventService,
                                        auditService: AuditService,
                                        validator: AnnualReturnValidator,
-                                       val lisaMetrics: LisaMetrics,
+                                       lisaMetrics: LisaMetrics,
                                        cc: ControllerComponents
-                                      ) extends LisaController(cc: ControllerComponents) {
+                                      ) extends LisaController(
+  cc: ControllerComponents,
+  lisaMetrics: LisaMetrics,
+  appContext: AppContext,
+  authConnector: AuthConnector
+) {
 
   override val validateVersion: String => Boolean = _ == "2.0"
 
