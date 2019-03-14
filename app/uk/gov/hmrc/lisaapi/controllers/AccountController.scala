@@ -18,7 +18,6 @@ package uk.gov.hmrc.lisaapi.controllers
 
 import com.google.inject.Inject
 import play.api.Logger
-import play.api.data.validation.ValidationError
 import play.api.libs.json.Json.toJson
 import play.api.libs.json.{JsObject, JsPath, Json, JsonValidationError}
 import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
@@ -29,6 +28,7 @@ import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AccountService, AuditService}
 import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
+import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext
 import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext._
 
 import scala.concurrent.Future
@@ -47,7 +47,7 @@ class AccountController @Inject()(
   authConnector: AuthConnector
 ) {
 
-  def createOrTransferLisaAccount(lisaManager: String): Action[AnyContent] =
+  def createOrTransferLisaAccount(lisaManager: String)(implicit ec: MdcLoggingExecutionContext): Action[AnyContent] =
     (validateHeader() andThen validateLMRN(lisaManager)).async { implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
 

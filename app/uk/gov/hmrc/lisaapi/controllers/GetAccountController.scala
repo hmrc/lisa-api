@@ -25,6 +25,7 @@ import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models.{GetLisaAccountDoesNotExistResponse, GetLisaAccountServiceUnavailable, GetLisaAccountSuccessResponse}
 import uk.gov.hmrc.lisaapi.services.{AccountService, AuditService}
+import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext
 import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext._
 
 class GetAccountController @Inject()(
@@ -41,7 +42,7 @@ class GetAccountController @Inject()(
   authConnector: AuthConnector
 ) {
 
-  def getAccountDetails(lisaManager: String, accountId: String): Action[AnyContent] =
+  def getAccountDetails(lisaManager: String, accountId: String)(implicit ec: MdcLoggingExecutionContext): Action[AnyContent] =
     (validateHeader() andThen validateLMRN(lisaManager) andThen validateAccountId(accountId)).async { implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
       withEnrolment(lisaManager) { (_) =>
