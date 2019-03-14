@@ -21,14 +21,15 @@ import org.mockito.Matchers._
 import org.mockito.Mockito.when
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.{Configuration, Environment}
+import play.api.Configuration
 import uk.gov.hmrc.lisaapi.config.AppContext
+import uk.gov.hmrc.play.bootstrap.config.RunMode
 
 class AppContextSpec extends PlaySpec with MockitoSugar {
 
-  val mockEnvironment = mock[Environment]
   val mockConfiguration = mock[Configuration]
-  val SUT = new AppContext(mockConfiguration, mockEnvironment)
+  val mockRunMode = mock[RunMode]
+  val SUT = new AppContext(mockConfiguration, mockRunMode)
 
   "endpointIsDisabled" must {
 

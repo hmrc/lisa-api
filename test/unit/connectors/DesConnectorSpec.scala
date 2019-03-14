@@ -16,6 +16,8 @@
 
 package unit.connectors
 
+import java.time.LocalDate
+
 import org.joda.time.DateTime
 import org.mockito.Matchers.{eq => matchersEquals, _}
 import org.mockito.Mockito.{verify, when}
@@ -755,7 +757,7 @@ class DesConnectorSpec extends PlaySpec
           response mustBe Right(List(GetLifeEventItem(
             lifeEventId = "1234567890",
             eventType = "Statutory Submission",
-            eventDate = new DateTime("2018-04-05")
+            eventDate = LocalDate.parse("2018-04-05")
           )))
         }
 
