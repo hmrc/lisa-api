@@ -21,11 +21,12 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.http.HeaderNames.ACCEPT
 import play.api.mvc._
-import play.api.test.{FakeApplication, FakeRequest}
+import play.api.test.FakeRequest
 import play.test.Helpers
 import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.controllers.{APIVersioning, ErrorAcceptHeaderContentInvalid, ErrorAcceptHeaderInvalid, ErrorAcceptHeaderVersionInvalid, ErrorApiNotAvailable}
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 import scala.language.postfixOps

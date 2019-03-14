@@ -23,9 +23,9 @@ import org.scalatest.BeforeAndAfter
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.{JsObject, Json}
-import play.api.mvc.{AnyContentAsJson, Result}
+import play.api.mvc.{AnyContentAsJson, ControllerComponents, Result}
 import play.api.test.Helpers._
-import play.api.test.{FakeRequest, Helpers}
+import play.api.test.{FakeRequest, Helpers, Injecting}
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
@@ -41,7 +41,8 @@ import scala.concurrent.Future
 class PropertyPurchaseControllerSpec extends PlaySpec
   with MockitoSugar
   with OneAppPerSuite
-  with BeforeAndAfter {
+  with BeforeAndAfter
+  with Injecting {
 
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.2.0+json")
   val lisaManager = "Z019283"
@@ -968,8 +969,9 @@ class PropertyPurchaseControllerSpec extends PlaySpec
   val mockAuthCon: AuthConnector = mock[AuthConnector]
   val mockAppContext: AppContext = mock[AppContext]
   val mockLisaMetrics: LisaMetrics = mock[LisaMetrics]
+  val mockControllerComponents = inject[ControllerComponents]
 
-  val SUT = new PropertyPurchaseController(mockAuthCon, mockAppContext, mockService, mockAuditService, mockLisaMetrics) {
+  val SUT = new PropertyPurchaseController(mockAuthCon, mockAppContext, mockService, mockAuditService, mockLisaMetrics, mockControllerComponents) {
     override lazy val v2endpointsEnabled = true
   }
 

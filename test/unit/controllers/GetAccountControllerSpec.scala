@@ -23,7 +23,7 @@ import org.scalatest.BeforeAndAfter
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.JsObject
-import play.api.mvc.Result
+import play.api.mvc.{ControllerComponents, Result}
 import play.api.test.Helpers._
 import play.api.test._
 import play.mvc.Http.HeaderNames
@@ -38,7 +38,7 @@ import uk.gov.hmrc.lisaapi.services.{AccountService, AuditService}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class GetAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite with BeforeAndAfter {
+class GetAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite with BeforeAndAfter with Injecting {
 
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
   val lisaManager = "Z019283"
@@ -291,7 +291,8 @@ class GetAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPer
   val mockAppContext: AppContext = mock[AppContext]
   val mockAuditService: AuditService = mock[AuditService]
   val mockLisaMetrics: LisaMetrics = mock[LisaMetrics]
-  val SUT = new GetAccountController(mockAuthCon, mockAppContext, mockService, mockAuditService, mockLisaMetrics) {
+  val mockControllerComponents = inject[ControllerComponents]
+  val SUT = new GetAccountController(mockAuthCon, mockAppContext, mockService, mockAuditService, mockLisaMetrics, mockControllerComponents) {
     override lazy val v2endpointsEnabled = true
   }
 

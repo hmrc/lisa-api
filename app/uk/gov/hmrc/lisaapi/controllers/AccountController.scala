@@ -28,10 +28,8 @@ import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AccountService, AuditService}
 import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
-import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext
-import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext._
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class AccountController @Inject()(
                                    authConnector: AuthConnector,
@@ -40,7 +38,7 @@ class AccountController @Inject()(
                                    auditService: AuditService,
                                    lisaMetrics: LisaMetrics,
                                    cc: ControllerComponents
-                                 )(implicit ec: MdcLoggingExecutionContext, parse: PlayBodyParsers) extends LisaController(
+                                 )(implicit ec: ExecutionContext, parse: PlayBodyParsers) extends LisaController(
   cc: ControllerComponents,
   lisaMetrics: LisaMetrics,
   appContext: AppContext,

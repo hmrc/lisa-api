@@ -22,7 +22,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsPath, Json, Reads}
-import play.api.mvc.{Action, AnyContent, AnyContentAsJson}
+import play.api.mvc.{Action, AnyContent, AnyContentAsJson, ControllerComponents}
 import play.api.test.Helpers._
 import play.api.test._
 import play.mvc.Http.HeaderNames
@@ -36,7 +36,7 @@ import uk.gov.hmrc.lisaapi.utils.ErrorConverter
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class LisaControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
+class LisaControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite with Injecting {
 
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
 
@@ -104,7 +104,8 @@ class LisaControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite 
   val mockAuditService: AuditService = mock[AuditService]
   val mockAppContext: AppContext = mock[AppContext]
   val mockLisaMetrics: LisaMetrics = mock[LisaMetrics]
-  val SUT = new AccountController(mockAuthCon, mockAppContext, mockService, mockAuditService, mockLisaMetrics) {
+  val mockControllerComponents = inject[ControllerComponents]
+  val SUT = new AccountController(mockAuthCon, mockAppContext, mockService, mockAuditService, mockLisaMetrics, mockControllerComponents) {
 
     def testJsonValidator(): Action[AnyContent] = validateHeader().async { implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()

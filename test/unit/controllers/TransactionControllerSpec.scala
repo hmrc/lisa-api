@@ -23,7 +23,8 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatest.{BeforeAndAfter, MustMatchers}
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
-import play.api.test.FakeRequest
+import play.api.mvc.ControllerComponents
+import play.api.test.{FakeRequest, Injecting}
 import play.api.test.Helpers._
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.api.controllers.ErrorAcceptHeaderInvalid
@@ -42,7 +43,8 @@ class TransactionControllerSpec extends PlaySpec
   with MockitoSugar
   with OneAppPerSuite
   with BeforeAndAfter
-  with MustMatchers {
+  with MustMatchers
+  with Injecting {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
   val acceptHeaderV1: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
@@ -369,8 +371,9 @@ class TransactionControllerSpec extends PlaySpec
   val mockAuthCon: AuthConnector = mock[AuthConnector]
   val mockAppContext: AppContext = mock[AppContext]
   val mockLisaMetrics: LisaMetrics = mock[LisaMetrics]
+  val mockControllerComponents = inject[ControllerComponents]
 
-  val SUT = new TransactionController(mockAuthCon, mockAppContext, mockService, mockAuditService, mockLisaMetrics) {
+  val SUT = new TransactionController(mockAuthCon, mockAppContext, mockService, mockAuditService, mockLisaMetrics, mockControllerComponents) {
     override lazy val v2endpointsEnabled = true
   }
 

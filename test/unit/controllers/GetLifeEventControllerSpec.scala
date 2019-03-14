@@ -16,6 +16,8 @@
 
 package unit.controllers
 
+import java.time.LocalDate
+
 import org.joda.time.DateTime
 import org.mockito.Matchers.{any, eq => matchersEquals}
 import org.mockito.Mockito._
@@ -23,8 +25,9 @@ import org.scalatest.BeforeAndAfter
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
+import play.api.mvc.ControllerComponents
 import play.api.test.Helpers._
-import play.api.test.{FakeRequest, Helpers}
+import play.api.test.{FakeRequest, Helpers, Injecting}
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.lisaapi.config.AppContext
@@ -36,7 +39,7 @@ import uk.gov.hmrc.lisaapi.services.{AuditService, LifeEventService}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class GetLifeEventControllerSpec extends PlaySpec with MockitoSugar with BeforeAndAfter with OneAppPerSuite {
+class GetLifeEventControllerSpec extends PlaySpec with MockitoSugar with BeforeAndAfter with OneAppPerSuite with Injecting {
 
   val acceptHeaderV1: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
   val acceptHeaderV2: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.2.0+json")
@@ -60,7 +63,7 @@ class GetLifeEventControllerSpec extends PlaySpec with MockitoSugar with BeforeA
 
     "return ok for api version 2" when {
       "given a successful response from the service layer" in {
-        val annualReturn = GetLifeEventItem("12345", "STATUTORY_SUBMISSION", new DateTime("2018-01-01"))
+        val annualReturn = GetLifeEventItem("12345", "STATUTORY_SUBMISSION", LocalDate.parse("2018-01-01"))
 
         when(mockService.getLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(Right(List(annualReturn))))
 
@@ -88,7 +91,7 @@ class GetLifeEventControllerSpec extends PlaySpec with MockitoSugar with BeforeA
 
     "audit getLifeEventReported" when {
       "given a successful response from the service layer" in {
-        val annualReturn = GetLifeEventItem("12345", "STATUTORY_SUBMISSION", new DateTime("2018-01-01"))
+        val annualReturn = GetLifeEventItem("12345", "STATUTORY_SUBMISSION", LocalDate.parse("2018-01-01"))
         when(mockService.getLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(Right(List(annualReturn))))
 
         val res = SUT.getLifeEvent(lisaManager, accountId, eventId).apply(FakeRequest().withHeaders(acceptHeaderV2))
@@ -129,8 +132,9 @@ class GetLifeEventControllerSpec extends PlaySpec with MockitoSugar with BeforeA
   val mockLisaMetrics: LisaMetrics = mock[LisaMetrics]
   val mockService: LifeEventService = mock[LifeEventService]
   val mockAuditService: AuditService = mock[AuditService]
+  val mockControllerComponents = inject[ControllerComponents]
 
-  val SUT = new GetLifeEventController(mockAuthCon, mockAppContext, mockLisaMetrics, mockService, mockAuditService) {
+  val SUT = new GetLifeEventController(mockAuthCon, mockAppContext, mockLisaMetrics, mockService, mockAuditService, mockControllerComponents) {
     override lazy val v2endpointsEnabled = true
   }
 
