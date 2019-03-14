@@ -19,7 +19,7 @@ package uk.gov.hmrc.lisaapi.controllers
 import com.google.inject.Inject
 import play.api.Logger
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
+import play.api.mvc._
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.config.AppContext
@@ -41,7 +41,7 @@ class WithdrawalController @Inject() (
                                        dateTimeService: CurrentDateService,
                                        lisaMetrics: LisaMetrics,
                                        cc: ControllerComponents
-                                     )(implicit ec: ExecutionContext) extends LisaController(
+                                     )(implicit ec: ExecutionContext, parse: PlayBodyParsers) extends LisaController(
   cc: ControllerComponents,
   lisaMetrics: LisaMetrics,
   appContext: AppContext,

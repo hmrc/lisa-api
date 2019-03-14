@@ -19,7 +19,7 @@ package uk.gov.hmrc.lisaapi.controllers
 import com.google.inject.Inject
 import play.api.Logger
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
+import play.api.mvc._
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.config.AppContext
@@ -27,6 +27,7 @@ import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, LifeEventService}
 import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
+import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext
 import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext._
 
 import scala.concurrent.Future
@@ -39,7 +40,7 @@ class AnnualReturnController @Inject()(
                                        validator: AnnualReturnValidator,
                                        lisaMetrics: LisaMetrics,
                                        cc: ControllerComponents
-                                      ) extends LisaController(
+                                      )(implicit ec: MdcLoggingExecutionContext, parse: PlayBodyParsers) extends LisaController(
   cc: ControllerComponents,
   lisaMetrics: LisaMetrics,
   appContext: AppContext,

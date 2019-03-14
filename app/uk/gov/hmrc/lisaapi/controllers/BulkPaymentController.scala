@@ -21,7 +21,7 @@ import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import play.api.libs.json.Reads.of
 import play.api.libs.json._
-import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
+import play.api.mvc._
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.config.AppContext
@@ -41,7 +41,7 @@ class BulkPaymentController @Inject()(
                                        auditService: AuditService,
                                        lisaMetrics: LisaMetrics,
                                        cc: ControllerComponents
-                                     )(implicit ec: ExecutionContext) extends LisaController(
+                                     )(implicit ec: ExecutionContext, parse: PlayBodyParsers) extends LisaController(
   cc: ControllerComponents,
   lisaMetrics: LisaMetrics,
   appContext: AppContext,

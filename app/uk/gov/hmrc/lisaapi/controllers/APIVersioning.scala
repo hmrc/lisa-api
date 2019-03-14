@@ -21,7 +21,7 @@ import play.api.http.HeaderNames.ACCEPT
 import play.api.mvc._
 import uk.gov.hmrc.lisaapi.config.AppContext
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 trait APIVersioning {
 
@@ -31,7 +31,9 @@ trait APIVersioning {
 
   protected def appContext: AppContext
 
-  def isEndpointEnabled(endpoint: String): ActionBuilder[Request, AnyContent] = new ActionBuilder[Request, AnyContent] {
+  def isEndpointEnabled(endpoint: String)(implicit ec: ExecutionContext, parse: PlayBodyParsers): ActionBuilder[Request, AnyContent] = new ActionBuilder[Request, AnyContent] {
+    override def parser: BodyParser[AnyContent] = parse.defaultBodyParser
+    override protected def executionContext: ExecutionContext = ec
     override def invokeBlock[A](request: Request[A], block: Request[A] => Future[Result]): Future[Result] = {
       if (appContext.endpointIsDisabled(endpoint)) {
         Logger.info(s"User attempted to use an endpoint which is not available ($endpoint)")
@@ -43,7 +45,9 @@ trait APIVersioning {
     }
   }
 
-  def validateHeader(): ActionBuilder[Request, AnyContent] = new ActionBuilder[Request, AnyContent] {
+  def validateHeader()(implicit ec: ExecutionContext, parse: PlayBodyParsers): ActionBuilder[Request, AnyContent] = new ActionBuilder[Request, AnyContent] {
+    override def parser: BodyParser[AnyContent] = parse.defaultBodyParser
+    override protected def executionContext: ExecutionContext = ec
     override def invokeBlock[A](request: Request[A], block: Request[A] => Future[Result]) = {
       extractAcceptHeader(request) match {
         case Some(AcceptHeader(version, content)) => {

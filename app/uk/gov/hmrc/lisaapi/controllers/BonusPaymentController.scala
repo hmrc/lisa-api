@@ -42,7 +42,7 @@ class BonusPaymentController @Inject()(
                                         dateTimeService: CurrentDateService,
                                         lisaMetrics: LisaMetrics,
                                         cc: ControllerComponents
-                                      )(implicit ec: ExecutionContext) extends LisaController(
+                                      )(implicit ec: ExecutionContext, parse: PlayBodyParsers) extends LisaController(
   cc: ControllerComponents,
   lisaMetrics: LisaMetrics,
   appContext: AppContext,
