@@ -18,8 +18,7 @@ package unit.models
 
 import org.joda.time.DateTime
 import org.scalatestplus.play.PlaySpec
-import play.api.data.validation.ValidationError
-import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
+import play.api.libs.json._
 import uk.gov.hmrc.lisaapi.models.CloseLisaAccountRequest
 
 class CloseLisaAccountSpec extends PlaySpec {
@@ -72,9 +71,9 @@ class CloseLisaAccountSpec extends PlaySpec {
 
         validateRequest(req) { errors =>
           errors.count {
-            case (path: JsPath, errors: Seq[ValidationError]) => {
-              val accountClosureReasonMissing = path.toString() == "/accountClosureReason" && errors.contains(ValidationError("error.path.missing"))
-              val closureDateMissing = path.toString() == "/closureDate" && errors.contains(ValidationError("error.path.missing"))
+            case (path: JsPath, errors: Seq[JsonValidationError]) => {
+              val accountClosureReasonMissing = path.toString() == "/accountClosureReason" && errors.contains(JsonValidationError("error.path.missing"))
+              val closureDateMissing = path.toString() == "/closureDate" && errors.contains(JsonValidationError("error.path.missing"))
 
               (accountClosureReasonMissing || closureDateMissing)
             }
@@ -87,8 +86,8 @@ class CloseLisaAccountSpec extends PlaySpec {
 
         validateRequest(req) { errors =>
           errors.count {
-            case (path: JsPath, errors: Seq[ValidationError]) => {
-              path.toString() == "/accountClosureReason" && errors.contains(ValidationError("error.formatting.accountClosureReason"))
+            case (path: JsPath, errors: Seq[JsonValidationError]) => {
+              path.toString() == "/accountClosureReason" && errors.contains(JsonValidationError("error.formatting.accountClosureReason"))
             }
           } mustBe 1
         }
@@ -99,8 +98,8 @@ class CloseLisaAccountSpec extends PlaySpec {
 
         validateRequest(req) { errors =>
           errors.count {
-            case (path: JsPath, errors: Seq[ValidationError]) => {
-              path.toString() == "/closureDate" && errors.contains(ValidationError("error.formatting.date"))
+            case (path: JsPath, errors: Seq[JsonValidationError]) => {
+              path.toString() == "/closureDate" && errors.contains(JsonValidationError("error.formatting.date"))
             }
           } mustBe 1
         }
@@ -112,8 +111,8 @@ class CloseLisaAccountSpec extends PlaySpec {
 
         validateRequest(req) { errors =>
           errors.count {
-            case (path: JsPath, errors: Seq[ValidationError]) => {
-              path.toString() == "/closureDate" && errors.contains(ValidationError("error.formatting.date"))
+            case (path: JsPath, errors: Seq[JsonValidationError]) => {
+              path.toString() == "/closureDate" && errors.contains(JsonValidationError("error.formatting.date"))
             }
           } mustBe 1
         }
@@ -123,7 +122,7 @@ class CloseLisaAccountSpec extends PlaySpec {
 
   }
 
-  private def validateRequest(req: String)(callback:(Seq[(JsPath, Seq[ValidationError])]) => Unit) = {
+  private def validateRequest(req: String)(callback:(Seq[(JsPath, Seq[JsonValidationError])]) => Unit) = {
     val res = Json.parse(req).validate[CloseLisaAccountRequest]
 
     res match {

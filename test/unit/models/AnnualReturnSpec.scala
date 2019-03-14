@@ -22,7 +22,7 @@ import org.scalatest.BeforeAndAfter
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.data.validation.ValidationError
-import play.api.libs.json.{JsError, JsPath, Json}
+import play.api.libs.json.{JsError, JsPath, Json, JsonValidationError}
 import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.controllers.ErrorValidation
 import uk.gov.hmrc.lisaapi.models.{AnnualReturn, AnnualReturnSupersede, AnnualReturnValidator}
@@ -54,27 +54,27 @@ class AnnualReturnSpec extends PlaySpec
       val invalidJson = validJson ++ Json.obj("originalEventDate" -> "3018-05-01")
 
       invalidJson.validate[AnnualReturnSupersede] mustBe JsError(errors = List(
-        ((JsPath \ "originalEventDate"), List(ValidationError("error.formatting.date")))
+        ((JsPath \ "originalEventDate"), List(JsonValidationError("error.formatting.date")))
       ))
     }
     "not allow a badly formatted event date" in {
       val invalidJson = validJson ++ Json.obj("originalEventDate" -> "30-12-2017")
 
       invalidJson.validate[AnnualReturnSupersede] mustBe JsError(errors = List(
-        ((JsPath \ "originalEventDate"), List(ValidationError("error.formatting.date")))
+        ((JsPath \ "originalEventDate"), List(JsonValidationError("error.formatting.date")))
       ))
     }
     "not allow a badly formatted life event id" in {
       val invalidJson = validJson ++ Json.obj("originalLifeEventId" -> "x")
 
       invalidJson.validate[AnnualReturnSupersede] mustBe JsError(errors = List(
-        ((JsPath \ "originalLifeEventId"), List(ValidationError("error.formatting.lifeEventId")))
+        ((JsPath \ "originalLifeEventId"), List(JsonValidationError("error.formatting.lifeEventId")))
       ))
     }
     "require all fields" in {
       Json.obj().validate[AnnualReturnSupersede] mustBe JsError(errors = List(
-        ((JsPath \ "originalLifeEventId"), List(ValidationError("error.path.missing"))),
-        ((JsPath \ "originalEventDate"), List(ValidationError("error.path.missing")))
+        ((JsPath \ "originalLifeEventId"), List(JsonValidationError("error.path.missing"))),
+        ((JsPath \ "originalEventDate"), List(JsonValidationError("error.path.missing")))
       ))
     }
 

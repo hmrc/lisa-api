@@ -16,7 +16,7 @@
 
 package unit.models
 
-import org.joda.time.DateTime
+import java.time.LocalDate
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsSuccess, Json}
 import uk.gov.hmrc.lisaapi.models.{GetLifeEventItem, GetLifeEventItemPropertyDetails, GetLifeEventItemSupersede}
@@ -50,7 +50,7 @@ class GetLifeEventItemSpec extends PlaySpec {
   val validItemWithAllFields = GetLifeEventItem(
     lifeEventId = "1234567890",
     eventType = "LISA Investor Terminal Ill Health",
-    eventDate = new DateTime("2018-01-30"),
+    eventDate = new LocalDate("2018-01-30"),
     lisaManagerName = Some("Company Name"),
     taxYear = Some(2018),
     marketValueCash = Some(1),
@@ -68,7 +68,7 @@ class GetLifeEventItemSpec extends PlaySpec {
     )),
     supersede = Some(GetLifeEventItemSupersede(
       originalLifeEventId = "3",
-      originalEventDate = new DateTime("2018-01-30")
+      originalEventDate = new LocalDate("2018-01-30")
     )),
     supersededBy = Some("5")
   )
@@ -76,7 +76,7 @@ class GetLifeEventItemSpec extends PlaySpec {
   val validItemWithMinimumFields = GetLifeEventItem(
     lifeEventId = "1234567890",
     eventType = "Extension one",
-    eventDate = new DateTime("2018-01-01")
+    eventDate = new LocalDate("2018-01-01")
   )
 
   "GetLifeEventItem" must {
