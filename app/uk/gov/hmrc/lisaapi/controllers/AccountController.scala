@@ -20,7 +20,7 @@ import com.google.inject.Inject
 import play.api.Logger
 import play.api.data.validation.ValidationError
 import play.api.libs.json.Json.toJson
-import play.api.libs.json.{JsObject, JsPath, Json}
+import play.api.libs.json.{JsObject, JsPath, Json, JsonValidationError}
 import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
@@ -67,8 +67,8 @@ class AccountController @Inject()(
             Logger.info("The errors are " + errors.toString())
 
             val transferAccountDataNotProvided = errors.exists {
-              case (path: JsPath, errors: Seq[ValidationError]) =>
-                path.toString().contains("/transferAccount") && errors.contains(ValidationError("error.path.missing"))
+              case (path: JsPath, errors: Seq[JsonValidationError]) =>
+                path.toString().contains("/transferAccount") && errors.contains(JsonValidationError("error.path.missing"))
             }
 
             if (transferAccountDataNotProvided) {
