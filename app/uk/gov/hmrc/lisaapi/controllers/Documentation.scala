@@ -34,7 +34,7 @@ class Documentation @Inject()(
                              ) extends DocumentationController(cc, assets, errorHandler) {
 
   override def documentation(version: String, endpointName: String): Action[AnyContent] = {
-    at(s"/public/api/documentation/$version", s"${endpointName.replaceAll(" ", "-")}.xml")
+    assets.at(s"/public/api/documentation/$version", s"${endpointName.replaceAll(" ", "-")}.xml")
   }
 
   override def definition(): Action[AnyContent] = Action {
@@ -49,7 +49,7 @@ class Documentation @Inject()(
   }
 
   def raml(version: String, file: String): Action[AnyContent] = {
-    at(s"/public/api/conf/$version", file)
+    assets.at(s"/public/api/conf/$version", file)
   }
 
   private def buildAccess() = {

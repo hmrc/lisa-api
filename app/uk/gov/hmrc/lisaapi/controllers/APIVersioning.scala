@@ -31,7 +31,7 @@ trait APIVersioning {
 
   protected def appContext: AppContext
 
-  def isEndpointEnabled(endpoint: String): ActionBuilder[Request] = new ActionBuilder[Request] {
+  def isEndpointEnabled(endpoint: String): ActionBuilder[Request, AnyContent] = new ActionBuilder[Request, AnyContent] {
     override def invokeBlock[A](request: Request[A], block: Request[A] => Future[Result]): Future[Result] = {
       if (appContext.endpointIsDisabled(endpoint)) {
         Logger.info(s"User attempted to use an endpoint which is not available ($endpoint)")
@@ -43,7 +43,7 @@ trait APIVersioning {
     }
   }
 
-  def validateHeader(): ActionBuilder[Request] = new ActionBuilder[Request] {
+  def validateHeader(): ActionBuilder[Request, AnyContent] = new ActionBuilder[Request, AnyContent] {
     override def invokeBlock[A](request: Request[A], block: Request[A] => Future[Result]) = {
       extractAcceptHeader(request) match {
         case Some(AcceptHeader(version, content)) => {
