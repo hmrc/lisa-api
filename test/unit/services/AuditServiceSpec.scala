@@ -43,6 +43,7 @@ class AuditServiceSpec extends PlaySpec
   "AuditService" must {
 
     before {
+      when(mockAppContext.appName).thenReturn("lisa-api")
       reset(mockAuditConnector)
     }
 
@@ -123,7 +124,7 @@ class AuditServiceSpec extends PlaySpec
 
   implicit val hc: HeaderCarrier = HeaderCarrier(authorization = Some(Authorization("abcde")))
   val mockAuditConnector = mock[AuditConnector]
-  val configuration = Configuration("appName" -> "lisa-api")
+  val configuration = mock[Configuration]
   val mockAppContext = mock[AppContext]
 
   object SUT extends AuditService(mockAuditConnector, configuration, mockAppContext)
