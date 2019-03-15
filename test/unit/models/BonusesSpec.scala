@@ -17,8 +17,7 @@
 package unit.models
 
 import org.scalatestplus.play.PlaySpec
-import play.api.data.validation.ValidationError
-import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
+import play.api.libs.json._
 import uk.gov.hmrc.lisaapi.models.Bonuses
 
 class BonusesSpec extends PlaySpec {
@@ -74,8 +73,8 @@ class BonusesSpec extends PlaySpec {
       res match {
         case JsError(errors) => {
           errors.count {
-            case (path: JsPath, errors: Seq[ValidationError]) => {
-              path.toString() == "/claimReason" && errors.contains(ValidationError("error.formatting.claimReason"))
+            case (path: JsPath, errors: Seq[JsonValidationError]) => {
+              path.toString() == "/claimReason" && errors.contains(JsonValidationError("error.formatting.claimReason"))
             }
           } mustBe 1
         }

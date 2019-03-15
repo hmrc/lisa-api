@@ -18,8 +18,7 @@ package unit.models
 
 import org.joda.time.DateTime
 import org.scalatestplus.play.PlaySpec
-import play.api.data.validation.ValidationError
-import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
+import play.api.libs.json._
 import uk.gov.hmrc.lisaapi.models.{AccountTransfer, CreateLisaAccountCreationRequest, CreateLisaAccountRequest, CreateLisaAccountTransferRequest}
 
 class CreateLisaAccountRequestSpec extends PlaySpec {
@@ -204,8 +203,8 @@ class CreateLisaAccountRequestSpec extends PlaySpec {
       res match {
         case JsError(errors) => {
           errors.count {
-            case (path: JsPath, errors: Seq[ValidationError]) => {
-              path.toString() == "/firstSubscriptionDate" && errors.contains(ValidationError("error.formatting.date"))
+            case (path: JsPath, errors: Seq[JsonValidationError]) => {
+              path.toString() == "/firstSubscriptionDate" && errors.contains(JsonValidationError("error.formatting.date"))
             }
           } mustBe 1
         }
@@ -220,8 +219,8 @@ class CreateLisaAccountRequestSpec extends PlaySpec {
       res match {
         case JsError(errors) => {
           errors.count {
-            case (path: JsPath, errors: Seq[ValidationError]) => {
-              path.toString() == "/investorId" && errors.contains(ValidationError("error.formatting.investorId"))
+            case (path: JsPath, errors: Seq[JsonValidationError]) => {
+              path.toString() == "/investorId" && errors.contains(JsonValidationError("error.formatting.investorId"))
             }
           } mustBe 1
         }
@@ -235,7 +234,7 @@ class CreateLisaAccountRequestSpec extends PlaySpec {
 
       res match {
         case JsError(errors) => {
-          errors mustBe Seq((JsPath \ "creationReason", Seq(ValidationError("error.formatting.creationReason"))))
+          errors mustBe Seq((JsPath \ "creationReason", Seq(JsonValidationError("error.formatting.creationReason"))))
         }
         case _ => fail()
       }
@@ -247,7 +246,7 @@ class CreateLisaAccountRequestSpec extends PlaySpec {
 
       res match {
         case JsError(errors) => {
-          errors mustBe Seq((JsPath \ "creationReason", Seq(ValidationError("error.expected.jsstring"))))
+          errors mustBe Seq((JsPath \ "creationReason", Seq(JsonValidationError("error.expected.jsstring"))))
         }
         case _ => fail()
       }
@@ -259,7 +258,7 @@ class CreateLisaAccountRequestSpec extends PlaySpec {
 
       res match {
         case JsError(errors) => {
-          errors mustBe Seq((JsPath \ "creationReason", Seq(ValidationError("error.path.missing"))))
+          errors mustBe Seq((JsPath \ "creationReason", Seq(JsonValidationError("error.path.missing"))))
         }
         case _ => fail()
       }
@@ -271,7 +270,7 @@ class CreateLisaAccountRequestSpec extends PlaySpec {
 
       res match {
         case JsError(errors) => {
-          errors mustBe Seq((JsPath \ "transferAccount", Seq(ValidationError("error.path.missing"))))
+          errors mustBe Seq((JsPath \ "transferAccount", Seq(JsonValidationError("error.path.missing"))))
         }
         case _ => fail()
       }
@@ -284,8 +283,8 @@ class CreateLisaAccountRequestSpec extends PlaySpec {
       res match {
         case JsError(errors) => {
           errors.count {
-            case (path: JsPath, errors: Seq[ValidationError]) => {
-              path.toString() == "/firstSubscriptionDate" && errors.contains(ValidationError("error.formatting.date"))
+            case (path: JsPath, errors: Seq[JsonValidationError]) => {
+              path.toString() == "/firstSubscriptionDate" && errors.contains(JsonValidationError("error.formatting.date"))
             }
           } mustBe 1
         }

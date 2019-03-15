@@ -18,8 +18,7 @@ package unit.models
 
 import org.joda.time.DateTime
 import org.scalatestplus.play.PlaySpec
-import play.api.data.validation.ValidationError
-import play.api.libs.json.{JsError, JsPath, Json}
+import play.api.libs.json.{JsError, JsPath, Json, JsonValidationError}
 import uk.gov.hmrc.lisaapi.models._
 
 class RequestPurchaseExtensionRequestSpec extends PlaySpec {
@@ -60,7 +59,7 @@ class RequestPurchaseExtensionRequestSpec extends PlaySpec {
 
       res match {
         case JsError(errors) => {
-          errors mustBe Seq((JsPath \ "fundReleaseId", Seq(ValidationError("error.formatting.fundReleaseId"))))
+          errors mustBe Seq((JsPath \ "fundReleaseId", Seq(JsonValidationError("error.formatting.fundReleaseId"))))
         }
         case _ => fail("Parsed invalid json as being valid")
       }
@@ -75,7 +74,7 @@ class RequestPurchaseExtensionRequestSpec extends PlaySpec {
 
       res match {
         case JsError(errors) => {
-          errors mustBe Seq((JsPath \ "eventType", Seq(ValidationError("error.formatting.extensionType"))))
+          errors mustBe Seq((JsPath \ "eventType", Seq(JsonValidationError("error.formatting.extensionType"))))
         }
         case _ => fail("Parsed invalid json as being valid")
       }
@@ -90,7 +89,7 @@ class RequestPurchaseExtensionRequestSpec extends PlaySpec {
 
       res match {
         case JsError(errors) => {
-          errors mustBe Seq((JsPath \ "eventDate", Seq(ValidationError("error.formatting.date"))))
+          errors mustBe Seq((JsPath \ "eventDate", Seq(JsonValidationError("error.formatting.date"))))
         }
         case _ => fail("Parsed invalid json as being valid")
       }
@@ -141,7 +140,7 @@ class RequestPurchaseExtensionRequestSpec extends PlaySpec {
 
       res match {
         case JsError(errors) => {
-          errors mustBe Seq((JsPath \ "eventType", Seq(ValidationError("error.formatting.extensionType"))))
+          errors mustBe Seq((JsPath \ "eventType", Seq(JsonValidationError("error.formatting.extensionType"))))
         }
         case _ => fail("Parsed invalid json as being valid")
       }
@@ -156,7 +155,7 @@ class RequestPurchaseExtensionRequestSpec extends PlaySpec {
 
       res match {
         case JsError(errors) => {
-          errors mustBe Seq((JsPath \ "eventDate", Seq(ValidationError("error.formatting.date"))))
+          errors mustBe Seq((JsPath \ "eventDate", Seq(JsonValidationError("error.formatting.date"))))
         }
         case _ => fail("Parsed invalid json as being valid")
       }
@@ -172,8 +171,8 @@ class RequestPurchaseExtensionRequestSpec extends PlaySpec {
       res match {
         case JsError(errors) => {
           errors.length mustBe 2
-          errors must contain (JsPath \ "supersede" \ "originalEventDate", Seq(ValidationError("error.path.missing")))
-          errors must contain (JsPath \ "supersede" \ "originalLifeEventId", Seq(ValidationError("error.path.missing")))
+          errors must contain (JsPath \ "supersede" \ "originalEventDate", Seq(JsonValidationError("error.path.missing")))
+          errors must contain (JsPath \ "supersede" \ "originalLifeEventId", Seq(JsonValidationError("error.path.missing")))
         }
         case _ => fail("Parsed invalid json as being valid")
       }
@@ -188,7 +187,7 @@ class RequestPurchaseExtensionRequestSpec extends PlaySpec {
 
       res match {
         case JsError(errors) => {
-          errors mustBe Seq((JsPath \ "supersede" \ "originalEventDate", Seq(ValidationError("error.formatting.date"))))
+          errors mustBe Seq((JsPath \ "supersede" \ "originalEventDate", Seq(JsonValidationError("error.formatting.date"))))
         }
         case _ => fail("Parsed invalid json as being valid")
       }
@@ -203,7 +202,7 @@ class RequestPurchaseExtensionRequestSpec extends PlaySpec {
 
       res match {
         case JsError(errors) => {
-          errors mustBe Seq((JsPath \ "supersede" \ "originalLifeEventId", Seq(ValidationError("error.formatting.lifeEventId"))))
+          errors mustBe Seq((JsPath \ "supersede" \ "originalLifeEventId", Seq(JsonValidationError("error.formatting.lifeEventId"))))
         }
         case _ => fail("Parsed invalid json as being valid")
       }
