@@ -23,7 +23,7 @@ import org.scalatest.BeforeAndAfter
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
-import play.api.mvc.{AnyContentAsJson, ControllerComponents, Result}
+import play.api.mvc.{AnyContentAsJson, ControllerComponents, PlayBodyParsers, Result}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers, Injecting}
 import play.mvc.Http.HeaderNames
@@ -337,7 +337,8 @@ class LifeEventControllerSpec extends PlaySpec
   val mockAppContext: AppContext = mock[AppContext]
   val mockLisaMetrics: LisaMetrics = mock[LisaMetrics]
   val mockControllerComponents = inject[ControllerComponents]
-  val SUT = new LifeEventController(mockAuthCon, mockAppContext, mockService, mockAuditService, mockLisaMetrics, mockControllerComponents) {
+  val mockParser = inject[PlayBodyParsers]
+  val SUT = new LifeEventController(mockAuthCon, mockAppContext, mockService, mockAuditService, mockLisaMetrics, mockControllerComponents, mockParser) {
     override lazy val v2endpointsEnabled = true
   }
 

@@ -22,7 +22,7 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
-import play.api.mvc.{AnyContentAsJson, ControllerComponents, Result}
+import play.api.mvc.{AnyContentAsJson, ControllerComponents, PlayBodyParsers, Result}
 import play.api.test.Helpers._
 import play.api.test._
 import play.mvc.Http.HeaderNames
@@ -307,8 +307,9 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
   val mockAppContext: AppContext = mock[AppContext]
   val mockLisaMetrics: LisaMetrics = mock[LisaMetrics]
   val mockControllerComponents = inject[ControllerComponents]
+  val mockParser = inject[PlayBodyParsers]
 
-  val SUT = new UpdateSubscriptionController(mockAuthCon, mockAppContext, mockService, mockAuditService, mockLisaMetrics, mockControllerComponents) {
+  val SUT = new UpdateSubscriptionController(mockAuthCon, mockAppContext, mockService, mockAuditService, mockLisaMetrics, mockControllerComponents, mockParser) {
     override lazy val v2endpointsEnabled = true
   }
 

@@ -23,7 +23,7 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{AnyContentAsJson, ControllerComponents, Result}
+import play.api.mvc.{AnyContentAsJson, ControllerComponents, PlayBodyParsers, Result}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers, Injecting}
 import play.mvc.Http.HeaderNames
@@ -417,8 +417,9 @@ class AnnualReturnControllerSpec extends PlaySpec
   val mockAppContext: AppContext = mock[AppContext]
   val mockLisaMetrics: LisaMetrics = mock[LisaMetrics]
   val mockControllerComponents = inject[ControllerComponents]
+  val mockParser = inject[PlayBodyParsers]
 
-  private val SUT = new AnnualReturnController(mockAuthCon, mockAppContext, mockService, mockAuditService, mockValidator, mockLisaMetrics, mockControllerComponents) {
+  private val SUT = new AnnualReturnController(mockAuthCon, mockAppContext, mockService, mockAuditService, mockValidator, mockLisaMetrics, mockControllerComponents, mockParser) {
     override lazy val v2endpointsEnabled = true
   }
 

@@ -21,7 +21,7 @@ import org.mockito.Mockito.when
 import org.scalatest.BeforeAndAfter
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.mvc.ControllerComponents
+import play.api.mvc.{ControllerComponents, PlayBodyParsers}
 import play.api.test.Helpers._
 import play.api.test._
 import play.mvc.Http.HeaderNames
@@ -106,8 +106,9 @@ class DiscoverControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSu
   val mockAppContext: AppContext = mock[AppContext]
   val mockLisaMetrics: LisaMetrics = mock[LisaMetrics]
   val mockControllerComponents = inject[ControllerComponents]
+  val mockParser = inject[PlayBodyParsers]
 
-  val SUT = new DiscoverController(mockAuthConnector, mockAppContext, mockLisaMetrics, mockControllerComponents) {
+  val SUT = new DiscoverController(mockAuthConnector, mockAppContext, mockLisaMetrics, mockControllerComponents, mockParser) {
     override lazy val v2endpointsEnabled = true
   }
 }

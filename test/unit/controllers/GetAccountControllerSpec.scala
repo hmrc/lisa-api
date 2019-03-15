@@ -23,7 +23,7 @@ import org.scalatest.BeforeAndAfter
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.JsObject
-import play.api.mvc.{ControllerComponents, Result}
+import play.api.mvc.{ControllerComponents, PlayBodyParsers, Result}
 import play.api.test.Helpers._
 import play.api.test._
 import play.mvc.Http.HeaderNames
@@ -292,7 +292,8 @@ class GetAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPer
   val mockAuditService: AuditService = mock[AuditService]
   val mockLisaMetrics: LisaMetrics = mock[LisaMetrics]
   val mockControllerComponents = inject[ControllerComponents]
-  val SUT = new GetAccountController(mockAuthCon, mockAppContext, mockService, mockAuditService, mockLisaMetrics, mockControllerComponents) {
+  val mockParser = inject[PlayBodyParsers]
+  val SUT = new GetAccountController(mockAuthCon, mockAppContext, mockService, mockAuditService, mockLisaMetrics, mockControllerComponents, mockParser) {
     override lazy val v2endpointsEnabled = true
   }
 
