@@ -37,8 +37,9 @@ class AnnualReturnController @Inject()(
                                        auditService: AuditService,
                                        validator: AnnualReturnValidator,
                                        lisaMetrics: LisaMetrics,
-                                       cc: ControllerComponents
-                                      )(implicit ec: ExecutionContext, parse: PlayBodyParsers) extends LisaController(
+                                       cc: ControllerComponents,
+                                       parse: PlayBodyParsers
+                                      )(implicit ec: ExecutionContext) extends LisaController(
   cc: ControllerComponents,
   lisaMetrics: LisaMetrics,
   appContext: AppContext,
@@ -47,7 +48,7 @@ class AnnualReturnController @Inject()(
 
   override val validateVersion: String => Boolean = _ == "2.0"
 
-  def submitReturn(lisaManager: String, accountId: String): Action[AnyContent] = (validateHeader() andThen isEndpointEnabled("annual-returns")).async {
+  def submitReturn(lisaManager: String, accountId: String): Action[AnyContent] = (validateHeader(parse) andThen isEndpointEnabled("annual-returns", parse)).async {
     implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
 

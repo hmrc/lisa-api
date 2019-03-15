@@ -41,8 +41,9 @@ class BonusPaymentController @Inject()(
                                         validator: BonusPaymentValidator,
                                         dateTimeService: CurrentDateService,
                                         lisaMetrics: LisaMetrics,
-                                        cc: ControllerComponents
-                                      )(implicit ec: ExecutionContext, parse: PlayBodyParsers) extends LisaController(
+                                        cc: ControllerComponents,
+                                        parse: PlayBodyParsers
+                                      )(implicit ec: ExecutionContext) extends LisaController(
   cc: ControllerComponents,
   lisaMetrics: LisaMetrics,
   appContext: AppContext,
@@ -68,7 +69,7 @@ class BonusPaymentController @Inject()(
 
   def requestBonusPayment(lisaManager: String, accountId: String): Action[AnyContent] = {
     implicit val startTime: Long = System.currentTimeMillis()
-    validateHeader().async { implicit request =>
+    validateHeader(parse).async { implicit request =>
 
       withValidLMRN(lisaManager) { () =>
         withValidAccountId(accountId) { () =>
@@ -82,7 +83,7 @@ class BonusPaymentController @Inject()(
   }
 
   def getBonusPayment(lisaManager: String, accountId: String, transactionId: String): Action[AnyContent] =
-    validateHeader().async { implicit request =>
+    validateHeader(parse).async { implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
 
       withValidLMRN(lisaManager) { () =>

@@ -31,21 +31,20 @@ trait APIVersioning {
 
   protected def appContext: AppContext
 
-  def isEndpointEnabled(endpoint: String)(implicit ec: ExecutionContext, parse: PlayBodyParsers): ActionBuilder[Request, AnyContent] = new ActionBuilder[Request, AnyContent] {
+  def isEndpointEnabled(endpoint: String, parse: PlayBodyParsers)(implicit ec: ExecutionContext): ActionBuilder[Request, AnyContent] = new ActionBuilder[Request, AnyContent] {
     override def parser: BodyParser[AnyContent] = parse.defaultBodyParser
     override protected def executionContext: ExecutionContext = ec
     override def invokeBlock[A](request: Request[A], block: Request[A] => Future[Result]): Future[Result] = {
       if (appContext.endpointIsDisabled(endpoint)) {
         Logger.info(s"User attempted to use an endpoint which is not available ($endpoint)")
         Future.successful(ErrorApiNotAvailable.asResult)
-      }
-      else {
+      } else {
         block(request)
       }
     }
   }
 
-  def validateHeader()(implicit ec: ExecutionContext, parse: PlayBodyParsers): ActionBuilder[Request, AnyContent] = new ActionBuilder[Request, AnyContent] {
+  def validateHeader(parse: PlayBodyParsers)(implicit ec: ExecutionContext): ActionBuilder[Request, AnyContent] = new ActionBuilder[Request, AnyContent] {
     override def parser: BodyParser[AnyContent] = parse.defaultBodyParser
     override protected def executionContext: ExecutionContext = ec
     override def invokeBlock[A](request: Request[A], block: Request[A] => Future[Result]) = {

@@ -29,8 +29,9 @@ class DiscoverController @Inject()(
                                     authConnector: AuthConnector,
                                     appContext: AppContext,
                                     lisaMetrics: LisaMetrics,
-                                    cc: ControllerComponents
-                                  )(implicit ec: ExecutionContext, parse: PlayBodyParsers) extends LisaController(
+                                    cc: ControllerComponents,
+                                    parse: PlayBodyParsers
+                                  )(implicit ec: ExecutionContext) extends LisaController(
   cc: ControllerComponents,
   lisaMetrics: LisaMetrics,
   appContext: AppContext,
@@ -38,7 +39,7 @@ class DiscoverController @Inject()(
 ) {
 
   def discover(lisaManagerReferenceNumber: String): Action[AnyContent] =
-    (validateHeader andThen
+    (validateHeader(parse) andThen
       validateLMRN(lisaManagerReferenceNumber)).async { implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
 

@@ -40,8 +40,9 @@ class BulkPaymentController @Inject()(
                                        service: BulkPaymentService,
                                        auditService: AuditService,
                                        lisaMetrics: LisaMetrics,
-                                       cc: ControllerComponents
-                                     )(implicit ec: ExecutionContext, parse: PlayBodyParsers) extends LisaController(
+                                       cc: ControllerComponents,
+                                       parse: PlayBodyParsers
+                                     )(implicit ec: ExecutionContext) extends LisaController(
   cc: ControllerComponents,
   lisaMetrics: LisaMetrics,
   appContext: AppContext,
@@ -49,7 +50,7 @@ class BulkPaymentController @Inject()(
 ) {
 
   def getBulkPayment(lisaManager: String, startDate: String, endDate: String): Action[AnyContent] =
-    validateHeader().async { implicit request =>
+    validateHeader(parse).async { implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
       withValidLMRN(lisaManager) { () =>
         withEnrolment(lisaManager) { _ =>

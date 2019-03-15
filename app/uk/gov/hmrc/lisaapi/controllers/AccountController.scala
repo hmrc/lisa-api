@@ -37,8 +37,9 @@ class AccountController @Inject()(
                                    service: AccountService,
                                    auditService: AuditService,
                                    lisaMetrics: LisaMetrics,
-                                   cc: ControllerComponents
-                                 )(implicit ec: ExecutionContext, parse: PlayBodyParsers) extends LisaController(
+                                   cc: ControllerComponents,
+                                   parse: PlayBodyParsers
+                                 )(implicit ec: ExecutionContext) extends LisaController(
   cc: ControllerComponents,
   lisaMetrics: LisaMetrics,
   appContext: AppContext,
@@ -46,7 +47,7 @@ class AccountController @Inject()(
 ) {
 
   def createOrTransferLisaAccount(lisaManager: String): Action[AnyContent] =
-    (validateHeader() andThen validateLMRN(lisaManager)).async { implicit request =>
+    (validateHeader(parse) andThen validateLMRN(lisaManager)).async { implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
 
       withValidJson[CreateLisaAccountRequest]({

@@ -40,8 +40,9 @@ class WithdrawalController @Inject() (
                                        validator: WithdrawalChargeValidator,
                                        dateTimeService: CurrentDateService,
                                        lisaMetrics: LisaMetrics,
-                                       cc: ControllerComponents
-                                     )(implicit ec: ExecutionContext, parse: PlayBodyParsers) extends LisaController(
+                                       cc: ControllerComponents,
+                                       parse: PlayBodyParsers
+                                     )(implicit ec: ExecutionContext) extends LisaController(
   cc: ControllerComponents,
   lisaMetrics: LisaMetrics,
   appContext: AppContext,
@@ -51,7 +52,7 @@ class WithdrawalController @Inject() (
   override val validateVersion: String => Boolean = _ == "2.0"
 
   def reportWithdrawalCharge(lisaManager: String, accountId: String): Action[AnyContent] =
-    (validateHeader() andThen validateLMRN(lisaManager) andThen validateAccountId(accountId)).async { implicit request =>
+    (validateHeader(parse) andThen validateLMRN(lisaManager) andThen validateAccountId(accountId)).async { implicit request =>
     implicit val startTime: Long = System.currentTimeMillis()
 
     withValidJson[ReportWithdrawalChargeRequest](req =>
@@ -78,7 +79,7 @@ class WithdrawalController @Inject() (
   }
 
   def getWithdrawalCharge(lisaManager: String, accountId: String, transactionId: String): Action[AnyContent] = {
-    validateHeader().async { implicit request =>
+    validateHeader(parse).async { implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
       withValidLMRN(lisaManager) { () =>
         withEnrolment(lisaManager) { _ =>

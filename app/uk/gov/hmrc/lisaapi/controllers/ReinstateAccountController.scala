@@ -35,8 +35,9 @@ class ReinstateAccountController @Inject() (
                                              service: ReinstateAccountService,
                                              auditService: AuditService,
                                              lisaMetrics: LisaMetrics,
-                                             cc: ControllerComponents
-                                           )(implicit ec: ExecutionContext, parse: PlayBodyParsers) extends LisaController(
+                                             cc: ControllerComponents,
+                                             parse: PlayBodyParsers
+                                           )(implicit ec: ExecutionContext) extends LisaController(
   cc: ControllerComponents,
   lisaMetrics: LisaMetrics,
   appContext: AppContext,

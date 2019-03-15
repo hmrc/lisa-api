@@ -35,15 +35,16 @@ class InvestorController @Inject()(
                                     service: InvestorService,
                                     auditService: AuditService,
                                     lisaMetrics: LisaMetrics,
-                                    cc: ControllerComponents
-                                  )(implicit ec: ExecutionContext, parse: PlayBodyParsers) extends LisaController(
+                                    cc: ControllerComponents,
+                                    parse: PlayBodyParsers
+                                  )(implicit ec: ExecutionContext) extends LisaController(
   cc: ControllerComponents,
   lisaMetrics: LisaMetrics,
   appContext: AppContext,
   authConnector: AuthConnector
 ) {
 
-  def createLisaInvestor(lisaManager: String): Action[AnyContent] = (validateHeader() andThen validateLMRN(lisaManager)).async { implicit request =>
+  def createLisaInvestor(lisaManager: String): Action[AnyContent] = (validateHeader(parse) andThen validateLMRN(lisaManager)).async { implicit request =>
     implicit val startTime: Long = System.currentTimeMillis()
     Logger.debug(s"LISA HTTP Request: ${request.uri} and method: ${request.method}")
     withValidJson[CreateLisaInvestorRequest](

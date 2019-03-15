@@ -33,8 +33,9 @@ class GetLifeEventController @Inject()(
                                         lisaMetrics: LisaMetrics,
                                         val service: LifeEventService,
                                         auditService: AuditService,
-                                        cc: ControllerComponents
-                                      )(implicit ec: ExecutionContext, parse: PlayBodyParsers) extends LisaController(
+                                        cc: ControllerComponents,
+                                        parse: PlayBodyParsers
+                                      )(implicit ec: ExecutionContext) extends LisaController(
   cc: ControllerComponents,
   lisaMetrics: LisaMetrics,
   appContext: AppContext,
@@ -43,7 +44,7 @@ class GetLifeEventController @Inject()(
 
   override val validateVersion: String => Boolean = _ == "2.0"
 
-  def getLifeEvent(lisaManager: String, accountId: String, lifeEventId: String): Action[AnyContent] = validateHeader().async { implicit request =>
+  def getLifeEvent(lisaManager: String, accountId: String, lifeEventId: String): Action[AnyContent] = validateHeader(parse).async { implicit request =>
     implicit val startTime: Long = System.currentTimeMillis()
 
     withValidLMRN(lisaManager) { () =>

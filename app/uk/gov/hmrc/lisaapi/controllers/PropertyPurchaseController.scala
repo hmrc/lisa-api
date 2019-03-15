@@ -36,8 +36,9 @@ class PropertyPurchaseController @Inject() (
                                              service: LifeEventService,
                                              auditService: AuditService,
                                              lisaMetrics: LisaMetrics,
-                                             cc: ControllerComponents
-                                           )(implicit ec: ExecutionContext, parse: PlayBodyParsers) extends LisaController(
+                                             cc: ControllerComponents,
+                                             parse: PlayBodyParsers
+                                           )(implicit ec: ExecutionContext) extends LisaController(
   cc: ControllerComponents,
   lisaMetrics: LisaMetrics,
   appContext: AppContext,
@@ -46,7 +47,7 @@ class PropertyPurchaseController @Inject() (
 
   override val validateVersion: String => Boolean = _ == "2.0"
 
-  def requestFundRelease(lisaManager: String, accountId: String): Action[AnyContent] = validateHeader().async {
+  def requestFundRelease(lisaManager: String, accountId: String): Action[AnyContent] = validateHeader(parse).async {
     implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
 
@@ -92,7 +93,7 @@ class PropertyPurchaseController @Inject() (
       }
   }
 
-  def requestExtension(lisaManager: String, accountId: String): Action[AnyContent] = validateHeader().async {
+  def requestExtension(lisaManager: String, accountId: String): Action[AnyContent] = validateHeader(parse).async {
     implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
 
@@ -134,7 +135,7 @@ class PropertyPurchaseController @Inject() (
       }
   }
 
-  def reportPurchaseOutcome(lisaManager: String, accountId: String): Action[AnyContent] = validateHeader().async {
+  def reportPurchaseOutcome(lisaManager: String, accountId: String): Action[AnyContent] = validateHeader(parse).async {
     implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
 

@@ -36,8 +36,9 @@ class LifeEventController @Inject()(
                                      service: LifeEventService,
                                      auditService: AuditService,
                                      lisaMetrics: LisaMetrics,
-                                     cc: ControllerComponents
-                                   )(implicit ec: ExecutionContext, parse: PlayBodyParsers) extends LisaController(
+                                     cc: ControllerComponents,
+                                     parse: PlayBodyParsers
+                                   )(implicit ec: ExecutionContext) extends LisaController(
   cc: ControllerComponents,
   lisaMetrics: LisaMetrics,
   appContext: AppContext,
@@ -45,7 +46,7 @@ class LifeEventController @Inject()(
 ) {
 
   def reportLisaLifeEvent(lisaManager: String, accountId: String): Action[AnyContent] =
-    (validateHeader() andThen validateLMRN(lisaManager) andThen validateAccountId(accountId)).async { implicit request =>
+    (validateHeader(parse) andThen validateLMRN(lisaManager) andThen validateAccountId(accountId)).async { implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
 
       withValidJson[ReportLifeEventRequest](

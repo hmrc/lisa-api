@@ -22,7 +22,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsPath, Json, Reads}
-import play.api.mvc.{Action, AnyContent, AnyContentAsJson, ControllerComponents}
+import play.api.mvc._
 import play.api.test.Helpers._
 import play.api.test._
 import play.mvc.Http.HeaderNames
@@ -105,9 +105,10 @@ class LisaControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite 
   val mockAppContext: AppContext = mock[AppContext]
   val mockLisaMetrics: LisaMetrics = mock[LisaMetrics]
   val mockControllerComponents = inject[ControllerComponents]
-  val SUT = new AccountController(mockAuthCon, mockAppContext, mockService, mockAuditService, mockLisaMetrics, mockControllerComponents) {
+  val mockParser = inject[PlayBodyParsers]
+  val SUT = new AccountController(mockAuthCon, mockAppContext, mockService, mockAuditService, mockLisaMetrics, mockControllerComponents, mockParser) {
 
-    def testJsonValidator(): Action[AnyContent] = validateHeader().async { implicit request =>
+    def testJsonValidator(): Action[AnyContent] = validateHeader(mockParser).async { implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
       withValidJson[TestType](_ =>
         Future.successful(PreconditionFailed) // we don't ever want this to return
@@ -115,7 +116,7 @@ class LisaControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite 
       )
     }
 
-    def testLMRNValidator(lmrn: String): Action[AnyContent] = validateHeader().async { implicit request =>
+    def testLMRNValidator(lmrn: String): Action[AnyContent] = validateHeader(mockParser).async { implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
       withValidLMRN(lmrn) { () => Future.successful(Ok) }
     }
