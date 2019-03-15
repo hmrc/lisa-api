@@ -16,6 +16,8 @@
 
 package unit.controllers
 
+import java.time.LocalDate
+
 import org.joda.time.DateTime
 import org.mockito.Matchers.{eq => MatcherEquals, _}
 import org.mockito.Mockito.{reset, verify, when}
@@ -288,7 +290,7 @@ class AnnualReturnControllerSpec extends PlaySpec
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountId" -> accountId,
               "eventType" -> "Statutory Submission",
-              "eventDate" -> (payload \ "eventDate").as[DateTime].toString("yyyy-MM-dd"),
+              "eventDate" -> (payload \ "eventDate").as[String],
               "lisaManagerName" -> (payload \ "lisaManagerName").as[String],
               "taxYear" -> (payload \ "taxYear").as[Int].toString,
               "marketValueCash" -> (payload \ "marketValueCash").as[Int].toString,
@@ -317,7 +319,7 @@ class AnnualReturnControllerSpec extends PlaySpec
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountId" -> accountId,
               "eventType" -> "Statutory Submission",
-              "eventDate" -> (json \ "eventDate").as[DateTime].toString("yyyy-MM-dd"),
+              "eventDate" -> (json \ "eventDate").as[String],
               "lisaManagerName" -> (json \ "lisaManagerName").as[String],
               "taxYear" -> (json \ "taxYear").as[Int].toString,
               "marketValueCash" -> (json \ "marketValueCash").as[Int].toString,
@@ -341,7 +343,7 @@ class AnnualReturnControllerSpec extends PlaySpec
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountId" -> accountId,
               "eventType" -> "Statutory Submission",
-              "eventDate" -> (json \ "eventDate").as[DateTime].toString("yyyy-MM-dd"),
+              "eventDate" -> (json \ "eventDate").as[String],
               "lisaManagerName" -> (json \ "lisaManagerName").as[String],
               "taxYear" -> (json \ "taxYear").as[Int].toString,
               "marketValueCash" -> (json \ "marketValueCash").as[Int].toString,
@@ -366,7 +368,7 @@ class AnnualReturnControllerSpec extends PlaySpec
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountId" -> accountId,
               "eventType" -> "Statutory Submission",
-              "eventDate" -> (json \ "eventDate").as[DateTime].toString("yyyy-MM-dd"),
+              "eventDate" -> (json \ "eventDate").as[String],
               "lisaManagerName" -> (json \ "lisaManagerName").as[String],
               "taxYear" -> (json \ "taxYear").as[Int].toString,
               "marketValueCash" -> (json \ "marketValueCash").as[Int].toString,

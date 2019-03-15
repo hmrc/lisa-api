@@ -1769,8 +1769,6 @@ class DesConnectorSpec extends PlaySpec
   }
   implicit val hc = HeaderCarrier()
 
-  object SUT extends DesConnector(mockHttp, mockEnvironment, mockAppContext, configuration, mockRunMode) {
-    override val mode = Mode.Test
-  }
+  object SUT extends DesConnector(mockHttp, mockEnvironment, mockAppContext, configuration, mockRunMode) {}
 
 }
