@@ -109,7 +109,7 @@ trait AnnualReturnValidator extends LisaConstants {
     (
       taxYearIsAfter2016 andThen
       taxYearIsNotCurrent andThen
-      taxYearIsNotInFuture andThen
+//      taxYearIsNotInFuture andThen
       onlyCashOrStocksHaveBeenSpecified
     ).apply(ValidationRequest(req)).errors
   }
