@@ -296,21 +296,21 @@ class AnnualReturnSpec extends PlaySpec
 
       SUT.validate(req) mustBe List(ErrorValidation(DATE_ERROR, "The taxYear must be a previous tax year", Some("/taxYear")))
     }
-    "return an error for a taxYear after the current year" in {
-      when(mockDateService.now()).thenReturn(new DateTime("2018-04-05")) // final day of the 2018 tax year
-
-      val req = AnnualReturn(
-        eventDate = new DateTime("2018-04-05"),
-        lisaManagerName = "ISA Manager",
-        taxYear = 2019,
-        marketValueCash = 0,
-        marketValueStocksAndShares = 55,
-        annualSubsCash = 0,
-        annualSubsStocksAndShares = 55
-      )
-
-      SUT.validate(req) mustBe List(ErrorValidation(DATE_ERROR, "The taxYear cannot be in the future", Some("/taxYear")))
-    }
+//    "return an error for a taxYear after the current year" in {
+//      when(mockDateService.now()).thenReturn(new DateTime("2018-04-05")) // final day of the 2018 tax year
+//
+//      val req = AnnualReturn(
+//        eventDate = new DateTime("2018-04-05"),
+//        lisaManagerName = "ISA Manager",
+//        taxYear = 2019,
+//        marketValueCash = 0,
+//        marketValueStocksAndShares = 55,
+//        annualSubsCash = 0,
+//        annualSubsStocksAndShares = 55
+//      )
+//
+//      SUT.validate(req) mustBe List(ErrorValidation(DATE_ERROR, "The taxYear cannot be in the future", Some("/taxYear")))
+//    }
     "return an error if marketValueCash and marketValueStocksAndShares are specified" in {
       val req = AnnualReturn(
         eventDate = new DateTime("2018-04-05"),
