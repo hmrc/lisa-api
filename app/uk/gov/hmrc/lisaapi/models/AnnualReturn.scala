@@ -42,7 +42,7 @@ case class AnnualReturn (
 ) extends ReportLifeEventRequestBase
 
 object AnnualReturnSupersede {
-  implicit val dateReads: Reads[DateTime] = JsonReads.notFutureDate
+  implicit val dateReads: Reads[DateTime] = JsonReads.isoDate
   implicit val dateWrites = Writes.jodaDateWrites("yyyy-MM-dd")
   implicit val lifeEventReads: Reads[LifeEventId] = JsonReads.lifeEventId
   implicit val formats = Json.format[AnnualReturnSupersede]
@@ -52,7 +52,7 @@ object AnnualReturn {
   implicit val dateWrites = Writes.jodaDateWrites("yyyy-MM-dd")
 
   implicit val reads: Reads[AnnualReturn] = (
-    (JsPath \ "eventDate").read(JsonReads.notFutureDate) and
+    (JsPath \ "eventDate").read(JsonReads.isoDate) and
     (JsPath \ "lisaManagerName").read(JsonReads.lisaManagerName) and
     (JsPath \ "taxYear").read(JsonReads.taxYearReads) and
     (JsPath \ "marketValueCash").read(JsonReads.annualFigures) and
@@ -108,7 +108,7 @@ trait AnnualReturnValidator extends LisaConstants {
   def validate(req: AnnualReturn): Seq[ErrorValidation] = {
     (
       taxYearIsAfter2016 andThen
-      taxYearIsNotCurrent andThen
+//      taxYearIsNotCurrent andThen
 //      taxYearIsNotInFuture andThen
       onlyCashOrStocksHaveBeenSpecified
     ).apply(ValidationRequest(req)).errors
