@@ -108,7 +108,7 @@ trait AnnualReturnValidator extends LisaConstants {
   def validate(req: AnnualReturn): Seq[ErrorValidation] = {
     (
       taxYearIsAfter2016 andThen
-      taxYearIsNotCurrent andThen
+//      taxYearIsNotCurrent andThen
 //      taxYearIsNotInFuture andThen
       onlyCashOrStocksHaveBeenSpecified
     ).apply(ValidationRequest(req)).errors
