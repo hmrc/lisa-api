@@ -346,7 +346,8 @@ class WithdrawalControllerSpec extends PlaySpec
               "withdrawalChargeAmountYTD" -> "750.00",
               "fundsDeductedDuringWithdrawal" -> "true",
               "automaticRecoveryAmount" -> "250.00",
-              "lateNotification" -> "no"
+              "lateNotification" -> "no",
+              "withdrawalReason" -> "Superseded withdrawal"
             ))
           )(any())
         }
@@ -373,7 +374,8 @@ class WithdrawalControllerSpec extends PlaySpec
               "withdrawalChargeAmountYTD" -> "750.00",
               "fundsDeductedDuringWithdrawal" -> "true",
               "automaticRecoveryAmount" -> "250.00",
-              "lateNotification" -> "yes"
+              "lateNotification" -> "yes",
+              "withdrawalReason" -> "Superseded withdrawal"
             ))
           )(any())
         }
@@ -399,7 +401,8 @@ class WithdrawalControllerSpec extends PlaySpec
               "withdrawalChargeAmount" -> "500.00",
               "withdrawalChargeAmountYTD" -> "750.00",
               "fundsDeductedDuringWithdrawal" -> "true",
-              "automaticRecoveryAmount" -> "250.00"
+              "automaticRecoveryAmount" -> "250.00",
+              "withdrawalReason" -> "Superseded withdrawal"
             ))
           )(any())
         }
@@ -429,6 +432,7 @@ class WithdrawalControllerSpec extends PlaySpec
               "withdrawalChargeAmountYTD" -> "750.00",
               "fundsDeductedDuringWithdrawal" -> "true",
               "automaticRecoveryAmount" -> "250.00",
+              "withdrawalReason" -> "Superseded withdrawal",
               "reasonNotRequested" -> ErrorAccountAlreadyCancelled.errorCode
             ))
           )(any())
@@ -456,6 +460,7 @@ class WithdrawalControllerSpec extends PlaySpec
               "withdrawalChargeAmountYTD" -> "750.00",
               "fundsDeductedDuringWithdrawal" -> "true",
               "automaticRecoveryAmount" -> "250.00",
+              "withdrawalReason" -> "Superseded withdrawal",
               "reasonNotRequested" -> ErrorAccountAlreadyVoided.errorCode
             ))
           )(any())
@@ -483,6 +488,7 @@ class WithdrawalControllerSpec extends PlaySpec
               "withdrawalChargeAmountYTD" -> "750.00",
               "fundsDeductedDuringWithdrawal" -> "true",
               "automaticRecoveryAmount" -> "250.00",
+              "withdrawalReason" -> "Superseded withdrawal",
               "reasonNotRequested" -> ErrorAccountAlreadyCancelled.errorCode
             ))
           )(any())
@@ -510,6 +516,7 @@ class WithdrawalControllerSpec extends PlaySpec
               "withdrawalChargeAmountYTD" -> "750.00",
               "fundsDeductedDuringWithdrawal" -> "true",
               "automaticRecoveryAmount" -> "250.00",
+              "withdrawalReason" -> "Superseded withdrawal",
               "reasonNotRequested" -> "WITHDRAWAL_REPORTING_ERROR"
             ))
           )(any())
@@ -537,6 +544,7 @@ class WithdrawalControllerSpec extends PlaySpec
               "withdrawalChargeAmountYTD" -> "750.00",
               "fundsDeductedDuringWithdrawal" -> "true",
               "automaticRecoveryAmount" -> "250.00",
+              "withdrawalReason" -> "Superseded withdrawal",
               "reasonNotRequested" -> "WITHDRAWAL_CHARGE_ALREADY_SUPERSEDED"
             ))
           )(any())
@@ -564,6 +572,7 @@ class WithdrawalControllerSpec extends PlaySpec
               "withdrawalChargeAmountYTD" -> "750.00",
               "fundsDeductedDuringWithdrawal" -> "true",
               "automaticRecoveryAmount" -> "250.00",
+              "withdrawalReason" -> "Superseded withdrawal",
               "reasonNotRequested" -> "SUPERSEDED_WITHDRAWAL_CHARGE_ID_AMOUNT_MISMATCH"
             ))
           )(any())
@@ -591,6 +600,7 @@ class WithdrawalControllerSpec extends PlaySpec
               "withdrawalChargeAmountYTD" -> "750.00",
               "fundsDeductedDuringWithdrawal" -> "true",
               "automaticRecoveryAmount" -> "250.00",
+              "withdrawalReason" -> "Superseded withdrawal",
               "reasonNotRequested" -> "SUPERSEDED_WITHDRAWAL_CHARGE_OUTCOME_ERROR"
             ))
           )(any())
@@ -626,6 +636,7 @@ class WithdrawalControllerSpec extends PlaySpec
               "withdrawalChargeAmountYTD" -> "750",
               "fundsDeductedDuringWithdrawal" -> "true",
               "automaticRecoveryAmount" -> "250",
+              "withdrawalReason" -> "Superseded withdrawal",
               "reasonNotRequested" -> ErrorWithdrawalTimescalesExceeded.errorCode
             ))
           )(any())
@@ -668,6 +679,7 @@ class WithdrawalControllerSpec extends PlaySpec
               "withdrawalChargeAmountYTD" -> "750",
               "fundsDeductedDuringWithdrawal" -> "true",
               "automaticRecoveryAmount" -> "250",
+              "withdrawalReason" -> "Superseded withdrawal",
               "reasonNotRequested" -> "FORBIDDEN"
             ))
           )(any())
@@ -695,6 +707,7 @@ class WithdrawalControllerSpec extends PlaySpec
               "withdrawalChargeAmountYTD" -> "750.00",
               "fundsDeductedDuringWithdrawal" -> "true",
               "automaticRecoveryAmount" -> "250.00",
+              "withdrawalReason" -> "Superseded withdrawal",
               "reasonNotRequested" -> ErrorAccountNotFound.errorCode
             ))
           )(any())
@@ -722,6 +735,7 @@ class WithdrawalControllerSpec extends PlaySpec
               "withdrawalChargeAmountYTD" -> "750.00",
               "fundsDeductedDuringWithdrawal" -> "true",
               "automaticRecoveryAmount" -> "250.00",
+              "withdrawalReason" -> "Superseded withdrawal",
               "reasonNotRequested" -> "WITHDRAWAL_CHARGE_ALREADY_EXISTS"
             ))
           )(any())
@@ -749,6 +763,7 @@ class WithdrawalControllerSpec extends PlaySpec
               "withdrawalChargeAmountYTD" -> "750.00",
               "fundsDeductedDuringWithdrawal" -> "true",
               "automaticRecoveryAmount" -> "250.00",
+              "withdrawalReason" -> "Superseded withdrawal",
               "reasonNotRequested" -> "INTERNAL_SERVER_ERROR"
             ))
           )(any())
