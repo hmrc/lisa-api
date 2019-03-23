@@ -200,6 +200,13 @@ class BonusPaymentValidator @Inject()(currentDateService: CurrentDateService) ex
             path = Some(s"/supersede")
           ))
         }
+        case("Regular Bonus", Some(_)) => {
+          req.copy(errors = req.errors :+ ErrorValidation(
+            errorCode = "BAD_REQUEST",
+            message = "supersede cannot be set when claimReason is regular bonus",
+            path = Some(s"/supersede")
+          ))
+        }
         case _ => {
           req
         }
