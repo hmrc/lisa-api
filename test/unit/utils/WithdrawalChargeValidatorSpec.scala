@@ -23,7 +23,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 import uk.gov.hmrc.lisaapi.controllers.ErrorValidation
-import uk.gov.hmrc.lisaapi.models.{ReportWithdrawalChargeRequest, SupersededWithdrawalChargeRequest}
+import uk.gov.hmrc.lisaapi.models.{ReportWithdrawalChargeRequest, SupersededWithdrawalChargeRequest, WithdrawalIncrease}
 import uk.gov.hmrc.lisaapi.services.CurrentDateService
 import uk.gov.hmrc.lisaapi.utils.WithdrawalChargeValidator
 
@@ -202,13 +202,31 @@ class WithdrawalChargeValidatorSpec extends PlaySpec
   "supersede" should {
     "pass validation" when {
       "withdrawalReason is Regular withdrawal and supersede is not set" in {
-        
+        val request = validWithdrawal.copy(withdrawalReason = "Regular withdrawal", supersede = None)
+
+        val errors = SUT.validate(request)
+
+        errors mustBe List()
       }
     }
 
     "return an error" when {
       "withdrawalReason is Regular withdrawal and supersede is set" in {
+        val request = validWithdrawal.copy(withdrawalReason = "Regular withdrawal", supersede = Some(WithdrawalIncrease(
+          "2345678901",
+          250.00,
+          250.00
+        )))
 
+        val errors = SUT.validate(request)
+
+        errors mustBe List(
+          ErrorValidation(
+            errorCode = "INVALID_FORMAT",
+            message = "Invalid format has been used",
+            path = Some("/withdrawalReason")
+          )
+        )
       }
     }
   }
