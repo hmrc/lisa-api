@@ -199,20 +199,34 @@ class WithdrawalChargeValidatorSpec extends PlaySpec
 
   }
 
+  "supersede" should {
+    "pass validation" when {
+      "withdrawalReason is Regular withdrawal and supersede is not set" in {
+        
+      }
+    }
+
+    "return an error" when {
+      "withdrawalReason is Regular withdrawal and supersede is set" in {
+
+      }
+    }
+  }
+
   "withdrawalAmount" should {
 
     "pass validation" when {
 
-      "it is zero" in {
-        val request = validWithdrawal.copy(automaticRecoveryAmount = Some(0))
+      "it is zero and fundsDeductedDuringWithdrawal is false" in {
+        val request = validWithdrawal.copy(automaticRecoveryAmount = Some(0), fundsDeductedDuringWithdrawal = false)
 
         val errors = SUT.validate(request)
 
         errors mustBe List()
       }
 
-      "it is less than the withdrawalChargeAmount" in {
-        val request = validWithdrawal.copy(automaticRecoveryAmount = Some(validWithdrawal.withdrawalChargeAmount - 0.01))
+      "it is less than the withdrawalChargeAmount and fundsDeductedDuringWithdrawal is false" in {
+        val request = validWithdrawal.copy(automaticRecoveryAmount = Some(validWithdrawal.withdrawalChargeAmount - 0.01), fundsDeductedDuringWithdrawal = false)
 
         val errors = SUT.validate(request)
 
@@ -231,8 +245,8 @@ class WithdrawalChargeValidatorSpec extends PlaySpec
 
     "return an error" when {
 
-      "it is greater than the withdrawalChargeAmount" in {
-        val request = validWithdrawal.copy(automaticRecoveryAmount = Some(validWithdrawal.withdrawalChargeAmount + 0.01))
+      "it is greater than the withdrawalChargeAmount and fundsDeductedDuringWithdrawal is false" in {
+        val request = validWithdrawal.copy(automaticRecoveryAmount = Some(validWithdrawal.withdrawalChargeAmount + 0.01), fundsDeductedDuringWithdrawal = false)
 
         val errors = SUT.validate(request)
 
@@ -240,6 +254,34 @@ class WithdrawalChargeValidatorSpec extends PlaySpec
           ErrorValidation(
             errorCode = "INVALID_MONETARY_AMOUNT",
             message = "automaticRecoveryAmount cannot be more than withdrawalChargeAmount",
+            path = Some("/automaticRecoveryAmount")
+          )
+        )
+      }
+
+      "it is greater than the withdrawalChargeAmount and fundsDeductedDuringWithdrawal is true" in {
+        val request = validWithdrawal.copy(automaticRecoveryAmount = Some(validWithdrawal.withdrawalChargeAmount + 0.01), fundsDeductedDuringWithdrawal = true)
+
+        val errors = SUT.validate(request)
+
+        errors mustBe List(
+          ErrorValidation(
+            errorCode = "INVALID_MONETARY_AMOUNT",
+            message = "automaticRecoveryAmount was not equal to withdrawalChargeAmount when fundsDeductedDuringWithdrawal",
+            path = Some("/automaticRecoveryAmount")
+          )
+        )
+      }
+
+      "it is less than the withdrawalChargeAmount and fundsDeductedDuringWithdrawal is true" in {
+        val request = validWithdrawal.copy(automaticRecoveryAmount = Some(validWithdrawal.withdrawalChargeAmount + 0.01), fundsDeductedDuringWithdrawal = true)
+
+        val errors = SUT.validate(request)
+
+        errors mustBe List(
+          ErrorValidation(
+            errorCode = "INVALID_MONETARY_AMOUNT",
+            message = "automaticRecoveryAmount was not equal to withdrawalChargeAmount when fundsDeductedDuringWithdrawal",
             path = Some("/automaticRecoveryAmount")
           )
         )

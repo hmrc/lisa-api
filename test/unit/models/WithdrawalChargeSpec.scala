@@ -79,12 +79,16 @@ class WithdrawalChargeSpec extends PlaySpec {
         250.00,
         500.00,
         true,
-        WithdrawalIncrease(
+        Some(WithdrawalIncrease(
           "2345678901",
           250.00,
           250.00
+<<<<<<< HEAD
         ),
         "Superseded withdrawal"
+=======
+        ))
+>>>>>>> LISA-2436: Adds to withdrawal request
       )
     }
 
@@ -105,12 +109,16 @@ class WithdrawalChargeSpec extends PlaySpec {
         250.00,
         500.00,
         true,
-        WithdrawalRefund(
+        Some(WithdrawalRefund(
           "2345678901",
           250.00,
           250.00
+<<<<<<< HEAD
         ),
         "Superseded withdrawal"
+=======
+        ))
+>>>>>>> LISA-2436: Adds to withdrawal request
       )
     }
 
@@ -124,12 +132,16 @@ class WithdrawalChargeSpec extends PlaySpec {
           250.00,
           500.00,
           true,
-          WithdrawalRefund(
+          Some(WithdrawalRefund(
             "2345678901",
             250.00,
             250.00
+<<<<<<< HEAD
           ),
           "Superseded withdrawal"
+=======
+          ))
+>>>>>>> LISA-2436: Adds to withdrawal request
         ))(ReportWithdrawalChargeRequest.desReportWithdrawalChargeWrites)
 
         result mustBe Json.obj(
