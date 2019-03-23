@@ -1756,12 +1756,8 @@ class DesConnectorSpec extends PlaySpec
         "2345678901",
         250.00,
         250.00
-<<<<<<< HEAD
-      ),
+      )),
       "Superseded withdrawal"
-=======
-      ))
->>>>>>> LISA-2436: Adds to withdrawal request
     )
 
     val response = Await.result(SUT.reportWithdrawalCharge("Z123456", "ABC12345", request), Duration.Inf)
