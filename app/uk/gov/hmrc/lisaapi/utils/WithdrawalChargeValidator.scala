@@ -103,32 +103,29 @@ class WithdrawalChargeValidator @Inject()(currentDateService: CurrentDateService
 
   private val regularWithdrawalIsNotSupersede: (WithdrawalChargeValidationRequest) => WithdrawalChargeValidationRequest =
     (req: WithdrawalChargeValidationRequest) => {
-      req
-//      req.data.automaticRecoveryAmount match {
-//        case Some(amount) if amount > req.data.withdrawalChargeAmount => {
-//          req.copy(errors = req.errors :+ ErrorValidation(
-//            errorCode = MONETARY_ERROR,
-//            message = "automaticRecoveryAmount cannot be more than withdrawalChargeAmount",
-//            path = Some("/automaticRecoveryAmount")
-//          ))
-//        }
-//        case _ => req
-//      }
+      if (req.data.supersede.isDefined && req.data.withdrawalReason == "Regular withdrawal") {
+        req.copy(errors = req.errors :+ ErrorValidation(
+          errorCode = "INVALID_FORMAT",
+          message = "Invalid format has been used",
+          path = Some("/withdrawalReason")
+        ))
+      } else {
+        req
+      }
     }
 
   private val automaticRecoveryAmountNotEqualToWithdrawalChargeAmountWhenFundsDeducted: (WithdrawalChargeValidationRequest) => WithdrawalChargeValidationRequest =
     (req: WithdrawalChargeValidationRequest) => {
-      req
-//      req.data.automaticRecoveryAmount match {
-//        case Some(amount) if amount > req.data.withdrawalChargeAmount => {
-//          req.copy(errors = req.errors :+ ErrorValidation(
-//            errorCode = MONETARY_ERROR,
-//            message = "automaticRecoveryAmount cannot be more than withdrawalChargeAmount",
-//            path = Some("/automaticRecoveryAmount")
-//          ))
-//        }
-//        case _ => req
-//      }
+      req.data.automaticRecoveryAmount match {
+        case Some(amount) if amount != req.data.withdrawalChargeAmount && req.data.fundsDeductedDuringWithdrawal => {
+          req.copy(errors = req.errors :+ ErrorValidation(
+            errorCode = MONETARY_ERROR,
+            message = "automaticRecoveryAmount was not equal to withdrawalChargeAmount when fundsDeductedDuringWithdrawal",
+            path = Some("/automaticRecoveryAmount")
+          ))
+        }
+        case _ => req
+      }
     }
 
   private val automaticRecoveryAmountLteWithdrawalChargeAmount: (WithdrawalChargeValidationRequest) => WithdrawalChargeValidationRequest =

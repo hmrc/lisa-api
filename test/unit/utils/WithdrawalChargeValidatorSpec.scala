@@ -287,12 +287,17 @@ class WithdrawalChargeValidatorSpec extends PlaySpec
             errorCode = "INVALID_MONETARY_AMOUNT",
             message = "automaticRecoveryAmount was not equal to withdrawalChargeAmount when fundsDeductedDuringWithdrawal",
             path = Some("/automaticRecoveryAmount")
+          ),
+          ErrorValidation(
+            errorCode = "INVALID_MONETARY_AMOUNT",
+            message = "automaticRecoveryAmount cannot be more than withdrawalChargeAmount",
+            path = Some("/automaticRecoveryAmount")
           )
         )
       }
 
       "it is less than the withdrawalChargeAmount and fundsDeductedDuringWithdrawal is true" in {
-        val request = validWithdrawal.copy(automaticRecoveryAmount = Some(validWithdrawal.withdrawalChargeAmount + 0.01), fundsDeductedDuringWithdrawal = true)
+        val request = validWithdrawal.copy(automaticRecoveryAmount = Some(validWithdrawal.withdrawalChargeAmount - 0.01), fundsDeductedDuringWithdrawal = true)
 
         val errors = SUT.validate(request)
 
