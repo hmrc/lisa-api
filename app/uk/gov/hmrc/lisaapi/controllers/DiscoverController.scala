@@ -18,7 +18,7 @@ package uk.gov.hmrc.lisaapi.controllers
 
 import com.google.inject.Inject
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent}
+import play.api.mvc.{Action, AnyContent, ControllerComponents, PlayBodyParsers}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
@@ -26,14 +26,20 @@ import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import scala.concurrent.{ExecutionContext, Future}
 
 class DiscoverController @Inject()(
-                                    val authConnector: AuthConnector,
-                                    val appContext: AppContext,
-                                    val lisaMetrics: LisaMetrics)
-                                  (implicit ec: ExecutionContext)
-  extends LisaController {
+                                    authConnector: AuthConnector,
+                                    appContext: AppContext,
+                                    lisaMetrics: LisaMetrics,
+                                    cc: ControllerComponents,
+                                    parse: PlayBodyParsers
+                                  )(implicit ec: ExecutionContext) extends LisaController(
+  cc: ControllerComponents,
+  lisaMetrics: LisaMetrics,
+  appContext: AppContext,
+  authConnector: AuthConnector
+) {
 
   def discover(lisaManagerReferenceNumber: String): Action[AnyContent] =
-    (validateHeader andThen
+    (validateHeader(parse) andThen
       validateLMRN(lisaManagerReferenceNumber)).async { implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
 

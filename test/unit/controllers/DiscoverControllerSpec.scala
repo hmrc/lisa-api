@@ -21,6 +21,7 @@ import org.mockito.Mockito.when
 import org.scalatest.BeforeAndAfter
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import play.api.mvc.{ControllerComponents, PlayBodyParsers}
 import play.api.test.Helpers._
 import play.api.test._
 import play.mvc.Http.HeaderNames
@@ -32,7 +33,7 @@ import uk.gov.hmrc.lisaapi.metrics.LisaMetrics
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class DiscoverControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite with BeforeAndAfter {
+class DiscoverControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite with BeforeAndAfter with Injecting {
 
   before {
     when(mockAuthConnector.authorise[Option[String]](any(),any())(any(), any())).thenReturn(Future.successful(Some("1234")))
@@ -104,8 +105,10 @@ class DiscoverControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSu
   val mockAuthConnector: AuthConnector = mock[AuthConnector]
   val mockAppContext: AppContext = mock[AppContext]
   val mockLisaMetrics: LisaMetrics = mock[LisaMetrics]
+  val mockControllerComponents = inject[ControllerComponents]
+  val mockParser = inject[PlayBodyParsers]
 
-  val SUT = new DiscoverController(mockAuthConnector, mockAppContext, mockLisaMetrics) {
+  val SUT = new DiscoverController(mockAuthConnector, mockAppContext, mockLisaMetrics, mockControllerComponents, mockParser) {
     override lazy val v2endpointsEnabled = true
   }
 }

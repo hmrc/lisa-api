@@ -21,7 +21,7 @@ import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import play.api.libs.json.Reads.of
 import play.api.libs.json._
-import play.api.mvc.{Action, AnyContent, Result}
+import play.api.mvc._
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.config.AppContext
@@ -34,16 +34,23 @@ import scala.collection.mutable
 import scala.concurrent.{ExecutionContext, Future}
 
 class BulkPaymentController @Inject()(
-                                       val authConnector: AuthConnector,
-                                       val appContext: AppContext,
+                                       authConnector: AuthConnector,
+                                       appContext: AppContext,
                                        currentDateService: CurrentDateService,
                                        service: BulkPaymentService,
                                        auditService: AuditService,
-                                       val lisaMetrics: LisaMetrics
-                                     )(implicit ec: ExecutionContext) extends LisaController {
+                                       lisaMetrics: LisaMetrics,
+                                       cc: ControllerComponents,
+                                       parse: PlayBodyParsers
+                                     )(implicit ec: ExecutionContext) extends LisaController(
+  cc: ControllerComponents,
+  lisaMetrics: LisaMetrics,
+  appContext: AppContext,
+  authConnector: AuthConnector
+) {
 
   def getBulkPayment(lisaManager: String, startDate: String, endDate: String): Action[AnyContent] =
-    validateHeader().async { implicit request =>
+    validateHeader(parse).async { implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
       withValidLMRN(lisaManager) { () =>
         withEnrolment(lisaManager) { _ =>

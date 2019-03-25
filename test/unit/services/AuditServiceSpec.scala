@@ -26,6 +26,7 @@ import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.Configuration
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.logging.Authorization
+import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.models.{Bonuses, HelpToBuyTransfer, InboundPayments, RequestBonusPaymentRequest}
 import uk.gov.hmrc.lisaapi.services.AuditService
 import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
@@ -42,6 +43,7 @@ class AuditServiceSpec extends PlaySpec
   "AuditService" must {
 
     before {
+      when(mockAppContext.appName).thenReturn("lisa-api")
       reset(mockAuditConnector)
     }
 
@@ -122,7 +124,8 @@ class AuditServiceSpec extends PlaySpec
 
   implicit val hc: HeaderCarrier = HeaderCarrier(authorization = Some(Authorization("abcde")))
   val mockAuditConnector = mock[AuditConnector]
-  val configuration = Configuration("appName" -> "lisa-api")
+  val configuration = mock[Configuration]
+  val mockAppContext = mock[AppContext]
 
-  object SUT extends AuditService(mockAuditConnector, configuration)
+  object SUT extends AuditService(mockAuditConnector, configuration, mockAppContext)
 }

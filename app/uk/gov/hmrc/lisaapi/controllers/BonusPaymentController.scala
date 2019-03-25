@@ -20,7 +20,7 @@ import com.google.inject.Inject
 import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.json.{Json, Reads}
-import play.api.mvc.{Action, AnyContent, Request, Result}
+import play.api.mvc._
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.config.AppContext
@@ -33,15 +33,22 @@ import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
 import scala.concurrent.{ExecutionContext, Future}
 
 class BonusPaymentController @Inject()(
-                                        val authConnector: AuthConnector,
-                                        val appContext: AppContext,
+                                        authConnector: AuthConnector,
+                                        appContext: AppContext,
                                         getService: BonusOrWithdrawalService,
                                         postService: BonusPaymentService,
                                         auditService: AuditService,
                                         validator: BonusPaymentValidator,
                                         dateTimeService: CurrentDateService,
-                                        val lisaMetrics: LisaMetrics
-                                      )(implicit ec: ExecutionContext) extends LisaController {
+                                        lisaMetrics: LisaMetrics,
+                                        cc: ControllerComponents,
+                                        parse: PlayBodyParsers
+                                      )(implicit ec: ExecutionContext) extends LisaController(
+  cc: ControllerComponents,
+  lisaMetrics: LisaMetrics,
+  appContext: AppContext,
+  authConnector: AuthConnector
+) {
 
   private val requestBonusErrors = Map[RequestBonusPaymentErrorResponse, ErrorResponse](
     RequestBonusPaymentBonusClaimError -> ErrorBonusClaimError,
@@ -62,7 +69,7 @@ class BonusPaymentController @Inject()(
 
   def requestBonusPayment(lisaManager: String, accountId: String): Action[AnyContent] = {
     implicit val startTime: Long = System.currentTimeMillis()
-    validateHeader().async { implicit request =>
+    validateHeader(parse).async { implicit request =>
 
       withValidLMRN(lisaManager) { () =>
         withValidAccountId(accountId) { () =>
@@ -76,7 +83,7 @@ class BonusPaymentController @Inject()(
   }
 
   def getBonusPayment(lisaManager: String, accountId: String, transactionId: String): Action[AnyContent] =
-    validateHeader().async { implicit request =>
+    validateHeader(parse).async { implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
 
       withValidLMRN(lisaManager) { () =>

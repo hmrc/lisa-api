@@ -16,25 +16,30 @@
 
 package uk.gov.hmrc.lisaapi.models
 
-import org.joda.time.DateTime
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+
 import play.api.libs.functional.syntax._
-import play.api.libs.json.{JsPath, Json, Reads, Writes}
+import play.api.libs.json._
 
 case class GetLifeEventItemPropertyDetails(nameOrNumber: String, postalCode: String)
 object GetLifeEventItemPropertyDetails {
   implicit val formats = Json.format[GetLifeEventItemPropertyDetails]
 }
 
-case class GetLifeEventItemSupersede(originalLifeEventId: LifeEventId, originalEventDate: DateTime)
+case class GetLifeEventItemSupersede(originalLifeEventId: LifeEventId, originalEventDate: LocalDate)
 object GetLifeEventItemSupersede {
-  implicit val dateWrites: Writes[DateTime] = Writes.jodaDateWrites(pattern = "yyyy-MM-dd")
+  implicit val dateReads: Reads[LocalDate] = Reads.localDateReads(DateTimeFormatter.ISO_LOCAL_DATE)
+  implicit val dateWrites: Writes[LocalDate] = Writes {
+    date => JsString(date.format(DateTimeFormatter.ISO_LOCAL_DATE))
+  }
   implicit val formats = Json.format[GetLifeEventItemSupersede]
 }
 
 case class GetLifeEventItem(
   lifeEventId: LifeEventId,
   eventType: LifeEventType,
-  eventDate: DateTime,
+  eventDate: LocalDate,
   lisaManagerName: Option[String] = None,
   taxYear: Option[Int] = None,
   marketValueCash: Option[Int] = None,
@@ -52,12 +57,15 @@ case class GetLifeEventItem(
 )
 
 object GetLifeEventItem {
-  implicit val dateReads: Reads[DateTime] = Reads.jodaDateReads("yyyy-MM-dd")
+  implicit val dateReads: Reads[LocalDate] = Reads.localDateReads(DateTimeFormatter.ISO_LOCAL_DATE)
+  implicit val dateWrites: Writes[LocalDate] = Writes {
+    date => JsString(date.format(DateTimeFormatter.ISO_LOCAL_DATE))
+  }
 
   implicit val reads: Reads[GetLifeEventItem] = (
     (JsPath \ "lifeEventId").read(JsonReads.lifeEventId) and
     (JsPath \ "lifeEventType").read[String] and
-    (JsPath \ "lifeEventDate").read(JsonReads.notFutureDate).map(new DateTime(_)) and
+    (JsPath \ "lifeEventDate").read[LocalDate] and
     (JsPath \ "isaManagerName").readNullable[String] and
     (JsPath \ "taxYear").readNullable[String].map(_.map(_.toInt)) and
     (JsPath \ "marketValueCash").readNullable[Int] and
@@ -72,7 +80,7 @@ object GetLifeEventItem {
     (JsPath \\ "nameOrNumber").readNullable[String] and
     (JsPath \\ "postcode").readNullable[String] and
     (JsPath \ "supersededLifeEventId").readNullable[LifeEventId] and
-    (JsPath \ "supersededLifeEventDate").readNullable[String].map(_.map(new DateTime(_))) and
+    (JsPath \ "supersededLifeEventDate").readNullable[LocalDate] and
     (JsPath \ "lifeEventSupersededById").readNullable[LifeEventId]
   )((lifeEventId,
      lifeEventType,
@@ -136,7 +144,7 @@ object GetLifeEventItem {
   implicit val writes: Writes[GetLifeEventItem] = (
     (JsPath \ "lifeEventId").write[String] and
     (JsPath \ "eventType").write[String] and
-    (JsPath \ "eventDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
+    (JsPath \ "eventDate").write[LocalDate] and
     (JsPath \ "lisaManagerName").writeNullable[String] and
     (JsPath \ "taxYear").writeNullable[Int] and
     (JsPath \ "marketValueCash").writeNullable[Int] and

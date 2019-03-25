@@ -43,13 +43,12 @@ class ErrorConverterSpec extends PlaySpec
 
           println(JsError.toFlatForm(e))
 
-          res.size mustBe 5
+          res.size mustBe 4
 
           res must contain(ErrorValidation("INVALID_DATA_TYPE", "Invalid data type has been used", Some("/str")))
           res must contain(ErrorValidation("INVALID_DATA_TYPE", "Invalid data type has been used", Some("/num")))
           res must contain(ErrorValidation("INVALID_DATA_TYPE", "Invalid data type has been used", Some("/arr")))
-          res must contain(ErrorValidation("MISSING_FIELD", "This field is required", Some("/obj/str")))
-          res must contain(ErrorValidation("MISSING_FIELD", "This field is required", Some("/obj/num")))
+          res must contain(ErrorValidation("INVALID_DATA_TYPE", "Invalid data type has been used", Some("/obj")))
 
         }
       }

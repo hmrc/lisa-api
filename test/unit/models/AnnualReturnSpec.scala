@@ -21,8 +21,7 @@ import org.mockito.Mockito.{reset, when}
 import org.scalatest.BeforeAndAfter
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.data.validation.ValidationError
-import play.api.libs.json.{JsError, JsPath, Json}
+import play.api.libs.json.{JsError, JsPath, Json, JsonValidationError}
 import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.controllers.ErrorValidation
 import uk.gov.hmrc.lisaapi.models.{AnnualReturn, AnnualReturnSupersede, AnnualReturnValidator}
@@ -54,27 +53,27 @@ class AnnualReturnSpec extends PlaySpec
       val invalidJson = validJson ++ Json.obj("originalEventDate" -> "3018-05-01")
 
       invalidJson.validate[AnnualReturnSupersede] mustBe JsError(errors = List(
-        ((JsPath \ "originalEventDate"), List(ValidationError("error.formatting.date")))
+        ((JsPath \ "originalEventDate"), List(JsonValidationError("error.formatting.date")))
       ))
     }
     "not allow a badly formatted event date" in {
       val invalidJson = validJson ++ Json.obj("originalEventDate" -> "30-12-2017")
 
       invalidJson.validate[AnnualReturnSupersede] mustBe JsError(errors = List(
-        ((JsPath \ "originalEventDate"), List(ValidationError("error.formatting.date")))
+        ((JsPath \ "originalEventDate"), List(JsonValidationError("error.formatting.date")))
       ))
     }
     "not allow a badly formatted life event id" in {
       val invalidJson = validJson ++ Json.obj("originalLifeEventId" -> "x")
 
       invalidJson.validate[AnnualReturnSupersede] mustBe JsError(errors = List(
-        ((JsPath \ "originalLifeEventId"), List(ValidationError("error.formatting.lifeEventId")))
+        ((JsPath \ "originalLifeEventId"), List(JsonValidationError("error.formatting.lifeEventId")))
       ))
     }
     "require all fields" in {
       Json.obj().validate[AnnualReturnSupersede] mustBe JsError(errors = List(
-        ((JsPath \ "originalLifeEventId"), List(ValidationError("error.path.missing"))),
-        ((JsPath \ "originalEventDate"), List(ValidationError("error.path.missing")))
+        ((JsPath \ "originalLifeEventId"), List(JsonValidationError("error.path.missing"))),
+        ((JsPath \ "originalEventDate"), List(JsonValidationError("error.path.missing")))
       ))
     }
 
@@ -123,14 +122,14 @@ class AnnualReturnSpec extends PlaySpec
       val invalidJson = validJson ++ Json.obj("eventDate" -> "3018-05-01")
 
       invalidJson.validate[AnnualReturn] mustBe JsError(errors = List(
-        ((JsPath \ "eventDate"), List(ValidationError("error.formatting.date")))
+        ((JsPath \ "eventDate"), List(JsonValidationError("error.formatting.date")))
       ))
     }
     "not allow a badly formatted event date" in {
       val invalidJson = validJson ++ Json.obj("eventDate" -> "30-12-2017")
 
       invalidJson.validate[AnnualReturn] mustBe JsError(errors = List(
-        ((JsPath \ "eventDate"), List(ValidationError("error.formatting.date")))
+        ((JsPath \ "eventDate"), List(JsonValidationError("error.formatting.date")))
       ))
     }
     "ensure the lisaManagerName is less than 50 characters" in {
@@ -138,35 +137,35 @@ class AnnualReturnSpec extends PlaySpec
       val invalidJson = validJson ++ Json.obj("lisaManagerName" -> tooLong)
 
       invalidJson.validate[AnnualReturn] mustBe JsError(errors = List(
-        ((JsPath \ "lisaManagerName"), List(ValidationError("error.formatting.lisaManagerName")))
+        ((JsPath \ "lisaManagerName"), List(JsonValidationError("error.formatting.lisaManagerName")))
       ))
     }
     "ensure the lisaManagerName doesn't have unexpected characters" in {
       val invalidJson = validJson ++ Json.obj("lisaManagerName" -> "?")
 
       invalidJson.validate[AnnualReturn] mustBe JsError(errors = List(
-        ((JsPath \ "lisaManagerName"), List(ValidationError("error.formatting.lisaManagerName")))
+        ((JsPath \ "lisaManagerName"), List(JsonValidationError("error.formatting.lisaManagerName")))
       ))
     }
     "ensure the lisaManagerName isn't empty" in {
       val invalidJson = validJson ++ Json.obj("lisaManagerName" -> "")
 
       invalidJson.validate[AnnualReturn] mustBe JsError(errors = List(
-        ((JsPath \ "lisaManagerName"), List(ValidationError("error.formatting.lisaManagerName")))
+        ((JsPath \ "lisaManagerName"), List(JsonValidationError("error.formatting.lisaManagerName")))
       ))
     }
     "ensure the taxYear is four figures - it must be less than 10000" in {
       val invalidJson = validJson ++ Json.obj("taxYear" -> 10000)
 
       invalidJson.validate[AnnualReturn] mustBe JsError(errors = List(
-        ((JsPath \ "taxYear"), List(ValidationError("error.formatting.taxYear")))
+        ((JsPath \ "taxYear"), List(JsonValidationError("error.formatting.taxYear")))
       ))
     }
     "ensure the taxYear is four figures - it must be more than 999" in {
       val invalidJson = validJson ++ Json.obj("taxYear" -> 999)
 
       invalidJson.validate[AnnualReturn] mustBe JsError(errors = List(
-        ((JsPath \ "taxYear"), List(ValidationError("error.formatting.taxYear")))
+        ((JsPath \ "taxYear"), List(JsonValidationError("error.formatting.taxYear")))
       ))
     }
     "ensure all numeric fields are integers" in {
@@ -179,11 +178,11 @@ class AnnualReturnSpec extends PlaySpec
       )
 
       val expectedErrors = List(
-        ((JsPath \ "taxYear"), List(ValidationError("error.expected.int"))),
-        ((JsPath \ "marketValueCash"), List(ValidationError("error.expected.int"))),
-        ((JsPath \ "marketValueStocksAndShares"), List(ValidationError("error.expected.int"))),
-        ((JsPath \ "annualSubsCash"), List(ValidationError("error.expected.int"))),
-        ((JsPath \ "annualSubsStocksAndShares"), List(ValidationError("error.expected.int")))
+        ((JsPath \ "taxYear"), List(JsonValidationError("error.expected.int"))),
+        ((JsPath \ "marketValueCash"), List(JsonValidationError("error.expected.int"))),
+        ((JsPath \ "marketValueStocksAndShares"), List(JsonValidationError("error.expected.int"))),
+        ((JsPath \ "annualSubsCash"), List(JsonValidationError("error.expected.int"))),
+        ((JsPath \ "annualSubsStocksAndShares"), List(JsonValidationError("error.expected.int")))
       )
 
       val result = invalidJson.validate[AnnualReturn]
@@ -205,10 +204,10 @@ class AnnualReturnSpec extends PlaySpec
       )
 
       val expectedErrors = List(
-        ((JsPath \ "marketValueCash"), List(ValidationError("error.formatting.annualFigures"))),
-        ((JsPath \ "marketValueStocksAndShares"), List(ValidationError("error.formatting.annualFigures"))),
-        ((JsPath \ "annualSubsCash"), List(ValidationError("error.formatting.annualFigures"))),
-        ((JsPath \ "annualSubsStocksAndShares"), List(ValidationError("error.formatting.annualFigures")))
+        ((JsPath \ "marketValueCash"), List(JsonValidationError("error.formatting.annualFigures"))),
+        ((JsPath \ "marketValueStocksAndShares"), List(JsonValidationError("error.formatting.annualFigures"))),
+        ((JsPath \ "annualSubsCash"), List(JsonValidationError("error.formatting.annualFigures"))),
+        ((JsPath \ "annualSubsStocksAndShares"), List(JsonValidationError("error.formatting.annualFigures")))
       )
 
       val result = invalidJson.validate[AnnualReturn]
@@ -223,13 +222,13 @@ class AnnualReturnSpec extends PlaySpec
     }
     "require all fields except supersede" in {
       val expectedErrors = List(
-        ((JsPath \ "eventDate"), List(ValidationError("error.path.missing"))),
-        ((JsPath \ "lisaManagerName"), List(ValidationError("error.path.missing"))),
-        ((JsPath \ "taxYear"), List(ValidationError("error.path.missing"))),
-        ((JsPath \ "marketValueCash"), List(ValidationError("error.path.missing"))),
-        ((JsPath \ "marketValueStocksAndShares"), List(ValidationError("error.path.missing"))),
-        ((JsPath \ "annualSubsCash"), List(ValidationError("error.path.missing"))),
-        ((JsPath \ "annualSubsStocksAndShares"), List(ValidationError("error.path.missing")))
+        ((JsPath \ "eventDate"), List(JsonValidationError("error.path.missing"))),
+        ((JsPath \ "lisaManagerName"), List(JsonValidationError("error.path.missing"))),
+        ((JsPath \ "taxYear"), List(JsonValidationError("error.path.missing"))),
+        ((JsPath \ "marketValueCash"), List(JsonValidationError("error.path.missing"))),
+        ((JsPath \ "marketValueStocksAndShares"), List(JsonValidationError("error.path.missing"))),
+        ((JsPath \ "annualSubsCash"), List(JsonValidationError("error.path.missing"))),
+        ((JsPath \ "annualSubsStocksAndShares"), List(JsonValidationError("error.path.missing")))
       )
 
       val result = Json.obj().validate[AnnualReturn]

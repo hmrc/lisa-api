@@ -19,7 +19,7 @@ package uk.gov.hmrc.lisaapi.controllers
 import com.google.inject.Inject
 import play.api.Logger
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent, Result}
+import play.api.mvc._
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.config.AppContext
@@ -32,20 +32,27 @@ import uk.gov.hmrc.lisaapi.utils.WithdrawalChargeValidator
 import scala.concurrent.{ExecutionContext, Future}
 
 class WithdrawalController @Inject() (
-                                       val authConnector: AuthConnector,
-                                       val appContext: AppContext,
+                                       authConnector: AuthConnector,
+                                       appContext: AppContext,
                                        postService: WithdrawalService,
                                        getService: BonusOrWithdrawalService,
                                        auditService: AuditService,
                                        validator: WithdrawalChargeValidator,
                                        dateTimeService: CurrentDateService,
-                                       val lisaMetrics: LisaMetrics
-                                     )(implicit ec: ExecutionContext) extends LisaController {
+                                       lisaMetrics: LisaMetrics,
+                                       cc: ControllerComponents,
+                                       parse: PlayBodyParsers
+                                     )(implicit ec: ExecutionContext) extends LisaController(
+  cc: ControllerComponents,
+  lisaMetrics: LisaMetrics,
+  appContext: AppContext,
+  authConnector: AuthConnector
+) {
 
   override val validateVersion: String => Boolean = _ == "2.0"
 
   def reportWithdrawalCharge(lisaManager: String, accountId: String): Action[AnyContent] =
-    (validateHeader() andThen validateLMRN(lisaManager) andThen validateAccountId(accountId)).async { implicit request =>
+    (validateHeader(parse) andThen validateLMRN(lisaManager) andThen validateAccountId(accountId)).async { implicit request =>
     implicit val startTime: Long = System.currentTimeMillis()
 
     withValidJson[ReportWithdrawalChargeRequest](req =>
@@ -72,7 +79,7 @@ class WithdrawalController @Inject() (
   }
 
   def getWithdrawalCharge(lisaManager: String, accountId: String, transactionId: String): Action[AnyContent] = {
-    validateHeader().async { implicit request =>
+    validateHeader(parse).async { implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
       withValidLMRN(lisaManager) { () =>
         withEnrolment(lisaManager) { _ =>

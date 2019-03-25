@@ -17,15 +17,15 @@
 package unit.controllers
 
 import org.joda.time.DateTime
-import org.mockito.Matchers.{eq => MatcherEquals, any}
+import org.mockito.Matchers.{any, eq => MatcherEquals}
 import org.mockito.Mockito.{reset, verify, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
-import play.api.mvc.{AnyContentAsJson, Result}
+import play.api.mvc.{AnyContentAsJson, ControllerComponents, PlayBodyParsers, Result}
 import play.api.test.Helpers._
-import play.api.test.{FakeRequest, Helpers}
+import play.api.test.{FakeRequest, Helpers, Injecting}
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
@@ -45,7 +45,8 @@ class WithdrawalControllerSpec extends PlaySpec
   with MockitoSugar
   with OneAppPerSuite
   with BeforeAndAfterEach
-  with LisaConstants {
+  with LisaConstants
+  with Injecting {
 
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.2.0+json")
   val lisaManager = "Z019283"
@@ -1034,6 +1035,8 @@ class WithdrawalControllerSpec extends PlaySpec
   val mockValidator: WithdrawalChargeValidator = mock[WithdrawalChargeValidator]
   val mockAppContext: AppContext = mock[AppContext]
   val mockLisaMetrics: LisaMetrics = mock[LisaMetrics]
+  val mockControllerComponents = inject[ControllerComponents]
+  val mockParser = inject[PlayBodyParsers]
 
   val SUT = new WithdrawalController(
     mockAuthCon,
@@ -1043,7 +1046,9 @@ class WithdrawalControllerSpec extends PlaySpec
     mockAuditService,
     mockValidator,
     mockDateTimeService,
-    mockLisaMetrics
+    mockLisaMetrics,
+    mockControllerComponents,
+    mockParser
   ) {
     override lazy val v2endpointsEnabled = true
   }

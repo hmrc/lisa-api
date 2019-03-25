@@ -18,8 +18,7 @@ package unit.models
 
 import org.joda.time.DateTime
 import org.scalatestplus.play.PlaySpec
-import play.api.data.validation.ValidationError
-import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
+import play.api.libs.json._
 import uk.gov.hmrc.lisaapi.models.AccountTransfer
 
 class AccountTransferSpec extends PlaySpec {
@@ -58,8 +57,8 @@ class AccountTransferSpec extends PlaySpec {
       res match {
         case JsError(errors) => {
           errors.count {
-            case (path: JsPath, errors: Seq[ValidationError]) => {
-              path.toString() == "/transferredFromLMRN" && errors.contains(ValidationError("error.formatting.lmrn"))
+            case (path: JsPath, errors: Seq[JsonValidationError]) => {
+              path.toString() == "/transferredFromLMRN" && errors.contains(JsonValidationError("error.formatting.lmrn"))
             }
           } mustBe 1
         }
@@ -74,8 +73,8 @@ class AccountTransferSpec extends PlaySpec {
       res match {
         case JsError(errors) => {
           errors.count {
-            case (path: JsPath, errors: Seq[ValidationError]) => {
-              path.toString() == "/transferInDate" && errors.contains(ValidationError("error.formatting.date"))
+            case (path: JsPath, errors: Seq[JsonValidationError]) => {
+              path.toString() == "/transferInDate" && errors.contains(JsonValidationError("error.formatting.date"))
             }
           } mustBe 1
         }

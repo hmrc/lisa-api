@@ -18,7 +18,6 @@ package unit.models
 
 import org.joda.time.DateTime
 import org.scalatestplus.play.PlaySpec
-import play.api.data.validation.ValidationError
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import uk.gov.hmrc.lisaapi.models._
@@ -91,7 +90,7 @@ class JsonSpec extends PlaySpec {
 
         res match {
           case JsError(errors) => {
-            errors mustBe Seq((JsPath \ property, Seq(ValidationError(currencyFormatError))))
+            errors mustBe Seq((JsPath \ property, Seq(JsonValidationError(currencyFormatError))))
           }
           case _ => fail("passed validation")
         }
@@ -102,7 +101,7 @@ class JsonSpec extends PlaySpec {
 
         res match {
           case JsError(errors) => {
-            errors mustBe Seq((JsPath \ property, Seq(ValidationError(currencyFormatError))))
+            errors mustBe Seq((JsPath \ property, Seq(JsonValidationError(currencyFormatError))))
           }
           case _ => fail("passed validation")
         }
@@ -113,7 +112,7 @@ class JsonSpec extends PlaySpec {
 
         res match {
           case JsError(errors) => {
-            errors mustBe Seq((JsPath \ property, Seq(ValidationError(currencyFormatError))))
+            errors mustBe Seq((JsPath \ property, Seq(JsonValidationError(currencyFormatError))))
           }
           case _ => fail("passed validation")
         }
@@ -124,7 +123,7 @@ class JsonSpec extends PlaySpec {
 
         res match {
           case JsError(errors) => {
-            errors mustBe Seq((JsPath \ property, Seq(ValidationError(currencyFormatError))))
+            errors mustBe Seq((JsPath \ property, Seq(JsonValidationError(currencyFormatError))))
           }
           case _ => fail("passed validation")
         }
@@ -135,7 +134,7 @@ class JsonSpec extends PlaySpec {
 
         res match {
           case JsError(errors) => {
-            errors mustBe Seq((JsPath \ property, Seq(ValidationError("error.expected.jsnumber"))))
+            errors mustBe Seq((JsPath \ property, Seq(JsonValidationError("error.expected.jsnumber"))))
           }
           case _ => fail("passed validation")
         }
@@ -146,7 +145,7 @@ class JsonSpec extends PlaySpec {
 
         res match {
           case JsError(errors) => {
-            errors mustBe Seq((JsPath \ property, Seq(ValidationError("error.expected.jsnumber"))))
+            errors mustBe Seq((JsPath \ property, Seq(JsonValidationError("error.expected.jsnumber"))))
           }
           case _ => fail("passed validation")
         }
@@ -202,7 +201,7 @@ class JsonSpec extends PlaySpec {
 
         res match {
           case JsError(errors) => {
-            errors mustBe Seq((JsPath \ property, Seq(ValidationError("error.expected.jsstring"))))
+            errors mustBe Seq((JsPath \ property, Seq(JsonValidationError("error.expected.jsstring"))))
           }
           case _ => fail("passed validation")
         }
@@ -217,7 +216,7 @@ class JsonSpec extends PlaySpec {
 
         res match {
           case JsError(errors) => {
-            errors mustBe Seq((JsPath \ property, Seq(ValidationError("error.formatting.date"))))
+            errors mustBe Seq((JsPath \ property, Seq(JsonValidationError("error.formatting.date"))))
           }
           case _ => fail("passed validation")
         }
@@ -228,7 +227,7 @@ class JsonSpec extends PlaySpec {
 
         res match {
           case JsError(errors) => {
-            errors mustBe Seq((JsPath \ property, Seq(ValidationError("error.formatting.date"))))
+            errors mustBe Seq((JsPath \ property, Seq(JsonValidationError("error.formatting.date"))))
           }
           case _ => fail("passed validation")
         }
@@ -239,7 +238,7 @@ class JsonSpec extends PlaySpec {
 
         res match {
           case JsError(errors) => {
-            errors mustBe Seq((JsPath \ property, Seq(ValidationError("error.formatting.date"))))
+            errors mustBe Seq((JsPath \ property, Seq(JsonValidationError("error.formatting.date"))))
           }
           case _ => fail("passed validation")
         }
