@@ -62,7 +62,8 @@ class WithdrawalChargeSpec extends PlaySpec {
         1000.00,
         250.00,
         500.00,
-        true
+        true,
+        "Regular withdrawal"
       )
     }
 
@@ -81,7 +82,8 @@ class WithdrawalChargeSpec extends PlaySpec {
           "2345678901",
           250.00,
           250.00
-        )
+        ),
+        "Superseded withdrawal"
       )
     }
 
@@ -106,7 +108,8 @@ class WithdrawalChargeSpec extends PlaySpec {
           "2345678901",
           250.00,
           250.00
-        )
+        ),
+        "Superseded withdrawal"
       )
     }
 
@@ -124,7 +127,8 @@ class WithdrawalChargeSpec extends PlaySpec {
             "2345678901",
             250.00,
             250.00
-          )
+          ),
+          "Superseded withdrawal"
         ))(ReportWithdrawalChargeRequest.desReportWithdrawalChargeWrites)
 
         result mustBe Json.obj(

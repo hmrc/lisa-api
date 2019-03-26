@@ -180,7 +180,8 @@ class WithdrawalServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSui
       1000.00,
       250.00,
       500.00,
-      true
+      true,
+      "Regular Withdrawal"
     )
 
     val response = Await.result(SUT.reportWithdrawalCharge("Z019283", "192837", request)(HeaderCarrier()), Duration.Inf)

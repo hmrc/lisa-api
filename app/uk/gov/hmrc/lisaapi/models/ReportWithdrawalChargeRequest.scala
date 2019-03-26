@@ -204,6 +204,7 @@ sealed trait ReportWithdrawalChargeRequest extends Product {
   val claimPeriodEndDate: DateTime
   val automaticRecoveryAmount: Option[Amount]
   val withdrawalChargeAmount: Amount
+  val withdrawalReason: String
 }
 
 case class RegularWithdrawalChargeRequest(
@@ -213,7 +214,8 @@ case class RegularWithdrawalChargeRequest(
   withdrawalAmount: Amount,
   withdrawalChargeAmount: Amount,
   withdrawalChargeAmountYTD: Amount,
-  fundsDeductedDuringWithdrawal: Boolean
+  fundsDeductedDuringWithdrawal: Boolean,
+  withdrawalReason: String
 ) extends ReportWithdrawalChargeRequest
 
 case class SupersededWithdrawalChargeRequest(
@@ -224,7 +226,8 @@ case class SupersededWithdrawalChargeRequest(
   withdrawalChargeAmount: Amount,
   withdrawalChargeAmountYTD: Amount,
   fundsDeductedDuringWithdrawal: Boolean,
-  supersede: WithdrawalSupersede
+  supersede: WithdrawalSupersede,
+  withdrawalReason: String
 ) extends ReportWithdrawalChargeRequest
 
 object ReportWithdrawalChargeRequest {
@@ -247,7 +250,7 @@ object ReportWithdrawalChargeRequest {
       withdrawalChargeAmount,
       withdrawalChargeAmountYTD,
       fundsDeductedDuringWithdrawal,
-      _
+      withdrawalReason
     ) => RegularWithdrawalChargeRequest(
       automaticRecoveryAmount,
       claimPeriodStartDate,
@@ -255,7 +258,8 @@ object ReportWithdrawalChargeRequest {
       withdrawalAmount,
       withdrawalChargeAmount,
       withdrawalChargeAmountYTD,
-      fundsDeductedDuringWithdrawal
+      fundsDeductedDuringWithdrawal,
+      withdrawalReason
     )
   )
 
@@ -278,7 +282,7 @@ object ReportWithdrawalChargeRequest {
       withdrawalChargeAmountYTD,
       fundsDeductedDuringWithdrawal,
       supersede,
-      _
+      withdrawalReason
     ) => SupersededWithdrawalChargeRequest(
       automaticRecoveryAmount,
       claimPeriodStartDate,
@@ -287,7 +291,8 @@ object ReportWithdrawalChargeRequest {
       withdrawalChargeAmount,
       withdrawalChargeAmountYTD,
       fundsDeductedDuringWithdrawal,
-      supersede
+      supersede,
+      withdrawalReason
     )
   )
 
