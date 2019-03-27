@@ -16,6 +16,8 @@
 
 package unit.controllers
 
+import java.time.LocalDate
+
 import org.joda.time.DateTime
 import org.mockito.Matchers.{eq => MatcherEquals, _}
 import org.mockito.Mockito.{reset, verify, when}
@@ -23,9 +25,9 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{AnyContentAsJson, Result}
+import play.api.mvc.{AnyContentAsJson, ControllerComponents, PlayBodyParsers, Result}
 import play.api.test.Helpers._
-import play.api.test.{FakeRequest, Helpers}
+import play.api.test.{FakeRequest, Helpers, Injecting}
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.lisaapi.LisaConstants
@@ -42,7 +44,8 @@ class AnnualReturnControllerSpec extends PlaySpec
   with MockitoSugar
   with OneAppPerSuite
   with BeforeAndAfterEach
-  with LisaConstants {
+  with LisaConstants
+  with Injecting {
 
   override def beforeEach() {
     reset(mockAuditService)
@@ -287,7 +290,7 @@ class AnnualReturnControllerSpec extends PlaySpec
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountId" -> accountId,
               "eventType" -> "Statutory Submission",
-              "eventDate" -> (payload \ "eventDate").as[DateTime].toString("yyyy-MM-dd"),
+              "eventDate" -> (payload \ "eventDate").as[String],
               "lisaManagerName" -> (payload \ "lisaManagerName").as[String],
               "taxYear" -> (payload \ "taxYear").as[Int].toString,
               "marketValueCash" -> (payload \ "marketValueCash").as[Int].toString,
@@ -316,7 +319,7 @@ class AnnualReturnControllerSpec extends PlaySpec
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountId" -> accountId,
               "eventType" -> "Statutory Submission",
-              "eventDate" -> (json \ "eventDate").as[DateTime].toString("yyyy-MM-dd"),
+              "eventDate" -> (json \ "eventDate").as[String],
               "lisaManagerName" -> (json \ "lisaManagerName").as[String],
               "taxYear" -> (json \ "taxYear").as[Int].toString,
               "marketValueCash" -> (json \ "marketValueCash").as[Int].toString,
@@ -340,7 +343,7 @@ class AnnualReturnControllerSpec extends PlaySpec
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountId" -> accountId,
               "eventType" -> "Statutory Submission",
-              "eventDate" -> (json \ "eventDate").as[DateTime].toString("yyyy-MM-dd"),
+              "eventDate" -> (json \ "eventDate").as[String],
               "lisaManagerName" -> (json \ "lisaManagerName").as[String],
               "taxYear" -> (json \ "taxYear").as[Int].toString,
               "marketValueCash" -> (json \ "marketValueCash").as[Int].toString,
@@ -365,7 +368,7 @@ class AnnualReturnControllerSpec extends PlaySpec
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountId" -> accountId,
               "eventType" -> "Statutory Submission",
-              "eventDate" -> (json \ "eventDate").as[DateTime].toString("yyyy-MM-dd"),
+              "eventDate" -> (json \ "eventDate").as[String],
               "lisaManagerName" -> (json \ "lisaManagerName").as[String],
               "taxYear" -> (json \ "taxYear").as[Int].toString,
               "marketValueCash" -> (json \ "marketValueCash").as[Int].toString,
@@ -415,8 +418,10 @@ class AnnualReturnControllerSpec extends PlaySpec
   private val mockValidator: AnnualReturnValidator = mock[AnnualReturnValidator]
   val mockAppContext: AppContext = mock[AppContext]
   val mockLisaMetrics: LisaMetrics = mock[LisaMetrics]
+  val mockControllerComponents = inject[ControllerComponents]
+  val mockParser = inject[PlayBodyParsers]
 
-  private val SUT = new AnnualReturnController(mockAuthCon, mockAppContext, mockService, mockAuditService, mockValidator, mockLisaMetrics) {
+  private val SUT = new AnnualReturnController(mockAuthCon, mockAppContext, mockService, mockAuditService, mockValidator, mockLisaMetrics, mockControllerComponents, mockParser) {
     override lazy val v2endpointsEnabled = true
   }
 

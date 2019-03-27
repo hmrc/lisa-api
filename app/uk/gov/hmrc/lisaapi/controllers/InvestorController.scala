@@ -19,7 +19,7 @@ package uk.gov.hmrc.lisaapi.controllers
 import com.google.inject.Inject
 import play.api.Logger
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent}
+import play.api.mvc.{Action, AnyContent, ControllerComponents, PlayBodyParsers}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.config.AppContext
@@ -30,14 +30,21 @@ import uk.gov.hmrc.lisaapi.services.{AuditService, InvestorService}
 import scala.concurrent.ExecutionContext
 
 class InvestorController @Inject()(
-                                    val authConnector: AuthConnector,
-                                    val appContext: AppContext,
+                                    authConnector: AuthConnector,
+                                    appContext: AppContext,
                                     service: InvestorService,
                                     auditService: AuditService,
-                                    val lisaMetrics: LisaMetrics
-                                  )(implicit ec: ExecutionContext) extends LisaController {
+                                    lisaMetrics: LisaMetrics,
+                                    cc: ControllerComponents,
+                                    parse: PlayBodyParsers
+                                  )(implicit ec: ExecutionContext) extends LisaController(
+  cc: ControllerComponents,
+  lisaMetrics: LisaMetrics,
+  appContext: AppContext,
+  authConnector: AuthConnector
+) {
 
-  def createLisaInvestor(lisaManager: String): Action[AnyContent] = (validateHeader() andThen validateLMRN(lisaManager)).async { implicit request =>
+  def createLisaInvestor(lisaManager: String): Action[AnyContent] = (validateHeader(parse) andThen validateLMRN(lisaManager)).async { implicit request =>
     implicit val startTime: Long = System.currentTimeMillis()
     Logger.debug(s"LISA HTTP Request: ${request.uri} and method: ${request.method}")
     withValidJson[CreateLisaInvestorRequest](

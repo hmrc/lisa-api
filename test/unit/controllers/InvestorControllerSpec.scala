@@ -23,7 +23,7 @@ import org.scalatest._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
-import play.api.mvc.AnyContentAsJson
+import play.api.mvc.{AnyContentAsJson, ControllerComponents, PlayBodyParsers}
 import play.api.test.Helpers._
 import play.api.test._
 import play.mvc.Http.HeaderNames
@@ -40,7 +40,8 @@ import scala.concurrent.Future
 class InvestorControllerSpec extends PlaySpec
   with MockitoSugar
   with OneAppPerSuite
-  with BeforeAndAfterEach {
+  with BeforeAndAfterEach
+  with Injecting {
 
 
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
@@ -281,7 +282,9 @@ class InvestorControllerSpec extends PlaySpec
   val mockAuthCon: AuthConnector = mock[AuthConnector]
   val mockAppContext: AppContext = mock[AppContext]
   val mockLisaMetrics: LisaMetrics = mock[LisaMetrics]
-  val SUT = new InvestorController(mockAuthCon, mockAppContext, mockService, mockAuditService, mockLisaMetrics) {
+  val mockControllerComponents = inject[ControllerComponents]
+  val mockParser = inject[PlayBodyParsers]
+  val SUT = new InvestorController(mockAuthCon, mockAppContext, mockService, mockAuditService, mockLisaMetrics, mockControllerComponents, mockParser) {
     override lazy val v2endpointsEnabled = true
   }
 }

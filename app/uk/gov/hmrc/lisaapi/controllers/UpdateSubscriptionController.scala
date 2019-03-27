@@ -19,7 +19,7 @@ package uk.gov.hmrc.lisaapi.controllers
 import com.google.inject.Inject
 import play.api.Logger
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent, Result}
+import play.api.mvc._
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.config.AppContext
@@ -30,15 +30,22 @@ import uk.gov.hmrc.lisaapi.services.{AuditService, UpdateSubscriptionService}
 import scala.concurrent.{ExecutionContext, Future}
 
 class UpdateSubscriptionController @Inject() (
-                                               val authConnector: AuthConnector,
-                                               val appContext: AppContext,
+                                               authConnector: AuthConnector,
+                                               appContext: AppContext,
                                                service: UpdateSubscriptionService,
                                                auditService: AuditService,
-                                               val lisaMetrics: LisaMetrics
-                                             )(implicit ec: ExecutionContext) extends LisaController {
+                                               lisaMetrics: LisaMetrics,
+                                               cc: ControllerComponents,
+                                               parse: PlayBodyParsers
+                                             )(implicit ec: ExecutionContext) extends LisaController(
+  cc: ControllerComponents,
+  lisaMetrics: LisaMetrics,
+  appContext: AppContext,
+  authConnector: AuthConnector
+) {
 
   def updateSubscription (lisaManager: String, accountId: String): Action[AnyContent] =
-    (validateHeader() andThen validateLMRN(lisaManager) andThen validateAccountId(accountId)).async { implicit request =>
+    (validateHeader(parse) andThen validateLMRN(lisaManager) andThen validateAccountId(accountId)).async { implicit request =>
     implicit val startTime: Long = System.currentTimeMillis()
 
     withValidJson[UpdateSubscriptionRequest](

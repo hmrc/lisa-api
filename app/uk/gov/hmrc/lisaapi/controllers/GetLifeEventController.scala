@@ -18,7 +18,7 @@ package uk.gov.hmrc.lisaapi.controllers
 
 import com.google.inject.Inject
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent}
+import play.api.mvc.{Action, AnyContent, ControllerComponents, PlayBodyParsers}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.config.AppContext
@@ -28,17 +28,23 @@ import uk.gov.hmrc.lisaapi.services.{AuditService, LifeEventService}
 import scala.concurrent.ExecutionContext
 
 class GetLifeEventController @Inject()(
-                                        val authConnector: AuthConnector,
-                                        val appContext: AppContext,
-                                        val lisaMetrics: LisaMetrics,
+                                        authConnector: AuthConnector,
+                                        appContext: AppContext,
+                                        lisaMetrics: LisaMetrics,
                                         val service: LifeEventService,
-                                        auditService: AuditService)
-                                      (implicit ec: ExecutionContext)
-  extends LisaController {
+                                        auditService: AuditService,
+                                        cc: ControllerComponents,
+                                        parse: PlayBodyParsers
+                                      )(implicit ec: ExecutionContext) extends LisaController(
+  cc: ControllerComponents,
+  lisaMetrics: LisaMetrics,
+  appContext: AppContext,
+  authConnector: AuthConnector
+) {
 
   override val validateVersion: String => Boolean = _ == "2.0"
 
-  def getLifeEvent(lisaManager: String, accountId: String, lifeEventId: String): Action[AnyContent] = validateHeader().async { implicit request =>
+  def getLifeEvent(lisaManager: String, accountId: String, lifeEventId: String): Action[AnyContent] = validateHeader(parse).async { implicit request =>
     implicit val startTime: Long = System.currentTimeMillis()
 
     withValidLMRN(lisaManager) { () =>

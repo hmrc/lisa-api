@@ -18,8 +18,7 @@ package unit.models
 
 import org.joda.time.DateTime
 import org.scalatestplus.play.PlaySpec
-import play.api.data.validation.ValidationError
-import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
+import play.api.libs.json._
 import uk.gov.hmrc.lisaapi.models._
 
 import scala.io.Source
@@ -58,8 +57,8 @@ class RequestBonusPaymentRequestSpec extends PlaySpec {
       res match {
         case JsError(errors) => {
           errors.count {
-            case (path: JsPath, errors: Seq[ValidationError]) => {
-              path.toString() == "/lifeEventId" && errors.contains(ValidationError("error.formatting.lifeEventId"))
+            case (path: JsPath, errors: Seq[JsonValidationError]) => {
+              path.toString() == "/lifeEventId" && errors.contains(JsonValidationError("error.formatting.lifeEventId"))
             }
           } mustBe 1
         }

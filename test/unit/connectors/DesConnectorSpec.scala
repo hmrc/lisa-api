@@ -16,6 +16,8 @@
 
 package unit.connectors
 
+import java.time.LocalDate
+
 import org.joda.time.DateTime
 import org.mockito.Matchers.{eq => matchersEquals, _}
 import org.mockito.Mockito.{verify, when}
@@ -29,6 +31,7 @@ import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des._
+import uk.gov.hmrc.play.bootstrap.config.RunMode
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -754,7 +757,7 @@ class DesConnectorSpec extends PlaySpec
           response mustBe Right(List(GetLifeEventItem(
             lifeEventId = "1234567890",
             eventType = "Statutory Submission",
-            eventDate = new DateTime("2018-04-05")
+            eventDate = LocalDate.parse("2018-04-05")
           )))
         }
 
@@ -1648,6 +1651,7 @@ class DesConnectorSpec extends PlaySpec
   val configuration = Configuration("microservice.services.des.host" -> "", "microservice.services.des.port" -> 0)
   val mockEnvironment = mock[Environment]
   val mockAppContext = mock[AppContext]
+  val mockRunMode = mock[RunMode]
 
   private def doCreateInvestorRequest(callback: (DesResponse) => Unit) = {
     val request = CreateLisaInvestorRequest("AB123456A", "A", "B", new DateTime("2000-01-01"))
@@ -1767,8 +1771,6 @@ class DesConnectorSpec extends PlaySpec
   }
   implicit val hc = HeaderCarrier()
 
-  object SUT extends DesConnector(mockHttp, configuration, mockEnvironment, mockAppContext) {
-    override val mode = Mode.Test
-  }
+  object SUT extends DesConnector(mockHttp, mockEnvironment, mockAppContext, configuration, mockRunMode) {}
 
 }

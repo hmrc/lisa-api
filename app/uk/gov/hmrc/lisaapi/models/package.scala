@@ -18,7 +18,6 @@ package uk.gov.hmrc.lisaapi
 
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
-import play.api.data.validation.ValidationError
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 
@@ -49,7 +48,7 @@ package object models {
   object JsonReads {
     val amount: Reads[Amount] = Reads
       .of[JsNumber]
-      .filter(ValidationError("error.formatting.currencyNegativeAllowed"))(
+      .filter(JsonValidationError("error.formatting.currencyNegativeAllowed"))(
         value => {
           val amount = value.as[BigDecimal]
 
@@ -58,7 +57,7 @@ package object models {
       ).map((value: JsNumber) => value.as[BigDecimal])
     val nonNegativeAmount: Reads[Amount] = Reads
       .of[JsNumber]
-      .filter(ValidationError("error.formatting.currencyNegativeDisallowed"))(
+      .filter(JsonValidationError("error.formatting.currencyNegativeDisallowed"))(
         value => {
           val amount = value.as[BigDecimal]
 
@@ -91,8 +90,8 @@ package object models {
       "error.formatting.claimReason"
     )
     val lisaManagerName: Reads[LisaManagerName] = Reads.pattern("^[a-zA-Z0-9 '/,&().-]{1,50}$".r, "error.formatting.lisaManagerName")
-    val taxYearReads: Reads[Int] = Reads.filter[Int](ValidationError("error.formatting.taxYear"))((p:Int) => p > 999 && p < 10000)
-    val annualFigures: Reads[Int] = Reads.filter[Int](ValidationError("error.formatting.annualFigures"))((p:Int) => p >= 0)
+    val taxYearReads: Reads[Int] = Reads.filter[Int](JsonValidationError("error.formatting.taxYear"))((p:Int) => p > 999 && p < 10000)
+    val annualFigures: Reads[Int] = Reads.filter[Int](JsonValidationError("error.formatting.annualFigures"))((p:Int) => p >= 0)
 
     val isoDate: Reads[DateTime] = isoDateReads()
     val notFutureDate: Reads[DateTime] = isoDateReads(false)
@@ -106,15 +105,15 @@ package object models {
         case JsString(s) => parseDate(s) match {
           case Some(d: DateTime) => {
             if (!allowFutureDates && d.isAfterNow) {
-              JsError(Seq(JsPath() -> Seq(ValidationError(dateValidationMessage))))
+              JsError(Seq(JsPath() -> Seq(JsonValidationError(dateValidationMessage))))
             }
             else {
               JsSuccess(d)
             }
           }
-          case None => JsError(Seq(JsPath() -> Seq(ValidationError(dateValidationMessage))))
+          case None => JsError(Seq(JsPath() -> Seq(JsonValidationError(dateValidationMessage))))
         }
-        case _ => JsError(Seq(JsPath() -> Seq(ValidationError("error.expected.jsstring"))))
+        case _ => JsError(Seq(JsPath() -> Seq(JsonValidationError("error.expected.jsstring"))))
       }
 
       private def parseDate(input: String): Option[DateTime] = {

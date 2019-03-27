@@ -27,18 +27,19 @@ import uk.gov.hmrc.http.logging.Authorization
 import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des._
+import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
-import uk.gov.hmrc.play.config.ServicesConfig
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 
 class DesConnector @Inject()(
                               wsHttp: HttpClient,
-                              val runModeConfiguration: Configuration,
                               environment: Environment,
-                              appContext: AppContext
-                            )(implicit ec: ExecutionContext) extends ServicesConfig {
+                              appContext: AppContext,
+                              runModeConfiguration: Configuration,
+                              runMode: RunMode
+                            )(implicit ec: ExecutionContext) extends ServicesConfig(runModeConfiguration: Configuration, runMode: RunMode) {
 
   val urlEncodingFormat:String = "utf-8"
   lazy val desUrl = baseUrl("des")
@@ -390,6 +391,4 @@ class DesConnector @Inject()(
         }
     }
   }
-
-  override protected def mode = environment.mode
 }

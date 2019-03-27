@@ -21,16 +21,19 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.http.HeaderNames.ACCEPT
 import play.api.mvc._
-import play.api.test.{FakeApplication, FakeRequest}
+import play.api.test.{FakeRequest, Injecting}
 import play.test.Helpers
 import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.controllers.{APIVersioning, ErrorAcceptHeaderContentInvalid, ErrorAcceptHeaderInvalid, ErrorAcceptHeaderVersionInvalid, ErrorApiNotAvailable}
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 import scala.language.postfixOps
 
-class APIVersioningSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
+class APIVersioningSpec extends PlaySpec with MockitoSugar with OneAppPerSuite with Injecting {
+
+  val mockParser = inject[PlayBodyParsers]
 
   "The withApiVersion function" must {
 
@@ -79,7 +82,7 @@ class APIVersioningSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
 
     "handle a v2 request when v2 endpoints are disabled" in {
       val request = FakeRequest(Helpers.GET, "/").withHeaders((ACCEPT, "application/vnd.hmrc.2.0+json"))
-      val builder = APIVersioningImplV2Disabled.validateHeader()
+      val builder = APIVersioningImplV2Disabled.validateHeader(mockParser)
       val response = builder.invokeBlock[AnyContent](request, _ => Future.successful(Results.Ok))
       Await.result(response, 100 millis) mustBe ErrorAcceptHeaderVersionInvalid.asResult
     }
@@ -125,7 +128,7 @@ class APIVersioningSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
   }
 
   def validateHeaderTest[A](request: Request[A]): Result = {
-    val builder = APIVersioningImpl.validateHeader()
+    val builder = APIVersioningImpl.validateHeader(mockParser)
     val response = builder.invokeBlock[A](
       request,
       (_) => Future.successful(Results.Ok))
@@ -133,7 +136,7 @@ class APIVersioningSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
   }
 
   def isEndpointEnabledTest[A](request: Request[A]): Result = {
-    val builder = APIVersioningImpl.isEndpointEnabled("test")
+    val builder = APIVersioningImpl.isEndpointEnabled("test", mockParser)
     val response = builder.invokeBlock[A](
       request,
       (_) => Future.successful(Results.Ok))
