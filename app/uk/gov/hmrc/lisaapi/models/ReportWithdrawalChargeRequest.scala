@@ -32,19 +32,22 @@ case class WithdrawalSuperseded(
 case class WithdrawalIncrease(
                                originalTransactionId: String,
                                originalWithdrawalChargeAmount: Amount,
-                               transactionResult: Amount
+                               transactionResult: Amount,
+                               reason: String
                              ) extends WithdrawalSupersede
 
 case class WithdrawalDecrease(
                                originalTransactionId: String,
                                originalWithdrawalChargeAmount: Amount,
-                               transactionResult: Amount
+                               transactionResult: Amount,
+                               reason: String
                              ) extends WithdrawalSupersede
 
 case class WithdrawalRefund(
                                originalTransactionId: String,
                                originalWithdrawalChargeAmount: Amount,
-                               transactionResult: Amount
+                               transactionResult: Amount,
+                               reason: String
                              ) extends WithdrawalSupersede
 
 object WithdrawalSupersede {
@@ -54,8 +57,8 @@ object WithdrawalSupersede {
     (JsPath \ "originalWithdrawalChargeAmount").read(JsonReads.nonNegativeAmount) and
     (JsPath \ "transactionResult").read(JsonReads.amount) and
     (JsPath \ "reason").read[String](Reads.pattern("Additional withdrawal".r, "error.formatting.reason"))
-  )((transactionId, transactionAmount, transactionResult, _) => WithdrawalIncrease(
-    transactionId, transactionAmount, transactionResult
+  )((transactionId, transactionAmount, transactionResult, reason) => WithdrawalIncrease(
+    transactionId, transactionAmount, transactionResult, reason
   ))
 
   val withdrawalDecreaseReads: Reads[WithdrawalDecrease] = (
@@ -63,8 +66,8 @@ object WithdrawalSupersede {
     (JsPath \ "originalWithdrawalChargeAmount").read(JsonReads.nonNegativeAmount) and
     (JsPath \ "transactionResult").read(JsonReads.amount) and
     (JsPath \ "reason").read[String](Reads.pattern("Withdrawal reduction".r, "error.formatting.reason"))
-  )((transactionId, transactionAmount, transactionResult, _) => WithdrawalDecrease(
-    transactionId, transactionAmount, transactionResult
+  )((transactionId, transactionAmount, transactionResult, reason) => WithdrawalDecrease(
+    transactionId, transactionAmount, transactionResult, reason
   ))
 
   val withdrawalRefundReads: Reads[WithdrawalRefund] = (
@@ -72,8 +75,8 @@ object WithdrawalSupersede {
     (JsPath \ "originalWithdrawalChargeAmount").read(JsonReads.nonNegativeAmount) and
     (JsPath \ "transactionResult").read(JsonReads.amount) and
     (JsPath \ "reason").read[String](Reads.pattern("Withdrawal refund".r, "error.formatting.reason"))
-  )((transactionId, transactionAmount, transactionResult, _) => WithdrawalRefund(
-  transactionId, transactionAmount, transactionResult
+  )((transactionId, transactionAmount, transactionResult, reason) => WithdrawalRefund(
+  transactionId, transactionAmount, transactionResult, reason
   ))
 
   implicit val supersedeReads: Reads[WithdrawalSupersede] = Reads[WithdrawalSupersede] { json =>
