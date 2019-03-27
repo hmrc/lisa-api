@@ -408,9 +408,9 @@ class BonusPaymentValidatorSpec extends PlaySpec
 
         errors mustBe List(
           ErrorValidation(
-            errorCode = "BAD_REQUEST",
-            message = "supersede cannot be set when claimReason is regular bonus",
-            path = Some("/supersede")
+            errorCode = "SUPERSEDE_NOT_ALLOWED",
+            message = "Supersede details are not allowed",
+            path = Some("/claimReason")
           )
         )
       }

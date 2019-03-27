@@ -222,8 +222,8 @@ class WithdrawalChargeValidatorSpec extends PlaySpec
 
         errors mustBe List(
           ErrorValidation(
-            errorCode = "INVALID_FORMAT",
-            message = "Invalid format has been used",
+            errorCode = "SUPERSEDE_NOT_ALLOWED",
+            message = "Supersede details are not allowed",
             path = Some("/withdrawalReason")
           )
         )
@@ -284,8 +284,8 @@ class WithdrawalChargeValidatorSpec extends PlaySpec
 
         errors mustBe List(
           ErrorValidation(
-            errorCode = "INVALID_MONETARY_AMOUNT",
-            message = "automaticRecoveryAmount was not equal to withdrawalChargeAmount when fundsDeductedDuringWithdrawal",
+            errorCode = "AMOUNT_MISMATCH",
+            message = "automaticRecoveryAmount and withdrawalAmount must be the same",
             path = Some("/automaticRecoveryAmount")
           ),
           ErrorValidation(
@@ -303,8 +303,8 @@ class WithdrawalChargeValidatorSpec extends PlaySpec
 
         errors mustBe List(
           ErrorValidation(
-            errorCode = "INVALID_MONETARY_AMOUNT",
-            message = "automaticRecoveryAmount was not equal to withdrawalChargeAmount when fundsDeductedDuringWithdrawal",
+            errorCode = "AMOUNT_MISMATCH",
+            message = "automaticRecoveryAmount and withdrawalAmount must be the same",
             path = Some("/automaticRecoveryAmount")
           )
         )

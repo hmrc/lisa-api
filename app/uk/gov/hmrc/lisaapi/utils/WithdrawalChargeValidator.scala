@@ -105,8 +105,8 @@ class WithdrawalChargeValidator @Inject()(currentDateService: CurrentDateService
     (req: WithdrawalChargeValidationRequest) => {
       if (req.data.supersede.isDefined && req.data.withdrawalReason == "Regular withdrawal") {
         req.copy(errors = req.errors :+ ErrorValidation(
-          errorCode = "INVALID_FORMAT",
-          message = "Invalid format has been used",
+          errorCode = "SUPERSEDE_NOT_ALLOWED",
+          message = "Supersede details are not allowed",
           path = Some("/withdrawalReason")
         ))
       } else {
@@ -119,8 +119,8 @@ class WithdrawalChargeValidator @Inject()(currentDateService: CurrentDateService
       req.data.automaticRecoveryAmount match {
         case Some(amount) if amount != req.data.withdrawalChargeAmount && req.data.fundsDeductedDuringWithdrawal => {
           req.copy(errors = req.errors :+ ErrorValidation(
-            errorCode = MONETARY_ERROR,
-            message = "automaticRecoveryAmount was not equal to withdrawalChargeAmount when fundsDeductedDuringWithdrawal",
+            errorCode = "AMOUNT_MISMATCH",
+            message = "automaticRecoveryAmount and withdrawalAmount must be the same",
             path = Some("/automaticRecoveryAmount")
           ))
         }
