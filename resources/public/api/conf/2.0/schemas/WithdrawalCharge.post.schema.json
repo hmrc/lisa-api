@@ -21,7 +21,7 @@
 			"type": "number"
 		},
 		"withdrawalChargeAmount": {
-			"description": "This is the amount charged for the withdrawal. You can include a value up to 2 decimal places.",
+			"description": "This is the amount charged for the withdrawal. You can include a value up to 2 decimal places. If there is a charge made during withdrawal, withdrawalChargeAmount and automaticRecoveryAmount must be the same.",
 			"type": "number"
 		},
 		"withdrawalChargeAmountYTD": {
@@ -41,7 +41,7 @@
 			]
 		},
 		"automaticRecoveryAmount": {
-			"description": "This is the amount HMRC can collect from the LISA manager when a withdrawal charge is due from the investor. This cannot be greater than the withdrawalChargeAmount. If there are no funds available, this value must be 0.",
+			"description": "This is the amount HMRC can collect from the LISA manager when a withdrawal charge is due from the investor. This cannot be greater than the withdrawalChargeAmount. If there are no funds available, this value must be 0. If there is a charge made during withdrawal, automaticRecoveryAmount and withdrawalChargeAmount must be the same.",
 			"type": "number"
 		},
 		"supersede": {
