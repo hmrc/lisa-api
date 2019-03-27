@@ -215,7 +215,8 @@ class WithdrawalChargeValidatorSpec extends PlaySpec
         val request = validWithdrawal.copy(withdrawalReason = "Regular withdrawal", supersede = Some(WithdrawalIncrease(
           "2345678901",
           250.00,
-          250.00
+          250.00,
+          "Additional Withdrawal"
         )))
 
         val errors = SUT.validate(request)

@@ -19,7 +19,7 @@ package uk.gov.hmrc.lisaapi.controllers
 import com.google.inject.Inject
 import play.api.Logger
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent, Result}
+import play.api.mvc._
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.config.AppContext
@@ -30,12 +30,19 @@ import uk.gov.hmrc.lisaapi.services.{AuditService, ReinstateAccountService}
 import scala.concurrent.ExecutionContext
 
 class ReinstateAccountController @Inject() (
-                                             val authConnector: AuthConnector,
-                                             val appContext: AppContext,
+                                             authConnector: AuthConnector,
+                                             appContext: AppContext,
                                              service: ReinstateAccountService,
                                              auditService: AuditService,
-                                             val lisaMetrics: LisaMetrics
-                                           )(implicit ec: ExecutionContext) extends LisaController {
+                                             lisaMetrics: LisaMetrics,
+                                             cc: ControllerComponents,
+                                             parse: PlayBodyParsers
+                                           )(implicit ec: ExecutionContext) extends LisaController(
+  cc: ControllerComponents,
+  lisaMetrics: LisaMetrics,
+  appContext: AppContext,
+  authConnector: AuthConnector
+) {
 
   def reinstateAccount (lisaManager: String): Action[AnyContent] = Action.async{ implicit request =>
     implicit val startTime: Long = System.currentTimeMillis()

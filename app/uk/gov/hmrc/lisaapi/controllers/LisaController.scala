@@ -15,29 +15,31 @@
  */
 
 package uk.gov.hmrc.lisaapi.controllers
-
 import play.api.Logger
-import play.api.data.validation.ValidationError
 import play.api.libs.json.Json.toJson
 import play.api.libs.json._
 import play.api.mvc._
 import uk.gov.hmrc.auth.core.retrieve.Retrievals.internalId
-import uk.gov.hmrc.auth.core.{AuthorisationException, AuthorisedFunctions, Enrolment, InsufficientEnrolments}
+import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.lisaapi.LisaConstants
+import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.utils.ErrorConverter
-import uk.gov.hmrc.play.bootstrap.controller.BaseController
+import uk.gov.hmrc.play.bootstrap.controller.BackendController
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 
-trait LisaController extends BaseController with LisaConstants with AuthorisedFunctions with APIVersioning with LisaActions {
+abstract case class LisaController(
+                                    cc: ControllerComponents,
+                                    lisaMetrics: LisaMetrics,
+                                    appContext: AppContext,
+                                    authConnector: AuthConnector
+                                  ) extends BackendController(cc: ControllerComponents) with LisaConstants with AuthorisedFunctions with APIVersioning with LisaActions {
 
   override val validateVersion: String => Boolean = str => str == "1.0" || str == "2.0"
   override val validateContentType: String => Boolean = _ == "json"
   lazy val errorConverter: ErrorConverter = ErrorConverter
-
-  def lisaMetrics: LisaMetrics
 
   protected def withValidLMRN(lisaManager: String)(success: () => Future[Result])(implicit request: Request[AnyContent], startTime: Long): Future[Result] = {
     if (lisaManager.matches("^Z([0-9]{4}|[0-9]{6})$")) {
@@ -69,7 +71,7 @@ trait LisaController extends BaseController with LisaConstants with AuthorisedFu
 
   protected def withValidJson[T](
                                   success: T => Future[Result],
-                                  invalid: Option[Seq[(JsPath, Seq[ValidationError])] => Future[Result]] = None,
+                                  invalid: Option[Seq[(JsPath, Seq[JsonValidationError])] => Future[Result]] = None,
                                   lisaManager: String
                                 )(implicit request: Request[AnyContent], reads: Reads[T], startTime: Long, ec: ExecutionContext): Future[Result] = {
 

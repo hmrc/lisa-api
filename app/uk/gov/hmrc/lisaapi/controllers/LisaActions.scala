@@ -20,12 +20,13 @@ import play.api.libs.json.Json.toJson
 import play.api.mvc.Results._
 import play.api.mvc._
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 trait LisaActions {
 
-  def validateLMRN(lisaManager: String): ActionRefiner[Request, LMRNRequest] =
+  def validateLMRN(lisaManager: String)(implicit ec: ExecutionContext): ActionRefiner[Request, LMRNRequest] =
     new ActionRefiner[Request, LMRNRequest] {
+      override def executionContext: ExecutionContext = ec
       override protected def refine[A](request: Request[A]) = Future.successful {
         if (lisaManager.matches("^Z([0-9]{4}|[0-9]{6})$")) {
           Right(LMRNRequest(request, lisaManager))
@@ -35,8 +36,9 @@ trait LisaActions {
       }
     }
 
-  def validateAccountId(accountId: String): ActionRefiner[LMRNRequest, LMRNWithAccountRequest] =
+  def validateAccountId(accountId: String)(implicit ec: ExecutionContext): ActionRefiner[LMRNRequest, LMRNWithAccountRequest] =
     new ActionRefiner[LMRNRequest, LMRNWithAccountRequest] {
+      override def executionContext: ExecutionContext = ec
       override protected def refine[A](request: LMRNRequest[A]) = Future.successful {
         if (accountId.matches("^[a-zA-Z0-9 :/-]{1,20}$")) {
           Right(LMRNWithAccountRequest(request.request, request.lmrn, accountId))

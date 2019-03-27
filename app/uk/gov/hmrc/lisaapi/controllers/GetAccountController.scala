@@ -18,26 +18,33 @@ package uk.gov.hmrc.lisaapi.controllers
 
 import com.google.inject.Inject
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent}
+import play.api.mvc.{Action, AnyContent, ControllerComponents, PlayBodyParsers}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models.{GetLisaAccountDoesNotExistResponse, GetLisaAccountServiceUnavailable, GetLisaAccountSuccessResponse}
 import uk.gov.hmrc.lisaapi.services.{AccountService, AuditService}
-import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext._
+
+import scala.concurrent.ExecutionContext
 
 class GetAccountController @Inject()(
-                                      val authConnector: AuthConnector,
-                                      val appContext: AppContext,
+                                      authConnector: AuthConnector,
+                                      appContext: AppContext,
                                       service: AccountService,
                                       auditService: AuditService,
-                                      val lisaMetrics: LisaMetrics
-                                    )
-  extends LisaController {
+                                      lisaMetrics: LisaMetrics,
+                                      cc: ControllerComponents,
+                                      parse: PlayBodyParsers
+                                    )(implicit ec: ExecutionContext) extends LisaController(
+  cc: ControllerComponents,
+  lisaMetrics: LisaMetrics,
+  appContext: AppContext,
+  authConnector: AuthConnector
+) {
 
   def getAccountDetails(lisaManager: String, accountId: String): Action[AnyContent] =
-    (validateHeader() andThen validateLMRN(lisaManager) andThen validateAccountId(accountId)).async { implicit request =>
+    (validateHeader(parse) andThen validateLMRN(lisaManager) andThen validateAccountId(accountId)).async { implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
       withEnrolment(lisaManager) { (_) =>
         service.getAccount(lisaManager, accountId).map {

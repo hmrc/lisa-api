@@ -28,6 +28,7 @@ import uk.gov.hmrc.lisaapi.controllers.{ErrorBadRequestAccountId, ErrorBadReques
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 import scala.language.postfixOps
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class LisaActionsSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
 

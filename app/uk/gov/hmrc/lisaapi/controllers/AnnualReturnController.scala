@@ -19,7 +19,7 @@ package uk.gov.hmrc.lisaapi.controllers
 import com.google.inject.Inject
 import play.api.Logger
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent, Result}
+import play.api.mvc._
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.config.AppContext
@@ -27,22 +27,28 @@ import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, LifeEventService}
 import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
-import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext._
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class AnnualReturnController @Inject()(
-                                       val authConnector: AuthConnector,
-                                       val appContext: AppContext,
+                                       authConnector: AuthConnector,
+                                       appContext: AppContext,
                                        service: LifeEventService,
                                        auditService: AuditService,
                                        validator: AnnualReturnValidator,
-                                       val lisaMetrics: LisaMetrics
-                                      ) extends LisaController {
+                                       lisaMetrics: LisaMetrics,
+                                       cc: ControllerComponents,
+                                       parse: PlayBodyParsers
+                                      )(implicit ec: ExecutionContext) extends LisaController(
+  cc: ControllerComponents,
+  lisaMetrics: LisaMetrics,
+  appContext: AppContext,
+  authConnector: AuthConnector
+) {
 
   override val validateVersion: String => Boolean = _ == "2.0"
 
-  def submitReturn(lisaManager: String, accountId: String): Action[AnyContent] = (validateHeader() andThen isEndpointEnabled("annual-returns")).async {
+  def submitReturn(lisaManager: String, accountId: String): Action[AnyContent] = (validateHeader(parse) andThen isEndpointEnabled("annual-returns", parse)).async {
     implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
 

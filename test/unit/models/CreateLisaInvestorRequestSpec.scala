@@ -18,8 +18,7 @@ package unit.models
 
 import org.joda.time.DateTime
 import org.scalatestplus.play.PlaySpec
-import play.api.data.validation.ValidationError
-import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
+import play.api.libs.json._
 import uk.gov.hmrc.lisaapi.models.CreateLisaInvestorRequest
 
 class CreateLisaInvestorRequestSpec extends PlaySpec {
@@ -102,8 +101,8 @@ class CreateLisaInvestorRequestSpec extends PlaySpec {
     res match {
       case JsError(errors) => {
         errors.count {
-          case (path: JsPath, errors: Seq[ValidationError]) => {
-            path.eq(path) && errors.contains(ValidationError(errorMessage))
+          case (path: JsPath, errors: Seq[JsonValidationError]) => {
+            path.eq(path) && errors.contains(JsonValidationError(errorMessage))
           }
         } mustBe 1
       }
