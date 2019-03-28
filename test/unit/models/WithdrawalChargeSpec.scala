@@ -78,12 +78,12 @@ class WithdrawalChargeSpec extends PlaySpec {
         250.00,
         500.00,
         true,
-        WithdrawalIncrease(
+        Some(WithdrawalIncrease(
           "2345678901",
           250.00,
           250.00,
           "Additional withdrawal"
-        ),
+        )),
         "Superseded withdrawal"
       )
     }
@@ -105,12 +105,12 @@ class WithdrawalChargeSpec extends PlaySpec {
         250.00,
         500.00,
         true,
-        WithdrawalRefund(
+        Some(WithdrawalRefund(
           "2345678901",
           250.00,
           250.00,
           "Withdrawal refund"
-        ),
+        )),
         "Superseded withdrawal"
       )
     }
@@ -125,12 +125,12 @@ class WithdrawalChargeSpec extends PlaySpec {
           250.00,
           500.00,
           true,
-          WithdrawalRefund(
+          Some(WithdrawalRefund(
             "2345678901",
             250.00,
             250.00,
             "Additional withdrawal"
-          ),
+          )),
           "Superseded withdrawal"
         ))(ReportWithdrawalChargeRequest.desReportWithdrawalChargeWrites)
 

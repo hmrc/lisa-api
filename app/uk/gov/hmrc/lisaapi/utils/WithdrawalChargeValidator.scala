@@ -33,6 +33,8 @@ class WithdrawalChargeValidator @Inject()(currentDateService: CurrentDateService
       periodStartDateIsNotInFuture andThen
       periodStartDateIsNotBeforeFirstValidDate andThen
       periodEndDateIsNotBeforeFirstValidDate andThen
+      regularWithdrawalIsNotSupersede andThen
+      automaticRecoveryAmountNotEqualToWithdrawalChargeAmountWhenFundsDeducted andThen
       automaticRecoveryAmountLteWithdrawalChargeAmount
     ).apply(WithdrawalChargeValidationRequest(data)).errors
   }
@@ -87,7 +89,6 @@ class WithdrawalChargeValidator @Inject()(currentDateService: CurrentDateService
 
   private val periodEndDateIsNotBeforeFirstValidDate: (WithdrawalChargeValidationRequest) => WithdrawalChargeValidationRequest =
     (req: WithdrawalChargeValidationRequest) => {
-
     if (req.data.claimPeriodEndDate.isBefore(LISA_START_DATE)) {
       req.copy(errors = req.errors :+ ErrorValidation(
         errorCode = DATE_ERROR,
@@ -99,6 +100,33 @@ class WithdrawalChargeValidator @Inject()(currentDateService: CurrentDateService
       req
     }
   }
+
+  private val regularWithdrawalIsNotSupersede: (WithdrawalChargeValidationRequest) => WithdrawalChargeValidationRequest =
+    (req: WithdrawalChargeValidationRequest) => {
+      if (req.data.supersede.isDefined && req.data.withdrawalReason == "Regular withdrawal") {
+        req.copy(errors = req.errors :+ ErrorValidation(
+          errorCode = "SUPERSEDE_NOT_ALLOWED",
+          message = "Supersede details are not allowed",
+          path = Some("/withdrawalReason")
+        ))
+      } else {
+        req
+      }
+    }
+
+  private val automaticRecoveryAmountNotEqualToWithdrawalChargeAmountWhenFundsDeducted: (WithdrawalChargeValidationRequest) => WithdrawalChargeValidationRequest =
+    (req: WithdrawalChargeValidationRequest) => {
+      req.data.automaticRecoveryAmount match {
+        case Some(amount) if amount != req.data.withdrawalChargeAmount && req.data.fundsDeductedDuringWithdrawal => {
+          req.copy(errors = req.errors :+ ErrorValidation(
+            errorCode = "AMOUNT_MISMATCH",
+            message = "automaticRecoveryAmount and withdrawalChargeAmount must be the same",
+            path = Some("/automaticRecoveryAmount")
+          ))
+        }
+        case _ => req
+      }
+    }
 
   private val automaticRecoveryAmountLteWithdrawalChargeAmount: (WithdrawalChargeValidationRequest) => WithdrawalChargeValidationRequest =
     (req: WithdrawalChargeValidationRequest) => {

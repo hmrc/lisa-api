@@ -346,7 +346,7 @@ class WithdrawalControllerSpec extends PlaySpec
               "withdrawalChargeAmount" -> "500.00",
               "withdrawalChargeAmountYTD" -> "750.00",
               "fundsDeductedDuringWithdrawal" -> "true",
-              "automaticRecoveryAmount" -> "250.00",
+              "automaticRecoveryAmount" -> "500.00",
               "lateNotification" -> "no",
               "withdrawalReason" -> "Superseded withdrawal",
               "reason" -> "Additional withdrawal"
@@ -375,7 +375,7 @@ class WithdrawalControllerSpec extends PlaySpec
               "withdrawalChargeAmount" -> "500.00",
               "withdrawalChargeAmountYTD" -> "750.00",
               "fundsDeductedDuringWithdrawal" -> "true",
-              "automaticRecoveryAmount" -> "250.00",
+              "automaticRecoveryAmount" -> "500.00",
               "lateNotification" -> "yes",
               "withdrawalReason" -> "Superseded withdrawal",
               "reason" -> "Additional withdrawal"
@@ -404,7 +404,7 @@ class WithdrawalControllerSpec extends PlaySpec
               "withdrawalChargeAmount" -> "500.00",
               "withdrawalChargeAmountYTD" -> "750.00",
               "fundsDeductedDuringWithdrawal" -> "true",
-              "automaticRecoveryAmount" -> "250.00",
+              "automaticRecoveryAmount" -> "500.00",
               "withdrawalReason" -> "Superseded withdrawal",
               "reason" -> "Additional withdrawal"
             ))
@@ -435,7 +435,7 @@ class WithdrawalControllerSpec extends PlaySpec
               "withdrawalChargeAmount" -> "500.00",
               "withdrawalChargeAmountYTD" -> "750.00",
               "fundsDeductedDuringWithdrawal" -> "true",
-              "automaticRecoveryAmount" -> "250.00",
+              "automaticRecoveryAmount" -> "500.00",
               "withdrawalReason" -> "Superseded withdrawal",
               "reason" -> "Additional withdrawal",
               "reasonNotRequested" -> ErrorAccountAlreadyCancelled.errorCode
@@ -464,7 +464,7 @@ class WithdrawalControllerSpec extends PlaySpec
               "withdrawalChargeAmount" -> "500.00",
               "withdrawalChargeAmountYTD" -> "750.00",
               "fundsDeductedDuringWithdrawal" -> "true",
-              "automaticRecoveryAmount" -> "250.00",
+              "automaticRecoveryAmount" -> "500.00",
               "withdrawalReason" -> "Superseded withdrawal",
               "reason" -> "Additional withdrawal",
               "reasonNotRequested" -> ErrorAccountAlreadyVoided.errorCode
@@ -493,7 +493,7 @@ class WithdrawalControllerSpec extends PlaySpec
               "withdrawalChargeAmount" -> "500.00",
               "withdrawalChargeAmountYTD" -> "750.00",
               "fundsDeductedDuringWithdrawal" -> "true",
-              "automaticRecoveryAmount" -> "250.00",
+              "automaticRecoveryAmount" -> "500.00",
               "withdrawalReason" -> "Superseded withdrawal",
               "reason" -> "Additional withdrawal",
               "reasonNotRequested" -> ErrorAccountAlreadyCancelled.errorCode
@@ -522,7 +522,7 @@ class WithdrawalControllerSpec extends PlaySpec
               "withdrawalChargeAmount" -> "500.00",
               "withdrawalChargeAmountYTD" -> "750.00",
               "fundsDeductedDuringWithdrawal" -> "true",
-              "automaticRecoveryAmount" -> "250.00",
+              "automaticRecoveryAmount" -> "500.00",
               "withdrawalReason" -> "Superseded withdrawal",
               "reason" -> "Additional withdrawal",
               "reasonNotRequested" -> "WITHDRAWAL_REPORTING_ERROR"
@@ -551,7 +551,7 @@ class WithdrawalControllerSpec extends PlaySpec
               "withdrawalChargeAmount" -> "500.00",
               "withdrawalChargeAmountYTD" -> "750.00",
               "fundsDeductedDuringWithdrawal" -> "true",
-              "automaticRecoveryAmount" -> "250.00",
+              "automaticRecoveryAmount" -> "500.00",
               "withdrawalReason" -> "Superseded withdrawal",
               "reason" -> "Additional withdrawal",
               "reasonNotRequested" -> "WITHDRAWAL_CHARGE_ALREADY_SUPERSEDED"
@@ -580,7 +580,7 @@ class WithdrawalControllerSpec extends PlaySpec
               "withdrawalChargeAmount" -> "500.00",
               "withdrawalChargeAmountYTD" -> "750.00",
               "fundsDeductedDuringWithdrawal" -> "true",
-              "automaticRecoveryAmount" -> "250.00",
+              "automaticRecoveryAmount" -> "500.00",
               "withdrawalReason" -> "Superseded withdrawal",
               "reason" -> "Additional withdrawal",
               "reasonNotRequested" -> "SUPERSEDED_WITHDRAWAL_CHARGE_ID_AMOUNT_MISMATCH"
@@ -609,7 +609,7 @@ class WithdrawalControllerSpec extends PlaySpec
               "withdrawalChargeAmount" -> "500.00",
               "withdrawalChargeAmountYTD" -> "750.00",
               "fundsDeductedDuringWithdrawal" -> "true",
-              "automaticRecoveryAmount" -> "250.00",
+              "automaticRecoveryAmount" -> "500.00",
               "withdrawalReason" -> "Superseded withdrawal",
               "reason" -> "Additional withdrawal",
               "reasonNotRequested" -> "SUPERSEDED_WITHDRAWAL_CHARGE_OUTCOME_ERROR"
@@ -646,7 +646,7 @@ class WithdrawalControllerSpec extends PlaySpec
               "withdrawalChargeAmount" -> "500",
               "withdrawalChargeAmountYTD" -> "750",
               "fundsDeductedDuringWithdrawal" -> "true",
-              "automaticRecoveryAmount" -> "250",
+              "automaticRecoveryAmount" -> "500",
               "withdrawalReason" -> "Superseded withdrawal",
               "reason" -> "Additional withdrawal",
               "reasonNotRequested" -> ErrorWithdrawalTimescalesExceeded.errorCode
@@ -690,7 +690,7 @@ class WithdrawalControllerSpec extends PlaySpec
               "withdrawalChargeAmount" -> "500",
               "withdrawalChargeAmountYTD" -> "750",
               "fundsDeductedDuringWithdrawal" -> "true",
-              "automaticRecoveryAmount" -> "250",
+              "automaticRecoveryAmount" -> "500",
               "withdrawalReason" -> "Superseded withdrawal",
               "reason" -> "Additional withdrawal",
               "reasonNotRequested" -> "FORBIDDEN"
@@ -719,7 +719,7 @@ class WithdrawalControllerSpec extends PlaySpec
               "withdrawalChargeAmount" -> "500.00",
               "withdrawalChargeAmountYTD" -> "750.00",
               "fundsDeductedDuringWithdrawal" -> "true",
-              "automaticRecoveryAmount" -> "250.00",
+              "automaticRecoveryAmount" -> "500.00",
               "withdrawalReason" -> "Superseded withdrawal",
               "reason" -> "Additional withdrawal",
               "reasonNotRequested" -> ErrorAccountNotFound.errorCode
@@ -748,7 +748,7 @@ class WithdrawalControllerSpec extends PlaySpec
               "withdrawalChargeAmount" -> "500.00",
               "withdrawalChargeAmountYTD" -> "750.00",
               "fundsDeductedDuringWithdrawal" -> "true",
-              "automaticRecoveryAmount" -> "250.00",
+              "automaticRecoveryAmount" -> "500.00",
               "withdrawalReason" -> "Superseded withdrawal",
               "reason" -> "Additional withdrawal",
               "reasonNotRequested" -> "WITHDRAWAL_CHARGE_ALREADY_EXISTS"
@@ -777,7 +777,7 @@ class WithdrawalControllerSpec extends PlaySpec
               "withdrawalChargeAmount" -> "500.00",
               "withdrawalChargeAmountYTD" -> "750.00",
               "fundsDeductedDuringWithdrawal" -> "true",
-              "automaticRecoveryAmount" -> "250.00",
+              "automaticRecoveryAmount" -> "500.00",
               "withdrawalReason" -> "Superseded withdrawal",
               "reason" -> "Additional withdrawal",
               "reasonNotRequested" -> "INTERNAL_SERVER_ERROR"

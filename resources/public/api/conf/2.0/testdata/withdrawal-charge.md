@@ -304,6 +304,11 @@
             "code": "INVALID_MONETARY_AMOUNT",
             "message": "automaticRecoveryAmount cannot be more than withdrawalChargeAmount",
             "path": "/automaticRecoveryAmount"
+        },
+        {
+            "code": "AMOUNT_MISMATCH",
+            "message": "automaticRecoveryAmount and withdrawalChargeAmount must be the same",
+            "path": "/automaticRecoveryAmount"
         }
     ]
 }

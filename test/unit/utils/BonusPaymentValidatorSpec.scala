@@ -396,6 +396,25 @@ class BonusPaymentValidatorSpec extends PlaySpec
         )
       }
 
+      "it is populated and the claimReason is 'Regular Bonus'" in {
+        val request = validBonusPayment.copy(
+          inboundPayments = InboundPayments(None, 0, 0, 0),
+          bonuses = Bonuses(0, 0, None, "Regular Bonus"),
+          supersede = Some(BonusRecovery(100, "1", 100, -100)),
+          htbTransfer = None
+        )
+
+        val errors = SUT.validate(request)
+
+        errors mustBe List(
+          ErrorValidation(
+            errorCode = "SUPERSEDE_NOT_ALLOWED",
+            message = "Supersede details are not allowed",
+            path = Some("/claimReason")
+          )
+        )
+      }
+
     }
 
   }

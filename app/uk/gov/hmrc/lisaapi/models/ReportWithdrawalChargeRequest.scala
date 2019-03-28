@@ -207,7 +207,9 @@ sealed trait ReportWithdrawalChargeRequest extends Product {
   val claimPeriodEndDate: DateTime
   val automaticRecoveryAmount: Option[Amount]
   val withdrawalChargeAmount: Amount
+  val fundsDeductedDuringWithdrawal: Boolean
   val withdrawalReason: String
+  val supersede: Option[WithdrawalSupersede]
 }
 
 case class RegularWithdrawalChargeRequest(
@@ -218,7 +220,8 @@ case class RegularWithdrawalChargeRequest(
   withdrawalChargeAmount: Amount,
   withdrawalChargeAmountYTD: Amount,
   fundsDeductedDuringWithdrawal: Boolean,
-  withdrawalReason: String
+  withdrawalReason: String,
+  supersede: Option[WithdrawalSupersede] = None
 ) extends ReportWithdrawalChargeRequest
 
 case class SupersededWithdrawalChargeRequest(
@@ -229,7 +232,7 @@ case class SupersededWithdrawalChargeRequest(
   withdrawalChargeAmount: Amount,
   withdrawalChargeAmountYTD: Amount,
   fundsDeductedDuringWithdrawal: Boolean,
-  supersede: WithdrawalSupersede,
+  supersede: Option[WithdrawalSupersede],
   withdrawalReason: String
 ) extends ReportWithdrawalChargeRequest
 
@@ -244,6 +247,7 @@ object ReportWithdrawalChargeRequest {
     (JsPath \ "withdrawalChargeAmount").read[Amount](JsonReads.nonNegativeAmount) and
     (JsPath \ "withdrawalChargeAmountYTD").read[Amount](JsonReads.nonNegativeAmount) and
     (JsPath \ "fundsDeductedDuringWithdrawal").read[Boolean] and
+    (JsPath \ "supersede").readNullable[WithdrawalSupersede] and
     (JsPath \ "withdrawalReason").read[String](Reads.pattern("Regular withdrawal".r, withdrawalFormatError))
   )((
       automaticRecoveryAmount,
@@ -253,6 +257,7 @@ object ReportWithdrawalChargeRequest {
       withdrawalChargeAmount,
       withdrawalChargeAmountYTD,
       fundsDeductedDuringWithdrawal,
+      supersede,
       withdrawalReason
     ) => RegularWithdrawalChargeRequest(
       automaticRecoveryAmount,
@@ -262,7 +267,8 @@ object ReportWithdrawalChargeRequest {
       withdrawalChargeAmount,
       withdrawalChargeAmountYTD,
       fundsDeductedDuringWithdrawal,
-      withdrawalReason
+      withdrawalReason,
+      supersede
     )
   )
 
@@ -294,7 +300,7 @@ object ReportWithdrawalChargeRequest {
       withdrawalChargeAmount,
       withdrawalChargeAmountYTD,
       fundsDeductedDuringWithdrawal,
-      supersede,
+      Some(supersede),
       withdrawalReason
     )
   )
@@ -337,7 +343,7 @@ object ReportWithdrawalChargeRequest {
     (JsPath \ "withdrawalChargeAmountYTD").write[Amount] and
     (JsPath \ "fundsDeductedDuringWithdrawal").write[Boolean] and
     (JsPath \ "withdrawalReason").write[String] and
-    (JsPath \ "supersede").write[WithdrawalSupersede]
+    (JsPath \ "supersede").writeNullable[WithdrawalSupersede]
   ){req: SupersededWithdrawalChargeRequest => (
     req.automaticRecoveryAmount,
     req.claimPeriodStartDate,
@@ -386,7 +392,7 @@ object ReportWithdrawalChargeRequest {
     (JsPath \ "withdrawalChargeAmountYTD").write[Amount] and
     (JsPath \ "fundsDeductedDuringWithdrawal").write[Boolean] and
     (JsPath \ "withdrawalReason").write[String] and
-    (JsPath \ "supersededDetail").write[WithdrawalSupersede](WithdrawalSupersede.desSupersedeWrites)
+    (JsPath \ "supersededDetail").writeNullable[WithdrawalSupersede](WithdrawalSupersede.desSupersedeWrites)
   ){req: SupersededWithdrawalChargeRequest => (
     req.automaticRecoveryAmount,
     req.claimPeriodStartDate,

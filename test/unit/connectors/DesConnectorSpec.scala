@@ -1756,12 +1756,12 @@ class DesConnectorSpec extends PlaySpec
       250.00,
       500.00,
       true,
-      WithdrawalIncrease(
+      Some(WithdrawalIncrease(
         "2345678901",
         250.00,
         250.00,
         "Additional withdrawal"
-      ),
+      )),
       "Superseded withdrawal"
     )
 

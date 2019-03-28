@@ -200,6 +200,13 @@ class BonusPaymentValidator @Inject()(currentDateService: CurrentDateService) ex
             path = Some(s"/supersede")
           ))
         }
+        case("Regular Bonus", Some(_)) => {
+          req.copy(errors = req.errors :+ ErrorValidation(
+            errorCode = "SUPERSEDE_NOT_ALLOWED",
+            message = "Supersede details are not allowed",
+            path = Some("/claimReason")
+          ))
+        }
         case _ => {
           req
         }
