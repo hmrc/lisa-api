@@ -120,7 +120,7 @@ class WithdrawalChargeValidator @Inject()(currentDateService: CurrentDateService
         case Some(amount) if amount != req.data.withdrawalChargeAmount && req.data.fundsDeductedDuringWithdrawal => {
           req.copy(errors = req.errors :+ ErrorValidation(
             errorCode = "AMOUNT_MISMATCH",
-            message = "automaticRecoveryAmount and withdrawalAmount must be the same",
+            message = "automaticRecoveryAmount and withdrawalChargeAmount must be the same",
             path = Some("/automaticRecoveryAmount")
           ))
         }

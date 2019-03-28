@@ -286,7 +286,7 @@ class WithdrawalChargeValidatorSpec extends PlaySpec
         errors mustBe List(
           ErrorValidation(
             errorCode = "AMOUNT_MISMATCH",
-            message = "automaticRecoveryAmount and withdrawalAmount must be the same",
+            message = "automaticRecoveryAmount and withdrawalChargeAmount must be the same",
             path = Some("/automaticRecoveryAmount")
           ),
           ErrorValidation(
@@ -305,7 +305,7 @@ class WithdrawalChargeValidatorSpec extends PlaySpec
         errors mustBe List(
           ErrorValidation(
             errorCode = "AMOUNT_MISMATCH",
-            message = "automaticRecoveryAmount and withdrawalAmount must be the same",
+            message = "automaticRecoveryAmount and withdrawalChargeAmount must be the same",
             path = Some("/automaticRecoveryAmount")
           )
         )
