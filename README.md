@@ -2,6 +2,10 @@
 
 [![Build Status](https://travis-ci.org/hmrc/lisa-api.svg)](https://travis-ci.org/hmrc/lisa-api) [ ![Download](https://api.bintray.com/packages/hmrc/releases/lisa-api/images/download.svg) ](https://bintray.com/hmrc/releases/lisa-api/_latestVersion)
 
+## Requirements
+
+This service is written in [Scala 2.11](http://www.scala-lang.org/) and [Play 2.6](http://playframework.com/), so needs at least a [JRE 1.8](http://www.oracle.com/technetwork/java/javase/downloads/index.html) to run.
+
 ## Description
 
 Access this REST API on the [HMRC Developer Hub](https://developer.service.hmrc.gov.uk/api-documentation).
