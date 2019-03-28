@@ -20,7 +20,7 @@
     "bonusDueForPeriod": 1000.00,
     "totalBonusDueYTD": 1000.00,
     "bonusPaidYTD": 1000.00,
-    "claimReason": "Life Event"
+    "claimReason": "Superseded Bonus"
   },
 
   "supersede": {
