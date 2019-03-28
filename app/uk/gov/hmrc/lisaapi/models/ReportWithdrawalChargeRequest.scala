@@ -280,7 +280,7 @@ object ReportWithdrawalChargeRequest {
     (JsPath \ "withdrawalChargeAmount").read[Amount](JsonReads.nonNegativeAmount) and
     (JsPath \ "withdrawalChargeAmountYTD").read[Amount](JsonReads.nonNegativeAmount) and
     (JsPath \ "fundsDeductedDuringWithdrawal").read[Boolean] and
-    (JsPath \ "supersede").readNullable[WithdrawalSupersede] and
+    (JsPath \ "supersede").read[WithdrawalSupersede] and
     (JsPath \ "withdrawalReason").read[String](Reads.pattern("Superseded withdrawal".r, withdrawalFormatError))
   )((
       automaticRecoveryAmount,
@@ -300,7 +300,7 @@ object ReportWithdrawalChargeRequest {
       withdrawalChargeAmount,
       withdrawalChargeAmountYTD,
       fundsDeductedDuringWithdrawal,
-      supersede,
+      Some(supersede),
       withdrawalReason
     )
   )
