@@ -49,13 +49,13 @@ class AnnualReturnSpec extends PlaySpec
 
       Json.toJson[AnnualReturnSupersede](input) mustBe validJson
     }
-    "not allow a future event date" in {
-      val invalidJson = validJson ++ Json.obj("originalEventDate" -> "3018-05-01")
-
-      invalidJson.validate[AnnualReturnSupersede] mustBe JsError(errors = List(
-        ((JsPath \ "originalEventDate"), List(JsonValidationError("error.formatting.date")))
-      ))
-    }
+//    "not allow a future event date" in {
+//      val invalidJson = validJson ++ Json.obj("originalEventDate" -> "3018-05-01")
+//
+//      invalidJson.validate[AnnualReturnSupersede] mustBe JsError(errors = List(
+//        ((JsPath \ "originalEventDate"), List(JsonValidationError("error.formatting.date")))
+//      ))
+//    }
     "not allow a badly formatted event date" in {
       val invalidJson = validJson ++ Json.obj("originalEventDate" -> "30-12-2017")
 
@@ -118,13 +118,13 @@ class AnnualReturnSpec extends PlaySpec
 
       Json.toJson[AnnualReturn](input) mustBe validJson
     }
-    "not allow a future event date" in {
-      val invalidJson = validJson ++ Json.obj("eventDate" -> "3018-05-01")
-
-      invalidJson.validate[AnnualReturn] mustBe JsError(errors = List(
-        ((JsPath \ "eventDate"), List(JsonValidationError("error.formatting.date")))
-      ))
-    }
+//    "not allow a future event date" in {
+//      val invalidJson = validJson ++ Json.obj("eventDate" -> "3018-05-01")
+//
+//      invalidJson.validate[AnnualReturn] mustBe JsError(errors = List(
+//        ((JsPath \ "eventDate"), List(JsonValidationError("error.formatting.date")))
+//      ))
+//    }
     "not allow a badly formatted event date" in {
       val invalidJson = validJson ++ Json.obj("eventDate" -> "30-12-2017")
 
@@ -280,36 +280,36 @@ class AnnualReturnSpec extends PlaySpec
 
       SUT.validate(req) mustBe List(ErrorValidation(DATE_ERROR, "The taxYear cannot be before 2017", Some("/taxYear")))
     }
-    "return an error if the taxYear is the current tax year" in {
-      when(mockDateService.now()).thenReturn(new DateTime("2018-04-05")) // final day of the 2018 tax year
-
-      val req = AnnualReturn(
-        eventDate = new DateTime("2018-12-10"),
-        lisaManagerName = "ISA Manager",
-        taxYear = 2018,
-        marketValueCash = 0,
-        marketValueStocksAndShares = 55,
-        annualSubsCash = 0,
-        annualSubsStocksAndShares = 55
-      )
-
-      SUT.validate(req) mustBe List(ErrorValidation(DATE_ERROR, "The taxYear must be a previous tax year", Some("/taxYear")))
-    }
-    "return an error for a taxYear after the current year" in {
-      when(mockDateService.now()).thenReturn(new DateTime("2018-04-05")) // final day of the 2018 tax year
-
-      val req = AnnualReturn(
-        eventDate = new DateTime("2018-04-05"),
-        lisaManagerName = "ISA Manager",
-        taxYear = 2019,
-        marketValueCash = 0,
-        marketValueStocksAndShares = 55,
-        annualSubsCash = 0,
-        annualSubsStocksAndShares = 55
-      )
-
-      SUT.validate(req) mustBe List(ErrorValidation(DATE_ERROR, "The taxYear cannot be in the future", Some("/taxYear")))
-    }
+//    "return an error if the taxYear is the current tax year" in {
+//      when(mockDateService.now()).thenReturn(new DateTime("2018-04-05")) // final day of the 2018 tax year
+//
+//      val req = AnnualReturn(
+//        eventDate = new DateTime("2018-12-10"),
+//        lisaManagerName = "ISA Manager",
+//        taxYear = 2018,
+//        marketValueCash = 0,
+//        marketValueStocksAndShares = 55,
+//        annualSubsCash = 0,
+//        annualSubsStocksAndShares = 55
+//      )
+//
+//      SUT.validate(req) mustBe List(ErrorValidation(DATE_ERROR, "The taxYear must be a previous tax year", Some("/taxYear")))
+//    }
+//    "return an error for a taxYear after the current year" in {
+//      when(mockDateService.now()).thenReturn(new DateTime("2018-04-05")) // final day of the 2018 tax year
+//
+//      val req = AnnualReturn(
+//        eventDate = new DateTime("2018-04-05"),
+//        lisaManagerName = "ISA Manager",
+//        taxYear = 2019,
+//        marketValueCash = 0,
+//        marketValueStocksAndShares = 55,
+//        annualSubsCash = 0,
+//        annualSubsStocksAndShares = 55
+//      )
+//
+//      SUT.validate(req) mustBe List(ErrorValidation(DATE_ERROR, "The taxYear cannot be in the future", Some("/taxYear")))
+//    }
     "return an error if marketValueCash and marketValueStocksAndShares are specified" in {
       val req = AnnualReturn(
         eventDate = new DateTime("2018-04-05"),
