@@ -85,7 +85,7 @@ class RequestFundReleaseRequestSpec extends PlaySpec {
 
     }
 
-    "deserialize to json with empty FundReleasePropertyDetails" in {
+    "deserialize to json without FundReleasePropertyDetails" in {
 
       val input = InitialFundReleaseRequest(
         eventDate = new DateTime("2017-05-10"),
@@ -99,7 +99,7 @@ class RequestFundReleaseRequestSpec extends PlaySpec {
 
     }
 
-    "deserialize to json with empty conveyancerReference" in {
+    "deserialize to json without conveyancerReference" in {
 
       val input = InitialFundReleaseRequest(
         eventDate = new DateTime("2017-05-10"),
