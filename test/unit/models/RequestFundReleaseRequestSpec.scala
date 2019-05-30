@@ -59,11 +59,11 @@ class RequestFundReleaseRequestSpec extends PlaySpec {
       Json.parse(json).as[RequestFundReleaseRequest] mustBe InitialFundReleaseRequest(
         eventDate = new DateTime("2017-05-10"),
         withdrawalAmount = 4000,
-        conveyancerReference = "CR12345-6789",
-        propertyDetails = FundReleasePropertyDetails(
+        conveyancerReference = Some("CR12345-6789"),
+        propertyDetails = Some(FundReleasePropertyDetails(
           nameOrNumber = "1",
           postalCode = "AA11 1AA"
-        )
+        ))
       )
 
     }
@@ -73,13 +73,44 @@ class RequestFundReleaseRequestSpec extends PlaySpec {
       val input = InitialFundReleaseRequest(
         eventDate = new DateTime("2017-05-10"),
         withdrawalAmount = 4000,
-        conveyancerReference = "CR12345-6789",
-        propertyDetails = FundReleasePropertyDetails(
+        conveyancerReference = Some("CR12345-6789"),
+        propertyDetails = Some(FundReleasePropertyDetails(
           nameOrNumber = "1",
           postalCode = "AA11 1AA"
-        )
+        ))
       )
       val expected = """{"eventType":"Funds Release","eventDate":"2017-05-10","withdrawalAmount":4000,"conveyancerReference":"CR12345-6789","propertyDetails":{"nameOrNumber":"1","postalCode":"AA11 1AA"}}"""
+
+      Json.toJson[RequestFundReleaseRequest](input).toString() mustBe expected
+
+    }
+
+    "deserialize to json without FundReleasePropertyDetails" in {
+
+      val input = InitialFundReleaseRequest(
+        eventDate = new DateTime("2017-05-10"),
+        withdrawalAmount = 4000,
+        conveyancerReference = Some("CR12345-6789"),
+        propertyDetails = None
+      )
+      val expected = """{"eventType":"Funds Release","eventDate":"2017-05-10","withdrawalAmount":4000,"conveyancerReference":"CR12345-6789"}"""
+
+      Json.toJson[RequestFundReleaseRequest](input).toString() mustBe expected
+
+    }
+
+    "deserialize to json without conveyancerReference" in {
+
+      val input = InitialFundReleaseRequest(
+        eventDate = new DateTime("2017-05-10"),
+        withdrawalAmount = 4000,
+        conveyancerReference = None,
+        propertyDetails = Some(FundReleasePropertyDetails(
+          nameOrNumber = "1",
+          postalCode = "AA11 1AA"
+        ))
+      )
+      val expected = """{"eventType":"Funds Release","eventDate":"2017-05-10","withdrawalAmount":4000,"propertyDetails":{"nameOrNumber":"1","postalCode":"AA11 1AA"}}"""
 
       Json.toJson[RequestFundReleaseRequest](input).toString() mustBe expected
 

@@ -39,7 +39,7 @@ trait RequestFundReleaseRequest extends ReportLifeEventRequestBase {
   val withdrawalAmount: Amount
 }
 
-case class InitialFundReleaseRequest(eventDate: DateTime, withdrawalAmount: Amount, conveyancerReference: String, propertyDetails: FundReleasePropertyDetails) extends RequestFundReleaseRequest
+case class InitialFundReleaseRequest(eventDate: DateTime, withdrawalAmount: Amount, conveyancerReference: Option[String], propertyDetails: Option[FundReleasePropertyDetails]) extends RequestFundReleaseRequest
 
 case class SupersedeFundReleaseRequest(eventDate: DateTime, withdrawalAmount: Amount, supersede: FundReleaseSupersedeDetails) extends RequestFundReleaseRequest
 
@@ -53,8 +53,8 @@ object RequestFundReleaseRequest {
     (JsPath \ "eventType").write[String] and
     (JsPath \ "eventDate").write[DateTime] and
     (JsPath \ "withdrawalAmount").write[Amount] and
-    (JsPath \ "conveyancerReference").write[String] and
-    (JsPath \ "propertyDetails").write[FundReleasePropertyDetails]
+    (JsPath \ "conveyancerReference").writeNullable[String] and
+    (JsPath \ "propertyDetails").writeNullable[FundReleasePropertyDetails]
   ){req: InitialFundReleaseRequest => (
     "Funds Release",
     req.eventDate,

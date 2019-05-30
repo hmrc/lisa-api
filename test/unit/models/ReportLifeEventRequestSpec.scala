@@ -67,11 +67,11 @@ class ReportLifeEventRequestSpec extends PlaySpec {
       val input = InitialFundReleaseRequest(
         eventDate = new DateTime("2017-05-10"),
         withdrawalAmount = 4000,
-        conveyancerReference = "CR12345-6789",
-        propertyDetails = FundReleasePropertyDetails(
+        conveyancerReference = Some("CR12345-6789"),
+        propertyDetails = Some(FundReleasePropertyDetails(
           nameOrNumber = "1",
           postalCode = "AA11 1AA"
-        )
+        ))
       )
       val output = Json.toJson[ReportLifeEventRequestBase](input)
 
@@ -84,6 +84,46 @@ class ReportLifeEventRequestSpec extends PlaySpec {
           "nameOrNumber" -> "1",
           "postalCode" -> "AA11 1AA"
         )
+      )
+    }
+
+    "correctly serialise a standard fund release without conveyancerReference" in {
+      val input = InitialFundReleaseRequest(
+        eventDate = new DateTime("2017-05-10"),
+        withdrawalAmount = 4000,
+        conveyancerReference = None,
+        propertyDetails = Some(FundReleasePropertyDetails(
+          nameOrNumber = "1",
+          postalCode = "AA11 1AA"
+        ))
+      )
+      val output = Json.toJson[ReportLifeEventRequestBase](input)
+
+      output mustBe Json.obj(
+        "eventType" -> "Funds Release",
+        "eventDate" -> "2017-05-10",
+        "withdrawalAmount" -> 4000,
+        "propertyDetails" -> Json.obj(
+          "nameOrNumber" -> "1",
+          "postalCode" -> "AA11 1AA"
+        )
+      )
+    }
+
+    "correctly serialise a standard fund release without propertyDetails" in {
+      val input = InitialFundReleaseRequest(
+        eventDate = new DateTime("2017-05-10"),
+        withdrawalAmount = 4000,
+        conveyancerReference = Some("CR12345-6789"),
+        propertyDetails = None
+      )
+      val output = Json.toJson[ReportLifeEventRequestBase](input)
+
+      output mustBe Json.obj(
+        "eventType" -> "Funds Release",
+        "eventDate" -> "2017-05-10",
+        "withdrawalAmount" -> 4000,
+        "conveyancerReference" -> "CR12345-6789"
       )
     }
 
