@@ -89,7 +89,9 @@ class BonusPaymentController @Inject()(
       withValidLMRN(lisaManager) { () =>
         withEnrolment(lisaManager) { _ =>
           withValidAccountId(accountId) { () =>
-            processGetBonusPayment(lisaManager, accountId, transactionId)
+            withValidTransactionId(transactionId) { () =>
+              processGetBonusPayment(lisaManager, accountId, transactionId)
+            }
           }
         }
       }

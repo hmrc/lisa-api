@@ -31,7 +31,7 @@ import uk.gov.hmrc.api.controllers.ErrorAcceptHeaderInvalid
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.config.AppContext
-import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountNotFound, ErrorBadRequestAccountId, ErrorBadRequestLmrn, ErrorBonusPaymentTransactionNotFound, ErrorInternalServerError, ErrorServiceUnavailable, ErrorTransactionNotFound, TransactionController}
+import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountNotFound, ErrorBadRequestAccountId, ErrorBadRequestLmrn, ErrorBadRequestTransactionId, ErrorBonusPaymentTransactionNotFound, ErrorInternalServerError, ErrorServiceUnavailable, ErrorTransactionNotFound, TransactionController}
 import uk.gov.hmrc.lisaapi.metrics.LisaMetrics
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AuditService, TransactionService}
@@ -137,6 +137,15 @@ class TransactionControllerSpec extends PlaySpec
         status(res) mustBe BAD_REQUEST
 
         (contentAsJson(res) \ "message").as[String] mustBe ErrorBadRequestAccountId.message
+      }
+      "the transactionId in the URL is in an incorrect format" in {
+        when(mockService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionErrorResponse))
+
+        val res = SUT.getTransaction(lmrn, accountId, "123.456").apply(FakeRequest().withHeaders(acceptHeaderV2))
+
+        status(res) mustBe BAD_REQUEST
+
+        (contentAsJson(res) \ "message").as[String] mustBe ErrorBadRequestTransactionId.message
       }
     }
 
