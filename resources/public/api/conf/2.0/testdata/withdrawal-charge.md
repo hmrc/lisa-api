@@ -106,7 +106,7 @@
   "withdrawalChargeAmountYTD": 750.00,
   "fundsDeductedDuringWithdrawal": true,
   "withdrawalReason": "Superseded withdrawal",
-  "automaticRecoveryAmount": 250.00,
+  "automaticRecoveryAmount": 500.00,
   "supersede": {
     "originalTransactionId": "2345678901",
     "originalWithdrawalChargeAmount": 250.00,
@@ -403,7 +403,7 @@
   "withdrawalChargeAmountYTD": 750.00,
   "fundsDeductedDuringWithdrawal": true,
   "withdrawalReason": "Superseded withdrawal",
-  "automaticRecoveryAmount": 250.00,
+  "automaticRecoveryAmount": 500.00,
   "supersede": {
     "originalTransactionId": "2345678901",
     "originalWithdrawalChargeAmount": 250.00,
@@ -443,7 +443,7 @@
   "withdrawalChargeAmountYTD": 750.00,
   "fundsDeductedDuringWithdrawal": true,
   "withdrawalReason": "Superseded withdrawal",
-  "automaticRecoveryAmount": 250.00,
+  "automaticRecoveryAmount": 500.00,
   "supersede": {
     "originalTransactionId": "2345678901",
     "originalWithdrawalChargeAmount": 250.00,
@@ -484,7 +484,7 @@
   "withdrawalChargeAmountYTD": 750.00,
   "fundsDeductedDuringWithdrawal": true,
   "withdrawalReason": "Superseded withdrawal",
-  "automaticRecoveryAmount": 250.00,
+  "automaticRecoveryAmount": 500.00,
   "supersede": {
     "originalTransactionId": "2345678901",
     "originalWithdrawalChargeAmount": 250.00,
@@ -524,7 +524,7 @@
   "withdrawalChargeAmountYTD": 750.00,
   "fundsDeductedDuringWithdrawal": true,
   "withdrawalReason": "Superseded withdrawal",
-  "automaticRecoveryAmount": 250.00,
+  "automaticRecoveryAmount": 500.00,
   "supersede": {
     "originalTransactionId": "2345678901",
     "originalWithdrawalChargeAmount": 250.00,
