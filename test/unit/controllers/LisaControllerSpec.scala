@@ -44,8 +44,8 @@ class LisaControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite 
 
   implicit val testTypeReads: Reads[TestType] = (
     (JsPath \ "prop1").read[Int].map[String](i => throw new RuntimeException("Deliberate Test Exception")) and
-    (JsPath \ "prop2").read[String]
-  ) (TestType.apply _)
+      (JsPath \ "prop2").read[String]
+    ) (TestType.apply _)
 
   "The withValidJson method" must {
 
@@ -98,29 +98,110 @@ class LisaControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite 
 
   }
 
-  val mockService = mock[AccountService]
-  val mockErrorConverter = mock[ErrorConverter]
-  val mockAuthCon: AuthConnector = mock[AuthConnector]
-  val mockAuditService: AuditService = mock[AuditService]
-  val mockAppContext: AppContext = mock[AppContext]
-  val mockLisaMetrics: LisaMetrics = mock[LisaMetrics]
-  val mockControllerComponents = inject[ControllerComponents]
-  val mockParser = inject[PlayBodyParsers]
-  val SUT = new AccountController(mockAuthCon, mockAppContext, mockService, mockAuditService, mockLisaMetrics, mockControllerComponents, mockParser) {
+  "The withValidaccount method" must {
 
-    def testJsonValidator(): Action[AnyContent] = validateHeader(mockParser).async { implicit request =>
-      implicit val startTime: Long = System.currentTimeMillis()
-      withValidJson[TestType](_ =>
-        Future.successful(PreconditionFailed) // we don't ever want this to return
-        , lisaManager = ""
-      )
+    "return a Bad Request Error" when {
+
+      "an invalid account is passed in" in {
+        val jsonString = """{"prop1": 123, "prop2": "123"}"""
+        val res = SUT.testAccountIdValidator("Z" *21).apply(FakeRequest(Helpers.PUT, "/")
+          .withHeaders(acceptHeader)
+          .withBody(AnyContentAsJson(Json.parse(jsonString))))
+
+        status(res) mustBe BAD_REQUEST
+
+        val json = contentAsJson(res)
+
+        (json \ "code").as[String] mustBe "BAD_REQUEST"
+        (json \ "message").as[String] mustBe "accountId in the URL is in the wrong format"
+      }
+
     }
 
-    def testLMRNValidator(lmrn: String): Action[AnyContent] = validateHeader(mockParser).async { implicit request =>
-      implicit val startTime: Long = System.currentTimeMillis()
-      withValidLMRN(lmrn) { () => Future.successful(Ok) }
+    "returns 200" when {
+
+      "a valid accountId is passed in" in {
+        val jsonString = """{"prop1": 123, "prop2": "123"}"""
+        val res = SUT.testAccountIdValidator("ABC12345").apply(FakeRequest(Helpers.PUT, "/")
+          .withHeaders(acceptHeader)
+          .withBody(AnyContentAsJson(Json.parse(jsonString))))
+
+        status(res) mustBe OK
+      }
+
     }
+
   }
 
+  "The withValidTransactionId method" must {
 
-}
+    "return a Bad Request Error" when {
+
+      "an invalid transaction Id is passed in" in {
+        val jsonString = """{"prop1": 123, "prop2": "123"}"""
+        val res = SUT.testTransactionIdValidator("123.345" ).apply(FakeRequest(Helpers.PUT, "/")
+          .withHeaders(acceptHeader)
+          .withBody(AnyContentAsJson(Json.parse(jsonString))))
+
+        status(res) mustBe BAD_REQUEST
+
+        val json = contentAsJson(res)
+
+        (json \ "code").as[String] mustBe "BAD_REQUEST"
+        (json \ "message").as[String] mustBe "transactionId in the URL is in the wrong format"
+      }
+
+    }
+
+    "returns 200" when {
+
+      "a valid accountId is passed in" in {
+        val jsonString = """{"prop1": 123, "prop2": "123"}"""
+        val res = SUT.testTransactionIdValidator("1234567890").apply(FakeRequest(Helpers.PUT, "/")
+          .withHeaders(acceptHeader)
+          .withBody(AnyContentAsJson(Json.parse(jsonString))))
+
+        status(res) mustBe OK
+      }
+
+    }
+
+  }
+
+    val mockService = mock[AccountService]
+    val mockErrorConverter = mock[ErrorConverter]
+    val mockAuthCon: AuthConnector = mock[AuthConnector]
+    val mockAuditService: AuditService = mock[AuditService]
+    val mockAppContext: AppContext = mock[AppContext]
+    val mockLisaMetrics: LisaMetrics = mock[LisaMetrics]
+    val mockControllerComponents = inject[ControllerComponents]
+    val mockParser = inject[PlayBodyParsers]
+    val SUT = new AccountController(mockAuthCon, mockAppContext, mockService, mockAuditService, mockLisaMetrics, mockControllerComponents, mockParser) {
+
+      def testJsonValidator(): Action[AnyContent] = validateHeader(mockParser).async { implicit request =>
+        implicit val startTime: Long = System.currentTimeMillis()
+        withValidJson[TestType](_ =>
+          Future.successful(PreconditionFailed) // we don't ever want this to return
+          , lisaManager = ""
+        )
+      }
+
+      def testLMRNValidator(lmrn: String): Action[AnyContent] = validateHeader(mockParser).async { implicit request =>
+        implicit val startTime: Long = System.currentTimeMillis()
+        withValidLMRN(lmrn) { () => Future.successful(Ok) }
+      }
+
+      def testAccountIdValidator(accountId: String): Action[AnyContent] = validateHeader(mockParser).async { implicit request =>
+        implicit val startTime: Long = System.currentTimeMillis()
+        withValidAccountId(accountId) { () => Future.successful(Ok) }
+      }
+
+      def testTransactionIdValidator(transactionId: String): Action[AnyContent] = validateHeader(mockParser).async { implicit request =>
+        implicit val startTime: Long = System.currentTimeMillis()
+        withValidTransactionId(transactionId) { () => Future.successful(Ok) }
+      }
+
+    }
+
+
+  }

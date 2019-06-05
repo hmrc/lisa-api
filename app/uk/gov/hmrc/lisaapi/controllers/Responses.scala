@@ -81,6 +81,7 @@ case class ErrorForbidden(errs: List[ErrorValidation]) extends ErrorResponseWith
 
 case object ErrorBadRequestLmrn extends ErrorResponse(400, "BAD_REQUEST", "lisaManagerReferenceNumber in the URL is in the wrong format")
 case object ErrorBadRequestAccountId extends ErrorResponse(400, "BAD_REQUEST", "accountId in the URL is in the wrong format")
+case object ErrorBadRequestTransactionId extends ErrorResponse(400, "BAD_REQUEST", "transactionId in the URL is in the wrong format")
 
 // specific errors for bulk payment url validation
 case object ErrorBadRequestStart extends ErrorResponse(400, "BAD_REQUEST", "startDate is in the wrong format")

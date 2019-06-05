@@ -59,6 +59,15 @@ abstract case class LisaController(
     }
   }
 
+  protected def withValidTransactionId(transactionId: String)(success: () => Future[Result])(implicit request: Request[AnyContent], startTime: Long): Future[Result] = {
+    if (transactionId.matches("^[0-9]{1,10}$")) {
+      success()
+    } else {
+      lisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.getMetricKey(request.uri))
+      Future.successful(BadRequest(toJson(ErrorBadRequestTransactionId)))
+    }
+  }
+
   protected def withEnrolment(lisaManager: String)
                              (callback: Option[String] => Future[Result])
                              (implicit request: Request[AnyContent], startTime: Long, ec: ExecutionContext): Future[Result] = {

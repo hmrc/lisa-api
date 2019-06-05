@@ -51,45 +51,47 @@ class TransactionController @Inject() (
       withValidLMRN(lisaManager) { () =>
         withEnrolment(lisaManager) { _ =>
           withValidAccountId(accountId) { () =>
-            service.getTransaction(lisaManager, accountId, transactionId) flatMap {
-              case success: GetTransactionSuccessResponse =>
-                Logger.debug("Matched Valid Response")
-                lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.TRANSACTION)
+            withValidTransactionId(transactionId) { () =>
+              service.getTransaction(lisaManager, accountId, transactionId) flatMap {
+                case success: GetTransactionSuccessResponse =>
+                  Logger.debug("Matched Valid Response")
+                  lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.TRANSACTION)
 
-                withApiVersion {
-                  case Some(VERSION_1) =>
-                    if (success.paymentStatus == TransactionPaymentStatus.REFUND_CANCELLED) {
-                      auditGetTransaction(lisaManager, accountId, transactionId, Some(ErrorInternalServerError.errorCode))
-                      Future.successful(ErrorInternalServerError.asResult)
-                    } else {
+                  withApiVersion {
+                    case Some(VERSION_1) =>
+                      if (success.paymentStatus == TransactionPaymentStatus.REFUND_CANCELLED) {
+                        auditGetTransaction(lisaManager, accountId, transactionId, Some(ErrorInternalServerError.errorCode))
+                        Future.successful(ErrorInternalServerError.asResult)
+                      } else {
+                        auditGetTransaction(lisaManager, accountId, transactionId)
+                        Future.successful(Ok(Json.toJson(success.copy(transactionType = None, supersededBy = None))))
+                      }
+                    case Some(VERSION_2) =>
                       auditGetTransaction(lisaManager, accountId, transactionId)
-                      Future.successful(Ok(Json.toJson(success.copy(transactionType = None, supersededBy = None))))
-                    }
-                  case Some(VERSION_2) =>
-                    auditGetTransaction(lisaManager, accountId, transactionId)
-                    Future.successful(Ok(Json.toJson(success.copy(bonusDueForPeriod = None))))
-                }
-              case GetTransactionTransactionNotFoundResponse =>
-                Logger.debug("Matched Not Found Response")
-                lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.TRANSACTION)
+                      Future.successful(Ok(Json.toJson(success.copy(bonusDueForPeriod = None))))
+                  }
+                case GetTransactionTransactionNotFoundResponse =>
+                  Logger.debug("Matched Not Found Response")
+                  lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.TRANSACTION)
 
-                withApiVersion {
-                  case Some(VERSION_1) =>
-                    auditGetTransaction(lisaManager, accountId, transactionId, Some(ErrorBonusPaymentTransactionNotFound.errorCode))
-                    Future.successful(ErrorBonusPaymentTransactionNotFound.asResult)
-                  case Some(VERSION_2) =>
-                    auditGetTransaction(lisaManager, accountId, transactionId, Some(ErrorTransactionNotFound.errorCode))
-                    Future.successful(ErrorTransactionNotFound.asResult)
-                }
-              case res: GetTransactionResponse =>
-                Logger.debug("Matched an error")
-                val errorResponse = errors.applyOrElse(res, { _: GetTransactionResponse =>
-                  Logger.debug(s"Matched an unexpected response: $res, returning a 500 error")
-                  ErrorInternalServerError
-                })
-                auditGetTransaction(lisaManager, accountId, transactionId, Some(errorResponse.errorCode))
-                lisaMetrics.incrementMetrics(startTime, errorResponse.httpStatusCode, LisaMetricKeys.TRANSACTION)
-                Future.successful(errorResponse.asResult)
+                  withApiVersion {
+                    case Some(VERSION_1) =>
+                      auditGetTransaction(lisaManager, accountId, transactionId, Some(ErrorBonusPaymentTransactionNotFound.errorCode))
+                      Future.successful(ErrorBonusPaymentTransactionNotFound.asResult)
+                    case Some(VERSION_2) =>
+                      auditGetTransaction(lisaManager, accountId, transactionId, Some(ErrorTransactionNotFound.errorCode))
+                      Future.successful(ErrorTransactionNotFound.asResult)
+                  }
+                case res: GetTransactionResponse =>
+                  Logger.debug("Matched an error")
+                  val errorResponse = errors.applyOrElse(res, { _: GetTransactionResponse =>
+                    Logger.debug(s"Matched an unexpected response: $res, returning a 500 error")
+                    ErrorInternalServerError
+                  })
+                  auditGetTransaction(lisaManager, accountId, transactionId, Some(errorResponse.errorCode))
+                  lisaMetrics.incrementMetrics(startTime, errorResponse.httpStatusCode, LisaMetricKeys.TRANSACTION)
+                  Future.successful(errorResponse.asResult)
+              }
             }
           }
         }
