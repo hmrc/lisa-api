@@ -57,6 +57,11 @@ case object DesUnavailableResponse extends DesFailure {
   override val reason = "Service Unavailable"
 }
 
+case object DesBadRequestResponse extends DesFailure {
+  override val code = "BAD_REQUEST"
+  override val reason = "Bad Request"
+}
+
 object DesResponse {
   implicit val desCreateAccountResponseFormats: OFormat[DesAccountResponse] = Json.format[DesAccountResponse]
 

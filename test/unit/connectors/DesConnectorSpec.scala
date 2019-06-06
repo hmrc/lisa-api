@@ -164,6 +164,25 @@ class DesConnectorSpec extends PlaySpec
 
     }
 
+    "return a DesBadRequestResponse" when {
+
+      "a 400 is returned" in {
+        when(mockHttp.POST[CreateLisaInvestorRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = BAD_REQUEST,
+                responseJson = None
+              )
+            )
+          )
+
+        doCreateInvestorRequest { response =>
+          response mustBe DesBadRequestResponse
+        }
+      }
+
+    }
   }
 
   "Create Account endpoint" must {
@@ -239,6 +258,26 @@ class DesConnectorSpec extends PlaySpec
 
         doCreateAccountRequest { response =>
           response mustBe DesUnavailableResponse
+        }
+      }
+
+    }
+
+    "return a DesBadRequestResponse" when {
+
+      "a 400 is returned" in {
+        when(mockHttp.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = BAD_REQUEST,
+                responseJson = None
+              )
+            )
+          )
+
+        doCreateAccountRequest { response =>
+          response mustBe DesBadRequestResponse
         }
       }
 
@@ -399,6 +438,25 @@ class DesConnectorSpec extends PlaySpec
       }
     }
 
+    "return a DesBadRequestResponse" when {
+
+      "a 400 is returned" in {
+        when(mockHttp.POST[CloseLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = BAD_REQUEST,
+                responseJson = None
+              )
+            )
+          )
+
+        doCloseAccountRequest { response =>
+          response mustBe DesBadRequestResponse
+        }
+      }
+    }
+
     "return a DesFailureResponse" when {
 
       "any other response is received" in {
@@ -470,6 +528,24 @@ class DesConnectorSpec extends PlaySpec
 
         doReinstateAccountRequest { response =>
           response mustBe DesUnavailableResponse
+        }
+      }
+    }
+
+    "return a DesBadRequestResponse" when {
+      "a 400 is returned" in {
+        when(mockHttp.PUT[JsValue, HttpResponse](any(), any())(any(), any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = BAD_REQUEST,
+                responseJson = None
+              )
+            )
+          )
+
+        doReinstateAccountRequest { response =>
+          response mustBe DesBadRequestResponse
         }
       }
     }
@@ -552,6 +628,26 @@ class DesConnectorSpec extends PlaySpec
 
       updateFirstSubscriptionDateRequest { response =>
         response mustBe DesUnavailableResponse
+      }
+    }
+
+  }
+
+  "return a DesBadRequestResponse" when {
+
+    "a 400 response is returned" in {
+      when(mockHttp.PUT[UpdateSubscriptionRequest, HttpResponse](any(), any())(any(), any(), any(), any()))
+        .thenReturn(
+          Future.successful(
+            HttpResponse(
+              responseStatus = BAD_REQUEST,
+              responseJson = None
+            )
+          )
+        )
+
+      updateFirstSubscriptionDateRequest { response =>
+        response mustBe DesBadRequestResponse
       }
     }
 
@@ -876,6 +972,26 @@ class DesConnectorSpec extends PlaySpec
 
         doRequestBonusPaymentRequest { response =>
           response mustBe DesUnavailableResponse
+        }
+      }
+
+    }
+
+    "return a DesBadRequestResponse" when {
+
+      "a 400 is returned" in {
+        when(mockHttp.POST[RequestBonusPaymentRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = BAD_REQUEST,
+                responseJson = None
+              )
+            )
+          )
+
+        doRequestBonusPaymentRequest { response =>
+          response mustBe DesBadRequestResponse
         }
       }
 
@@ -1639,6 +1755,26 @@ class DesConnectorSpec extends PlaySpec
 
         doReportWithdrawalRequest { response =>
           response mustBe DesUnavailableResponse
+        }
+      }
+
+    }
+
+    "return a DesBadRequestResponse" when {
+
+      "a 400 is returned" in {
+        when(mockHttp.POST[ReportWithdrawalChargeRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                responseStatus = BAD_REQUEST,
+                responseJson = None
+              )
+            )
+          )
+
+        doReportWithdrawalRequest { response =>
+          response mustBe DesBadRequestResponse
         }
       }
 
