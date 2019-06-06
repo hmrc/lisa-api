@@ -70,6 +70,7 @@ class DesConnector @Inject()(
       Logger.debug("Create Investor request returned status: " + res.status)
       res.status match {
         case SERVICE_UNAVAILABLE => DesUnavailableResponse
+        case BAD_REQUEST => DesBadRequestResponse
         case CONFLICT => parseDesResponse[CreateLisaInvestorAlreadyExistsResponse](res)
         case _ => parseDesResponse[CreateLisaInvestorSuccessResponse](res)
       }
@@ -89,6 +90,7 @@ class DesConnector @Inject()(
       Logger.debug("Create Account request returned status: " + res.status)
       res.status match {
         case SERVICE_UNAVAILABLE => DesUnavailableResponse
+        case BAD_REQUEST => DesBadRequestResponse
         case CREATED => DesAccountResponse(request.accountId)
         case _ => parseDesResponse[DesFailureResponse](res)
       }
@@ -132,6 +134,7 @@ class DesConnector @Inject()(
       Logger.debug("Reinstate Account request returned status: " + res.status)
       res.status match {
         case SERVICE_UNAVAILABLE => DesUnavailableResponse
+        case BAD_REQUEST => DesBadRequestResponse
         case OK => parseDesResponse[DesReinstateAccountSuccessResponse](res)
         case _ => parseDesResponse[DesFailureResponse](res)
       }
@@ -151,6 +154,7 @@ class DesConnector @Inject()(
       Logger.debug("Create Transfer request returned status: " + res.status)
       res.status match {
         case SERVICE_UNAVAILABLE => DesUnavailableResponse
+        case BAD_REQUEST => DesBadRequestResponse
         case CREATED => DesAccountResponse(request.accountId)
         case _ => parseDesResponse[DesFailureResponse](res)
       }
@@ -170,6 +174,7 @@ class DesConnector @Inject()(
       Logger.debug("Close Account request returned status: " + res.status)
       res.status match {
         case SERVICE_UNAVAILABLE => DesUnavailableResponse
+        case BAD_REQUEST => DesBadRequestResponse
         case OK => DesEmptySuccessResponse
         case _ => parseDesResponse[DesFailureResponse](res)
       }
@@ -190,6 +195,7 @@ class DesConnector @Inject()(
       Logger.debug("Life Event request returned status: " + res.status)
       res.status match {
         case SERVICE_UNAVAILABLE => DesUnavailableResponse
+        case BAD_REQUEST => DesBadRequestResponse
         case _ => parseDesResponse[DesLifeEventResponse](res)
       }
 
@@ -255,6 +261,7 @@ class DesConnector @Inject()(
       Logger.debug("Update first subscription date request returned status: " + res.status)
       res.status match {
         case OK => parseDesResponse[DesUpdateSubscriptionSuccessResponse](res)
+        case BAD_REQUEST => DesBadRequestResponse
         case CONFLICT => parseDesResponse[DesTransactionExistResponse](res)
         case SERVICE_UNAVAILABLE => DesUnavailableResponse
         case _ => parseDesResponse[DesFailureResponse](res)
@@ -279,6 +286,7 @@ class DesConnector @Inject()(
       Logger.debug("Bonus Payment request returned status: " + res.status)
       res.status match {
         case CONFLICT => parseDesResponse[DesTransactionExistResponse](res)
+        case BAD_REQUEST => DesBadRequestResponse
         case SERVICE_UNAVAILABLE => DesUnavailableResponse
         case _ => parseDesResponse[DesTransactionResponse](res)
       }
@@ -322,6 +330,7 @@ class DesConnector @Inject()(
       Logger.debug("Withdrawal request returned status: " + res.status)
       (res.status, res.body != null && res.body.contains("supersededTransactionByID")) match {
         case (CONFLICT, _) => parseDesResponse[DesWithdrawalChargeAlreadyExistsResponse](res)
+        case (BAD_REQUEST, _) => DesBadRequestResponse
         case (FORBIDDEN, true) => parseDesResponse[DesWithdrawalChargeAlreadySupersededResponse](res)
         case (SERVICE_UNAVAILABLE, _) => DesUnavailableResponse
         case _ => parseDesResponse[DesTransactionResponse](res)
