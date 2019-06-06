@@ -25,7 +25,6 @@ trait DesResponse
 
 sealed abstract class DesFailure extends DesResponse {
   val code: String
-  val reason: String
 }
 
 case class DesAccountResponse(accountID: String) extends DesResponse
@@ -54,12 +53,10 @@ case class DesGetBonusPaymentResponse(lifeEventId: Option[LifeEventId],
 
 case object DesUnavailableResponse extends DesFailure {
   override val code = "SERVER_ERROR"
-  override val reason = "Service Unavailable"
 }
 
 case object DesBadRequestResponse extends DesFailure {
   override val code = "BAD_REQUEST"
-  override val reason = "Bad Request"
 }
 
 object DesResponse {
