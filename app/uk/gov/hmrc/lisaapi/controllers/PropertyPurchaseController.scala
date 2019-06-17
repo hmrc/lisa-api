@@ -53,42 +53,44 @@ class PropertyPurchaseController @Inject() (
 
       withValidLMRN(lisaManager) { () =>
         withValidAccountId(accountId) { () =>
-          withValidJson[RequestFundReleaseRequest](
-            req => {
-              if (conveyancerOrPropertyDetailsIncludedOnASupersedeRequest(request.body.asJson)) {
-                Logger.debug("Fund release not reported - conveyancer and/or property details included on a supersede request")
-                auditFundRelease(lisaManager, accountId, req, success = false, Map("reasonNotReported" -> ErrorInvalidDataProvided.errorCode))
-                lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
-                Future.successful(Forbidden(Json.toJson(ErrorInvalidDataProvided)))
-              } else if (req.eventDate.isBefore(LISA_START_DATE)) {
-                Logger.debug("Fund release not reported - invalid event date")
-                auditFundRelease(lisaManager, accountId, req, success = false, Map("reasonNotReported" -> "FORBIDDEN"))
-                lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
-                Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
-                  ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("eventDate"), Some("/eventDate"))
-                )))))
-              } else {
-                service.reportLifeEvent(lisaManager, accountId, req).map {
-                  case res: ReportLifeEventSuccessResponse =>
-                    Logger.debug("Fund release successful")
-                    auditFundRelease(lisaManager, accountId, req, success = true)
-                    lisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.PROPERTY_PURCHASE)
-                    val data = req match {
-                      case _: InitialFundReleaseRequest => ApiResponseData(message = "Fund release created", lifeEventId = Some(res.lifeEventId))
-                      case _: SupersedeFundReleaseRequest => ApiResponseData(message = "Fund release superseded", lifeEventId = Some(res.lifeEventId))
-                    }
-                    Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
-                  case res: ReportLifeEventResponse =>
-                    val response = fundReleaseErrors.applyOrElse(res, {_ : ReportLifeEventResponse => ErrorInternalServerError})
-                    Logger.debug(s"Fund Release received $res, responding with $response")
-                    auditFundRelease(lisaManager, accountId, req, success = false, Map("reasonNotReported" -> response.errorCode))
-                    lisaMetrics.incrementMetrics(startTime, response.httpStatusCode, LisaMetricKeys.PROPERTY_PURCHASE)
-                    response.asResult
+          withValidAddress(request.body.asJson) { () =>
+            withValidJson[RequestFundReleaseRequest](
+              req => {
+                if (conveyancerOrPropertyDetailsIncludedOnASupersedeRequest(request.body.asJson)) {
+                  Logger.debug("Fund release not reported - conveyancer and/or property details included on a supersede request")
+                  auditFundRelease(lisaManager, accountId, req, success = false, Map("reasonNotReported" -> ErrorInvalidDataProvided.errorCode))
+                  lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
+                  Future.successful(Forbidden(Json.toJson(ErrorInvalidDataProvided)))
+                } else if (req.eventDate.isBefore(LISA_START_DATE)) {
+                  Logger.debug("Fund release not reported - invalid event date")
+                  auditFundRelease(lisaManager, accountId, req, success = false, Map("reasonNotReported" -> "FORBIDDEN"))
+                  lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
+                  Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
+                    ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("eventDate"), Some("/eventDate"))
+                  )))))
+                } else {
+                  service.reportLifeEvent(lisaManager, accountId, req).map {
+                    case res: ReportLifeEventSuccessResponse =>
+                      Logger.debug("Fund release successful")
+                      auditFundRelease(lisaManager, accountId, req, success = true)
+                      lisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.PROPERTY_PURCHASE)
+                      val data = req match {
+                        case _: InitialFundReleaseRequest => ApiResponseData(message = "Fund release created", lifeEventId = Some(res.lifeEventId))
+                        case _: SupersedeFundReleaseRequest => ApiResponseData(message = "Fund release superseded", lifeEventId = Some(res.lifeEventId))
+                      }
+                      Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
+                    case res: ReportLifeEventResponse =>
+                      val response = fundReleaseErrors.applyOrElse(res, { _: ReportLifeEventResponse => ErrorInternalServerError })
+                      Logger.debug(s"Fund Release received $res, responding with $response")
+                      auditFundRelease(lisaManager, accountId, req, success = false, Map("reasonNotReported" -> response.errorCode))
+                      lisaMetrics.incrementMetrics(startTime, response.httpStatusCode, LisaMetricKeys.PROPERTY_PURCHASE)
+                      response.asResult
+                  }
                 }
-              }
-            },
-            lisaManager = lisaManager
-          )
+              },
+              lisaManager = lisaManager
+            )
+          }
         }
       }
   }

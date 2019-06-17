@@ -69,11 +69,11 @@ types:
                       type: !include schemas/ErrorCodes.schema.json
                       examples:
                         InvalidLmrn:
-                          description: lisaManagerReferenceNumber in the URL is in the wrong format
+                          description: Enter lisaManagerReferenceNumber in the correct format, like Z1234
                           value: |
                             {
                               "code" : "BAD_REQUEST",
-                              "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
+                              "message" : "Enter lisaManagerReferenceNumber in the correct format, like Z1234"
                             }
                 401:
                   body:
@@ -81,11 +81,11 @@ types:
                       type: !include schemas/ErrorCodes.schema.json
                       examples:
                         notOpenStatus:
-                          description: lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
+                          description: Enter a real lisaManagerReferenceNumber
                           value: |
                             {
                               "code" : "UNAUTHORIZED",
-                              "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
+                              "message" : "Enter a real lisaManagerReferenceNumber"
                             }
             /investors:
               post:
@@ -120,11 +120,11 @@ types:
                                   "message" : "Bad Request"
                                 }
                             InvalidLmrn:
-                              description: lisaManagerReferenceNumber in the URL is in the wrong format
+                              description: Enter lisaManagerReferenceNumber in the correct format, like Z1234
                               value: |
                                 {
                                   "code" : "BAD_REQUEST",
-                                  "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
+                                  "message" : "Enter lisaManagerReferenceNumber in the correct format, like Z1234"
                                 }
                     401:
                       body:
@@ -132,11 +132,11 @@ types:
                           type: !include schemas/ErrorCodes.schema.json
                           examples:
                             notOpenStatus:
-                              description: lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
+                              description: Enter a real lisaManagerReferenceNumber
                               value: |
                                 {
                                   "code" : "UNAUTHORIZED",
-                                  "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
+                                  "message" : "Enter a real lisaManagerReferenceNumber"
                                 }
                     403:
                       body:
@@ -200,11 +200,11 @@ types:
                                     "message" : "Bad Request"
                                   }
                               InvalidLmrn:
-                                description: lisaManagerReferenceNumber in the URL is in the wrong format
+                                description: Enter lisaManagerReferenceNumber in the correct format, like Z1234
                                 value: |
                                   {
                                     "code" : "BAD_REQUEST",
-                                    "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
+                                    "message" : "Enter lisaManagerReferenceNumber in the correct format, like Z1234"
                                   }
                       401:
                         body:
@@ -212,11 +212,11 @@ types:
                             type: !include schemas/ErrorCodes.schema.json
                             examples:
                               notOpenStatus:
-                                description: lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
+                                description: Enter a real lisaManagerReferenceNumber
                                 value: |
                                   {
                                     "code" : "UNAUTHORIZED",
-                                    "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
+                                    "message" : "Enter a real lisaManagerReferenceNumber"
                                   }
                       403:
                         body:
@@ -337,11 +337,11 @@ types:
                                     ]
                                 }
                             InvalidLmrn:
-                              description: lisaManagerReferenceNumber in the URL is in the wrong format
+                              description: Enter lisaManagerReferenceNumber in the correct format, like Z1234
                               value: |
                                 {
                                   "code" : "BAD_REQUEST",
-                                  "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
+                                  "message" : "Enter lisaManagerReferenceNumber in the correct format, like Z1234"
                                 }
                     401:
                       body:
@@ -349,11 +349,11 @@ types:
                           type: !include schemas/ErrorCodes.schema.json
                           examples:
                             notOpenStatus:
-                              description: lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
+                              description: Enter a real lisaManagerReferenceNumber
                               value: |
                                 {
                                   "code" : "UNAUTHORIZED",
-                                  "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
+                                  "message" : "Enter a real lisaManagerReferenceNumber"
                                 }
                     404:
                       body:
@@ -361,11 +361,11 @@ types:
                           type: !include schemas/ErrorCodes.schema.json
                           examples:
                             accountIdNOTFound:
-                              description: The accountId does not match HMRC’s records
+                              description: Enter a real accountId
                               value: |
                                 {
                                   "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
-                                  "message": "The accountId does not match HMRC’s records"
+                                  "message": "Enter a real accountId"
                                 }
 
                     403:
@@ -430,18 +430,18 @@ types:
                             type: !include schemas/ErrorCodes.schema.json
                             examples:
                               InvalidLmrn:
-                                description: lisaManagerReferenceNumber in the URL is in the wrong format
+                                description: Enter lisaManagerReferenceNumber in the correct format, like Z1234
                                 value: |
                                   {
                                     "code" : "BAD_REQUEST",
-                                    "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
+                                    "message" : "Enter lisaManagerReferenceNumber in the correct format, like Z1234"
                                   }
                               InvalidAccountId:
-                                description: accountId in the URL is in the wrong format
+                                description: Enter accountId in the correct format, like ABC12345
                                 value: |
                                   {
                                     "code" : "BAD_REQUEST",
-                                    "message" : "accountId in the URL is in the wrong format"
+                                    "message" : "Enter accountId in the correct format, like ABC12345"
                                   }
                       401:
                         body:
@@ -449,11 +449,11 @@ types:
                             type: !include schemas/ErrorCodes.schema.json
                             examples:
                               notOpenStatus:
-                                description: lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
+                                description: Enter a real lisaManagerReferenceNumber
                                 value: |
                                   {
                                     "code" : "UNAUTHORIZED",
-                                    "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
+                                    "message" : "Enter a real lisaManagerReferenceNumber"
                                   }
                       404:
                         body:
@@ -461,11 +461,11 @@ types:
                             type: !include schemas/ErrorCodes.schema.json
                             examples:
                               accountIdNOTFound:
-                                description: The accountId does not match HMRC’s records
+                                description: Enter a real accountId
                                 value: |
                                   {
                                     "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
-                                    "message": "The accountId does not match HMRC’s records"
+                                    "message": "Enter a real accountId"
                                   }
                 /close-account:
                   post:
@@ -501,18 +501,18 @@ types:
                                     "message" : "Bad Request"
                                   }
                               InvalidLmrn:
-                                description: lisaManagerReferenceNumber in the URL is in the wrong format
+                                description: Enter lisaManagerReferenceNumber in the correct format, like Z1234
                                 value: |
                                   {
                                     "code" : "BAD_REQUEST",
-                                    "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
+                                    "message" : "Enter lisaManagerReferenceNumber in the correct format, like Z1234"
                                   }
                               InvalidAccountId:
-                                description: accountId in the URL is in the wrong format
+                                description: Enter accountId in the correct format, like ABC12345
                                 value: |
                                   {
                                     "code" : "BAD_REQUEST",
-                                    "message" : "accountId in the URL is in the wrong format"
+                                    "message" : "Enter accountId in the correct format, like ABC12345"
                                   }
                       401:
                         body:
@@ -520,11 +520,11 @@ types:
                             type: !include schemas/ErrorCodes.schema.json
                             examples:
                               notOpenStatus:
-                                description: lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
+                                description: Enter a real lisaManagerReferenceNumber
                                 value: |
                                   {
                                     "code" : "UNAUTHORIZED",
-                                    "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
+                                    "message" : "Enter a real lisaManagerReferenceNumber"
                                   }
                       403:
                         body:
@@ -565,11 +565,11 @@ types:
                             type: !include schemas/ErrorCodes.schema.json
                             examples:
                               accountIdNOTFound:
-                                description: The accountId does not match HMRC’s records
+                                description: Enter a real accountId
                                 value: |
                                   {
                                     "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
-                                    "message": "The accountId does not match HMRC’s records"
+                                    "message": "Enter a real accountId"
                                   }
                 /update-subscription:
                   post:
@@ -606,18 +606,18 @@ types:
                                     "message" : "Bad Request"
                                   }
                               InvalidLmrn:
-                                description: lisaManagerReferenceNumber in the URL is in the wrong format
+                                description: Enter lisaManagerReferenceNumber in the correct format, like Z1234
                                 value: |
                                   {
                                     "code" : "BAD_REQUEST",
-                                    "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
+                                    "message" : "Enter lisaManagerReferenceNumber in the correct format, like Z1234"
                                   }
                               InvalidAccountId:
-                                description: accountId in the URL is in the wrong format
+                                description: Enter accountId in the correct format, like ABC12345
                                 value: |
                                   {
                                     "code" : "BAD_REQUEST",
-                                    "message" : "accountId in the URL is in the wrong format"
+                                    "message" : "Enter accountId in the correct format, like ABC12345"
                                   }
                       401:
                         body:
@@ -625,11 +625,11 @@ types:
                             type: !include schemas/ErrorCodes.schema.json
                             examples:
                               notOpenStatus:
-                                description: lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
+                                description: Enter a real lisaManagerReferenceNumber
                                 value: |
                                   {
                                     "code" : "UNAUTHORIZED",
-                                    "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
+                                    "message" : "Enter a real lisaManagerReferenceNumber"
                                   }
                       403:
                         body:
@@ -663,11 +663,11 @@ types:
                             type: !include schemas/ErrorCodes.schema.json
                             examples:
                               accountIdNOTFound:
-                                description: The accountId does not match HMRC’s records
+                                description: Enter a real accountId
                                 value: |
                                   {
                                     "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
-                                    "message": "The accountId does not match HMRC’s records"
+                                    "message": "Enter a real accountId"
                                   }
                 /events:
                   (annotations.group):
@@ -704,18 +704,18 @@ types:
                                     "message" : "Bad Request"
                                   }
                               InvalidLmrn:
-                                description: lisaManagerReferenceNumber in the URL is in the wrong format
+                                description: Enter lisaManagerReferenceNumber in the correct format, like Z1234
                                 value: |
                                   {
                                     "code" : "BAD_REQUEST",
-                                    "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
+                                    "message" : "Enter lisaManagerReferenceNumber in the correct format, like Z1234"
                                   }
                               InvalidAccountId:
-                                description: accountId in the URL is in the wrong format
+                                description: Enter accountId in the correct format, like ABC12345
                                 value: |
                                   {
                                     "code" : "BAD_REQUEST",
-                                    "message" : "accountId in the URL is in the wrong format"
+                                    "message" : "Enter accountId in the correct format, like ABC12345"
                                   }
                       401:
                         body:
@@ -723,11 +723,11 @@ types:
                             type: !include schemas/ErrorCodes.schema.json
                             examples:
                               notOpenStatus:
-                                description: lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
+                                description: Enter a real lisaManagerReferenceNumber
                                 value: |
                                   {
                                     "code" : "UNAUTHORIZED",
-                                    "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
+                                    "message" : "Enter a real lisaManagerReferenceNumber"
                                   }
                       403:
                         description: Matches already existing resource.
@@ -770,11 +770,11 @@ types:
                             type: !include schemas/ErrorCodes.schema.json
                             examples:
                               accountIdNOTFound:
-                                description: The accountId does not match HMRC’s records
+                                description: Enter a real accountId
                                 value: |
                                   {
                                     "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
-                                    "message": "The accountId does not match HMRC’s records"
+                                    "message": "Enter a real accountId"
                                   }
                       409:
                         body:
@@ -822,18 +822,18 @@ types:
                                       "message" : "Bad Request"
                                     }
                                 InvalidLmrn:
-                                  description: lisaManagerReferenceNumber in the URL is in the wrong format
+                                  description: Enter lisaManagerReferenceNumber in the correct format, like Z1234
                                   value: |
                                     {
                                       "code" : "BAD_REQUEST",
-                                      "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
+                                      "message" : "Enter lisaManagerReferenceNumber in the correct format, like Z1234"
                                     }
                                 InvalidAccountId:
-                                  description: accountId in the URL is in the wrong format
+                                  description: Enter accountId in the correct format, like ABC12345
                                   value: |
                                     {
                                       "code" : "BAD_REQUEST",
-                                      "message" : "accountId in the URL is in the wrong format"
+                                      "message" : "Enter accountId in the correct format, like ABC12345"
                                     }
                         401:
                           body:
@@ -841,11 +841,11 @@ types:
                               type: !include schemas/ErrorCodes.schema.json
                               examples:
                                 notOpenStatus:
-                                  description: lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
+                                  description: Enter a real lisaManagerReferenceNumber
                                   value: |
                                     {
                                       "code" : "UNAUTHORIZED",
-                                      "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
+                                      "message" : "Enter a real lisaManagerReferenceNumber"
                                     }
                         403:
                           body:
@@ -879,11 +879,11 @@ types:
                               type: !include schemas/ErrorCodes.schema.json
                               examples:
                                 accountIdNOTFound:
-                                  description: The accountId does not match HMRC’s records
+                                  description: Enter a real accountId
                                   value: |
                                     {
                                       "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
-                                      "message": "The accountId does not match HMRC’s records"
+                                      "message": "Enter a real accountId"
                                     }
                         409:
                           body:
@@ -934,18 +934,18 @@ types:
                               type: !include schemas/ErrorCodes.schema.json
                               examples:
                                 InvalidLmrn:
-                                  description: lisaManagerReferenceNumber in the URL is in the wrong format
+                                  description: Enter lisaManagerReferenceNumber in the correct format, like Z1234
                                   value: |
                                     {
                                       "code" : "BAD_REQUEST",
-                                      "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
+                                      "message" : "Enter lisaManagerReferenceNumber in the correct format, like Z1234"
                                     }
                                 InvalidAccountId:
-                                  description: accountId in the URL is in the wrong format
+                                  description: Enter accountId in the correct format, like ABC12345
                                   value: |
                                     {
                                       "code" : "BAD_REQUEST",
-                                      "message" : "accountId in the URL is in the wrong format"
+                                      "message" : "Enter accountId in the correct format, like ABC12345"
                                     }
                         401:
                           body:
@@ -953,11 +953,11 @@ types:
                               type: !include schemas/ErrorCodes.schema.json
                               examples:
                                 notOpenStatus:
-                                  description: lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
+                                  description: Enter a real lisaManagerReferenceNumber
                                   value: |
                                     {
                                       "code" : "UNAUTHORIZED",
-                                      "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
+                                      "message" : "Enter a real lisaManagerReferenceNumber"
                                     }
                         403:
                           body:
@@ -1019,11 +1019,11 @@ types:
                               type: !include schemas/ErrorCodes.schema.json
                               examples:
                                 accountNotFound:
-                                  description: The accountId does not match HMRC’s records
+                                  description: Enter a real accountId
                                   value : |
                                     {
                                       "code" : "INVESTOR_ACCOUNTID_NOT_FOUND",
-                                      "message" : "The accountId does not match HMRC’s records"
+                                      "message" : "Enter a real accountId"
                                     }
                         409:
                           body:
@@ -1127,11 +1127,11 @@ types:
                               type: !include schemas/ErrorCodes.schema.json
                               examples:
                                 accountNotFound:
-                                  description: The accountId does not match HMRC’s records
+                                  description: Enter a real accountId
                                   value : |
                                     {
                                       "code" : "INVESTOR_ACCOUNTID_NOT_FOUND",
-                                      "message" : "The accountId does not match HMRC’s records"
+                                      "message" : "Enter a real accountId"
                                     }
                                 fundReleaseNotFound:
                                   description: The fundReleaseId does not match HMRC’s records
@@ -1209,7 +1209,7 @@ types:
                               type: !include schemas/ErrorCodes.schema.json
                               examples:
                                 accountNotFound:
-                                  description: The accountId does not match HMRC’s records
+                                  description: Enter a real accountId
                                   value : |
                                     {
                                       "code" : "INVESTOR_ACCOUNTID_NOT_FOUND",
@@ -1276,18 +1276,18 @@ types:
                                 type: !include schemas/ErrorCodes.schema.json
                                 examples:
                                   InvalidLmrn:
-                                    description: lisaManagerReferenceNumber in the URL is in the wrong format
+                                    description: Enter lisaManagerReferenceNumber in the correct format, like Z1234
                                     value: |
                                       {
                                         "code" : "BAD_REQUEST",
-                                        "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
+                                        "message" : "Enter lisaManagerReferenceNumber in the correct format, like Z1234"
                                       }
                                   InvalidAccountId:
-                                    description: accountId in the URL is in the wrong format
+                                    description: Enter accountId in the correct format, like ABC12345
                                     value: |
                                       {
                                         "code" : "BAD_REQUEST",
-                                        "message" : "accountId in the URL is in the wrong format"
+                                        "message" : "Enter accountId in the correct format, like ABC12345"
                                       }
                           401:
                             body:
@@ -1295,11 +1295,11 @@ types:
                                 type: !include schemas/ErrorCodes.schema.json
                                 examples:
                                   notOpenStatus:
-                                    description: lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
+                                    description: Enter a real lisaManagerReferenceNumber
                                     value: |
                                       {
                                         "code" : "UNAUTHORIZED",
-                                        "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
+                                        "message" : "Enter a real lisaManagerReferenceNumber"
                                       }
                           404:
                             body:
@@ -1307,18 +1307,18 @@ types:
                                 type: !include schemas/ErrorCodes.schema.json
                                 examples:
                                   noTransaction:
-                                    description: The lifeEventId does not match HMRC’s records
+                                    description: Enter a real lifeEventId
                                     value: |
                                       {
                                         "code" : "LIFE_EVENT_NOT_FOUND",
-                                        "message" : "The lifeEventId does not match HMRC’s records"
+                                        "message" : "Enter a real lifeEventId"
                                       }
                                   accountIdNOTFound:
-                                    description: The accountId does not match HMRC’s records
+                                    description: Enter a real accountId
                                     value: |
                                       {
                                         "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
-                                        "message": "The accountId does not match HMRC’s records"
+                                        "message": "Enter a real accountId"
                                       }
                 /withdrawal-charges:
                   (annotations.group):
@@ -1360,18 +1360,18 @@ types:
                                     "message" : "Bad Request"
                                   }
                               InvalidLmrn:
-                                description: lisaManagerReferenceNumber in the URL is in the wrong format
+                                description: Enter lisaManagerReferenceNumber in the correct format, like Z1234
                                 value: |
                                   {
                                     "code" : "BAD_REQUEST",
-                                    "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
+                                    "message" : "Enter lisaManagerReferenceNumber in the correct format, like Z1234"
                                   }
                               InvalidAccountId:
-                                description: accountId in the URL is in the wrong format
+                                description: Enter accountId in the correct format, like ABC12345
                                 value: |
                                   {
                                     "code" : "BAD_REQUEST",
-                                    "message" : "accountId in the URL is in the wrong format"
+                                    "message" : "Enter accountId in the correct format, like ABC12345"
                                   }
                       401:
                         body:
@@ -1379,11 +1379,11 @@ types:
                             type: !include schemas/ErrorCodes.schema.json
                             examples:
                               notOpenStatus:
-                                description: lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
+                                description: Enter a real lisaManagerReferenceNumber
                                 value: |
                                   {
                                     "code" : "UNAUTHORIZED",
-                                    "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
+                                    "message" : "Enter a real lisaManagerReferenceNumber"
                                   }
                       403:
                         body:
@@ -1453,11 +1453,11 @@ types:
                             type: !include schemas/ErrorCodes.schema.json
                             examples:
                               accountIdNOTFound:
-                                description: The accountId does not match HMRC’s records
+                                description: Enter a real accountId
                                 value: |
                                   {
                                     "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
-                                    "message": "The accountId does not match HMRC’s records"
+                                    "message": "Enter a real accountId"
                                   }
                       409:
                         body:
@@ -1498,18 +1498,18 @@ types:
                               type: !include schemas/ErrorCodes.schema.json
                               examples:
                                 InvalidLmrn:
-                                  description: lisaManagerReferenceNumber in the URL is in the wrong format
+                                  description: Enter lisaManagerReferenceNumber in the correct format, like Z1234
                                   value: |
                                     {
                                       "code" : "BAD_REQUEST",
-                                      "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
+                                      "message" : "Enter lisaManagerReferenceNumber in the correct format, like Z1234"
                                     }
                                 InvalidAccountId:
-                                  description: accountId in the URL is in the wrong format
+                                  description: Enter accountId in the correct format, like ABC12345
                                   value: |
                                     {
                                       "code" : "BAD_REQUEST",
-                                      "message" : "accountId in the URL is in the wrong format"
+                                      "message" : "Enter accountId in the correct format, like ABC12345"
                                     }
                         401:
                           body:
@@ -1517,11 +1517,11 @@ types:
                               type: !include schemas/ErrorCodes.schema.json
                               examples:
                                 notOpenStatus:
-                                  description: lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
+                                  description: Enter a real lisaManagerReferenceNumber
                                   value: |
                                     {
                                       "code" : "UNAUTHORIZED",
-                                      "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
+                                      "message" : "Enter a real lisaManagerReferenceNumber"
                                     }
                         404:
                           body:
@@ -1536,11 +1536,11 @@ types:
                                       "message" : "The transactionId does not match HMRC’s records"
                                     }
                                 accountIdNOTFound:
-                                  description: The accountId does not match HMRC’s records
+                                  description: Enter a real accountId
                                   value: |
                                     {
                                       "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
-                                      "message": "The accountId does not match HMRC’s records"
+                                      "message": "Enter a real accountId"
                                     }
                 /transactions:
                   (annotations.group):
@@ -1582,18 +1582,18 @@ types:
                                     "message" : "Bad Request"
                                   }
                               InvalidLmrn:
-                                description: lisaManagerReferenceNumber in the URL is in the wrong format
+                                description: Enter lisaManagerReferenceNumber in the correct format, like Z1234
                                 value: |
                                   {
                                     "code" : "BAD_REQUEST",
-                                    "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
+                                    "message" : "Enter lisaManagerReferenceNumber in the correct format, like Z1234"
                                   }
                               InvalidAccountId:
-                                description: accountId in the URL is in the wrong format
+                                description: Enter accountId in the correct format, like ABC12345
                                 value: |
                                   {
                                     "code" : "BAD_REQUEST",
-                                    "message" : "accountId in the URL is in the wrong format"
+                                    "message" : "Enter accountId in the correct format, like ABC12345"
                                   }
                       401:
                         body:
@@ -1601,11 +1601,11 @@ types:
                             type: !include schemas/ErrorCodes.schema.json
                             examples:
                               notOpenStatus:
-                                description: lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
+                                description: Enter a real lisaManagerReferenceNumber
                                 value: |
                                   {
                                     "code" : "UNAUTHORIZED",
-                                    "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
+                                    "message" : "Enter a real lisaManagerReferenceNumber"
                                   }
                       403:
                         body:
@@ -1702,11 +1702,11 @@ types:
                                     "message" : "The lifeEventId does not match with HMRC’s records"
                                   }
                               accountIdNOTFound:
-                                description: The accountId does not match HMRC’s records
+                                description: Enter a real accountId
                                 value: |
                                   {
                                     "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
-                                    "message": "The accountId does not match HMRC’s records"
+                                    "message": "Enter a real accountId"
                                   }
                       409:
                           body:
@@ -1755,18 +1755,18 @@ types:
                               type: !include schemas/ErrorCodes.schema.json
                               examples:
                                 InvalidLmrn:
-                                  description: lisaManagerReferenceNumber in the URL is in the wrong format
+                                  description: Enter lisaManagerReferenceNumber in the correct format, like Z1234
                                   value: |
                                     {
                                       "code" : "BAD_REQUEST",
-                                      "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
+                                      "message" : "Enter lisaManagerReferenceNumber in the correct format, like Z1234"
                                     }
                                 InvalidAccountId:
-                                  description: accountId in the URL is in the wrong format
+                                  description: Enter accountId in the correct format, like ABC12345
                                   value: |
                                     {
                                       "code" : "BAD_REQUEST",
-                                      "message" : "accountId in the URL is in the wrong format"
+                                      "message" : "Enter accountId in the correct format, like ABC12345"
                                     }
                         401:
                           body:
@@ -1774,11 +1774,11 @@ types:
                               type: !include schemas/ErrorCodes.schema.json
                               examples:
                                 notOpenStatus:
-                                  description: lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
+                                  description: Enter a real lisaManagerReferenceNumber
                                   value: |
                                     {
                                       "code" : "UNAUTHORIZED",
-                                      "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
+                                      "message" : "Enter a real lisaManagerReferenceNumber"
                                     }
                         404:
                           body:
@@ -1793,11 +1793,11 @@ types:
                                       "message" : "The transactionId does not match HMRC’s records"
                                     }
                                 accountIdNOTFound:
-                                  description: The accountId does not match HMRC’s records
+                                  description: Enter a real accountId
                                   value: |
                                     {
                                       "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
-                                      "message": "The accountId does not match HMRC’s records"
+                                      "message": "Enter a real accountId"
                                     }
                     /payments:
                       (annotations.group):
@@ -1824,18 +1824,18 @@ types:
                                  type: !include schemas/ErrorCodes.schema.json
                                  examples:
                                    InvalidLmrn:
-                                     description: lisaManagerReferenceNumber in the URL is in the wrong format
+                                     description: Enter lisaManagerReferenceNumber in the correct format, like Z1234
                                      value: |
                                        {
                                          "code" : "BAD_REQUEST",
-                                         "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
+                                         "message" : "Enter lisaManagerReferenceNumber in the correct format, like Z1234"
                                        }
                                    InvalidAccountId:
-                                     description: accountId in the URL is in the wrong format
+                                     description: Enter accountId in the correct format, like ABC12345
                                      value: |
                                        {
                                          "code" : "BAD_REQUEST",
-                                         "message" : "accountId in the URL is in the wrong format"
+                                         "message" : "Enter accountId in the correct format, like ABC12345"
                                        }
                            401:
                              body:
@@ -1843,11 +1843,11 @@ types:
                                  type: !include schemas/ErrorCodes.schema.json
                                  examples:
                                    notOpenStatus:
-                                     description: lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
+                                     description: Enter a real lisaManagerReferenceNumber
                                      value: |
                                        {
                                          "code" : "UNAUTHORIZED",
-                                         "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
+                                         "message" : "Enter a real lisaManagerReferenceNumber"
                                        }
                            404:
                              body:
@@ -1862,11 +1862,11 @@ types:
                                          "message" : "The transactionId does not match HMRC’s records"
                                        }
                                    accountIdNOTFound:
-                                     description: The accountId does not match HMRC’s records
+                                     description: Enter a real accountId
                                      value: |
                                        {
                                          "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
-                                         "message": "The accountId does not match HMRC’s records"
+                                         "message": "Enter a real accountId"
                                        }
 
             /payments:
@@ -1905,11 +1905,11 @@ types:
                                     "message" : "Bad Request"
                                   }
                               InvalidLmrn:
-                                description: lisaManagerReferenceNumber in the URL is in the wrong format
+                                description: Enter lisaManagerReferenceNumber in the correct format, like Z1234
                                 value: |
                                   {
                                     "code" : "BAD_REQUEST",
-                                    "message" : "lisaManagerReferenceNumber in the URL is in the wrong format"
+                                    "message" : "Enter lisaManagerReferenceNumber in the correct format, like Z1234"
                                   }
                               InvalidStartDate:
                                 description: startDate is in the wrong format
@@ -1938,11 +1938,11 @@ types:
                             type: !include schemas/ErrorCodes.schema.json
                             examples:
                               notOpenStatus:
-                                description: lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records
+                                description: Enter a real lisaManagerReferenceNumber
                                 value: |
                                   {
                                     "code" : "UNAUTHORIZED",
-                                    "message" : "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records"
+                                    "message" : "Enter a real lisaManagerReferenceNumber"
                                   }
                       403:
                         body:

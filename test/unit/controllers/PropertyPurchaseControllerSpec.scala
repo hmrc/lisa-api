@@ -62,7 +62,19 @@ class PropertyPurchaseControllerSpec extends PlaySpec
   "withdrawalAmount": 4000.00,
   "conveyancerReference": "CR12345-6789",
   "propertyDetails": {
-    "nameOrNumber": "1",
+    "nameOrNumber": "Flat A",
+    "postalCode": "AA11 1AA"
+  }
+}
+"""
+
+  val fundReleaseJsonForInvalidAddress = """
+{
+  "eventDate": "2017-05-10",
+  "withdrawalAmount": 4000.00,
+  "conveyancerReference": "CR12345-6789",
+  "propertyDetails": {
+    "nameOrNumber": "1~~!!",
     "postalCode": "AA11 1AA"
   }
 }
@@ -135,7 +147,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
               "eventDate" -> "2017-05-10",
               "withdrawalAmount" -> "4000.00",
               "conveyancerReference" -> "CR12345-6789",
-              "nameOrNumber" -> "1",
+              "nameOrNumber" -> "Flat A",
               "postalCode" -> "AA11 1AA"
             ))
           )(any())
@@ -177,7 +189,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
               "eventDate" -> "2017-05-10",
               "withdrawalAmount" -> "4000.00",
               "conveyancerReference" -> "CR12345-6789",
-              "nameOrNumber" -> "1",
+              "nameOrNumber" -> "Flat A",
               "postalCode" -> "AA11 1AA",
               "reasonNotReported" -> "INTERNAL_SERVER_ERROR"
             ))
@@ -198,7 +210,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
               "eventDate" -> "2017-04-05",
               "withdrawalAmount" -> "4000.00",
               "conveyancerReference" -> "CR12345-6789",
-              "nameOrNumber" -> "1",
+              "nameOrNumber" -> "Flat A",
               "postalCode" -> "AA11 1AA",
               "reasonNotReported" -> "FORBIDDEN"
             ))
@@ -346,7 +358,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
       doFundReleaseRequest(fundReleaseJson){ res =>
         status(res) mustBe NOT_FOUND
         (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNTID_NOT_FOUND"
-        (contentAsJson(res) \ "message").as[String] mustBe "The accountId does not match HMRC’s records"
+        (contentAsJson(res) \ "message").as[String] mustBe "Enter a real accountId"
       }
     }
 
@@ -624,7 +636,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
       doExtensionRequest(extensionJson){ res =>
         status(res) mustBe NOT_FOUND
         (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNTID_NOT_FOUND"
-        (contentAsJson(res) \ "message").as[String] mustBe "The accountId does not match HMRC’s records"
+        (contentAsJson(res) \ "message").as[String] mustBe "Enter a real accountId"
       }
     }
 
@@ -873,7 +885,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
       doOutcomeRequest(outcomeJson) { res =>
         status(res) mustBe NOT_FOUND
         (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNTID_NOT_FOUND"
-        (contentAsJson(res) \ "message").as[String] mustBe "The accountId does not match HMRC’s records"
+        (contentAsJson(res) \ "message").as[String] mustBe "Enter a real accountId"
       }
     }
 
@@ -940,6 +952,15 @@ class PropertyPurchaseControllerSpec extends PlaySpec
 
   }
 
+  "a initial fund release request is having invalid address" in {
+    when(mockService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
+    doFundReleaseRequestForInvalidAddress(fundReleaseJsonForInvalidAddress) { res =>
+      status(res) mustBe BAD_REQUEST
+      (contentAsJson(res) \ "code").as[String] mustBe "BAD_REQUEST"
+      (contentAsJson(res) \ "message").as[String] mustBe "nameOrNumber must be 35 characters or less"
+    }
+  }
+
   def doFundReleaseRequest(jsonString: String, lmrn: String = lisaManager, accId: String = accountId, header: (String, String) = acceptHeader)(callback: (Future[Result]) =>  Unit): Unit = {
     val req = FakeRequest(Helpers.POST, "/")
     val res = SUT.requestFundRelease(lmrn, accId).apply(req.withHeaders(header).
@@ -959,6 +980,14 @@ class PropertyPurchaseControllerSpec extends PlaySpec
   def doOutcomeRequest(jsonString: String, lmrn: String = lisaManager, accId: String = accountId, header: (String, String) = acceptHeader)(callback: (Future[Result]) =>  Unit): Unit = {
     val req = FakeRequest(Helpers.POST, "/")
     val res = SUT.reportPurchaseOutcome(lmrn, accId).apply(req.withHeaders(header).
+      withBody(AnyContentAsJson(Json.parse(jsonString))))
+
+    callback(res)
+  }
+
+  def doFundReleaseRequestForInvalidAddress(jsonString: String, lmrn: String = lisaManager, accId: String = accountId, header: (String, String) = acceptHeader)(callback: (Future[Result]) =>  Unit): Unit = {
+    val req = FakeRequest(Helpers.POST, "/")
+    val res = SUT.requestFundRelease(lmrn, accId).apply(req.withHeaders(header).
       withBody(AnyContentAsJson(Json.parse(jsonString))))
 
     callback(res)

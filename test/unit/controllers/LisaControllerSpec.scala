@@ -78,7 +78,7 @@ class LisaControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite 
         val json = contentAsJson(res)
 
         (json \ "code").as[String] mustBe "BAD_REQUEST"
-        (json \ "message").as[String] mustBe "lisaManagerReferenceNumber in the URL is in the wrong format"
+        (json \ "message").as[String] mustBe "Enter lisaManagerReferenceNumber in the correct format, like Z1234"
       }
 
     }
@@ -113,7 +113,7 @@ class LisaControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite 
         val json = contentAsJson(res)
 
         (json \ "code").as[String] mustBe "BAD_REQUEST"
-        (json \ "message").as[String] mustBe "accountId in the URL is in the wrong format"
+        (json \ "message").as[String] mustBe "Enter accountId in the correct format, like ABC12345"
       }
 
     }

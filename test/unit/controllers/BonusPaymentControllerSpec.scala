@@ -327,7 +327,7 @@ class BonusPaymentControllerSpec extends PlaySpec
         doRequest(validBonusPaymentJson) { res =>
           status(res) mustBe NOT_FOUND
           (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNTID_NOT_FOUND"
-          (contentAsJson(res) \ "message").as[String] mustBe "The accountId does not match HMRC’s records"
+          (contentAsJson(res) \ "message").as[String] mustBe "Enter a real accountId"
         }
       }
 
