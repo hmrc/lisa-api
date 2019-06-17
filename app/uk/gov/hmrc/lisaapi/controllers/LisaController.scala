@@ -61,12 +61,8 @@ abstract case class LisaController(
 
   protected def withValidAddress(req: Option[JsValue])(success: () => Future[Result])(implicit request: Request[AnyContent], startTime: Long): Future[Result] = {
     ((nameOrNumberExists(req) && (Json.toJson(req) \ "propertyDetails" \ "nameOrNumber").get.toString().matches("^[A-Za-z0-9 \":/-]{1,35}$")) || !nameOrNumberExists(req)) match {
-      case true => {
-        println("=========================================Adress suc")
-        success()
-      }
+      case true => success()
       case false => {
-        println("=======================================Address fail")
         lisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.getMetricKey(request.uri))
         Future.successful(BadRequest(toJson(ErrorBadRequestAddress)))
       }
