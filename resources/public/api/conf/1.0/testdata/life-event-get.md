@@ -28,7 +28,7 @@
             <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
                 <p class ="code--block"> {<br>
                     "code": "BAD_REQUEST",<br>
-                    "message": "lisaManagerReferenceNumber in the URL is in the wrong format"<br>
+                    "message": "Enter lisaManagerReferenceNumber in the correct format, like Z1234"<br>
                   }
                 </p>
             </td>
@@ -39,7 +39,7 @@
             <td><p>HTTP status: <code class="code--slim">404 (Not found)</code></p>
                 <p class ="code--block"> {<br>
                                             "code": "INVESTOR_ACCOUNTID_NOT_FOUND",<br>
-                                            "message": "The accountId does not match HMRC’s records"<br>
+                                            "message": "Enter a real accountId"<br>
                                           }
                 </p>
             </td>
@@ -50,9 +50,9 @@
             <td><p>HTTP status: <code class="code--slim">404 (Not found)</code></p>
                 <p class ="code--block"> {<br>
                                             "code": "LIFE_EVENT_NOT_FOUND",<br>
-                                            "message": "The lifeEventId does not match HMRC’s records"<br>
+                                            "message": "Enter a real lifeEventId"<br>
                                           }
-                </p>
+                </p>Enter a real accountId
             </td>
         </tr>        
         <tr>

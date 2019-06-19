@@ -188,7 +188,7 @@
 <pre class ="code--block">
 {
   "code": "BAD_REQUEST",
-  "message": "lisaManagerReferenceNumber in the URL is in the wrong format"
+  "message": "Enter lisaManagerReferenceNumber in the correct format, like Z1234"
 }
 </pre>
             </td>
@@ -233,7 +233,7 @@
 <pre class="code--block">
 {
   "code": "BAD_REQUEST",
-  "message": "accountId in the URL is in the wrong format"
+  "message": "Enter accountId in the correct format, like ABC12345"
 }
 </pre>
                         </td>
@@ -656,7 +656,7 @@
 <pre class="code--block">
 {
   "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
-  "message": "The accountId does not match HMRC’s records"
+  "message": "Enter a real accountId"
 }
 </pre>
             </td>

@@ -90,7 +90,7 @@ class BulkPaymentControllerSpec extends PlaySpec
         val json = contentAsJson(result)
 
         (json \ "code").as[String] mustBe "BAD_REQUEST"
-        (json \ "message").as[String] mustBe "lisaManagerReferenceNumber in the URL is in the wrong format"
+        (json \ "message").as[String] mustBe "Enter lisaManagerReferenceNumber in the correct format, like Z1234"
       }
       "the startDate parameter is in the wrong format" in {
         val result = SUT.getBulkPayment(lmrn, invalidDate, validDate).

@@ -198,7 +198,7 @@ class AnnualReturnControllerSpec extends PlaySpec
           status(res) mustBe NOT_FOUND
           contentAsJson(res) mustBe Json.obj(
             "code" -> "INVESTOR_ACCOUNTID_NOT_FOUND",
-            "message" -> "The accountId does not match HMRC’s records"
+            "message" -> "Enter a real accountId"
           )
         }
       }

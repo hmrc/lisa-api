@@ -346,7 +346,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
       doFundReleaseRequest(fundReleaseJson){ res =>
         status(res) mustBe NOT_FOUND
         (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNTID_NOT_FOUND"
-        (contentAsJson(res) \ "message").as[String] mustBe "The accountId does not match HMRC’s records"
+        (contentAsJson(res) \ "message").as[String] mustBe "Enter a real accountId"
       }
     }
 
@@ -624,7 +624,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
       doExtensionRequest(extensionJson){ res =>
         status(res) mustBe NOT_FOUND
         (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNTID_NOT_FOUND"
-        (contentAsJson(res) \ "message").as[String] mustBe "The accountId does not match HMRC’s records"
+        (contentAsJson(res) \ "message").as[String] mustBe "Enter a real accountId"
       }
     }
 
@@ -873,7 +873,7 @@ class PropertyPurchaseControllerSpec extends PlaySpec
       doOutcomeRequest(outcomeJson) { res =>
         status(res) mustBe NOT_FOUND
         (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNTID_NOT_FOUND"
-        (contentAsJson(res) \ "message").as[String] mustBe "The accountId does not match HMRC’s records"
+        (contentAsJson(res) \ "message").as[String] mustBe "Enter a real accountId"
       }
     }
 

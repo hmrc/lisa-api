@@ -59,6 +59,23 @@ abstract case class LisaController(
     }
   }
 
+  protected def withValidAddress(req: Option[JsValue])(success: () => Future[Result])(implicit request: Request[AnyContent], startTime: Long): Future[Result] = {
+    ((nameOrNumberExists(req) && (Json.toJson(req) \ "propertyDetails" \ "nameOrNumber").get.toString().matches("^[A-Za-z0-9 \":/-]{1,35}$")) || !nameOrNumberExists(req)) match {
+      case true => success()
+      case false => {
+        lisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.getMetricKey(request.uri))
+        Future.successful(BadRequest(toJson(ErrorBadRequestAddress)))
+      }
+    }
+  }
+
+  private def nameOrNumberExists(req: Option[JsValue]) = {
+    req exists { json =>
+      val propertyDetailsAreDefined = (json \ "propertyDetails" \ "nameOrNumber").asOpt[JsValue].isDefined
+      propertyDetailsAreDefined
+    }
+  }
+
   protected def withValidTransactionId(transactionId: String)(success: () => Future[Result])(implicit request: Request[AnyContent], startTime: Long): Future[Result] = {
     if (transactionId.matches("^[0-9]{1,10}$")) {
       success()

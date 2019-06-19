@@ -79,9 +79,10 @@ case class ErrorBadRequest(errs: List[ErrorValidation]) extends ErrorResponseWit
 
 case class ErrorForbidden(errs: List[ErrorValidation]) extends ErrorResponseWithErrors(403, "FORBIDDEN", "There is a problem with the request data", errors = Some(errs))
 
-case object ErrorBadRequestLmrn extends ErrorResponse(400, "BAD_REQUEST", "lisaManagerReferenceNumber in the URL is in the wrong format")
-case object ErrorBadRequestAccountId extends ErrorResponse(400, "BAD_REQUEST", "accountId in the URL is in the wrong format")
+case object ErrorBadRequestLmrn extends ErrorResponse(400, "BAD_REQUEST", "Enter lisaManagerReferenceNumber in the correct format, like Z1234")
+case object ErrorBadRequestAccountId extends ErrorResponse(400, "BAD_REQUEST", "Enter accountId in the correct format, like ABC12345")
 case object ErrorBadRequestTransactionId extends ErrorResponse(400, "BAD_REQUEST", "transactionId in the URL is in the wrong format")
+case object ErrorBadRequestAddress extends ErrorResponse(400, "BAD_REQUEST", "nameOrNumber must be 35 characters or less")
 
 // specific errors for bulk payment url validation
 case object ErrorBadRequestStart extends ErrorResponse(400, "BAD_REQUEST", "startDate is in the wrong format")
@@ -144,7 +145,7 @@ case object ErrorAccountAlreadyCancelled extends ErrorResponse(403, "INVESTOR_AC
 
 case object ErrorAccountAlreadyOpen extends ErrorResponse(403, "INVESTOR_ACCOUNT_ALREADY_OPEN", "You cannot reinstate this account because it is already open")
 
-case object ErrorAccountNotFound extends ErrorResponse(404, "INVESTOR_ACCOUNTID_NOT_FOUND", "The accountId does not match HMRC’s records")
+case object ErrorAccountNotFound extends ErrorResponse(404, "INVESTOR_ACCOUNTID_NOT_FOUND", "Enter a real accountId")
 
 case object ErrorBulkTransactionNotFoundV1 extends ErrorResponse(404, "PAYMENT_NOT_FOUND", "No bonus payments have been made for this date range")
 
@@ -156,7 +157,7 @@ case object ErrorTransferAccountDataProvided extends ErrorResponse(403, "TRANSFE
 
 case object ErrorLifeEventInappropriate extends ErrorResponse(403, "LIFE_EVENT_INAPPROPRIATE", "The life event conflicts with a previous life event reported")
 
-case object ErrorInvalidLisaManager extends ErrorResponse(401,"UNAUTHORIZED", "lisaManagerReferenceNumber path parameter used does not match with an authorised LISA provider in HMRC’s records")
+case object ErrorInvalidLisaManager extends ErrorResponse(401,"UNAUTHORIZED", "Enter a real lisaManagerReferenceNumber")
 
 case object ErrorBonusPaymentTransactionNotFound extends ErrorResponse(404, "BONUS_PAYMENT_TRANSACTION_NOT_FOUND", "transactionId does not match HMRC’s records")
 
