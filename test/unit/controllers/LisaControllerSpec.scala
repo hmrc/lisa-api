@@ -21,15 +21,19 @@ import org.mockito.Mockito.when
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.functional.syntax._
-import play.api.libs.json.{JsPath, Json, Reads}
+import play.api.libs.json.{JsPath, JsValue, Json, Reads}
+import play.api.libs.json.{JsObject, Json}
 import play.api.mvc._
 import play.api.test.Helpers._
+import play.api.mvc.{AnyContentAsJson, ControllerComponents, PlayBodyParsers, Result}
 import play.api.test._
+import play.api.test.{FakeRequest, Helpers, Injecting}
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.controllers.AccountController
 import uk.gov.hmrc.lisaapi.metrics.LisaMetrics
+import uk.gov.hmrc.lisaapi.models.ReportLifeEventSuccessResponse
 import uk.gov.hmrc.lisaapi.services.{AccountService, AuditService}
 import uk.gov.hmrc.lisaapi.utils.ErrorConverter
 
@@ -42,10 +46,92 @@ class LisaControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite 
 
   case class TestType(prop1: String, prop2: String)
 
+  val fundReleaseJsonForInvalidAddress = """
+{
+  "propertyDetails": {
+    "nameOrNumber": "Flat~1!!",
+    "postalCode": "AA11 1AA"
+  }
+}
+"""
+
+  val fundReleaseJsonForNotValidAddress = """
+{
+  "propertyDetails": {
+    "nameOrNumber": "Flat A Wiiliams Park Benton Road Newcastle Upon Tyne",
+    "postalCode": "AA11 1AA"
+  }
+}
+"""
+
+  val fundReleaseJsonForValidAddress = """
+{
+  "propertyDetails": {
+    "nameOrNumber": "Flat A",
+    "postalCode": "AA11 1AA"
+  }
+}
+"""
+
+  val fundReleaseJsonForNoAddress = """
+{
+  "eventDate": "2017-05-10"
+}
+"""
+
   implicit val testTypeReads: Reads[TestType] = (
     (JsPath \ "prop1").read[Int].map[String](i => throw new RuntimeException("Deliberate Test Exception")) and
       (JsPath \ "prop2").read[String]
     ) (TestType.apply _)
+
+  "The withValidAddress method" must {
+
+    "return with a Bad Request" when {
+
+      "when address contains invalid charcters" in {
+        val res = SUT.testAddressValidator().apply(FakeRequest(Helpers.POST, "/")
+          .withHeaders(acceptHeader)
+          .withBody(AnyContentAsJson(Json.parse(fundReleaseJsonForInvalidAddress))))
+        status(res) mustBe BAD_REQUEST
+        val json = contentAsJson(res)
+        (json \ "code").as[String] mustBe "BAD_REQUEST"
+        (json \ "message").as[String] mustBe "nameOrNumber must be 35 characters or less"
+      }
+    }
+
+    "return with a Bad Request" when {
+
+      "when address contains more than 35 charcters" in {
+        val res = SUT.testAddressValidator().apply(FakeRequest(Helpers.POST, "/")
+          .withHeaders(acceptHeader)
+          .withBody(AnyContentAsJson(Json.parse(fundReleaseJsonForNotValidAddress))))
+        status(res) mustBe BAD_REQUEST
+        val json = contentAsJson(res)
+        (json \ "code").as[String] mustBe "BAD_REQUEST"
+        (json \ "message").as[String] mustBe "nameOrNumber must be 35 characters or less"
+      }
+    }
+
+    "return with a success" when {
+
+      "when address is in valid format" in {
+        val res = SUT.testAddressValidator().apply(FakeRequest(Helpers.POST, "/")
+          .withHeaders(acceptHeader)
+          .withBody(AnyContentAsJson(Json.parse(fundReleaseJsonForValidAddress))))
+        status(res) mustBe OK
+      }
+    }
+
+    "return with a success" when {
+
+      "when address does not exist" in {
+        val res = SUT.testAddressValidator().apply(FakeRequest(Helpers.POST, "/")
+          .withHeaders(acceptHeader)
+          .withBody(AnyContentAsJson(Json.parse(fundReleaseJsonForNoAddress))))
+        status(res) mustBe OK
+      }
+    }
+  }
 
   "The withValidJson method" must {
 
@@ -195,6 +281,14 @@ class LisaControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite 
         implicit val startTime: Long = System.currentTimeMillis()
         withValidAccountId(accountId) { () => Future.successful(Ok) }
       }
+
+
+      def testAddressValidator(): Action[AnyContent] = validateHeader(mockParser).async { implicit request =>
+        implicit val startTime: Long = System.currentTimeMillis()
+         withValidAddress(request.body.asJson){
+           () => Future.successful(Ok) }
+      }
+
 
       def testTransactionIdValidator(transactionId: String): Action[AnyContent] = validateHeader(mockParser).async { implicit request =>
         implicit val startTime: Long = System.currentTimeMillis()
