@@ -1,9 +1,0 @@
-{
-  "data": {
-    "accountId": "1234567890",
-    "code": "UPDATED",
-    "message": "Successfully updated the firstSubscriptionDate for the LISA account"
-  },
-  "success": true,
-  "status": 200
-}

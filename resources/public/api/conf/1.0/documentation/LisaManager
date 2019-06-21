@@ -1,3 +1,0 @@
-This resource models the existence of a registered LISA Manager organisation.
-      It is created by HMRC as a result of a LISA registration.  The registration process is not
-      part of the API specification as it is a forms based process with manual verification by HMRC staff.
