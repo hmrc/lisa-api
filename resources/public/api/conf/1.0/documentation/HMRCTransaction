@@ -1,0 +1,9 @@
+This resource is created by HMRC at the end of an accounting period.
+It represents a portion of a bulk payment of money (modelled as HMRC Payment)
+and how it related to a LISA Account and LISA Transaction. HMRC Transaction
+resources for an HMRC Payment can be accessed by a LISA Manager to determine
+what the allocation of funds from the payment should be (by inspecting the
+associated HMRC Transaction resources. This resource is expected to be created
+before any funds are transferred using BACS or Direct Debit.
+The HMRC Transaction resources will inform a LISA Manager to which accounts the
+charges or bonuses are allocated.

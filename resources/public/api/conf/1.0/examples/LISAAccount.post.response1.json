@@ -1,0 +1,8 @@
+{
+  "status": 201,
+  "success": true,
+  "data": {
+    "message": "Account transferred",
+    "accountId": "1234567891"
+  }
+}
