@@ -1,0 +1,23 @@
+Description
+The LISATransaction resource is designed to model the various transactions on a LISA account that HMRC has a business need to be informed of.  Some "transactions" will need to be informed as they occur and some may be an aggregated summary of transactions.  For example HMRC needs to know when the first deposit in the accounting period is made.  This is because this is the action that starts a "subscription" to a LISA for the accounting period.  The accounting period for a LISA is set at the HMRC financial year at present.  The API has been designed so that an accounting period is modelled in data and not fixed as a Financial Year.  This is to protect the API specification against changes in accounting periods.
+The LISATransaction resource models six transaction types:
+•	deposit – Adding of funds to the LSA in whatever form
+•	withdrawal – Withdrawing of fund from a LISA (compliant or not)
+•	HTBtransfer – Transfer-in to a LISA of funds from a Help-to-Buy ISA
+•	LISAtransfer – Transfer-in to a LISA of all funds from another LISA
+•	bonusClaim – The request from a LISA provider for the HMRC bonus for a LISA account
+•	chargeMade – The informing of a charge made to a LISA account due to non-compliant action
+Parts of the LISATransaction are only required only for particular "Transaction Types":
+
++-----------------+----------------+------------------------+
+|Content name     |  JSON type     | Transaction Types      |
++-----------------+----------------+------------------------+
+|transferFromLISA |  Object        | LISAtransfer           |
+|chargeDueTo      |  Object        | chargeMade             |
+|complianceReason |  Property      | deposit or withdrawal  |
+|incurredCharge*  |  Object        | deposit or withdrawal  |
++-----------------+----------------+------------------------+
+* refers to the chargeMade transaction due to the compliance reason on the deposit or withdrawal
+
+The supersedesTransaction object is required for a transaction that supersedes a previous transaction to correct an error, making of a change due to provided evidence or due to an outcome of an appeal or review.
+It is likely that compliance failures can be detected at the point of recording the non-compliant transaction.  However, if a non-compliance is detected after a transaction has been notified to HMRC then the original LISATransaction can be superseded.  Similarly, if a non-compliance needs to be overturned, then again, the original LISATransaction can be superseded.

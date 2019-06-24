@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "data" : {
+      "description": "Response details.",
+      "type": "object",
+      "properties": {
+        "accountId": {
+          "description": "The provider’s own unique reference number for the investor’s LISA account.",
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9 :/-]{1,20}$"
+        },
+        "message": {
+          "description": "A human-readable explanation for the result of the API call.",
+          "type": "string",
+          "enum": ["LISA account closed"]
+        }
+      },
+      "required": ["accountId", "message"]
+    },
+    "success": {
+      "description": "Whether the API call was successful or not. Always true.",
+      "type": "boolean"
+    },
+    "status": {
+      "description": "The HTTP status of the result of the API call. Always 200.",
+      "type": "number"
+    }
+  },
+  "required": ["data", "success", "status"]
+}

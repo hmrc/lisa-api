@@ -1,0 +1,8 @@
+{
+  "data": {
+    "investorId": "9876543210",
+    "message": "Investor created"
+  },
+  "success": true,
+  "status": 201
+}

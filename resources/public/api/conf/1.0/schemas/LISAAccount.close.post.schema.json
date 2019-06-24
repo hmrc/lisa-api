@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "accountClosureReason": {
+      "description": "The reason the account was closed.",
+      "type": "string",
+      "enum": [
+        "All funds withdrawn",
+        "Cancellation"
+      ]
+    },
+    "closureDate": {
+      "description": "The date the account was closed. This cannot be in the future.",
+      "$ref": "#/definitions/ISO8601-Date"
+    }
+  },
+    "required": [
+	  "accountClosureReason",
+	  "closureDate"
+	],
+	"additionalProperties": false,
+	"definitions": {
+	  "ISO8601-Date": {
+        "id": "full-date",
+		"type": "string",
+		"pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+        "example": "2017-05-20"
+	  }
+	}
+
+}

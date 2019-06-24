@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "accountId": {
+      "description": "The provider’s own unique reference number for the investor’s LISA account.",
+      "$ref": "#/definitions/accountIdType",
+      "example": "AB76543210"
+    }
+  },
+  "required": [
+    "accountId"
+  ],
+  "additionalProperties": false,
+  "definitions": {
+    "accountIdType": {
+      "type": "string",
+      "example": "AB9876543210",
+      "pattern": "^[a-zA-Z0-9 :/-]{1,20}$"
+    }
+  }
+}
