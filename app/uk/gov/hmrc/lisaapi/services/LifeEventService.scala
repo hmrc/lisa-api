@@ -42,8 +42,11 @@ class LifeEventService @Inject()(desConnector: DesConnector)(implicit ec: Execut
         ReportLifeEventServiceUnavailableResponse
       case failureResponse: DesFailureResponse =>
         Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
-        postErrors.applyOrElse((failureResponse.code, failureResponse), { _:(String, DesFailureResponse) =>
+        println("$$$$$$$$$$$$$$ Matched DesFailureResponse and the code is " + failureResponse.code)
+          postErrors.applyOrElse((failureResponse.code, failureResponse), { _:(String, DesFailureResponse) =>
           Logger.warn(s"Report life event returned error: ${failureResponse.code}")
+            println("$$$$$$$$$$$$$$ failureResponse is " + failureResponse)
+            println("$$$$$$$$$$$$$$ ReportLifeEventErrorResponse is " + ReportLifeEventErrorResponse.toString)
           ReportLifeEventErrorResponse
         })
     }
@@ -73,6 +76,7 @@ class LifeEventService @Inject()(desConnector: DesConnector)(implicit ec: Execut
 
   private val postErrors: PartialFunction[(String, DesFailureResponse), ReportLifeEventResponse] = {
     case ("LIFE_EVENT_ALREADY_EXISTS", res) =>
+      print("$$$$$$$$$$$$$res is "+ res.reason)
       val lifeEventId = extractLifeEventIdFromReason(res.reason, "^The investor’s life event id (\\d{10}) has already been reported\\.$".r)
       ReportLifeEventAlreadyExistsResponse(lifeEventId)
     case ("SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED", res) =>
@@ -100,7 +104,9 @@ class LifeEventService @Inject()(desConnector: DesConnector)(implicit ec: Execut
     case ("PURCHASE_EXTENSION_1_LIFE_EVENT_NOT_YET_APPROVED", _) => ReportLifeEventExtensionOneNotYetApprovedResponse
   }
 
-  private def extractLifeEventIdFromReason(reason: String, regex: Regex) =
+  private def extractLifeEventIdFromReason(reason: String, regex: Regex) = {
     regex.findFirstMatchIn(reason).get.group(1)
+
+  }
 
 }

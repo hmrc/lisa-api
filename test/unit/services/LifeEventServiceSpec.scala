@@ -18,6 +18,7 @@ package unit.services
 
 import java.time.LocalDate
 
+import com.github.tomakehurst.wiremock.client.WireMock
 import org.joda.time.DateTime
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
@@ -221,7 +222,6 @@ class LifeEventServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuit
 
         when(mockDesConnector.getLifeEvent(any(), any(), any())(any())).
           thenReturn(Future.successful(Right(success)))
-
         doGetRequest {
           _ mustBe Right(success)
         }

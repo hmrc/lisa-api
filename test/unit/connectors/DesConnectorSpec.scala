@@ -1695,6 +1695,7 @@ class DesConnectorSpec extends PlaySpec
 
   val validBonusPaymentResponseJson = Source.fromInputStream(getClass().getResourceAsStream("/json/request.valid.bonus-payment-response.json")).mkString
   val mockHttp = mock[HttpClient]
+
   val configuration = Configuration("microservice.services.des.host" -> "", "microservice.services.des.port" -> 0)
   val mockEnvironment = mock[Environment]
   val mockAppContext = mock[AppContext]

@@ -151,6 +151,22 @@ class AnnualReturnControllerSpec extends PlaySpec
           )
         }
       }
+
+
+      "the life event service returns a ReportLifeEventAccountClosedResponse" in {
+        when(mockService.reportLifeEvent(any(), any(),any())(any())).
+          thenReturn(Future.successful(ReportLifeEventAccountClosedResponse))
+
+        doRequest(){ res =>
+          status(res) mustBe FORBIDDEN
+          contentAsJson(res) mustBe Json.obj(
+            "code" -> "INVESTOR_ACCOUNT_ALREADY_CLOSED",
+                    "message" -> "The LISA account is already closed"
+          )
+        }
+      }
+
+
       "the life event service returns a ReportLifeEventAccountVoidResponse" in {
         when(mockService.reportLifeEvent(any(), any(),any())(any())).
           thenReturn(Future.successful(ReportLifeEventAccountVoidResponse))
