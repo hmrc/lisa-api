@@ -223,6 +223,7 @@ class DesConnector @Inject()(
       res.status match {
         case SERVICE_UNAVAILABLE => Left(DesUnavailableResponse)
         case _ => {
+
           Try(res.json.as[Seq[GetLifeEventItem]]) match {
             case Success(data) => Right(data)
             case Failure(er) => {
