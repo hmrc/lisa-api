@@ -16,38 +16,31 @@
 
 package unit.services
 
-import akka.http.scaladsl.model.StatusCodes
+import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, post, urlPathEqualTo}
 import org.joda.time.DateTime
-import org.scalatestplus.play.PlaySpec
-import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.{Application, Environment, Play}
-import play.api.test.{FakeHeaders, FakeRequest, Injecting}
+import play.api.test.Injecting
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
-import uk.gov.hmrc.lisaapi.models.{ReportLifeEventAccountClosedResponse, ReportLifeEventRequest}
-import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesResponse}
-import uk.gov.hmrc.play.bootstrap.config.RunMode
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
-import unit.utils.DesWireMockConnector
-import com.github.tomakehurst.wiremock.WireMockServer
+import uk.gov.hmrc.lisaapi.models.ReportLifeEventRequest
+import uk.gov.hmrc.lisaapi.models.des.DesResponse
+import unit.utils.{DesWireMockConnector, WireMockHelper}
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{Await, Future}
-import scala.concurrent.duration.Duration
-import com.github.tomakehurst.wiremock.WireMockServer
-import play.api.libs.json.JsValue
-import play.api.mvc.Result
-class LifeEventServiceSpec2 extends DesWireMockConnector with Injecting {
+import scala.concurrent.Future
+class LifeEventServiceSpec2 extends WireMockHelper with Injecting {
 
   "LiveEventController " must {
     "return ReportLifeEventAccountClosedResponse" when {
       "the error code is INVESTOR_ACCOUNT_ALREADY_CLOSED" in {
 
-        desWireMockConnectorStub("/lifetime-isa/manager/Z019283/accounts/192837/life-event", "INVESTOR_ACCOUNT_ALREADY_CLOSED", 403)
-
-        val responseFuture : Future[DesResponse] = DesConnector2.reportLifeEvent("Z019283", "192837", ReportLifeEventRequest("LISA Investor Terminal Ill Health", new DateTime("2017-04-06")))(HeaderCarrier())
-
+        server.stubFor(post(urlPathEqualTo("/lifetime-isa/manager/Z019283/accounts/192837/life-event"))
+          .willReturn(aResponse()
+            .withStatus(403)
+            .withBody("INVESTOR_ACCOUNT_ALREADY_CLOSED")
+          )
+        )
+        //val responseFuture : Future[DesResponse] = DesConnector2.reportLifeEvent("Z019283", "192837", ReportLifeEventRequest("LISA Investor Terminal Ill Health", new DateTime("2017-04-06")))(HeaderCarrier())
+        val responseFuture: Future[DesResponse] = inject[DesConnector].reportLifeEvent("Z019283", "192837", ReportLifeEventRequest("LISA Investor Terminal Ill Health", new DateTime("2017-04-06")))(HeaderCarrier())
 
         responseFuture.onComplete(
           resp => println("FFFFFFFFFFF"+resp)
