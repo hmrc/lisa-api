@@ -26,9 +26,13 @@ import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.play.bootstrap.config.RunMode
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import play.api.inject.Injector
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.io.Source
 import com.github.tomakehurst.wiremock.WireMockServer
+import uk.gov.hmrc.lisaapi.services.LifeEventService
+
+import scala.concurrent.ExecutionContext
 
 
 trait DesWireMockConnector extends WireMockHelper {
@@ -40,10 +44,11 @@ trait DesWireMockConnector extends WireMockHelper {
   lazy val runMode = inject[RunMode]
   lazy val port = 8080
 
-
   object DesConnector2 extends DesConnector(httpClient, environment, appContext, configuration, runMode) {
     override lazy val desUrl: String = s"http://localhost:${server.port}"
   }
+
+
 
   def desWireMockConnectorStub(urlToGet: String, responseData: String, status: Int) ={
 
