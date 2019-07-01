@@ -35,7 +35,7 @@ import scala.concurrent.{Await, Future}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountNotFound, ErrorInternalServerError, ErrorLifeEventIdNotFound, ErrorResponse, ErrorServiceUnavailable}
 
-class LifeEventServiceSpec extends PlaySpec with MockitoSugar with WireMock with OneAppPerSuite {
+class LifeEventServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
 
   "Report life event" must {
 
@@ -222,7 +222,6 @@ class LifeEventServiceSpec extends PlaySpec with MockitoSugar with WireMock with
 
         when(mockDesConnector.getLifeEvent(any(), any(), any())(any())).
           thenReturn(Future.successful(Right(success)))
-ƒ
         doGetRequest {
           _ mustBe Right(success)
         }

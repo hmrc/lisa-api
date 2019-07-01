@@ -36,7 +36,6 @@ object AppDependencies {
     "info.cukes" %% "cucumber-scala" % "1.2.4",
     "info.cukes" % "cucumber-junit" % "1.2.4",
     "org.scalaj" %% "scalaj-http" % "1.1.5",
-    "com.github.tomakehurst" % "wiremock" % "1.57" ,
     "com.github.tomakehurst" % "wiremock-standalone" % "2.21.0",
     "org.scalatestplus.play" %% "scalatestplus-play" % "4.0.2"
   ).map(_ % Test)
