@@ -68,13 +68,11 @@ case class ErrorResponseWithAccountId (
                                          accountId: String
                                        ) extends ErrorResponse(httpStatusCode, errorCode, message)
 
-
 case class ErrorValidation(
                              errorCode: String,
                              message: String,
                              path: Option[String] = None
                            )
-
 
 case class ErrorBadRequest(errs: List[ErrorValidation]) extends ErrorResponseWithErrors(400, "BAD_REQUEST", "Bad Request", errors = Some(errs))
 

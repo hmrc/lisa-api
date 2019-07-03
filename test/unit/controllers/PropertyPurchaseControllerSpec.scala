@@ -226,18 +226,15 @@ class PropertyPurchaseControllerSpec extends PlaySpec
       }
     }
 
-
-
+    "return with 400 bad request and a code of INVALID_PAYLOAD" in {
+      when(mockService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventInvalidPayload))
+      doFundReleaseRequest(fundReleaseJson) { res =>
+        status(res) mustBe BAD_REQUEST
+        (contentAsJson(res) \ "code").as[String] mustBe "INVALID_PAYLOAD"
+      }
+    }
 
     "return with 400 bad request and a code of BAD_REQUEST" when {
-
-      "return with 400 bad request and a code of INVALID_PAYLOAD" in {
-        when(mockService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventInvalidPayload))
-        doFundReleaseRequest(fundReleaseJson) { res =>
-          status(res) mustBe BAD_REQUEST
-          (contentAsJson(res) \ "code").as[String] mustBe "INVALID_PAYLOAD"
-          }
-        }
 
       "given a future eventDate" in {
         val invalidJson = fundReleaseJson.replace("2017-05-10", DateTime.now.plusDays(1).toString("yyyy-MM-dd"))

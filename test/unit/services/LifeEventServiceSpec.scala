@@ -18,22 +18,21 @@ package unit.services
 
 import java.time.LocalDate
 
-import com.github.tomakehurst.wiremock.client.WireMock
 import org.joda.time.DateTime
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
+import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountNotFound, ErrorInternalServerError, ErrorLifeEventIdNotFound, ErrorResponse, ErrorServiceUnavailable}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des._
 import uk.gov.hmrc.lisaapi.services.LifeEventService
 
-import scala.concurrent.duration.Duration
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountNotFound, ErrorInternalServerError, ErrorLifeEventIdNotFound, ErrorResponse, ErrorServiceUnavailable}
 
 class LifeEventServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
 

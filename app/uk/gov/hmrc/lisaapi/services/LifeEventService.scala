@@ -88,6 +88,7 @@ class LifeEventService @Inject()(desConnector: DesConnector)(implicit ec: Execut
       val lifeEventId = extractLifeEventIdFromReason(res.reason, "^The fund release life event id (\\d{10}) in the request has been superseded\\.$".r)
       ReportLifeEventFundReleaseSupersededResponse(lifeEventId)
     case ("LIFE_EVENT_INAPPROPRIATE", _) => ReportLifeEventInappropriateResponse
+    case ("INVESTOR_ACCOUNTID_NOT_FOUND", _) => ReportLifeEventAccountNotFoundResponse
     case ("INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID", _) => ReportLifeEventAccountClosedOrVoidResponse
     case ("INVESTOR_ACCOUNT_ALREADY_CLOSED", _) => ReportLifeEventAccountClosedResponse
     case ("INVESTOR_ACCOUNT_ALREADY_VOID", _) => ReportLifeEventAccountVoidResponse
@@ -101,7 +102,7 @@ class LifeEventService @Inject()(desConnector: DesConnector)(implicit ec: Execut
 
   private def extractLifeEventIdFromReason(reason: String, regex: Regex) = {
     regex.findFirstMatchIn(reason).get.group(1)
-
   }
+
 
 }

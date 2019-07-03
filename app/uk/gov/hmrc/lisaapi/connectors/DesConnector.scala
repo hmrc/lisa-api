@@ -192,7 +192,6 @@ class DesConnector @Inject()(
     val result = wsHttp.POST[ReportLifeEventRequestBase, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc), implicitly)
     result.map(res => {
       Logger.debug("Life Event request returned status: " + res.status)
-      println("$$$$$$$$$$$ "+res.status+" || "+ res.body + " | ")
       res.status match {
         case SERVICE_UNAVAILABLE => DesUnavailableResponse
         case BAD_REQUEST => DesBadRequestResponse
@@ -388,20 +387,16 @@ class DesConnector @Inject()(
 
     Try(res.json.as[A]) match {
       case Success(data) =>
-        println("$$$$$$$$$$$ success " + data.toString)
         data
       case Failure(er) =>
         if (res.status == 200 | res.status == 201) {
-          println("$$$$$$$$$$$  200 Failure(er) " + er.getMessage)
           Logger.error(s"Error from DES (parsing as DesResponse): ${er.getMessage}")
         }
 
         Try(res.json.as[DesFailureResponse]) match {
           case Success(data) => Logger.info(s"DesFailureResponse from DES: ${data}")
-            println("$$$$$$$$$$$ failure " + data.toString)
              data
           case Failure(ex) => Logger.error(s"Error from DES (parsing as DesFailureResponse): ${ex.getMessage}")
-            println("$$$$$$$$$$$ Failure(ex) "  +ex.getMessage)
              DesFailureResponse()
         }
     }

@@ -16,9 +16,6 @@
 
 package unit.controllers
 
-import java.time.LocalDate
-
-import org.joda.time.DateTime
 import org.mockito.Matchers.{eq => MatcherEquals, _}
 import org.mockito.Mockito.{reset, verify, when}
 import org.scalatest.BeforeAndAfterEach
