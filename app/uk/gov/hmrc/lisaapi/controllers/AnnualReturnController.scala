@@ -111,6 +111,7 @@ class AnnualReturnController @Inject()(
       case ReportLifeEventAlreadySupersededResponse(lifeEventId) => ErrorLifeEventAlreadySuperseded(lifeEventId)
       case ReportLifeEventAlreadyExistsResponse(lifeEventId) => ErrorLifeEventAlreadyExists(lifeEventId)
       case ReportLifeEventServiceUnavailableResponse => ErrorServiceUnavailable
+      case ReportLifeEventAccountClosedResponse => ErrorAccountAlreadyClosed
       case _ => ErrorInternalServerError
     }
   }

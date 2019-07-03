@@ -42,7 +42,7 @@ class LifeEventService @Inject()(desConnector: DesConnector)(implicit ec: Execut
         ReportLifeEventServiceUnavailableResponse
       case failureResponse: DesFailureResponse =>
         Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
-        postErrors.applyOrElse((failureResponse.code, failureResponse), { _:(String, DesFailureResponse) =>
+          postErrors.applyOrElse((failureResponse.code, failureResponse), { _:(String, DesFailureResponse) =>
           Logger.warn(s"Report life event returned error: ${failureResponse.code}")
           ReportLifeEventErrorResponse
         })
@@ -88,7 +88,6 @@ class LifeEventService @Inject()(desConnector: DesConnector)(implicit ec: Execut
       val lifeEventId = extractLifeEventIdFromReason(res.reason, "^The fund release life event id (\\d{10}) in the request has been superseded\\.$".r)
       ReportLifeEventFundReleaseSupersededResponse(lifeEventId)
     case ("LIFE_EVENT_INAPPROPRIATE", _) => ReportLifeEventInappropriateResponse
-    case ("INVESTOR_ACCOUNTID_NOT_FOUND", _) => ReportLifeEventAccountNotFoundResponse
     case ("INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID", _) => ReportLifeEventAccountClosedOrVoidResponse
     case ("INVESTOR_ACCOUNT_ALREADY_CLOSED", _) => ReportLifeEventAccountClosedResponse
     case ("INVESTOR_ACCOUNT_ALREADY_VOID", _) => ReportLifeEventAccountVoidResponse
@@ -100,7 +99,9 @@ class LifeEventService @Inject()(desConnector: DesConnector)(implicit ec: Execut
     case ("PURCHASE_EXTENSION_1_LIFE_EVENT_NOT_YET_APPROVED", _) => ReportLifeEventExtensionOneNotYetApprovedResponse
   }
 
-  private def extractLifeEventIdFromReason(reason: String, regex: Regex) =
+  private def extractLifeEventIdFromReason(reason: String, regex: Regex) = {
     regex.findFirstMatchIn(reason).get.group(1)
+
+  }
 
 }
