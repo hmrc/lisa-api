@@ -162,7 +162,7 @@ class DesConnector @Inject()(
   }
 
   /**
-    * Attempts to report a LISA account
+    * Attempts to close a LISA account
     */
   def closeAccount(lisaManager: String, accountId: String, request: CloseLisaAccountRequest)
                   (implicit hc: HeaderCarrier): Future[DesResponse] = {
