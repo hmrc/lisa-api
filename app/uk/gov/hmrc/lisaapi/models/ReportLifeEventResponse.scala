@@ -21,6 +21,7 @@ trait ReportLifeEventResponse
 @deprecated("Still valid for v1, but replaced in v2 by separate closed, void, and cancelled responses.")
 case object ReportLifeEventAccountClosedOrVoidResponse extends ReportLifeEventResponse
 
+case object ReportLifeEventInvalidPayload extends ReportLifeEventResponse
 case class ReportLifeEventSuccessResponse(lifeEventId: String) extends ReportLifeEventResponse
 case object ReportLifeEventInappropriateResponse extends ReportLifeEventResponse
 case object ReportLifeEventAccountClosedResponse extends ReportLifeEventResponse

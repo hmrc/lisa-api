@@ -75,10 +75,12 @@ case class ErrorValidation(
                              path: Option[String] = None
                            )
 
+
 case class ErrorBadRequest(errs: List[ErrorValidation]) extends ErrorResponseWithErrors(400, "BAD_REQUEST", "Bad Request", errors = Some(errs))
 
 case class ErrorForbidden(errs: List[ErrorValidation]) extends ErrorResponseWithErrors(403, "FORBIDDEN", "There is a problem with the request data", errors = Some(errs))
 
+case object ErrorBadRequestInvalidPayload extends ErrorResponse(400,"INVALID_PAYLOAD", "Submission has not passed validation")
 case object ErrorBadRequestLmrn extends ErrorResponse(400, "BAD_REQUEST", "Enter lisaManagerReferenceNumber in the correct format, like Z1234")
 case object ErrorBadRequestAccountId extends ErrorResponse(400, "BAD_REQUEST", "Enter accountId in the correct format, like ABC12345")
 case object ErrorBadRequestTransactionId extends ErrorResponse(400, "BAD_REQUEST", "transactionId in the URL is in the wrong format")

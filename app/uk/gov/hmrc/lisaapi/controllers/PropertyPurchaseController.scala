@@ -205,6 +205,7 @@ class PropertyPurchaseController @Inject() (
   private val fundReleaseErrors: PartialFunction[ReportLifeEventResponse, ErrorResponse] = commonErrors.orElse({
     case ReportLifeEventAccountNotOpenLongEnoughResponse => ErrorAccountNotOpenLongEnough
     case ReportLifeEventOtherPurchaseOnRecordResponse => ErrorFundReleaseOtherPropertyOnRecord
+    case ReportLifeEventInvalidPayload => ErrorBadRequestInvalidPayload
   })
 
   private val extensionErrors: PartialFunction[ReportLifeEventResponse, ErrorResponse] = commonErrors.orElse({
