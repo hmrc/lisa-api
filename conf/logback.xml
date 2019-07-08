@@ -53,6 +53,10 @@
         <appender-ref ref="STDOUT"/>
     </logger>
 
+    <logger name="play.shaded.ahc.org.asynchttpclient.netty.channel.DefaultChannelPool" level="OFF">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
     <logger name="org.asynchttpclient.netty.channel" level="WARN"/>
 
     <root level="DEBUG">

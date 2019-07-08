@@ -33,15 +33,16 @@ class LifeEventService @Inject()(desConnector: DesConnector)(implicit ec: Execut
 
   def reportLifeEvent(lisaManager: String, accountId: String, request: ReportLifeEventRequestBase)
                      (implicit hc: HeaderCarrier): Future[ReportLifeEventResponse] = {
+    Logger.error("******* HERE")
     desConnector.reportLifeEvent(lisaManager, accountId, request) map {
       case successResponse: DesLifeEventResponse =>
-        Logger.debug("Matched DesLifeEventResponse")
+        Logger.error("Matched DesLifeEventResponse")
         ReportLifeEventSuccessResponse(successResponse.lifeEventID)
       case DesUnavailableResponse =>
-        Logger.debug("Matched DesUnavailableResponse")
+        Logger.error("Matched DesUnavailableResponse")
         ReportLifeEventServiceUnavailableResponse
       case failureResponse: DesFailureResponse =>
-        Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
+        Logger.error("*******************\n\n\nMatched DesFailureResponse and the code is " + failureResponse.code)
           postErrors.applyOrElse((failureResponse.code, failureResponse), { _:(String, DesFailureResponse) =>
           Logger.warn(s"Report life event returned error: ${failureResponse.code}")
           ReportLifeEventErrorResponse
