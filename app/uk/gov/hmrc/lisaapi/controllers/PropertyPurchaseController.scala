@@ -85,8 +85,6 @@ class PropertyPurchaseController @Inject() (
                       auditFundRelease(lisaManager, accountId, req, success = false, Map("reasonNotReported" -> response.errorCode))
                       lisaMetrics.incrementMetrics(startTime, response.httpStatusCode, LisaMetricKeys.PROPERTY_PURCHASE)
                       response.asResult
-                  } recover {
-                    case e: Exception => Logger.error(s"************ ${e.getMessage}"); ???
                   }
                 }
               },
@@ -175,6 +173,7 @@ class PropertyPurchaseController @Inject() (
                     auditOutcome(lisaManager, accountId, req, success = false, Map("reasonNotReported" -> response.errorCode))
                     lisaMetrics.incrementMetrics(startTime, response.httpStatusCode, LisaMetricKeys.PROPERTY_PURCHASE)
                     Status(response.httpStatusCode)(Json.toJson(response))
+
                 }
               },
             lisaManager = lisaManager

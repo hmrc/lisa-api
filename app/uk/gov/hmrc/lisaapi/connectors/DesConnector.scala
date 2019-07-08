@@ -194,7 +194,6 @@ class DesConnector @Inject()(
       Logger.debug("Life Event request returned status: " + res.status)
       res.status match {
         case SERVICE_UNAVAILABLE => DesUnavailableResponse
-        case BAD_REQUEST => Logger.error("RFYGUHNJMK"); DesBadRequestResponse
         case _ => parseDesResponse[DesLifeEventResponse](res)
       }
 

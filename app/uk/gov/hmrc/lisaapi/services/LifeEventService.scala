@@ -33,17 +33,16 @@ class LifeEventService @Inject()(desConnector: DesConnector)(implicit ec: Execut
 
   def reportLifeEvent(lisaManager: String, accountId: String, request: ReportLifeEventRequestBase)
                      (implicit hc: HeaderCarrier): Future[ReportLifeEventResponse] = {
-    Logger.error("******* HERE")
     desConnector.reportLifeEvent(lisaManager, accountId, request) map {
       case successResponse: DesLifeEventResponse =>
-        Logger.error("Matched DesLifeEventResponse")
+        Logger.debug("Matched DesLifeEventResponse")
         ReportLifeEventSuccessResponse(successResponse.lifeEventID)
       case DesUnavailableResponse =>
-        Logger.error("Matched DesUnavailableResponse")
+        Logger.debug("Matched DesUnavailableResponse")
         ReportLifeEventServiceUnavailableResponse
       case failureResponse: DesFailureResponse =>
-        Logger.error("*******************\n\n\nMatched DesFailureResponse and the code is " + failureResponse.code)
-          postErrors.applyOrElse((failureResponse.code, failureResponse), { _:(String, DesFailureResponse) =>
+        Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
+        postErrors.applyOrElse((failureResponse.code, failureResponse), { _:(String, DesFailureResponse) =>
           Logger.warn(s"Report life event returned error: ${failureResponse.code}")
           ReportLifeEventErrorResponse
         })
@@ -99,6 +98,7 @@ class LifeEventService @Inject()(desConnector: DesConnector)(implicit ec: Execut
     case ("COMPLIANCE_ERROR_OTHER_PURCHASE_ON_RECORD", _) => ReportLifeEventOtherPurchaseOnRecordResponse
     case ("FUND_RELEASE_LIFE_EVENT_ID_NOT_FOUND", _) => ReportLifeEventFundReleaseNotFoundResponse
     case ("PURCHASE_EXTENSION_1_LIFE_EVENT_NOT_YET_APPROVED", _) => ReportLifeEventExtensionOneNotYetApprovedResponse
+    case ("INVALID_PAYLOAD", _) => ReportLifeEventInvalidPayload
   }
 
   private def extractLifeEventIdFromReason(reason: String, regex: Regex) = {

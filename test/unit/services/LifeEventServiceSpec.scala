@@ -178,6 +178,12 @@ class LifeEventServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuit
       }
     }
 
+    "return ReportLifeEventInvalidPayload" when {
+      "the DES error code returned as INVALID_PAYLOAD" in {
+        when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("INVALID_PAYLOAD", "JZ")))
+        doPostRequest(response => response mustBe ReportLifeEventInvalidPayload)
+      }
+    }
   }
 
   "Get life event" must {
