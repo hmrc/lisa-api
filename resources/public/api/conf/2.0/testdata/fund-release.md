@@ -169,7 +169,7 @@
                                                     <p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
 <pre class="code--block">
 {
-  "code": "BAD_REQUEST",
+  "code": "INVALID_PAYLOAD",
   "message": "Submission has not passed validation"
 }
 </pre>
