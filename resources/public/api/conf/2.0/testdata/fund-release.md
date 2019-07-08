@@ -166,7 +166,7 @@
 </pre>
                                                   </td>
                                                   <td>
-                                                    <p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
+                                                    <p>HTTP status: <code class="code--slim">400 (Invalid Payload)</code></p>
 <pre class="code--block">
 {
   "code": "INVALID_PAYLOAD",
