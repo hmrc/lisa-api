@@ -146,7 +146,35 @@
 }
 </pre>
                                                 </td>
-                                            </tr>                                            
+                                            </tr>
+                                            <tr>
+                                                  <td>
+                                                    <p>Submission has not passed validation</p>
+                                                    <p class="code--block"> <strong>lisaManagerReferenceNumber:</strong><br /> 123456 <br /> <br /> <strong>accountId:</strong><br />0000000405 </p>
+                                                  </td>
+                                                  <td>
+<pre class="code--block">
+{
+  "eventDate": "2017-05-10",
+  "withdrawalAmount": 4000.00,
+  "conveyancerReference": "CR12345-6789",
+  "propertyDetails": {
+    "nameOrNumber": "1",
+    "postalCode": "AA11 1AA"
+  }
+}
+</pre>
+                                                  </td>
+                                                  <td>
+                                                    <p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
+<pre class="code--block">
+{
+  "code": "BAD_REQUEST",
+  "message": "Submission has not passed validation"
+}
+</pre>
+                                                  </td>
+                                                </tr>
                                              <tr>
                                                 <td>
                                                     <p>This LISA account is already closed</p>
