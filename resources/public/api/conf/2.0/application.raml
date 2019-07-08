@@ -873,6 +873,13 @@ types:
                                       "code" : "SUPERSEDED_LIFE_EVENT_MISMATCH_ERROR",
                                       "message" : "originalLifeEventId and the originalEventDate do not match the information in the original request"
                                     }
+                                accountAlreadyClosed:
+                                  description: The LISA account is already closed
+                                  value: |
+                                    {
+                                      "code" : "INVESTOR_ACCOUNT_ALREADY_CLOSED",
+                                      "message" : "The LISA account is already closed"
+                                    }
                         404:
                           body:
                             application/json:
@@ -946,6 +953,13 @@ types:
                                     {
                                       "code" : "BAD_REQUEST",
                                       "message" : "Enter accountId in the correct format, like ABC12345"
+                                    }
+                                InvalidPayLoad:
+                                  description: Enter a payment which is not valid
+                                  value: |
+                                    {
+                                       "code" : "INVALID_PAYLOAD",
+                                       "message" : "Submission has not passed validation"
                                     }
                         401:
                           body:

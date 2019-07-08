@@ -98,9 +98,12 @@ class LifeEventService @Inject()(desConnector: DesConnector)(implicit ec: Execut
     case ("COMPLIANCE_ERROR_OTHER_PURCHASE_ON_RECORD", _) => ReportLifeEventOtherPurchaseOnRecordResponse
     case ("FUND_RELEASE_LIFE_EVENT_ID_NOT_FOUND", _) => ReportLifeEventFundReleaseNotFoundResponse
     case ("PURCHASE_EXTENSION_1_LIFE_EVENT_NOT_YET_APPROVED", _) => ReportLifeEventExtensionOneNotYetApprovedResponse
+    case ("INVALID_PAYLOAD", _) => ReportLifeEventInvalidPayload
   }
 
-  private def extractLifeEventIdFromReason(reason: String, regex: Regex) =
+  private def extractLifeEventIdFromReason(reason: String, regex: Regex) = {
     regex.findFirstMatchIn(reason).get.group(1)
+  }
+
 
 }

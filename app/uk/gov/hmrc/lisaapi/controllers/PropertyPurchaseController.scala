@@ -173,6 +173,7 @@ class PropertyPurchaseController @Inject() (
                     auditOutcome(lisaManager, accountId, req, success = false, Map("reasonNotReported" -> response.errorCode))
                     lisaMetrics.incrementMetrics(startTime, response.httpStatusCode, LisaMetricKeys.PROPERTY_PURCHASE)
                     Status(response.httpStatusCode)(Json.toJson(response))
+
                 }
               },
             lisaManager = lisaManager
@@ -205,6 +206,7 @@ class PropertyPurchaseController @Inject() (
   private val fundReleaseErrors: PartialFunction[ReportLifeEventResponse, ErrorResponse] = commonErrors.orElse({
     case ReportLifeEventAccountNotOpenLongEnoughResponse => ErrorAccountNotOpenLongEnough
     case ReportLifeEventOtherPurchaseOnRecordResponse => ErrorFundReleaseOtherPropertyOnRecord
+    case ReportLifeEventInvalidPayload => ErrorBadRequestInvalidPayload
   })
 
   private val extensionErrors: PartialFunction[ReportLifeEventResponse, ErrorResponse] = commonErrors.orElse({

@@ -48,13 +48,11 @@ class LifeEventController @Inject()(
   def reportLisaLifeEvent(lisaManager: String, accountId: String): Action[AnyContent] =
     (validateHeader(parse) andThen validateLMRN(lisaManager) andThen validateAccountId(accountId)).async { implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
-
       withValidJson[ReportLifeEventRequest](
         req => {
           withValidDates(lisaManager, accountId, req) { () =>
             service.reportLifeEvent(lisaManager, accountId, req) flatMap { res =>
               Logger.debug("Entering LifeEvent Controller and the response is " + res.toString)
-
               res match {
                 case ReportLifeEventSuccessResponse(lifeEventId) =>
                   Logger.debug("Matched Valid Response ")

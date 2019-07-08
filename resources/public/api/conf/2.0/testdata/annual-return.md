@@ -310,6 +310,30 @@
             </td>
         </tr>
         <tr>
+                    <td><p>Account void</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1000000403</p></td>
+                    <td>
+<pre class="code--block">
+{
+  "eventDate": "2017-05-10",
+  "lisaManagerName": "ISA Manager 1",
+  "taxYear": 2018,
+  "marketValueCash": 0,
+  "marketValueStocksAndShares": 56,
+  "annualSubsCash": 0,
+  "annualSubsStocksAndShares": 55
+}
+</pre>
+                    </td>
+                    <td><p>HTTP status: <code class="code--slim">403 (Forbidden)</code></p>
+        <pre class="code--block">
+{
+  "code": "INVESTOR_ACCOUNT_ALREADY_CLOSED",
+  "message": "The LISA account is already closed"
+}
+        </pre>
+                    </td>
+                </tr>
+        <tr>
             <td>
                 <p>Supersede details do not match the original return of information</p>
                 <p class="code--block">

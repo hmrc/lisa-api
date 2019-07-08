@@ -23,16 +23,16 @@ import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
+import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountNotFound, ErrorInternalServerError, ErrorLifeEventIdNotFound, ErrorResponse, ErrorServiceUnavailable}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des._
 import uk.gov.hmrc.lisaapi.services.LifeEventService
 
-import scala.concurrent.duration.Duration
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountNotFound, ErrorInternalServerError, ErrorLifeEventIdNotFound, ErrorResponse, ErrorServiceUnavailable}
 
 class LifeEventServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
 
@@ -178,6 +178,12 @@ class LifeEventServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuit
       }
     }
 
+    "return ReportLifeEventInvalidPayload" when {
+      "the DES error code returned as INVALID_PAYLOAD" in {
+        when(mockDesConnector.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("INVALID_PAYLOAD", "JZ")))
+        doPostRequest(response => response mustBe ReportLifeEventInvalidPayload)
+      }
+    }
   }
 
   "Get life event" must {
@@ -221,7 +227,6 @@ class LifeEventServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuit
 
         when(mockDesConnector.getLifeEvent(any(), any(), any())(any())).
           thenReturn(Future.successful(Right(success)))
-
         doGetRequest {
           _ mustBe Right(success)
         }

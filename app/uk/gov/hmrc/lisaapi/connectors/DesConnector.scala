@@ -190,12 +190,10 @@ class DesConnector @Inject()(
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/life-event"
     Logger.debug("Posting Life Event request to des: " + uri)
     val result = wsHttp.POST[ReportLifeEventRequestBase, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc), implicitly)
-
     result.map(res => {
       Logger.debug("Life Event request returned status: " + res.status)
       res.status match {
         case SERVICE_UNAVAILABLE => DesUnavailableResponse
-        case BAD_REQUEST => DesBadRequestResponse
         case _ => parseDesResponse[DesLifeEventResponse](res)
       }
 
@@ -223,6 +221,7 @@ class DesConnector @Inject()(
       res.status match {
         case SERVICE_UNAVAILABLE => Left(DesUnavailableResponse)
         case _ => {
+
           Try(res.json.as[Seq[GetLifeEventItem]]) match {
             case Success(data) => Right(data)
             case Failure(er) => {
@@ -384,6 +383,7 @@ class DesConnector @Inject()(
   // scalastyle:off magic.number
   def parseDesResponse[A <: DesResponse](res: HttpResponse)
                                         (implicit reads:Reads[A]): DesResponse = {
+
     Try(res.json.as[A]) match {
       case Success(data) =>
         data
