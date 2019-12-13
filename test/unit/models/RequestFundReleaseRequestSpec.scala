@@ -18,8 +18,10 @@ package unit.models
 
 import org.joda.time.DateTime
 import org.scalatestplus.play.PlaySpec
-import play.api.libs.json.Json
+import play.api.libs.json._
+import uk.gov.hmrc.lisaapi.controllers.ErrorValidation
 import uk.gov.hmrc.lisaapi.models._
+import uk.gov.hmrc.lisaapi.utils.ErrorConverter
 
 class RequestFundReleaseRequestSpec extends PlaySpec {
 
@@ -152,5 +154,80 @@ class RequestFundReleaseRequestSpec extends PlaySpec {
     }
 
   }
+
+  private def extractErrorValidation(result: JsResult[FundReleasePropertyDetails]) = {
+    result match {
+      case JsError(errors) => ErrorConverter.convert(errors)
+      case _ => throw new Exception("no error message found")
+    }
+  }
+
+  private def createJson(nameOrNumber: String, postalCode: String): JsObject =
+    Json.obj(
+      "nameOrNumber" -> nameOrNumber,
+      "postalCode" -> postalCode
+    )
+
+  "validate nameOrNumber" when {
+
+    "nameOrNumber is Empty" in {
+
+      val invalidNameOrNumberJson = createJson("", "AA11 1AA")
+
+      extractErrorValidation(invalidNameOrNumberJson.validate[FundReleasePropertyDetails]) must contain(ErrorValidation("INVALID_NAME_OR_NUMBER", "Enter nameOrNumber", Some("/nameOrNumber")))
+    }
+
+    "nameOrNumber is too long" in {
+
+      val invalidNameOrNumberJson = createJson("aaaaaaaaaabbbbbbbbbbccccccccccdddddd", "AA11 1AA")
+
+      extractErrorValidation(invalidNameOrNumberJson.validate[FundReleasePropertyDetails]) must contain(ErrorValidation("INVALID_NAME_OR_NUMBER", "nameOrNumber must be 35 characters or less", Some("/nameOrNumber")))
+    }
+
+    "nameOrNumber is invalid" in {
+
+      val invalidNameOrNumberJson = createJson("%%%%%", "AA11 1AA")
+
+      extractErrorValidation(invalidNameOrNumberJson.validate[FundReleasePropertyDetails]) must contain(ErrorValidation("INVALID_NAME_OR_NUMBER", "nameOrNumber must only include letters a to z, numbers 0 to 9, colons, forward slashes, hyphen and spaces", Some("/nameOrNumber")))
+    }
+
+    "nameOrNumber is valid" in {
+
+      val validNameOrNumberJson = createJson("007 Park Avenue", "AA11 1AA")
+
+      validNameOrNumberJson.validate[FundReleasePropertyDetails] must be (JsSuccess(FundReleasePropertyDetails("007 Park Avenue","AA11 1AA")))
+    }
+  }
+
+    "validate postalCode" when {
+
+      "postalCode is Empty" in {
+
+        val invalidPostalCodeJson = createJson("007 Park Avenue", "")
+
+        extractErrorValidation(invalidPostalCodeJson.validate[FundReleasePropertyDetails]) must contain(ErrorValidation("INVALID_POSTAL_CODE", "Enter a postcode", Some("/postalCode")))
+      }
+
+      "postalCode is having invalid characters" in {
+
+        val invalidPostalCodeJson = createJson("007 Park Avenue", "AA|2 4AA")
+
+        extractErrorValidation(invalidPostalCodeJson.validate[FundReleasePropertyDetails]) must contain(ErrorValidation("INVALID_POSTAL_CODE", "Postcode must only include letters a to z and numbers 0 to 9", Some("/postalCode")))
+      }
+
+      "postalCode is having invalid format" in {
+
+        val invalidPostalCodeJson = createJson("007 Park Avenue", "9A11 1AA")
+
+        extractErrorValidation(invalidPostalCodeJson.validate[FundReleasePropertyDetails]) must contain(ErrorValidation("INVALID_POSTAL_CODE", "Enter a postcode, like AA1 1AA", Some("/postalCode")))
+      }
+
+      "postalCode is valid" in {
+
+        val validPostalCodeJson = createJson("007 Park Avenue", "AA11 1AA")
+
+       validPostalCodeJson.validate[FundReleasePropertyDetails] must be (JsSuccess(FundReleasePropertyDetails("007 Park Avenue","AA11 1AA")))
+      }
+    }
 
 }

@@ -84,54 +84,6 @@ class LisaControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite 
       (JsPath \ "prop2").read[String]
     ) (TestType.apply _)
 
-  "The withValidAddress method" must {
-
-    "return with a Bad Request" when {
-
-      "when address contains invalid charcters" in {
-        val res = SUT.testAddressValidator().apply(FakeRequest(Helpers.POST, "/")
-          .withHeaders(acceptHeader)
-          .withBody(AnyContentAsJson(Json.parse(fundReleaseJsonForInvalidAddress))))
-        status(res) mustBe BAD_REQUEST
-        val json = contentAsJson(res)
-        (json \ "code").as[String] mustBe "BAD_REQUEST"
-        (json \ "message").as[String] mustBe "nameOrNumber must be 35 characters or less"
-      }
-    }
-
-    "return with a Bad Request" when {
-
-      "when address contains more than 35 charcters" in {
-        val res = SUT.testAddressValidator().apply(FakeRequest(Helpers.POST, "/")
-          .withHeaders(acceptHeader)
-          .withBody(AnyContentAsJson(Json.parse(fundReleaseJsonForNotValidAddress))))
-        status(res) mustBe BAD_REQUEST
-        val json = contentAsJson(res)
-        (json \ "code").as[String] mustBe "BAD_REQUEST"
-        (json \ "message").as[String] mustBe "nameOrNumber must be 35 characters or less"
-      }
-    }
-
-    "return with a success" when {
-
-      "when address is in valid format" in {
-        val res = SUT.testAddressValidator().apply(FakeRequest(Helpers.POST, "/")
-          .withHeaders(acceptHeader)
-          .withBody(AnyContentAsJson(Json.parse(fundReleaseJsonForValidAddress))))
-        status(res) mustBe OK
-      }
-    }
-
-    "return with a success" when {
-
-      "when address does not exist" in {
-        val res = SUT.testAddressValidator().apply(FakeRequest(Helpers.POST, "/")
-          .withHeaders(acceptHeader)
-          .withBody(AnyContentAsJson(Json.parse(fundReleaseJsonForNoAddress))))
-        status(res) mustBe OK
-      }
-    }
-  }
 
   "The withValidJson method" must {
 
@@ -280,13 +232,6 @@ class LisaControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite 
       def testAccountIdValidator(accountId: String): Action[AnyContent] = validateHeader(mockParser).async { implicit request =>
         implicit val startTime: Long = System.currentTimeMillis()
         withValidAccountId(accountId) { () => Future.successful(Ok) }
-      }
-
-
-      def testAddressValidator(): Action[AnyContent] = validateHeader(mockParser).async { implicit request =>
-        implicit val startTime: Long = System.currentTimeMillis()
-         withValidAddress(request.body.asJson){
-           () => Future.successful(Ok) }
       }
 
 

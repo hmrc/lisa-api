@@ -23,7 +23,34 @@ import play.api.libs.json._
 case class FundReleasePropertyDetails(nameOrNumber: String, postalCode: String)
 
 object FundReleasePropertyDetails {
-  implicit val formats = Json.format[FundReleasePropertyDetails]
+  def nameOrNumberValidator: Reads[String] = new Reads[String] {
+    override def reads(json: JsValue): JsResult[String] = {
+      json.as[String] match {
+        case name if name.isEmpty => JsError(JsonValidationError("emptyNameOrNumber"))
+        case name if name.length > 35 => JsError(JsonValidationError("tooLongNameOrNumber"))
+        case name if (name.matches("^[A-Za-z0-9 :/-]{1,35}$")) => JsSuccess(name)
+        case name => JsError(JsonValidationError("invalidNameOrNumber"))
+      }
+    }
+  }
+
+  def postalCodeValidator: Reads[String] = new Reads[String] {
+    override def reads(json: JsValue): JsResult[String] = {
+      json.as[String] match {
+        case postalCode if postalCode.isEmpty => JsError(JsonValidationError("emptyPostalCode"))
+        case postalCode if !(postalCode.matches("^[A-Za-z0-9 ]{1,8}$")) => JsError(JsonValidationError("invalidPostalCode"))
+        case postalCode if !(postalCode.matches("^([A-Za-z][A-Ha-hK-Yk-y]?[0-9][A-Za-z0-9]? ?[0-9][A-Za-z]{2}|[Gg][Ii][Rr] ?0[Aa]{2})$")) => JsError(JsonValidationError("invalidFormat"))
+        case postalCode => JsSuccess(postalCode)
+      }
+    }
+  }
+
+  implicit val reads: Reads[FundReleasePropertyDetails] = (
+    (JsPath \ "nameOrNumber").read[String](nameOrNumberValidator) and
+      (JsPath \ "postalCode").read[String](postalCodeValidator)
+    )(FundReleasePropertyDetails.apply _)
+
+  implicit val writes: Writes[FundReleasePropertyDetails] = Json.writes[FundReleasePropertyDetails]
 }
 
 case class FundReleaseSupersedeDetails(originalLifeEventId: LifeEventId, originalEventDate: DateTime)
