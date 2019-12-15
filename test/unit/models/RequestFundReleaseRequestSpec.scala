@@ -215,13 +215,6 @@ class RequestFundReleaseRequestSpec extends PlaySpec {
         extractErrorValidation(invalidPostalCodeJson.validate[FundReleasePropertyDetails]) must contain(ErrorValidation("INVALID_POSTAL_CODE", "Postcode must only include letters a to z and numbers 0 to 9", Some("/postalCode")))
       }
 
-      "postalCode is having invalid format" in {
-
-        val invalidPostalCodeJson = createJson("007 Park Avenue", "9A11 1AA")
-
-        extractErrorValidation(invalidPostalCodeJson.validate[FundReleasePropertyDetails]) must contain(ErrorValidation("INVALID_POSTAL_CODE", "Enter a postcode, like AA1 1AA", Some("/postalCode")))
-      }
-
       "postalCode is valid" in {
 
         val validPostalCodeJson = createJson("007 Park Avenue", "AA11 1AA")

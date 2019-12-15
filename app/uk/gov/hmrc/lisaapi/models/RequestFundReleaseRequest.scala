@@ -22,25 +22,41 @@ import play.api.libs.json._
 
 case class FundReleasePropertyDetails(nameOrNumber: String, postalCode: String)
 
+
+
 object FundReleasePropertyDetails {
+
+  private val nameOrNumberRegex = "^[A-Za-z0-9 :/-]{1,35}$"
+
+  private val postalCodeRegex = "^([A-Za-z][A-Ha-hK-Yk-y]?[0-9][A-Za-z0-9]? ?[0-9][A-Za-z]{2}|[Gg][Ii][Rr] ?0[Aa]{2})$"
+
+  private def toJsError(errorType : String) : JsError ={
+    JsError(JsonValidationError(errorType))
+  }
+
+  private def getNameOrNumberErrorMessage(nameOrNumber : String) : JsError = {
+    nameOrNumber match {
+      case name if name.isEmpty => toJsError("emptyNameOrNumber")
+      case name if name.length > 35 => toJsError("tooLongNameOrNumber")
+      case _ => toJsError("invalidNameOrNumber")
+    }
+  }
+
   def nameOrNumberValidator: Reads[String] = new Reads[String] {
-    override def reads(json: JsValue): JsResult[String] = {
-      json.as[String] match {
-        case name if name.isEmpty => JsError(JsonValidationError("emptyNameOrNumber"))
-        case name if name.length > 35 => JsError(JsonValidationError("tooLongNameOrNumber"))
-        case name if (name.matches("^[A-Za-z0-9 :/-]{1,35}$")) => JsSuccess(name)
-        case name => JsError(JsonValidationError("invalidNameOrNumber"))
+    override def reads(nameOrNumber: JsValue): JsResult[String] = {
+      nameOrNumber.as[String] match {
+        case name if name.matches(nameOrNumberRegex) => JsSuccess(name)
+        case name => getNameOrNumberErrorMessage(name)
       }
     }
   }
 
   def postalCodeValidator: Reads[String] = new Reads[String] {
-    override def reads(json: JsValue): JsResult[String] = {
-      json.as[String] match {
-        case postalCode if postalCode.isEmpty => JsError(JsonValidationError("emptyPostalCode"))
-        case postalCode if !(postalCode.matches("^[A-Za-z0-9 ]{1,8}$")) => JsError(JsonValidationError("invalidPostalCode"))
-        case postalCode if !(postalCode.matches("^([A-Za-z][A-Ha-hK-Yk-y]?[0-9][A-Za-z0-9]? ?[0-9][A-Za-z]{2}|[Gg][Ii][Rr] ?0[Aa]{2})$")) => JsError(JsonValidationError("invalidFormat"))
-        case postalCode => JsSuccess(postalCode)
+    override def reads(postalCode: JsValue): JsResult[String] = {
+      postalCode.as[String] match {
+        case postalCode if postalCode.matches(postalCodeRegex) => JsSuccess(postalCode)
+        case postalCode if postalCode.isEmpty => toJsError("emptyPostalCode")
+        case postalCode => toJsError("invalidPostalCode")
       }
     }
   }

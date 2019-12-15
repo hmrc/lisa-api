@@ -46,7 +46,6 @@ trait ErrorConverter {
       case f7: String if f7.matches("invalidNameOrNumber") => ("INVALID_NAME_OR_NUMBER", "nameOrNumber must only include letters a to z, numbers 0 to 9, colons, forward slashes, hyphen and spaces")
       case f8: String if f8.matches("emptyPostalCode") => ("INVALID_POSTAL_CODE", "Enter a postcode")
       case f9: String if f9.matches("invalidPostalCode") => ("INVALID_POSTAL_CODE", "Postcode must only include letters a to z and numbers 0 to 9")
-      case f10: String if f10.matches("invalidFormat") => ("INVALID_POSTAL_CODE", "Enter a postcode, like AA1 1AA")
       case "error.path.missing" => ("MISSING_FIELD", "This field is required")
       case _ => throw new MatchError("Could not match the JSON Validation error")
     }

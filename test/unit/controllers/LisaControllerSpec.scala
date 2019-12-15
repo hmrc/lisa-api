@@ -21,19 +21,15 @@ import org.mockito.Mockito.when
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.functional.syntax._
-import play.api.libs.json.{JsPath, JsValue, Json, Reads}
-import play.api.libs.json.{JsObject, Json}
-import play.api.mvc._
+import play.api.libs.json.{JsPath, Json, Reads}
+import play.api.mvc.{AnyContentAsJson, ControllerComponents, PlayBodyParsers, _}
 import play.api.test.Helpers._
-import play.api.mvc.{AnyContentAsJson, ControllerComponents, PlayBodyParsers, Result}
-import play.api.test._
 import play.api.test.{FakeRequest, Helpers, Injecting}
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.controllers.AccountController
 import uk.gov.hmrc.lisaapi.metrics.LisaMetrics
-import uk.gov.hmrc.lisaapi.models.ReportLifeEventSuccessResponse
 import uk.gov.hmrc.lisaapi.services.{AccountService, AuditService}
 import uk.gov.hmrc.lisaapi.utils.ErrorConverter
 
