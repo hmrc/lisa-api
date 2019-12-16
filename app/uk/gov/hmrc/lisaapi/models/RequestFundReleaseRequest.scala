@@ -22,8 +22,6 @@ import play.api.libs.json._
 
 case class FundReleasePropertyDetails(nameOrNumber: String, postalCode: String)
 
-
-
 object FundReleasePropertyDetails {
 
   private val nameOrNumberRegex = "^[A-Za-z0-9 :/-]{1,35}$"
@@ -42,7 +40,7 @@ object FundReleasePropertyDetails {
     }
   }
 
-  def nameOrNumberValidator: Reads[String] = new Reads[String] {
+  private def nameOrNumberValidator: Reads[String] = new Reads[String] {
     override def reads(nameOrNumber: JsValue): JsResult[String] = {
       nameOrNumber.as[String] match {
         case name if name.matches(nameOrNumberRegex) => JsSuccess(name)
@@ -51,7 +49,7 @@ object FundReleasePropertyDetails {
     }
   }
 
-  def postalCodeValidator: Reads[String] = new Reads[String] {
+  private def postalCodeValidator: Reads[String] = new Reads[String] {
     override def reads(postalCode: JsValue): JsResult[String] = {
       postalCode.as[String] match {
         case postalCode if postalCode.matches(postalCodeRegex) => JsSuccess(postalCode)
