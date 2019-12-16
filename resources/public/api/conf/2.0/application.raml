@@ -961,6 +961,76 @@ types:
                                        "code" : "INVALID_PAYLOAD",
                                        "message" : "Submission has not passed validation"
                                     }
+                                EmptyNameOrNumber:
+                                  description: Empty nameOrNumber
+                                  value: |
+                                    {
+                                       "code": "BAD_REQUEST",
+                                       "message": "Bad Request",
+                                       "errors": [
+                                           {
+                                               "code": "INVALID_NAME_OR_NUMBER",
+                                               "message": "Enter nameOrNumber",
+                                               "path": "/propertyDetails/nameOrNumber"
+                                           }
+                                       ]
+                                    }
+                                TooLongNameOrNumber:
+                                  description: Too long nameOrNumber
+                                  value: |
+                                    {
+                                       "code": "BAD_REQUEST",
+                                       "message": "Bad Request",
+                                       "errors": [
+                                           {
+                                               "code": "INVALID_NAME_OR_NUMBER",
+                                               "message": "nameOrNumber must be 35 characters or less",
+                                               "path": "/propertyDetails/nameOrNumber"
+                                           }
+                                      ]
+                                    }
+                                InvalidNameOrNumber:
+                                  description: invalid nameOrNumber
+                                  value: |
+                                    {
+                                       "code": "BAD_REQUEST",
+                                       "message": "Bad Request",
+                                       "errors": [
+                                           {
+                                               "code": "INVALID_NAME_OR_NUMBER",
+                                               "message": "nameOrNumber must only include letters a to z, numbers 0 to 9, colons, forward slashes, hyphen and spaces",
+                                               "path": "/propertyDetails/nameOrNumber"
+                                           }
+                                       ]
+                                    }
+                                EmptyPostalCode:
+                                  description: empty postalCode
+                                  value: |
+                                    {
+                                       "code": "BAD_REQUEST",
+                                       "message": "Bad Request",
+                                       "errors": [
+                                           {
+                                               "code": "INVALID_POSTAL_CODE",
+                                               "message": "Enter a postcode",
+                                               "path": "/propertyDetails/postalCode"
+                                           }
+                                       ]
+                                    }
+                                InvalidPostalCode:
+                                  description: invalid postalCode
+                                  value: |
+                                    {
+                                       "code": "BAD_REQUEST",
+                                       "message": "Bad Request",
+                                       "errors": [
+                                           {
+                                               "code": "INVALID_POSTAL_CODE",
+                                               "message": "Postcode must only include letters a to z and numbers 0 to 9, like AA1 1AA",
+                                               "path": "/propertyDetails/postalCode"
+                                           }
+                                       ]
+                                    }
                         401:
                           body:
                             application/json:

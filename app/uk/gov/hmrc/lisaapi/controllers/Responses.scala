@@ -82,7 +82,6 @@ case object ErrorBadRequestInvalidPayload extends ErrorResponse(400,"INVALID_PAY
 case object ErrorBadRequestLmrn extends ErrorResponse(400, "BAD_REQUEST", "Enter lisaManagerReferenceNumber in the correct format, like Z1234")
 case object ErrorBadRequestAccountId extends ErrorResponse(400, "BAD_REQUEST", "Enter accountId in the correct format, like ABC12345")
 case object ErrorBadRequestTransactionId extends ErrorResponse(400, "BAD_REQUEST", "transactionId in the URL is in the wrong format")
-case object ErrorBadRequestAddress extends ErrorResponse(400, "BAD_REQUEST", "nameOrNumber must be 35 characters or less")
 
 // specific errors for bulk payment url validation
 case object ErrorBadRequestStart extends ErrorResponse(400, "BAD_REQUEST", "startDate is in the wrong format")
