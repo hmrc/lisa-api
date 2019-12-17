@@ -42,8 +42,8 @@ object FundReleasePropertyDetails {
 
   private def nameOrNumberValidator: Reads[String] = new Reads[String] {
     override def reads(nameOrNumberJsValue: JsValue): JsResult[String] = {
-      val nameOrNumberString = nameOrNumberJsValue.as[String]
-      if(nameOrNumberString.matches(nameOrNumberRegex)) JsSuccess(nameOrNumberString) else getNameOrNumberErrorMessage(nameOrNumberString)
+      val nameOrNumber = nameOrNumberJsValue.as[String]
+      if(nameOrNumber.matches(nameOrNumberRegex)) JsSuccess(nameOrNumber) else getNameOrNumberErrorMessage(nameOrNumber)
     }
   }
 
