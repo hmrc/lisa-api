@@ -177,11 +177,18 @@ class RequestFundReleaseRequestSpec extends PlaySpec {
       extractErrorValidation(invalidNameOrNumberJson.validate[FundReleasePropertyDetails]) must contain(ErrorValidation("INVALID_NAME_OR_NUMBER", "Enter nameOrNumber", Some("/nameOrNumber")))
     }
 
-    "nameOrNumber is too long" in {
+    "nameOrNumber is 36 characters long" in {
 
-      val invalidNameOrNumberJson = createJson("aaaaaaaaaabbbbbbbbbbccccccccccdddddd", "AA11 1AA")
+      val invalidNameOrNumberJson = createJson("a" * 36, "AA11 1AA")
 
       extractErrorValidation(invalidNameOrNumberJson.validate[FundReleasePropertyDetails]) must contain(ErrorValidation("INVALID_NAME_OR_NUMBER", "nameOrNumber must be 35 characters or less", Some("/nameOrNumber")))
+    }
+
+    "nameOrNumber is 35 characters long" in {
+
+      val validNameOrNumberJson = createJson("a" * 35, "AA11 1AA")
+
+      validNameOrNumberJson.validate[FundReleasePropertyDetails] must be (JsSuccess(FundReleasePropertyDetails("a" * 35,"AA11 1AA")))
     }
 
     "nameOrNumber is invalid" in {

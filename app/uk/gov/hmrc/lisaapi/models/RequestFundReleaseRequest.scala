@@ -41,11 +41,9 @@ object FundReleasePropertyDetails {
   }
 
   private def nameOrNumberValidator: Reads[String] = new Reads[String] {
-    override def reads(nameOrNumber: JsValue): JsResult[String] = {
-      nameOrNumber.as[String] match {
-        case name if name.matches(nameOrNumberRegex) => JsSuccess(name)
-        case name => getNameOrNumberErrorMessage(name)
-      }
+    override def reads(nameOrNumberJsValue: JsValue): JsResult[String] = {
+      val nameOrNumberString = nameOrNumberJsValue.as[String]
+      if(nameOrNumberString.matches(nameOrNumberRegex)) JsSuccess(nameOrNumberString) else getNameOrNumberErrorMessage(nameOrNumberString)
     }
   }
 
@@ -54,7 +52,7 @@ object FundReleasePropertyDetails {
       postalCode.as[String] match {
         case postalCode if postalCode.matches(postalCodeRegex) => JsSuccess(postalCode)
         case postalCode if postalCode.isEmpty => toJsError("emptyPostalCode")
-        case postalCode => toJsError("invalidPostalCode")
+        case _ => toJsError("invalidPostalCode")
       }
     }
   }
