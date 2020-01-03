@@ -26,7 +26,7 @@ object FundReleasePropertyDetails {
 
   private val nameOrNumberRegex = "^[A-Za-z0-9 :/-]{1,35}$"
 
-  private val postalCodeRegex = "^([A-Za-z][A-Ha-hK-Yk-y]?[0-9][A-Za-z0-9]? ?[0-9][A-Za-z]{2}|[Gg][Ii][Rr] ?0[Aa]{2})$"
+  private val postalCodeRegex = "^[A-Za-z0-9 ]{1,8}$"
 
   private def toJsError(errorType : String) : JsError ={
     JsError(JsonValidationError(errorType))
