@@ -53,7 +53,6 @@ class PropertyPurchaseController @Inject() (
 
       withValidLMRN(lisaManager) { () =>
         withValidAccountId(accountId) { () =>
-          withValidAddress(request.body.asJson) { () =>
             withValidJson[RequestFundReleaseRequest](
               req => {
                 if (conveyancerOrPropertyDetailsIncludedOnASupersedeRequest(request.body.asJson)) {
@@ -90,7 +89,6 @@ class PropertyPurchaseController @Inject() (
               },
               lisaManager = lisaManager
             )
-          }
         }
       }
   }

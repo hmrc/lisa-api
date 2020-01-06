@@ -19,8 +19,8 @@ import play.api.Logger
 import play.api.libs.json.Json.toJson
 import play.api.libs.json._
 import play.api.mvc._
-import uk.gov.hmrc.auth.core.retrieve.Retrievals.internalId
 import uk.gov.hmrc.auth.core._
+import uk.gov.hmrc.auth.core.retrieve.Retrievals.internalId
 import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
@@ -56,23 +56,6 @@ abstract case class LisaController(
     } else {
       lisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.getMetricKey(request.uri))
       Future.successful(BadRequest(toJson(ErrorBadRequestAccountId)))
-    }
-  }
-
-  protected def withValidAddress(req: Option[JsValue])(success: () => Future[Result])(implicit request: Request[AnyContent], startTime: Long): Future[Result] = {
-    ((nameOrNumberExists(req) && (Json.toJson(req) \ "propertyDetails" \ "nameOrNumber").get.toString().matches("^[A-Za-z0-9 \":/-]{1,35}$")) || !nameOrNumberExists(req)) match {
-      case true => success()
-      case false => {
-        lisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.getMetricKey(request.uri))
-        Future.successful(BadRequest(toJson(ErrorBadRequestAddress)))
-      }
-    }
-  }
-
-  private def nameOrNumberExists(req: Option[JsValue]) = {
-    req exists { json =>
-      val propertyDetailsAreDefined = (json \ "propertyDetails" \ "nameOrNumber").asOpt[JsValue].isDefined
-      propertyDetailsAreDefined
     }
   }
 
