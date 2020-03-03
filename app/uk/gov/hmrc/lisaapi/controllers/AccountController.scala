@@ -63,7 +63,7 @@ class AccountController @Inject()(
       },
         Some(
           errors => {
-            Logger.info("The errors are " + errors.toString())
+            Logger.warn("[AccountController][createOrTransferLisaAccount] The errors are " + errorConverter.convert(errors))
 
             val transferAccountDataNotProvided = errors.exists {
               case (path: JsPath, errors: Seq[JsonValidationError]) =>
