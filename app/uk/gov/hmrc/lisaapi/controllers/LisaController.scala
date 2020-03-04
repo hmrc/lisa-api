@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -99,7 +99,7 @@ abstract case class LisaController(
             case Success(JsError(errors)) =>
               invalid map { _(errors)} getOrElse {
                 lisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.getMetricKey(request.uri))
-                Logger.error(s"The errors are ${errors.toString()}")
+                Logger.warn(s"[LisaController][withValidJson] The errors are ${errorConverter.convert(errors)}")
                 Future.successful(BadRequest(toJson(ErrorBadRequest(errorConverter.convert(errors)))))
               }
             case Failure(e) =>
