@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,11 @@
 
 package unit.controllers
 
+import helpers.ControllerTestFixture
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.http.HeaderNames.ACCEPT
 import play.api.mvc._
-import play.api.test.{FakeRequest, Injecting}
+import play.api.test.FakeRequest
 import play.test.Helpers
 import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.controllers.{APIVersioning, ErrorAcceptHeaderContentInvalid, ErrorAcceptHeaderInvalid, ErrorAcceptHeaderVersionInvalid, ErrorApiNotAvailable}
@@ -31,9 +30,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 import scala.language.postfixOps
 
-class APIVersioningSpec extends PlaySpec with MockitoSugar with OneAppPerSuite with Injecting {
-
-  val mockParser = inject[PlayBodyParsers]
+class APIVersioningSpec extends ControllerTestFixture {
 
   "The withApiVersion function" must {
 
@@ -101,8 +98,6 @@ class APIVersioningSpec extends PlaySpec with MockitoSugar with OneAppPerSuite w
       isEndpointEnabledTest(request) mustBe ErrorApiNotAvailable.asResult
     }
   }
-
-  val mockAppContext = mock[AppContext]
 
   object APIVersioningImpl extends APIVersioning {
     override val validateVersion: String => Boolean = List("1.0", "2.0") contains _

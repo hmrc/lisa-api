@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,26 +16,24 @@
 
 package unit.controllers
 
-import org.mockito.Matchers.any
+import helpers.ControllerTestFixture
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
-import org.scalatest.BeforeAndAfter
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.mvc.{ControllerComponents, PlayBodyParsers}
 import play.api.test.Helpers._
 import play.api.test._
 import play.mvc.Http.HeaderNames
-import uk.gov.hmrc.auth.core.AuthConnector
-import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.controllers.{DiscoverController, ErrorAcceptHeaderInvalid, ErrorBadRequestLmrn}
-import uk.gov.hmrc.lisaapi.metrics.LisaMetrics
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class DiscoverControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite with BeforeAndAfter with Injecting {
+class DiscoverControllerSpec extends ControllerTestFixture {
 
-  before {
+  val discoverController: DiscoverController = new DiscoverController(mockAuthConnector, mockAppContext, mockLisaMetrics, mockControllerComponents, mockParser) {
+    override lazy val v2endpointsEnabled = true
+  }
+
+  override def beforeEach {
     when(mockAuthConnector.authorise[Option[String]](any(),any())(any(), any())).thenReturn(Future.successful(Some("1234")))
   }
 
@@ -45,7 +43,7 @@ class DiscoverControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSu
   "The Discover available endpoints endpoint" must {
 
     "return with status 200 ok and appropriate json for v1" in {
-      val res = SUT.discover("Z019283").apply(FakeRequest(Helpers.GET, "/").withHeaders(v1))
+      val res = discoverController.discover("Z019283").apply(FakeRequest(Helpers.GET, "/").withHeaders(v1))
 
       status(res) mustBe OK
       val json = contentAsJson(res)
@@ -54,7 +52,7 @@ class DiscoverControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSu
     }
 
     "return with status 200 ok and appropriate json for v2" in {
-      val res = SUT.discover("Z019283").apply(FakeRequest(Helpers.GET, "/").withHeaders(v2))
+      val res = discoverController.discover("Z019283").apply(FakeRequest(Helpers.GET, "/").withHeaders(v2))
 
       status(res) mustBe OK
       val json = contentAsJson(res)
@@ -63,7 +61,7 @@ class DiscoverControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSu
     }
 
     "return the lisa manager reference number provided" in {
-      val res = SUT.discover("Z111111").apply(FakeRequest(Helpers.GET, "/").withHeaders(v1))
+      val res = discoverController.discover("Z111111").apply(FakeRequest(Helpers.GET, "/").withHeaders(v1))
 
       status(res) mustBe OK
       (contentAsJson(res) \ "_links" \ "close account" \ "href").as[String] mustBe "/lifetime-isa/manager/Z111111/accounts/{accountId}/close-account"
@@ -72,7 +70,7 @@ class DiscoverControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSu
     "return with status 400 bad request" when {
 
       "given an invalid lmrn in the url" in {
-        val res = SUT.discover("Z0192831").apply(FakeRequest(Helpers.GET, "/").withHeaders(v1))
+        val res = discoverController.discover("Z0192831").apply(FakeRequest(Helpers.GET, "/").withHeaders(v1))
 
         status(res) mustBe BAD_REQUEST
 
@@ -88,7 +86,7 @@ class DiscoverControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSu
 
       "given an unsupported api version in the accept header" in {
         val v99: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.99.0+json")
-        val res = SUT.discover("Z0192831").apply(FakeRequest(Helpers.GET, "/").withHeaders(v99))
+        val res = discoverController.discover("Z0192831").apply(FakeRequest(Helpers.GET, "/").withHeaders(v99))
 
         status(res) mustBe NOT_ACCEPTABLE
 
@@ -99,16 +97,5 @@ class DiscoverControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSu
       }
 
     }
-
-  }
-
-  val mockAuthConnector: AuthConnector = mock[AuthConnector]
-  val mockAppContext: AppContext = mock[AppContext]
-  val mockLisaMetrics: LisaMetrics = mock[LisaMetrics]
-  val mockControllerComponents = inject[ControllerComponents]
-  val mockParser = inject[PlayBodyParsers]
-
-  val SUT = new DiscoverController(mockAuthConnector, mockAppContext, mockLisaMetrics, mockControllerComponents, mockParser) {
-    override lazy val v2endpointsEnabled = true
   }
 }

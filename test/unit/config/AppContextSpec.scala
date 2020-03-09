@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,41 +16,39 @@
 
 package unit.config
 
-import collection.JavaConverters._
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito.when
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.Configuration
 import uk.gov.hmrc.lisaapi.config.AppContext
-import uk.gov.hmrc.play.bootstrap.config.RunMode
+import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
 
 class AppContextSpec extends PlaySpec with MockitoSugar {
 
-  val mockConfiguration = mock[Configuration]
-  val mockRunMode = mock[RunMode]
-  val SUT = new AppContext(mockConfiguration, mockRunMode)
+  val mockConfiguration: Configuration = mock[Configuration]
+  val mockServicesConfig: ServicesConfig = mock[ServicesConfig]
+  val appContext: AppContext = new AppContext(mockConfiguration, mockServicesConfig)
 
   "endpointIsDisabled" must {
 
     "return false if there are no disabled endpoints in the config" in {
-      when(mockConfiguration.getStringList(any())).thenReturn(None)
+      when(mockConfiguration.getOptional[String](any())(any())).thenReturn(None)
 
-      SUT.endpointIsDisabled("test1") mustBe false
+      appContext.endpointIsDisabled("test1") mustBe false
     }
 
     "return false if the named endpoint isn't in the disabled list" in {
-      when(mockConfiguration.getStringList(any())).thenReturn(Some(List[String]("test1").asJava))
+      when(mockConfiguration.getOptional[Seq[String]](any())(any())).thenReturn(Some(Seq[String]("test1")))
 
-      SUT.endpointIsDisabled("test2") mustBe false
+      appContext.endpointIsDisabled("test2") mustBe false
     }
 
     "return true if the named endpoint is in the disabled list" in {
-      when(mockConfiguration.getStringList(any())).thenReturn(Some(List[String]("test1", "test2", "test3").asJava))
+      when(mockConfiguration.getOptional[Seq[String]](any())(any())).thenReturn(Some(Seq[String]("test1", "test2", "test3")))
 
-      SUT.endpointIsDisabled("test3") mustBe true
+      appContext.endpointIsDisabled("test3") mustBe true
     }
-
   }
-
 }
+

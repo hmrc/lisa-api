@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,30 +16,31 @@
 
 package unit.utils
 
-import org.mockito.Mockito._
+import helpers.BaseTestFixture
 import org.joda.time.DateTime
+import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 import uk.gov.hmrc.lisaapi.controllers.ErrorValidation
-import uk.gov.hmrc.lisaapi.models.{ReportWithdrawalChargeRequest, SupersededWithdrawalChargeRequest, WithdrawalIncrease}
+import uk.gov.hmrc.lisaapi.models.{SupersededWithdrawalChargeRequest, WithdrawalIncrease}
 import uk.gov.hmrc.lisaapi.services.CurrentDateService
 import uk.gov.hmrc.lisaapi.utils.WithdrawalChargeValidator
 
 import scala.io.Source
 
-class WithdrawalChargeValidatorSpec extends PlaySpec
-  with MockitoSugar
+class WithdrawalChargeValidatorSpec extends BaseTestFixture
   with BeforeAndAfter {
+
+  val mockDateService: CurrentDateService = mock[CurrentDateService]
+  val withdrawalChargeValidator: WithdrawalChargeValidator = new WithdrawalChargeValidator(mockDateService)
 
   before {
     reset(mockDateService)
     when(mockDateService.now()).thenReturn(DateTime.now)
   }
 
-  val validWithdrawalJson = Source.fromInputStream(getClass().getResourceAsStream("/json/request.valid.withdrawal-charge.json")).mkString
-  val validWithdrawal = Json.parse(validWithdrawalJson).as[SupersededWithdrawalChargeRequest]
+  val validWithdrawalJson: String = Source.fromInputStream(getClass().getResourceAsStream("/json/request.valid.withdrawal-charge.json")).mkString
+  val validWithdrawal: SupersededWithdrawalChargeRequest = Json.parse(validWithdrawalJson).as[SupersededWithdrawalChargeRequest]
 
   "claimPeriodStartDate" should {
 
@@ -54,7 +55,7 @@ class WithdrawalChargeValidatorSpec extends PlaySpec
 
         val request = validWithdrawal.copy(claimPeriodStartDate = today, claimPeriodEndDate = periodEndDate)
 
-        val errors = SUT.validate(request)
+        val errors = withdrawalChargeValidator.validate(request)
 
         errors mustBe List()
       }
@@ -68,7 +69,7 @@ class WithdrawalChargeValidatorSpec extends PlaySpec
         val periodEndDate = new DateTime("2017-06-05")
         val request = validWithdrawal.copy(claimPeriodStartDate = periodStartDate, claimPeriodEndDate = periodEndDate)
 
-        val errors = SUT.validate(request)
+        val errors = withdrawalChargeValidator.validate(request)
 
         errors mustBe List(
           ErrorValidation(
@@ -84,7 +85,7 @@ class WithdrawalChargeValidatorSpec extends PlaySpec
         val periodEndDate = nextMonth.plusMonths(1).withDayOfMonth(5)
         val request = validWithdrawal.copy(claimPeriodStartDate = nextMonth, claimPeriodEndDate = periodEndDate)
 
-        val errors = SUT.validate(request)
+        val errors = withdrawalChargeValidator.validate(request)
 
         errors mustBe List(
           ErrorValidation(
@@ -100,7 +101,7 @@ class WithdrawalChargeValidatorSpec extends PlaySpec
         val periodEndDate = new DateTime("2017-04-05")
         val request = validWithdrawal.copy(claimPeriodStartDate = periodStartDate, claimPeriodEndDate = periodEndDate)
 
-        val errors = SUT.validate(request)
+        val errors = withdrawalChargeValidator.validate(request)
 
         errors must contain(
           ErrorValidation(
@@ -124,7 +125,7 @@ class WithdrawalChargeValidatorSpec extends PlaySpec
         val periodEndDate = new DateTime("2018-01-05")
         val request = validWithdrawal.copy(claimPeriodStartDate = periodStartDate, claimPeriodEndDate = periodEndDate)
 
-        val errors = SUT.validate(request)
+        val errors = withdrawalChargeValidator.validate(request)
 
         errors mustBe List()
       }
@@ -136,7 +137,7 @@ class WithdrawalChargeValidatorSpec extends PlaySpec
       "it is not the 5th day of the month" in {
         val request = validWithdrawal.copy(claimPeriodEndDate = new DateTime("2017-05-01"))
 
-        val errors = SUT.validate(request)
+        val errors = withdrawalChargeValidator.validate(request)
 
         errors mustBe List(
           ErrorValidation(
@@ -152,7 +153,7 @@ class WithdrawalChargeValidatorSpec extends PlaySpec
         val periodEndDate = new DateTime("2018-02-05")
         val request = validWithdrawal.copy(claimPeriodStartDate = periodStartDate, claimPeriodEndDate = periodEndDate)
 
-        val errors = SUT.validate(request)
+        val errors = withdrawalChargeValidator.validate(request)
 
         errors mustBe List(
           ErrorValidation(
@@ -168,7 +169,7 @@ class WithdrawalChargeValidatorSpec extends PlaySpec
         val periodEndDate = new DateTime("2017-05-05")
         val request = validWithdrawal.copy(claimPeriodStartDate = periodStartDate, claimPeriodEndDate = periodEndDate)
 
-        val errors = SUT.validate(request)
+        val errors = withdrawalChargeValidator.validate(request)
 
         errors mustBe List(
           ErrorValidation(
@@ -184,7 +185,7 @@ class WithdrawalChargeValidatorSpec extends PlaySpec
         val periodEndDate = new DateTime("2017-04-05")
         val request = validWithdrawal.copy(claimPeriodStartDate = periodStartDate, claimPeriodEndDate = periodEndDate)
 
-        val errors = SUT.validate(request)
+        val errors = withdrawalChargeValidator.validate(request)
 
         errors must contain(
           ErrorValidation(
@@ -204,7 +205,7 @@ class WithdrawalChargeValidatorSpec extends PlaySpec
       "withdrawalReason is Regular withdrawal and supersede is not set" in {
         val request = validWithdrawal.copy(withdrawalReason = "Regular withdrawal", supersede = None)
 
-        val errors = SUT.validate(request)
+        val errors = withdrawalChargeValidator.validate(request)
 
         errors mustBe List()
       }
@@ -219,7 +220,7 @@ class WithdrawalChargeValidatorSpec extends PlaySpec
           "Additional Withdrawal"
         )))
 
-        val errors = SUT.validate(request)
+        val errors = withdrawalChargeValidator.validate(request)
 
         errors mustBe List(
           ErrorValidation(
@@ -239,7 +240,7 @@ class WithdrawalChargeValidatorSpec extends PlaySpec
       "it is zero and fundsDeductedDuringWithdrawal is false" in {
         val request = validWithdrawal.copy(automaticRecoveryAmount = Some(0), fundsDeductedDuringWithdrawal = false)
 
-        val errors = SUT.validate(request)
+        val errors = withdrawalChargeValidator.validate(request)
 
         errors mustBe List()
       }
@@ -247,7 +248,7 @@ class WithdrawalChargeValidatorSpec extends PlaySpec
       "it is less than the withdrawalChargeAmount and fundsDeductedDuringWithdrawal is false" in {
         val request = validWithdrawal.copy(automaticRecoveryAmount = Some(validWithdrawal.withdrawalChargeAmount - 0.01), fundsDeductedDuringWithdrawal = false)
 
-        val errors = SUT.validate(request)
+        val errors = withdrawalChargeValidator.validate(request)
 
         errors mustBe List()
       }
@@ -255,7 +256,7 @@ class WithdrawalChargeValidatorSpec extends PlaySpec
       "it is equal to the withdrawalChargeAmount" in {
         val request = validWithdrawal.copy(automaticRecoveryAmount = Some(validWithdrawal.withdrawalChargeAmount))
 
-        val errors = SUT.validate(request)
+        val errors = withdrawalChargeValidator.validate(request)
 
         errors mustBe List()
       }
@@ -267,7 +268,7 @@ class WithdrawalChargeValidatorSpec extends PlaySpec
       "it is greater than the withdrawalChargeAmount and fundsDeductedDuringWithdrawal is false" in {
         val request = validWithdrawal.copy(automaticRecoveryAmount = Some(validWithdrawal.withdrawalChargeAmount + 0.01), fundsDeductedDuringWithdrawal = false)
 
-        val errors = SUT.validate(request)
+        val errors = withdrawalChargeValidator.validate(request)
 
         errors mustBe List(
           ErrorValidation(
@@ -281,7 +282,7 @@ class WithdrawalChargeValidatorSpec extends PlaySpec
       "it is greater than the withdrawalChargeAmount and fundsDeductedDuringWithdrawal is true" in {
         val request = validWithdrawal.copy(automaticRecoveryAmount = Some(validWithdrawal.withdrawalChargeAmount + 0.01), fundsDeductedDuringWithdrawal = true)
 
-        val errors = SUT.validate(request)
+        val errors = withdrawalChargeValidator.validate(request)
 
         errors mustBe List(
           ErrorValidation(
@@ -300,7 +301,7 @@ class WithdrawalChargeValidatorSpec extends PlaySpec
       "it is less than the withdrawalChargeAmount and fundsDeductedDuringWithdrawal is true" in {
         val request = validWithdrawal.copy(automaticRecoveryAmount = Some(validWithdrawal.withdrawalChargeAmount - 0.01), fundsDeductedDuringWithdrawal = true)
 
-        val errors = SUT.validate(request)
+        val errors = withdrawalChargeValidator.validate(request)
 
         errors mustBe List(
           ErrorValidation(
@@ -319,7 +320,7 @@ class WithdrawalChargeValidatorSpec extends PlaySpec
 
     "return no errors" when {
       "everything is valid" in {
-        val errors = SUT.validate(validWithdrawal)
+        val errors = withdrawalChargeValidator.validate(validWithdrawal)
 
         errors.size mustBe 0
       }
@@ -331,7 +332,7 @@ class WithdrawalChargeValidatorSpec extends PlaySpec
         val periodEndDate = new DateTime("2018-05-01")
         val request = validWithdrawal.copy(claimPeriodStartDate = periodStartDate, claimPeriodEndDate = periodEndDate)
 
-        val errors = SUT.validate(request)
+        val errors = withdrawalChargeValidator.validate(request)
 
         errors.size mustBe 2
         errors(0).path mustBe Some("/claimPeriodStartDate")
@@ -340,8 +341,4 @@ class WithdrawalChargeValidatorSpec extends PlaySpec
     }
 
   }
-
-  val mockDateService: CurrentDateService = mock[CurrentDateService]
-
-  object SUT extends WithdrawalChargeValidator(mockDateService)
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,29 +19,17 @@ package unit.connectors
 import java.time.LocalDate
 
 import org.joda.time.DateTime
-import org.mockito.Matchers.{eq => matchersEquals, _}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo, _}
 import org.mockito.Mockito.{verify, when}
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.{JsValue, Json}
 import play.api.test.Helpers._
-import play.api.{Configuration, Environment, Mode}
 import uk.gov.hmrc.http._
-import uk.gov.hmrc.lisaapi.config.AppContext
-import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des._
-import uk.gov.hmrc.play.bootstrap.config.RunMode
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
-import scala.io.Source
+import scala.concurrent.Future
 
-class DesConnectorSpec extends PlaySpec
-  with MockitoSugar
-  with OneAppPerSuite {
+class DesConnectorSpec extends DesConnectorTestHelper {
 
   "Create Lisa Investor endpoint" must {
     "return a populated CreateLisaInvestorSuccessResponse" when {
@@ -55,7 +43,7 @@ class DesConnectorSpec extends PlaySpec
               )
             )
           )
-          doCreateInvestorRequest { response =>
+        doCreateInvestorRequest { response =>
           response must be(
             CreateLisaInvestorSuccessResponse("1234567890")
           )
@@ -74,7 +62,7 @@ class DesConnectorSpec extends PlaySpec
               )
             )
           )
-          doCreateInvestorRequest { response =>
+        doCreateInvestorRequest { response =>
           response must be(DesFailureResponse())
         }
       }
@@ -89,7 +77,7 @@ class DesConnectorSpec extends PlaySpec
               )
             )
           )
-          doCreateInvestorRequest { response =>
+        doCreateInvestorRequest { response =>
           response must be(DesFailureResponse())
         }
       }
@@ -107,7 +95,7 @@ class DesConnectorSpec extends PlaySpec
               )
             )
           )
-          doCreateInvestorRequest { response =>
+        doCreateInvestorRequest { response =>
           response must be(CreateLisaInvestorAlreadyExistsResponse(investorID))
         }
       }
@@ -124,7 +112,7 @@ class DesConnectorSpec extends PlaySpec
               )
             )
           )
-          doCreateInvestorRequest { response =>
+        doCreateInvestorRequest { response =>
           response must be(DesFailureResponse("INVESTOR_NOT_FOUND", "The investor details given do not match with HMRC’s records."))
         }
       }
@@ -159,7 +147,7 @@ class DesConnectorSpec extends PlaySpec
               )
             )
           )
-          doCreateInvestorRequest { response =>
+        doCreateInvestorRequest { response =>
           response mustBe DesBadRequestResponse
         }
       }
@@ -178,7 +166,7 @@ class DesConnectorSpec extends PlaySpec
               )
             )
           )
-          doCreateAccountRequest { response =>
+        doCreateAccountRequest { response =>
           response mustBe DesAccountResponse("9876543210")
         }
       }
@@ -195,7 +183,7 @@ class DesConnectorSpec extends PlaySpec
               )
             )
           )
-          doCreateAccountRequest { response =>
+        doCreateAccountRequest { response =>
           response mustBe DesFailureResponse()
         }
       }
@@ -210,7 +198,7 @@ class DesConnectorSpec extends PlaySpec
               )
             )
           )
-          doCreateAccountRequest { response =>
+        doCreateAccountRequest { response =>
           response mustBe DesFailureResponse()
         }
       }
@@ -248,7 +236,7 @@ class DesConnectorSpec extends PlaySpec
               )
             )
           )
-          doCreateAccountRequest { response =>
+        doCreateAccountRequest { response =>
           response mustBe DesBadRequestResponse
         }
       }
@@ -265,7 +253,7 @@ class DesConnectorSpec extends PlaySpec
               )
             )
           )
-          doCreateAccountRequest { response =>
+        doCreateAccountRequest { response =>
           response mustBe DesFailureResponse("INVESTOR_NOT_FOUND", "The investorId given does not match with HMRC’s records.")
         }
       }
@@ -284,7 +272,7 @@ class DesConnectorSpec extends PlaySpec
               )
             )
           )
-          doTransferAccountRequest { response =>
+        doTransferAccountRequest { response =>
           response mustBe DesAccountResponse("9876543210")
         }
       }
@@ -302,7 +290,7 @@ class DesConnectorSpec extends PlaySpec
               )
             )
           )
-          doTransferAccountRequest { response =>
+        doTransferAccountRequest { response =>
           response mustBe DesFailureResponse()
         }
       }
@@ -336,7 +324,7 @@ class DesConnectorSpec extends PlaySpec
               )
             )
           )
-          doTransferAccountRequest { response =>
+        doTransferAccountRequest { response =>
           response mustBe DesFailureResponse("INVESTOR_NOT_FOUND", "The investorId given does not match with HMRC’s records.")
         }
       }
@@ -353,7 +341,7 @@ class DesConnectorSpec extends PlaySpec
               )
             )
           )
-          doTransferAccountRequest { response =>
+        doTransferAccountRequest { response =>
           response mustBe DesUnavailableResponse
         }
       }
@@ -383,7 +371,7 @@ class DesConnectorSpec extends PlaySpec
               )
             )
           )
-          doCloseAccountRequest { response =>
+        doCloseAccountRequest { response =>
           response mustBe DesUnavailableResponse
         }
       }
@@ -400,7 +388,7 @@ class DesConnectorSpec extends PlaySpec
               )
             )
           )
-          doCloseAccountRequest { response =>
+        doCloseAccountRequest { response =>
           response mustBe DesBadRequestResponse
         }
       }
@@ -417,7 +405,7 @@ class DesConnectorSpec extends PlaySpec
               )
             )
           )
-          doCloseAccountRequest { response =>
+        doCloseAccountRequest { response =>
           response mustBe DesFailureResponse()
         }
       }
@@ -430,7 +418,7 @@ class DesConnectorSpec extends PlaySpec
 
     "return a populated success response" when {
       "DES returns 200 ok" in {
-        when(mockHttp.PUT[JsValue, HttpResponse](any(), any())(any(), any(), any(), any()))
+        when(mockHttp.PUT[JsValue, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(Future.successful(
             HttpResponse(
               responseStatus = OK,
@@ -445,7 +433,7 @@ class DesConnectorSpec extends PlaySpec
 
     "return a generic failure response" when {
       "the DES response has no json body" in {
-        when(mockHttp.PUT[JsValue, HttpResponse](any(), any())(any(), any(), any(), any()))
+        when(mockHttp.PUT[JsValue, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -463,7 +451,7 @@ class DesConnectorSpec extends PlaySpec
 
     "return a DesUnavailableResponse" when {
       "a 503 is returned" in {
-        when(mockHttp.PUT[JsValue, HttpResponse](any(), any())(any(), any(), any(), any()))
+        when(mockHttp.PUT[JsValue, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -481,7 +469,7 @@ class DesConnectorSpec extends PlaySpec
 
     "return a DesBadRequestResponse" when {
       "a 400 is returned" in {
-        when(mockHttp.PUT[JsValue, HttpResponse](any(), any())(any(), any(), any(), any()))
+        when(mockHttp.PUT[JsValue, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -490,7 +478,7 @@ class DesConnectorSpec extends PlaySpec
               )
             )
           )
-          doReinstateAccountRequest { response =>
+        doReinstateAccountRequest { response =>
           response mustBe DesBadRequestResponse
         }
       }
@@ -500,7 +488,7 @@ class DesConnectorSpec extends PlaySpec
   "Update First Subscription date endpoint" must {
     "return a populated DesUpdateSubscriptionSuccessResponse" when {
       "the DES response has a json body that is in the correct format" in {
-        when(mockHttp.PUT[UpdateSubscriptionRequest, HttpResponse](any(), any())(any(), any(), any(), any()))
+        when(mockHttp.PUT[UpdateSubscriptionRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -522,7 +510,7 @@ class DesConnectorSpec extends PlaySpec
     "return a failure response" when {
 
       "the DES response has no json body" in {
-        when(mockHttp.PUT[UpdateSubscriptionRequest, HttpResponse](any(), any())(any(), any(), any(), any()))
+        when(mockHttp.PUT[UpdateSubscriptionRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -539,7 +527,7 @@ class DesConnectorSpec extends PlaySpec
     }
 
     "status is 201 and json is invalid" in {
-      when(mockHttp.PUT[UpdateSubscriptionRequest, HttpResponse](any(), any())(any(), any(), any(), any()))
+      when(mockHttp.PUT[UpdateSubscriptionRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
         .thenReturn(
           Future.successful(
             HttpResponse(
@@ -559,7 +547,7 @@ class DesConnectorSpec extends PlaySpec
   "return a DesUnavailableResponse" when {
 
     "a 503 response is returned" in {
-      when(mockHttp.PUT[UpdateSubscriptionRequest, HttpResponse](any(), any())(any(), any(), any(), any()))
+      when(mockHttp.PUT[UpdateSubscriptionRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
         .thenReturn(
           Future.successful(
             HttpResponse(
@@ -578,7 +566,7 @@ class DesConnectorSpec extends PlaySpec
 
   "return a DesBadRequestResponse" when {
     "a 400 response is returned" in {
-      when(mockHttp.PUT[UpdateSubscriptionRequest, HttpResponse](any(), any())(any(), any(), any(), any()))
+      when(mockHttp.PUT[UpdateSubscriptionRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
         .thenReturn(
           Future.successful(
             HttpResponse(
@@ -587,7 +575,7 @@ class DesConnectorSpec extends PlaySpec
             )
           )
         )
-        updateFirstSubscriptionDateRequest { response =>
+      updateFirstSubscriptionDateRequest { response =>
         response mustBe DesBadRequestResponse
       }
     }
@@ -605,7 +593,7 @@ class DesConnectorSpec extends PlaySpec
               )
             )
           )
-          doReportLifeEventRequest { response =>
+        doReportLifeEventRequest { response =>
           response mustBe DesLifeEventResponse("87654321")
         }
       }
@@ -925,7 +913,7 @@ class DesConnectorSpec extends PlaySpec
               )
             )
           )
-         doRequestBonusPaymentRequest { response =>
+        doRequestBonusPaymentRequest { response =>
           response mustBe DesBadRequestResponse
         }
       }
@@ -944,7 +932,7 @@ class DesConnectorSpec extends PlaySpec
               )
             )
           )
-          doRetrieveBonusPaymentRequest { response =>
+        doRetrieveBonusPaymentRequest { response =>
           response mustBe DesUnavailableResponse
         }
       }
@@ -1552,8 +1540,8 @@ class DesConnectorSpec extends PlaySpec
             )
           )
         )
-        doReportWithdrawalRequest { response =>
-        verify(mockHttp).POST(any(), any(), any())(matchersEquals(ReportWithdrawalChargeRequest.desReportWithdrawalChargeWrites), any(), any(), any())
+      doReportWithdrawalRequest { response =>
+        verify(mockHttp).POST(any(), any(), any())(eqTo(ReportWithdrawalChargeRequest.desReportWithdrawalChargeWrites), any(), any(), any())
       }
     }
 
@@ -1568,7 +1556,7 @@ class DesConnectorSpec extends PlaySpec
               )
             )
           )
-          doReportWithdrawalRequest { response =>
+        doReportWithdrawalRequest { response =>
           response mustBe DesTransactionResponse("87654321", Some("On Time"))
         }
       }
@@ -1586,7 +1574,7 @@ class DesConnectorSpec extends PlaySpec
               )
             )
           )
-         doReportWithdrawalRequest { response =>
+        doReportWithdrawalRequest { response =>
           response mustBe DesWithdrawalChargeAlreadyExistsResponse("WITHDRAWAL_CHARGE_ALREADY_EXISTS", "A withdrawal charge with these details has already been requested for this investor", "2345678901")
         }
       }
@@ -1601,7 +1589,7 @@ class DesConnectorSpec extends PlaySpec
               )
             )
           )
-          doReportWithdrawalRequest { response =>
+        doReportWithdrawalRequest { response =>
           response mustBe DesWithdrawalChargeAlreadySupersededResponse("SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED", "This withdrawal charge has already been superseded", "2345678901")
         }
       }
@@ -1618,7 +1606,7 @@ class DesConnectorSpec extends PlaySpec
               )
             )
           )
-          doReportWithdrawalRequest { response =>
+        doReportWithdrawalRequest { response =>
           response mustBe DesFailureResponse()
         }
       }
@@ -1633,7 +1621,7 @@ class DesConnectorSpec extends PlaySpec
               )
             )
           )
-          doReportWithdrawalRequest { response =>
+        doReportWithdrawalRequest { response =>
           response mustBe DesFailureResponse()
         }
       }
@@ -1651,7 +1639,7 @@ class DesConnectorSpec extends PlaySpec
               )
             )
           )
-          doReportWithdrawalRequest { response =>
+        doReportWithdrawalRequest { response =>
           response mustBe DesFailureResponse("LIFE_EVENT_DOES_NOT_EXIST", "The lifeEventId does not match with HMRC’s records.")
         }
       }
@@ -1669,7 +1657,7 @@ class DesConnectorSpec extends PlaySpec
               )
             )
           )
-          doReportWithdrawalRequest { response =>
+        doReportWithdrawalRequest { response =>
           response mustBe DesUnavailableResponse
         }
       }
@@ -1686,139 +1674,10 @@ class DesConnectorSpec extends PlaySpec
               )
             )
           )
-          doReportWithdrawalRequest { response =>
+        doReportWithdrawalRequest { response =>
           response mustBe DesBadRequestResponse
         }
       }
     }
   }
-
-  val validBonusPaymentResponseJson = Source.fromInputStream(getClass().getResourceAsStream("/json/request.valid.bonus-payment-response.json")).mkString
-  val mockHttp = mock[HttpClient]
-
-  val configuration = Configuration("microservice.services.des.host" -> "", "microservice.services.des.port" -> 0)
-  val mockEnvironment = mock[Environment]
-  val mockAppContext = mock[AppContext]
-  val mockRunMode = mock[RunMode]
-
-  private def doCreateInvestorRequest(callback: (DesResponse) => Unit) = {
-    val request = CreateLisaInvestorRequest("AB123456A", "A", "B", new DateTime("2000-01-01"))
-    val response = Await.result(SUT.createInvestor("Z019283", request), Duration.Inf)
-
-    callback(response)
-  }
-
-  private def doCreateAccountRequest(callback: (DesResponse) => Unit) = {
-    val request = CreateLisaAccountCreationRequest("1234567890", "9876543210", new DateTime("2000-01-01"))
-    val response = Await.result(SUT.createAccount("Z019283", request), Duration.Inf)
-
-    callback(response)
-  }
-
-  private def doTransferAccountRequest(callback: (DesResponse) => Unit) = {
-    val transferAccount = AccountTransfer("1234", "1234", new DateTime("2000-01-01"))
-    val request = CreateLisaAccountTransferRequest("Transferred", "1234567890", "9876543210", new DateTime("2000-01-01"), transferAccount)
-    val response = Await.result(SUT.transferAccount("Z019283", request), Duration.Inf)
-
-    callback(response)
-  }
-
-  private def doCloseAccountRequest(callback: (DesResponse) => Unit) = {
-    val request = CloseLisaAccountRequest("All funds withdrawn", new DateTime("2000-01-01"))
-    val response = Await.result(SUT.closeAccount("Z123456", "ABC12345", request), Duration.Inf)
-
-    callback(response)
-  }
-
-  private def doReinstateAccountRequest(callback: (DesResponse) => Unit) = {
-    val response = Await.result(SUT.reinstateAccount("Z123456", "ABC12345"), Duration.Inf)
-
-    callback(response)
-  }
-
-  private def updateFirstSubscriptionDateRequest(callback: (DesResponse) => Unit) = {
-    val request = UpdateSubscriptionRequest(new DateTime("2000-01-01"))
-    val response = Await.result(SUT.updateFirstSubDate("Z019283", "123456789", request), Duration.Inf)
-
-    callback(response)
-  }
-
-  private def doReportLifeEventRequest(callback: (DesResponse) => Unit) = {
-    val request = ReportLifeEventRequest("LISA Investor Terminal Ill Health", new DateTime("2000-01-01"))
-    val response = Await.result(SUT.reportLifeEvent("Z123456", "ABC12345", request), Duration.Inf)
-
-    callback(response)
-  }
-
-  private def doRetrieveLifeEventRequest(callback: (Either[DesFailure, Seq[GetLifeEventItem]]) => Unit) = {
-    val response = Await.result(SUT.getLifeEvent("Z123456", "ABC12345", "1234567890"), Duration.Inf)
-
-    callback(response)
-  }
-
-  private def doRequestBonusPaymentRequest(callback: (DesResponse) => Unit) = {
-    val request = RequestBonusPaymentRequest(
-      lifeEventId = Some("1234567891"),
-      periodStartDate = new DateTime("2017-04-06"),
-      periodEndDate = new DateTime("2017-05-05"),
-      htbTransfer = Some(HelpToBuyTransfer(0, 0)),
-      inboundPayments = InboundPayments(Some(4000), 4000, 4000, 4000),
-      bonuses = Bonuses(1000, 1000, None, "Life Event")
-    )
-
-    val response = Await.result(SUT.requestBonusPayment("Z123456", "ABC12345", request), Duration.Inf)
-
-    callback(response)
-  }
-
-  private def doRetrieveBonusPaymentRequest(callback: (DesResponse) => Unit) = {
-    val response = Await.result(SUT.getBonusOrWithdrawal("Z123456", "ABC12345", "123456"), Duration.Inf)
-
-    callback(response)
-  }
-
-  private def doRetrieveTransactionRequest(callback: (DesResponse) => Unit) = {
-    val response = Await.result(SUT.getTransaction("Z123456", "ABC12345", "123456"), Duration.Inf)
-
-    callback(response)
-  }
-
-  private def doRetrieveBulkPaymentRequest(callback: (DesResponse) => Unit) = {
-    val response = Await.result(SUT.getBulkPayment("Z123456", new DateTime("2018-01-01"), new DateTime("2018-01-01")), Duration.Inf)
-
-    callback(response)
-  }
-
-  private def doRetrieveAccountRequest(callback: (DesResponse) => Unit) = {
-    val response = Await.result(SUT.getAccountInformation("Z123456", "123456"), Duration.Inf)
-
-    callback(response)
-  }
-
-  private def doReportWithdrawalRequest(callback: (DesResponse) => Unit) = {
-    val request = SupersededWithdrawalChargeRequest(
-      Some(250.00),
-      new DateTime("2017-12-06"),
-      new DateTime("2018-01-05"),
-      1000.00,
-      250.00,
-      500.00,
-      true,
-      Some(WithdrawalIncrease(
-        "2345678901",
-        250.00,
-        250.00,
-        "Additional withdrawal"
-      )),
-      "Superseded withdrawal"
-    )
-
-    val response = Await.result(SUT.reportWithdrawalCharge("Z123456", "ABC12345", request), Duration.Inf)
-
-    callback(response)
-  }
-  implicit val hc = HeaderCarrier()
-
-  object SUT extends DesConnector(mockHttp, mockEnvironment, mockAppContext, configuration, mockRunMode) {}
-
 }

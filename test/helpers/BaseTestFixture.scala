@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-package unit.controllers
+package helpers
 
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.libs.json.Json
-import uk.gov.hmrc.lisaapi.controllers.ErrorAcceptHeaderInvalid
+import play.api.{Configuration, Environment}
+import uk.gov.hmrc.lisaapi.config.AppContext
+import uk.gov.hmrc.play.bootstrap.config.RunMode
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
-class ErrorResponseSpec extends PlaySpec {
+trait BaseTestFixture extends PlaySpec with MockitoSugar {
 
-  "errorResponse" should {
-    "be translated to error Json with only the required fields" in {
-      Json.toJson(ErrorAcceptHeaderInvalid).toString() mustBe
-        """{"code":"ACCEPT_HEADER_INVALID","message":"The accept header is missing or invalid"}"""
-    }
-  }
-
+  val mockConfiguration: Configuration = mock[Configuration]
+  val mockEnvironment: Environment = mock[Environment]
+  val mockAppContext: AppContext = mock[AppContext]
+  val mockRunMode: RunMode = mock[RunMode]
+  val mockHttp: HttpClient = mock[HttpClient]
 }

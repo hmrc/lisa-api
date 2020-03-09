@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,53 +16,43 @@
 
 package unit.controllers
 
+import helpers.ControllerTestFixture
 import org.joda.time.DateTime
-import org.mockito.Matchers.{any, eq => matchersEquals}
+import org.mockito.ArgumentMatchers.{any, eq => matchersEquals}
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
-import org.scalatest.{BeforeAndAfter, MustMatchers}
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
-import play.api.mvc.{ControllerComponents, PlayBodyParsers}
-import play.api.test.{FakeRequest, Injecting}
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.api.controllers.ErrorAcceptHeaderInvalid
-import uk.gov.hmrc.auth.core.AuthConnector
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountNotFound, ErrorBadRequestAccountId, ErrorBadRequestLmrn, ErrorBadRequestTransactionId, ErrorBonusPaymentTransactionNotFound, ErrorInternalServerError, ErrorServiceUnavailable, ErrorTransactionNotFound, TransactionController}
-import uk.gov.hmrc.lisaapi.metrics.LisaMetrics
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.services.{AuditService, TransactionService}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class TransactionControllerSpec extends PlaySpec
-  with MockitoSugar
-  with OneAppPerSuite
-  with BeforeAndAfter
-  with MustMatchers
-  with Injecting {
+class TransactionControllerSpec extends ControllerTestFixture {
 
-  implicit val hc: HeaderCarrier = HeaderCarrier()
+  val transactionController = new TransactionController(mockAuthConnector, mockAppContext, mockTransactionService, mockAuditService, mockLisaMetrics, mockControllerComponents, mockParser) {
+    override lazy val v2endpointsEnabled = true
+  }
+
   val acceptHeaderV1: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
   val acceptHeaderV2: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.2.0+json")
   val lmrn = "Z1234"
   val accountId = "12345"
   val transactionId = "67890"
 
-  before {
+  override def beforeEach {
     reset(mockAuditService)
-    when(mockAuthCon.authorise[Option[String]](any(),any())(any(), any())).thenReturn(Future(Some("1234")))
+    when(mockAuthConnector.authorise[Option[String]](any(),any())(any(), any())).thenReturn(Future(Some("1234")))
   }
 
   "Get transaction" must {
 
     "return 200 ok" when {
       "data is returned from the service for v1" in {
-        when(mockService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionSuccessResponse(
+        when(mockTransactionService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionSuccessResponse(
           transactionId = transactionId,
           transactionType = Some("Payment"),
           paymentStatus = "Paid",
@@ -73,7 +63,7 @@ class TransactionControllerSpec extends PlaySpec
           bonusDueForPeriod = Some(1.0)
         )))
 
-        val res = SUT.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV1))
+        val res = transactionController.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV1))
 
         status(res) mustBe OK
 
@@ -90,7 +80,7 @@ class TransactionControllerSpec extends PlaySpec
       }
 
       "data is returned from the service for v2" in {
-        when(mockService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionSuccessResponse(
+        when(mockTransactionService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionSuccessResponse(
           transactionId = transactionId,
           transactionType = Some("Payment"),
           paymentStatus = "Paid",
@@ -101,7 +91,7 @@ class TransactionControllerSpec extends PlaySpec
           bonusDueForPeriod = Some(1.0)
         )))
 
-        val res = SUT.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV2))
+        val res = transactionController.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV2))
 
         status(res) mustBe OK
 
@@ -121,27 +111,27 @@ class TransactionControllerSpec extends PlaySpec
 
     "return 400 bad request" when {
       "the LMRN in the URL is in an incorrect format" in {
-        when(mockService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionErrorResponse))
+        when(mockTransactionService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionErrorResponse))
 
-        val res = SUT.getTransaction("1234", accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV2))
+        val res = transactionController.getTransaction("1234", accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV2))
 
         status(res) mustBe BAD_REQUEST
 
         (contentAsJson(res) \ "message").as[String] mustBe ErrorBadRequestLmrn.message
       }
       "the accountId in the URL is in an incorrect format" in {
-        when(mockService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionErrorResponse))
+        when(mockTransactionService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionErrorResponse))
 
-        val res = SUT.getTransaction(lmrn, "~=123", transactionId).apply(FakeRequest().withHeaders(acceptHeaderV2))
+        val res = transactionController.getTransaction(lmrn, "~=123", transactionId).apply(FakeRequest().withHeaders(acceptHeaderV2))
 
         status(res) mustBe BAD_REQUEST
 
         (contentAsJson(res) \ "message").as[String] mustBe ErrorBadRequestAccountId.message
       }
       "the transactionId in the URL is in an incorrect format" in {
-        when(mockService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionErrorResponse))
+        when(mockTransactionService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionErrorResponse))
 
-        val res = SUT.getTransaction(lmrn, accountId, "123.456").apply(FakeRequest().withHeaders(acceptHeaderV2))
+        val res = transactionController.getTransaction(lmrn, accountId, "123.456").apply(FakeRequest().withHeaders(acceptHeaderV2))
 
         status(res) mustBe BAD_REQUEST
 
@@ -151,27 +141,27 @@ class TransactionControllerSpec extends PlaySpec
 
     "return 404 not found" when {
       "the service returns account not found" in {
-        when(mockService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionAccountNotFoundResponse))
+        when(mockTransactionService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionAccountNotFoundResponse))
 
-        val res = SUT.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV2))
+        val res = transactionController.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV2))
 
         status(res) mustBe NOT_FOUND
 
         (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNTID_NOT_FOUND"
       }
       "the service returns transaction not found for v1" in {
-        when(mockService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionTransactionNotFoundResponse))
+        when(mockTransactionService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionTransactionNotFoundResponse))
 
-        val res = SUT.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV1))
+        val res = transactionController.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV1))
 
         status(res) mustBe NOT_FOUND
 
         (contentAsJson(res) \ "code").as[String] mustBe "BONUS_PAYMENT_TRANSACTION_NOT_FOUND"
       }
       "the service returns transaction not found for v2" in {
-        when(mockService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionTransactionNotFoundResponse))
+        when(mockTransactionService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionTransactionNotFoundResponse))
 
-        val res = SUT.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV2))
+        val res = transactionController.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV2))
 
         status(res) mustBe NOT_FOUND
 
@@ -181,9 +171,9 @@ class TransactionControllerSpec extends PlaySpec
 
     "return 406 not acceptable" when {
       "the http accept header is missing" in {
-        when(mockService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionErrorResponse))
+        when(mockTransactionService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionErrorResponse))
 
-        val res = SUT.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest())
+        val res = transactionController.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest())
 
         status(res) mustBe NOT_ACCEPTABLE
 
@@ -193,21 +183,21 @@ class TransactionControllerSpec extends PlaySpec
 
     "return 500 internal server error" when {
       "the service returns an error" in {
-        when(mockService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionErrorResponse))
+        when(mockTransactionService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionErrorResponse))
 
-        val res = SUT.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV2))
+        val res = transactionController.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV2))
 
         status(res) mustBe INTERNAL_SERVER_ERROR
 
         (contentAsJson(res) \ "code").as[String] mustBe "INTERNAL_SERVER_ERROR"
       }
       "a charge refund cancelled is returned for api v1" in {
-        when(mockService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionSuccessResponse(
+        when(mockTransactionService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionSuccessResponse(
           transactionId = "1234",
           paymentStatus = "Charge refund cancelled"
         )))
 
-        val res = SUT.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV1))
+        val res = transactionController.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV1))
 
         status(res) mustBe INTERNAL_SERVER_ERROR
 
@@ -217,10 +207,10 @@ class TransactionControllerSpec extends PlaySpec
 
     "return 503 service unavailable" when {
       "the service returns a GetTransactionServiceUnavailableResponse" in {
-        when(mockService.getTransaction(any(), any(), any())(any())).
+        when(mockTransactionService.getTransaction(any(), any(), any())(any())).
           thenReturn(Future.successful(GetTransactionServiceUnavailableResponse))
 
-        val res = SUT.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV2))
+        val res = transactionController.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV2))
 
         status(res) mustBe SERVICE_UNAVAILABLE
 
@@ -230,7 +220,7 @@ class TransactionControllerSpec extends PlaySpec
 
     "audit getTransactionReported" when {
       "data is returned from the service for v1" in {
-        when(mockService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionSuccessResponse(
+        when(mockTransactionService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionSuccessResponse(
           transactionId = transactionId,
           transactionType = Some("Payment"),
           paymentStatus = "Paid",
@@ -240,7 +230,7 @@ class TransactionControllerSpec extends PlaySpec
           supersededBy = Some("0000012345"),
           bonusDueForPeriod = Some(1.0)
         )))
-        val res = SUT.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV1))
+        val res = transactionController.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV1))
         await(res)
         verify(mockAuditService).audit(
           auditType = matchersEquals("getTransactionReported"),
@@ -252,7 +242,7 @@ class TransactionControllerSpec extends PlaySpec
           )))(any())
       }
       "data is returned from the service for v2" in {
-        when(mockService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionSuccessResponse(
+        when(mockTransactionService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionSuccessResponse(
           transactionId = transactionId,
           transactionType = Some("Payment"),
           paymentStatus = "Paid",
@@ -263,7 +253,7 @@ class TransactionControllerSpec extends PlaySpec
           bonusDueForPeriod = Some(1.0)
         )))
 
-        val res = SUT.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV2))
+        val res = transactionController.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV2))
         await(res)
         verify(mockAuditService).audit(
           auditType = matchersEquals("getTransactionReported"),
@@ -278,9 +268,9 @@ class TransactionControllerSpec extends PlaySpec
 
     "audit getTransactionNotReported" when {
       "the service returns account not found" in {
-        when(mockService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionAccountNotFoundResponse))
+        when(mockTransactionService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionAccountNotFoundResponse))
 
-        val res = SUT.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV2))
+        val res = transactionController.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV2))
         await(res)
         verify(mockAuditService).audit(
           auditType = matchersEquals("getTransactionNotReported"),
@@ -293,9 +283,9 @@ class TransactionControllerSpec extends PlaySpec
           )))(any())
       }
       "the service returns transaction not found for v1" in {
-        when(mockService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionTransactionNotFoundResponse))
+        when(mockTransactionService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionTransactionNotFoundResponse))
 
-        val res = SUT.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV1))
+        val res = transactionController.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV1))
         await(res)
         verify(mockAuditService).audit(
           auditType = matchersEquals("getTransactionNotReported"),
@@ -308,9 +298,9 @@ class TransactionControllerSpec extends PlaySpec
           )))(any())
       }
       "the service returns transaction not found for v2" in {
-        when(mockService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionTransactionNotFoundResponse))
+        when(mockTransactionService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionTransactionNotFoundResponse))
 
-        val res = SUT.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV2))
+        val res = transactionController.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV2))
         await(res)
         verify(mockAuditService).audit(
           auditType = matchersEquals("getTransactionNotReported"),
@@ -323,9 +313,9 @@ class TransactionControllerSpec extends PlaySpec
           )))(any())
       }
       "the service returns an error" in {
-        when(mockService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionErrorResponse))
+        when(mockTransactionService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionErrorResponse))
 
-        val res = SUT.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV2))
+        val res = transactionController.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV2))
         await(res)
         verify(mockAuditService).audit(
           auditType = matchersEquals("getTransactionNotReported"),
@@ -338,12 +328,12 @@ class TransactionControllerSpec extends PlaySpec
           )))(any())
       }
       "a charge refund cancelled is returned for api v1" in {
-        when(mockService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionSuccessResponse(
+        when(mockTransactionService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionSuccessResponse(
           transactionId = "1234",
           paymentStatus = "Charge refund cancelled"
         )))
 
-        val res = SUT.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV1))
+        val res = transactionController.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV1))
         await(res)
         verify(mockAuditService).audit(
           auditType = matchersEquals("getTransactionNotReported"),
@@ -356,10 +346,10 @@ class TransactionControllerSpec extends PlaySpec
           )))(any())
       }
       "the service returns a GetTransactionServiceUnavailableResponse" in {
-        when(mockService.getTransaction(any(), any(), any())(any())).
+        when(mockTransactionService.getTransaction(any(), any(), any())(any())).
           thenReturn(Future.successful(GetTransactionServiceUnavailableResponse))
 
-        val res = SUT.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV2))
+        val res = transactionController.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV2))
         await(res)
         verify(mockAuditService).audit(
           auditType = matchersEquals("getTransactionNotReported"),
@@ -374,17 +364,4 @@ class TransactionControllerSpec extends PlaySpec
     }
 
   }
-
-  val mockService: TransactionService = mock[TransactionService]
-  val mockAuditService: AuditService = mock[AuditService]
-  val mockAuthCon: AuthConnector = mock[AuthConnector]
-  val mockAppContext: AppContext = mock[AppContext]
-  val mockLisaMetrics: LisaMetrics = mock[LisaMetrics]
-  val mockControllerComponents = inject[ControllerComponents]
-  val mockParser = inject[PlayBodyParsers]
-
-  val SUT = new TransactionController(mockAuthCon, mockAppContext, mockService, mockAuditService, mockLisaMetrics, mockControllerComponents, mockParser) {
-    override lazy val v2endpointsEnabled = true
-  }
-
 }

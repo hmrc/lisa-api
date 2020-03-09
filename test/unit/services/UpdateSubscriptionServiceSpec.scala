@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,22 +16,22 @@
 
 package unit.services
 
+import helpers.ServiceTestFixture
 import org.joda.time.DateTime
-import org.mockito.Matchers.any
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des._
 import uk.gov.hmrc.lisaapi.services.UpdateSubscriptionService
 
-import scala.concurrent.duration.Duration
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
-class UpdateSubscriptionServiceSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
+class UpdateSubscriptionServiceSpec extends ServiceTestFixture {
+
+  val updateSubscriptionService: UpdateSubscriptionService = new UpdateSubscriptionService(mockDesConnector)
 
   "Update subscription event" must {
 
@@ -101,15 +101,10 @@ class UpdateSubscriptionServiceSpec extends PlaySpec with MockitoSugar with OneA
 
   }
 
-
-
   private def doRequest(callback: (UpdateSubscriptionResponse) => Unit): Unit = {
     val request = UpdateSubscriptionRequest( new DateTime("2017-04-06"))
-    val response = Await.result(SUT.updateSubscription("Z019283", "192837", request)(HeaderCarrier()), Duration.Inf)
+    val response = Await.result(updateSubscriptionService.updateSubscription("Z019283", "192837", request)(HeaderCarrier()), Duration.Inf)
 
     callback(response)
   }
-
-  val mockDesConnector = mock[DesConnector]
-  object SUT extends UpdateSubscriptionService(mockDesConnector)
 }

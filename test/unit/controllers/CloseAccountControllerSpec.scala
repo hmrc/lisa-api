@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,27 +16,25 @@
 
 package unit.controllers
 
-import org.mockito.Matchers.{eq => matchersEquals, _}
+import helpers.ControllerTestFixture
+import org.mockito.ArgumentMatchers.{eq => matchersEquals, _}
 import org.mockito.Mockito._
-import org.scalatest.BeforeAndAfterEach
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
-import play.api.mvc.{AnyContentAsJson, ControllerComponents, PlayBodyParsers, Result}
+import play.api.mvc.{AnyContentAsJson, Result}
 import play.api.test.Helpers._
 import play.api.test._
 import play.mvc.Http.HeaderNames
-import uk.gov.hmrc.auth.core.AuthConnector
-import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.controllers.{CloseAccountController, ErrorBadRequestAccountId, ErrorBadRequestLmrn}
-import uk.gov.hmrc.lisaapi.metrics.LisaMetrics
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.services.{AccountService, AuditService}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class CloseAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite with BeforeAndAfterEach with Injecting {
+class CloseAccountControllerSpec extends ControllerTestFixture {
+
+  val closeAccountController: CloseAccountController = new CloseAccountController(mockAuthConnector, mockAppContext, mockAuditService, mockAccountService, mockLisaMetrics, mockControllerComponents, mockParser) {
+    override lazy val v2endpointsEnabled = true
+  }
 
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
   val lisaManager = "Z019283"
@@ -47,21 +45,19 @@ class CloseAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppP
 
   val closeAccountJson = s"""{"accountClosureReason" : "All funds withdrawn", "closureDate" : "$validDate"}"""
 
-  val mockAuthCon = mock[AuthConnector]
-
   override def beforeEach() {
     reset(mockAuditService)
-    reset(mockService)
+    reset(mockAccountService)
   }
 
   "The Close Account endpoint" must {
 
-    when(mockAuthCon.authorise[Option[String]](any(),any())(any(), any())).thenReturn(Future(Some("1234")))
+    when(mockAuthConnector.authorise[Option[String]](any(),any())(any(), any())).thenReturn(Future(Some("1234")))
 
     "audit an accountClosed event" when {
       "return with status 200 ok" when {
         "submitted a valid close account request" in {
-          when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountSuccessResponse(accountId)))
+          when(mockAccountService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountSuccessResponse(accountId)))
 
           doSyncCloseRequest(closeAccountJson) { res =>
             verify(mockAuditService).audit(
@@ -94,7 +90,7 @@ class CloseAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppP
         }
       }
       "the data service returns a CloseLisaAccountAlreadyVoidResponse" in {
-        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountAlreadyVoidResponse))
+        when(mockAccountService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountAlreadyVoidResponse))
 
         doSyncCloseRequest(closeAccountJson) { res =>
           verify(mockAuditService).audit(
@@ -110,7 +106,7 @@ class CloseAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppP
         }
       }
       "the data service returns a CloseLisaAccountAlreadyClosedResponse" in {
-        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountAlreadyClosedResponse))
+        when(mockAccountService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountAlreadyClosedResponse))
 
         doSyncCloseRequest(closeAccountJson) { res =>
           verify(mockAuditService).audit(
@@ -126,7 +122,7 @@ class CloseAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppP
         }
       }
       "the data service returns a CloseLisaAccountCancellationPeriodExceeded" in {
-        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountCancellationPeriodExceeded))
+        when(mockAccountService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountCancellationPeriodExceeded))
 
         doSyncCloseRequest(closeAccountJson) { res =>
           verify(mockAuditService).audit(
@@ -142,7 +138,7 @@ class CloseAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppP
         }
       }
       "the data service returns a CloseLisaAccountWithinCancellationPeriod" in {
-        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountWithinCancellationPeriod))
+        when(mockAccountService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountWithinCancellationPeriod))
 
         doSyncCloseRequest(closeAccountJson) { res =>
           verify(mockAuditService).audit(
@@ -158,7 +154,7 @@ class CloseAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppP
         }
       }
       "the data service returns a CloseLisaAccountNotFoundResponse" in {
-        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountNotFoundResponse))
+        when(mockAccountService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountNotFoundResponse))
 
         doSyncCloseRequest(closeAccountJson) { res =>
           verify(mockAuditService).audit(
@@ -175,7 +171,7 @@ class CloseAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppP
         }
       }
       "the data service returns a CloseLisaAccountErrorResponse" in {
-        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountErrorResponse))
+        when(mockAccountService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountErrorResponse))
 
         doSyncCloseRequest(closeAccountJson) { res =>
           verify(mockAuditService).audit(
@@ -195,7 +191,7 @@ class CloseAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppP
 
     "return with status 200 ok" when {
       "submitted a valid close account request" in {
-        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountSuccessResponse(accountId)))
+        when(mockAccountService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountSuccessResponse(accountId)))
 
         doCloseRequest(closeAccountJson) { res =>
           status(res) mustBe (OK)
@@ -205,7 +201,7 @@ class CloseAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppP
 
     "return with status 403 forbidden and a code of FORBIDDEN" when {
       "given a closure date prior to 6 April 2017" in {
-        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountSuccessResponse(accountId)))
+        when(mockAccountService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountSuccessResponse(accountId)))
 
         val json = closeAccountJson.replace(validDate, "2017-04-05")
 
@@ -224,7 +220,7 @@ class CloseAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppP
 
     "return with status 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_VOID" when {
       "the data service returns a CloseLisaAccountAlreadyVoidResponse" in {
-        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountAlreadyVoidResponse))
+        when(mockAccountService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountAlreadyVoidResponse))
 
         doCloseRequest(closeAccountJson) { res =>
           status(res) mustBe (FORBIDDEN)
@@ -235,7 +231,7 @@ class CloseAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppP
 
     "return with status 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_CLOSED" when {
       "the data service returns a CloseLisaAccountAlreadyClosedResponse" in {
-        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountAlreadyClosedResponse))
+        when(mockAccountService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountAlreadyClosedResponse))
 
         doCloseRequest(closeAccountJson) { res =>
           status(res) mustBe (FORBIDDEN)
@@ -246,7 +242,7 @@ class CloseAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppP
 
     "return with status 403 forbidden and a code of CANCELLATION_PERIOD_EXCEEDED" when {
       "the data service returns a CloseLisaAccountAlreadyClosedResponse" in {
-        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountCancellationPeriodExceeded))
+        when(mockAccountService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountCancellationPeriodExceeded))
 
         doCloseRequest(closeAccountJson) { res =>
           status(res) mustBe (FORBIDDEN)
@@ -257,7 +253,7 @@ class CloseAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppP
 
     "return with status 403 forbidden and a code of ACCOUNT_WITHIN_CANCELLATION_PERIOD" when {
       "the data service returns a CloseLisaAccountAlreadyClosedResponse" in {
-        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountWithinCancellationPeriod))
+        when(mockAccountService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountWithinCancellationPeriod))
 
         doCloseRequest(closeAccountJson) { res =>
           status(res) mustBe (FORBIDDEN)
@@ -268,7 +264,7 @@ class CloseAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppP
 
     "return with status 404 forbidden and a code of INVESTOR_ACCOUNTID_NOT_FOUND" when {
       "the data service returns a CloseLisaAccountNotFoundResponse" in {
-        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountNotFoundResponse))
+        when(mockAccountService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountNotFoundResponse))
 
         doCloseRequest(closeAccountJson) { res =>
           status(res) mustBe (NOT_FOUND)
@@ -303,14 +299,14 @@ class CloseAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppP
 
     "return with status 500 internal server error" when {
       "the data service returns an error" in {
-        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountErrorResponse))
+        when(mockAccountService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountErrorResponse))
 
         doCloseRequest(closeAccountJson) { res =>
           status(res) mustBe (INTERNAL_SERVER_ERROR)
         }
       }
       "an exception is thrown" in {
-        when(mockService.closeAccount(any(), any(), any())(any())).thenThrow(new RuntimeException("Test"))
+        when(mockAccountService.closeAccount(any(), any(), any())(any())).thenThrow(new RuntimeException("Test"))
 
         doCloseRequest(closeAccountJson) { res =>
           status(res) mustBe (INTERNAL_SERVER_ERROR)
@@ -320,7 +316,7 @@ class CloseAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppP
 
     "return with status 503 service unavailable" when {
       "the data service returns an error" in {
-        when(mockService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountServiceUnavailable))
+        when(mockAccountService.closeAccount(any(), any(), any())(any())).thenReturn(Future.successful(CloseLisaAccountServiceUnavailable))
 
         doCloseRequest(closeAccountJson) { res =>
           status(res) mustBe SERVICE_UNAVAILABLE
@@ -332,28 +328,16 @@ class CloseAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppP
   }
 
   def doCloseRequest(jsonString: String, lmrn: String = lisaManager, accId: String = accountId)(callback: (Future[Result]) => Unit) {
-    val res = SUT.closeLisaAccount(lmrn, accId).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
+    val res = closeAccountController.closeLisaAccount(lmrn, accId).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
       withBody(AnyContentAsJson(Json.parse(jsonString))))
 
     callback(res)
   }
 
   def doSyncCloseRequest(jsonString: String)(callback: Result => Unit) {
-    val res = await(SUT.closeLisaAccount(lisaManager, accountId).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
+    val res = await(closeAccountController.closeLisaAccount(lisaManager, accountId).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
       withBody(AnyContentAsJson(Json.parse(jsonString)))))
 
     callback(res)
   }
-
-  val mockService: AccountService = mock[AccountService]
-  val mockAuditService: AuditService = mock[AuditService]
-  val mockAppContext: AppContext = mock[AppContext]
-  val mockLisaMetrics: LisaMetrics = mock[LisaMetrics]
-  val mockControllerComponents = inject[ControllerComponents]
-  val mockParser = inject[PlayBodyParsers]
-
-  val SUT = new CloseAccountController(mockAuthCon, mockAppContext, mockAuditService, mockService, mockLisaMetrics, mockControllerComponents, mockParser) {
-    override lazy val v2endpointsEnabled = true
-  }
-
 }

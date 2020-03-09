@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,11 @@
 
 package unit.services
 
+import helpers.ServiceTestFixture
 import org.joda.time.DateTime
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito.when
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesUnavailableResponse}
 import uk.gov.hmrc.lisaapi.services.InvestorService
@@ -31,9 +29,10 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
-class InvestorServiceSpec extends PlaySpec
-  with MockitoSugar
-  with OneAppPerSuite {
+class InvestorServiceSpec extends ServiceTestFixture {
+
+  val investorService: InvestorService = new InvestorService(mockDesConnector)
+
 
   "InvestorService" must {
 
@@ -107,12 +106,10 @@ class InvestorServiceSpec extends PlaySpec
 
   private def doRequest(callback: (CreateLisaInvestorResponse) => Unit) = {
     val request = CreateLisaInvestorRequest("AB123456A", "A", "B", new DateTime("2000-01-01"))
-    val response = Await.result(SUT.createInvestor("Z019283", request)(HeaderCarrier()), Duration.Inf)
+    val response = Await.result(investorService.createInvestor("Z019283", request)(HeaderCarrier()), Duration.Inf)
 
     callback(response)
   }
 
   val investorId = "1234567890"
-  val mockDesConnector = mock[DesConnector]
-  object SUT extends InvestorService(mockDesConnector)
 }

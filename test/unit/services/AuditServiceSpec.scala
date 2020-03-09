@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,29 +16,26 @@
 
 package unit.services
 
+import helpers.ServiceTestFixture
 import org.joda.time.DateTime
 import org.mockito.ArgumentCaptor
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.Configuration
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.logging.Authorization
-import uk.gov.hmrc.lisaapi.config.AppContext
-import uk.gov.hmrc.lisaapi.models.{Bonuses, HelpToBuyTransfer, InboundPayments, RequestBonusPaymentRequest}
+import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.AuditService
 import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.DataEvent
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class AuditServiceSpec extends PlaySpec
-  with MockitoSugar
-  with OneAppPerSuite
-  with BeforeAndAfter {
+class AuditServiceSpec extends ServiceTestFixture with BeforeAndAfter {
+
+  implicit val hc: HeaderCarrier = HeaderCarrier(authorization = Some(Authorization("abcde")))
+
+  val auditService: AuditService = new AuditService(mockAuditConnector, mockConfiguration, mockAppContext)
 
   "AuditService" must {
 
@@ -48,8 +45,8 @@ class AuditServiceSpec extends PlaySpec
     }
 
     "build an audit event with the correct mandatory details" in {
-      val res = SUT.audit("investorCreated", "/create", Map("investorID" -> "1234567890"))
-      val captor = ArgumentCaptor.forClass(classOf[DataEvent])
+      val res = auditService.audit("investorCreated", "/create", Map("investorID" -> "1234567890"))
+      val captor: ArgumentCaptor[DataEvent] = ArgumentCaptor.forClass(classOf[DataEvent])
 
       verify(mockAuditConnector).sendEvent(captor.capture())(any(), any())
 
@@ -60,8 +57,8 @@ class AuditServiceSpec extends PlaySpec
     }
 
     "build an audit event with the correct tags" in {
-      val res = SUT.audit("investorCreated", "/create", Map("investorID" -> "1234567890"))
-      val captor = ArgumentCaptor.forClass(classOf[DataEvent])
+      val res = auditService.audit("investorCreated", "/create", Map("investorID" -> "1234567890"))
+      val captor: ArgumentCaptor[DataEvent] = ArgumentCaptor.forClass(classOf[DataEvent])
 
       verify(mockAuditConnector).sendEvent(captor.capture())(any(), any())
 
@@ -73,8 +70,8 @@ class AuditServiceSpec extends PlaySpec
     }
 
     "build an audit event with the correct detail" in {
-      val res = SUT.audit("investorCreated", "/create", Map("investorId" -> "1234567890", "investorNINO" -> "AB123456D"))
-      val captor = ArgumentCaptor.forClass(classOf[DataEvent])
+      val res = auditService.audit("investorCreated", "/create", Map("investorId" -> "1234567890", "investorNINO" -> "AB123456D"))
+      val captor: ArgumentCaptor[DataEvent] = ArgumentCaptor.forClass(classOf[DataEvent])
 
       verify(mockAuditConnector).sendEvent(captor.capture())(any(), any())
 
@@ -93,8 +90,8 @@ class AuditServiceSpec extends PlaySpec
         inboundPayments = InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
         bonuses = Bonuses(1000f, 1000f, Some(1000f), "Life Event")
       )
-      val res = SUT.audit("investorCreated", "/create", data.toStringMap)
-      val captor = ArgumentCaptor.forClass(classOf[DataEvent])
+      val res = auditService.audit("investorCreated", "/create", data.toStringMap)
+      val captor: ArgumentCaptor[DataEvent] = ArgumentCaptor.forClass(classOf[DataEvent])
 
       verify(mockAuditConnector).sendEvent(captor.capture())(any(), any())
 
@@ -116,16 +113,9 @@ class AuditServiceSpec extends PlaySpec
     }
 
     "send an event via the audit connector" in {
-      val event = SUT.audit("investorCreated", "/create", Map("investorId" -> "1234567890"))
+      val event = auditService.audit("investorCreated", "/create", Map("investorId" -> "1234567890"))
 
       verify(mockAuditConnector).sendEvent(any())(any(), any())
     }
   }
-
-  implicit val hc: HeaderCarrier = HeaderCarrier(authorization = Some(Authorization("abcde")))
-  val mockAuditConnector = mock[AuditConnector]
-  val configuration = mock[Configuration]
-  val mockAppContext = mock[AppContext]
-
-  object SUT extends AuditService(mockAuditConnector, configuration, mockAppContext)
 }

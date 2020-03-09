@@ -20,24 +20,22 @@ object AppDependencies {
   import play.core.PlayVersion
   import play.sbt.PlayImport._
 
-  val compile = Seq(
+  val compile: Seq[ModuleID] = Seq(
     ws,
-    "uk.gov.hmrc" %% "bootstrap-play-26" % "0.40.0",
-    "uk.gov.hmrc" %% "auth-client" % "2.21.0-play-26",
-    "uk.gov.hmrc" %% "play-hmrc-api" % "3.4.0-play-26",
+    "uk.gov.hmrc" %% "bootstrap-play-26" % "1.5.0",
+    "uk.gov.hmrc" %% "auth-client" % "2.35.0-play-26",
+    "uk.gov.hmrc" %% "play-hmrc-api" % "4.1.0-play-26",
     "com.codahale.metrics" % "metrics-graphite" % "3.0.2"
   )
 
-  val test = Seq(
+  val test: Seq[ModuleID] = Seq(
     "org.scalatest" %% "scalatest" % "3.0.8",
     "org.pegdown" % "pegdown" % "1.6.0",
     "com.typesafe.play" %% "play-test" % PlayVersion.current,
-    "org.mockito" % "mockito-core" % "1.9.0",
-    "info.cukes" %% "cucumber-scala" % "1.2.4",
-    "info.cukes" % "cucumber-junit" % "1.2.4",
-    "org.scalaj" %% "scalaj-http" % "1.1.5",
-    "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2"
+    "org.mockito" % "mockito-core" % "3.3.0",
+    "org.scalaj" %% "scalaj-http" % "2.4.2",
+    "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.3"
   ).map(_ % Test)
 
-  def apply() = compile ++ test
+  def apply(): Seq[ModuleID] = compile ++ test
 }
