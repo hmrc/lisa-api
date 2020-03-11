@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 
 package unit.utils
 
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import helpers.BaseTestFixture
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.libs.json.{JsError, Json, OFormat}
 import uk.gov.hmrc.lisaapi.controllers.ErrorValidation
 import uk.gov.hmrc.lisaapi.models.CreateLisaInvestorRequest
@@ -26,12 +26,12 @@ import uk.gov.hmrc.lisaapi.utils.ErrorConverter
 case class SimpleClass(str: String, num: Int)
 case class MultipleDataTypes(str: String, num: Int, arr: List[SimpleClass], obj: SimpleClass)
 
-class ErrorConverterSpec extends PlaySpec
-  with MockitoSugar
-  with OneAppPerSuite {
+class ErrorConverterSpec extends BaseTestFixture with GuiceOneAppPerSuite {
 
   implicit val simpleFormats: OFormat[SimpleClass] = Json.format[SimpleClass]
   implicit val multipleFormats: OFormat[MultipleDataTypes] = Json.format[MultipleDataTypes]
+
+  val errorConverter: ErrorConverter.type = ErrorConverter
 
   "Error Converter" must {
     "catch invalid data types" in {
@@ -39,7 +39,7 @@ class ErrorConverterSpec extends PlaySpec
 
       validate match {
         case e: JsError => {
-          val res = SUT.convert(e.errors)
+          val res = errorConverter.convert(e.errors)
 
           println(JsError.toFlatForm(e))
 
@@ -67,7 +67,7 @@ class ErrorConverterSpec extends PlaySpec
 
       validate match {
         case e: JsError => {
-          val res = SUT.convert(e.errors)
+          val res = errorConverter.convert(e.errors)
           res.size mustBe 1
           res must contain(ErrorValidation("INVALID_DATE", "Date is invalid", Some("/dateOfBirth")))
         }
@@ -75,7 +75,4 @@ class ErrorConverterSpec extends PlaySpec
       }
     }
   }
-
-  val SUT = ErrorConverter
-
 }

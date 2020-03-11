@@ -21,22 +21,23 @@ import play.api.Configuration
 import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
 
 @Singleton
-class AppContext @Inject()(runModeConfiguration: Configuration, runMode: RunMode) extends ServicesConfig(runModeConfiguration: Configuration, runMode: RunMode) {
-  lazy val appName = runModeConfiguration.getString("appName").getOrElse(throw new RuntimeException("appName is not configured"))
-  lazy val appUrl = runModeConfiguration.getString("appUrl").getOrElse(throw new RuntimeException("appUrl is not configured"))
-  lazy val serviceLocatorUrl: String = baseUrl("service-locator")
-  lazy val registrationEnabled: Boolean = runModeConfiguration.getBoolean(s"microservice.services.service-locator.enabled").getOrElse(false)
-  lazy val apiContext = runModeConfiguration.getString("api.context").getOrElse(throw new RuntimeException(s"Missing Key api.context"))
-  lazy val baseUrl = runModeConfiguration.getString(s"baseUrl").getOrElse(throw new RuntimeException(s"Missing Key baseUrl"))
-  lazy val v1apiStatus = runModeConfiguration.getString("api.status").getOrElse(throw new RuntimeException(s"Missing Key api.status"))
-  lazy val v2apiStatus = runModeConfiguration.getString("api.statusv2").getOrElse(throw new RuntimeException(s"Missing Key api.statusv2"))
-  lazy val desAuthToken = runModeConfiguration.getString("desauthtoken").getOrElse(throw new RuntimeException(s"Missing Key desauthtoken"))
-  lazy val desUrlHeaderEnv: String =  runModeConfiguration.getString("environment").getOrElse(throw new RuntimeException(s"Missing Key environment"))
-  lazy val access = runModeConfiguration.getConfig(s"api.access")
-  lazy val v1endpointsEnabled = runModeConfiguration.getBoolean("api.endpointsEnabled").getOrElse(throw new RuntimeException(s"Missing key api.endpointsEnabled"))
-  lazy val v2endpointsEnabled = runModeConfiguration.getBoolean("api.endpointsEnabledv2").getOrElse(throw new RuntimeException(s"Missing key api.endpointsEnabledv2"))
+class AppContext @Inject()(config: Configuration, serviceConfig: ServicesConfig) {
+  lazy val appName: String = serviceConfig.getString("appName")
+  lazy val appUrl: String = serviceConfig.getString("appUrl")
+  lazy val serviceLocatorUrl: String = serviceConfig.baseUrl("service-locator")
+  lazy val registrationEnabled: Boolean = serviceConfig.getConfBool(s"microservice.services.service-locator.enabled", defBool = false)
+  lazy val apiContext: String = serviceConfig.getString("api.context")
+  lazy val baseUrl: String = serviceConfig.getString(s"baseUrl")
+  lazy val v1apiStatus: String = serviceConfig.getString("api.status")
+  lazy val v2apiStatus: String = serviceConfig.getString("api.statusv2")
+  lazy val desAuthToken: String = serviceConfig.getString("desauthtoken")
+  lazy val desUrlHeaderEnv: String =  serviceConfig.getString("environment")
+  lazy val access: Option[Configuration] =  config.getOptional[Configuration](s"api.access")
+  lazy val v1endpointsEnabled: Boolean = serviceConfig.getBoolean("api.endpointsEnabled")
+  lazy val v2endpointsEnabled: Boolean = serviceConfig.getBoolean("api.endpointsEnabledv2")
+  lazy val desUrl: String = serviceConfig.baseUrl("des")
 
   def endpointIsDisabled(endpoint: String): Boolean = {
-    runModeConfiguration.getStringList("api.disabledEndpoints").fold(false)(list => list.contains(endpoint))
+    config.getOptional[Seq[String]]("api.disabledEndpoints").fold(false)(list => list.contains(endpoint))
   }
 }

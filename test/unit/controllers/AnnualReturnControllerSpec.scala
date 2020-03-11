@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,41 +16,33 @@
 
 package unit.controllers
 
-import org.mockito.Matchers.{eq => MatcherEquals, _}
+import helpers.ControllerTestFixture
+import org.mockito.ArgumentMatchers.{eq => MatcherEquals, _}
 import org.mockito.Mockito.{reset, verify, when}
-import org.scalatest.BeforeAndAfterEach
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{AnyContentAsJson, ControllerComponents, PlayBodyParsers, Result}
+import play.api.mvc.{AnyContentAsJson, Result}
 import play.api.test.Helpers._
-import play.api.test.{FakeRequest, Helpers, Injecting}
+import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
-import uk.gov.hmrc.auth.core.AuthConnector
-import uk.gov.hmrc.lisaapi.LisaConstants
-import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.controllers.{AnnualReturnController, ErrorBadRequest, ErrorBadRequestAccountId, ErrorBadRequestLmrn, ErrorForbidden, ErrorInternalServerError, ErrorServiceUnavailable, ErrorValidation}
-import uk.gov.hmrc.lisaapi.metrics.LisaMetrics
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.services.{AuditService, LifeEventService}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class AnnualReturnControllerSpec extends PlaySpec
-  with MockitoSugar
-  with OneAppPerSuite
-  with BeforeAndAfterEach
-  with LisaConstants
-  with Injecting {
+class AnnualReturnControllerSpec extends ControllerTestFixture {
+
+  val annualReturnController: AnnualReturnController = new AnnualReturnController(mockAuthConnector, mockAppContext, mockLifeEventService, mockAuditService, mockAnnualReturnValidator, mockLisaMetrics, mockControllerComponents, mockParser) {
+    override lazy val v2endpointsEnabled = true
+  }
 
   override def beforeEach() {
     reset(mockAuditService)
-    reset(mockValidator)
-    reset(mockService)
+    reset(mockAnnualReturnValidator)
+    reset(mockLifeEventService)
 
-    when(mockAuthCon.authorise[Option[String]](any(),any())(any(), any())).thenReturn(Future(Some("1234")))
-    when(mockValidator.validate(any())).thenReturn(Nil)
+    when(mockAuthConnector.authorise[Option[String]](any(),any())(any(), any())).thenReturn(Future(Some("1234")))
+    when(mockAnnualReturnValidator.validate(any())).thenReturn(Nil)
     when(mockAppContext.endpointIsDisabled(any())).thenReturn(false)
   }
 
@@ -58,7 +50,7 @@ class AnnualReturnControllerSpec extends PlaySpec
 
     "return 201 created" when {
       "the life event service returns a ReportLifeEventSuccessResponse" in {
-        when(mockService.reportLifeEvent(any(), any(),any())(any())).
+        when(mockLifeEventService.reportLifeEvent(any(), any(),any())(any())).
           thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
 
         doRequest(){ res =>
@@ -74,7 +66,7 @@ class AnnualReturnControllerSpec extends PlaySpec
         }
       }
       "the life event service returns a ReportLifeEventSuccessResponse for a superseded life event" in {
-        when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
+        when(mockLifeEventService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
 
         doRequest(payload = supersedeJson){ res =>
           status(res) mustBe CREATED
@@ -127,7 +119,7 @@ class AnnualReturnControllerSpec extends PlaySpec
     "return 403 forbidden" when {
       "given a json payload which does not meet the business rules" in {
         val errors = List(ErrorValidation(DATE_ERROR, "The taxYear cannot be before 2017", Some("/taxYear")))
-        when(mockValidator.validate(any())).thenReturn(errors)
+        when(mockAnnualReturnValidator.validate(any())).thenReturn(errors)
 
         doRequest() { res =>
           status(res) mustBe FORBIDDEN
@@ -151,7 +143,7 @@ class AnnualReturnControllerSpec extends PlaySpec
 
 
       "the life event service returns a ReportLifeEventAccountClosedResponse" in {
-        when(mockService.reportLifeEvent(any(), any(),any())(any())).
+        when(mockLifeEventService.reportLifeEvent(any(), any(),any())(any())).
           thenReturn(Future.successful(ReportLifeEventAccountClosedResponse))
 
         doRequest(){ res =>
@@ -165,7 +157,7 @@ class AnnualReturnControllerSpec extends PlaySpec
 
 
       "the life event service returns a ReportLifeEventAccountVoidResponse" in {
-        when(mockService.reportLifeEvent(any(), any(),any())(any())).
+        when(mockLifeEventService.reportLifeEvent(any(), any(),any())(any())).
           thenReturn(Future.successful(ReportLifeEventAccountVoidResponse))
 
         doRequest(){ res =>
@@ -177,7 +169,7 @@ class AnnualReturnControllerSpec extends PlaySpec
         }
       }
       "the life event service returns a ReportLifeEventAccountCancelledResponse" in {
-        when(mockService.reportLifeEvent(any(), any(),any())(any())).
+        when(mockLifeEventService.reportLifeEvent(any(), any(),any())(any())).
           thenReturn(Future.successful(ReportLifeEventAccountCancelledResponse))
 
         doRequest(){ res =>
@@ -189,7 +181,7 @@ class AnnualReturnControllerSpec extends PlaySpec
         }
       }
       "the life event service returns a ReportLifeEventMismatchResponse" in {
-        when(mockService.reportLifeEvent(any(), any(),any())(any())).
+        when(mockLifeEventService.reportLifeEvent(any(), any(),any())(any())).
           thenReturn(Future.successful(ReportLifeEventMismatchResponse))
 
         doRequest(){ res =>
@@ -204,7 +196,7 @@ class AnnualReturnControllerSpec extends PlaySpec
 
     "return 404 not found" when {
       "the life event service returns a ReportLifeEventAccountNotFoundResponse" in {
-        when(mockService.reportLifeEvent(any(), any(),any())(any())).
+        when(mockLifeEventService.reportLifeEvent(any(), any(),any())(any())).
           thenReturn(Future.successful(ReportLifeEventAccountNotFoundResponse))
 
         doRequest(){ res =>
@@ -227,7 +219,7 @@ class AnnualReturnControllerSpec extends PlaySpec
 
     "return 409 conflict" when {
       "the life event service returns a ReportLifeEventAlreadyExistsResponse" in {
-        when(mockService.reportLifeEvent(any(), any(),any())(any())).
+        when(mockLifeEventService.reportLifeEvent(any(), any(),any())(any())).
           thenReturn(Future.successful(ReportLifeEventAlreadyExistsResponse("123")))
 
         doRequest(){ res =>
@@ -240,7 +232,7 @@ class AnnualReturnControllerSpec extends PlaySpec
         }
       }
       "the life event service returns a ReportLifeEventAlreadySupersededResponse" in {
-        when(mockService.reportLifeEvent(any(), any(),any())(any())).
+        when(mockLifeEventService.reportLifeEvent(any(), any(),any())(any())).
           thenReturn(Future.successful(ReportLifeEventAlreadySupersededResponse("123")))
 
         doRequest(){ res =>
@@ -256,7 +248,7 @@ class AnnualReturnControllerSpec extends PlaySpec
 
     "return 500 internal server error" when {
       "the life event service returns a error" in {
-        when(mockService.reportLifeEvent(any(), any(),any())(any())).
+        when(mockLifeEventService.reportLifeEvent(any(), any(),any())(any())).
           thenReturn(Future.failed(new RuntimeException("Test")))
 
         doRequest() { res =>
@@ -266,7 +258,7 @@ class AnnualReturnControllerSpec extends PlaySpec
         }
       }
       "the life event service returns a unexpected response" in {
-        when(mockService.reportLifeEvent(any(), any(),any())(any())).
+        when(mockLifeEventService.reportLifeEvent(any(), any(),any())(any())).
           thenReturn(Future.successful(ReportLifeEventFundReleaseNotFoundResponse))
 
         doRequest() { res =>
@@ -278,7 +270,7 @@ class AnnualReturnControllerSpec extends PlaySpec
 
     "return 503 service unavailable" when {
       "the life event service returns a ReportLifeEventServiceUnavailableResponse" in {
-        when(mockService.reportLifeEvent(any(), any(),any())(any())).
+        when(mockLifeEventService.reportLifeEvent(any(), any(),any())(any())).
           thenReturn(Future.successful(ReportLifeEventServiceUnavailableResponse))
 
         doRequest() { res =>
@@ -290,7 +282,7 @@ class AnnualReturnControllerSpec extends PlaySpec
 
     "audit lifeEventRequested" when {
       "the life event service returns a ReportLifeEventSuccessResponse" in {
-        when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
+        when(mockLifeEventService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
 
         val payload = supersedeJson
 
@@ -321,7 +313,7 @@ class AnnualReturnControllerSpec extends PlaySpec
     "audit lifeEventNotRequested" when {
       "given a json payload which does not meet the business rules" in {
         val errors = List(ErrorValidation(DATE_ERROR, "The taxYear cannot be before 2017", Some("/taxYear")))
-        when(mockValidator.validate(any())).thenReturn(errors)
+        when(mockAnnualReturnValidator.validate(any())).thenReturn(errors)
 
         doRequest() { res =>
           await(res)
@@ -345,7 +337,7 @@ class AnnualReturnControllerSpec extends PlaySpec
         }
       }
       "the life event service returns a failure response" in {
-        when(mockService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventAccountNotFoundResponse))
+        when(mockLifeEventService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventAccountNotFoundResponse))
 
         doRequest() { res =>
           await(res)
@@ -369,7 +361,7 @@ class AnnualReturnControllerSpec extends PlaySpec
         }
       }
       "the life event service returns a error" in {
-        when(mockService.reportLifeEvent(any(), any(),any())(any())).
+        when(mockLifeEventService.reportLifeEvent(any(), any(),any())(any())).
           thenReturn(Future.failed(new RuntimeException("Test")))
 
         doRequest() { res =>
@@ -420,22 +412,8 @@ class AnnualReturnControllerSpec extends PlaySpec
   private def doRequest(lmrn: String = lisaManager, accountId: String = accountId, acceptHeader: (String, String) = acceptHeaderV2, payload: JsValue = json)
                        (callback: (Future[Result]) =>  Unit): Unit = {
     val req = FakeRequest(Helpers.POST, "/")
-    val res = SUT.submitReturn(lmrn, accountId).apply(req.withHeaders(acceptHeader).withBody(AnyContentAsJson(payload)))
+    val res = annualReturnController.submitReturn(lmrn, accountId).apply(req.withHeaders(acceptHeader).withBody(AnyContentAsJson(payload)))
 
     callback(res)
   }
-
-  private val mockService: LifeEventService = mock[LifeEventService]
-  private val mockAuditService: AuditService = mock[AuditService]
-  private val mockAuthCon: AuthConnector = mock[AuthConnector]
-  private val mockValidator: AnnualReturnValidator = mock[AnnualReturnValidator]
-  val mockAppContext: AppContext = mock[AppContext]
-  val mockLisaMetrics: LisaMetrics = mock[LisaMetrics]
-  val mockControllerComponents = inject[ControllerComponents]
-  val mockParser = inject[PlayBodyParsers]
-
-  private val SUT = new AnnualReturnController(mockAuthCon, mockAppContext, mockService, mockAuditService, mockValidator, mockLisaMetrics, mockControllerComponents, mockParser) {
-    override lazy val v2endpointsEnabled = true
-  }
-
 }

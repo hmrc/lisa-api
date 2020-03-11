@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,11 @@
 
 package unit.services
 
+import helpers.ServiceTestFixture
 import org.joda.time.DateTime
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des.{DesAccountResponse, DesEmptySuccessResponse, DesFailureResponse, DesUnavailableResponse}
 import uk.gov.hmrc.lisaapi.services.AccountService
@@ -32,9 +30,9 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
 // scalastyle:off multiple.string.literals
-class AccountServiceSpec extends PlaySpec
-  with MockitoSugar
-  with OneAppPerSuite {
+class AccountServiceSpec extends ServiceTestFixture {
+
+  val accountService: AccountService = new AccountService(mockDesConnector)
 
   "Create Account" must {
 
@@ -411,7 +409,7 @@ class AccountServiceSpec extends PlaySpec
         when(mockDesConnector.getAccountInformation(any(), any())(any()))
           .thenReturn(Future.successful(successResponse))
 
-        val res = Await.result(SUT.getAccount(testLMRN, "A123456")(HeaderCarrier()), Duration.Inf)
+        val res = Await.result(accountService.getAccount(testLMRN, "A123456")(HeaderCarrier()), Duration.Inf)
 
         res mustBe successResponse
       }
@@ -424,7 +422,7 @@ class AccountServiceSpec extends PlaySpec
         when(mockDesConnector.getAccountInformation(any(), any())(any()))
           .thenReturn(Future.successful(DesUnavailableResponse))
 
-        val res = Await.result(SUT.getAccount(testLMRN, "A123456")(HeaderCarrier()), Duration.Inf)
+        val res = Await.result(accountService.getAccount(testLMRN, "A123456")(HeaderCarrier()), Duration.Inf)
 
         res mustBe GetLisaAccountServiceUnavailable
       }
@@ -433,7 +431,7 @@ class AccountServiceSpec extends PlaySpec
         when(mockDesConnector.getAccountInformation(any(), any())(any()))
           .thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNTID_NOT_FOUND")))
 
-        val res = Await.result(SUT.getAccount(testLMRN, "A123456")(HeaderCarrier()), Duration.Inf)
+        val res = Await.result(accountService.getAccount(testLMRN, "A123456")(HeaderCarrier()), Duration.Inf)
 
         res mustBe GetLisaAccountDoesNotExistResponse
       }
@@ -442,41 +440,35 @@ class AccountServiceSpec extends PlaySpec
         when(mockDesConnector.getAccountInformation(any(), any())(any()))
           .thenReturn(Future.successful(DesFailureResponse("X")))
 
-        val res = Await.result(SUT.getAccount(testLMRN, "A123456")(HeaderCarrier()), Duration.Inf)
+        val res = Await.result(accountService.getAccount(testLMRN, "A123456")(HeaderCarrier()), Duration.Inf)
 
         res mustBe GetLisaAccountErrorResponse
       }
-
     }
-
   }
 
-  private def doCreateRequest(callback: (CreateLisaAccountResponse) => Unit) = {
+  private def doCreateRequest(callback: (CreateLisaAccountResponse) => Unit): Unit = {
     val request = CreateLisaAccountCreationRequest("1234567890",  "9876543210", testDate)
-    val response = Await.result(SUT.createAccount(testLMRN, request)(HeaderCarrier()), Duration.Inf)
+    val response = Await.result(accountService.createAccount(testLMRN, request)(HeaderCarrier()), Duration.Inf)
 
     callback(response)
   }
 
-  private def doTransferRequest(callback: (CreateLisaAccountResponse) => Unit) = {
+  private def doTransferRequest(callback: (CreateLisaAccountResponse) => Unit): Unit = {
     val accountTransfer = AccountTransfer("123456", "123456", testDate)
     val request = CreateLisaAccountTransferRequest("Transferred", "1234567890", "9876543210", testDate, accountTransfer)
-    val response = Await.result(SUT.transferAccount(testLMRN, request)(HeaderCarrier()), Duration.Inf)
+    val response = Await.result(accountService.transferAccount(testLMRN, request)(HeaderCarrier()), Duration.Inf)
 
     callback(response)
   }
 
-  private def doCloseRequest(callback: (CloseLisaAccountResponse) => Unit) = {
+  private def doCloseRequest(callback: (CloseLisaAccountResponse) => Unit): Unit = {
     val request = CloseLisaAccountRequest("All funds withdrawn", testDate)
-    val response = Await.result(SUT.closeAccount(testLMRN, "A123456", request)(HeaderCarrier()), Duration.Inf)
+    val response = Await.result(accountService.closeAccount(testLMRN, "A123456", request)(HeaderCarrier()), Duration.Inf)
 
     callback(response)
   }
 
   val testDate = new DateTime("2000-01-01")
   val testLMRN = "Z019283"
-
-  val mockDesConnector: DesConnector = mock[DesConnector]
-
-  object SUT extends AccountService(mockDesConnector)
 }

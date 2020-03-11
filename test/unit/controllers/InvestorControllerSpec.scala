@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,44 +16,37 @@
 
 package unit.controllers
 
+import helpers.ControllerTestFixture
 import org.joda.time.DateTime
-import org.mockito.Matchers.{eq => matchersEquals, _}
+import org.mockito.ArgumentMatchers.{eq => matchersEquals, _}
 import org.mockito.Mockito._
-import org.scalatest._
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
-import play.api.mvc.{AnyContentAsJson, ControllerComponents, PlayBodyParsers}
+import play.api.mvc.AnyContentAsJson
 import play.api.test.Helpers._
 import play.api.test._
 import play.mvc.Http.HeaderNames
-import uk.gov.hmrc.auth.core.AuthConnector
-import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.controllers._
-import uk.gov.hmrc.lisaapi.metrics.LisaMetrics
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.services.{AuditService, InvestorService}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class InvestorControllerSpec extends PlaySpec
-  with MockitoSugar
-  with OneAppPerSuite
-  with BeforeAndAfterEach
-  with Injecting {
+class InvestorControllerSpec extends ControllerTestFixture {
 
+  val investorController: InvestorController = new InvestorController(mockAuthConnector, mockAppContext, mockInvestorService, mockAuditService, mockLisaMetrics, mockControllerComponents, mockParser) {
+    override lazy val v2endpointsEnabled = true
+  }
 
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
 
-  val investorJson = """{
+  val investorJson: String = """{
                          "investorNINO" : "AB123456D",
                          "firstName" : "Ex first Name",
                          "lastName" : "Ample",
                          "dateOfBirth" : "1973-03-24"
                        }""".stripMargin
 
-  val invalidInvestorJson = """{
+  val invalidInvestorJson: String = """{
                          "investorNINO" : 123456,
                          "firstName" : "Ex first Name",
                          "lastName" : "Ample",
@@ -64,16 +57,16 @@ class InvestorControllerSpec extends PlaySpec
 
   override def beforeEach() {
     reset(mockAuditService)
-    reset(mockService)
-    when(mockAuthCon.authorise[Option[String]](any(),any())(any(), any())).thenReturn(Future(Some("1234")))
+    reset(mockInvestorService)
+    when(mockAuthConnector.authorise[Option[String]](any(),any())(any(), any())).thenReturn(Future(Some("1234")))
   }
 
   "The Investor Controller" should {
 
     "return with status 201 created" in {
-      when(mockService.createInvestor(any(), any())(any())).thenReturn(Future.successful(CreateLisaInvestorSuccessResponse("AB123456")))
+      when(mockInvestorService.createInvestor(any(), any())(any())).thenReturn(Future.successful(CreateLisaInvestorSuccessResponse("AB123456")))
 
-      val res = SUT.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT,"/").withHeaders(acceptHeader).
+      val res = investorController.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT,"/").withHeaders(acceptHeader).
         withBody(AnyContentAsJson(Json.parse(investorJson))))
 
       status(res) must be (CREATED)
@@ -82,7 +75,7 @@ class InvestorControllerSpec extends PlaySpec
     "return with status 400 bad request" when {
 
       "given an invalid json request" in {
-        val res = SUT.createLisaInvestor(lisaManager).
+        val res = investorController.createLisaInvestor(lisaManager).
           apply(FakeRequest(Helpers.PUT, "/").
             withHeaders(acceptHeader).
             withBody(AnyContentAsJson(Json.parse(invalidInvestorJson))))
@@ -91,7 +84,7 @@ class InvestorControllerSpec extends PlaySpec
       }
 
       "given an invalid lmrn in the url" in {
-        val res = SUT.createLisaInvestor("Z").
+        val res = investorController.createLisaInvestor("Z").
           apply(FakeRequest(Helpers.PUT, "/").
             withHeaders(acceptHeader).
             withBody(AnyContentAsJson(Json.parse(investorJson))))
@@ -108,18 +101,18 @@ class InvestorControllerSpec extends PlaySpec
 
     "return with status 406 not acceptable" when {
       "given an invalid accept header" in {
-        when(mockService.createInvestor(any(), any())(any())).thenReturn(Future.successful(CreateLisaInvestorSuccessResponse("AB123456")))
-        val res = SUT.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT, "/").withHeaders(("accept", "application/vnd.hmrcc.1.0+json")))
+        when(mockInvestorService.createInvestor(any(), any())(any())).thenReturn(Future.successful(CreateLisaInvestorSuccessResponse("AB123456")))
+        val res = investorController.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT, "/").withHeaders(("accept", "application/vnd.hmrcc.1.0+json")))
         status(res) must be(406)
       }
     }
 
     "return with status 403 forbidden" when {
       "given the Investor details cannot be found" in {
-        when(mockService.createInvestor(any(), any())(any())).
+        when(mockInvestorService.createInvestor(any(), any())(any())).
           thenReturn(Future.successful(CreateLisaInvestorInvestorNotFoundResponse))
 
-        val res = SUT.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT,"/").withHeaders(acceptHeader).
+        val res = investorController.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT,"/").withHeaders(acceptHeader).
           withBody(AnyContentAsJson(Json.parse(investorJson))))
         status(res) must be (FORBIDDEN)
       }
@@ -127,10 +120,10 @@ class InvestorControllerSpec extends PlaySpec
 
     "return with status 409 conflict" when {
       "given the investor already exists on the system" in {
-        when(mockService.createInvestor(any(), any())(any())).
+        when(mockInvestorService.createInvestor(any(), any())(any())).
           thenReturn(Future.successful(CreateLisaInvestorAlreadyExistsResponse("1234567890")))
 
-        val res = SUT.createLisaInvestor(lisaManager).
+        val res = investorController.createLisaInvestor(lisaManager).
           apply(FakeRequest(Helpers.PUT, "/").
             withHeaders(acceptHeader).
             withBody(AnyContentAsJson(Json.parse(investorJson))))
@@ -148,10 +141,10 @@ class InvestorControllerSpec extends PlaySpec
 
     "return with status 500 internal server error" when {
       "an exception gets thrown" in {
-        when(mockService.createInvestor(any(), any())(any())).
+        when(mockInvestorService.createInvestor(any(), any())(any())).
           thenThrow(new RuntimeException("Test"))
 
-        val res = SUT.createLisaInvestor(lisaManager).
+        val res = investorController.createLisaInvestor(lisaManager).
           apply(FakeRequest(Helpers.PUT, "/").
             withHeaders(acceptHeader).
             withBody(AnyContentAsJson(Json.parse(investorJson))))
@@ -163,10 +156,10 @@ class InvestorControllerSpec extends PlaySpec
 
     "return with status 503 service unavailable" when {
       "given a CreateLisaInvestorServiceUnavailableResponse" in {
-        when(mockService.createInvestor(any(), any())(any())).
+        when(mockInvestorService.createInvestor(any(), any())(any())).
           thenReturn(Future.successful(CreateLisaInvestorServiceUnavailableResponse))
 
-        val res = SUT.createLisaInvestor(lisaManager).
+        val res = investorController.createLisaInvestor(lisaManager).
           apply(FakeRequest(Helpers.PUT, "/").
             withHeaders(acceptHeader).
             withBody(AnyContentAsJson(Json.parse(investorJson))))
@@ -178,41 +171,41 @@ class InvestorControllerSpec extends PlaySpec
 
     "convert names to uppercase" when {
       "given standard a-z characters" in {
-        when(mockService.createInvestor(any(), any())(any())).thenReturn(Future.successful(CreateLisaInvestorSuccessResponse("AB123456")))
+        when(mockInvestorService.createInvestor(any(), any())(any())).thenReturn(Future.successful(CreateLisaInvestorSuccessResponse("AB123456")))
 
         val json = investorJson.replace("Ex first Name", "rick").replace("Ample", "Sanchez")
 
-        val res = SUT.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT,"/").withHeaders(acceptHeader).
+        val res = investorController.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT,"/").withHeaders(acceptHeader).
           withBody(AnyContentAsJson(Json.parse(json))))
 
         await(res)
 
-        verify(mockService).createInvestor(matchersEquals(lisaManager), matchersEquals(CreateLisaInvestorRequest(investorNINO = "AB123456D", firstName = "RICK", lastName = "SANCHEZ", dateOfBirth = new DateTime("1973-03-24"))
+        verify(mockInvestorService).createInvestor(matchersEquals(lisaManager), matchersEquals(CreateLisaInvestorRequest(investorNINO = "AB123456D", firstName = "RICK", lastName = "SANCHEZ", dateOfBirth = new DateTime("1973-03-24"))
         ))(any())
       }
     }
 
     "reject names" when {
       "they contain diacritics" in {
-        when(mockService.createInvestor(any(), any())(any())).thenReturn(Future.successful(CreateLisaInvestorSuccessResponse("AB123456")))
+        when(mockInvestorService.createInvestor(any(), any())(any())).thenReturn(Future.successful(CreateLisaInvestorSuccessResponse("AB123456")))
 
         val json = investorJson.replace("Ex first Name", "riçk").replace("Ample", "Sånchez")
 
-        val res = SUT.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT,"/").withHeaders(acceptHeader).
+        val res = investorController.createLisaInvestor(lisaManager).apply(FakeRequest(Helpers.PUT,"/").withHeaders(acceptHeader).
           withBody(AnyContentAsJson(Json.parse(json))))
 
         status(res) mustBe BAD_REQUEST
 
-        verify(mockService, times(0)).createInvestor(any(), any())(any())
+        verify(mockInvestorService, times(0)).createInvestor(any(), any())(any())
       }
     }
 
     "audit an investorNotCreated event" when {
       "a investor not found response is returned" in {
-          when(mockService.createInvestor(any(), any())(any())).
+          when(mockInvestorService.createInvestor(any(), any())(any())).
             thenReturn(Future.successful(CreateLisaInvestorInvestorNotFoundResponse))
 
-          await(SUT.createLisaInvestor(lisaManager).
+          await(investorController.createLisaInvestor(lisaManager).
             apply(FakeRequest(Helpers.PUT, "/").
               withHeaders(acceptHeader).
               withBody(AnyContentAsJson(Json.parse(investorJson)))))
@@ -231,11 +224,11 @@ class InvestorControllerSpec extends PlaySpec
       "a investor already exists response is returned" in {
         val investorId = "9876543210"
 
-        when(mockService.createInvestor(any(), any())(any())).
+        when(mockInvestorService.createInvestor(any(), any())(any())).
           thenReturn(Future.successful(CreateLisaInvestorAlreadyExistsResponse(investorId)))
 
 
-        await(SUT.createLisaInvestor(lisaManager).
+        await(investorController.createLisaInvestor(lisaManager).
           apply(FakeRequest(Helpers.PUT, "/").
             withHeaders(acceptHeader).
             withBody(AnyContentAsJson(Json.parse(investorJson)))))
@@ -255,10 +248,10 @@ class InvestorControllerSpec extends PlaySpec
 
     "audit an investorCreated event" when {
       "a successful response is returned" in {
-        when(mockService.createInvestor(any(), any())(any())).
+        when(mockInvestorService.createInvestor(any(), any())(any())).
           thenReturn(Future.successful(CreateLisaInvestorSuccessResponse("AB123456")))
 
-        await(SUT.createLisaInvestor(lisaManager).
+        await(investorController.createLisaInvestor(lisaManager).
           apply(FakeRequest(Helpers.PUT,"/").
             withHeaders(acceptHeader).
             withBody(AnyContentAsJson(Json.parse(investorJson)))))
@@ -274,17 +267,5 @@ class InvestorControllerSpec extends PlaySpec
           ))(any())
       }
     }
-
-  }
-
-  val mockAuditService: AuditService = mock[AuditService]
-  val mockService: InvestorService = mock[InvestorService]
-  val mockAuthCon: AuthConnector = mock[AuthConnector]
-  val mockAppContext: AppContext = mock[AppContext]
-  val mockLisaMetrics: LisaMetrics = mock[LisaMetrics]
-  val mockControllerComponents = inject[ControllerComponents]
-  val mockParser = inject[PlayBodyParsers]
-  val SUT = new InvestorController(mockAuthCon, mockAppContext, mockService, mockAuditService, mockLisaMetrics, mockControllerComponents, mockParser) {
-    override lazy val v2endpointsEnabled = true
   }
 }

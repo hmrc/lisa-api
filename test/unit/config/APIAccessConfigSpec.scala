@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,16 @@
 
 package unit.config
 
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.PlaySpec
+import helpers.BaseTestFixture
 import play.api.Configuration
 import uk.gov.hmrc.lisaapi.config.APIAccessConfig
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito.when
 
-class APIAccessConfigSpec extends PlaySpec with MockitoSugar {
+class APIAccessConfigSpec extends BaseTestFixture {
 
-  val apiAccessConfigNone = APIAccessConfig(None)
-  val mockConfiguration = mock[Configuration]
-  val apiAccessConfigMocked = APIAccessConfig(Some(mockConfiguration))
+  val apiAccessConfigNone: APIAccessConfig = APIAccessConfig(None)
+  val apiAccessConfigMocked: APIAccessConfig = APIAccessConfig(Some(mockConfiguration))
 
   "APIAccessConfig created with no Configuration" should {
     "return private for type" in {
@@ -40,11 +38,11 @@ class APIAccessConfigSpec extends PlaySpec with MockitoSugar {
 
   "APIAccessConfig created with valid configuration" should {
     "return private for the access type" in {
-      when(mockConfiguration.getString(any(),any())).thenReturn(Some("PRIVATE"))
+      when(mockConfiguration.getOptional[String](any())(any())).thenReturn(Some("PRIVATE"))
       apiAccessConfigMocked.accessType must be ("PRIVATE")
     }
     "return a sequence of ids" in {
-      when(mockConfiguration.getStringSeq(any())).thenReturn(Some(Seq("a","b")))
+      when(mockConfiguration.getOptional[Seq[String]](any())(any())).thenReturn(Some(Seq("a","b")))
       apiAccessConfigMocked.whiteListedApplicationIds must be (Some(Seq("a","b")))
     }
   }

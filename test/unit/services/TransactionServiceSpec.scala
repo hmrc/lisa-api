@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,26 +16,22 @@
 
 package unit.services
 
+import helpers.ServiceTestFixture
 import org.joda.time.DateTime
-import org.mockito.Matchers.any
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
-import org.scalatest.MustMatchers
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.lisaapi.connectors.DesConnector
-import uk.gov.hmrc.lisaapi.models.{des, _}
 import uk.gov.hmrc.lisaapi.models.des._
+import uk.gov.hmrc.lisaapi.models.{des, _}
 import uk.gov.hmrc.lisaapi.services.TransactionService
 
-import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
 
-class TransactionServiceSpec extends PlaySpec
-  with MustMatchers
-  with MockitoSugar
-  with OneAppPerSuite {
+class TransactionServiceSpec extends ServiceTestFixture {
+
+  val transactionService: TransactionService = new TransactionService(mockDesConnector)
 
   "Get Transaction" must {
 
@@ -52,7 +48,7 @@ class TransactionServiceSpec extends PlaySpec
             creationDate = new DateTime("2000-01-01"),
             paymentStatus = "Pending")))
 
-        val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
+        val result = Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
 
         result mustBe GetTransactionSuccessResponse(
           transactionId = "12345",
@@ -75,7 +71,7 @@ class TransactionServiceSpec extends PlaySpec
         when(mockDesConnector.getTransaction(any(), any(), any())(any())).
           thenReturn(Future.successful(DesGetTransactionPending(new DateTime("2000-01-01"), None, None)))
 
-        val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
+        val result = Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
 
         result mustBe GetTransactionSuccessResponse(
           transactionId = "12345",
@@ -100,7 +96,7 @@ class TransactionServiceSpec extends PlaySpec
         when(mockDesConnector.getTransaction(any(), any(), any())(any())).
           thenReturn(Future.successful(DesFailureResponse("NOT_FOUND")))
 
-        val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
+        val result = Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
 
         result mustBe GetTransactionSuccessResponse(
           transactionId = "12345",
@@ -131,7 +127,7 @@ class TransactionServiceSpec extends PlaySpec
         when(mockDesConnector.getTransaction(any(), any(), any())(any())).
           thenReturn(Future.successful(DesGetTransactionPending(new DateTime("2000-01-01"), Some("YREF"), Some(30))))
 
-        val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
+        val result = Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
 
         result mustBe GetTransactionSuccessResponse(
           transactionId = "12345",
@@ -162,7 +158,7 @@ class TransactionServiceSpec extends PlaySpec
         when(mockDesConnector.getTransaction(any(), any(), any())(any())).
           thenReturn(Future.successful(DesFailureResponse("NOT_FOUND")))
 
-        val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
+        val result = Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
 
         result mustBe GetTransactionSuccessResponse(
           transactionId = "12345",
@@ -184,7 +180,7 @@ class TransactionServiceSpec extends PlaySpec
             creationDate = new DateTime("2000-01-01"),
             paymentStatus = "Cancelled")))
 
-        val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
+        val result = Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
 
         result mustBe GetTransactionSuccessResponse(
           transactionId = "12345",
@@ -207,7 +203,7 @@ class TransactionServiceSpec extends PlaySpec
             creationDate = new DateTime("2000-01-01"),
             paymentStatus = "Void")))
 
-        val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
+        val result = Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
 
         result mustBe GetTransactionSuccessResponse(
           transactionId = "12345",
@@ -231,7 +227,7 @@ class TransactionServiceSpec extends PlaySpec
             paymentStatus = "Superseded",
             supersededBy = Some("123456"))))
 
-        val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
+        val result = Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
 
         result mustBe GetTransactionSuccessResponse(
           transactionId = "12345",
@@ -260,7 +256,7 @@ class TransactionServiceSpec extends PlaySpec
             paymentReference = "002630000993",
             paymentAmount = 1.0)))
 
-        val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
+        val result = Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
 
         result mustBe GetTransactionSuccessResponse(
           transactionId = "12345",
@@ -295,7 +291,7 @@ class TransactionServiceSpec extends PlaySpec
         when(mockDesConnector.getTransaction(any(), any(), any())(any())).
           thenReturn(Future.successful(des.DesGetTransactionPaid(new DateTime("2000-01-01"), "XREF", 25)))
 
-        val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
+        val result = Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
 
         result mustBe GetTransactionSuccessResponse(
           transactionId = "12345",
@@ -324,7 +320,7 @@ class TransactionServiceSpec extends PlaySpec
         when(mockDesConnector.getTransaction(any(), any(), any())(any())).
           thenReturn(Future.successful(DesFailureResponse("COULD_NOT_PROCESS")))
 
-        val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
+        val result = Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
 
         result mustBe GetTransactionSuccessResponse(
           transactionId = "12345",
@@ -339,7 +335,7 @@ class TransactionServiceSpec extends PlaySpec
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
           thenReturn(Future.successful(DesFailureResponse("TRANSACTION_ID_NOT_FOUND")))
 
-        val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
+        val result = Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
 
         result mustBe GetTransactionTransactionNotFoundResponse
       }
@@ -350,7 +346,7 @@ class TransactionServiceSpec extends PlaySpec
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
           thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNTID_NOT_FOUND")))
 
-        val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
+        val result = Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
 
         result mustBe GetTransactionAccountNotFoundResponse
       }
@@ -361,7 +357,7 @@ class TransactionServiceSpec extends PlaySpec
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
           thenReturn(Future.successful(DesUnavailableResponse))
 
-        val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
+        val result = Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
 
         result mustBe GetTransactionServiceUnavailableResponse
       }
@@ -380,7 +376,7 @@ class TransactionServiceSpec extends PlaySpec
         when(mockDesConnector.getTransaction(any(), any(), any())(any())).
           thenReturn(Future.successful(DesUnavailableResponse))
 
-        val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
+        val result = Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
 
         result mustBe GetTransactionServiceUnavailableResponse
       }
@@ -399,15 +395,11 @@ class TransactionServiceSpec extends PlaySpec
         when(mockDesConnector.getTransaction(any(), any(), any())(any())).
           thenReturn(Future.successful(DesUnavailableResponse))
 
-        val result = Await.result(SUT.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
+        val result = Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
 
         result mustBe GetTransactionServiceUnavailableResponse
       }
     }
 
   }
-
-  val mockDesConnector = mock[DesConnector]
-  object SUT extends TransactionService(mockDesConnector)
-
 }

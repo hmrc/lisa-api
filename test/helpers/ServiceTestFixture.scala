@@ -14,17 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.lisaapi
+package helpers
 
-import javax.inject.{Inject, Singleton}
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import uk.gov.hmrc.lisaapi.connectors.DesConnector
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
-import play.api.Configuration
-import uk.gov.hmrc.api.connector.ApiServiceLocatorConnector
-import uk.gov.hmrc.http.HeaderCarrier
+trait ServiceTestFixture extends BaseTestFixture with GuiceOneAppPerSuite {
 
-@Singleton
-class ApplicationRegistration @Inject()(serviceLocatorConnector: ApiServiceLocatorConnector, config: Configuration) {
-  val registrationEnabled: Boolean = config.getBoolean("service-locator.enabled").getOrElse(false)
-
-  if (registrationEnabled) serviceLocatorConnector.register(HeaderCarrier())
+  val mockDesConnector: DesConnector = mock[DesConnector]
+  val mockAuditConnector: AuditConnector = mock[AuditConnector]
 }

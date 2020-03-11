@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,49 +16,44 @@
 
 package unit.controllers
 
+import helpers.ControllerTestFixture
 import org.joda.time.DateTime
-import org.mockito.Matchers.{any, eq => matchersEquals}
+import org.mockito.ArgumentMatchers.{any, eq => matchersEquals}
 import org.mockito.Mockito.{reset, verify, when}
-import org.scalatest.BeforeAndAfter
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.JsObject
-import play.api.mvc.{ControllerComponents, PlayBodyParsers, Result}
+import play.api.mvc.Result
 import play.api.test.Helpers._
 import play.api.test._
 import play.mvc.Http.HeaderNames
-import uk.gov.hmrc.auth.core.AuthConnector
-import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.controllers.GetAccountController
-import uk.gov.hmrc.lisaapi.metrics.LisaMetrics
-import uk.gov.hmrc.lisaapi.models.{GetLisaAccountDoesNotExistResponse, GetLisaAccountErrorResponse, GetLisaAccountSuccessResponse, GetLisaAccountTransferAccount}
-import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.services.{AccountService, AuditService}
+import uk.gov.hmrc.lisaapi.models.{GetLisaAccountDoesNotExistResponse, GetLisaAccountErrorResponse, GetLisaAccountSuccessResponse, GetLisaAccountTransferAccount, _}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class GetAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPerSuite with BeforeAndAfter with Injecting {
+class GetAccountControllerSpec extends ControllerTestFixture {
+
+  val getAccountController: GetAccountController = new GetAccountController(mockAuthConnector, mockAppContext, mockAccountService, mockAuditService, mockLisaMetrics, mockControllerComponents, mockParser) {
+    override lazy val v2endpointsEnabled = true
+  }
 
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
   val lisaManager = "Z019283"
   val accountId = "ABC/12345"
-  val mockAuthCon = mock[AuthConnector]
-
   val validDate = "2017-04-06"
   val invalidDate = "2015-04-05"
 
-  before {
+  override def beforeEach {
     reset(mockAuditService)
   }
 
   "The Get Account Details endpoint" must {
 
-    when(mockAuthCon.authorise[Option[String]](any(), any())(any(), any())).thenReturn(Future(Some("1234")))
+    when(mockAuthConnector.authorise[Option[String]](any(), any())(any(), any())).thenReturn(Future(Some("1234")))
 
     "return the correct json" when {
       "returning a valid open account response" in {
-        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(
+        when(mockAccountService.getAccount(any(), any())(any())).thenReturn(Future.successful(
           GetLisaAccountSuccessResponse(
             investorId = "9876543210",
             accountId = "8765432100",
@@ -88,7 +83,7 @@ class GetAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPer
         })
       }
       "returning a valid close account response" in {
-        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(
+        when(mockAccountService.getAccount(any(), any())(any())).thenReturn(Future.successful(
           GetLisaAccountSuccessResponse(
             investorId = "9876543210",
             accountId = "8765432100",
@@ -118,7 +113,7 @@ class GetAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPer
         })
       }
       "returning a valid transfer account response" in {
-        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(
+        when(mockAccountService.getAccount(any(), any())(any())).thenReturn(Future.successful(
           GetLisaAccountSuccessResponse(
             investorId = "9876543210",
             accountId = "8765432100",
@@ -157,7 +152,7 @@ class GetAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPer
         })
       }
       "returning a valid void account response" in {
-        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(
+        when(mockAccountService.getAccount(any(), any())(any())).thenReturn(Future.successful(
           GetLisaAccountSuccessResponse(
             investorId = "9876543210",
             accountId = "8765432100",
@@ -188,20 +183,20 @@ class GetAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPer
         })
       }
       "returning a service unavailable response" in {
-        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountServiceUnavailable))
+        when(mockAccountService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountServiceUnavailable))
         doSyncGetAccountDetailsRequest(res => {
           status(res) mustBe SERVICE_UNAVAILABLE
           (contentAsJson(res) \ "code").as[String] mustBe "SERVER_ERROR"
         })
       }
       "returning a account not found response" in {
-        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountDoesNotExistResponse))
+        when(mockAccountService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountDoesNotExistResponse))
         doSyncGetAccountDetailsRequest(res => {
           (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNTID_NOT_FOUND"
         })
       }
       "returning a internal server error response" in {
-        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountErrorResponse))
+        when(mockAccountService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountErrorResponse))
         doSyncGetAccountDetailsRequest(res => {
           (contentAsJson(res) \ "code").as[String] mustBe "INTERNAL_SERVER_ERROR"
         })
@@ -210,7 +205,7 @@ class GetAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPer
 
     "audit an getAccountReported event" when {
       "submitted a valid get account request" in {
-        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(
+        when(mockAccountService.getAccount(any(), any())(any())).thenReturn(Future.successful(
           GetLisaAccountSuccessResponse(
             investorId = "9876543210",
             accountId = accountId,
@@ -237,7 +232,7 @@ class GetAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPer
 
     "audit an getAccountNotReported event" when {
       "the account does not exist" in {
-        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountDoesNotExistResponse))
+        when(mockAccountService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountDoesNotExistResponse))
         doSyncGetAccountDetailsRequest(res => {
           await(res)
           verify(mockAuditService).audit(
@@ -251,7 +246,7 @@ class GetAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPer
         })
       }
       "there is a service unavailable error" in {
-        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountServiceUnavailable))
+        when(mockAccountService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountServiceUnavailable))
         doSyncGetAccountDetailsRequest(res => {
           await(res)
           verify(mockAuditService).audit(
@@ -265,7 +260,7 @@ class GetAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPer
         })
       }
       "there is an internal server error" in {
-        when(mockService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountErrorResponse))
+        when(mockAccountService.getAccount(any(), any())(any())).thenReturn(Future.successful(GetLisaAccountErrorResponse))
         doSyncGetAccountDetailsRequest(res => {
           await(res)
           verify(mockAuditService).audit(
@@ -279,22 +274,10 @@ class GetAccountControllerSpec extends PlaySpec with MockitoSugar with OneAppPer
         })
       }
     }
-
   }
 
   def doSyncGetAccountDetailsRequest(callback: (Future[Result]) => Unit) {
-    val res = SUT.getAccountDetails(lisaManager, accountId).apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
+    val res = getAccountController.getAccountDetails(lisaManager, accountId).apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
     callback(res)
   }
-
-  val mockService: AccountService = mock[AccountService]
-  val mockAppContext: AppContext = mock[AppContext]
-  val mockAuditService: AuditService = mock[AuditService]
-  val mockLisaMetrics: LisaMetrics = mock[LisaMetrics]
-  val mockControllerComponents = inject[ControllerComponents]
-  val mockParser = inject[PlayBodyParsers]
-  val SUT = new GetAccountController(mockAuthCon, mockAppContext, mockService, mockAuditService, mockLisaMetrics, mockControllerComponents, mockParser) {
-    override lazy val v2endpointsEnabled = true
-  }
-
 }

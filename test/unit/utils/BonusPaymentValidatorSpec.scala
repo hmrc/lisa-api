@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,10 @@
 
 package unit.utils
 
-import org.mockito.Mockito._
+import helpers.BaseTestFixture
 import org.joda.time.DateTime
+import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 import uk.gov.hmrc.lisaapi.controllers.ErrorValidation
 import uk.gov.hmrc.lisaapi.models._
@@ -29,17 +28,18 @@ import uk.gov.hmrc.lisaapi.utils.BonusPaymentValidator
 
 import scala.io.Source
 
-class BonusPaymentValidatorSpec extends PlaySpec
-  with MockitoSugar
-  with BeforeAndAfter {
+class BonusPaymentValidatorSpec extends BaseTestFixture with BeforeAndAfter {
+
+  val mockDateService: CurrentDateService = mock[CurrentDateService]
+  val bonusPaymentValidator: BonusPaymentValidator = new BonusPaymentValidator(mockDateService)
 
   before {
     reset(mockDateService)
     when(mockDateService.now()).thenReturn(DateTime.now)
   }
 
-  val validBonusPaymentJson = Source.fromInputStream(getClass().getResourceAsStream("/json/request.valid.bonus-payment.additional-bonus.json")).mkString
-  val validBonusPayment = Json.parse(validBonusPaymentJson).as[RequestBonusPaymentRequest]
+  val validBonusPaymentJson: String = Source.fromInputStream(getClass().getResourceAsStream("/json/request.valid.bonus-payment.additional-bonus.json")).mkString
+  val validBonusPayment: RequestBonusPaymentRequest = Json.parse(validBonusPaymentJson).as[RequestBonusPaymentRequest]
 
   "newSubsForPeriod and htbTransferForPeriod" should {
 
@@ -50,7 +50,7 @@ class BonusPaymentValidatorSpec extends PlaySpec
         val htb = validBonusPayment.htbTransfer.get.copy(htbTransferInForPeriod = 0)
         val request = validBonusPayment.copy(inboundPayments = ibp, htbTransfer = Some(htb))
 
-        val errors = SUT.validate(request)
+        val errors = bonusPaymentValidator.validate(request)
 
         errors.size mustBe 2
         errors(0).path mustBe Some("/inboundPayments/newSubsForPeriod")
@@ -61,7 +61,7 @@ class BonusPaymentValidatorSpec extends PlaySpec
         val ibp = validBonusPayment.inboundPayments.copy(newSubsForPeriod = None)
         val request = validBonusPayment.copy(inboundPayments = ibp, htbTransfer = None)
 
-        val errors = SUT.validate(request)
+        val errors = bonusPaymentValidator.validate(request)
 
         errors.size mustBe 2
         errors(0).path mustBe Some("/inboundPayments/newSubsForPeriod")
@@ -76,7 +76,7 @@ class BonusPaymentValidatorSpec extends PlaySpec
         val ibp = validBonusPayment.inboundPayments.copy(newSubsForPeriod = Some(0))
         val request = validBonusPayment.copy(inboundPayments = ibp, htbTransfer = None)
 
-        val errors = SUT.validate(request)
+        val errors = bonusPaymentValidator.validate(request)
 
         errors.size mustBe 1
         errors(0).path mustBe Some("/inboundPayments/newSubsForPeriod")
@@ -87,7 +87,7 @@ class BonusPaymentValidatorSpec extends PlaySpec
         val htb = validBonusPayment.htbTransfer.get.copy(htbTransferInForPeriod = 0)
         val request = validBonusPayment.copy(inboundPayments = ibp, htbTransfer = Some(htb))
 
-        val errors = SUT.validate(request)
+        val errors = bonusPaymentValidator.validate(request)
 
         errors.size mustBe 1
         errors(0).path mustBe Some("/htbTransfer/htbTransferInForPeriod")
@@ -105,7 +105,7 @@ class BonusPaymentValidatorSpec extends PlaySpec
         val ibp = validBonusPayment.inboundPayments.copy(newSubsForPeriod = Some(1), newSubsYTD = 0)
         val request = validBonusPayment.copy(inboundPayments = ibp)
 
-        val errors = SUT.validate(request)
+        val errors = bonusPaymentValidator.validate(request)
 
         errors.size mustBe 1
         errors(0).path mustBe Some("/inboundPayments/newSubsYTD")
@@ -123,7 +123,7 @@ class BonusPaymentValidatorSpec extends PlaySpec
         val htb = validBonusPayment.htbTransfer.get.copy(htbTransferInForPeriod = 1, htbTransferTotalYTD = 0)
         val request = validBonusPayment.copy(htbTransfer = Some(htb))
 
-        val errors = SUT.validate(request)
+        val errors = bonusPaymentValidator.validate(request)
 
         errors.size mustBe 1
         errors(0).path mustBe Some("/htbTransfer/htbTransferTotalYTD")
@@ -141,7 +141,7 @@ class BonusPaymentValidatorSpec extends PlaySpec
         val ibp = validBonusPayment.inboundPayments.copy(totalSubsForPeriod = 0)
         val request = validBonusPayment.copy(inboundPayments = ibp)
 
-        val errors = SUT.validate(request)
+        val errors = bonusPaymentValidator.validate(request)
 
         errors.size mustBe 1
         errors(0).path mustBe Some("/inboundPayments/totalSubsForPeriod")
@@ -159,7 +159,7 @@ class BonusPaymentValidatorSpec extends PlaySpec
         val ibp = validBonusPayment.inboundPayments.copy(totalSubsForPeriod = 10, totalSubsYTD = 5)
         val request = validBonusPayment.copy(inboundPayments = ibp)
 
-        val errors = SUT.validate(request)
+        val errors = bonusPaymentValidator.validate(request)
 
         errors.size mustBe 1
         errors(0).path mustBe Some("/inboundPayments/totalSubsYTD")
@@ -177,7 +177,7 @@ class BonusPaymentValidatorSpec extends PlaySpec
         val bon = validBonusPayment.bonuses.copy(bonusDueForPeriod = 0)
         val request = validBonusPayment.copy(bonuses = bon)
 
-        val errors = SUT.validate(request)
+        val errors = bonusPaymentValidator.validate(request)
 
         errors.size mustBe 1
         errors(0).path mustBe Some("/bonuses/bonusDueForPeriod")
@@ -195,7 +195,7 @@ class BonusPaymentValidatorSpec extends PlaySpec
         val bon = validBonusPayment.bonuses.copy(totalBonusDueYTD = 0)
         val request = validBonusPayment.copy(bonuses = bon)
 
-        val errors = SUT.validate(request)
+        val errors = bonusPaymentValidator.validate(request)
 
         errors.size mustBe 1
         errors(0).path mustBe Some("/bonuses/totalBonusDueYTD")
@@ -218,7 +218,7 @@ class BonusPaymentValidatorSpec extends PlaySpec
 
         val request = validBonusPayment.copy(periodStartDate = today, periodEndDate = periodEndDate)
 
-        val errors = SUT.validate(request)
+        val errors = bonusPaymentValidator.validate(request)
 
         errors mustBe List()
       }
@@ -232,7 +232,7 @@ class BonusPaymentValidatorSpec extends PlaySpec
         val periodEndDate = new DateTime("2017-06-05")
         val request = validBonusPayment.copy(periodStartDate = periodStartDate, periodEndDate = periodEndDate)
 
-        val errors = SUT.validate(request)
+        val errors = bonusPaymentValidator.validate(request)
 
         errors mustBe List(
           ErrorValidation(
@@ -248,7 +248,7 @@ class BonusPaymentValidatorSpec extends PlaySpec
         val periodEndDate = nextMonth.plusMonths(1).withDayOfMonth(5)
         val request = validBonusPayment.copy(periodStartDate = nextMonth, periodEndDate = periodEndDate)
 
-        val errors = SUT.validate(request)
+        val errors = bonusPaymentValidator.validate(request)
 
         errors mustBe List(
           ErrorValidation(
@@ -264,7 +264,7 @@ class BonusPaymentValidatorSpec extends PlaySpec
         val periodEndDate = new DateTime("2017-04-05")
         val request = validBonusPayment.copy(periodStartDate = periodStartDate, periodEndDate = periodEndDate)
 
-        val errors = SUT.validate(request)
+        val errors = bonusPaymentValidator.validate(request)
 
         errors must contain(
           ErrorValidation(
@@ -288,7 +288,7 @@ class BonusPaymentValidatorSpec extends PlaySpec
         val periodEndDate = new DateTime("2018-01-05")
         val request = validBonusPayment.copy(periodStartDate = periodStartDate, periodEndDate = periodEndDate)
 
-        val errors = SUT.validate(request)
+        val errors = bonusPaymentValidator.validate(request)
 
         errors mustBe List()
       }
@@ -300,7 +300,7 @@ class BonusPaymentValidatorSpec extends PlaySpec
       "it is not the 5th day of the month" in {
         val request = validBonusPayment.copy(periodEndDate = new DateTime("2017-05-01"))
 
-        val errors = SUT.validate(request)
+        val errors = bonusPaymentValidator.validate(request)
 
         errors mustBe List(
           ErrorValidation(
@@ -316,7 +316,7 @@ class BonusPaymentValidatorSpec extends PlaySpec
         val periodEndDate = new DateTime("2018-02-05")
         val request = validBonusPayment.copy(periodStartDate = periodStartDate, periodEndDate = periodEndDate)
 
-        val errors = SUT.validate(request)
+        val errors = bonusPaymentValidator.validate(request)
 
         errors mustBe List(
           ErrorValidation(
@@ -332,7 +332,7 @@ class BonusPaymentValidatorSpec extends PlaySpec
         val periodEndDate = new DateTime("2017-05-05")
         val request = validBonusPayment.copy(periodStartDate = periodStartDate, periodEndDate = periodEndDate)
 
-        val errors = SUT.validate(request)
+        val errors = bonusPaymentValidator.validate(request)
 
         errors mustBe List(
           ErrorValidation(
@@ -348,7 +348,7 @@ class BonusPaymentValidatorSpec extends PlaySpec
         val periodEndDate = new DateTime("2017-04-05")
         val request = validBonusPayment.copy(periodStartDate = periodStartDate, periodEndDate = periodEndDate)
 
-        val errors = SUT.validate(request)
+        val errors = bonusPaymentValidator.validate(request)
 
         errors must contain(
           ErrorValidation(
@@ -375,7 +375,7 @@ class BonusPaymentValidatorSpec extends PlaySpec
           htbTransfer = None
         )
 
-        SUT.validate(request) mustBe Nil
+        bonusPaymentValidator.validate(request) mustBe Nil
       }
 
     }
@@ -385,7 +385,7 @@ class BonusPaymentValidatorSpec extends PlaySpec
       "it is not populated and the claimReason is 'Superseded Bonus'" in {
         val request = validBonusPayment.copy(supersede = None, bonuses = Bonuses(10f, 10f, Some(10f), "Superseded Bonus"))
 
-        val errors = SUT.validate(request)
+        val errors = bonusPaymentValidator.validate(request)
 
         errors mustBe List(
           ErrorValidation(
@@ -404,7 +404,7 @@ class BonusPaymentValidatorSpec extends PlaySpec
           htbTransfer = None
         )
 
-        val errors = SUT.validate(request)
+        val errors = bonusPaymentValidator.validate(request)
 
         errors mustBe List(
           ErrorValidation(
@@ -424,7 +424,7 @@ class BonusPaymentValidatorSpec extends PlaySpec
     "return no errors" when {
 
       "everything is valid" in {
-        val errors = SUT.validate(validBonusPayment)
+        val errors = bonusPaymentValidator.validate(validBonusPayment)
 
         errors.size mustBe 0
       }
@@ -438,7 +438,7 @@ class BonusPaymentValidatorSpec extends PlaySpec
         val htb = validBonusPayment.htbTransfer.get.copy(htbTransferInForPeriod = 1, htbTransferTotalYTD = 0)
         val request = validBonusPayment.copy(inboundPayments = ibp, htbTransfer = Some(htb))
 
-        val errors = SUT.validate(request)
+        val errors = bonusPaymentValidator.validate(request)
 
         errors.size mustBe 3
         errors(0).path mustBe Some("/htbTransfer/htbTransferTotalYTD")
@@ -449,9 +449,4 @@ class BonusPaymentValidatorSpec extends PlaySpec
     }
 
   }
-
-  val mockDateService: CurrentDateService = mock[CurrentDateService]
-
-  object SUT extends BonusPaymentValidator(mockDateService)
-
 }

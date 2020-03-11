@@ -36,25 +36,22 @@ import scala.util.{Failure, Success, Try}
 class DesConnector @Inject()(
                               wsHttp: HttpClient,
                               environment: Environment,
-                              appContext: AppContext,
-                              runModeConfiguration: Configuration,
-                              runMode: RunMode
-                            )(implicit ec: ExecutionContext) extends ServicesConfig(runModeConfiguration: Configuration, runMode: RunMode) {
+                              appContext: AppContext
+                            )(implicit ec: ExecutionContext){
 
-  val urlEncodingFormat:String = "utf-8"
-  lazy val desUrl = baseUrl("des")
-  lazy val lisaServiceUrl = s"$desUrl/lifetime-isa/manager"
+  val urlEncodingFormat: String = "utf-8"
+  lazy val lisaServiceUrl: String = s"${appContext.desUrl}/lifetime-isa/manager"
 
   val httpReads: HttpReads[HttpResponse] = new HttpReads[HttpResponse] {
     override def read(method: String, url: String, response: HttpResponse) = response
   }
 
   private def updateHeaderCarrier(headerCarrier: HeaderCarrier) =
-    headerCarrier.copy(extraHeaders = Seq(("Environment" -> appContext.desUrlHeaderEnv)),
+    headerCarrier.copy(extraHeaders = Seq("Environment" -> appContext.desUrlHeaderEnv),
           authorization = Some(Authorization(s"Bearer ${appContext.desAuthToken}")))
 
   private def updateHeaderCarrierWithAllDesHeaders(headerCarrier: HeaderCarrier) =
-    headerCarrier.copy(extraHeaders = Seq(("Environment" -> appContext.desUrlHeaderEnv), ("OriginatorId" -> "DA2_LISA")),
+    headerCarrier.copy(extraHeaders = Seq("Environment" -> appContext.desUrlHeaderEnv, "OriginatorId" -> "DA2_LISA"),
       authorization = Some(Authorization(s"Bearer ${appContext.desAuthToken}")))
 
   /**
@@ -62,7 +59,7 @@ class DesConnector @Inject()(
     */
   def createInvestor(lisaManager: String, request: CreateLisaInvestorRequest)
                     (implicit hc: HeaderCarrier): Future[DesResponse] = {
-    val uri = s"$lisaServiceUrl/$lisaManager/investors"
+    val uri: String = s"$lisaServiceUrl/$lisaManager/investors"
     Logger.debug("Posting Create Investor request to des: " + uri)
     val result = wsHttp.POST[CreateLisaInvestorRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc), implicitly)
 
@@ -358,7 +355,7 @@ class DesConnector @Inject()(
 
   def getBulkPayment(lisaManager: String, startDate: DateTime, endDate: DateTime)
                     (implicit hc:HeaderCarrier): Future[DesResponse] = {
-    val uri = s"$desUrl/enterprise/financial-data/ZISA/$lisaManager/LISA" +
+    val uri = s"${appContext.desUrl}/enterprise/financial-data/ZISA/$lisaManager/LISA" +
       s"?dateFrom=${startDate.toString("yyyy-MM-dd")}" +
       s"&dateTo=${endDate.toString("yyyy-MM-dd")}" +
       "&onlyOpenItems=false"

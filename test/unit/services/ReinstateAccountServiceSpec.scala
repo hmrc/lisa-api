@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,10 @@
 
 package unit.services
 
-import org.mockito.Matchers._
+import helpers.ServiceTestFixture
+import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito.when
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesReinstateAccountSuccessResponse, _}
 import uk.gov.hmrc.lisaapi.services.ReinstateAccountService
@@ -31,10 +29,9 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
 // scalastyle:off multiple.string.literals
-class ReinstateAccountServiceSpec extends PlaySpec
-  with MockitoSugar
-  with OneAppPerSuite {
+class ReinstateAccountServiceSpec extends ServiceTestFixture {
 
+  val reinstateAccountService: ReinstateAccountService = new ReinstateAccountService(mockDesConnector)
 
   "Reinstate Account" must {
 
@@ -149,14 +146,10 @@ class ReinstateAccountServiceSpec extends PlaySpec
 
 
   private def doReinstateRequest(callback: (ReinstateLisaAccountResponse) => Unit) = {
-    val response = Await.result(SUT.reinstateAccountService(testLMRN, "A123456")(HeaderCarrier()), Duration.Inf)
+    val response = Await.result(reinstateAccountService.reinstateAccountService(testLMRN, "A123456")(HeaderCarrier()), Duration.Inf)
 
     callback(response)
   }
 
   val testLMRN = "Z019283"
-
-  val mockDesConnector: DesConnector = mock[DesConnector]
-
-  object SUT extends ReinstateAccountService(mockDesConnector)
 }

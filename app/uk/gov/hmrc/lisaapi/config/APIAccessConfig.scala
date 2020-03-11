@@ -22,17 +22,17 @@ case class APIAccessConfig(value: Option[Configuration]) {
 
   val PUBLIC = "PUBLIC"
 
-  def accessType = {
+  def accessType: String = {
     value match {
-      case Some(config) => config.getString("type").getOrElse(PUBLIC)
+      case Some(config) => config.getOptional[String]("type").getOrElse(PUBLIC)
       case None => PUBLIC
     }
   }
 
-  def whiteListedApplicationIds = {
+  def whiteListedApplicationIds: Option[Seq[String]] = {
     value match {
-      case Some(config) => config.getStringSeq("white-list.applicationIds")
-      case None => Some(Seq())
+      case Some(config) => config.getOptional[Seq[String]]("white-list.applicationIds")
+      case None => Some(Seq.empty)
     }
   }
 }

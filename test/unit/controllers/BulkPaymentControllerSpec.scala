@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,32 +16,25 @@
 
 package unit.controllers
 
+import helpers.ControllerTestFixture
 import org.joda.time.DateTime
-import org.mockito.Matchers.{any, eq => matchersEquals}
+import org.mockito.ArgumentMatchers.{any, eq => matchersEquals}
 import org.mockito.Mockito._
-import org.scalatest.BeforeAndAfter
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
-import play.api.mvc.{ControllerComponents, PlayBodyParsers}
 import play.api.test.Helpers._
-import play.api.test.{FakeRequest, Helpers, Injecting}
+import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
-import uk.gov.hmrc.auth.core.AuthConnector
-import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.controllers._
-import uk.gov.hmrc.lisaapi.metrics.LisaMetrics
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.services.{AuditService, BulkPaymentService, CurrentDateService}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class BulkPaymentControllerSpec extends PlaySpec
-  with MockitoSugar
-  with OneAppPerSuite
-  with BeforeAndAfter
-  with Injecting {
+class BulkPaymentControllerSpec extends ControllerTestFixture {
+
+  val mockBulkPaymentController: BulkPaymentController = new BulkPaymentController(mockAuthConnector, mockAppContext, mockDateTimeService, mockBulkPaymentService, mockAuditService, mockLisaMetrics, mockControllerComponents, mockParser) {
+    override lazy val v2endpointsEnabled = true
+  }
 
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.2.0+json")
   val currentDate = new DateTime("2020-01-01")
@@ -49,24 +42,24 @@ class BulkPaymentControllerSpec extends PlaySpec
   val invalidDate = "01-01-2018"
   val lmrn = "Z123456"
 
-  before {
+  override def beforeEach() {
     reset(mockAuditService)
-    when(mockAuthCon.authorise[Option[String]](any(),any())(any(), any())).
-      thenReturn(Future(Some("1234")))
+    when(mockAuthConnector.authorise[Option[String]](any(),any())(any(), any()))
+      .thenReturn(Future(Some("1234")))
 
-    when(mockCurrentDateService.now()).
-      thenReturn(currentDate)
+    when(mockDateTimeService.now())
+      .thenReturn(currentDate)
   }
 
   "Get Bulk Payment" must {
 
     "return 200 success" when {
       "the service returns a GetBulkPaymentSuccessResponse" in {
-        when(mockService.getBulkPayment(any(), any(), any())(any())).
+        when(mockBulkPaymentService.getBulkPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(successResponse))
 
         val oneYearInFuture = new DateTime(validDate).plusYears(1).toString("yyyy-MM-dd")
-        val result = SUT.getBulkPayment(lmrn, validDate, oneYearInFuture).
+        val result = mockBulkPaymentController.getBulkPayment(lmrn, validDate, oneYearInFuture).
           apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
 
         status(result) mustBe OK
@@ -82,7 +75,7 @@ class BulkPaymentControllerSpec extends PlaySpec
 
     "return 400 BAD_REQUEST" when {
       "the lisa manager reference number is invalid" in {
-        val result = SUT.getBulkPayment("Z1234567", validDate, validDate).
+        val result = mockBulkPaymentController.getBulkPayment("Z1234567", validDate, validDate).
           apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
 
         status(result) mustBe BAD_REQUEST
@@ -93,7 +86,7 @@ class BulkPaymentControllerSpec extends PlaySpec
         (json \ "message").as[String] mustBe "Enter lisaManagerReferenceNumber in the correct format, like Z1234"
       }
       "the startDate parameter is in the wrong format" in {
-        val result = SUT.getBulkPayment(lmrn, invalidDate, validDate).
+        val result = mockBulkPaymentController.getBulkPayment(lmrn, invalidDate, validDate).
           apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
 
         status(result) mustBe BAD_REQUEST
@@ -104,7 +97,7 @@ class BulkPaymentControllerSpec extends PlaySpec
         (json \ "message").as[String] mustBe ErrorBadRequestStart.message
       }
       "the endDate parameter is in the wrong format" in {
-        val result = SUT.getBulkPayment(lmrn, validDate, invalidDate).
+        val result = mockBulkPaymentController.getBulkPayment(lmrn, validDate, invalidDate).
           apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
 
         status(result) mustBe BAD_REQUEST
@@ -115,7 +108,7 @@ class BulkPaymentControllerSpec extends PlaySpec
         (json \ "message").as[String] mustBe ErrorBadRequestEnd.message
       }
       "the startDate and endDate parameters are invalid" in {
-        val result = SUT.getBulkPayment(lmrn, invalidDate, invalidDate).
+        val result = mockBulkPaymentController.getBulkPayment(lmrn, invalidDate, invalidDate).
           apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
 
         status(result) mustBe BAD_REQUEST
@@ -130,7 +123,7 @@ class BulkPaymentControllerSpec extends PlaySpec
     "return 403 FORBIDDEN" when {
       "the endDate parameter is in the future" in {
         val futureDate = currentDate.plusDays(1).toString("yyyy-MM-dd")
-        val result = SUT.getBulkPayment(lmrn, validDate, futureDate).
+        val result = mockBulkPaymentController.getBulkPayment(lmrn, validDate, futureDate).
           apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
 
         status(result) mustBe FORBIDDEN
@@ -142,7 +135,7 @@ class BulkPaymentControllerSpec extends PlaySpec
       }
       "the endDate is before the startDate" in {
         val beforeDate = new DateTime(validDate).minusDays(1).toString("yyyy-MM-dd")
-        val result = SUT.getBulkPayment(lmrn, validDate, beforeDate).
+        val result = mockBulkPaymentController.getBulkPayment(lmrn, validDate, beforeDate).
           apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
 
         status(result) mustBe FORBIDDEN
@@ -153,7 +146,7 @@ class BulkPaymentControllerSpec extends PlaySpec
         (json \ "message").as[String] mustBe ErrorBadRequestEndBeforeStart.message
       }
       "the startDate is before 6 April 2017" in {
-        val result = SUT.getBulkPayment(lmrn, "2017-04-05", validDate).
+        val result = mockBulkPaymentController.getBulkPayment(lmrn, "2017-04-05", validDate).
           apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
 
         status(result) mustBe FORBIDDEN
@@ -165,7 +158,7 @@ class BulkPaymentControllerSpec extends PlaySpec
       }
       "there's more than a year between startDate and endDate" in {
         val futureDate = new DateTime(validDate).plusYears(1).plusDays(1).toString("yyyy-MM-dd")
-        val result = SUT.getBulkPayment(lmrn, validDate, futureDate).
+        val result = mockBulkPaymentController.getBulkPayment(lmrn, validDate, futureDate).
           apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
 
         status(result) mustBe FORBIDDEN
@@ -179,10 +172,10 @@ class BulkPaymentControllerSpec extends PlaySpec
 
     "return 404 TRANSACTION_NOT_FOUND" when {
       "the service returns a GetBulkPaymentNotFoundResponse" in {
-        when(mockService.getBulkPayment(any(), any(), any())(any())).
+        when(mockBulkPaymentService.getBulkPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(GetBulkPaymentNotFoundResponse))
 
-        val result = SUT.getBulkPayment(lmrn, validDate, validDate).
+        val result = mockBulkPaymentController.getBulkPayment(lmrn, validDate, validDate).
           apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
 
         status(result) mustBe NOT_FOUND
@@ -196,10 +189,10 @@ class BulkPaymentControllerSpec extends PlaySpec
 
     "return 500 INTERNAL_SERVER_ERROR" when {
       "the service return a GetBulkPaymentErrorResponse" in {
-        when(mockService.getBulkPayment(any(), any(), any())(any())).
+        when(mockBulkPaymentService.getBulkPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(GetBulkPaymentErrorResponse))
 
-        val result = SUT.getBulkPayment(lmrn, validDate, validDate).
+        val result = mockBulkPaymentController.getBulkPayment(lmrn, validDate, validDate).
           apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
 
         status(result) mustBe INTERNAL_SERVER_ERROR
@@ -213,10 +206,10 @@ class BulkPaymentControllerSpec extends PlaySpec
 
     "return 503 SERVER_ERROR" when {
       "the service return a GetBulkPaymentServiceUnavailableResponse" in {
-        when(mockService.getBulkPayment(any(), any(), any())(any())).
+        when(mockBulkPaymentService.getBulkPayment(any(), any(), any())(any())).
           thenReturn(Future.successful(GetBulkPaymentServiceUnavailableResponse))
 
-        val result = SUT.getBulkPayment(lmrn, validDate, validDate).
+        val result = mockBulkPaymentController.getBulkPayment(lmrn, validDate, validDate).
           apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
 
         status(result) mustBe SERVICE_UNAVAILABLE
@@ -261,7 +254,7 @@ class BulkPaymentControllerSpec extends PlaySpec
         )
       )
 
-      val result = Future.successful(SUT.transformV1Response(input))
+      val result = Future.successful(mockBulkPaymentController.transformV1Response(input))
 
       status(result) mustBe OK
       contentAsJson(result) mustBe expected
@@ -275,7 +268,7 @@ class BulkPaymentControllerSpec extends PlaySpec
 
       val expected = Json.obj("code" -> "INTERNAL_SERVER_ERROR", "message" -> "Internal server error")
 
-      val result = Future.successful(SUT.transformV1Response(input))
+      val result = Future.successful(mockBulkPaymentController.transformV1Response(input))
 
       status(result) mustBe INTERNAL_SERVER_ERROR
       contentAsJson(result) mustBe expected
@@ -285,11 +278,11 @@ class BulkPaymentControllerSpec extends PlaySpec
 
   "audit getBulkPaymentReported" when {
     "the service returns a GetBulkPaymentSuccessResponse" in {
-      when(mockService.getBulkPayment(any(), any(), any())(any())).
+      when(mockBulkPaymentService.getBulkPayment(any(), any(), any())(any())).
         thenReturn(Future.successful(successResponse))
 
       val oneYearInFuture = new DateTime(validDate).plusYears(1).toString("yyyy-MM-dd")
-      val result = SUT.getBulkPayment(lmrn, validDate, oneYearInFuture).
+      val result = mockBulkPaymentController.getBulkPayment(lmrn, validDate, oneYearInFuture).
         apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
 
       await(result)
@@ -305,7 +298,7 @@ class BulkPaymentControllerSpec extends PlaySpec
 
   "audit getBulkPaymentNotReported" when {
     "the startDate parameter is in the wrong format" in {
-      val result = SUT.getBulkPayment(lmrn, invalidDate, validDate).
+      val result = mockBulkPaymentController.getBulkPayment(lmrn, invalidDate, validDate).
         apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
       await(result)
 
@@ -318,7 +311,7 @@ class BulkPaymentControllerSpec extends PlaySpec
         )))(any())
     }
     "the endDate parameter is in the wrong format" in {
-      val result = SUT.getBulkPayment(lmrn, validDate, invalidDate).
+      val result = mockBulkPaymentController.getBulkPayment(lmrn, validDate, invalidDate).
         apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
       await(result)
 
@@ -331,7 +324,7 @@ class BulkPaymentControllerSpec extends PlaySpec
         )))(any())
     }
     "the startDate and endDate parameters are invalid" in {
-      val result = SUT.getBulkPayment(lmrn, invalidDate, invalidDate).
+      val result = mockBulkPaymentController.getBulkPayment(lmrn, invalidDate, invalidDate).
         apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
       await(result)
 
@@ -345,7 +338,7 @@ class BulkPaymentControllerSpec extends PlaySpec
     }
     "the endDate parameter is in the future" in {
       val futureDate = currentDate.plusDays(1).toString("yyyy-MM-dd")
-      val result = SUT.getBulkPayment(lmrn, validDate, futureDate).
+      val result = mockBulkPaymentController.getBulkPayment(lmrn, validDate, futureDate).
         apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
       await(result)
 
@@ -359,7 +352,7 @@ class BulkPaymentControllerSpec extends PlaySpec
     }
     "the endDate is before the startDate" in {
       val beforeDate = new DateTime(validDate).minusDays(1).toString("yyyy-MM-dd")
-      val result = SUT.getBulkPayment(lmrn, validDate, beforeDate).
+      val result = mockBulkPaymentController.getBulkPayment(lmrn, validDate, beforeDate).
         apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
       await(result)
 
@@ -372,7 +365,7 @@ class BulkPaymentControllerSpec extends PlaySpec
         )))(any())
     }
     "the startDate is before 6 April 2017" in {
-      val result = SUT.getBulkPayment(lmrn, "2017-04-05", validDate).
+      val result = mockBulkPaymentController.getBulkPayment(lmrn, "2017-04-05", validDate).
         apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
       await(result)
 
@@ -386,7 +379,7 @@ class BulkPaymentControllerSpec extends PlaySpec
     }
     "there's more than a year between startDate and endDate" in {
       val futureDate = new DateTime(validDate).plusYears(1).plusDays(1).toString("yyyy-MM-dd")
-      val result = SUT.getBulkPayment(lmrn, validDate, futureDate).
+      val result = mockBulkPaymentController.getBulkPayment(lmrn, validDate, futureDate).
         apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
       await(result)
 
@@ -399,10 +392,10 @@ class BulkPaymentControllerSpec extends PlaySpec
         )))(any())
     }
     "the service returns a GetBulkPaymentNotFoundResponse" in {
-      when(mockService.getBulkPayment(any(), any(), any())(any())).
+      when(mockBulkPaymentService.getBulkPayment(any(), any(), any())(any())).
         thenReturn(Future.successful(GetBulkPaymentNotFoundResponse))
 
-      val result = SUT.getBulkPayment(lmrn, validDate, validDate).
+      val result = mockBulkPaymentController.getBulkPayment(lmrn, validDate, validDate).
         apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
       await(result)
 
@@ -415,10 +408,10 @@ class BulkPaymentControllerSpec extends PlaySpec
         )))(any())
     }
     "the service return a GetBulkPaymentErrorResponse" in {
-      when(mockService.getBulkPayment(any(), any(), any())(any())).
+      when(mockBulkPaymentService.getBulkPayment(any(), any(), any())(any())).
         thenReturn(Future.successful(GetBulkPaymentErrorResponse))
 
-      val result = SUT.getBulkPayment(lmrn, validDate, validDate).
+      val result = mockBulkPaymentController.getBulkPayment(lmrn, validDate, validDate).
         apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
       await(result)
 
@@ -431,10 +424,10 @@ class BulkPaymentControllerSpec extends PlaySpec
         )))(any())
     }
     "the service return a GetBulkPaymentServiceUnavailableResponse" in {
-      when(mockService.getBulkPayment(any(), any(), any())(any())).
+      when(mockBulkPaymentService.getBulkPayment(any(), any(), any())(any())).
         thenReturn(Future.successful(GetBulkPaymentServiceUnavailableResponse))
 
-      val result = SUT.getBulkPayment(lmrn, validDate, validDate).
+      val result = mockBulkPaymentController.getBulkPayment(lmrn, validDate, validDate).
         apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
       await(result)
 
@@ -455,18 +448,4 @@ class BulkPaymentControllerSpec extends PlaySpec
       BulkPaymentPending(100.0, new DateTime("2018-02-02"))
     )
   )
-
-  val mockService: BulkPaymentService = mock[BulkPaymentService]
-  val mockAuditService: AuditService = mock[AuditService]
-  val mockAuthCon: AuthConnector = mock[AuthConnector]
-  val mockCurrentDateService: CurrentDateService = mock[CurrentDateService]
-  val mockAppContext: AppContext = mock[AppContext]
-  val mockLisaMetrics: LisaMetrics = mock[LisaMetrics]
-  val mockControllerComponents = inject[ControllerComponents]
-  val mockParser = inject[PlayBodyParsers]
-
-  val SUT = new BulkPaymentController(mockAuthCon, mockAppContext, mockCurrentDateService, mockService, mockAuditService, mockLisaMetrics, mockControllerComponents, mockParser) {
-    override lazy val v2endpointsEnabled = true
-  }
-
 }

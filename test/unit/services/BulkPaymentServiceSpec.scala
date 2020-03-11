@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,24 +16,23 @@
 
 package unit.services
 
+import helpers.ServiceTestFixture
 import org.joda.time.DateTime
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito.when
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.lisaapi.connectors.DesConnector
-import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesUnavailableResponse}
 import uk.gov.hmrc.lisaapi.models._
+import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesUnavailableResponse}
 import uk.gov.hmrc.lisaapi.services.BulkPaymentService
 
-import scala.concurrent.{Await, Future}
-import scala.concurrent.duration.Duration
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
 
-class BulkPaymentServiceSpec extends PlaySpec
-  with MockitoSugar
-  with OneAppPerSuite {
+class BulkPaymentServiceSpec extends ServiceTestFixture {
+
+  val bulkPaymentService: BulkPaymentService = new BulkPaymentService(mockDesConnector)
+
 
   "Get Bulk Payment" must {
 
@@ -120,13 +119,11 @@ class BulkPaymentServiceSpec extends PlaySpec
   }
 
   private def doRequest(callback: (GetBulkPaymentResponse) => Unit) = {
-    val response = Await.result(SUT.getBulkPayment(lmrn, date, date)(HeaderCarrier()), Duration.Inf)
+    val response = Await.result(bulkPaymentService.getBulkPayment(lmrn, date, date)(HeaderCarrier()), Duration.Inf)
 
     callback(response)
   }
 
   val lmrn = "Z123456"
   val date = new DateTime("2018-01-01")
-  val mockDesConnector = mock[DesConnector]
-  object SUT extends BulkPaymentService(mockDesConnector)
 }

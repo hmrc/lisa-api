@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,42 +16,37 @@
 
 package unit.utils
 
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import helpers.BaseTestFixture
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
 
-class LisaExtensionsSpec  extends PlaySpec
-  with MockitoSugar
-  with OneAppPerSuite {
+class LisaExtensionsSpec  extends BaseTestFixture
+  with GuiceOneAppPerSuite {
 
-"LisaExtension" must {
+  "LisaExtension" must {
 
-  case class OneOption(first: Option[String])
-  case class TestInts(anInt: Int, anOpInt: Option[Int])
-  case class TestDouble(aDouble: Double, anOpDouble: Option[Double])
-  "Return empty for case class containing one None" in {
-    val one = OneOption(None)
-    one.toStringMap mustBe Map()
+    case class OneOption(first: Option[String])
+    case class TestInts(anInt: Int, anOpInt: Option[Int])
+    case class TestDouble(aDouble: Double, anOpDouble: Option[Double])
+    "Return empty for case class containing one None" in {
+      val one = OneOption(None)
+      one.toStringMap mustBe Map()
+    }
+
+    "Return Map for case with one Value" in {
+      val one = OneOption(Some("one"))
+      one.toStringMap mustBe Map("first" -> "one")
+    }
+
+    "Return Map with int and option int converted to strings" in {
+      val testints = TestInts(1,Some(1))
+      testints.toStringMap mustBe Map("anInt" -> "1", "anOpInt" -> "1")
+    }
+
+    "Return Map with Doubles and Option Doubles converted to strings" in {
+      val testdoubles = TestDouble(1.2d, Some(1.2d))
+      testdoubles.toStringMap mustBe Map("aDouble" -> "1.2", "anOpDouble" -> "1.2")
+
+    }
   }
-
-  "Return Map for case with one Value" in {
-    val one = OneOption(Some("one"))
-    one.toStringMap mustBe Map("first" -> "one")
-  }
-
-  "Return Map with int and option int converted to strings" in {
-    val testints = TestInts(1,Some(1))
-    testints.toStringMap mustBe Map("anInt" -> "1", "anOpInt" -> "1")
-  }
-
-  "Return Map with Doubles and Option Doubles converted to strings" in {
-    val testdoubles = TestDouble(1.2d, Some(1.2d))
-    testdoubles.toStringMap mustBe Map("aDouble" -> "1.2", "anOpDouble" -> "1.2")
-
-  }
-
-
-}
-
-
 }

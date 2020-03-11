@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,40 +16,34 @@
 
 package unit.controllers
 
-import org.mockito.Matchers.{eq => matchersEquals, _}
+import helpers.ControllerTestFixture
+import org.mockito.ArgumentMatchers.{eq => matchersEquals, _}
 import org.mockito.Mockito._
-import org.scalatest.BeforeAndAfterEach
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
-import play.api.mvc.{AnyContentAsJson, ControllerComponents, PlayBodyParsers, Result}
+import play.api.mvc.{AnyContentAsJson, Result}
 import play.api.test.Helpers._
 import play.api.test._
 import play.mvc.Http.HeaderNames
-import uk.gov.hmrc.auth.core.AuthConnector
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.controllers._
-import uk.gov.hmrc.lisaapi.metrics.LisaMetrics
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.services.{AuditService, UpdateSubscriptionService}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 
-class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with OneAppPerSuite with BeforeAndAfterEach with Injecting {
+class UpdateFirstSubscriptionDateSpec extends ControllerTestFixture {
+
+  val updateSubscriptionController: UpdateSubscriptionController = new UpdateSubscriptionController(mockAuthConnector, mockAppContext, mockUpdateSubscritionService, mockAuditService, mockLisaMetrics, mockControllerComponents, mockParser) {
+    override lazy val v2endpointsEnabled = true
+  }
 
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
   val lisaManager = "Z019283"
   val accountId = "1234/567890"
-  val mockAuthCon = mock[AuthConnector]
-
-  implicit val hc: HeaderCarrier = HeaderCarrier()
 
   override def beforeEach() {
     reset(mockAuditService)
-    when(mockAuthCon.authorise[Option[String]](any(), any())(any(), any())).thenReturn(Future(Some("1234")))
+    when(mockAuthConnector.authorise[Option[String]](any(), any())(any(), any())).thenReturn(Future(Some("1234")))
   }
 
   val updateFirstSubscriptionDate =
@@ -60,7 +54,7 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
   "The update first subscription date endpoint" must {
     "audit a firstSubscriptionDateUpdated event" when {
       "the data service returns a UpdateSubscriptionSuccessResponse" in {
-        when(mockService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionSuccessResponse("code", "message")))
+        when(mockUpdateSubscritionService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionSuccessResponse("code", "message")))
         doUpdateSubsDate(updateFirstSubscriptionDate) { result =>
           await(result)
 
@@ -93,7 +87,7 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
         }
       }
       "the data service returns a UpdateFirstSubscriptionDateAccountAlreadyVoidedResponse" in {
-        when(mockService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionAccountVoidedResponse))
+        when(mockUpdateSubscritionService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionAccountVoidedResponse))
 
         doUpdateSubsDate(updateFirstSubscriptionDate) { result =>
           await(result)
@@ -110,7 +104,7 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
         }
       }
       "the data service returns a UpdateFirstSubscriptionDateAccountAlreadyClosedResponse" in {
-        when(mockService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionAccountClosedResponse))
+        when(mockUpdateSubscritionService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionAccountClosedResponse))
 
         doUpdateSubsDate(updateFirstSubscriptionDate) { result =>
           await(result)
@@ -127,7 +121,7 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
         }
       }
       "the data service returns a UpdateFirstSubscriptionDateAccountNotFound" in {
-        when(mockService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionAccountNotFoundResponse))
+        when(mockUpdateSubscritionService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionAccountNotFoundResponse))
 
         doUpdateSubsDate(updateFirstSubscriptionDate) { result =>
           await(result)
@@ -144,7 +138,7 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
         }
       }
       "the data service returns a UpdateSubscriptionServiceUnavailableResponse" in {
-        when(mockService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionServiceUnavailableResponse))
+        when(mockUpdateSubscritionService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionServiceUnavailableResponse))
 
         doUpdateSubsDate(updateFirstSubscriptionDate) { result =>
           await(result)
@@ -161,7 +155,7 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
         }
       }
       "the data service returns a UpdateFirstSubscriptionDateErrorResponse" in {
-        when(mockService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionErrorResponse))
+        when(mockUpdateSubscritionService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionErrorResponse))
 
         doUpdateSubsDate(updateFirstSubscriptionDate) { result =>
           await(result)
@@ -180,7 +174,7 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
     }
     "return with status 200 ok and an account Id" when {
       "the data service returns a UpdateSubscriptionSuccessResponse" in {
-        when(mockService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionSuccessResponse("UPDATED", "message")))
+        when(mockUpdateSubscritionService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionSuccessResponse("UPDATED", "message")))
         doUpdateSubsDate(updateFirstSubscriptionDate) { res =>
           status(res) mustBe (OK)
           (contentAsJson(res) \ "data" \ "accountId").as[String] mustBe accountId
@@ -200,7 +194,7 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
         }
       }
       "an invalid lmrn is sent" in {
-        when(mockService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionSuccessResponse("code", "message")))
+        when(mockUpdateSubscritionService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionSuccessResponse("code", "message")))
 
         doUpdateSubsDate(updateFirstSubscriptionDate, lmrn = "123") { res =>
           status(res) mustBe (BAD_REQUEST)
@@ -210,7 +204,7 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
         }
       }
       "an invalid accountId is sent" in {
-        when(mockService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionSuccessResponse("code", "message")))
+        when(mockUpdateSubscritionService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionSuccessResponse("code", "message")))
 
         doUpdateSubsDate(updateFirstSubscriptionDate, accId = "1=2!") { res =>
           status(res) mustBe (BAD_REQUEST)
@@ -235,7 +229,7 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
     }
     "return with status 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_CLOSED" when {
       "the data service returns a UpdateSubscriptionAccountClosedResponse" in {
-        when(mockService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionAccountClosedResponse))
+        when(mockUpdateSubscritionService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionAccountClosedResponse))
 
         doUpdateSubsDate(updateFirstSubscriptionDate) { res =>
           status(res) mustBe (FORBIDDEN)
@@ -245,7 +239,7 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
     }
     "return with status 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_CANCELLED" when {
       "the data service returns a UpdateSubscriptionAccountCancelledResponse" in {
-        when(mockService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionAccountCancelledResponse))
+        when(mockUpdateSubscritionService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionAccountCancelledResponse))
 
         doUpdateSubsDate(updateFirstSubscriptionDate) { res =>
           status(res) mustBe (FORBIDDEN)
@@ -255,7 +249,7 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
     }
     "return with status 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_VOID" when {
       "the data service returns a UpdateSubscriptionAccountVoidedResponse" in {
-        when(mockService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionAccountVoidedResponse))
+        when(mockUpdateSubscritionService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionAccountVoidedResponse))
 
         doUpdateSubsDate(updateFirstSubscriptionDate) { res =>
           status(res) mustBe (FORBIDDEN)
@@ -265,7 +259,7 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
     }
     "return with status 404 not found and a code of INVESTOR_ACCOUNTID_NOT_FOUND" when {
       "the data service returns a UpdateFirstSubscriptionDateAccountNotFound" in {
-        when(mockService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionAccountNotFoundResponse))
+        when(mockUpdateSubscritionService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionAccountNotFoundResponse))
 
         doUpdateSubsDate(updateFirstSubscriptionDate) { res =>
 
@@ -276,7 +270,7 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
     }
     "return with status 500 internal server error" when {
       "the data service returns an error" in {
-        when(mockService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionErrorResponse))
+        when(mockUpdateSubscritionService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionErrorResponse))
 
         doUpdateSubsDate(updateFirstSubscriptionDate) { res =>
           status(res) mustBe (INTERNAL_SERVER_ERROR)
@@ -285,7 +279,7 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
     }
     "return with status 503 service unavailable" when {
       "the data service returns a UpdateSubscriptionServiceUnavailableResponse" in {
-        when(mockService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionServiceUnavailableResponse))
+        when(mockUpdateSubscritionService.updateSubscription(any(), any(), any())(any())).thenReturn(Future.successful(UpdateSubscriptionServiceUnavailableResponse))
 
         doUpdateSubsDate(updateFirstSubscriptionDate) { res =>
           status(res) mustBe SERVICE_UNAVAILABLE
@@ -296,21 +290,9 @@ class UpdateFirstSubscriptionDateSpec extends PlaySpec with MockitoSugar with On
   }
 
   def doUpdateSubsDate(jsonString: String, lmrn: String = lisaManager, accId: String = accountId)(callback: (Future[Result]) => Unit) {
-    val res = SUT.updateSubscription(lmrn, accId).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
+    val res = updateSubscriptionController.updateSubscription(lmrn, accId).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
       withBody(AnyContentAsJson(Json.parse(jsonString))))
 
     callback(res)
   }
-
-  val mockService: UpdateSubscriptionService = mock[UpdateSubscriptionService]
-  val mockAuditService: AuditService = mock[AuditService]
-  val mockAppContext: AppContext = mock[AppContext]
-  val mockLisaMetrics: LisaMetrics = mock[LisaMetrics]
-  val mockControllerComponents = inject[ControllerComponents]
-  val mockParser = inject[PlayBodyParsers]
-
-  val SUT = new UpdateSubscriptionController(mockAuthCon, mockAppContext, mockService, mockAuditService, mockLisaMetrics, mockControllerComponents, mockParser) {
-    override lazy val v2endpointsEnabled = true
-  }
-
 }

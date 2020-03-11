@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package unit.models
 import org.joda.time.DateTime
 import org.mockito.Mockito.{reset, when}
 import org.scalatest.BeforeAndAfter
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsPath, Json, JsonValidationError}
 import uk.gov.hmrc.lisaapi.LisaConstants
@@ -27,10 +27,7 @@ import uk.gov.hmrc.lisaapi.controllers.ErrorValidation
 import uk.gov.hmrc.lisaapi.models.{AnnualReturn, AnnualReturnSupersede, AnnualReturnValidator}
 import uk.gov.hmrc.lisaapi.services.CurrentDateService
 
-class AnnualReturnSpec extends PlaySpec
-  with LisaConstants
-  with MockitoSugar
-  with BeforeAndAfter {
+class AnnualReturnSpec extends PlaySpec with LisaConstants with MockitoSugar with BeforeAndAfter {
 
   "AnnualReturnSupersede" must {
 
