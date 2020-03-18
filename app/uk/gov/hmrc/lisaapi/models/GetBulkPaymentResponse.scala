@@ -28,17 +28,17 @@ case object GetBulkPaymentErrorResponse extends GetBulkPaymentResponse
 case object GetBulkPaymentServiceUnavailableResponse extends GetBulkPaymentResponse
 
 trait BulkPayment
-
 case class BulkPaymentPaid(paymentAmount: Amount, paymentDate: DateTime, paymentReference: String) extends BulkPayment
 case class BulkPaymentPending(paymentAmount: Amount, dueDate: DateTime) extends BulkPayment
 case class BulkPaymentCollected(paymentAmount: Amount, paymentDate: DateTime, paymentReference: String) extends BulkPayment
 case class BulkPaymentDue(paymentAmount: Amount, dueDate: DateTime) extends BulkPayment
 
 object BulkPayment {
+
   implicit val bpPaidReads: Reads[BulkPaymentPaid] = (
     (JsPath \ "clearedAmount").read[Amount] and
     (JsPath \ "items" \ 0 \ "clearingDate").read(JsonReads.isoDate).map(new DateTime(_)) and
-    (JsPath \ "sapDocumentNumber").read[String]
+    (JsPath \ "items" \ 0 \ "clearingSAPDocument").read[String]
   )((amount, date, ref) => BulkPaymentPaid.apply(amount.abs, date, ref))
 
   implicit val bpPaidWrites: Writes[BulkPaymentPaid] = (
@@ -60,7 +60,7 @@ object BulkPayment {
   implicit val bpCollectedReads: Reads[BulkPaymentCollected] = (
     (JsPath \ "clearedAmount").read[Amount] and
     (JsPath \ "items" \ 0 \ "clearingDate").read(JsonReads.isoDate).map(new DateTime(_)) and
-    (JsPath \ "sapDocumentNumber").read[String]
+    (JsPath \ "items" \ 0 \ "clearingSAPDocument").read[String]
   )((amount, date, ref) => BulkPaymentCollected.apply(amount.abs, date, ref))
 
   implicit val bpCollectedWrites: Writes[BulkPaymentCollected] = (
@@ -130,13 +130,11 @@ object BulkPayment {
     }
   }
 
-  implicit val bpWrites: Writes[BulkPayment] = Writes[BulkPayment] { bp =>
-    bp match {
-      case paid: BulkPaymentPaid => bpPaidWrites.writes(paid)
-      case pending: BulkPaymentPending => bpPendingWrites.writes(pending)
-      case collected: BulkPaymentCollected => bpCollectedWrites.writes(collected)
-      case due: BulkPaymentDue => bpDueWrites.writes(due)
-    }
+  implicit val bpWrites: Writes[BulkPayment] = Writes[BulkPayment] {
+    case paid: BulkPaymentPaid => bpPaidWrites.writes(paid)
+    case pending: BulkPaymentPending => bpPendingWrites.writes(pending)
+    case collected: BulkPaymentCollected => bpCollectedWrites.writes(collected)
+    case due: BulkPaymentDue => bpDueWrites.writes(due)
   }
 }
 
