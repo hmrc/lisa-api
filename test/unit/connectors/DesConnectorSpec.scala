@@ -1250,9 +1250,9 @@ class DesConnectorSpec extends DesConnectorTestHelper {
             |    "financialTransactions": [
             |      {
             |        "clearedAmount": -1000,
-            |        "sapDocumentNumber": "ABC123456789",
             |        "items": [
             |          {
+            |            "clearingSAPDocument": "ABC123456789",
             |            "clearingDate": "2017-06-01"
             |          }
             |        ]
