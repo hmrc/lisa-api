@@ -24,6 +24,7 @@ import uk.gov.hmrc.lisaapi.models.CreateLisaInvestorRequest
 class CreateLisaInvestorRequestSpec extends PlaySpec {
 
   val validRequestJson = """{"investorNINO":"AB123456A", "firstName":"A", "lastName":"B", "dateOfBirth":"2000-02-29"}"""
+  val validRequestJsonWithSpaces = """{"investorNINO":"AB123456B", "firstName":"  A      ", "lastName":" C    ", "dateOfBirth":"2000-02-29"}"""
 
   "CreateLisaInvestorRequest" must {
 
@@ -36,6 +37,22 @@ class CreateLisaInvestorRequestSpec extends PlaySpec {
           data.investorNINO mustBe "AB123456A"
           data.firstName mustBe "A"
           data.lastName mustBe "B"
+          data.dateOfBirth.getYear mustBe 2000
+          data.dateOfBirth.getMonthOfYear mustBe 2
+          data.dateOfBirth.getDayOfMonth mustBe 29
+        }
+      }
+    }
+
+    "serialize from json with spaces" in {
+      val res = Json.parse(validRequestJsonWithSpaces).validate[CreateLisaInvestorRequest]
+
+      res match {
+        case JsError(errors) => fail()
+        case JsSuccess(data, path) => {
+          data.investorNINO mustBe "AB123456B"
+          data.firstName mustBe "A"
+          data.lastName mustBe "C"
           data.dateOfBirth.getYear mustBe 2000
           data.dateOfBirth.getMonthOfYear mustBe 2
           data.dateOfBirth.getDayOfMonth mustBe 29

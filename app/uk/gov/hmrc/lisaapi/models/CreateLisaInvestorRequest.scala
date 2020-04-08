@@ -25,8 +25,8 @@ case class CreateLisaInvestorRequest(investorNINO: Nino, firstName: Name, lastNa
 object CreateLisaInvestorRequest {
   implicit val createLisaInvestorRequestReads: Reads[CreateLisaInvestorRequest] = (
     (JsPath \ "investorNINO").read[Nino](JsonReads.nino) and
-    (JsPath \ "firstName").read(JsonReads.name).map[String](_.toUpperCase) and
-    (JsPath \ "lastName").read(JsonReads.name).map[String](_.toUpperCase) and
+    (JsPath \ "firstName").read(JsonReads.name).map[String](_.toUpperCase.trim) and
+    (JsPath \ "lastName").read(JsonReads.name).map[String](_.toUpperCase.trim) and
     (JsPath \ "dateOfBirth").read(JsonReads.notFutureDate).map(new DateTime(_))
   )(CreateLisaInvestorRequest.apply _)
 
