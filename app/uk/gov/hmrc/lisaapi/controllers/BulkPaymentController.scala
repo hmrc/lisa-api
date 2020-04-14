@@ -61,19 +61,17 @@ class BulkPaymentController @Inject()(
               case s: GetBulkPaymentSuccessResponse =>
                 getBulkPaymentAudit(lisaManager)
                 lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.TRANSACTION)
-                withApiVersion {
-                  case Some(VERSION_2) => Future.successful(Ok(Json.toJson(s)))
-                }
+                Future.successful(Ok(Json.toJson(s)))
+
               case GetBulkPaymentNotFoundResponse =>
                 lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.TRANSACTION)
-                withApiVersion {
-                  case Some(VERSION_2) =>
                     getBulkPaymentAudit(lisaManager, Some(ErrorBulkTransactionNotFoundV2.errorCode))
                     Future.successful(NotFound(Json.toJson(ErrorBulkTransactionNotFoundV2)))
-                }
+
               case GetBulkPaymentServiceUnavailableResponse =>
                 getBulkPaymentAudit(lisaManager, Some(ErrorServiceUnavailable.errorCode))
                 Future.successful(ErrorServiceUnavailable.asResult)
+
               case _ =>
                 getBulkPaymentAudit(lisaManager, Some(ErrorInternalServerError.errorCode))
                 lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.TRANSACTION)

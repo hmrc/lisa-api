@@ -61,14 +61,11 @@ class LifeEventController @Inject()(
                   val data = ApiResponseData(message = "Life event created", lifeEventId = Some(lifeEventId))
                   Future.successful(Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED))))
                 case res: ReportLifeEventResponse =>
-                  withApiVersion {
-                    case Some(VERSION_2) =>
                       val errorResponse = v2errors.applyOrElse(res, { _: ReportLifeEventResponse =>
                         Logger.debug(s"Matched an unexpected response: $res, returning a 500 error")
                         ErrorInternalServerError
                       })
                       Future.successful(error(errorResponse, lisaManager, accountId, req))
-                  }
               }
             }
           }

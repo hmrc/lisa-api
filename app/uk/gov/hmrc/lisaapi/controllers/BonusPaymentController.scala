@@ -71,9 +71,7 @@ class BonusPaymentController @Inject()(
 
       withValidLMRN(lisaManager) { () =>
         withValidAccountId(accountId) { () =>
-          withApiVersion {
-            case Some(VERSION_2) => processRequestBonusPayment(lisaManager, accountId, RequestBonusPaymentRequest.requestBonusPaymentReadsV2)
-          }
+            processRequestBonusPayment(lisaManager, accountId, RequestBonusPaymentRequest.requestBonusPaymentReadsV2)
         }
       }
     }
@@ -99,20 +97,8 @@ class BonusPaymentController @Inject()(
     getService.getBonusOrWithdrawal(lisaManager, accountId, transactionId).flatMap {
       case response: GetBonusResponse =>
         lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.BONUS_PAYMENT)
-        withApiVersion {
-          case Some(VERSION_1) =>
-            if (response.bonuses.claimReason == "Superseded Bonus") {
-              getBonusPaymentAudit(lisaManager, accountId, transactionId, Some(ErrorInternalServerError.errorCode))
-              Logger.warn(s"API v1 received a superseded bonus claim. ID was $transactionId")
-              Future.successful(InternalServerError(Json.toJson(ErrorInternalServerError)))
-            } else {
-              getBonusPaymentAudit(lisaManager, accountId, transactionId)
-              Future.successful(Ok(Json.toJson(response.copy(supersededBy = None))))
-            }
-          case Some(VERSION_2) =>
             getBonusPaymentAudit(lisaManager, accountId, transactionId)
             Future.successful(Ok(Json.toJson(response)))
-        }
 
       case _: GetWithdrawalResponse | GetBonusOrWithdrawalTransactionNotFoundResponse =>
         getBonusPaymentAudit(lisaManager, accountId, transactionId, Some(ErrorBonusPaymentTransactionNotFound.errorCode))

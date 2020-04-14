@@ -56,32 +56,15 @@ class TransactionController @Inject() (
                 case success: GetTransactionSuccessResponse =>
                   Logger.debug("Matched Valid Response")
                   lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.TRANSACTION)
-
-                  withApiVersion {
-                    case Some(VERSION_1) =>
-                      if (success.paymentStatus == TransactionPaymentStatus.REFUND_CANCELLED) {
-                        auditGetTransaction(lisaManager, accountId, transactionId, Some(ErrorInternalServerError.errorCode))
-                        Future.successful(ErrorInternalServerError.asResult)
-                      } else {
-                        auditGetTransaction(lisaManager, accountId, transactionId)
-                        Future.successful(Ok(Json.toJson(success.copy(transactionType = None, supersededBy = None))))
-                      }
-                    case Some(VERSION_2) =>
                       auditGetTransaction(lisaManager, accountId, transactionId)
                       Future.successful(Ok(Json.toJson(success.copy(bonusDueForPeriod = None))))
-                  }
+
                 case GetTransactionTransactionNotFoundResponse =>
                   Logger.debug("Matched Not Found Response")
                   lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.TRANSACTION)
-
-                  withApiVersion {
-                    case Some(VERSION_1) =>
-                      auditGetTransaction(lisaManager, accountId, transactionId, Some(ErrorBonusPaymentTransactionNotFound.errorCode))
-                      Future.successful(ErrorBonusPaymentTransactionNotFound.asResult)
-                    case Some(VERSION_2) =>
                       auditGetTransaction(lisaManager, accountId, transactionId, Some(ErrorTransactionNotFound.errorCode))
                       Future.successful(ErrorTransactionNotFound.asResult)
-                  }
+
                 case res: GetTransactionResponse =>
                   Logger.debug("Matched an error")
                   val errorResponse = errors.applyOrElse(res, { _: GetTransactionResponse =>

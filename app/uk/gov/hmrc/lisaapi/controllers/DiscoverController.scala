@@ -44,9 +44,7 @@ class DiscoverController @Inject()(
       implicit val startTime: Long = System.currentTimeMillis()
 
       withEnrolment(lisaManagerReferenceNumber) { (_) =>
-        val result = withApiVersion {
-          case Some(VERSION_2) => Future.successful(Ok(Json.parse(v2(lisaManagerReferenceNumber))))
-        }
+        val result = Future.successful(Ok(Json.parse(v2(lisaManagerReferenceNumber))))
 
         lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.DISCOVER)
         result
