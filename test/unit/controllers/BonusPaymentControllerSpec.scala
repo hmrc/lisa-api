@@ -41,7 +41,6 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
 
   case object TestBonusPaymentResponse extends RequestBonusPaymentResponse
 
-  val acceptHeaderV1: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
   val acceptHeaderV2: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.2.0+json")
   val lisaManager = "Z019283"
   val accountId = "ABC/12345"
@@ -115,21 +114,6 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
           (json \ "code").as[String] mustBe ErrorBadRequestLmrn.errorCode
           (json \ "message").as[String] mustBe ErrorBadRequestLmrn.message
         }
-      }
-
-      "attempting a superseded claim on v1 of the api" in {
-        doRequest(validBonusPaymentJson.replace("Life Event", "Superseded Bonus"))(
-          res => {
-            status(res) mustBe BAD_REQUEST
-            val json = contentAsJson(res)
-            (json \ "code").as[String] mustBe "BAD_REQUEST"
-            (json \ "message").as[String] mustBe "Bad Request"
-            (json \ "errors" \ 0 \ "code").as[String] mustBe "INVALID_FORMAT"
-            (json \ "errors" \ 0 \ "message").as[String] mustBe "Invalid format has been used"
-            (json \ "errors" \ 0 \ "path").as[String] mustBe "/bonuses/claimReason"
-          },
-          acceptHeaderV1
-        )
       }
 
     }
@@ -220,20 +204,6 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
           "or the qualifying deposits are above the maximum annual amount or the bonus claim does not equal the correct " +
           "percentage of qualifying funds"
         }
-      }
-
-      "given a RequestBonusPaymentAccountClosedOrVoid response from the service layer for v1" in {
-        when(mockBonusPaymentService.requestBonusPayment(any(), any(),any())(any())).thenReturn(
-          Future.successful(RequestBonusPaymentAccountClosedOrVoid))
-
-        doRequest(validBonusPaymentJson)(
-          res => {
-            status(res) mustBe FORBIDDEN
-            (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID"
-            (contentAsJson(res) \ "message").as[String] mustBe "This LISA account has already been closed or been made void by HMRC"
-          },
-          acceptHeaderV1
-        )
       }
 
       "given a RequestBonusPaymentAccountClosed response from the service layer" in {
@@ -396,97 +366,6 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
         }
       }
 
-      "a RequestBonusPaymentAccountClosed response is received for version 1 of the api" in {
-        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any())).thenReturn(
-          Future.successful(RequestBonusPaymentAccountClosed))
-
-        doRequest(validBonusPaymentJson)(
-          res => {
-            status(res) mustBe INTERNAL_SERVER_ERROR
-            contentAsJson(res) mustBe internalServerError
-          },
-          acceptHeaderV1
-        )
-      }
-
-      "a RequestBonusPaymentAccountCancelled response is received for version 1 of the api" in {
-        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any())).thenReturn(
-          Future.successful(RequestBonusPaymentAccountCancelled))
-
-        doRequest(validBonusPaymentJson)(
-          res => {
-            status(res) mustBe INTERNAL_SERVER_ERROR
-            contentAsJson(res) mustBe internalServerError
-          },
-          acceptHeaderV1
-        )
-      }
-
-      "a RequestBonusPaymentAccountVoid response is received for version 1 of the api" in {
-        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any())).thenReturn(
-          Future.successful(RequestBonusPaymentAccountVoid))
-
-        doRequest(validBonusPaymentJson)(
-          res => {
-            status(res) mustBe INTERNAL_SERVER_ERROR
-            contentAsJson(res) mustBe internalServerError
-          },
-          acceptHeaderV1
-        )
-      }
-
-      "a RequestBonusPaymentSupersededAmountMismatch response is received for version 1 of the api" in {
-        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any())).thenReturn(
-          Future.successful(RequestBonusPaymentSupersededAmountMismatch))
-
-        doRequest(validBonusPaymentJson)(
-          res => {
-            status(res) mustBe INTERNAL_SERVER_ERROR
-            contentAsJson(res) mustBe internalServerError
-          },
-          acceptHeaderV1
-        )
-      }
-
-      "a RequestBonusPaymentSupersededOutcomeError response is received for version 1 of the api" in {
-        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any())).thenReturn(
-          Future.successful(RequestBonusPaymentSupersededOutcomeError))
-
-        doRequest(validBonusPaymentJson)(
-          res => {
-            status(res) mustBe INTERNAL_SERVER_ERROR
-            contentAsJson(res) mustBe internalServerError
-          },
-          acceptHeaderV1
-        )
-      }
-
-      "a RequestBonusPaymentClaimAlreadyExists response is received for version 1 of the api" in {
-        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(RequestBonusPaymentClaimAlreadyExists(transactionId)))
-
-        doRequest(validBonusPaymentJson)(
-          res => {
-            status(res) mustBe INTERNAL_SERVER_ERROR
-            contentAsJson(res) mustBe internalServerError
-          },
-          acceptHeaderV1
-        )
-      }
-
-      "a RequestBonusPaymentAlreadySuperseded response is received for version 1 of the api" in {
-        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(RequestBonusPaymentAlreadySuperseded(transactionId)))
-
-        doRequest(validBonusPaymentJson)(
-          res => {
-            status(res) mustBe INTERNAL_SERVER_ERROR
-            contentAsJson(res) mustBe internalServerError
-          },
-          acceptHeaderV1
-        )
-      }
-
       "a RequestBonusPaymentAccountClosedOrVoid response is received for version 2 of the api" in {
         when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any())).thenReturn(
           Future.successful(RequestBonusPaymentAccountClosedOrVoid))
@@ -519,43 +398,6 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
     "audit bonusPaymentRequested" when {
 
       "given a success response from the service layer and all optional fields" when {
-        "using v1 of the API" in {
-          when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any())).
-            thenReturn(Future.successful(RequestBonusPaymentOnTimeResponse("1928374")))
-
-          doSyncRequest(validBonusPaymentJson)(
-            _ => {
-              val json = Json.parse(validBonusPaymentJson)
-              val htb = json \ "htbTransfer"
-              val inboundPayments = json \ "inboundPayments"
-              val bonuses = json \ "bonuses"
-
-              verify(mockAuditService).audit(
-                auditType = MatcherEquals("bonusPaymentRequested"),
-                path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions"),
-                auditData = MatcherEquals(Map(
-                  "lisaManagerReferenceNumber" -> lisaManager,
-                  "accountId" -> accountId,
-                  "lateNotification" -> "no",
-                  "lifeEventId" -> (json \ "lifeEventId").as[String],
-                  "periodStartDate" -> (json \ "periodStartDate").as[String],
-                  "periodEndDate" -> (json \ "periodEndDate").as[String],
-                  "htbTransferInForPeriod" -> (htb \ "htbTransferInForPeriod").as[Amount].toString,
-                  "htbTransferTotalYTD" -> (htb \ "htbTransferTotalYTD").as[Amount].toString,
-                  "newSubsForPeriod" -> (inboundPayments \ "newSubsForPeriod").as[Amount].toString,
-                  "newSubsYTD" -> (inboundPayments \ "newSubsYTD").as[Amount].toString,
-                  "totalSubsForPeriod" -> (inboundPayments \ "totalSubsForPeriod").as[Amount].toString,
-                  "totalSubsYTD" -> (inboundPayments \ "totalSubsYTD").as[Amount].toString,
-                  "bonusDueForPeriod" -> (bonuses \ "bonusDueForPeriod").as[Amount].toString,
-                  "bonusPaidYTD" -> (bonuses \ "bonusPaidYTD").as[Amount].toString,
-                  "totalBonusDueYTD" -> (bonuses \ "totalBonusDueYTD").as[Amount].toString,
-                  "claimReason" -> (bonuses \ "claimReason").as[String]
-                ))
-              )(any())
-            },
-            acceptHeaderV1
-          )
-        }
         "using v2 of the API" in {
           when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any())).
             thenReturn(Future.successful(RequestBonusPaymentOnTimeResponse("1928374")))
@@ -630,7 +472,7 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
               )
               ))(any())
           },
-          acceptHeaderV1
+          acceptHeaderV2
         )
       }
 
@@ -854,51 +696,6 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
       }
     }
 
-    "return 200 success response without supersededBy data" when {
-      "given an api version of 1 for a request which has been superseded" in {
-        when(mockBonusOrWithdrawalService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusResponse(
-          Some("1234567891"),
-          new DateTime("2017-04-06"),
-          new DateTime("2017-05-05"),
-          Some(HelpToBuyTransfer(0f, 10f)),
-          InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
-          Bonuses(1000f, 1000f, Some(1000f), "Life Event"),
-          Some("1234567892"),
-          None,
-          "Paid",
-          new DateTime("2017-05-20"))
-        ))
-
-        doGetBonusPaymentTransactionRequest(
-          res => {
-            status(res) mustBe OK
-            contentAsJson(res) mustBe Json.obj(
-              "lifeEventId" -> "1234567891",
-              "periodStartDate" -> "2017-04-06",
-              "periodEndDate" -> "2017-05-05",
-              "htbTransfer" -> Json.obj(
-                "htbTransferInForPeriod" -> 0,
-                "htbTransferTotalYTD" -> 10
-              ),
-              "inboundPayments" -> Json.obj(
-                "newSubsForPeriod" -> 4000,
-                "newSubsYTD" -> 4000,
-                "totalSubsForPeriod" -> 4000,
-                "totalSubsYTD" -> 4000
-              ),
-              "bonuses" -> Json.obj(
-                "bonusDueForPeriod" -> 1000,
-                "totalBonusDueYTD" -> 1000,
-                "bonusPaidYTD" -> 1000,
-                "claimReason" -> "Life Event"
-              )
-            )
-          },
-          acceptHeaderV1
-        )
-      }
-    }
-
     "return 404 status invalid lisa account (investor id not found)" in {
       when(mockBonusOrWithdrawalService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusOrWithdrawalInvestorNotFoundResponse))
       doGetBonusPaymentTransactionRequest(res => {
@@ -953,28 +750,6 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
           contentAsJson(res) mustBe internalServerError
         })
       }
-      "given an api version of 1 for a request which supersedes another" in {
-        when(mockBonusOrWithdrawalService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusResponse(
-          Some("1234567891"),
-          new DateTime("2017-04-06"),
-          new DateTime("2017-05-05"),
-          Some(HelpToBuyTransfer(0f, 10f)),
-          InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
-          Bonuses(1000f, 1000f, Some(1000f), "Superseded Bonus"),
-          Some("1234567892"),
-          Some(BonusRecovery(100, "1234567890", 1100, -100)),
-          "Paid",
-          new DateTime("2017-05-20"))
-        ))
-
-        doGetBonusPaymentTransactionRequest(
-          res => {
-            status(res) mustBe INTERNAL_SERVER_ERROR
-            contentAsJson(res) mustBe internalServerError
-          },
-          acceptHeaderV1
-        )
-      }
     }
 
     "return a service unavailable response" when {
@@ -1018,36 +793,6 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
               ))
             )(any())
           }
-        )
-      }
-      "given an api version of 1 for a request which has been superseded" in {
-        when(mockBonusOrWithdrawalService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusResponse(
-          Some("1234567891"),
-          new DateTime("2017-04-06"),
-          new DateTime("2017-05-05"),
-          Some(HelpToBuyTransfer(0f, 10f)),
-          InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
-          Bonuses(1000f, 1000f, Some(1000f), "Life Event"),
-          Some("1234567892"),
-          None,
-          "Paid",
-          new DateTime("2017-05-20"))
-        ))
-
-        doGetBonusPaymentTransactionRequest(
-          res => {
-            await(res)
-            verify(mockAuditService).audit(
-              auditType = MatcherEquals("getBonusPaymentReported"),
-              path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions/$transactionId"),
-              auditData = MatcherEquals(Map(
-                "lisaManagerReferenceNumber" -> lisaManager,
-                "accountId" -> accountId,
-                "transactionId" -> transactionId
-              ))
-            )(any())
-          },
-          acceptHeaderV1
         )
       }
     }
@@ -1130,36 +875,7 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
           )(any())
         })
       }
-      "given an api version of 1 for a request which supersedes another" in {
-        when(mockBonusOrWithdrawalService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusResponse(
-          Some("1234567891"),
-          new DateTime("2017-04-06"),
-          new DateTime("2017-05-05"),
-          Some(HelpToBuyTransfer(0f, 10f)),
-          InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
-          Bonuses(1000f, 1000f, Some(1000f), "Superseded Bonus"),
-          Some("1234567892"),
-          Some(BonusRecovery(100, "1234567890", 1100, -100)),
-          "Paid",
-          new DateTime("2017-05-20"))
-        ))
 
-        doGetBonusPaymentTransactionRequest(res => {
-          await(res)
-          verify(mockAuditService).audit(
-              auditType = MatcherEquals("getBonusPaymentNotReported"),
-              path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions/$transactionId"),
-              auditData = MatcherEquals(Map(
-                "lisaManagerReferenceNumber" -> lisaManager,
-                "accountId" -> accountId,
-                "transactionId" -> transactionId,
-                "reasonNotReported" -> "INTERNAL_SERVER_ERROR"
-              ))
-            )(any())
-          },
-          acceptHeaderV1
-        )
-      }
       "GetBonusOrWithdrawalServiceUnavailableResponse is returned from the service layer" in {
         when(mockBonusOrWithdrawalService.getBonusOrWithdrawal(any(), any(), any())(any())).
           thenReturn(Future.successful(GetBonusOrWithdrawalServiceUnavailableResponse))

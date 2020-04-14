@@ -209,14 +209,6 @@ class AnnualReturnControllerSpec extends ControllerTestFixture {
       }
     }
 
-    "return 406 not acceptable" when {
-      "the accept header is for v1.0 of the api" in {
-        doRequest(acceptHeader = acceptHeaderV1){ res =>
-          status(res) mustBe NOT_ACCEPTABLE
-        }
-      }
-    }
-
     "return 409 conflict" when {
       "the life event service returns a ReportLifeEventAlreadyExistsResponse" in {
         when(mockLifeEventService.reportLifeEvent(any(), any(),any())(any())).
@@ -389,7 +381,6 @@ class AnnualReturnControllerSpec extends ControllerTestFixture {
 
   }
 
-  private val acceptHeaderV1 = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
   private val acceptHeaderV2 = (HeaderNames.ACCEPT, "application/vnd.hmrc.2.0+json")
   private val lisaManager = "Z123456"
   private val accountId = "1234567890"

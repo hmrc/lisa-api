@@ -40,10 +40,8 @@ class Documentation @Inject()(
   override def definition(): Action[AnyContent] = Action {
     Ok(txt.definition(
       appContext.apiContext,
-      appContext.v1apiStatus,
       appContext.v2apiStatus,
       buildAccess(),
-      appContext.v1endpointsEnabled,
       appContext.v2endpointsEnabled
     ))
   }

@@ -85,10 +85,6 @@ package object models {
       "^(Life Event|Regular Bonus|Superseded Bonus)$".r,
       "error.formatting.claimReason"
     )
-    val bonusClaimReasonV1: Reads[BonusClaimReason] = Reads.pattern(
-      "^(Life Event|Regular Bonus)$".r,
-      "error.formatting.claimReason"
-    )
     val lisaManagerName: Reads[LisaManagerName] = Reads.pattern("^[a-zA-Z0-9 '/,&().-]{1,50}$".r, "error.formatting.lisaManagerName")
     val taxYearReads: Reads[Int] = Reads.filter[Int](JsonValidationError("error.formatting.taxYear"))((p:Int) => p > 999 && p < 10000)
     val annualFigures: Reads[Int] = Reads.filter[Int](JsonValidationError("error.formatting.annualFigures"))((p:Int) => p >= 0)

@@ -146,8 +146,6 @@ case object ErrorAccountAlreadyOpen extends ErrorResponse(403, "INVESTOR_ACCOUNT
 
 case object ErrorAccountNotFound extends ErrorResponse(404, "INVESTOR_ACCOUNTID_NOT_FOUND", "Enter a real accountId")
 
-case object ErrorBulkTransactionNotFoundV1 extends ErrorResponse(404, "PAYMENT_NOT_FOUND", "No bonus payments have been made for this date range")
-
 case object ErrorBulkTransactionNotFoundV2 extends ErrorResponse(404, "TRANSACTION_NOT_FOUND", "No payments or debts exist for this date range")
 
 case object ErrorTransferAccountDataNotProvided extends ErrorResponse(403, "TRANSFER_ACCOUNT_DATA_NOT_PROVIDED", "You must give a transferredFromAccountId, transferredFromLMRN and transferInDate when the creationReason is transferred, current or previous year funds transferred")

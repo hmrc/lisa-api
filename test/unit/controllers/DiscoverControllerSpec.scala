@@ -37,19 +37,9 @@ class DiscoverControllerSpec extends ControllerTestFixture {
     when(mockAuthConnector.authorise[Option[String]](any(),any())(any(), any())).thenReturn(Future.successful(Some("1234")))
   }
 
-  val v1: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
   val v2: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.2.0+json")
 
   "The Discover available endpoints endpoint" must {
-
-    "return with status 200 ok and appropriate json for v1" in {
-      val res = discoverController.discover("Z019283").apply(FakeRequest(Helpers.GET, "/").withHeaders(v1))
-
-      status(res) mustBe OK
-      val json = contentAsJson(res)
-      (json \ "_links" \ "close account" \ "href").as[String] mustBe "/lifetime-isa/manager/Z019283/accounts/{accountId}/close-account"
-      (json \ "_links" \ "property purchase fund release" \ "href").asOpt[String] mustBe None
-    }
 
     "return with status 200 ok and appropriate json for v2" in {
       val res = discoverController.discover("Z019283").apply(FakeRequest(Helpers.GET, "/").withHeaders(v2))
@@ -61,7 +51,7 @@ class DiscoverControllerSpec extends ControllerTestFixture {
     }
 
     "return the lisa manager reference number provided" in {
-      val res = discoverController.discover("Z111111").apply(FakeRequest(Helpers.GET, "/").withHeaders(v1))
+      val res = discoverController.discover("Z111111").apply(FakeRequest(Helpers.GET, "/").withHeaders(v2))
 
       status(res) mustBe OK
       (contentAsJson(res) \ "_links" \ "close account" \ "href").as[String] mustBe "/lifetime-isa/manager/Z111111/accounts/{accountId}/close-account"
@@ -70,7 +60,7 @@ class DiscoverControllerSpec extends ControllerTestFixture {
     "return with status 400 bad request" when {
 
       "given an invalid lmrn in the url" in {
-        val res = discoverController.discover("Z0192831").apply(FakeRequest(Helpers.GET, "/").withHeaders(v1))
+        val res = discoverController.discover("Z0192831").apply(FakeRequest(Helpers.GET, "/").withHeaders(v2))
 
         status(res) mustBe BAD_REQUEST
 

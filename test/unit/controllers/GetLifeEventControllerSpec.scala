@@ -37,7 +37,6 @@ class GetLifeEventControllerSpec extends ControllerTestFixture {
     override lazy val v2endpointsEnabled = true
   }
 
-  val acceptHeaderV1: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
   val acceptHeaderV2: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.2.0+json")
   val lisaManager = "Z019283"
   val accountId = "ABC/12345"
@@ -49,13 +48,6 @@ class GetLifeEventControllerSpec extends ControllerTestFixture {
   }
 
   "Get Life Event" should {
-
-    "not be available for api version 1" in {
-      val req = FakeRequest(Helpers.GET, "/")
-      val res = getLifeEventController.getLifeEvent(lisaManager, accountId, eventId).apply(req.withHeaders(acceptHeaderV1))
-
-      status(res) mustBe NOT_ACCEPTABLE
-    }
 
     "return ok for api version 2" when {
       "given a successful response from the service layer" in {

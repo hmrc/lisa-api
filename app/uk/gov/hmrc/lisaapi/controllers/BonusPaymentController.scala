@@ -56,9 +56,7 @@ class BonusPaymentController @Inject()(
     RequestBonusPaymentAccountNotFound -> ErrorAccountNotFound,
     RequestBonusPaymentLifeEventNotFound -> ErrorLifeEventIdNotFound
   )
-  private val requestBonusErrorsV1 = requestBonusErrors ++ Map[RequestBonusPaymentErrorResponse, ErrorResponse](
-    RequestBonusPaymentAccountClosedOrVoid -> ErrorAccountAlreadyClosedOrVoid
-  )
+
   private val requestBonusErrorsV2 = requestBonusErrors ++ Map[RequestBonusPaymentErrorResponse, ErrorResponse](
     RequestBonusPaymentAccountClosed -> ErrorAccountAlreadyClosed,
     RequestBonusPaymentAccountCancelled -> ErrorAccountAlreadyCancelled,
@@ -74,7 +72,6 @@ class BonusPaymentController @Inject()(
       withValidLMRN(lisaManager) { () =>
         withValidAccountId(accountId) { () =>
           withApiVersion {
-            case Some(VERSION_1) => processRequestBonusPayment(lisaManager, accountId, RequestBonusPaymentRequest.requestBonusPaymentReadsV1)
             case Some(VERSION_2) => processRequestBonusPayment(lisaManager, accountId, RequestBonusPaymentRequest.requestBonusPaymentReadsV2)
           }
         }
@@ -284,7 +281,6 @@ class BonusPaymentController @Inject()(
       case(e: RequestBonusPaymentClaimAlreadyExists, Some(VERSION_2)) => ErrorBonusClaimAlreadyExists(e.transactionId)
       case(e: RequestBonusPaymentAlreadySuperseded, Some(VERSION_2)) => ErrorBonusClaimAlreadySuperseded(e.transactionId)
       case (RequestBonusPaymentServiceUnavailable, _) => ErrorServiceUnavailable
-      case (_, Some(VERSION_1)) => requestBonusErrorsV1.getOrElse(errorResponse, ErrorInternalServerError)
       case (_, Some(VERSION_2)) => requestBonusErrorsV2.getOrElse(errorResponse, ErrorInternalServerError)
     }
     requestBonusPaymentFailureAudit(lisaManager, accountId, req, response.errorCode)

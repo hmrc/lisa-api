@@ -37,7 +37,6 @@ class TransactionControllerSpec extends ControllerTestFixture {
     override lazy val v2endpointsEnabled = true
   }
 
-  val acceptHeaderV1: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
   val acceptHeaderV2: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.2.0+json")
   val lmrn = "Z1234"
   val accountId = "12345"
@@ -51,34 +50,6 @@ class TransactionControllerSpec extends ControllerTestFixture {
   "Get transaction" must {
 
     "return 200 ok" when {
-      "data is returned from the service for v1" in {
-        when(mockTransactionService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionSuccessResponse(
-          transactionId = transactionId,
-          transactionType = Some("Payment"),
-          paymentStatus = "Paid",
-          paymentDate = Some(new DateTime("2017-06-20")),
-          paymentAmount = Some(1.0),
-          paymentReference = Some("ref"),
-          supersededBy = Some("0000012345"),
-          bonusDueForPeriod = Some(1.0)
-        )))
-
-        val res = transactionController.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV1))
-
-        status(res) mustBe OK
-
-        val json = contentAsJson(res)
-
-        json mustBe Json.obj(
-          "transactionId" -> transactionId,
-          "paymentStatus" -> "Paid",
-          "paymentDate" -> "2017-06-20",
-          "paymentAmount" -> 1.0,
-          "paymentReference" -> "ref",
-          "bonusDueForPeriod" -> 1.0
-        )
-      }
-
       "data is returned from the service for v2" in {
         when(mockTransactionService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionSuccessResponse(
           transactionId = transactionId,
@@ -149,15 +120,6 @@ class TransactionControllerSpec extends ControllerTestFixture {
 
         (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNTID_NOT_FOUND"
       }
-      "the service returns transaction not found for v1" in {
-        when(mockTransactionService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionTransactionNotFoundResponse))
-
-        val res = transactionController.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV1))
-
-        status(res) mustBe NOT_FOUND
-
-        (contentAsJson(res) \ "code").as[String] mustBe "BONUS_PAYMENT_TRANSACTION_NOT_FOUND"
-      }
       "the service returns transaction not found for v2" in {
         when(mockTransactionService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionTransactionNotFoundResponse))
 
@@ -191,18 +153,6 @@ class TransactionControllerSpec extends ControllerTestFixture {
 
         (contentAsJson(res) \ "code").as[String] mustBe "INTERNAL_SERVER_ERROR"
       }
-      "a charge refund cancelled is returned for api v1" in {
-        when(mockTransactionService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionSuccessResponse(
-          transactionId = "1234",
-          paymentStatus = "Charge refund cancelled"
-        )))
-
-        val res = transactionController.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV1))
-
-        status(res) mustBe INTERNAL_SERVER_ERROR
-
-        (contentAsJson(res) \ "code").as[String] mustBe "INTERNAL_SERVER_ERROR"
-      }
     }
 
     "return 503 service unavailable" when {
@@ -219,28 +169,6 @@ class TransactionControllerSpec extends ControllerTestFixture {
     }
 
     "audit getTransactionReported" when {
-      "data is returned from the service for v1" in {
-        when(mockTransactionService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionSuccessResponse(
-          transactionId = transactionId,
-          transactionType = Some("Payment"),
-          paymentStatus = "Paid",
-          paymentDate = Some(new DateTime("2017-06-20")),
-          paymentAmount = Some(1.0),
-          paymentReference = Some("ref"),
-          supersededBy = Some("0000012345"),
-          bonusDueForPeriod = Some(1.0)
-        )))
-        val res = transactionController.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV1))
-        await(res)
-        verify(mockAuditService).audit(
-          auditType = matchersEquals("getTransactionReported"),
-          path = matchersEquals(s"/manager/$lmrn/accounts/$accountId/transactions/$transactionId/payments"),
-          auditData = matchersEquals(Map(
-            "lisaManagerReferenceNumber" -> lmrn,
-            "accountId" -> accountId,
-            "transactionId" -> transactionId
-          )))(any())
-      }
       "data is returned from the service for v2" in {
         when(mockTransactionService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionSuccessResponse(
           transactionId = transactionId,
@@ -282,21 +210,6 @@ class TransactionControllerSpec extends ControllerTestFixture {
             "reasonNotReported" -> ErrorAccountNotFound.errorCode
           )))(any())
       }
-      "the service returns transaction not found for v1" in {
-        when(mockTransactionService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionTransactionNotFoundResponse))
-
-        val res = transactionController.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV1))
-        await(res)
-        verify(mockAuditService).audit(
-          auditType = matchersEquals("getTransactionNotReported"),
-          path = matchersEquals(s"/manager/$lmrn/accounts/$accountId/transactions/$transactionId/payments"),
-          auditData = matchersEquals(Map(
-            "lisaManagerReferenceNumber" -> lmrn,
-            "accountId" -> accountId,
-            "transactionId" -> transactionId,
-            "reasonNotReported" -> ErrorBonusPaymentTransactionNotFound.errorCode
-          )))(any())
-      }
       "the service returns transaction not found for v2" in {
         when(mockTransactionService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionTransactionNotFoundResponse))
 
@@ -316,24 +229,6 @@ class TransactionControllerSpec extends ControllerTestFixture {
         when(mockTransactionService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionErrorResponse))
 
         val res = transactionController.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV2))
-        await(res)
-        verify(mockAuditService).audit(
-          auditType = matchersEquals("getTransactionNotReported"),
-          path = matchersEquals(s"/manager/$lmrn/accounts/$accountId/transactions/$transactionId/payments"),
-          auditData = matchersEquals(Map(
-            "lisaManagerReferenceNumber" -> lmrn,
-            "accountId" -> accountId,
-            "transactionId" -> transactionId,
-            "reasonNotReported" -> ErrorInternalServerError.errorCode
-          )))(any())
-      }
-      "a charge refund cancelled is returned for api v1" in {
-        when(mockTransactionService.getTransaction(any(), any(), any())(any())).thenReturn(Future.successful(GetTransactionSuccessResponse(
-          transactionId = "1234",
-          paymentStatus = "Charge refund cancelled"
-        )))
-
-        val res = transactionController.getTransaction(lmrn, accountId, transactionId).apply(FakeRequest().withHeaders(acceptHeaderV1))
         await(res)
         verify(mockAuditService).audit(
           auditType = matchersEquals("getTransactionNotReported"),

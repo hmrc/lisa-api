@@ -223,59 +223,6 @@ class BulkPaymentControllerSpec extends ControllerTestFixture {
 
   }
 
-  "transformV1Response" must {
-
-    "remove transactionType and status" in {
-      val input = Json.obj(
-        "lisaManagerReferenceNumber" -> "Z123456",
-        "payments" -> Json.arr(
-          Json.obj(
-            "transactionId" -> "1",
-            "transactionType" -> "Payment",
-            "status" -> "Paid"
-          ),
-          Json.obj(
-            "transactionId" -> "2",
-            "transactionType" -> "Payment",
-            "status" -> "Pending"
-          )
-        )
-      )
-
-      val expected = Json.obj(
-        "lisaManagerReferenceNumber" -> "Z123456",
-        "payments" -> Json.arr(
-          Json.obj(
-            "transactionId" -> "1"
-          ),
-          Json.obj(
-            "transactionId" -> "2"
-          )
-        )
-      )
-
-      val result = Future.successful(mockBulkPaymentController.transformV1Response(input))
-
-      status(result) mustBe OK
-      contentAsJson(result) mustBe expected
-    }
-
-    "return an error if the transform fails" in {
-      val input = Json.obj(
-        "lisaManagerReferenceNumber" -> "Z123456",
-        "payments" -> "invalid"
-      )
-
-      val expected = Json.obj("code" -> "INTERNAL_SERVER_ERROR", "message" -> "Internal server error")
-
-      val result = Future.successful(mockBulkPaymentController.transformV1Response(input))
-
-      status(result) mustBe INTERNAL_SERVER_ERROR
-      contentAsJson(result) mustBe expected
-    }
-
-  }
-
   "audit getBulkPaymentReported" when {
     "the service returns a GetBulkPaymentSuccessResponse" in {
       when(mockBulkPaymentService.getBulkPayment(any(), any(), any())(any())).

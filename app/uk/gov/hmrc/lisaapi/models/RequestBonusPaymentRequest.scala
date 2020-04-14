@@ -41,26 +41,6 @@ object RequestBonusPaymentRequest {
     (JsPath \ "supersede").readNullable[Supersede]
   )(RequestBonusPaymentRequest.apply _)
 
-  val requestBonusPaymentReadsV1: Reads[RequestBonusPaymentRequest] = (
-    (JsPath \ "lifeEventId").readNullable(JsonReads.lifeEventId) and
-    (JsPath \ "periodStartDate").read(JsonReads.isoDate).map(new DateTime(_)) and
-    (JsPath \ "periodEndDate").read(JsonReads.isoDate).map(new DateTime(_)) and
-    (JsPath \ "htbTransfer").readNullable[HelpToBuyTransfer] and
-    (JsPath \ "inboundPayments").read[InboundPayments] and
-    (JsPath \ "bonuses").read[Bonuses](Bonuses.bonusesReadsV1)
-  )(
-    (lifeEventId, periodStartDate, periodEndDate, htbTransfer, inboundPayments, bonuses) =>
-    RequestBonusPaymentRequest(
-      lifeEventId = lifeEventId,
-      periodStartDate = periodStartDate,
-      periodEndDate = periodEndDate,
-      htbTransfer = htbTransfer,
-      inboundPayments = inboundPayments,
-      bonuses = bonuses,
-      supersede = None
-    )
-  )
-
   implicit val requestBonusPaymentWrites: Writes[RequestBonusPaymentRequest] = (
     (JsPath \ "lifeEventId").writeNullable[String] and
     (JsPath \ "periodStartDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and

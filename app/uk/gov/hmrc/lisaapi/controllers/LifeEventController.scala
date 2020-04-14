@@ -62,12 +62,6 @@ class LifeEventController @Inject()(
                   Future.successful(Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED))))
                 case res: ReportLifeEventResponse =>
                   withApiVersion {
-                    case Some(VERSION_1) =>
-                      val errorResponse = v1errors.applyOrElse(res, { _: ReportLifeEventResponse =>
-                        Logger.debug(s"Matched an unexpected response: $res, returning a 500 error")
-                        ErrorInternalServerError
-                      })
-                      Future.successful(error(errorResponse, lisaManager, accountId, req))
                     case Some(VERSION_2) =>
                       val errorResponse = v2errors.applyOrElse(res, { _: ReportLifeEventResponse =>
                         Logger.debug(s"Matched an unexpected response: $res, returning a 500 error")
@@ -88,10 +82,6 @@ class LifeEventController @Inject()(
     case ReportLifeEventAccountNotFoundResponse => ErrorAccountNotFound
     case ReportLifeEventServiceUnavailableResponse => ErrorServiceUnavailable
   }
-
-  private val v1errors: PartialFunction[ReportLifeEventResponse, ErrorResponse] = commonErrors.orElse({
-    case ReportLifeEventAccountClosedOrVoidResponse => ErrorAccountAlreadyClosedOrVoid
-  })
 
   private val v2errors: PartialFunction[ReportLifeEventResponse, ErrorResponse] = commonErrors.orElse({
     case ReportLifeEventAccountClosedResponse => ErrorAccountAlreadyClosed

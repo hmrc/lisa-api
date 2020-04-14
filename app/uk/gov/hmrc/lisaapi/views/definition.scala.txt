@@ -1,7 +1,7 @@
 @import uk.gov.hmrc.lisaapi.domain.APIAccess
 @import play.api.libs.json.Json
 
-@(context: String, v1status: String, v2status: String, access: APIAccess, v1endpointsEnabled: Boolean, v2endpointsEnabled: Boolean)
+@(context: String, v2status: String, access: APIAccess, v2endpointsEnabled: Boolean)
 {
   "scopes": [
     {
@@ -20,12 +20,6 @@
     "description": "The Lifetime ISA (LISA) API allows financial organisations to report information to HM Revenue and Customs (HMRC) and get information about payments made by HMRC.",
     "context": "@context",
     "versions": [
-      {
-        "version": "1.0",
-        "status": "@v1status",
-        "endpointsEnabled": @v1endpointsEnabled,
-        "access": @Json.toJson(access)
-      },
       {
         "version": "2.0",
         "status": "@v2status",

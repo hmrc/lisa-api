@@ -37,7 +37,6 @@ class LifeEventControllerSpec extends ControllerTestFixture {
     override lazy val v2endpointsEnabled = true
   }
 
-  val acceptHeaderV1: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
   val acceptHeaderV2: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.2.0+json")
   val lisaManager = "Z019283"
   val accountId = "ABC/12345"
@@ -237,15 +236,6 @@ class LifeEventControllerSpec extends ControllerTestFixture {
       }
     }
 
-    "return with 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID in version 1" in {
-      when(mockLifeEventService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful((ReportLifeEventAccountClosedOrVoidResponse)))
-      doReportLifeEventRequest(reportLifeEventJson){res =>
-        status(res) mustBe (FORBIDDEN)
-        (contentAsJson(res) \"code").as[String] mustBe ("INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID")
-        (contentAsJson(res) \"message").as[String] mustBe ("This LISA account has already been closed or been made void by HMRC")
-      }
-    }
-
     "return with 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_CLOSED in version 2" in {
       when(mockLifeEventService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful((ReportLifeEventAccountClosedResponse)))
       doReportLifeEventRequest(reportLifeEventJson, acceptHeader = acceptHeaderV2){res =>
@@ -312,7 +302,7 @@ class LifeEventControllerSpec extends ControllerTestFixture {
 
   }
 
-  def doReportLifeEventRequest(jsonString: String, lmrn: String = lisaManager, accId: String = accountId, acceptHeader: (String, String) = acceptHeaderV1)
+  def doReportLifeEventRequest(jsonString: String, lmrn: String = lisaManager, accId: String = accountId, acceptHeader: (String, String) = acceptHeaderV2)
                               (callback: (Future[Result]) =>  Unit): Unit = {
     val req = FakeRequest(Helpers.PUT, "/")
     val res = lifeEventController.reportLisaLifeEvent(lmrn, accId).

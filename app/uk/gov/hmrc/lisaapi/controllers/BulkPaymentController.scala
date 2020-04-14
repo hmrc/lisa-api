@@ -62,15 +62,11 @@ class BulkPaymentController @Inject()(
                 getBulkPaymentAudit(lisaManager)
                 lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.TRANSACTION)
                 withApiVersion {
-                  case Some(VERSION_1) => Future.successful(transformV1Response(Json.toJson(s)))
                   case Some(VERSION_2) => Future.successful(Ok(Json.toJson(s)))
                 }
               case GetBulkPaymentNotFoundResponse =>
                 lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.TRANSACTION)
                 withApiVersion {
-                  case Some(VERSION_1) =>
-                    getBulkPaymentAudit(lisaManager, Some(ErrorBulkTransactionNotFoundV1.errorCode))
-                    Future.successful(NotFound(Json.toJson(ErrorBulkTransactionNotFoundV1)))
                   case Some(VERSION_2) =>
                     getBulkPaymentAudit(lisaManager, Some(ErrorBulkTransactionNotFoundV2.errorCode))
                     Future.successful(NotFound(Json.toJson(ErrorBulkTransactionNotFoundV2)))
@@ -87,21 +83,6 @@ class BulkPaymentController @Inject()(
         }
       }
     }
-
-  def transformV1Response(json: JsValue): Result = {
-    val jsonTransformer = (__ \ 'payments).json.update(
-      of[JsArray] map {
-        case JsArray(arr) => JsArray(arr map {
-          case JsObject(o) => JsObject(o - "transactionType" - "status")
-        })
-      }
-    )
-
-    json.transform(jsonTransformer).fold(
-      _ => InternalServerError(Json.toJson(ErrorInternalServerError)),
-      success => Ok(Json.toJson(success))
-    )
-  }
 
   private def withValidDates(startDate: String, endDate: String, lisaManager: String)
                             (success: (DateTime, DateTime) => Future[Result])

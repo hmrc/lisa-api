@@ -104,13 +104,6 @@ object Bonuses {
     (JsPath \ "claimReason").read(JsonReads.bonusClaimReasonV2)
   )(Bonuses.apply _)
 
-  val bonusesReadsV1: Reads[Bonuses] = (
-    (JsPath \ "bonusDueForPeriod").read[Amount](JsonReads.nonNegativeAmount) and
-    (JsPath \ "totalBonusDueYTD").read[Amount](JsonReads.nonNegativeAmount) and
-    (JsPath \ "bonusPaidYTD").readNullable[Amount](JsonReads.nonNegativeAmount) and
-    (JsPath \ "claimReason").read(JsonReads.bonusClaimReasonV1)
-  )(Bonuses.apply _)
-
   implicit val bonusesWrites: Writes[Bonuses] = (
     (JsPath \ "bonusDueForPeriod").write[Amount] and
     (JsPath \ "totalBonusDueYTD").write[Amount] and
