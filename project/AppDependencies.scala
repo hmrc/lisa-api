@@ -22,8 +22,8 @@ object AppDependencies {
 
   val compile: Seq[ModuleID] = Seq(
     ws,
-    "uk.gov.hmrc" %% "bootstrap-play-26" % "1.5.0",
-    "uk.gov.hmrc" %% "auth-client" % "2.35.0-play-26",
+    "uk.gov.hmrc" %% "bootstrap-play-26" % "1.8.0",
+    "uk.gov.hmrc" %% "auth-client" % "3.0.0-play-26",
     "uk.gov.hmrc" %% "play-hmrc-api" % "4.1.0-play-26",
     "com.codahale.metrics" % "metrics-graphite" % "3.0.2"
   )
@@ -32,7 +32,7 @@ object AppDependencies {
     "org.scalatest" %% "scalatest" % "3.0.8",
     "org.pegdown" % "pegdown" % "1.6.0",
     "com.typesafe.play" %% "play-test" % PlayVersion.current,
-    "org.mockito" % "mockito-core" % "3.3.0",
+    "org.mockito" % "mockito-core" % "3.3.3",
     "org.scalaj" %% "scalaj-http" % "2.4.2",
     "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.3"
   ).map(_ % Test)
