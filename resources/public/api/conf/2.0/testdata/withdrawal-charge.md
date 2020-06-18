@@ -506,7 +506,8 @@
         </tr>
         <tr>
             <td>
-                <p>The withdrawal charge does not equal 25% of the withdrawal amount</p>
+                <p>The withdrawal charge as a percentage of the withdrawal amount is incorrect. 
+                For withdrawals made between 06/03/2020 and 05/04/2021 the withdrawal charge is 20%. For all other withdrawals it is 25%.</p>
                 <p class="code--block">
                     <strong>lisaManagerReferenceNumber:</strong><br>
                     <a href="#testing">Use your test user profile</a><br>

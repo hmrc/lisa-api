@@ -136,7 +136,8 @@ class WithdrawalControllerSpec extends ControllerTestFixture {
         doRequest(validWithdrawalJson) { res =>
           status(res) mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "WITHDRAWAL_REPORTING_ERROR"
-          (contentAsJson(res) \ "message").as[String] mustBe "The withdrawal charge does not equal 25% of the withdrawal amount"
+          (contentAsJson(res) \ "message").as[String] mustBe "The withdrawal charge as a percentage of the withdrawal amount is incorrect. " +
+            "For withdrawals made between 06/03/2020 and 05/04/2021 the withdrawal charge is 20%. For all other withdrawals it is 25%."
         }
       }
 
