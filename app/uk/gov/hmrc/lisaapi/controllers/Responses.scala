@@ -176,7 +176,7 @@ case object ErrorBonusHelpToBuyNotApplicable extends ErrorResponse(403, "HELP_TO
 
 case object ErrorNoSubscriptions extends ErrorResponse(403, "ACCOUNT_ERROR_NO_SUBSCRIPTIONS_THIS_TAX_YEAR", "This account is not eligible for a bonus payment because the investor already has another LISA account")
 
-case object ErrorWithdrawalReportingError extends ErrorResponse(403, "WITHDRAWAL_REPORTING_ERROR", "The withdrawal charge does not equal 25% of the withdrawal amount")
+case object ErrorWithdrawalReportingError extends ErrorResponse(403, "WITHDRAWAL_REPORTING_ERROR", "The withdrawal charge as a percentage of the withdrawal amount is incorrect. For withdrawals made between 06/03/2020 and 05/04/2021 the withdrawal charge is 20%. For all other withdrawals it is 25%.")
 
 case object ErrorWithdrawalSupersededAmountMismatch extends ErrorResponse(403, "SUPERSEDED_WITHDRAWAL_CHARGE_ID_AMOUNT_MISMATCH", "originalTransactionId and the originalWithdrawalChargeAmount do not match the information in the original request")
 

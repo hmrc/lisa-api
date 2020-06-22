@@ -1525,11 +1525,13 @@ types:
                                     "message": "The timescale for reporting a withdrawal charge has passed. The claim period lasts for 6 years and 14 days"
                                   }
                               reportingError:
-                                description: "The withdrawal charge does not equal 25% of the withdrawal amount"
+                                description: "The withdrawal charge as a percentage of the withdrawal amount is incorrect.
+                                For withdrawals made between 06/03/2020 and 05/04/2021 the withdrawal charge is 20%. For all other withdrawals it is 25%."
                                 value: |
                                   {
                                     "code": "WITHDRAWAL_REPORTING_ERROR",
-                                    "message": "The withdrawal charge does not equal 25% of the withdrawal amount"
+                                    "message": "The withdrawal charge as a percentage of the withdrawal amount is incorrect.
+                                    For withdrawals made between 06/03/2020 and 05/04/2021 the withdrawal charge is 20%. For all other withdrawals it is 25%."
                                   }
                       404:
                         body:
