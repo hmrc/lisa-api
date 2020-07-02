@@ -39,7 +39,7 @@ class BulkPaymentServiceSpec extends ServiceTestFixture {
     "return payments" when {
       "the connector passes a success message with some payments" in {
         val successResponse = GetBulkPaymentSuccessResponse(lmrn, List(
-          BulkPaymentPaid(950.2, date, "12345")
+          BulkPaymentPaid(950.2, Some(date), Some("12345"))
         ))
 
         when(mockDesConnector.getBulkPayment(any(), any(), any())(any())).
