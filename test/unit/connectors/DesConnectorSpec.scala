@@ -1282,8 +1282,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           response mustBe GetBulkPaymentSuccessResponse(
             lisaManagerReferenceNumber = "Z5555",
             payments = List(
-              BulkPaymentPaid(paymentDate = new DateTime("2017-06-01"), paymentReference = "ABC123456789", paymentAmount = 1000.00),
-              BulkPaymentPending(dueDate = new DateTime("2017-07-01"), paymentAmount = 1500.55)
+              BulkPaymentPaid(paymentDate = Some(new DateTime("2017-06-01")), paymentReference = Some("ABC123456789"), paymentAmount = 1000.00),
+              BulkPaymentPending(dueDate = Some(new DateTime("2017-07-01")), paymentAmount = 1500.55)
             )
           )
         }

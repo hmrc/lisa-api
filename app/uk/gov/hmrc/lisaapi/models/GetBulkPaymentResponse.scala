@@ -28,25 +28,28 @@ case object GetBulkPaymentErrorResponse extends GetBulkPaymentResponse
 case object GetBulkPaymentServiceUnavailableResponse extends GetBulkPaymentResponse
 
 trait BulkPayment
-case class BulkPaymentPaid(paymentAmount: Amount, paymentDate: DateTime, paymentReference: String) extends BulkPayment
-case class BulkPaymentPending(paymentAmount: Amount, dueDate: DateTime) extends BulkPayment
-case class BulkPaymentCollected(paymentAmount: Amount, paymentDate: DateTime, paymentReference: String) extends BulkPayment
-case class BulkPaymentDue(paymentAmount: Amount, dueDate: DateTime) extends BulkPayment
+case class BulkPaymentPaid(paymentAmount: Amount, paymentDate: Option[DateTime] = None, paymentReference: Option[String] = None) extends BulkPayment
+case class BulkPaymentPending(paymentAmount: Amount, dueDate: Option[DateTime] = None) extends BulkPayment
+case class BulkPaymentCollected(paymentAmount: Amount, paymentDate: Option[DateTime] = None, paymentReference: Option[String] = None) extends BulkPayment
+case class BulkPaymentDue(paymentAmount: Amount, dueDate: Option[DateTime] = None) extends BulkPayment
 
 object BulkPayment {
-
+  
   implicit val bpPaidReads: Reads[BulkPaymentPaid] = (
     (JsPath \ "clearedAmount").read[Amount] and
-    (JsPath \ "items" \ 0 \ "clearingDate").read(JsonReads.isoDate).map(new DateTime(_)) and
-    (JsPath \ "items" \ 0 \ "clearingSAPDocument").read[String]
-  )((amount, date, ref) => BulkPaymentPaid.apply(amount.abs, date, ref))
+    (JsPath \ "items" \ 0 \ "clearingDate").readNullable(JsonReads.isoDate) and
+    (JsPath \ "items" \ 0 \ "clearingSAPDocument").readNullable[String]
+  )((amount, date, ref) => BulkPaymentPaid.apply(amount.abs, date.map(new DateTime(_)), ref))
 
   implicit val bpPaidWrites: Writes[BulkPaymentPaid] = (
     (JsPath \ "transactionType").write[String] and
     (JsPath \ "status").write[String] and
     (JsPath \ "paymentAmount").write[Amount] and
-    (JsPath \ "paymentDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
-    (JsPath \ "paymentReference").write[String]
+    (JsPath \ "paymentDate").writeNullable[String].contramap[Option[DateTime]]{
+      case Some(dateTime) => Some(dateTime.toString("yyyy-MM-dd"))
+      case None => None
+    }  and
+    (JsPath \ "paymentReference").writeNullable[String]
   )(
     bp => (
       "Payment",
@@ -59,16 +62,19 @@ object BulkPayment {
 
   implicit val bpCollectedReads: Reads[BulkPaymentCollected] = (
     (JsPath \ "clearedAmount").read[Amount] and
-    (JsPath \ "items" \ 0 \ "clearingDate").read(JsonReads.isoDate).map(new DateTime(_)) and
-    (JsPath \ "items" \ 0 \ "clearingSAPDocument").read[String]
-  )((amount, date, ref) => BulkPaymentCollected.apply(amount.abs, date, ref))
+    (JsPath \ "items" \ 0 \ "clearingDate").readNullable(JsonReads.isoDate) and
+    (JsPath \ "items" \ 0 \ "clearingSAPDocument").readNullable[String]
+  )((amount, date, ref) => BulkPaymentCollected.apply(amount.abs, date.map(new DateTime(_)), ref))
 
   implicit val bpCollectedWrites: Writes[BulkPaymentCollected] = (
     (JsPath \ "transactionType").write[String] and
     (JsPath \ "status").write[String] and
     (JsPath \ "paymentAmount").write[Amount] and
-    (JsPath \ "paymentDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
-    (JsPath \ "paymentReference").write[String]
+    (JsPath \ "paymentDate").writeNullable[String].contramap[Option[DateTime]]{
+      case Some(dateTime) => Some(dateTime.toString("yyyy-MM-dd"))
+      case None => None
+    }  and
+    (JsPath \ "paymentReference").writeNullable[String]
   )(
     bp => (
       "Debt",
@@ -81,15 +87,18 @@ object BulkPayment {
 
   implicit val bpPendingReads: Reads[BulkPaymentPending] = (
     (JsPath \ "outstandingAmount").read[Amount] and
-    (JsPath \ "items" \ 0 \ "dueDate").read(JsonReads.isoDate).map(new DateTime(_))
-  )((amount, date) => BulkPaymentPending.apply(amount.abs, date))
+    (JsPath \ "items" \ 0 \ "dueDate").readNullable(JsonReads.isoDate)
+  )((amount, date) => BulkPaymentPending.apply(amount.abs, date.map(new DateTime(_))))
 
   implicit val bpPendingWrites: Writes[BulkPaymentPending] = (
     (JsPath \ "transactionType").write[String] and
     (JsPath \ "status").write[String] and
     (JsPath \ "paymentAmount").write[Amount] and
-    (JsPath \ "dueDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd"))
-  )(
+    (JsPath \ "dueDate").writeNullable[String].contramap[Option[DateTime]]{
+      case Some(dateTime) => Some(dateTime.toString("yyyy-MM-dd"))
+      case None => None
+    }
+    )(
     bp => (
       "Payment",
       "Pending",
@@ -100,15 +109,18 @@ object BulkPayment {
 
   implicit val bpDueReads: Reads[BulkPaymentDue] = (
     (JsPath \ "outstandingAmount").read[Amount] and
-    (JsPath \ "items" \ 0 \ "dueDate").read(JsonReads.isoDate).map(new DateTime(_))
-  )((amount, date) => BulkPaymentDue.apply(amount.abs, date))
+    (JsPath \ "items" \ 0 \ "dueDate").readNullable(JsonReads.isoDate)
+  )((amount, date) => BulkPaymentDue.apply(amount.abs, date.map(new DateTime(_))))
 
   implicit val bpDueWrites: Writes[BulkPaymentDue] = (
     (JsPath \ "transactionType").write[String] and
     (JsPath \ "status").write[String] and
     (JsPath \ "paymentAmount").write[Amount] and
-    (JsPath \ "dueDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd"))
-  )(
+    (JsPath \ "dueDate").writeNullable[String].contramap[Option[DateTime]]{
+      case Some(dateTime) => Some(dateTime.toString("yyyy-MM-dd"))
+      case None => None
+    }
+    )(
     bp => (
       "Debt",
       "Due",
