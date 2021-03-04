@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -894,6 +894,38 @@ class DesConnectorSpec extends DesConnectorTestHelper {
               )
             )
           )
+
+        doRequestBonusPaymentRequest { response =>
+          response mustBe DesUnavailableResponse
+        }
+      }
+
+    }
+
+    "return a DesFailureResponse" when {
+
+      "a gateway timeout is returned" in {
+        when(mockHttp.POST[RequestBonusPaymentRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+          .thenReturn(
+            Future.failed(
+              Upstream5xxResponse("Timeout",GATEWAY_TIMEOUT,GATEWAY_TIMEOUT)
+            ))
+
+        doRequestBonusPaymentRequest { response =>
+          response mustBe DesFailureResponse("Timeout", "Timeout")
+        }
+      }
+
+    }
+
+    "return a DesUnavailableResponse" when {
+
+      "a 499 is returned" in {
+        when(mockHttp.POST[RequestBonusPaymentRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+          .thenReturn(
+            Future.failed(
+              Upstream4xxResponse("CLIENT CLOSED REQUEST",499,499)
+            ))
 
         doRequestBonusPaymentRequest { response =>
           response mustBe DesUnavailableResponse

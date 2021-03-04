@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -286,7 +286,19 @@ class DesConnector @Inject()(
         case SERVICE_UNAVAILABLE => DesUnavailableResponse
         case _ => parseDesResponse[DesTransactionResponse](res)
       }
-    })
+    }).recover{
+      case response: UpstreamErrorResponse =>
+      if (response.reportAs == 499) {
+        Logger.error(s"[DesConnector][requestBonusPayment] Service unavailable")
+        DesUnavailableResponse
+      } else {
+        Logger.error(s"[DesConnector][requestBonusPayment] Upstream Des error")
+        DesFailureResponse(response.message,response.message)
+      }
+      case _:Any =>
+        Logger.error(s"[DesConnector][requestBonusPayment] Des failure error")
+        DesFailureResponse()
+    }
   }
 
   /**
