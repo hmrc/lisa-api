@@ -17,7 +17,6 @@
 package unit.config
 
 import helpers.BaseTestFixture
-import play.api.Configuration
 import uk.gov.hmrc.lisaapi.config.APIAccessConfig
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito.when

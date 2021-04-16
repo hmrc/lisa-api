@@ -17,7 +17,6 @@
 package uk.gov.hmrc.lisaapi.controllers
 
 import com.google.inject.Inject
-import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents, PlayBodyParsers}
 import uk.gov.hmrc.auth.core.AuthConnector
@@ -54,7 +53,7 @@ class TransactionController @Inject() (
             withValidTransactionId(transactionId) { () =>
               service.getTransaction(lisaManager, accountId, transactionId) flatMap {
                 case success: GetTransactionSuccessResponse =>
-                  Logger.debug("Matched Valid Response")
+                  logger.debug("Matched Valid Response")
                   lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.TRANSACTION)
 
                   withApiVersion {
@@ -71,7 +70,7 @@ class TransactionController @Inject() (
                       Future.successful(Ok(Json.toJson(success.copy(bonusDueForPeriod = None))))
                   }
                 case GetTransactionTransactionNotFoundResponse =>
-                  Logger.debug("Matched Not Found Response")
+                  logger.debug("Matched Not Found Response")
                   lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.TRANSACTION)
 
                   withApiVersion {
@@ -83,9 +82,9 @@ class TransactionController @Inject() (
                       Future.successful(ErrorTransactionNotFound.asResult)
                   }
                 case res: GetTransactionResponse =>
-                  Logger.debug("Matched an error")
+                  logger.debug("Matched an error")
                   val errorResponse = errors.applyOrElse(res, { _: GetTransactionResponse =>
-                    Logger.debug(s"Matched an unexpected response: $res, returning a 500 error")
+                    logger.debug(s"Matched an unexpected response: $res, returning a 500 error")
                     ErrorInternalServerError
                   })
                   auditGetTransaction(lisaManager, accountId, transactionId, Some(errorResponse.errorCode))

@@ -15,7 +15,7 @@
  */
 
 package uk.gov.hmrc.lisaapi.controllers
-import play.api.Logger
+import play.api.Logging
 import play.api.libs.json.Json.toJson
 import play.api.libs.json._
 import play.api.mvc._
@@ -25,7 +25,7 @@ import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.utils.ErrorConverter
-import uk.gov.hmrc.play.bootstrap.controller.BackendController
+import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
@@ -35,7 +35,8 @@ abstract case class LisaController(
                                     lisaMetrics: LisaMetrics,
                                     appContext: AppContext,
                                     authConnector: AuthConnector
-                                  ) extends BackendController(cc: ControllerComponents) with LisaConstants with AuthorisedFunctions with APIVersioning with LisaActions {
+                                  ) extends BackendController(cc: ControllerComponents) with LisaConstants
+  with AuthorisedFunctions with APIVersioning with LisaActions with Logging {
 
   override val validateVersion: String => Boolean = str => str == "1.0" || str == "2.0"
   override val validateContentType: String => Boolean = _ == "json"
@@ -92,18 +93,18 @@ abstract case class LisaController(
               Try(success(payload)) match {
                 case Success(result) => result
                 case Failure(ex: Exception) =>
-                  Logger.error(s"LisaController An error occurred in Json payload validation ${ex.getMessage}")
+                  logger.error(s"LisaController An error occurred in Json payload validation ${ex.getMessage}")
                   lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.getMetricKey(request.uri))
                   Future.successful(InternalServerError(toJson(ErrorInternalServerError)))
               }
             case Success(JsError(errors)) =>
               invalid map { _(errors)} getOrElse {
                 lisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.getMetricKey(request.uri))
-                Logger.warn(s"[LisaController][withValidJson] The errors are ${errorConverter.convert(errors)}")
+                logger.warn(s"[LisaController][withValidJson] The errors are ${errorConverter.convert(errors)}")
                 Future.successful(BadRequest(toJson(ErrorBadRequest(errorConverter.convert(errors)))))
               }
             case Failure(e) =>
-              Logger.error(s"LisaController: An error occurred in lisa-api due to ${e.getMessage} returning internal server error")
+              logger.error(s"LisaController: An error occurred in lisa-api due to ${e.getMessage} returning internal server error")
               lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.getMetricKey(request.uri))
               Future.successful(InternalServerError(toJson(ErrorInternalServerError)))
           }
@@ -117,11 +118,11 @@ abstract case class LisaController(
 
   def handleFailure(implicit request: Request[_], startTime: Long): PartialFunction[Throwable, Future[Result]] = PartialFunction[Throwable, Future[Result]] {
     case _: InsufficientEnrolments =>
-      Logger.warn(s"Unauthorised access for ${request.uri}")
+      logger.warn(s"Unauthorised access for ${request.uri}")
       lisaMetrics.incrementMetrics(startTime, UNAUTHORIZED, LisaMetricKeys.getMetricKey(request.uri))
       Future.successful(Unauthorized(Json.toJson(ErrorInvalidLisaManager)))
     case _: AuthorisationException =>
-      Logger.warn(s"Unauthorised Exception for ${request.uri}")
+      logger.warn(s"Unauthorised Exception for ${request.uri}")
       lisaMetrics.incrementMetrics(startTime, UNAUTHORIZED, LisaMetricKeys.getMetricKey(request.uri))
       Future.successful(Unauthorized(Json.toJson(ErrorUnauthorized)))
     case _ =>

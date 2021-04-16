@@ -25,7 +25,6 @@ import play.api.mvc.{AnyContentAsJson, Result}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.controllers.{BonusPaymentController, ErrorAccountNotFound, ErrorBadRequestLmrn, ErrorBonusPaymentTransactionNotFound, ErrorValidation}
 import uk.gov.hmrc.lisaapi.models._
 

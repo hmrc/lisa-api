@@ -17,7 +17,7 @@
 package uk.gov.hmrc.lisaapi.services
 
 import com.google.inject.Inject
-import play.api.Logger
+import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
@@ -25,13 +25,13 @@ import uk.gov.hmrc.lisaapi.models.des._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class UpdateSubscriptionService @Inject()(desConnector: DesConnector)(implicit ec: ExecutionContext) {
+class UpdateSubscriptionService @Inject()(desConnector: DesConnector)(implicit ec: ExecutionContext) extends Logging {
 
   def updateSubscription(lisaManager: String, accountId: String, request: UpdateSubscriptionRequest)
                         (implicit hc: HeaderCarrier): Future[UpdateSubscriptionResponse] = {
     desConnector.updateFirstSubDate(lisaManager, accountId, request) map {
       case successResponse: DesUpdateSubscriptionSuccessResponse =>
-        Logger.debug("Update subscription success response")
+        logger.debug("Update subscription success response")
         if (successResponse.code == "SUCCESS") {
           UpdateSubscriptionSuccessResponse("UPDATED", "Successfully updated the firstSubscriptionDate for the LISA account")
         } else {
@@ -40,12 +40,12 @@ class UpdateSubscriptionService @Inject()(desConnector: DesConnector)(implicit e
           UpdateSubscriptionSuccessResponse("UPDATED_AND_ACCOUNT_VOID", voidMsg)
         }
       case DesUnavailableResponse =>
-        Logger.debug("Update subscription des unavailable response")
+        logger.debug("Update subscription des unavailable response")
         UpdateSubscriptionServiceUnavailableResponse
       case failureResponse: DesFailureResponse =>
-        Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
+        logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
         desFailures.getOrElse(failureResponse.code, {
-          Logger.warn(s"Update date of first subscription returned error: ${failureResponse.code}")
+          logger.warn(s"Update date of first subscription returned error: ${failureResponse.code}")
           UpdateSubscriptionErrorResponse
         })
     }

@@ -16,17 +16,16 @@
 
 package unit.connectors
 
-import java.time.LocalDate
-
 import org.joda.time.DateTime
-import org.mockito.ArgumentMatchers.{any, eq => eqTo, _}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.JsValue
 import play.api.test.Helpers._
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des._
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class DesConnectorSpec extends DesConnectorTestHelper {
@@ -38,8 +37,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = CREATED,
-                responseJson = Some(Json.parse(s"""{"investorID": "1234567890"}"""))
+                CREATED,
+                s"""{"investorID": "1234567890"}"""
               )
             )
           )
@@ -57,8 +56,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = GATEWAY_TIMEOUT,
-                responseJson = None
+                GATEWAY_TIMEOUT,
+                ""
               )
             )
           )
@@ -72,8 +71,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = OK,
-                responseJson = Some(Json.parse("""[1,2,3]"""))
+                OK,
+                """[1,2,3]"""
               )
             )
           )
@@ -90,8 +89,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = CONFLICT,
-                responseJson = Some(Json.parse(s"""{"investorID": "$investorID"}"""))
+                CONFLICT,
+                s"""{"investorID": "$investorID"}"""
               )
             )
           )
@@ -107,8 +106,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = FORBIDDEN,
-                responseJson = Some(Json.parse(s"""{"code": "INVESTOR_NOT_FOUND","reason": "The investor details given do not match with HMRC’s records."}"""))
+                FORBIDDEN,
+                s"""{"code": "INVESTOR_NOT_FOUND","reason": "The investor details given do not match with HMRC’s records."}"""
               )
             )
           )
@@ -124,8 +123,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = SERVICE_UNAVAILABLE,
-                responseJson = None
+                SERVICE_UNAVAILABLE,
+                ""
               )
             )
           )
@@ -142,8 +141,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = BAD_REQUEST,
-                responseJson = None
+                BAD_REQUEST,
+                ""
               )
             )
           )
@@ -161,8 +160,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = CREATED,
-                responseJson = None
+                CREATED,
+                ""
               )
             )
           )
@@ -178,8 +177,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = GATEWAY_TIMEOUT,
-                responseJson = None
+                GATEWAY_TIMEOUT,
+                ""
               )
             )
           )
@@ -193,8 +192,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = GATEWAY_TIMEOUT,
-                responseJson = Some(Json.parse(s"""{"problem": "service unavailable"}"""))
+                GATEWAY_TIMEOUT,
+                ((s"""{"problem": "service unavailable"}"""))
               )
             )
           )
@@ -212,8 +211,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = SERVICE_UNAVAILABLE,
-                responseJson = None
+                SERVICE_UNAVAILABLE,
+                ""
               )
             )
           )
@@ -231,8 +230,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = BAD_REQUEST,
-                responseJson = None
+                BAD_REQUEST,
+                ""
               )
             )
           )
@@ -248,8 +247,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = FORBIDDEN,
-                responseJson = Some(Json.parse(s"""{"code": "INVESTOR_NOT_FOUND", "reason": "The investorId given does not match with HMRC’s records."}"""))
+                FORBIDDEN,
+                ((s"""{"code": "INVESTOR_NOT_FOUND", "reason": "The investorId given does not match with HMRC’s records."}"""))
               )
             )
           )
@@ -267,8 +266,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = CREATED,
-                responseJson = None
+                CREATED,
+                ""
               )
             )
           )
@@ -285,8 +284,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = GATEWAY_TIMEOUT,
-                responseJson = None
+                GATEWAY_TIMEOUT,
+                ""
               )
             )
           )
@@ -300,8 +299,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = GATEWAY_TIMEOUT,
-                responseJson = Some(Json.parse(s"""{"problem": "service unavailable"}"""))
+                GATEWAY_TIMEOUT,
+                ((s"""{"problem": "service unavailable"}"""))
               )
             )
           )
@@ -319,8 +318,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = FORBIDDEN,
-                responseJson = Some(Json.parse(s"""{"code": "INVESTOR_NOT_FOUND", "reason": "The investorId given does not match with HMRC’s records."}"""))
+                FORBIDDEN,
+                ((s"""{"code": "INVESTOR_NOT_FOUND", "reason": "The investorId given does not match with HMRC’s records."}"""))
               )
             )
           )
@@ -336,8 +335,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = SERVICE_UNAVAILABLE,
-                responseJson = None
+                SERVICE_UNAVAILABLE,
+                ""
               )
             )
           )
@@ -352,7 +351,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
     "return a DesEmptySuccessResponse" when {
       "DES returns 200 ok" in {
         when(mockHttp.POST[CloseLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
-          .thenReturn(Future.successful(HttpResponse(responseStatus = OK, responseJson = None)))
+          .thenReturn(Future.successful(HttpResponse(OK, "")))
 
         doCloseAccountRequest { response =>
           response mustBe DesEmptySuccessResponse
@@ -366,8 +365,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = SERVICE_UNAVAILABLE,
-                responseJson = None
+                SERVICE_UNAVAILABLE,
+                ""
               )
             )
           )
@@ -383,8 +382,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = BAD_REQUEST,
-                responseJson = None
+                BAD_REQUEST,
+                ""
               )
             )
           )
@@ -400,8 +399,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = GATEWAY_TIMEOUT,
-                responseJson = None
+                GATEWAY_TIMEOUT,
+                ""
               )
             )
           )
@@ -421,8 +420,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
         when(mockHttp.PUT[JsValue, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(Future.successful(
             HttpResponse(
-              responseStatus = OK,
-              responseJson = Some(Json.parse(s"""{"code": "SUCCESS", "reason": "Account successfully reinstated"}"""))
+              OK,
+              ((s"""{"code": "SUCCESS", "reason": "Account successfully reinstated"}"""))
             )))
 
         doReinstateAccountRequest { response =>
@@ -437,8 +436,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = GATEWAY_TIMEOUT,
-                responseJson = None
+                GATEWAY_TIMEOUT,
+                ""
               )
             )
           )
@@ -455,8 +454,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = SERVICE_UNAVAILABLE,
-                responseJson = None
+                SERVICE_UNAVAILABLE,
+                ""
               )
             )
           )
@@ -473,8 +472,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = BAD_REQUEST,
-                responseJson = None
+                BAD_REQUEST,
+                ""
               )
             )
           )
@@ -492,8 +491,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = OK,
-                responseJson = Some(Json.parse(s"""{"code": "INVESTOR_ACCOUNT_NOW_VOID", "reason": "Date of first Subscription updated successfully, but as a result of the date change the account has subsequently been voided"}"""))
+                OK,
+                ((s"""{"code": "INVESTOR_ACCOUNT_NOW_VOID", "reason": "Date of first Subscription updated successfully, but as a result of the date change the account has subsequently been voided"}"""))
               )
             )
           )
@@ -514,8 +513,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = GATEWAY_TIMEOUT,
-                responseJson = None
+                GATEWAY_TIMEOUT,
+                ""
               )
             )
           )
@@ -531,8 +530,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
         .thenReturn(
           Future.successful(
             HttpResponse(
-              responseStatus = CREATED,
-              responseJson = Some(Json.parse(s"""{"code": "UPDATED_AND_ACCOUNT_VOIDED", "message": "LISA Account firstSubscriptionDate has been updated successfully"}"""))
+              CREATED,
+              ((s"""{"code": "UPDATED_AND_ACCOUNT_VOIDED", "message": "LISA Account firstSubscriptionDate has been updated successfully"}"""))
             )
           )
         )
@@ -551,8 +550,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
         .thenReturn(
           Future.successful(
             HttpResponse(
-              responseStatus = SERVICE_UNAVAILABLE,
-              responseJson = None
+              SERVICE_UNAVAILABLE,
+              ""
             )
           )
         )
@@ -570,8 +569,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
         .thenReturn(
           Future.successful(
             HttpResponse(
-              responseStatus = BAD_REQUEST,
-              responseJson = None
+              BAD_REQUEST,
+              ""
             )
           )
         )
@@ -588,8 +587,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = CREATED,
-                responseJson = Some(Json.parse(s"""{"lifeEventID": "87654321"}"""))
+                CREATED,
+                ((s"""{"lifeEventID": "87654321"}"""))
               )
             )
           )
@@ -607,8 +606,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = SERVICE_UNAVAILABLE,
-                responseJson = None
+                SERVICE_UNAVAILABLE,
+                ""
               )
             )
           )
@@ -627,8 +626,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = CREATED,
-                responseJson = Some(Json.parse(s"""{"lifeEvent": "87654321"}"""))
+                CREATED,
+                ((s"""{"lifeEvent": "87654321"}"""))
               )
             )
           )
@@ -643,8 +642,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = CREATED,
-                responseJson = None
+                CREATED,
+                ""
               )
             )
           )
@@ -663,8 +662,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = FORBIDDEN,
-                responseJson = Some(Json.parse(s"""{"code": "LIFE_EVENT_INAPPROPRIATE","reason": "The life event conflicts with previous life event reported."}"""))
+                FORBIDDEN,
+                ((s"""{"code": "LIFE_EVENT_INAPPROPRIATE","reason": "The life event conflicts with previous life event reported."}"""))
               )
             )
           )
@@ -683,12 +682,12 @@ class DesConnectorSpec extends DesConnectorTestHelper {
     "return a Left of DesUnavailableResponse" when {
 
       "a 503 is returned" in {
-        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = SERVICE_UNAVAILABLE,
-                responseJson = None
+                SERVICE_UNAVAILABLE,
+                ""
               )
             )
           )
@@ -703,12 +702,12 @@ class DesConnectorSpec extends DesConnectorTestHelper {
     "return a Left of DesFailureResponse" when {
 
       "a specific failure is returned" in {
-        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = CONFLICT,
-                responseJson = Some(Json.parse(
+                CONFLICT,
+                ((
                   """{
                     | "code": "ERROR_CODE",
                     | "reason" : "ERROR MESSAGE"
@@ -723,12 +722,12 @@ class DesConnectorSpec extends DesConnectorTestHelper {
       }
 
       "the response has no json body" in {
-        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = INTERNAL_SERVER_ERROR,
-                responseJson = None
+                INTERNAL_SERVER_ERROR,
+                ""
               )
             )
           )
@@ -739,12 +738,12 @@ class DesConnectorSpec extends DesConnectorTestHelper {
       }
 
       "the response is badly formed" in {
-        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = INTERNAL_SERVER_ERROR,
-                responseJson = Some(Json.obj("test" -> "test"))
+                INTERNAL_SERVER_ERROR,
+                """{"test": "test"}"""
               )
             )
           )
@@ -760,16 +759,17 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
       "DES returns successfully" in {
 
-        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = OK,
-                responseJson = Some(Json.arr(Json.obj(
-                  "lifeEventId" -> "1234567890",
-                  "lifeEventType" -> "STATUTORY_SUBMISSION",
-                  "lifeEventDate" -> "2018-04-05"
-                )))
+                OK,
+                """[{
+                  "lifeEventId": "1234567890",
+                  "lifeEventType": "STATUTORY_SUBMISSION",
+                  "lifeEventDate": "2018-04-05"
+                  }]
+                """
               )
             )
           )
@@ -796,8 +796,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = CREATED,
-                responseJson = Some(Json.parse(s"""{"transactionID": "87654321","message": "On Time"}"""))
+                CREATED,
+                ((s"""{"transactionID": "87654321","message": "On Time"}"""))
               )
             )
           )
@@ -814,8 +814,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = CONFLICT,
-                responseJson = Some(Json.parse(s"""{"code": "x", "reason": "xx", "transactionID": "87654321"}"""))
+                CONFLICT,
+                ((s"""{"code": "x", "reason": "xx", "transactionID": "87654321"}"""))
               )
             )
           )
@@ -833,8 +833,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = GATEWAY_TIMEOUT,
-                responseJson = None
+                GATEWAY_TIMEOUT,
+                ""
               )
             )
           )
@@ -849,8 +849,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = CREATED,
-                responseJson = Some(Json.parse("""[1,2,3]"""))
+                CREATED,
+                (("""[1,2,3]"""))
               )
             )
           )
@@ -869,8 +869,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = NOT_FOUND,
-                responseJson = Some(Json.parse(s"""{"code": "LIFE_EVENT_DOES_NOT_EXIST","reason": "The lifeEventId does not match with HMRC’s records."}"""))
+                NOT_FOUND,
+                ((s"""{"code": "LIFE_EVENT_DOES_NOT_EXIST","reason": "The lifeEventId does not match with HMRC’s records."}"""))
               )
             )
           )
@@ -889,8 +889,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = SERVICE_UNAVAILABLE,
-                responseJson = None
+                SERVICE_UNAVAILABLE,
+                ""
               )
             )
           )
@@ -908,7 +908,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
         when(mockHttp.POST[RequestBonusPaymentRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.failed(
-              Upstream5xxResponse("Timeout",GATEWAY_TIMEOUT,GATEWAY_TIMEOUT)
+              UpstreamErrorResponse("Timeout",GATEWAY_TIMEOUT,GATEWAY_TIMEOUT)
             ))
 
         doRequestBonusPaymentRequest { response =>
@@ -924,7 +924,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
         when(mockHttp.POST[RequestBonusPaymentRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
           .thenReturn(
             Future.failed(
-              Upstream4xxResponse("CLIENT CLOSED REQUEST",499,499)
+              UpstreamErrorResponse("CLIENT CLOSED REQUEST",499,499)
             ))
 
         doRequestBonusPaymentRequest { response =>
@@ -940,8 +940,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = BAD_REQUEST,
-                responseJson = None
+                BAD_REQUEST,
+                ""
               )
             )
           )
@@ -955,12 +955,12 @@ class DesConnectorSpec extends DesConnectorTestHelper {
   "Retrieve Bonus Payment endpoint" must {
     "return a DesUnavailableResponse" when {
       "a 503 is returned" in {
-        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = SERVICE_UNAVAILABLE,
-                responseJson = None
+                SERVICE_UNAVAILABLE,
+                ""
               )
             )
           )
@@ -974,12 +974,12 @@ class DesConnectorSpec extends DesConnectorTestHelper {
     "return a DesFailureResponse" when {
 
       "a specific failure is returned" in {
-        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = CONFLICT,
-                responseJson = Some(Json.parse(
+                CONFLICT,
+                ((
                   """{
                     | "code": "ERROR_CODE",
                     | "reason" : "ERROR MESSAGE"
@@ -994,12 +994,12 @@ class DesConnectorSpec extends DesConnectorTestHelper {
       }
 
       "the response has no json body" in {
-        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = INTERNAL_SERVER_ERROR,
-                responseJson = None
+                INTERNAL_SERVER_ERROR,
+                ""
               )
             )
           )
@@ -1015,12 +1015,12 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
       "DES returns successfully" in {
 
-        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = OK,
-                responseJson = Some(Json.parse(validBonusPaymentResponseJson))
+                OK,
+                ((validBonusPaymentResponseJson))
               )
             )
           )
@@ -1050,12 +1050,12 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
     "return a unavailable response" when {
       "a 503 is returned" in {
-        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = SERVICE_UNAVAILABLE,
-                responseJson = None
+                SERVICE_UNAVAILABLE,
+                ""
               )
             )
           )
@@ -1068,12 +1068,12 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
     "return a failure response" when {
       "the DES response is a failure response" in {
-        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = OK,
-                responseJson = Some(Json.parse(
+                OK,
+                ((
                   """{
                     | "code": "ERROR_CODE",
                     | "reason" : "ERROR MESSAGE"
@@ -1087,12 +1087,12 @@ class DesConnectorSpec extends DesConnectorTestHelper {
         }
       }
       "the DES response has no json body" in {
-        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = OK,
-                responseJson = None
+                OK,
+                ""
               )
             )
           )
@@ -1102,12 +1102,12 @@ class DesConnectorSpec extends DesConnectorTestHelper {
         }
       }
       "the DES response is invalid" in {
-        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = OK,
-                responseJson = Some(Json.parse(
+                OK,
+                ((
                   """{
                     | "status": "Due"
                   }""".stripMargin))
@@ -1123,12 +1123,12 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
     "return a success response" when {
       "the DES response is a valid collected Pending transaction" in {
-        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = OK,
-                responseJson = Some(Json.parse(
+                OK,
+                ((
                   """{
                     |    "paymentStatus": "PENDING",
                     |    "paymentDate": "2000-01-01",
@@ -1148,12 +1148,12 @@ class DesConnectorSpec extends DesConnectorTestHelper {
         }
       }
       "the DES response is a valid paid Pending transaction" in {
-        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = OK,
-                responseJson = Some(Json.parse(
+                OK,
+                ((
                   """{
                     |    "paymentStatus": "PENDING",
                     |    "paymentDate": "2000-01-01"
@@ -1171,12 +1171,12 @@ class DesConnectorSpec extends DesConnectorTestHelper {
         }
       }
       "the DES response is a valid Paid transaction" in {
-        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = OK,
-                responseJson = Some(Json.parse(
+                OK,
+                ((
                   """{
                     |    "paymentStatus": "PAID",
                     |    "paymentDate": "2000-01-01",
@@ -1203,12 +1203,12 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
     "return a unavailable response" when {
       "a 503 is returned" in {
-        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = SERVICE_UNAVAILABLE,
-                responseJson = None
+                SERVICE_UNAVAILABLE,
+                ""
               )
             )
           )
@@ -1221,12 +1221,12 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
     "return a failure response" when {
       "the DES response is a failure response" in {
-        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = OK,
-                responseJson = Some(Json.parse(
+                OK,
+                ((
                   """{
                     | "code": "ERROR_CODE",
                     | "reason" : "ERROR MESSAGE"
@@ -1240,12 +1240,12 @@ class DesConnectorSpec extends DesConnectorTestHelper {
         }
       }
       "the DES response has no json body" in {
-        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = OK,
-                responseJson = None
+                OK,
+                ""
               )
             )
           )
@@ -1255,14 +1255,14 @@ class DesConnectorSpec extends DesConnectorTestHelper {
         }
       }
       "the DES response is missing a processingDate" in {
-        val responseJson = Json.parse("{}")
+        val responseString = ("{}")
 
-        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = OK,
-                responseJson = Some(responseJson)
+                OK,
+                responseString
               )
             )
           )
@@ -1275,7 +1275,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
     "return a success response" when {
       "the DES response is the appropriate json response" in {
-        val responseJson = Json.parse(
+        val responseString = (
           """{
             |    "processingDate": "2017-03-07T09:30:00.000Z",
             |    "idNumber": "Z5555",
@@ -1300,12 +1300,12 @@ class DesConnectorSpec extends DesConnectorTestHelper {
             |    ]
             |}""".stripMargin)
 
-        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = OK,
-                responseJson = Some(responseJson)
+                OK,
+                responseString
               )
             )
           )
@@ -1324,18 +1324,18 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
     "return a not found response" when {
       "the DES response has no financial transactions field" in {
-        val responseJson = Json.parse(
+        val responseString = (
           """{
             | "processingDate": "2017-03-07T09:30:00.000Z",
             | "idNumber": "Z1234"
             |}""".stripMargin)
 
-        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = OK,
-                responseJson = Some(responseJson)
+                OK,
+                responseString
               )
             )
           )
@@ -1345,18 +1345,18 @@ class DesConnectorSpec extends DesConnectorTestHelper {
         }
       }
       "the DES response has no id number field" in {
-        val responseJson = Json.parse(
+        val responseString = (
           """{
             | "processingDate": "2017-03-07T09:30:00.000Z",
             | "financialTransactions": []
             |}""".stripMargin)
 
-        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = OK,
-                responseJson = Some(responseJson)
+                OK,
+                responseString
               )
             )
           )
@@ -1366,17 +1366,17 @@ class DesConnectorSpec extends DesConnectorTestHelper {
         }
       }
       "the DES response has no id number or financial transactions field" in {
-        val responseJson = Json.parse(
+        val responseString = (
           """{
             | "processingDate": "2017-03-07T09:30:00.000Z"
             |}""".stripMargin)
 
-        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = OK,
-                responseJson = Some(responseJson)
+                OK,
+                responseString
               )
             )
           )
@@ -1393,12 +1393,12 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
     "return a unavailable response" when {
       "a 503 is returned" in {
-        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = SERVICE_UNAVAILABLE,
-                responseJson = None
+                SERVICE_UNAVAILABLE,
+                ""
               )
             )
           )
@@ -1411,12 +1411,12 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
     "return a failure response" when {
       "the DES response is a failure response" in {
-        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = OK,
-                responseJson = Some(Json.parse(
+                OK,
+                ((
                   """{
                     | "code": "ERROR_CODE",
                     | "reason" : "ERROR MESSAGE"
@@ -1430,12 +1430,12 @@ class DesConnectorSpec extends DesConnectorTestHelper {
         }
       }
       "the DES response has no json body" in {
-        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = OK,
-                responseJson = None
+                OK,
+                ""
               )
             )
           )
@@ -1445,14 +1445,14 @@ class DesConnectorSpec extends DesConnectorTestHelper {
         }
       }
       "the DES response is missing required fields" in {
-        val responseJson = Json.parse("{}")
+        val responseString = ("{}")
 
-        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = OK,
-                responseJson = Some(responseJson)
+                OK,
+                responseString
               )
             )
           )
@@ -1465,7 +1465,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
     "return a success response" when {
       "the DES response is the appropriate json response" in {
-        val responseJson = Json.parse(
+        val responseString = (
           """{
             |  "investorId": "1234567890",
             |  "status": "OPEN",
@@ -1482,12 +1482,12 @@ class DesConnectorSpec extends DesConnectorTestHelper {
             |  "firstSubscriptionDate": "2016-01-06"
             |}""".stripMargin)
 
-        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = OK,
-                responseJson = Some(responseJson)
+                OK,
+                responseString
               )
             )
           )
@@ -1514,8 +1514,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
     "return a subscriptionStatus of AVAILABLE" when {
       "there is no subscriptionStatus in the json response from DES" in {
-        val responseJson = Json.parse(
-          """{
+        val responseString = """{
             |  "investorId": "1234567890",
             |  "status": "OPEN",
             |  "creationDate": "2016-01-01",
@@ -1528,14 +1527,14 @@ class DesConnectorSpec extends DesConnectorTestHelper {
             |  "xferredFromLmrn": "Z123453",
             |  "lisaManagerClosureDate": "2016-05-01",
             |  "firstSubscriptionDate": "2016-01-06"
-            |}""".stripMargin)
+            |}""".stripMargin
 
-        when(mockHttp.GET[HttpResponse](any())(any(), any(), any()))
+        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = OK,
-                responseJson = Some(responseJson)
+                OK,
+                responseString
               )
             )
           )
@@ -1567,8 +1566,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
         .thenReturn(
           Future.successful(
             HttpResponse(
-              responseStatus = CREATED,
-              responseJson = Some(Json.parse(s"""{"transactionID": "87654321","message": "On Time"}"""))
+              CREATED,
+              ((s"""{"transactionID": "87654321","message": "On Time"}"""))
             )
           )
         )
@@ -1583,8 +1582,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = CREATED,
-                responseJson = Some(Json.parse(s"""{"transactionID": "87654321","message": "On Time"}"""))
+                CREATED,
+                ((s"""{"transactionID": "87654321","message": "On Time"}"""))
               )
             )
           )
@@ -1601,8 +1600,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = CONFLICT,
-                responseJson = Some(Json.parse(s"""{"code": "WITHDRAWAL_CHARGE_ALREADY_EXISTS","reason": "A withdrawal charge with these details has already been requested for this investor","investorTransactionID":"2345678901"}"""))
+                CONFLICT,
+                ((s"""{"code": "WITHDRAWAL_CHARGE_ALREADY_EXISTS","reason": "A withdrawal charge with these details has already been requested for this investor","investorTransactionID":"2345678901"}"""))
               )
             )
           )
@@ -1616,8 +1615,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = FORBIDDEN,
-                responseJson = Some(Json.parse(s"""{"code": "SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED","reason": "This withdrawal charge has already been superseded","supersededTransactionByID": "2345678901"}"""))
+                FORBIDDEN,
+                ((s"""{"code": "SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED","reason": "This withdrawal charge has already been superseded","supersededTransactionByID": "2345678901"}"""))
               )
             )
           )
@@ -1633,8 +1632,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = GATEWAY_TIMEOUT,
-                responseJson = None
+                GATEWAY_TIMEOUT,
+                ""
               )
             )
           )
@@ -1648,8 +1647,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = CREATED,
-                responseJson = Some(Json.parse("""[1,2,3]"""))
+                CREATED,
+                (("""[1,2,3]"""))
               )
             )
           )
@@ -1666,8 +1665,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = NOT_FOUND,
-                responseJson = Some(Json.parse(s"""{"code": "LIFE_EVENT_DOES_NOT_EXIST","reason": "The lifeEventId does not match with HMRC’s records."}"""))
+                NOT_FOUND,
+                ((s"""{"code": "LIFE_EVENT_DOES_NOT_EXIST","reason": "The lifeEventId does not match with HMRC’s records."}"""))
               )
             )
           )
@@ -1684,8 +1683,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = SERVICE_UNAVAILABLE,
-                responseJson = None
+                SERVICE_UNAVAILABLE,
+                ""
               )
             )
           )
@@ -1701,8 +1700,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           .thenReturn(
             Future.successful(
               HttpResponse(
-                responseStatus = BAD_REQUEST,
-                responseJson = None
+                BAD_REQUEST,
+                ""
               )
             )
           )

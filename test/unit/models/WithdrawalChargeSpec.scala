@@ -158,13 +158,13 @@ class WithdrawalChargeSpec extends PlaySpec {
         errors => {
           val missingError = "error.path.missing"
 
-          errors must contain (JsPath \ "claimPeriodStartDate", Seq(JsonValidationError(missingError)))
-          errors must contain (JsPath \ "claimPeriodEndDate", Seq(JsonValidationError(missingError)))
-          errors must contain (JsPath \ "withdrawalAmount", Seq(JsonValidationError(missingError)))
-          errors must contain (JsPath \ "withdrawalChargeAmount", Seq(JsonValidationError(missingError)))
-          errors must contain (JsPath \ "withdrawalChargeAmountYTD", Seq(JsonValidationError(missingError)))
-          errors must contain (JsPath \ "fundsDeductedDuringWithdrawal", Seq(JsonValidationError(missingError)))
-          errors must contain (JsPath \ "withdrawalReason", Seq(JsonValidationError(missingError)))
+          errors must contain((JsPath \ "claimPeriodStartDate", Seq(JsonValidationError(missingError))))
+          errors must contain((JsPath \ "claimPeriodEndDate", Seq(JsonValidationError(missingError))))
+          errors must contain((JsPath \ "withdrawalAmount", Seq(JsonValidationError(missingError))))
+          errors must contain((JsPath \ "withdrawalChargeAmount", Seq(JsonValidationError(missingError))))
+          errors must contain((JsPath \ "withdrawalChargeAmountYTD", Seq(JsonValidationError(missingError))))
+          errors must contain((JsPath \ "fundsDeductedDuringWithdrawal", Seq(JsonValidationError(missingError))))
+          errors must contain((JsPath \ "withdrawalReason", Seq(JsonValidationError(missingError))))
         },
         _ => fail("invalid json passed validation")
       )
@@ -187,13 +187,13 @@ class WithdrawalChargeSpec extends PlaySpec {
           val withdrawalFormatError = "error.formatting.withdrawalReason"
           val numberFormatError = "error.formatting.currencyNegativeDisallowed"
 
-          errors must contain (JsPath \ "claimPeriodStartDate", Seq(JsonValidationError(dateFormatError)))
-          errors must contain (JsPath \ "claimPeriodEndDate", Seq(JsonValidationError(dateFormatError)))
-          errors must contain (JsPath \ "withdrawalAmount", Seq(JsonValidationError(numberFormatError)))
-          errors must contain (JsPath \ "withdrawalChargeAmount", Seq(JsonValidationError(numberFormatError)))
-          errors must contain (JsPath \ "withdrawalChargeAmountYTD", Seq(JsonValidationError(numberFormatError)))
-          errors must contain (JsPath \ "fundsDeductedDuringWithdrawal", Seq(JsonValidationError("error.expected.jsboolean")))
-          errors must contain (JsPath \ "withdrawalReason", Seq(JsonValidationError(withdrawalFormatError)))
+          errors must contain ((JsPath \ "claimPeriodStartDate", Seq(JsonValidationError(dateFormatError))))
+          errors must contain ((JsPath \ "claimPeriodEndDate", Seq(JsonValidationError(dateFormatError))))
+          errors must contain ((JsPath \ "withdrawalAmount", Seq(JsonValidationError(numberFormatError))))
+          errors must contain ((JsPath \ "withdrawalChargeAmount", Seq(JsonValidationError(numberFormatError))))
+          errors must contain ((JsPath \ "withdrawalChargeAmountYTD", Seq(JsonValidationError(numberFormatError))))
+          errors must contain ((JsPath \ "fundsDeductedDuringWithdrawal", Seq(JsonValidationError("error.expected.jsboolean"))))
+          errors must contain ((JsPath \ "withdrawalReason", Seq(JsonValidationError(withdrawalFormatError))))
         },
         _ => fail("invalid json passed validation")
       )

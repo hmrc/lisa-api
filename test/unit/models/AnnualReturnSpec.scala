@@ -19,7 +19,7 @@ package unit.models
 import org.joda.time.DateTime
 import org.mockito.Mockito.{reset, when}
 import org.scalatest.BeforeAndAfter
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsPath, Json, JsonValidationError}
 import uk.gov.hmrc.lisaapi.LisaConstants

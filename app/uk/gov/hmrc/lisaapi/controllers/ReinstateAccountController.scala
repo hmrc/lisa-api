@@ -17,7 +17,6 @@
 package uk.gov.hmrc.lisaapi.controllers
 
 import com.google.inject.Inject
-import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc._
 import uk.gov.hmrc.auth.core.AuthConnector
@@ -85,7 +84,7 @@ class ReinstateAccountController @Inject() (
         processReinstateFailure(lisaManager, accountId, ErrorInternalServerError)
     } recover {
       case _:Exception  =>
-        Logger.error(s"ReinstateAccountController: reinstateAccount: An error occurred returning internal server error")
+        logger.error(s"ReinstateAccountController: reinstateAccount: An error occurred returning internal server error")
         lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.REINSTATE)
         ErrorInternalServerError.asResult
     }

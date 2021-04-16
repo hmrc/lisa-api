@@ -19,17 +19,13 @@ package helpers
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.inject.Injector
-import play.api.mvc.{Action, AnyContent, ControllerComponents, PlayBodyParsers}
+import play.api.mvc.{ControllerComponents, PlayBodyParsers}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.lisaapi.LisaConstants
-import uk.gov.hmrc.lisaapi.controllers.{AccountController, AnnualReturnController, BonusPaymentController, BulkPaymentController, CloseAccountController, DiscoverController, GetAccountController, GetLifeEventController, InvestorController, LifeEventController, PropertyPurchaseController, ReinstateAccountController}
 import uk.gov.hmrc.lisaapi.metrics.LisaMetrics
 import uk.gov.hmrc.lisaapi.models.AnnualReturnValidator
-import uk.gov.hmrc.lisaapi.services.{AccountService, AuditService, BonusOrWithdrawalService, BonusPaymentService, BulkPaymentService, CurrentDateService, InvestorService, LifeEventService, ReinstateAccountService, TransactionService, UpdateSubscriptionService, WithdrawalService}
+import uk.gov.hmrc.lisaapi.services._
 import uk.gov.hmrc.lisaapi.utils.{BonusPaymentValidator, ErrorConverter, WithdrawalChargeValidator}
-
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
 trait ControllerTestFixture extends BaseTestFixture with GuiceOneAppPerSuite with BeforeAndAfterEach with LisaConstants {
 

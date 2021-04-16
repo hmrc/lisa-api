@@ -24,6 +24,7 @@ import uk.gov.hmrc.lisaapi.models.CreateLisaInvestorRequest
 import uk.gov.hmrc.lisaapi.utils.ErrorConverter
 
 case class SimpleClass(str: String, num: Int)
+
 case class MultipleDataTypes(str: String, num: Int, arr: List[SimpleClass], obj: SimpleClass)
 
 class ErrorConverterSpec extends BaseTestFixture with GuiceOneAppPerSuite {
@@ -37,25 +38,24 @@ class ErrorConverterSpec extends BaseTestFixture with GuiceOneAppPerSuite {
     "catch invalid data types" in {
       val validate = Json.parse("""{"str": 1, "num": "text", "arr": {}, "obj": 123}""").validate[MultipleDataTypes]
 
-      validate match {
-        case e: JsError => {
-          val res = errorConverter.convert(e.errors)
+      assert(validate.isInstanceOf[JsError])
+      val e = validate.asInstanceOf[JsError]
+      val res = errorConverter.convert(e.errors)
 
-          println(JsError.toFlatForm(e))
+      println(JsError.toFlatForm(e))
 
-          res.size mustBe 4
+      res.size mustBe 4
 
-          res must contain(ErrorValidation("INVALID_DATA_TYPE", "Invalid data type has been used", Some("/str")))
-          res must contain(ErrorValidation("INVALID_DATA_TYPE", "Invalid data type has been used", Some("/num")))
-          res must contain(ErrorValidation("INVALID_DATA_TYPE", "Invalid data type has been used", Some("/arr")))
-          res must contain(ErrorValidation("INVALID_DATA_TYPE", "Invalid data type has been used", Some("/obj")))
+      res must contain(ErrorValidation("INVALID_DATA_TYPE", "Invalid data type has been used", Some("/str")))
+      res must contain(ErrorValidation("INVALID_DATA_TYPE", "Invalid data type has been used", Some("/num")))
+      res must contain(ErrorValidation("INVALID_DATA_TYPE", "Invalid data type has been used", Some("/arr")))
+      res must contain(ErrorValidation("INVALID_DATA_TYPE", "Invalid data type has been used", Some("/obj")))
 
-        }
-      }
     }
 
     "catch invalid date" in {
-      val investorJson = """{
+      val investorJson =
+        """{
                          "investorNINO" : "AB123456D",
                          "firstName" : "Ex first Name",
                          "lastName" : "Ample",
@@ -65,14 +65,13 @@ class ErrorConverterSpec extends BaseTestFixture with GuiceOneAppPerSuite {
       val validate = Json.parse(investorJson).validate[CreateLisaInvestorRequest]
 
 
-      validate match {
-        case e: JsError => {
-          val res = errorConverter.convert(e.errors)
-          res.size mustBe 1
-          res must contain(ErrorValidation("INVALID_DATE", "Date is invalid", Some("/dateOfBirth")))
-        }
+      assert(validate.isInstanceOf[JsError])
+      val e = validate.asInstanceOf[JsError]
+      val res = errorConverter.convert(e.errors)
+      res.size mustBe 1
+      res must contain(ErrorValidation("INVALID_DATE", "Date is invalid", Some("/dateOfBirth")))
 
-      }
+
     }
   }
 }

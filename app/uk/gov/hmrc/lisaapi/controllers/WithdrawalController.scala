@@ -17,7 +17,6 @@
 package uk.gov.hmrc.lisaapi.controllers
 
 import com.google.inject.Inject
-import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc._
 import uk.gov.hmrc.auth.core.AuthConnector
@@ -42,7 +41,7 @@ class WithdrawalController @Inject() (
                                        lisaMetrics: LisaMetrics,
                                        cc: ControllerComponents,
                                        parse: PlayBodyParsers
-                                     )(implicit ec: ExecutionContext) extends LisaController(
+                                     )(implicit ec: ExecutionContext) extends LisaController (
   cc: ControllerComponents,
   lisaMetrics: LisaMetrics,
   appContext: AppContext,
@@ -59,7 +58,7 @@ class WithdrawalController @Inject() (
       withValidData(req)(lisaManager, accountId) { () =>
         withValidClaimPeriod(req)(lisaManager, accountId) { () =>
           postService.reportWithdrawalCharge(lisaManager, accountId, req) map { res =>
-            Logger.debug("reportWithdrawalCharge: The response is " + res.toString)
+            logger.debug("reportWithdrawalCharge: The response is " + res.toString)
 
             res match {
               case successResponse: ReportWithdrawalChargeSuccessResponse =>
@@ -69,7 +68,7 @@ class WithdrawalController @Inject() (
             }
           } recover {
             case e: Exception =>
-              Logger.error(s"reportWithdrawalCharge: An error occurred due to ${e.getMessage}, returning internal server error")
+              logger.error(s"reportWithdrawalCharge: An error occurred due to ${e.getMessage}, returning internal server error")
               handleFailure(lisaManager, accountId, req, ReportWithdrawalChargeError)
           }
         }
@@ -181,7 +180,7 @@ class WithdrawalController @Inject() (
 
   private def handleSuccess(lisaManager: String, accountId: String, req: ReportWithdrawalChargeRequest, resp: ReportWithdrawalChargeSuccessResponse)
                            (implicit hc: HeaderCarrier, startTime: Long) = {
-    Logger.debug("Matched success response")
+    logger.debug("Matched success response")
 
     val (responseData, notification) = resp match {
       case _:ReportWithdrawalChargeOnTimeResponse =>

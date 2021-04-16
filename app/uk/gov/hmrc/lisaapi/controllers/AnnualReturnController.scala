@@ -17,7 +17,6 @@
 package uk.gov.hmrc.lisaapi.controllers
 
 import com.google.inject.Inject
-import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc._
 import uk.gov.hmrc.auth.core.AuthConnector
@@ -57,7 +56,7 @@ class AnnualReturnController @Inject()(
           withValidJson[AnnualReturn]( req =>
             withValidData(req)(lisaManager, accountId) { () =>
               service.reportLifeEvent(lisaManager, accountId, req) map { res =>
-                Logger.debug("submitAnnualReturn: The response is " + res.toString)
+                logger.debug("submitAnnualReturn: The response is " + res.toString)
 
                 res match {
                   case success: ReportLifeEventSuccessResponse =>
@@ -76,7 +75,7 @@ class AnnualReturnController @Inject()(
                 }
               } recover {
                 case e: Exception =>
-                  Logger.error(s"submitAnnualReturn: An error occurred due to ${e.getMessage}, returning internal server error")
+                  logger.error(s"submitAnnualReturn: An error occurred due to ${e.getMessage}, returning internal server error")
 
                   audit(lisaManager, accountId, req, Some("INTERNAL_SERVER_ERROR"))
                   lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.EVENT)
@@ -93,7 +92,7 @@ class AnnualReturnController @Inject()(
                    (implicit hc: HeaderCarrier) = {
     val (auditType, auditData) = failureCode map { code =>
       ("lifeEventNotRequested", req.toStringMap ++ Map("reasonNotRequested" -> code))
-    } getOrElse ("lifeEventRequested", req.toStringMap)
+    } getOrElse(("lifeEventRequested", req.toStringMap))
 
     auditService.audit(
       auditType = auditType,

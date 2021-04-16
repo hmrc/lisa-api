@@ -23,11 +23,11 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.logging.Authorization
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.AuditService
 import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
 import uk.gov.hmrc.play.audit.model.DataEvent
+import uk.gov.hmrc.http.Authorization
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -45,7 +45,7 @@ class AuditServiceSpec extends ServiceTestFixture with BeforeAndAfter {
     }
 
     "build an audit event with the correct mandatory details" in {
-      val res = auditService.audit("investorCreated", "/create", Map("investorID" -> "1234567890"))
+      auditService.audit("investorCreated", "/create", Map("investorID" -> "1234567890"))
       val captor: ArgumentCaptor[DataEvent] = ArgumentCaptor.forClass(classOf[DataEvent])
 
       verify(mockAuditConnector).sendEvent(captor.capture())(any(), any())
@@ -57,7 +57,7 @@ class AuditServiceSpec extends ServiceTestFixture with BeforeAndAfter {
     }
 
     "build an audit event with the correct tags" in {
-      val res = auditService.audit("investorCreated", "/create", Map("investorID" -> "1234567890"))
+      auditService.audit("investorCreated", "/create", Map("investorID" -> "1234567890"))
       val captor: ArgumentCaptor[DataEvent] = ArgumentCaptor.forClass(classOf[DataEvent])
 
       verify(mockAuditConnector).sendEvent(captor.capture())(any(), any())
@@ -70,7 +70,7 @@ class AuditServiceSpec extends ServiceTestFixture with BeforeAndAfter {
     }
 
     "build an audit event with the correct detail" in {
-      val res = auditService.audit("investorCreated", "/create", Map("investorId" -> "1234567890", "investorNINO" -> "AB123456D"))
+      auditService.audit("investorCreated", "/create", Map("investorId" -> "1234567890", "investorNINO" -> "AB123456D"))
       val captor: ArgumentCaptor[DataEvent] = ArgumentCaptor.forClass(classOf[DataEvent])
 
       verify(mockAuditConnector).sendEvent(captor.capture())(any(), any())
@@ -90,7 +90,7 @@ class AuditServiceSpec extends ServiceTestFixture with BeforeAndAfter {
         inboundPayments = InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
         bonuses = Bonuses(1000f, 1000f, Some(1000f), "Life Event")
       )
-      val res = auditService.audit("investorCreated", "/create", data.toStringMap)
+      auditService.audit("investorCreated", "/create", data.toStringMap)
       val captor: ArgumentCaptor[DataEvent] = ArgumentCaptor.forClass(classOf[DataEvent])
 
       verify(mockAuditConnector).sendEvent(captor.capture())(any(), any())
@@ -113,7 +113,7 @@ class AuditServiceSpec extends ServiceTestFixture with BeforeAndAfter {
     }
 
     "send an event via the audit connector" in {
-      val event = auditService.audit("investorCreated", "/create", Map("investorId" -> "1234567890"))
+      auditService.audit("investorCreated", "/create", Map("investorId" -> "1234567890"))
 
       verify(mockAuditConnector).sendEvent(any())(any(), any())
     }

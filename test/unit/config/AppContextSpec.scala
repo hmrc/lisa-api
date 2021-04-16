@@ -18,11 +18,11 @@ package unit.config
 
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito.when
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.Configuration
 import uk.gov.hmrc.lisaapi.config.AppContext
-import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 class AppContextSpec extends PlaySpec with MockitoSugar {
 

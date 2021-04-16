@@ -18,7 +18,7 @@ package uk.gov.hmrc.lisaapi.models.des
 
 import org.joda.time.DateTime
 import play.api.libs.functional.syntax._
-import play.api.libs.json.{JsPath, JsSuccess, Reads}
+import play.api.libs.json.{JsPath, Reads}
 import uk.gov.hmrc.lisaapi.models.{Amount, JsonReads}
 
 trait DesGetTransactionResponse extends DesResponse

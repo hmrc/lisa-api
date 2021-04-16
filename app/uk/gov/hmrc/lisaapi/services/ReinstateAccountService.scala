@@ -17,7 +17,7 @@
 package uk.gov.hmrc.lisaapi.services
 
 import com.google.inject.Inject
-import play.api.Logger
+import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
@@ -25,15 +25,15 @@ import uk.gov.hmrc.lisaapi.models.des._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ReinstateAccountService @Inject()(desConnector: DesConnector)(implicit ec: ExecutionContext) {
+class ReinstateAccountService @Inject()(desConnector: DesConnector)(implicit ec: ExecutionContext) extends Logging {
 
   def reinstateAccountService(lisaManager: String, accountId: AccountId)(implicit hc: HeaderCarrier): Future[ReinstateLisaAccountResponse] = {
     desConnector.reinstateAccount(lisaManager, accountId) map {
       case successResponse: DesReinstateAccountSuccessResponse =>
-        Logger.debug("Reinstate account success response")
+        logger.debug("Reinstate account success response")
         ReinstateLisaAccountSuccessResponse(successResponse.code, successResponse.reason)
       case DesUnavailableResponse =>
-        Logger.debug("Reinstate account returned service unavailable")
+        logger.debug("Reinstate account returned service unavailable")
         ReinstateLisaAccountServiceUnavailableResponse
       case failureResponse: DesFailureResponse =>
         failureResponse.code match {
@@ -43,7 +43,7 @@ class ReinstateAccountService @Inject()(desConnector: DesConnector)(implicit ec:
           case "INVESTOR_ACCOUNT_ALREADY_OPEN" => ReinstateLisaAccountAlreadyOpenResponse
           case "INVESTOR_COMPLIANCE_CHECK_FAILED" => ReinstateLisaAccountInvestorComplianceCheckFailedResponse
           case _ =>
-            Logger.warn(s"Reinstate account returned error ${failureResponse.code}")
+            logger.warn(s"Reinstate account returned error ${failureResponse.code}")
             ReinstateLisaAccountErrorResponse
         }
     }

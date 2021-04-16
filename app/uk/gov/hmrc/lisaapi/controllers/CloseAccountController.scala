@@ -17,13 +17,11 @@
 package uk.gov.hmrc.lisaapi.controllers
 
 import com.google.inject.Inject
-import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc._
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.config.AppContext
-import uk.gov.hmrc.lisaapi.{LisaConstants, models}
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.{AccountService, AuditService}
@@ -73,7 +71,7 @@ class CloseAccountController @Inject()(
               }
             } recover {
               case e: Exception =>
-                Logger.error(s"AccountController: closeAccount: An error occurred due to ${e.getMessage} returning internal server error")
+                logger.error(s"AccountController: closeAccount: An error occurred due to ${e.getMessage} returning internal server error")
 
                 handleFailure(lisaManager, accountId, requestData, CloseLisaAccountErrorResponse)
             }

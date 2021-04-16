@@ -18,7 +18,6 @@ package uk.gov.hmrc.lisaapi.controllers
 
 import com.google.inject.Inject
 import org.joda.time.DateTime
-import play.api.Logger
 import play.api.libs.json.{Json, Reads}
 import play.api.mvc._
 import uk.gov.hmrc.auth.core.AuthConnector
@@ -106,7 +105,7 @@ class BonusPaymentController @Inject()(
           case Some(VERSION_1) =>
             if (response.bonuses.claimReason == "Superseded Bonus") {
               getBonusPaymentAudit(lisaManager, accountId, transactionId, Some(ErrorInternalServerError.errorCode))
-              Logger.warn(s"API v1 received a superseded bonus claim. ID was $transactionId")
+              logger.warn(s"API v1 received a superseded bonus claim. ID was $transactionId")
               Future.successful(InternalServerError(Json.toJson(ErrorInternalServerError)))
             } else {
               getBonusPaymentAudit(lisaManager, accountId, transactionId)
@@ -247,7 +246,7 @@ class BonusPaymentController @Inject()(
 
   private def handleSuccess(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest, resp: RequestBonusPaymentSuccessResponse)
                            (implicit hc: HeaderCarrier, startTime: Long) = {
-    Logger.debug("Matched success response")
+    logger.debug("Matched success response")
 
     val (responseData, notification) = resp match {
       case _: RequestBonusPaymentOnTimeResponse =>
@@ -278,7 +277,7 @@ class BonusPaymentController @Inject()(
 
   private def handleFailure(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest, errorResponse: RequestBonusPaymentErrorResponse)
                            (implicit hc: HeaderCarrier, request: Request[AnyContent], startTime: Long) = {
-    Logger.debug("Matched failure response")
+    logger.debug("Matched failure response")
 
     val response: ErrorResponse = (errorResponse, getAPIVersionFromRequest(request)) match {
       case(e: RequestBonusPaymentClaimAlreadyExists, Some(VERSION_2)) => ErrorBonusClaimAlreadyExists(e.transactionId)
@@ -294,7 +293,7 @@ class BonusPaymentController @Inject()(
 
   private def handleError(e: Exception, lisaManager: String, accountId: String, req: RequestBonusPaymentRequest)
                          (implicit hc: HeaderCarrier, startTime: Long) = {
-    Logger.error(s"requestBonusPayment: An error occurred due to ${e.getMessage} returning internal server error")
+    logger.error(s"requestBonusPayment: An error occurred due to ${e.getMessage} returning internal server error")
 
     requestBonusPaymentFailureAudit(lisaManager, accountId, req, ErrorInternalServerError.errorCode)
     lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.BONUS_PAYMENT)
@@ -304,7 +303,7 @@ class BonusPaymentController @Inject()(
 
   private def handleLifeEventNotProvided(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest)
                                         (implicit hc: HeaderCarrier, startTime: Long) = {
-    Logger.debug("Life event not provided")
+    logger.debug("Life event not provided")
 
     requestBonusPaymentFailureAudit(lisaManager, accountId, req, ErrorLifeEventNotProvided.errorCode)
     lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.BONUS_PAYMENT)

@@ -17,33 +17,33 @@
 package uk.gov.hmrc.lisaapi.services
 
 import com.google.inject.Inject
-import play.api.Logger
+import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesResponse, DesUnavailableResponse}
+import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesUnavailableResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class BonusOrWithdrawalService @Inject()(desConnector: DesConnector)(implicit ec: ExecutionContext) {
+class BonusOrWithdrawalService @Inject()(desConnector: DesConnector)(implicit ec: ExecutionContext) extends Logging {
 
   def getBonusOrWithdrawal(lisaManager: String, accountId: String, transactionId: String)
                           (implicit hc: HeaderCarrier): Future[GetBonusOrWithdrawalResponse] = {
 
     desConnector.getBonusOrWithdrawal(lisaManager, accountId, transactionId) map {
       case successResponse: GetBonusOrWithdrawalResponse =>
-        Logger.debug("Matched GetBonusOrWithdrawalResponse")
+        logger.debug("Matched GetBonusOrWithdrawalResponse")
         successResponse
       case DesUnavailableResponse =>
-        Logger.debug("Matched DesUnavailableResponse")
+        logger.debug("Matched DesUnavailableResponse")
         GetBonusOrWithdrawalServiceUnavailableResponse
       case failureResponse: DesFailureResponse =>
-        Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
+        logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
         failureResponse.code match {
           case "TRANSACTION_ID_NOT_FOUND" => GetBonusOrWithdrawalTransactionNotFoundResponse
           case "INVESTOR_ACCOUNTID_NOT_FOUND" => GetBonusOrWithdrawalInvestorNotFoundResponse
           case _ =>
-            Logger.warn(s"Get bonus payment or withdrawal returned error: ${failureResponse.code}")
+            logger.warn(s"Get bonus payment or withdrawal returned error: ${failureResponse.code}")
             GetBonusOrWithdrawalErrorResponse
         }
     }

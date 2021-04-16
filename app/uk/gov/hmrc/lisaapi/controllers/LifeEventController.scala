@@ -17,7 +17,6 @@
 package uk.gov.hmrc.lisaapi.controllers
 
 import com.google.inject.Inject
-import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc._
 import uk.gov.hmrc.auth.core.AuthConnector
@@ -52,10 +51,10 @@ class LifeEventController @Inject()(
         req => {
           withValidDates(lisaManager, accountId, req) { () =>
             service.reportLifeEvent(lisaManager, accountId, req) flatMap { res =>
-              Logger.debug("Entering LifeEvent Controller and the response is " + res.toString)
+              logger.debug("Entering LifeEvent Controller and the response is " + res.toString)
               res match {
                 case ReportLifeEventSuccessResponse(lifeEventId) =>
-                  Logger.debug("Matched Valid Response ")
+                  logger.debug("Matched Valid Response ")
                   auditReportLifeEvent(lisaManager, accountId, req, success = true)
                   lisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.EVENT)
                   val data = ApiResponseData(message = "Life event created", lifeEventId = Some(lifeEventId))
@@ -64,13 +63,13 @@ class LifeEventController @Inject()(
                   withApiVersion {
                     case Some(VERSION_1) =>
                       val errorResponse = v1errors.applyOrElse(res, { _: ReportLifeEventResponse =>
-                        Logger.debug(s"Matched an unexpected response: $res, returning a 500 error")
+                        logger.debug(s"Matched an unexpected response: $res, returning a 500 error")
                         ErrorInternalServerError
                       })
                       Future.successful(error(errorResponse, lisaManager, accountId, req))
                     case Some(VERSION_2) =>
                       val errorResponse = v2errors.applyOrElse(res, { _: ReportLifeEventResponse =>
-                        Logger.debug(s"Matched an unexpected response: $res, returning a 500 error")
+                        logger.debug(s"Matched an unexpected response: $res, returning a 500 error")
                         ErrorInternalServerError
                       })
                       Future.successful(error(errorResponse, lisaManager, accountId, req))
@@ -101,7 +100,7 @@ class LifeEventController @Inject()(
 
   private def error(e: ErrorResponse, lisaManager: String, accountId: String, req: ReportLifeEventRequest)
                    (implicit hc: HeaderCarrier, startTime: Long): Result = {
-    Logger.debug("Matched an error response")
+    logger.debug("Matched an error response")
     auditReportLifeEvent(lisaManager, accountId, req, success = false, Map("reasonNotReported" -> e.errorCode))
     lisaMetrics.incrementMetrics(startTime, e.httpStatusCode, LisaMetricKeys.EVENT)
     e.asResult
@@ -123,7 +122,7 @@ class LifeEventController @Inject()(
                             (success: () => Future[Result])
                             (implicit hc: HeaderCarrier, startTime: Long) = {
     if (req.eventDate.isBefore(LISA_START_DATE)) {
-      Logger.debug("Life event not reported - invalid event date")
+      logger.debug("Life event not reported - invalid event date")
 
       auditReportLifeEvent(lisaManager, accountId, req, success = false, Map("reasonNotReported" -> "FORBIDDEN"))
       lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.EVENT)
