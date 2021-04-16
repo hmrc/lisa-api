@@ -17,7 +17,6 @@
 package uk.gov.hmrc.lisaapi.controllers
 
 import com.google.inject.Inject
-import play.api.Logger
 import play.api.libs.json.Json.toJson
 import play.api.libs.json.{JsObject, JsPath, Json, JsonValidationError}
 import play.api.mvc._
@@ -63,7 +62,7 @@ class AccountController @Inject()(
       },
         Some(
           errors => {
-            Logger.warn("[AccountController][createOrTransferLisaAccount] The errors are " + errorConverter.convert(errors))
+            logger.warn("[AccountController][createOrTransferLisaAccount] The errors are " + errorConverter.convert(errors))
 
             val transferAccountDataNotProvided = errors.exists {
               case (path: JsPath, errors: Seq[JsonValidationError]) =>
@@ -111,7 +110,7 @@ class AccountController @Inject()(
           handleCreateOrTransferFailure(lisaManager, creationRequest, errorResponse, action)
       } recover {
         case e: Exception =>
-          Logger.error(s"AccountController: An error occurred due to ${e.getMessage} returning internal server error")
+          logger.error(s"AccountController: An error occurred due to ${e.getMessage} returning internal server error")
           handleCreateOrTransferFailure(lisaManager, creationRequest, ErrorInternalServerError, action)
       }
     }
@@ -153,7 +152,7 @@ class AccountController @Inject()(
           handleCreateOrTransferFailure(lisaManager, transferRequest, errorResponse, action)
       } recover {
         case e: Exception =>
-          Logger.error(s"AccountController: An error occurred in due to ${e.getMessage} returning internal server error")
+          logger.error(s"AccountController: An error occurred in due to ${e.getMessage} returning internal server error")
           handleCreateOrTransferFailure(lisaManager, transferRequest, ErrorInternalServerError, action)
       }
     }

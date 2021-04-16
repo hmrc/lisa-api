@@ -18,7 +18,7 @@ package uk.gov.hmrc.lisaapi.models
 
 import org.joda.time.DateTime
 import play.api.libs.functional.syntax._
-import play.api.libs.json.{JsPath, Json, Reads, Writes}
+import play.api.libs.json.{JsPath, Reads, Writes}
 import uk.gov.hmrc.lisaapi.models.des.DesResponse
 
 sealed trait GetLisaAccountResponse

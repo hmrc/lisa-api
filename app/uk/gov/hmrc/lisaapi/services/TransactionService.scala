@@ -17,7 +17,7 @@
 package uk.gov.hmrc.lisaapi.services
 
 import com.google.inject.Inject
-import play.api.Logger
+import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models.des._
@@ -25,7 +25,7 @@ import uk.gov.hmrc.lisaapi.models._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class TransactionService @Inject()(desConnector: DesConnector)(implicit ec: ExecutionContext) {
+class TransactionService @Inject()(desConnector: DesConnector)(implicit ec: ExecutionContext) extends Logging {
 
   def getTransaction(lisaManager: String, accountId: String, transactionId: String)
                      (implicit hc: HeaderCarrier): Future[GetTransactionResponse] = {
@@ -34,16 +34,16 @@ class TransactionService @Inject()(desConnector: DesConnector)(implicit ec: Exec
       case success: GetBonusOrWithdrawalSuccessResponse =>
         handleITMPResponse(lisaManager, accountId, transactionId, success)
       case DesUnavailableResponse =>
-        Logger.debug("503 from ITMP")
+        logger.debug("503 from ITMP")
         Future.successful(GetTransactionServiceUnavailableResponse)
       case error: DesFailureResponse =>
-        Logger.debug(s"Error from ITMP: ${error.code}")
+        logger.debug(s"Error from ITMP: ${error.code}")
         Future.successful(
           error.code match {
             case "TRANSACTION_ID_NOT_FOUND" => GetTransactionTransactionNotFoundResponse
             case "INVESTOR_ACCOUNTID_NOT_FOUND" => GetTransactionAccountNotFoundResponse
             case _ =>
-              Logger.warn(s"Get transaction returned error: ${error.code} from ITMP")
+              logger.warn(s"Get transaction returned error: ${error.code} from ITMP")
               GetTransactionErrorResponse
           }
         )
@@ -52,7 +52,7 @@ class TransactionService @Inject()(desConnector: DesConnector)(implicit ec: Exec
 
   private def handleITMPResponse(lisaManager: String, accountId: String, transactionId: String, itmpResponse: GetBonusOrWithdrawalSuccessResponse)
                                 (implicit hc: HeaderCarrier): Future[GetTransactionResponse] = {
-    Logger.debug(s"Matched a ${itmpResponse.paymentStatus} transaction from ITMP")
+    logger.debug(s"Matched a ${itmpResponse.paymentStatus} transaction from ITMP")
     itmpResponse.paymentStatus match {
       case TransactionPaymentStatus.PENDING |
            TransactionPaymentStatus.DUE |
@@ -74,7 +74,7 @@ class TransactionService @Inject()(desConnector: DesConnector)(implicit ec: Exec
       case TransactionPaymentStatus.COLLECTED =>
         handleCollectedTransaction(lisaManager, accountId, transactionId)
       case _ =>
-        Logger.warn(s"Unexpected status: ${itmpResponse.paymentStatus}, returning an error")
+        logger.warn(s"Unexpected status: ${itmpResponse.paymentStatus}, returning an error")
         Future.successful(GetTransactionErrorResponse)
     }
   }
@@ -109,7 +109,7 @@ class TransactionService @Inject()(desConnector: DesConnector)(implicit ec: Exec
               paymentStatus = TransactionPaymentStatus.DUE
             )
           case _ =>
-            Logger.warn(s"Get collected transaction returned error: ${error.code} from ETMP")
+            logger.warn(s"Get collected transaction returned error: ${error.code} from ETMP")
             GetTransactionErrorResponse
         }
     }
@@ -154,7 +154,7 @@ class TransactionService @Inject()(desConnector: DesConnector)(implicit ec: Exec
               bonusDueForPeriod = bonusDueForPeriod
             )
           case _ =>
-            Logger.warn(s"Get paid transaction returned error: ${error.code} from ETMP")
+            logger.warn(s"Get paid transaction returned error: ${error.code} from ETMP")
             GetTransactionErrorResponse
         }
     }

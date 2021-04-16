@@ -17,7 +17,7 @@
 package uk.gov.hmrc.lisaapi.services
 
 import com.google.inject.Inject
-import play.api.Logger
+import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
@@ -25,7 +25,7 @@ import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesUnavailableRespons
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class InvestorService @Inject()(desConnector: DesConnector)(implicit ec: ExecutionContext)  {
+class InvestorService @Inject()(desConnector: DesConnector)(implicit ec: ExecutionContext) extends Logging {
 
   def createInvestor(lisaManager: String, request: CreateLisaInvestorRequest)(implicit hc: HeaderCarrier) : Future[CreateLisaInvestorResponse] = {
     desConnector.createInvestor(lisaManager, request) map {
@@ -36,7 +36,7 @@ class InvestorService @Inject()(desConnector: DesConnector)(implicit ec: Executi
         error.code match {
           case "INVESTOR_NOT_FOUND" => CreateLisaInvestorInvestorNotFoundResponse
           case _ =>
-            Logger.warn(s"Create investor returned error code ${error.code}")
+            logger.warn(s"Create investor returned error code ${error.code}")
             CreateLisaInvestorErrorResponse
         }
     }

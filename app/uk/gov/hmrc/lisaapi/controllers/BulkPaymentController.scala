@@ -29,8 +29,6 @@ import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models.{GetBulkPaymentNotFoundResponse, GetBulkPaymentServiceUnavailableResponse, GetBulkPaymentSuccessResponse}
 import uk.gov.hmrc.lisaapi.services.{AuditService, BulkPaymentService, CurrentDateService}
 
-import scala.collection.immutable.ListMap
-import scala.collection.mutable
 import scala.concurrent.{ExecutionContext, Future}
 
 class BulkPaymentController @Inject()(

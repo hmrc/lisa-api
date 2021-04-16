@@ -21,7 +21,7 @@ import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 scalaVersion := "2.12.11"
 
 lazy val lisaapi = (project in file("."))
-  .enablePlugins(PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin, SbtArtifactory)
+  .enablePlugins(PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin)
   .settings(scoverageSettings: _*)
   .settings(scalaSettings: _*)
   .settings(publishingSettings: _*)
@@ -49,3 +49,7 @@ lazy val scoverageSettings = {
     parallelExecution in Test := false
   )
 }
+
+scalacOptions ++= Seq(
+  "-P:silencer:pathFilters=views;routes"
+)

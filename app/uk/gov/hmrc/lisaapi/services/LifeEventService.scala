@@ -17,7 +17,7 @@
 package uk.gov.hmrc.lisaapi.services
 
 import com.google.inject.Inject
-import play.api.Logger
+import play.api.Logging
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des._
@@ -29,21 +29,21 @@ import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountNotFound, ErrorInternalServe
 import scala.util.matching.Regex
 
 
-class LifeEventService @Inject()(desConnector: DesConnector)(implicit ec: ExecutionContext) {
+class LifeEventService @Inject()(desConnector: DesConnector)(implicit ec: ExecutionContext) extends Logging {
 
   def reportLifeEvent(lisaManager: String, accountId: String, request: ReportLifeEventRequestBase)
                      (implicit hc: HeaderCarrier): Future[ReportLifeEventResponse] = {
     desConnector.reportLifeEvent(lisaManager, accountId, request) map {
       case successResponse: DesLifeEventResponse =>
-        Logger.debug("Matched DesLifeEventResponse")
+        logger.debug("Matched DesLifeEventResponse")
         ReportLifeEventSuccessResponse(successResponse.lifeEventID)
       case DesUnavailableResponse =>
-        Logger.debug("Matched DesUnavailableResponse")
+        logger.debug("Matched DesUnavailableResponse")
         ReportLifeEventServiceUnavailableResponse
       case failureResponse: DesFailureResponse =>
-        Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
+        logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
         postErrors.applyOrElse((failureResponse.code, failureResponse), { _:(String, DesFailureResponse) =>
-          Logger.warn(s"Report life event returned error: ${failureResponse.code}")
+          logger.warn(s"Report life event returned error: ${failureResponse.code}")
           ReportLifeEventErrorResponse
         })
     }
@@ -53,12 +53,12 @@ class LifeEventService @Inject()(desConnector: DesConnector)(implicit ec: Execut
                   (implicit hc: HeaderCarrier): Future[Either[ErrorResponse, Seq[GetLifeEventItem]]] = {
     desConnector.getLifeEvent(lisaManager, accountId, lifeEventId) map {
       case Right(successResponse) =>
-        Logger.debug("Matched ReportLifeEventRequestBase")
+        logger.debug("Matched ReportLifeEventRequestBase")
         Right(successResponse)
       case Left(failureResponse) =>
-        Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
+        logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
         val error = getErrors.getOrElse(failureResponse.code, {
-          Logger.warn(s"Report life event returned error: ${failureResponse.code}")
+          logger.warn(s"Report life event returned error: ${failureResponse.code}")
           ErrorInternalServerError
         })
         Left(error)

@@ -20,14 +20,12 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.{Configuration, Environment}
 import uk.gov.hmrc.lisaapi.config.AppContext
-import uk.gov.hmrc.play.bootstrap.config.RunMode
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.http.HttpClient
 
 trait BaseTestFixture extends PlaySpec with MockitoSugar {
 
   val mockConfiguration: Configuration = mock[Configuration]
   val mockEnvironment: Environment = mock[Environment]
   val mockAppContext: AppContext = mock[AppContext]
-  val mockRunMode: RunMode = mock[RunMode]
   val mockHttp: HttpClient = mock[HttpClient]
 }

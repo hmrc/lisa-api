@@ -17,7 +17,6 @@
 package uk.gov.hmrc.lisaapi.controllers
 
 import com.google.inject.Inject
-import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc._
 import uk.gov.hmrc.auth.core.AuthConnector
@@ -52,10 +51,10 @@ class UpdateSubscriptionController @Inject() (
       updateSubsRequest => {
         withValidDates(lisaManager, accountId, updateSubsRequest) { () =>
           service.updateSubscription(lisaManager, accountId, updateSubsRequest) map { result =>
-            Logger.debug("Entering Updated subscription Controller and the response is " + result.toString)
+            logger.debug("Entering Updated subscription Controller and the response is " + result.toString)
             result match {
               case success: UpdateSubscriptionSuccessResponse =>
-                Logger.debug("First Subscription date updated")
+                logger.debug("First Subscription date updated")
                 auditUpdateSubscription(lisaManager, accountId, updateSubsRequest)
                 val data = ApiResponseData(message = success.message, code = Some(success.code), accountId = Some(accountId))
                 lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.UPDATE_SUBSCRIPTION)
@@ -82,7 +81,7 @@ class UpdateSubscriptionController @Inject() (
 
   private def error(e: ErrorResponse, lisaManager: String, accountId: String, req: UpdateSubscriptionRequest)
                    (implicit hc: HeaderCarrier, startTime: Long): Result = {
-    Logger.debug("Matched an error")
+    logger.debug("Matched an error")
     auditUpdateSubscription(lisaManager, accountId, req, Some(e.errorCode))
     lisaMetrics.incrementMetrics(startTime, e.httpStatusCode, LisaMetricKeys.UPDATE_SUBSCRIPTION)
     e.asResult
@@ -93,7 +92,7 @@ class UpdateSubscriptionController @Inject() (
                                      (implicit hc: HeaderCarrier, startTime: Long): Future[Result] = {
 
     if (updateSubsRequest.firstSubscriptionDate.isBefore(LISA_START_DATE)) {
-      Logger.debug("First Subscription date not updated - failed business rule validation")
+      logger.debug("First Subscription date not updated - failed business rule validation")
 
       auditUpdateSubscription(lisaManager, accountId, updateSubsRequest, Some("FORBIDDEN"))
 

@@ -171,8 +171,8 @@ class RequestPurchaseExtensionRequestSpec extends PlaySpec {
       res match {
         case JsError(errors) => {
           errors.length mustBe 2
-          errors must contain (JsPath \ "supersede" \ "originalEventDate", Seq(JsonValidationError("error.path.missing")))
-          errors must contain (JsPath \ "supersede" \ "originalLifeEventId", Seq(JsonValidationError("error.path.missing")))
+          errors must contain((JsPath \ "supersede" \ "originalEventDate", Seq(JsonValidationError("error.path.missing"))))
+          errors must contain((JsPath \ "supersede" \ "originalLifeEventId", Seq(JsonValidationError("error.path.missing"))))
         }
         case _ => fail("Parsed invalid json as being valid")
       }

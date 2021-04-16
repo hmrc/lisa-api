@@ -17,7 +17,7 @@
 package uk.gov.hmrc.lisaapi.services
 
 import com.google.inject.Inject
-import play.api.Logger
+import play.api.Logging
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des._
@@ -25,18 +25,18 @@ import uk.gov.hmrc.lisaapi.models.des._
 import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.http.HeaderCarrier
 
-class AccountService @Inject()(desConnector: DesConnector)(implicit ec: ExecutionContext) {
+class AccountService @Inject()(desConnector: DesConnector)(implicit ec: ExecutionContext) extends Logging {
 
   def createAccount(lisaManager: String, request: CreateLisaAccountCreationRequest)(implicit hc: HeaderCarrier): Future[CreateLisaAccountResponse] = {
     desConnector.createAccount(lisaManager, request) map {
       case successResponse: DesAccountResponse =>
-        Logger.debug("Matched DesAccountResponse")
+        logger.debug("Matched DesAccountResponse")
         CreateLisaAccountSuccessResponse(successResponse.accountID)
       case DesUnavailableResponse =>
-        Logger.debug("Matched DesUnavailableResponse")
+        logger.debug("Matched DesUnavailableResponse")
         CreateLisaAccountServiceUnavailableResponse
       case failureResponse: DesFailureResponse =>
-        Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
+        logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
         failureResponse.code match {
           case "INVESTOR_NOT_FOUND" => CreateLisaAccountInvestorNotFoundResponse
           case "INVESTOR_ELIGIBILITY_CHECK_FAILED" => CreateLisaAccountInvestorNotEligibleResponse
@@ -46,7 +46,7 @@ class AccountService @Inject()(desConnector: DesConnector)(implicit ec: Executio
           case "INVESTOR_ACCOUNT_ALREADY_CLOSED" => CreateLisaAccountInvestorAccountAlreadyClosedResponse
           case "INVESTOR_ACCOUNT_ALREADY_VOID" => CreateLisaAccountInvestorAccountAlreadyVoidResponse
           case _ =>
-            Logger.warn(s"Create account returned error: ${failureResponse.code}")
+            logger.warn(s"Create account returned error: ${failureResponse.code}")
             CreateLisaAccountErrorResponse
         }
     }
@@ -55,17 +55,17 @@ class AccountService @Inject()(desConnector: DesConnector)(implicit ec: Executio
   def getAccount(lisaManager: String, accountId: String)(implicit hc: HeaderCarrier): Future[GetLisaAccountResponse] = {
     desConnector.getAccountInformation(lisaManager, accountId) map {
       case res: GetLisaAccountSuccessResponse =>
-        Logger.debug("Matched GetLisaAccountSuccessResponse")
+        logger.debug("Matched GetLisaAccountSuccessResponse")
         res
       case DesUnavailableResponse =>
-        Logger.debug("Matched GetLisaAccountServiceUnavailable")
+        logger.debug("Matched GetLisaAccountServiceUnavailable")
         GetLisaAccountServiceUnavailable
       case failureResponse: DesFailureResponse =>
-        Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
+        logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
         failureResponse.code match {
           case "INVESTOR_ACCOUNTID_NOT_FOUND" => GetLisaAccountDoesNotExistResponse
           case _ =>
-            Logger.warn(s"Get account returned error: ${failureResponse.code}")
+            logger.warn(s"Get account returned error: ${failureResponse.code}")
             GetLisaAccountErrorResponse
         }
     }
@@ -74,13 +74,13 @@ class AccountService @Inject()(desConnector: DesConnector)(implicit ec: Executio
   def transferAccount(lisaManager: String, request: CreateLisaAccountTransferRequest)(implicit hc: HeaderCarrier): Future[CreateLisaAccountResponse] = {
     desConnector.transferAccount(lisaManager, request) map {
       case successResponse: DesAccountResponse =>
-        Logger.debug("Matched DesAccountResponse")
+        logger.debug("Matched DesAccountResponse")
         CreateLisaAccountSuccessResponse(successResponse.accountID)
       case DesUnavailableResponse =>
-        Logger.debug("Matched DesUnavailableResponse")
+        logger.debug("Matched DesUnavailableResponse")
         CreateLisaAccountServiceUnavailableResponse
       case failureResponse: DesFailureResponse =>
-        Logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
+        logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
         failureResponse.code match {
           case "INVESTOR_NOT_FOUND" => CreateLisaAccountInvestorNotFoundResponse
           case "INVESTOR_COMPLIANCE_CHECK_FAILED" => CreateLisaAccountInvestorComplianceCheckFailedResponse
@@ -90,7 +90,7 @@ class AccountService @Inject()(desConnector: DesConnector)(implicit ec: Executio
           case "INVESTOR_ACCOUNT_ALREADY_CLOSED" => CreateLisaAccountInvestorAccountAlreadyClosedResponse
           case "INVESTOR_ACCOUNT_ALREADY_VOID" => CreateLisaAccountInvestorAccountAlreadyVoidResponse
           case _ =>
-            Logger.warn(s"Transfer account returned error: ${failureResponse.code}")
+            logger.warn(s"Transfer account returned error: ${failureResponse.code}")
             CreateLisaAccountErrorResponse
         }
     }
@@ -109,7 +109,7 @@ class AccountService @Inject()(desConnector: DesConnector)(implicit ec: Executio
           case "CANCELLATION_PERIOD_EXCEEDED" => CloseLisaAccountCancellationPeriodExceeded
           case "ACCOUNT_WITHIN_CANCELLATION_PERIOD" => CloseLisaAccountWithinCancellationPeriod
           case _ =>
-            Logger.warn(s"Close account returned error: ${failureResponse.code}")
+            logger.warn(s"Close account returned error: ${failureResponse.code}")
             CloseLisaAccountErrorResponse
         }
     }

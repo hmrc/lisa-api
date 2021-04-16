@@ -19,7 +19,6 @@ package unit.connectors
 import helpers.BaseTestFixture
 import org.joda.time.DateTime
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.Configuration
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models.{AccountTransfer, Bonuses, CloseLisaAccountRequest, CreateLisaAccountCreationRequest, CreateLisaAccountTransferRequest, CreateLisaInvestorRequest, GetLifeEventItem, HelpToBuyTransfer, InboundPayments, ReportLifeEventRequest, RequestBonusPaymentRequest, SupersededWithdrawalChargeRequest, UpdateSubscriptionRequest, WithdrawalIncrease}

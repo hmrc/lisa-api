@@ -17,7 +17,6 @@
 package uk.gov.hmrc.lisaapi.controllers
 
 import com.google.inject.Inject
-import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents, PlayBodyParsers}
 import uk.gov.hmrc.auth.core.AuthConnector
@@ -37,7 +36,7 @@ class InvestorController @Inject()(
                                     lisaMetrics: LisaMetrics,
                                     cc: ControllerComponents,
                                     parse: PlayBodyParsers
-                                  )(implicit ec: ExecutionContext) extends LisaController(
+                                  )(implicit ec: ExecutionContext) extends LisaController (
   cc: ControllerComponents,
   lisaMetrics: LisaMetrics,
   appContext: AppContext,
@@ -46,7 +45,7 @@ class InvestorController @Inject()(
 
   def createLisaInvestor(lisaManager: String): Action[AnyContent] = (validateHeader(parse) andThen validateLMRN(lisaManager)).async { implicit request =>
     implicit val startTime: Long = System.currentTimeMillis()
-    Logger.debug(s"LISA HTTP Request: ${request.uri} and method: ${request.method}")
+    logger.debug(s"LISA HTTP Request: ${request.uri} and method: ${request.method}")
     withValidJson[CreateLisaInvestorRequest](
       createRequest => {
         service.createInvestor(lisaManager, createRequest).map {
@@ -58,7 +57,7 @@ class InvestorController @Inject()(
             error(lisaManager, createRequest, errorMap.getOrElse(r, ErrorInternalServerError))
         } recover {
           case e: Exception =>
-            Logger.error(s"createLisaInvestor: An error occurred due to ${e.getMessage} returning internal server error")
+            logger.error(s"createLisaInvestor: An error occurred due to ${e.getMessage} returning internal server error")
             error(lisaManager, createRequest, ErrorInternalServerError)
         }
       },

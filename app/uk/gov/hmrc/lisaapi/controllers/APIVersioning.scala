@@ -16,14 +16,14 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
-import play.api.Logger
+import play.api.Logging
 import play.api.http.HeaderNames.ACCEPT
 import play.api.mvc._
 import uk.gov.hmrc.lisaapi.config.AppContext
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait APIVersioning {
+trait APIVersioning extends Logging {
 
   val validateVersion: String => Boolean
   val validateContentType: String => Boolean
@@ -36,7 +36,7 @@ trait APIVersioning {
     override protected def executionContext: ExecutionContext = ec
     override def invokeBlock[A](request: Request[A], block: Request[A] => Future[Result]): Future[Result] = {
       if (appContext.endpointIsDisabled(endpoint)) {
-        Logger.info(s"User attempted to use an endpoint which is not available ($endpoint)")
+        logger.info(s"User attempted to use an endpoint which is not available ($endpoint)")
         Future.successful(ErrorApiNotAvailable.asResult)
       } else {
         block(request)
@@ -52,22 +52,22 @@ trait APIVersioning {
         case Some(AcceptHeader(version, content)) => {
           val version2NotEnabled = version == "2.0" && !v2endpointsEnabled
           if (version2NotEnabled) {
-            Logger.info(s"Request accept header has invalid version: $version")
+            logger.info(s"Request accept header has invalid version: $version")
             Future.successful(ErrorAcceptHeaderVersionInvalid.asResult)
           } else {
             (validateVersion(version), validateContentType(content)) match {
               case (true, true) => block(request)
               case (false, _) =>
-                Logger.info(s"Request accept header has invalid version: $version")
+                logger.info(s"Request accept header has invalid version: $version")
                 Future.successful(ErrorAcceptHeaderVersionInvalid.asResult)
               case (_, false) =>
-                Logger.info(s"Request accept header has invalid content type: $content")
+                logger.info(s"Request accept header has invalid content type: $content")
                 Future.successful(ErrorAcceptHeaderContentInvalid.asResult)
             }
           }
         }
         case _ =>
-          Logger.info("Request accept header is missing or invalid")
+          logger.info("Request accept header is missing or invalid")
           Future.successful(ErrorAcceptHeaderInvalid.asResult)
       }
     }
@@ -77,10 +77,10 @@ trait APIVersioning {
                     (implicit request: Request[A]): Future[Result] = {
     pf.orElse[Option[String], Future[Result]] {
       case Some(version) =>
-        Logger.info(s"Request accept header has unimplemented version: $version")
+        logger.info(s"Request accept header has unimplemented version: $version")
         Future.successful(ErrorAcceptHeaderVersionInvalid.asResult)
       case None =>
-        Logger.info("Request accept header is missing or invalid")
+        logger.info("Request accept header is missing or invalid")
         Future.successful(ErrorAcceptHeaderInvalid.asResult)
     }(extractAcceptHeader(request).map(_.version))
   }

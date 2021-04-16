@@ -19,16 +19,13 @@ package uk.gov.hmrc.lisaapi.connectors
 import com.google.inject.Inject
 import org.joda.time.DateTime
 import play.api.http.Status._
-import play.api.{Configuration, Environment, Logger}
 import play.api.libs.json.{JsValue, Json, Reads}
+import play.api.{Environment, Logging}
 import play.utils.UriEncoding
-import uk.gov.hmrc.http._
-import uk.gov.hmrc.http.logging.Authorization
+import uk.gov.hmrc.http.{HttpClient, _}
 import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des._
-import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
@@ -37,14 +34,12 @@ class DesConnector @Inject()(
                               wsHttp: HttpClient,
                               environment: Environment,
                               appContext: AppContext
-                            )(implicit ec: ExecutionContext){
+                            )(implicit ec: ExecutionContext) extends Logging {
 
   val urlEncodingFormat: String = "utf-8"
   lazy val lisaServiceUrl: String = s"${appContext.desUrl}/lifetime-isa/manager"
 
-  val httpReads: HttpReads[HttpResponse] = new HttpReads[HttpResponse] {
-    override def read(method: String, url: String, response: HttpResponse) = response
-  }
+  val httpReads: HttpReads[HttpResponse] = (method: String, url: String, response: HttpResponse) => response
 
   private def updateHeaderCarrier(headerCarrier: HeaderCarrier) =
     headerCarrier.copy(extraHeaders = Seq("Environment" -> appContext.desUrlHeaderEnv),
@@ -60,11 +55,11 @@ class DesConnector @Inject()(
   def createInvestor(lisaManager: String, request: CreateLisaInvestorRequest)
                     (implicit hc: HeaderCarrier): Future[DesResponse] = {
     val uri: String = s"$lisaServiceUrl/$lisaManager/investors"
-    Logger.debug("Posting Create Investor request to des: " + uri)
+    logger.debug("Posting Create Investor request to des: " + uri)
     val result = wsHttp.POST[CreateLisaInvestorRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc), implicitly)
 
     result.map(res => {
-      Logger.debug("Create Investor request returned status: " + res.status)
+      logger.debug("Create Investor request returned status: " + res.status)
       res.status match {
         case SERVICE_UNAVAILABLE => DesUnavailableResponse
         case BAD_REQUEST => DesBadRequestResponse
@@ -80,11 +75,11 @@ class DesConnector @Inject()(
   def createAccount(lisaManager: String, request: CreateLisaAccountCreationRequest)
                    (implicit hc: HeaderCarrier): Future[DesResponse] = {
     val uri = s"$lisaServiceUrl/$lisaManager/accounts"
-    Logger.debug("Posting Create Account request to des: " + uri)
+    logger.debug("Posting Create Account request to des: " + uri)
     val result = wsHttp.POST[CreateLisaAccountCreationRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc), implicitly)
 
     result.map(res => {
-      Logger.debug("Create Account request returned status: " + res.status)
+      logger.debug("Create Account request returned status: " + res.status)
       res.status match {
         case SERVICE_UNAVAILABLE => DesUnavailableResponse
         case BAD_REQUEST => DesBadRequestResponse
@@ -100,12 +95,12 @@ class DesConnector @Inject()(
   def getAccountInformation(lisaManager: String, accountId: String)
                            (implicit hc: HeaderCarrier): Future[DesResponse] = {
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}"
-    Logger.debug("Getting the Account details from des: " + uri)
+    logger.debug("Getting the Account details from des: " + uri)
 
     val result: Future[HttpResponse] = wsHttp.GET(uri)(httpReads, hc = updateHeaderCarrierWithAllDesHeaders(hc), implicitly)
 
     result.map(res => {
-      Logger.debug("Get Account request returned status: " + res.status)
+      logger.debug("Get Account request returned status: " + res.status)
       res.status match {
         case SERVICE_UNAVAILABLE => DesUnavailableResponse
         case _ => {
@@ -124,11 +119,11 @@ class DesConnector @Inject()(
   def reinstateAccount(lisaManager: String, accountId: String)
                       (implicit hc: HeaderCarrier): Future[DesResponse] = {
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/reinstate"
-    Logger.debug("Reinstate Account request returned status: " + uri)
+    logger.debug("Reinstate Account request returned status: " + uri)
 
     val result = wsHttp.PUT[JsValue,HttpResponse](uri,Json.toJson(""))(implicitly,httpReads, updateHeaderCarrierWithAllDesHeaders(hc), implicitly)
     result.map(res => {
-      Logger.debug("Reinstate Account request returned status: " + res.status)
+      logger.debug("Reinstate Account request returned status: " + res.status)
       res.status match {
         case SERVICE_UNAVAILABLE => DesUnavailableResponse
         case BAD_REQUEST => DesBadRequestResponse
@@ -144,11 +139,11 @@ class DesConnector @Inject()(
   def transferAccount(lisaManager: String, request: CreateLisaAccountTransferRequest)
                      (implicit hc: HeaderCarrier): Future[DesResponse] = {
     val uri = s"$lisaServiceUrl/$lisaManager/accounts"
-    Logger.debug("Posting Create Transfer request to des: " + uri)
+    logger.debug("Posting Create Transfer request to des: " + uri)
     val result = wsHttp.POST[CreateLisaAccountTransferRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc), implicitly)
 
     result.map(res => {
-      Logger.debug("Create Transfer request returned status: " + res.status)
+      logger.debug("Create Transfer request returned status: " + res.status)
       res.status match {
         case SERVICE_UNAVAILABLE => DesUnavailableResponse
         case BAD_REQUEST => DesBadRequestResponse
@@ -164,11 +159,11 @@ class DesConnector @Inject()(
   def closeAccount(lisaManager: String, accountId: String, request: CloseLisaAccountRequest)
                   (implicit hc: HeaderCarrier): Future[DesResponse] = {
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/close-account"
-    Logger.debug("Posting Close Account request to des: " + uri)
+    logger.debug("Posting Close Account request to des: " + uri)
     val result = wsHttp.POST[CloseLisaAccountRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc), implicitly)
 
     result.map(res => {
-      Logger.debug("Close Account request returned status: " + res.status)
+      logger.debug("Close Account request returned status: " + res.status)
       res.status match {
         case SERVICE_UNAVAILABLE => DesUnavailableResponse
         case BAD_REQUEST => DesBadRequestResponse
@@ -185,10 +180,10 @@ class DesConnector @Inject()(
                      (implicit hc: HeaderCarrier): Future[DesResponse] = {
 
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/life-event"
-    Logger.debug("Posting Life Event request to des: " + uri)
+    logger.debug("Posting Life Event request to des: " + uri)
     val result = wsHttp.POST[ReportLifeEventRequestBase, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc), implicitly)
     result.map(res => {
-      Logger.debug("Life Event request returned status: " + res.status)
+      logger.debug("Life Event request returned status: " + res.status)
       res.status match {
         case SERVICE_UNAVAILABLE => DesUnavailableResponse
         case _ => parseDesResponse[DesLifeEventResponse](res)
@@ -204,7 +199,7 @@ class DesConnector @Inject()(
                   (implicit hc: HeaderCarrier): Future[Either[DesFailure, Seq[GetLifeEventItem]]] = {
 
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/life-events/$lifeEventId"
-    Logger.debug("Getting life event from des: " + uri)
+    logger.debug("Getting life event from des: " + uri)
 
     val result: Future[HttpResponse] = wsHttp.GET(uri)(
       httpReads,
@@ -213,7 +208,7 @@ class DesConnector @Inject()(
     )
 
     result.map(res => {
-      Logger.debug("Get life event returned status: " + res.status)
+      logger.debug("Get life event returned status: " + res.status)
 
       res.status match {
         case SERVICE_UNAVAILABLE => Left(DesUnavailableResponse)
@@ -223,16 +218,16 @@ class DesConnector @Inject()(
             case Success(data) => Right(data)
             case Failure(er) => {
               if (res.status == 200 | res.status == 201) {
-                Logger.error(s"Error from DES (parsing as DesResponse): ${er.getMessage}")
+                logger.error(s"Error from DES (parsing as DesResponse): ${er.getMessage}")
               }
 
               Try(res.json.as[DesFailureResponse]) match {
                 case Success(data) => {
-                  Logger.info(s"DesFailureResponse from DES: ${data}")
+                  logger.info(s"DesFailureResponse from DES: ${data}")
                   Left(data)
                 }
                 case Failure(ex) => {
-                  Logger.error(s"Error from DES (parsing as DesFailureResponse): ${ex.getMessage}")
+                  logger.error(s"Error from DES (parsing as DesFailureResponse): ${ex.getMessage}")
                   Left(DesFailureResponse())
                 }
               }
@@ -250,11 +245,11 @@ class DesConnector @Inject()(
                         (implicit hc: HeaderCarrier): Future[DesResponse] = {
 
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}"
-    Logger.debug("Posting update subscription request to des: " + uri)
+    logger.debug("Posting update subscription request to des: " + uri)
     val result = wsHttp.PUT[UpdateSubscriptionRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrierWithAllDesHeaders(hc), implicitly)
 
     result.map(res => {
-      Logger.debug("Update first subscription date request returned status: " + res.status)
+      logger.debug("Update first subscription date request returned status: " + res.status)
       res.status match {
         case OK => parseDesResponse[DesUpdateSubscriptionSuccessResponse](res)
         case BAD_REQUEST => DesBadRequestResponse
@@ -275,11 +270,11 @@ class DesConnector @Inject()(
                          (implicit hc: HeaderCarrier): Future[DesResponse] = {
 
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/bonus-claim"
-    Logger.debug("Posting Bonus Payment request to des: " + uri)
+    logger.debug("Posting Bonus Payment request to des: " + uri)
     val result = wsHttp.POST[RequestBonusPaymentRequest, HttpResponse](uri, request)(implicitly, httpReads, updateHeaderCarrier(hc), implicitly)
 
     result.map(res => {
-      Logger.debug("Bonus Payment request returned status: " + res.status)
+      logger.debug("Bonus Payment request returned status: " + res.status)
       res.status match {
         case CONFLICT => parseDesResponse[DesTransactionExistResponse](res)
         case BAD_REQUEST => DesBadRequestResponse
@@ -289,14 +284,14 @@ class DesConnector @Inject()(
     }).recover{
       case response: UpstreamErrorResponse =>
       if (response.reportAs == 499) {
-        Logger.error(s"[DesConnector][requestBonusPayment] Service unavailable")
+        logger.error(s"[DesConnector][requestBonusPayment] Service unavailable")
         DesUnavailableResponse
       } else {
-        Logger.error(s"[DesConnector][requestBonusPayment] Upstream Des error")
+        logger.error(s"[DesConnector][requestBonusPayment] Upstream Des error")
         DesFailureResponse(response.message,response.message)
       }
       case th: Throwable  =>
-        Logger.error(s"[DesConnector][requestBonusPayment] Des failure error: " + th.getMessage)
+        logger.error(s"[DesConnector][requestBonusPayment] Des failure error: " + th.getMessage)
         DesFailureResponse()
     }
   }
@@ -307,12 +302,12 @@ class DesConnector @Inject()(
   def getBonusOrWithdrawal(lisaManager: String, accountId: String, transactionId: String)
                           (implicit hc: HeaderCarrier): Future[DesResponse] = {
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/transaction/$transactionId"
-    Logger.debug("Getting the Bonus Payment transaction details from des: " + uri)
+    logger.debug("Getting the Bonus Payment transaction details from des: " + uri)
 
     val result: Future[HttpResponse] = wsHttp.GET(uri)(httpReads, hc = updateHeaderCarrierWithAllDesHeaders(hc), implicitly)
 
     result.map(res => {
-      Logger.debug("Get Bonus Payment transaction details returned status: " + res.status)
+      logger.debug("Get Bonus Payment transaction details returned status: " + res.status)
       res.status match {
         case SERVICE_UNAVAILABLE => DesUnavailableResponse
         case _ => parseDesResponse[GetBonusOrWithdrawalResponse](res)
@@ -330,12 +325,12 @@ class DesConnector @Inject()(
                             (implicit hc: HeaderCarrier): Future[DesResponse] = {
 
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/withdrawal"
-    Logger.debug("Posting withdrawal request to des: " + uri)
+    logger.debug("Posting withdrawal request to des: " + uri)
 
     val result = wsHttp.POST[ReportWithdrawalChargeRequest, HttpResponse](uri, request)(ReportWithdrawalChargeRequest.desReportWithdrawalChargeWrites, httpReads, updateHeaderCarrier(hc), implicitly)
 
     result.map(res => {
-      Logger.debug("Withdrawal request returned status: " + res.status)
+      logger.debug("Withdrawal request returned status: " + res.status)
       (res.status, res.body != null && res.body.contains("supersededTransactionByID")) match {
         case (CONFLICT, _) => parseDesResponse[DesWithdrawalChargeAlreadyExistsResponse](res)
         case (BAD_REQUEST, _) => DesBadRequestResponse
@@ -352,12 +347,12 @@ class DesConnector @Inject()(
   def getTransaction(lisaManager: String, accountId: String, transactionId: String)
                     (implicit hc:HeaderCarrier): Future[DesResponse] = {
     val uri = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/transaction/$transactionId/bonusChargeDetails"
-    Logger.debug("Getting the Transaction details from des: " + uri)
+    logger.debug("Getting the Transaction details from des: " + uri)
 
     val result: Future[HttpResponse] = wsHttp.GET(uri)(httpReads, hc = updateHeaderCarrier(hc), implicitly)
 
     result.map(res => {
-      Logger.debug("Get Transaction details returned status: " + res.status)
+      logger.debug("Get Transaction details returned status: " + res.status)
       res.status match {
         case SERVICE_UNAVAILABLE => DesUnavailableResponse
         case _ => parseDesResponse[DesGetTransactionResponse](res)
@@ -372,7 +367,7 @@ class DesConnector @Inject()(
       s"&dateTo=${endDate.toString("yyyy-MM-dd")}" +
       "&onlyOpenItems=false"
 
-    Logger.debug("Getting Bulk payment details from des: " + uri)
+    logger.debug("Getting Bulk payment details from des: " + uri)
 
     val result: Future[HttpResponse] = wsHttp.GET(uri)(
       httpReads,
@@ -381,7 +376,7 @@ class DesConnector @Inject()(
     )
 
     result.map(res => {
-      Logger.debug("Get Bulk payment details returned status: " + res.status)
+      logger.debug("Get Bulk payment details returned status: " + res.status)
       res.status match {
         case SERVICE_UNAVAILABLE => DesUnavailableResponse
         case _ => parseDesResponse[GetBulkPaymentResponse](res)
@@ -398,13 +393,13 @@ class DesConnector @Inject()(
         data
       case Failure(er) =>
         if (res.status == 200 | res.status == 201) {
-          Logger.error(s"Error from DES (parsing as DesResponse): ${er.getMessage}")
+          logger.error(s"Error from DES (parsing as DesResponse): ${er.getMessage}")
         }
 
         Try(res.json.as[DesFailureResponse]) match {
-          case Success(data) => Logger.info(s"DesFailureResponse from DES: ${data}")
+          case Success(data) => logger.info(s"DesFailureResponse from DES: ${data}")
              data
-          case Failure(ex) => Logger.error(s"Error from DES (parsing as DesFailureResponse): ${ex.getMessage}")
+          case Failure(ex) => logger.error(s"Error from DES (parsing as DesFailureResponse): ${ex.getMessage}")
              DesFailureResponse()
         }
     }

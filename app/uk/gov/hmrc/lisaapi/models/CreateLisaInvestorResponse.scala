@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.lisaapi.models
 
-import play.api.libs.functional.syntax._
 import play.api.libs.json.{Reads, Writes, __}
 import uk.gov.hmrc.lisaapi.models.des.DesResponse
 

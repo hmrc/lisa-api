@@ -18,12 +18,11 @@ package uk.gov.hmrc.lisaapi.config
 
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
-import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 @Singleton
 class AppContext @Inject()(config: Configuration, serviceConfig: ServicesConfig) {
   lazy val appName: String = serviceConfig.getString("appName")
-  lazy val appUrl: String = serviceConfig.getString("appUrl")
   lazy val serviceLocatorUrl: String = serviceConfig.baseUrl("service-locator")
   lazy val registrationEnabled: Boolean = serviceConfig.getConfBool(s"microservice.services.service-locator.enabled", defBool = false)
   lazy val apiContext: String = serviceConfig.getString("api.context")

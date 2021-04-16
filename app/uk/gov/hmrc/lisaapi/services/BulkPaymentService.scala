@@ -18,7 +18,7 @@ package uk.gov.hmrc.lisaapi.services
 
 import com.google.inject.Inject
 import org.joda.time.DateTime
-import play.api.Logger
+import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesUnavailableResponse}
@@ -26,7 +26,7 @@ import uk.gov.hmrc.lisaapi.models._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class BulkPaymentService @Inject()(desConnector: DesConnector)(implicit ec: ExecutionContext) {
+class BulkPaymentService @Inject()(desConnector: DesConnector)(implicit ec: ExecutionContext) extends Logging {
 
   def getBulkPayment(lisaManager: String, startDate: DateTime, endDate: DateTime)
                     (implicit hc: HeaderCarrier): Future[GetBulkPaymentResponse] = {
@@ -41,7 +41,7 @@ class BulkPaymentService @Inject()(desConnector: DesConnector)(implicit ec: Exec
                "INVALID_CALCULATEACCRUEDINTEREST" |
                "INVALID_CUSTOMERPAYMENTINFORMATION" => GetBulkPaymentNotFoundResponse
           case _ =>
-            Logger.warn(s"Get bulk payment returned error: ${f.code}")
+            logger.warn(s"Get bulk payment returned error: ${f.code}")
             GetBulkPaymentErrorResponse
         }
     }

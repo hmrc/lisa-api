@@ -17,7 +17,7 @@
 package uk.gov.hmrc.lisaapi
 
 import org.joda.time.DateTime
-import play.api.libs.json.{JsPath, JsValue, Json, Writes}
+import play.api.libs.json.{JsValue, Json, Writes}
 
 package object controllers {
 

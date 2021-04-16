@@ -18,7 +18,6 @@ package uk.gov.hmrc.lisaapi.models
 
 
 import org.joda.time.DateTime
-import play.api.libs.functional.syntax._
 import play.api.libs.json._
 
 case class UpdateSubscriptionRequest(firstSubscriptionDate: DateTime)
