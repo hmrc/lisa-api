@@ -27,7 +27,6 @@ object AppDependencies {
     "uk.gov.hmrc" %% "bootstrap-backend-play-27" % "4.2.0",
     "uk.gov.hmrc" %% "auth-client" % "3.0.0-play-27",
     "uk.gov.hmrc" %% "play-hmrc-api" % "6.2.0-play-27",
-    "com.codahale.metrics" % "metrics-graphite" % "3.0.2",
     compilerPlugin("com.github.ghik" % "silencer-plugin" % silencerVersion cross CrossVersion.full),
     "com.github.ghik" % "silencer-lib" % silencerVersion % Provided cross CrossVersion.full
   )
