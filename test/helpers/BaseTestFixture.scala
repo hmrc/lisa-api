@@ -25,7 +25,6 @@ import uk.gov.hmrc.http.HttpClient
 trait BaseTestFixture extends PlaySpec with MockitoSugar {
 
   val mockConfiguration: Configuration = mock[Configuration]
-  val mockEnvironment: Environment = mock[Environment]
   val mockAppContext: AppContext = mock[AppContext]
   val mockHttp: HttpClient = mock[HttpClient]
 }
