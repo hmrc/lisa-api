@@ -36,7 +36,7 @@ trait DesConnectorTestHelper extends BaseTestFixture with GuiceOneAppPerSuite {
 
   val validBonusPaymentResponseJson: String = Source.fromInputStream(getClass.getResourceAsStream("/json/request.valid.bonus-payment-response.json")).mkString
 
-  val desConnector: DesConnector = new DesConnector(mockHttp, mockEnvironment, mockAppContext)
+  val desConnector: DesConnector = new DesConnector(mockHttp, mockAppContext)
 
   def doCreateInvestorRequest(callback: (DesResponse) => Unit): Unit = {
     val request = CreateLisaInvestorRequest("AB123456A", "A", "B", new DateTime("2000-01-01"))
