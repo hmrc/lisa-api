@@ -35,10 +35,7 @@ lazy val lisaapi = (project in file("."))
     evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
     unmanagedResourceDirectories in Compile += baseDirectory.value / "resources",
     fork in Test := true,
-    resolvers ++= Seq(
-      Resolver.bintrayRepo("hmrc", "releases"),
-      Resolver.jcenterRepo
-    ))
+  )
 
 lazy val scoverageSettings = {
   Seq(
