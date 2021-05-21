@@ -17,7 +17,6 @@
 package unit.controllers
 
 import helpers.ControllerTestFixture
-import play.api.libs.json.Json.toJson
 import play.api.mvc.Results.BadRequest
 import play.api.mvc._
 import play.api.test.FakeRequest
@@ -47,25 +46,25 @@ class LisaActionsSpec extends ControllerTestFixture {
     "reject a LMRN without a leading Z" in {
       val action: ActionRefiner[Request, LMRNRequest] = TestController.validateLMRN("123456")
       val response = action.invokeBlock[AnyContent](FakeRequest(Helpers.GET, "/"), (_) => Future.successful(Results.Ok))
-      Await.result(response, 100 millis) mustBe BadRequest(toJson(ErrorBadRequestLmrn))
+      Await.result(response, 100 millis) mustBe BadRequest(ErrorBadRequestLmrn.asJson)
     }
 
     "reject a LMRN with 3 digits" in {
       val action: ActionRefiner[Request, LMRNRequest] = TestController.validateLMRN("Z123")
       val response = action.invokeBlock[AnyContent](FakeRequest(Helpers.GET, "/"), (_) => Future.successful(Results.Ok))
-      Await.result(response, 100 millis) mustBe BadRequest(toJson(ErrorBadRequestLmrn))
+      Await.result(response, 100 millis) mustBe BadRequest(ErrorBadRequestLmrn.asJson)
     }
 
     "reject a LMRN with 5 digits" in {
       val action: ActionRefiner[Request, LMRNRequest] = TestController.validateLMRN("Z12345")
       val response = action.invokeBlock[AnyContent](FakeRequest(Helpers.GET, "/"), (_) => Future.successful(Results.Ok))
-      Await.result(response, 100 millis) mustBe BadRequest(toJson(ErrorBadRequestLmrn))
+      Await.result(response, 100 millis) mustBe BadRequest(ErrorBadRequestLmrn.asJson)
     }
 
     "reject a LMRN with 7 digits" in {
       val action: ActionRefiner[Request, LMRNRequest] = TestController.validateLMRN("Z1234567")
       val response = action.invokeBlock[AnyContent](FakeRequest(Helpers.GET, "/"), (_) => Future.successful(Results.Ok))
-      Await.result(response, 100 millis) mustBe BadRequest(toJson(ErrorBadRequestLmrn))
+      Await.result(response, 100 millis) mustBe BadRequest(ErrorBadRequestLmrn.asJson)
     }
   }
 
@@ -91,13 +90,13 @@ class LisaActionsSpec extends ControllerTestFixture {
     "reject an account id with 21 characters" in {
       val action: ActionRefiner[LMRNRequest, LMRNWithAccountRequest] = TestController.validateAccountId("123456789012345678901")
       val response = action.invokeBlock[AnyContent](LMRNRequest(FakeRequest(Helpers.GET, "/"), "Z1234"), (_) => Future.successful(Results.Ok))
-      Await.result(response, 100 millis) mustBe BadRequest(toJson(ErrorBadRequestAccountId))
+      Await.result(response, 100 millis) mustBe BadRequest(ErrorBadRequestAccountId.asJson)
     }
 
     "reject an account id with illegal characters" in {
       val action: ActionRefiner[LMRNRequest, LMRNWithAccountRequest] = TestController.validateAccountId("12345%67890")
       val response = action.invokeBlock[AnyContent](LMRNRequest(FakeRequest(Helpers.GET, "/"), "Z1234"), (_) => Future.successful(Results.Ok))
-      Await.result(response, 100 millis) mustBe BadRequest(toJson(ErrorBadRequestAccountId))
+      Await.result(response, 100 millis) mustBe BadRequest(ErrorBadRequestAccountId.asJson)
     }
   }
 

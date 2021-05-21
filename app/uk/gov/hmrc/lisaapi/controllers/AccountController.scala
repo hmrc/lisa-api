@@ -17,7 +17,6 @@
 package uk.gov.hmrc.lisaapi.controllers
 
 import com.google.inject.Inject
-import play.api.libs.json.Json.toJson
 import play.api.libs.json.{JsObject, JsPath, Json, JsonValidationError}
 import play.api.mvc._
 import uk.gov.hmrc.auth.core.AuthConnector
@@ -54,7 +53,7 @@ class AccountController @Inject()(
           if (hasAccountTransferData(request.body.asJson.get.as[JsObject])) {
             lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.ACCOUNT)
 
-            Future.successful(Forbidden(toJson(ErrorTransferAccountDataProvided)))
+            Future.successful(Forbidden(ErrorTransferAccountDataProvided.asJson))
           } else {
             processAccountCreation(lisaManager, createRequest)
           }
@@ -72,11 +71,11 @@ class AccountController @Inject()(
             if (transferAccountDataNotProvided) {
               lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.ACCOUNT)
 
-              Future.successful(Forbidden(toJson(ErrorTransferAccountDataNotProvided)))
+              Future.successful(Forbidden(ErrorTransferAccountDataNotProvided.asJson))
             } else {
               lisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.ACCOUNT)
 
-              Future.successful(BadRequest(toJson(ErrorBadRequest(errorConverter.convert(errors)))))
+              Future.successful(BadRequest(ErrorBadRequest(errorConverter.convert(errors)).asJson))
             }
           }
         ), lisaManager = lisaManager
@@ -183,9 +182,9 @@ class AccountController @Inject()(
 
       lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.ACCOUNT)
 
-      Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
+      Future.successful(Forbidden(ErrorForbidden(List(
         ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("firstSubscriptionDate"), Some("/firstSubscriptionDate"))
-      )))))
+      )).asJson))
     } else {
       success()
     }
@@ -210,7 +209,7 @@ class AccountController @Inject()(
 
       lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.ACCOUNT)
 
-      Future.successful(Forbidden(Json.toJson(ErrorForbidden(errors))))
+      Future.successful(Forbidden(ErrorForbidden(errors).asJson))
     } else {
       success()
     }

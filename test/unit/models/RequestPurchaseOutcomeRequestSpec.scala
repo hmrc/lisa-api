@@ -162,7 +162,7 @@ class RequestPurchaseOutcomeRequestSpec extends PlaySpec {
         )
       )
 
-      Json.toJson[RequestPurchaseOutcomeRequest](input).toString() mustBe """{"eventType":"Purchase Result","eventDate":"2017-06-10","propertyDetails":{"purchaseResult":"Purchase completed","purchaseValue":250000},"supersededLifeEventID":"5678900001","supersededLifeEventDate":"2017-05-05"}"""
+      Json.toJson(input)(RequestPurchaseOutcomeRequest.supersedeCompletedWrites).toString() mustBe """{"eventType":"Purchase Result","eventDate":"2017-06-10","propertyDetails":{"purchaseResult":"Purchase completed","purchaseValue":250000},"supersededLifeEventID":"5678900001","supersededLifeEventDate":"2017-05-05"}"""
     }
 
     "validate the eventDate" when {
@@ -243,7 +243,7 @@ class RequestPurchaseOutcomeRequestSpec extends PlaySpec {
         )
       )
 
-      Json.toJson[RequestPurchaseOutcomeRequest](input).toString() mustBe """{"eventType":"Purchase Result","eventDate":"2017-06-10","propertyDetails":{"purchaseResult":"Purchase failed"},"supersededLifeEventID":"5678900001","supersededLifeEventDate":"2017-05-05"}"""
+      Json.toJson(input)(RequestPurchaseOutcomeRequest.supersedeFailedWrites).toString() mustBe """{"eventType":"Purchase Result","eventDate":"2017-06-10","propertyDetails":{"purchaseResult":"Purchase failed"},"supersededLifeEventID":"5678900001","supersededLifeEventDate":"2017-05-05"}"""
     }
 
     "validate the eventDate" when {

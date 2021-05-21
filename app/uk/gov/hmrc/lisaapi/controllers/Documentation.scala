@@ -21,8 +21,7 @@ import controllers.Assets
 import play.api.http.HttpErrorHandler
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.api.controllers.DocumentationController
-import uk.gov.hmrc.lisaapi.config.AppContext
-import uk.gov.hmrc.lisaapi.config.APIAccessConfig
+import uk.gov.hmrc.lisaapi.config.{APIAccessConfig, AppContext}
 import uk.gov.hmrc.lisaapi.domain.APIAccess
 import uk.gov.hmrc.lisaapi.views._
 

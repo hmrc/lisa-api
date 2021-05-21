@@ -16,6 +16,8 @@
 
 package unit.connectors
 
+import java.time.LocalDate
+
 import org.joda.time.DateTime
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
@@ -25,7 +27,6 @@ import uk.gov.hmrc.http._
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des._
 
-import java.time.LocalDate
 import scala.concurrent.Future
 
 class DesConnectorSpec extends DesConnectorTestHelper {

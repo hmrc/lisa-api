@@ -132,7 +132,7 @@ class WithdrawalChargeSpec extends PlaySpec {
             "Additional withdrawal"
           )),
           "Superseded withdrawal"
-        ))(ReportWithdrawalChargeRequest.desReportWithdrawalChargeWrites)
+        ))(ReportWithdrawalChargeRequest.desSupersededWithdrawalWrites)
 
         result mustBe Json.obj(
           "claimPeriodStartDate" -> "2017-12-06",

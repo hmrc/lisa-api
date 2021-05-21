@@ -127,9 +127,9 @@ class LifeEventController @Inject()(
       auditReportLifeEvent(lisaManager, accountId, req, success = false, Map("reasonNotReported" -> "FORBIDDEN"))
       lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.EVENT)
 
-      Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
+      Future.successful(Forbidden(ErrorForbidden(List(
         ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("eventDate"), Some("/eventDate"))
-      )))))
+      )).asJson))
     } else {
       success()
     }

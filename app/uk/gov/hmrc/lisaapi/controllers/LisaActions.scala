@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
-import play.api.libs.json.Json.toJson
 import play.api.mvc.Results._
 import play.api.mvc._
 
@@ -31,7 +30,7 @@ trait LisaActions {
         if (lisaManager.matches("^Z([0-9]{4}|[0-9]{6})$")) {
           Right(LMRNRequest(request, lisaManager))
         } else {
-          Left(BadRequest(toJson(ErrorBadRequestLmrn)))
+          Left(BadRequest(ErrorBadRequestLmrn.asJson))
         }
       }
     }
@@ -43,7 +42,7 @@ trait LisaActions {
         if (accountId.matches("^[a-zA-Z0-9 :/-]{1,20}$")) {
           Right(LMRNWithAccountRequest(request.request, request.lmrn, accountId))
         } else {
-          Left(BadRequest(toJson(ErrorBadRequestAccountId)))
+          Left(BadRequest(ErrorBadRequestAccountId.asJson))
         }
       }
     }

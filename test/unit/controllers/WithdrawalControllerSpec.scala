@@ -185,7 +185,7 @@ class WithdrawalControllerSpec extends ControllerTestFixture {
 
         val validWithdrawalCharge = Json.parse(validWithdrawalJson).as[SupersededWithdrawalChargeRequest]
         val request = validWithdrawalCharge.copy(claimPeriodStartDate = testStartDate, claimPeriodEndDate = testEndDate)
-        val requestJson = Json.toJson(request).toString()
+        val requestJson = Json.toJson(request)(ReportWithdrawalChargeRequest.supersededWithdrawalWrites).toString()
 
         doRequest(requestJson) { res =>
           status(res) mustBe FORBIDDEN
@@ -214,7 +214,7 @@ class WithdrawalControllerSpec extends ControllerTestFixture {
         when(mockWithdrawalChargeValidator.validate(any())).thenReturn(errors)
 
         val validWithdrawalCharge = Json.parse(validWithdrawalJson).as[SupersededWithdrawalChargeRequest]
-        val requestJson = Json.toJson(validWithdrawalCharge).toString()
+        val requestJson = Json.toJson(validWithdrawalCharge)(ReportWithdrawalChargeRequest.supersededWithdrawalWrites).toString()
 
         doRequest(requestJson) { res =>
           status(res) mustBe FORBIDDEN
@@ -618,7 +618,7 @@ class WithdrawalControllerSpec extends ControllerTestFixture {
 
         val validWithdrawalCharge = Json.parse(validWithdrawalJson).as[SupersededWithdrawalChargeRequest]
         val request = validWithdrawalCharge.copy(claimPeriodStartDate = testStartDate, claimPeriodEndDate = testEndDate)
-        val requestJson = Json.toJson(request).toString()
+        val requestJson = Json.toJson(request)(ReportWithdrawalChargeRequest.supersededWithdrawalWrites).toString()
 
         doRequest(requestJson) { res =>
           await(res)
@@ -662,7 +662,7 @@ class WithdrawalControllerSpec extends ControllerTestFixture {
         when(mockWithdrawalChargeValidator.validate(any())).thenReturn(errors)
 
         val validWithdrawalCharge = Json.parse(validWithdrawalJson).as[SupersededWithdrawalChargeRequest]
-        val requestJson = Json.toJson(validWithdrawalCharge).toString()
+        val requestJson = Json.toJson(validWithdrawalCharge)(ReportWithdrawalChargeRequest.supersededWithdrawalWrites).toString()
 
         doRequest(requestJson) { res =>
           await(res)

@@ -83,7 +83,7 @@ class RequestFundReleaseRequestSpec extends PlaySpec {
       )
       val expected = """{"eventType":"Funds Release","eventDate":"2017-05-10","withdrawalAmount":4000,"conveyancerReference":"CR12345-6789","propertyDetails":{"nameOrNumber":"1","postalCode":"AA11 1AA"}}"""
 
-      Json.toJson[RequestFundReleaseRequest](input).toString() mustBe expected
+      Json.toJson(input)(RequestFundReleaseRequest.initialWrites).toString() mustBe expected
 
     }
 
@@ -97,7 +97,7 @@ class RequestFundReleaseRequestSpec extends PlaySpec {
       )
       val expected = """{"eventType":"Funds Release","eventDate":"2017-05-10","withdrawalAmount":4000,"conveyancerReference":"CR12345-6789"}"""
 
-      Json.toJson[RequestFundReleaseRequest](input).toString() mustBe expected
+      Json.toJson(input)(RequestFundReleaseRequest.initialWrites).toString() mustBe expected
 
     }
 
@@ -114,7 +114,7 @@ class RequestFundReleaseRequestSpec extends PlaySpec {
       )
       val expected = """{"eventType":"Funds Release","eventDate":"2017-05-10","withdrawalAmount":4000,"propertyDetails":{"nameOrNumber":"1","postalCode":"AA11 1AA"}}"""
 
-      Json.toJson[RequestFundReleaseRequest](input).toString() mustBe expected
+      Json.toJson(input)(RequestFundReleaseRequest.initialWrites).toString() mustBe expected
 
     }
 
@@ -149,7 +149,7 @@ class RequestFundReleaseRequestSpec extends PlaySpec {
       )
       val expected = """{"eventType":"Funds Release","eventDate":"2017-05-05","withdrawalAmount":5000,"supersededLifeEventDate":"2017-05-10","supersededLifeEventID":"3456789000"}"""
 
-      Json.toJson[RequestFundReleaseRequest](input).toString() mustBe expected
+      Json.toJson(input)(RequestFundReleaseRequest.supersedeWrites).toString() mustBe expected
 
     }
 

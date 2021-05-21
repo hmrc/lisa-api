@@ -58,14 +58,14 @@ class PropertyPurchaseController @Inject() (
                   logger.debug("Fund release not reported - conveyancer and/or property details included on a supersede request")
                   auditFundRelease(lisaManager, accountId, req, success = false, Map("reasonNotReported" -> ErrorInvalidDataProvided.errorCode))
                   lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
-                  Future.successful(Forbidden(Json.toJson(ErrorInvalidDataProvided)))
+                  Future.successful(Forbidden(ErrorInvalidDataProvided.asJson))
                 } else if (req.eventDate.isBefore(LISA_START_DATE)) {
                   logger.debug("Fund release not reported - invalid event date")
                   auditFundRelease(lisaManager, accountId, req, success = false, Map("reasonNotReported" -> "FORBIDDEN"))
                   lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
-                  Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
+                  Future.successful(Forbidden(ErrorForbidden(List(
                     ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("eventDate"), Some("/eventDate"))
-                  )))))
+                  )).asJson))
                 } else {
                   service.reportLifeEvent(lisaManager, accountId, req).map {
                     case res: ReportLifeEventSuccessResponse =>
@@ -106,9 +106,9 @@ class PropertyPurchaseController @Inject() (
                 auditExtension(lisaManager, accountId, req, success = false, Map("reasonNotReported" -> "FORBIDDEN"))
                 lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
 
-                Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
+                Future.successful(Forbidden(ErrorForbidden(List(
                   ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("eventDate"), Some("/eventDate"))
-                )))))
+                )).asJson))
               } else {
                 service.reportLifeEvent(lisaManager, accountId, req).map {
                   case res: ReportLifeEventSuccessResponse =>
@@ -148,9 +148,9 @@ class PropertyPurchaseController @Inject() (
                 auditOutcome(lisaManager, accountId, req, success = false, Map("reasonNotReported" -> "FORBIDDEN"))
                 lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
 
-                Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
+                Future.successful(Forbidden(ErrorForbidden(List(
                   ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("eventDate"), Some("/eventDate"))
-                )))))
+                )).asJson))
               } else {
                 service.reportLifeEvent(lisaManager, accountId, req) map {
                   case res: ReportLifeEventSuccessResponse =>

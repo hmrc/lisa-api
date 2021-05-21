@@ -96,8 +96,6 @@ case object ErrorApiNotAvailable extends ErrorResponse(403, "API_NOT_AVAILABLE",
 
 case object ErrorUnauthorized extends ErrorResponse(401, "UNAUTHORIZED", "Bearer token is missing or not authorized")
 
-case object ErrorNotFound extends ErrorResponse(404, "NOT_FOUND", "Resource was not found")
-
 case object ErrorGenericBadRequest extends ErrorResponse(400, "BAD_REQUEST", "Bad Request")
 
 case object ErrorAcceptHeaderInvalid extends ErrorResponse(406, "ACCEPT_HEADER_INVALID", "The accept header is missing or invalid")
@@ -109,12 +107,6 @@ case object ErrorAcceptHeaderContentInvalid extends ErrorResponse(406, "ACCEPT_H
 case object ErrorInternalServerError extends ErrorResponse(500, "INTERNAL_SERVER_ERROR", "Internal server error")
 
 case object ErrorServiceUnavailable extends ErrorResponse(503, "SERVER_ERROR", "Service unavailable")
-
-case object InvalidAuthorisationHeader extends ErrorResponse(403, "AUTH_HEADER_INVALID", "The value provided for Authorization header is invalid")
-
-case object InvalidAcceptHeader extends ErrorResponse(401, "ACCEPT_HEADER_INVALID", "The accept header is missing or invalid")
-
-case object MissingAuthorisationHeader extends ErrorResponse(401, "AUTH_HEADER_MISSING", "The Authorization header is missing")
 
 case object EmptyJson extends ErrorResponse(400, "BAD_REQUEST", "Can't parse empty json")
 

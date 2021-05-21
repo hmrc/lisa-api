@@ -82,12 +82,12 @@ object GetLisaAccountSuccessResponse {
       firstSubscriptionDate = firstSubscriptionDate,
       accountStatus = status,
       subscriptionStatus = if (subscriptionStatus.isEmpty) "AVAILABLE" else subscriptionStatus.get,
-      accountClosureReason = accountClosureReason.map(cr => cr match {
+      accountClosureReason = accountClosureReason.map {
         case "TRANSFERRED_OUT" => "Transferred out"
         case "ALL_FUNDS_WITHDRAWN" => "All funds withdrawn"
         case "VOIDED" => "Voided"
         case "CANCELLED" => "Cancellation"
-      }),
+      },
       closureDate = lisaManagerClosureDate,
       transferAccount = (xferredFromAccountId, xferredFromLmrn, transferInDate) match {
         case (Some(accountId), Some(lmrn), Some(date)) => Some(GetLisaAccountTransferAccount(

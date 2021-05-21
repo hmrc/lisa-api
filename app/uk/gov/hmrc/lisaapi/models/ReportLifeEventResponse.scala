@@ -18,7 +18,7 @@ package uk.gov.hmrc.lisaapi.models
 
 trait ReportLifeEventResponse
 
-@deprecated("Still valid for v1, but replaced in v2 by separate closed, void, and cancelled responses.")
+@deprecated("Still valid for v1, but replaced in v2 by separate closed, void, and cancelled responses.", "v2")
 case object ReportLifeEventAccountClosedOrVoidResponse extends ReportLifeEventResponse
 
 case object ReportLifeEventInvalidPayload extends ReportLifeEventResponse

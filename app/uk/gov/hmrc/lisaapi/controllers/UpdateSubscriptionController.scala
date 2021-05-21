@@ -98,9 +98,9 @@ class UpdateSubscriptionController @Inject() (
 
       lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.UPDATE_SUBSCRIPTION)
 
-      Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
+      Future.successful(Forbidden(ErrorForbidden(List(
         ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("firstSubscriptionDate"), Some("/firstSubscriptionDate"))
-      )))))
+      )).asJson))
     } else {
       success()
     }
