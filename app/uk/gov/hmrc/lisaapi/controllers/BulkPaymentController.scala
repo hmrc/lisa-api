@@ -68,10 +68,10 @@ class BulkPaymentController @Inject()(
                 withApiVersion {
                   case Some(VERSION_1) =>
                     getBulkPaymentAudit(lisaManager, Some(ErrorBulkTransactionNotFoundV1.errorCode))
-                    Future.successful(NotFound(Json.toJson(ErrorBulkTransactionNotFoundV1)))
+                    Future.successful(NotFound(ErrorBulkTransactionNotFoundV1.asJson))
                   case Some(VERSION_2) =>
                     getBulkPaymentAudit(lisaManager, Some(ErrorBulkTransactionNotFoundV2.errorCode))
-                    Future.successful(NotFound(Json.toJson(ErrorBulkTransactionNotFoundV2)))
+                    Future.successful(NotFound(ErrorBulkTransactionNotFoundV2.asJson))
                 }
               case GetBulkPaymentServiceUnavailableResponse =>
                 getBulkPaymentAudit(lisaManager, Some(ErrorServiceUnavailable.errorCode))
@@ -79,7 +79,7 @@ class BulkPaymentController @Inject()(
               case _ =>
                 getBulkPaymentAudit(lisaManager, Some(ErrorInternalServerError.errorCode))
                 lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.TRANSACTION)
-                Future.successful(InternalServerError(Json.toJson(ErrorInternalServerError)))
+                Future.successful(InternalServerError(ErrorInternalServerError.asJson))
             }
           }
         }
@@ -96,7 +96,7 @@ class BulkPaymentController @Inject()(
     )
 
     json.transform(jsonTransformer).fold(
-      _ => InternalServerError(Json.toJson(ErrorInternalServerError)),
+      _ => InternalServerError(ErrorInternalServerError.asJson),
       success => Ok(Json.toJson(success))
     )
   }
@@ -116,15 +116,15 @@ class BulkPaymentController @Inject()(
       case (None, Some(_)) =>
         getBulkPaymentAudit(lisaManager, Some(ErrorBadRequestStart.errorCode))
         lisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.TRANSACTION)
-        Future.successful(BadRequest(Json.toJson(ErrorBadRequestStart)))
+        Future.successful(BadRequest(ErrorBadRequestStart.asJson))
       case (Some(_), None) =>
         getBulkPaymentAudit(lisaManager, Some(ErrorBadRequestEnd.errorCode))
         lisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.TRANSACTION)
-        Future.successful(BadRequest(Json.toJson(ErrorBadRequestEnd)))
+        Future.successful(BadRequest(ErrorBadRequestEnd.asJson))
       case _ =>
         getBulkPaymentAudit(lisaManager, Some(ErrorBadRequestStartEnd.errorCode))
         lisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.TRANSACTION)
-        Future.successful(BadRequest(Json.toJson(ErrorBadRequestStartEnd)))
+        Future.successful(BadRequest(ErrorBadRequestStartEnd.asJson))
     }
   }
 
@@ -146,7 +146,7 @@ class BulkPaymentController @Inject()(
     errorResponse.map{ error =>
       getBulkPaymentAudit(lisaManager, Some(error.errorCode))
       lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.TRANSACTION)
-      Future.successful(Forbidden(Json.toJson(error)))
+      Future.successful(Forbidden(error.asJson))
     }.getOrElse(success())
   }
 

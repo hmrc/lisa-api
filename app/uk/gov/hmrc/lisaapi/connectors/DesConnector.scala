@@ -20,7 +20,7 @@ import com.google.inject.Inject
 import org.joda.time.DateTime
 import play.api.http.Status._
 import play.api.libs.json.{JsValue, Json, Reads}
-import play.api.{Environment, Logging}
+import play.api.Logging
 import play.utils.UriEncoding
 import uk.gov.hmrc.http.{HttpClient, _}
 import uk.gov.hmrc.lisaapi.config.AppContext

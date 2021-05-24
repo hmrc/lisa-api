@@ -55,15 +55,15 @@ class GetAccountController @Inject()(
           case GetLisaAccountDoesNotExistResponse =>
             auditGetAccount(lisaManager, accountId, Some(ErrorAccountNotFound.errorCode))
             lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.ACCOUNT)
-            NotFound(Json.toJson(ErrorAccountNotFound))
+            NotFound(ErrorAccountNotFound.asJson)
           case GetLisaAccountServiceUnavailable =>
             auditGetAccount(lisaManager, accountId, Some(ErrorServiceUnavailable.errorCode))
             lisaMetrics.incrementMetrics(startTime, SERVICE_UNAVAILABLE, LisaMetricKeys.ACCOUNT)
-            ServiceUnavailable(Json.toJson(ErrorServiceUnavailable))
+            ServiceUnavailable(ErrorServiceUnavailable.asJson)
           case _ =>
             auditGetAccount(lisaManager, accountId, Some(ErrorInternalServerError.errorCode))
             lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.ACCOUNT)
-            InternalServerError(Json.toJson(ErrorInternalServerError))
+            InternalServerError(ErrorInternalServerError.asJson)
         }
       }
     }

@@ -263,7 +263,7 @@ class AnnualReturnControllerSpec extends ControllerTestFixture {
 
         doRequest() { res =>
           status(res) mustBe INTERNAL_SERVER_ERROR
-          contentAsJson(res) mustBe Json.toJson(ErrorInternalServerError)
+          contentAsJson(res) mustBe ErrorInternalServerError.asJson
         }
       }
     }

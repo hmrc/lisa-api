@@ -18,9 +18,9 @@ package helpers
 
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.{Configuration, Environment}
-import uk.gov.hmrc.lisaapi.config.AppContext
+import play.api.Configuration
 import uk.gov.hmrc.http.HttpClient
+import uk.gov.hmrc.lisaapi.config.AppContext
 
 trait BaseTestFixture extends PlaySpec with MockitoSugar {
 

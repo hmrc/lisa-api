@@ -356,11 +356,9 @@ object ReportWithdrawalChargeRequest {
     req.supersede
   )}
 
-  implicit val reportWithdrawalChargeWrites: Writes[ReportWithdrawalChargeRequest] = Writes[ReportWithdrawalChargeRequest] { obj =>
-    obj match {
-      case regular: RegularWithdrawalChargeRequest => regularWithdrawalWrites.writes(regular)
-      case superseded: SupersededWithdrawalChargeRequest => supersededWithdrawalWrites.writes(superseded)
-    }
+  implicit val reportWithdrawalChargeWrites: Writes[ReportWithdrawalChargeRequest] = Writes[ReportWithdrawalChargeRequest] {
+    case regular: RegularWithdrawalChargeRequest => regularWithdrawalWrites.writes(regular)
+    case superseded: SupersededWithdrawalChargeRequest => supersededWithdrawalWrites.writes(superseded)
   }
 
   implicit val desRegularWithdrawalWrites: Writes[RegularWithdrawalChargeRequest] = (
@@ -405,10 +403,8 @@ object ReportWithdrawalChargeRequest {
     req.supersede
   )}
 
-  val desReportWithdrawalChargeWrites: Writes[ReportWithdrawalChargeRequest] = Writes[ReportWithdrawalChargeRequest] { obj =>
-    obj match {
-      case regular: RegularWithdrawalChargeRequest => desRegularWithdrawalWrites.writes(regular)
-      case superseded: SupersededWithdrawalChargeRequest => desSupersededWithdrawalWrites.writes(superseded)
-    }
+  val desReportWithdrawalChargeWrites: Writes[ReportWithdrawalChargeRequest] = Writes[ReportWithdrawalChargeRequest] {
+    case regular: RegularWithdrawalChargeRequest => desRegularWithdrawalWrites.writes(regular)
+    case superseded: SupersededWithdrawalChargeRequest => desSupersededWithdrawalWrites.writes(superseded)
   }
 }

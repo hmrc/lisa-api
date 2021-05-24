@@ -40,20 +40,16 @@ object FundReleasePropertyDetails {
     }
   }
 
-  private def nameOrNumberValidator: Reads[String] = new Reads[String] {
-    override def reads(nameOrNumberJsValue: JsValue): JsResult[String] = {
-      val nameOrNumber = nameOrNumberJsValue.as[String]
-      if(nameOrNumber.matches(nameOrNumberRegex)) JsSuccess(nameOrNumber) else getNameOrNumberErrorMessage(nameOrNumber)
-    }
+  private def nameOrNumberValidator: Reads[String] = (nameOrNumberJsValue: JsValue) => {
+    val nameOrNumber = nameOrNumberJsValue.as[String]
+    if (nameOrNumber.matches(nameOrNumberRegex)) JsSuccess(nameOrNumber) else getNameOrNumberErrorMessage(nameOrNumber)
   }
 
-  private def postalCodeValidator: Reads[String] = new Reads[String] {
-    override def reads(postalCode: JsValue): JsResult[String] = {
-      postalCode.as[String] match {
-        case postalCode if postalCode.matches(postalCodeRegex) => JsSuccess(postalCode)
-        case postalCode if postalCode.isEmpty => toJsError("emptyPostalCode")
-        case _ => toJsError("invalidPostalCode")
-      }
+  private def postalCodeValidator: Reads[String] = (postalCode: JsValue) => {
+    postalCode.as[String] match {
+      case postalCode if postalCode.matches(postalCodeRegex) => JsSuccess(postalCode)
+      case postalCode if postalCode.isEmpty => toJsError("emptyPostalCode")
+      case _ => toJsError("invalidPostalCode")
     }
   }
 
@@ -68,9 +64,9 @@ object FundReleasePropertyDetails {
 case class FundReleaseSupersedeDetails(originalLifeEventId: LifeEventId, originalEventDate: DateTime)
 
 object FundReleaseSupersedeDetails {
-  implicit val dateReads: Reads[DateTime] = Reads.jodaDateReads("yyyy-MM-dd")
-  implicit val dateWrites: Writes[DateTime] = Writes.jodaDateWrites("yyyy-MM-dd")
-  implicit val formats = Json.format[FundReleaseSupersedeDetails]
+  implicit val dateReads: Reads[DateTime] = JodaReads.jodaDateReads("yyyy-MM-dd")
+  implicit val dateWrites: Writes[DateTime] = JodaWrites.jodaDateWrites("yyyy-MM-dd")
+  implicit val formats: OFormat[FundReleaseSupersedeDetails] = Json.format[FundReleaseSupersedeDetails]
 }
 
 trait RequestFundReleaseRequest extends ReportLifeEventRequestBase {
@@ -84,7 +80,7 @@ case class SupersedeFundReleaseRequest(eventDate: DateTime, withdrawalAmount: Am
 
 object RequestFundReleaseRequest {
   implicit val dateReads: Reads[DateTime] = JsonReads.notFutureDate
-  implicit val dateWrites: Writes[DateTime] = Writes.jodaDateWrites("yyyy-MM-dd")
+  implicit val dateWrites: Writes[DateTime] = JodaWrites.jodaDateWrites("yyyy-MM-dd")
 
   val initialReads = Json.reads[InitialFundReleaseRequest]
 

@@ -16,11 +16,10 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 import play.api.Logging
-import play.api.libs.json.Json.toJson
 import play.api.libs.json._
 import play.api.mvc._
 import uk.gov.hmrc.auth.core._
-import uk.gov.hmrc.auth.core.retrieve.Retrievals.internalId
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.internalId
 import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
@@ -47,7 +46,7 @@ abstract case class LisaController(
       success()
     } else {
       lisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.getMetricKey(request.uri))
-      Future.successful(BadRequest(toJson(ErrorBadRequestLmrn)))
+      Future.successful(BadRequest(ErrorBadRequestLmrn.asJson))
     }
   }
 
@@ -56,7 +55,7 @@ abstract case class LisaController(
       success()
     } else {
       lisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.getMetricKey(request.uri))
-      Future.successful(BadRequest(toJson(ErrorBadRequestAccountId)))
+      Future.successful(BadRequest(ErrorBadRequestAccountId.asJson))
     }
   }
 
@@ -65,7 +64,7 @@ abstract case class LisaController(
       success()
     } else {
       lisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.getMetricKey(request.uri))
-      Future.successful(BadRequest(toJson(ErrorBadRequestTransactionId)))
+      Future.successful(BadRequest(ErrorBadRequestTransactionId.asJson))
     }
   }
 
@@ -95,39 +94,39 @@ abstract case class LisaController(
                 case Failure(ex: Exception) =>
                   logger.error(s"LisaController An error occurred in Json payload validation ${ex.getMessage}")
                   lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.getMetricKey(request.uri))
-                  Future.successful(InternalServerError(toJson(ErrorInternalServerError)))
+                  Future.successful(InternalServerError(ErrorInternalServerError.asJson))
               }
             case Success(JsError(errors)) =>
               invalid map { _(errors)} getOrElse {
                 lisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.getMetricKey(request.uri))
                 logger.warn(s"[LisaController][withValidJson] The errors are ${errorConverter.convert(errors)}")
-                Future.successful(BadRequest(toJson(ErrorBadRequest(errorConverter.convert(errors)))))
+                Future.successful(BadRequest(ErrorBadRequest(errorConverter.convert(errors)).asJson))
               }
             case Failure(e) =>
               logger.error(s"LisaController: An error occurred in lisa-api due to ${e.getMessage} returning internal server error")
               lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.getMetricKey(request.uri))
-              Future.successful(InternalServerError(toJson(ErrorInternalServerError)))
+              Future.successful(InternalServerError(ErrorInternalServerError.asJson))
           }
 
         case None =>
           lisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.getMetricKey(request.uri))
-          Future.successful(BadRequest(toJson(EmptyJson)))
+          Future.successful(BadRequest(EmptyJson.asJson))
       }
     }
   }
 
-  def handleFailure(implicit request: Request[_], startTime: Long): PartialFunction[Throwable, Future[Result]] = PartialFunction[Throwable, Future[Result]] {
+  def handleFailure(implicit request: Request[_], startTime: Long): PartialFunction[Throwable, Future[Result]] = {
     case _: InsufficientEnrolments =>
       logger.warn(s"Unauthorised access for ${request.uri}")
       lisaMetrics.incrementMetrics(startTime, UNAUTHORIZED, LisaMetricKeys.getMetricKey(request.uri))
-      Future.successful(Unauthorized(Json.toJson(ErrorInvalidLisaManager)))
+      Future.successful(Unauthorized(ErrorInvalidLisaManager.asJson))
     case _: AuthorisationException =>
       logger.warn(s"Unauthorised Exception for ${request.uri}")
       lisaMetrics.incrementMetrics(startTime, UNAUTHORIZED, LisaMetricKeys.getMetricKey(request.uri))
-      Future.successful(Unauthorized(Json.toJson(ErrorUnauthorized)))
+      Future.successful(Unauthorized(ErrorUnauthorized.asJson))
     case _ =>
       lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.getMetricKey(request.uri))
-      Future.successful(InternalServerError(toJson(ErrorInternalServerError)))
+      Future.successful(InternalServerError(ErrorInternalServerError.asJson))
   }
 }
 

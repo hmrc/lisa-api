@@ -17,9 +17,9 @@
 package unit.config
 
 import helpers.BaseTestFixture
-import uk.gov.hmrc.lisaapi.config.APIAccessConfig
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito.when
+import uk.gov.hmrc.lisaapi.config.APIAccessConfig
 
 class APIAccessConfigSpec extends BaseTestFixture {
 

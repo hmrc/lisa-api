@@ -18,7 +18,7 @@ package uk.gov.hmrc.lisaapi.models
 
 import org.joda.time.DateTime
 import play.api.libs.functional.syntax._
-import play.api.libs.json.{JsPath, Json, Reads, Writes}
+import play.api.libs.json.{JodaWrites, JsPath, Json, Reads, Writes}
 import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.controllers.ErrorValidation
 import uk.gov.hmrc.lisaapi.services.CurrentDateService
@@ -43,13 +43,13 @@ case class AnnualReturn (
 
 object AnnualReturnSupersede {
   implicit val dateReads: Reads[DateTime] = JsonReads.notFutureDate
-  implicit val dateWrites = Writes.jodaDateWrites("yyyy-MM-dd")
+  implicit val dateWrites = JodaWrites.jodaDateWrites("yyyy-MM-dd")
   implicit val lifeEventReads: Reads[LifeEventId] = JsonReads.lifeEventId
   implicit val formats = Json.format[AnnualReturnSupersede]
 }
 
 object AnnualReturn {
-  implicit val dateWrites = Writes.jodaDateWrites("yyyy-MM-dd")
+  implicit val dateWrites = JodaWrites.jodaDateWrites("yyyy-MM-dd")
 
   implicit val reads: Reads[AnnualReturn] = (
     (JsPath \ "eventDate").read(JsonReads.notFutureDate) and

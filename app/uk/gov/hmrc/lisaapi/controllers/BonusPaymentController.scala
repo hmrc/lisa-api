@@ -106,7 +106,7 @@ class BonusPaymentController @Inject()(
             if (response.bonuses.claimReason == "Superseded Bonus") {
               getBonusPaymentAudit(lisaManager, accountId, transactionId, Some(ErrorInternalServerError.errorCode))
               logger.warn(s"API v1 received a superseded bonus claim. ID was $transactionId")
-              Future.successful(InternalServerError(Json.toJson(ErrorInternalServerError)))
+              Future.successful(InternalServerError(ErrorInternalServerError.asJson))
             } else {
               getBonusPaymentAudit(lisaManager, accountId, transactionId)
               Future.successful(Ok(Json.toJson(response.copy(supersededBy = None))))
@@ -119,22 +119,22 @@ class BonusPaymentController @Inject()(
       case _: GetWithdrawalResponse | GetBonusOrWithdrawalTransactionNotFoundResponse =>
         getBonusPaymentAudit(lisaManager, accountId, transactionId, Some(ErrorBonusPaymentTransactionNotFound.errorCode))
         lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.BONUS_PAYMENT)
-        Future.successful(NotFound(Json.toJson(ErrorBonusPaymentTransactionNotFound)))
+        Future.successful(NotFound(ErrorBonusPaymentTransactionNotFound.asJson))
 
       case GetBonusOrWithdrawalInvestorNotFoundResponse =>
         getBonusPaymentAudit(lisaManager, accountId, transactionId, Some(ErrorAccountNotFound.errorCode))
         lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.BONUS_PAYMENT)
-        Future.successful(NotFound(Json.toJson(ErrorAccountNotFound)))
+        Future.successful(NotFound(ErrorAccountNotFound.asJson))
 
       case GetBonusOrWithdrawalServiceUnavailableResponse =>
         getBonusPaymentAudit(lisaManager, accountId, transactionId, Some(ErrorServiceUnavailable.errorCode))
         lisaMetrics.incrementMetrics(startTime, SERVICE_UNAVAILABLE, LisaMetricKeys.BONUS_PAYMENT)
-        Future.successful(ServiceUnavailable(Json.toJson(ErrorServiceUnavailable)))
+        Future.successful(ServiceUnavailable(ErrorServiceUnavailable.asJson))
 
       case _ =>
         getBonusPaymentAudit(lisaManager, accountId, transactionId, Some(ErrorInternalServerError.errorCode))
         lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.BONUS_PAYMENT)
-        Future.successful(InternalServerError(Json.toJson(ErrorInternalServerError)))
+        Future.successful(InternalServerError(ErrorInternalServerError.asJson))
     }
   }
 
@@ -199,7 +199,7 @@ class BonusPaymentController @Inject()(
 
           lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.BONUS_PAYMENT)
 
-          Future.successful(Forbidden(Json.toJson(ErrorForbidden(errors.toList))))
+          Future.successful(Forbidden(ErrorForbidden(errors.toList).asJson))
         }
     }
   }
@@ -220,7 +220,7 @@ class BonusPaymentController @Inject()(
 
       lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.BONUS_PAYMENT)
 
-      Future.successful(Forbidden(Json.toJson(ErrorBonusClaimTimescaleExceeded)))
+      Future.successful(Forbidden(ErrorBonusClaimTimescaleExceeded.asJson))
     }
   }
 
@@ -238,7 +238,7 @@ class BonusPaymentController @Inject()(
     } yield {
       requestBonusPaymentFailureAudit(lisaManager, accountId, data, error.errorCode)
       lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.BONUS_PAYMENT)
-      Future.successful(Forbidden(Json.toJson(error)))
+      Future.successful(Forbidden(error.asJson))
     }
 
     htbResponse.getOrElse(callback())
@@ -298,7 +298,7 @@ class BonusPaymentController @Inject()(
     requestBonusPaymentFailureAudit(lisaManager, accountId, req, ErrorInternalServerError.errorCode)
     lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.BONUS_PAYMENT)
 
-    InternalServerError(Json.toJson(ErrorInternalServerError))
+    InternalServerError(ErrorInternalServerError.asJson)
   }
 
   private def handleLifeEventNotProvided(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest)
@@ -308,7 +308,7 @@ class BonusPaymentController @Inject()(
     requestBonusPaymentFailureAudit(lisaManager, accountId, req, ErrorLifeEventNotProvided.errorCode)
     lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.BONUS_PAYMENT)
 
-    Future.successful(Forbidden(Json.toJson(ErrorLifeEventNotProvided)))
+    Future.successful(Forbidden(ErrorLifeEventNotProvided.asJson))
   }
 
   private def requestBonusPaymentFailureAudit(lisaManager: String, accountId: String, req: RequestBonusPaymentRequest, failureReason: String)

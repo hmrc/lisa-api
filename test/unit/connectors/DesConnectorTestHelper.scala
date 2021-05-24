@@ -21,14 +21,13 @@ import org.joda.time.DateTime
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
-import uk.gov.hmrc.lisaapi.models.{AccountTransfer, Bonuses, CloseLisaAccountRequest, CreateLisaAccountCreationRequest, CreateLisaAccountTransferRequest, CreateLisaInvestorRequest, GetLifeEventItem, HelpToBuyTransfer, InboundPayments, ReportLifeEventRequest, RequestBonusPaymentRequest, SupersededWithdrawalChargeRequest, UpdateSubscriptionRequest, WithdrawalIncrease}
 import uk.gov.hmrc.lisaapi.models.des.{DesFailure, DesResponse}
+import uk.gov.hmrc.lisaapi.models._
 
 import scala.concurrent.Await
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.io.Source
-
-import scala.concurrent.ExecutionContext.Implicits.global
 
 trait DesConnectorTestHelper extends BaseTestFixture with GuiceOneAppPerSuite {
 

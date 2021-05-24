@@ -96,9 +96,9 @@ class CloseAccountController @Inject()(
 
       lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.CLOSE)
 
-      Future.successful(Forbidden(Json.toJson(ErrorForbidden(List(
+      Future.successful(Forbidden(ErrorForbidden(List(
         ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("closureDate"), Some("/closureDate"))
-      )))))
+      )).asJson))
     } else {
       success()
     }

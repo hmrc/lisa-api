@@ -79,7 +79,7 @@ class AnnualReturnController @Inject()(
 
                   audit(lisaManager, accountId, req, Some("INTERNAL_SERVER_ERROR"))
                   lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.EVENT)
-                  InternalServerError(Json.toJson(ErrorInternalServerError))
+                  InternalServerError(ErrorInternalServerError.asJson)
               }
             },
             lisaManager = lisaManager
@@ -126,7 +126,7 @@ class AnnualReturnController @Inject()(
     } else {
       audit(lisaManager, accountId, req, Some("FORBIDDEN"))
       lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.WITHDRAWAL_CHARGE)
-      Future.successful(Forbidden(Json.toJson(ErrorForbidden(errors.toList))))
+      Future.successful(Forbidden(ErrorForbidden(errors.toList).asJson))
     }
   }
 

@@ -275,7 +275,7 @@ class ReinstateAccountControllerSpec extends ControllerTestFixture {
           reset(mockReinstateAccountService) // removes the thenThrow
 
           status(res) mustBe INTERNAL_SERVER_ERROR
-          contentAsJson(res)  mustBe Json.toJson(ErrorInternalServerError)
+          contentAsJson(res)  mustBe ErrorInternalServerError.asJson
         }
       }
     }

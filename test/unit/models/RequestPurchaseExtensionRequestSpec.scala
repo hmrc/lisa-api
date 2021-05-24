@@ -47,7 +47,7 @@ class RequestPurchaseExtensionRequestSpec extends PlaySpec {
 
       val expected = """{"eventType":"Extension one","eventDate":"2017-05-10","fundsReleaseLifeEventID":"3456789001"}"""
 
-      Json.toJson[RequestPurchaseExtension](input).toString() mustBe expected
+      Json.toJson(input)(RequestPurchaseExtension.standardWrites).toString() mustBe expected
 
     }
 
@@ -128,7 +128,7 @@ class RequestPurchaseExtensionRequestSpec extends PlaySpec {
 
       val expected = """{"eventType":"Extension one","eventDate":"2017-05-10","supersededLifeEventDate":"2017-05-10","supersededLifeEventID":"6789000001"}"""
 
-      Json.toJson[RequestPurchaseExtension](input).toString() mustBe expected
+      Json.toJson(input)(RequestPurchaseExtension.supersededWrites).toString() mustBe expected
 
     }
 
