@@ -18,7 +18,7 @@ package uk.gov.hmrc.lisaapi.domain
 
 import play.api.libs.json.Json
 
-case class APIAccess(`type`: String, whitelistedApplicationIds: Option[Seq[String]])
+case class APIAccess(`type`: String)
 
 object APIAccess {
   implicit val apiAccessFormats = Json.format[APIAccess]
