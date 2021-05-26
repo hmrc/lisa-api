@@ -53,6 +53,6 @@ class Documentation @Inject()(
 
   private def buildAccess() = {
     val access = APIAccessConfig(appContext.access)
-    APIAccess(access.accessType, access.whiteListedApplicationIds)
+    APIAccess(access.accessType)
   }
 }

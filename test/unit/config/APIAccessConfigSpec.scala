@@ -30,19 +30,12 @@ class APIAccessConfigSpec extends BaseTestFixture {
     "return private for type" in {
       apiAccessConfigNone.accessType must be ("PUBLIC")
     }
-    "return an empty sequence for the whitelist ids" in {
-      apiAccessConfigNone.whiteListedApplicationIds must be (Some(Seq()))
-    }
   }
 
   "APIAccessConfig created with valid configuration" should {
     "return private for the access type" in {
       when(mockConfiguration.getOptional[String](any())(any())).thenReturn(Some("PRIVATE"))
       apiAccessConfigMocked.accessType must be ("PRIVATE")
-    }
-    "return a sequence of ids" in {
-      when(mockConfiguration.getOptional[Seq[String]](any())(any())).thenReturn(Some(Seq("a","b")))
-      apiAccessConfigMocked.whiteListedApplicationIds must be (Some(Seq("a","b")))
     }
   }
 }

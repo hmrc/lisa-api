@@ -29,10 +29,4 @@ case class APIAccessConfig(value: Option[Configuration]) {
     }
   }
 
-  def whiteListedApplicationIds: Option[Seq[String]] = {
-    value match {
-      case Some(config) => config.getOptional[Seq[String]]("white-list.applicationIds")
-      case None => Some(Seq.empty)
-    }
-  }
 }
