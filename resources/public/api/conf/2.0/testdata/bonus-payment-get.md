@@ -33,13 +33,13 @@
   "inboundPayments": {
     "newSubsForPeriod": 4000,
     "newSubsYTD": 4000,
-    "totalSubsForPeriod": 40000,
-    "totalSubsYTD": 40000
+    "totalSubsForPeriod": 4000,
+    "totalSubsYTD": 4000
   },
   "bonuses": {
     "bonusPaidYTD": 0,
-    "bonusDueForPeriod": 10000,
-    "totalBonusDueYTD": 10000,
+    "bonusDueForPeriod": 1000,
+    "totalBonusDueYTD": 1000,
     "claimReason": "Life Event"
   },
   "supersededBy": "0000456789"
@@ -65,13 +65,13 @@
   "inboundPayments": {
     "newSubsForPeriod": 4000,
     "newSubsYTD": 4000,
-    "totalSubsForPeriod": 40000,
-    "totalSubsYTD": 40000
+    "totalSubsForPeriod": 4000,
+    "totalSubsYTD": 4000
   },
   "bonuses": {
     "bonusPaidYTD": 0,
-    "bonusDueForPeriod": 10000,
-    "totalBonusDueYTD": 10000,
+    "bonusDueForPeriod": 1000,
+    "totalBonusDueYTD": 1000,
     "claimReason": "Regular Bonus"
   },
   "supersededBy": "0000056789"
