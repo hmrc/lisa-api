@@ -34,13 +34,13 @@
   "inboundPayments": {
     "newSubsForPeriod": 4000.00,
     "newSubsYTD": 4000.00,
-    "totalSubsForPeriod": 40000.00,
-    "totalSubsYTD": 40000.00
+    "totalSubsForPeriod": 4000.00,
+    "totalSubsYTD": 4000.00
   },
   "bonuses": {
     "bonusPaidYTD": 0.0,
-    "bonusDueForPeriod": 10000.00,
-    "totalBonusDueYTD": 10000.00,
+    "bonusDueForPeriod": 1000.00,
+    "totalBonusDueYTD": 1000.00,
     "claimReason": "Life Event"
   }
 }
@@ -79,13 +79,13 @@
   "inboundPayments": {
     "newSubsForPeriod": 4000.00,
     "newSubsYTD": 4000.00,
-    "totalSubsForPeriod": 40000.00,
-    "totalSubsYTD": 40000.00
+    "totalSubsForPeriod": 4000.00,
+    "totalSubsYTD": 4000.00
   },
   "bonuses": {
     "bonusPaidYTD": 0.0,
-    "bonusDueForPeriod": 10000.00,
-    "totalBonusDueYTD": 10000.00,
+    "bonusDueForPeriod": 1000.00,
+    "totalBonusDueYTD": 1000.00,
     "claimReason": "Life Event"
   }
 }
@@ -123,13 +123,13 @@
   "inboundPayments": {
     "newSubsForPeriod": 4000.00,
     "newSubsYTD": 4000.00,
-    "totalSubsForPeriod": 40000.00,
-    "totalSubsYTD": 40000.00
+    "totalSubsForPeriod": 4000.00,
+    "totalSubsYTD": 4000.00
   },
   "bonuses": {
     "bonusPaidYTD": 0.0,
-    "bonusDueForPeriod": 10000.00,
-    "totalBonusDueYTD": 10000.00,
+    "bonusDueForPeriod": 1000.00,
+    "totalBonusDueYTD": 1000.00,
     "claimReason": "Regular Bonus"
   }
 }
@@ -273,13 +273,13 @@
   "inboundPayments": {
     "newSubsForPeriod": 4000.00,
     "newSubsYTD": 4000.00,
-    "totalSubsForPeriod": 40000.00,
-    "totalSubsYTD": 40000.00
+    "totalSubsForPeriod": 4000.00,
+    "totalSubsYTD": 4000.00
   },
   "bonuses": {
     "bonusPaidYTD": 0.0,
-    "bonusDueForPeriod": 10000.00,
-    "totalBonusDueYTD": 10000.00,
+    "bonusDueForPeriod": 1000.00,
+    "totalBonusDueYTD": 1000.00,
     "claimReason": "Life Event"
   }
 }
@@ -318,13 +318,13 @@
   "inboundPayments": {
     "newSubsForPeriod": 4000.00,
     "newSubsYTD": 4000.00,
-    "totalSubsForPeriod": 40000.00,
-    "totalSubsYTD": 40000.00
+    "totalSubsForPeriod": 4000.00,
+    "totalSubsYTD": 4000.00
   },
   "bonuses": {
     "bonusPaidYTD": 0.0,
-    "bonusDueForPeriod": 10000.00,
-    "totalBonusDueYTD": 10000.00,
+    "bonusDueForPeriod": 1000.00,
+    "totalBonusDueYTD": 1000.00,
     "claimReason": "Life Event"
   }
 }
@@ -363,12 +363,12 @@
   "inboundPayments": {
     "newSubsForPeriod": 4000.00,
     "newSubsYTD": 4000.00,
-    "totalSubsForPeriod": 40000.00,
-    "totalSubsYTD": 40000.00
+    "totalSubsForPeriod": 4000.00,
+    "totalSubsYTD": 4000.00
   },
   "bonuses": {
     "bonusPaidYTD": 0.0,
-    "bonusDueForPeriod": 10000.00,
+    "bonusDueForPeriod": 1000.00,
     "claimReason": "X"
   },
   "supersede": {
@@ -551,13 +551,13 @@
   "inboundPayments": {
     "newSubsForPeriod": 4000.00,
     "newSubsYTD": 4000.00,
-    "totalSubsForPeriod": 40000.00,
-    "totalSubsYTD": 40000.00
+    "totalSubsForPeriod": 4000.00,
+    "totalSubsYTD": 4000.00
   },
   "bonuses": {
     "bonusPaidYTD": 0.0,
-    "bonusDueForPeriod": 10000.00,
-    "totalBonusDueYTD": 10000.00,
+    "bonusDueForPeriod": 1000.00,
+    "totalBonusDueYTD": 1000.00,
     "claimReason": "Life Event"
   }
 }
@@ -596,13 +596,13 @@
   "inboundPayments": {
     "newSubsForPeriod": 4000.00,
     "newSubsYTD": 4000.00,
-    "totalSubsForPeriod": 40000.00,
-    "totalSubsYTD": 40000.00
+    "totalSubsForPeriod": 4000.00,
+    "totalSubsYTD": 4000.00
   },
   "bonuses": {
     "bonusPaidYTD": 0.0,
-    "bonusDueForPeriod": 10000.00,
-    "totalBonusDueYTD": 10000.00,
+    "bonusDueForPeriod": 1000.00,
+    "totalBonusDueYTD": 1000.00,
     "claimReason": "Life Event"
   }
 }
@@ -641,13 +641,13 @@
   "inboundPayments": {
     "newSubsForPeriod": 4000.00,
     "newSubsYTD": 4000.00,
-    "totalSubsForPeriod": 40000.00,
-    "totalSubsYTD": 40000.00
+    "totalSubsForPeriod": 4000.00,
+    "totalSubsYTD": 4000.00
   },
   "bonuses": {
     "bonusPaidYTD": 0.0,
-    "bonusDueForPeriod": 10000.00,
-    "totalBonusDueYTD": 10000.00,
+    "bonusDueForPeriod": 1000.00,
+    "totalBonusDueYTD": 1000.00,
     "claimReason": "Life Event"
   }
 }
@@ -686,13 +686,13 @@
  "inboundPayments": {
    "newSubsForPeriod": 4000.00,
    "newSubsYTD": 4000.00,
-   "totalSubsForPeriod": 40000.00,
-   "totalSubsYTD": 40000.00
+   "totalSubsForPeriod": 4000.00,
+   "totalSubsYTD": 4000.00
  },
  "bonuses": {
    "bonusPaidYTD": 0.0,
-   "bonusDueForPeriod": 10000.00,
-   "totalBonusDueYTD": 10000.00,
+   "bonusDueForPeriod": 1000.00,
+   "totalBonusDueYTD": 1000.00,
    "claimReason": "Life Event"
  }
 }
@@ -732,13 +732,13 @@
  "inboundPayments": {
    "newSubsForPeriod": 4000.00,
    "newSubsYTD": 4000.00,
-   "totalSubsForPeriod": 40000.00,
-   "totalSubsYTD": 40000.00
+   "totalSubsForPeriod": 4000.00,
+   "totalSubsYTD": 4000.00
  },
  "bonuses": {
    "bonusPaidYTD": 0.0,
-   "bonusDueForPeriod": 10000.00,
-   "totalBonusDueYTD": 10000.00,
+   "bonusDueForPeriod": 1000.00,
+   "totalBonusDueYTD": 1000.00,
    "claimReason": "Life Event"
  }
 }
@@ -776,13 +776,13 @@
   "inboundPayments": {
     "newSubsForPeriod": 4000.00,
     "newSubsYTD": 4000.00,
-    "totalSubsForPeriod": 40000.00,
-    "totalSubsYTD": 40000.00
+    "totalSubsForPeriod": 4000.00,
+    "totalSubsYTD": 4000.00
   },
   "bonuses": {
     "bonusPaidYTD": 0.0,
-    "bonusDueForPeriod": 10500.00,
-    "totalBonusDueYTD": 10000.00,
+    "bonusDueForPeriod": 1050.00,
+    "totalBonusDueYTD": 1000.00,
     "claimReason": "Regular Bonus"
   }
 }
@@ -816,13 +816,13 @@
   "inboundPayments": {
     "newSubsForPeriod": 4000.00,
     "newSubsYTD": 4000.00,
-    "totalSubsForPeriod": 40000.00,
-    "totalSubsYTD": 40000.00
+    "totalSubsForPeriod": 4000.00,
+    "totalSubsYTD": 4000.00
   },
   "bonuses": {
     "bonusPaidYTD": 0.0,
-    "bonusDueForPeriod": 10500.00,
-    "totalBonusDueYTD": 10000.00,
+    "bonusDueForPeriod": 1050.00,
+    "totalBonusDueYTD": 1000.00,
     "claimReason": "Superseded Bonus"
   },
   "supersede": {
@@ -863,13 +863,13 @@
   "inboundPayments": {
     "newSubsForPeriod": 4000.00,
     "newSubsYTD": 4000.00,
-    "totalSubsForPeriod": 40000.00,
-    "totalSubsYTD": 40000.00
+    "totalSubsForPeriod": 4000.00,
+    "totalSubsYTD": 4000.00
   },
   "bonuses": {
     "bonusPaidYTD": 0.0,
-    "bonusDueForPeriod": 10500.00,
-    "totalBonusDueYTD": 10000.00,
+    "bonusDueForPeriod": 1050.00,
+    "totalBonusDueYTD": 1000.00,
     "claimReason": "Superseded Bonus"
   },
   "supersede": {
@@ -910,13 +910,13 @@
   "inboundPayments": {
     "newSubsForPeriod": 4000.00,
     "newSubsYTD": 4000.00,
-    "totalSubsForPeriod": 40000.00,
-    "totalSubsYTD": 40000.00
+    "totalSubsForPeriod": 4000.00,
+    "totalSubsYTD": 4000.00
   },
   "bonuses": {
     "bonusPaidYTD": 0.0,
-    "bonusDueForPeriod": 10500.00,
-    "totalBonusDueYTD": 10000.00,
+    "bonusDueForPeriod": 1050.00,
+    "totalBonusDueYTD": 1000.00,
     "claimReason": "Superseded Bonus"
   },
   "supersede": {
@@ -962,13 +962,13 @@
   "inboundPayments": {
     "newSubsForPeriod": 4000.00,
     "newSubsYTD": 4000.00,
-    "totalSubsForPeriod": 40000.00,
-    "totalSubsYTD": 40000.00
+    "totalSubsForPeriod": 4000.00,
+    "totalSubsYTD": 4000.00
   },
   "bonuses": {
     "bonusPaidYTD": 0.0,
-    "bonusDueForPeriod": 10000.00,
-    "totalBonusDueYTD": 10000.00,
+    "bonusDueForPeriod": 1000.00,
+    "totalBonusDueYTD": 1000.00,
     "claimReason": "Life Event"
   }
 }
@@ -1007,13 +1007,13 @@
   "inboundPayments": {
     "newSubsForPeriod": 4000.00,
     "newSubsYTD": 4000.00,
-    "totalSubsForPeriod": 40000.00,
-    "totalSubsYTD": 40000.00
+    "totalSubsForPeriod": 4000.00,
+    "totalSubsYTD": 4000.00
   },
   "bonuses": {
     "bonusPaidYTD": 0.0,
-    "bonusDueForPeriod": 10000.00,
-    "totalBonusDueYTD": 10000.00,
+    "bonusDueForPeriod": 1000.00,
+    "totalBonusDueYTD": 1000.00,
     "claimReason": "Life Event"
   }
 }
@@ -1052,13 +1052,13 @@
   "inboundPayments": {
     "newSubsForPeriod": 4000.00,
     "newSubsYTD": 4000.00,
-    "totalSubsForPeriod": 40000.00,
-    "totalSubsYTD": 40000.00
+    "totalSubsForPeriod": 4000.00,
+    "totalSubsYTD": 4000.00
   },
   "bonuses": {
     "bonusPaidYTD": 0.0,
-    "bonusDueForPeriod": 10000.00,
-    "totalBonusDueYTD": 10000.00,
+    "bonusDueForPeriod": 1000.00,
+    "totalBonusDueYTD": 1000.00,
     "claimReason": "Life Event"
   }
 }
@@ -1093,13 +1093,13 @@
   "inboundPayments": {
     "newSubsForPeriod": 4000.00,
     "newSubsYTD": 4000.00,
-    "totalSubsForPeriod": 40000.00,
-    "totalSubsYTD": 40000.00
+    "totalSubsForPeriod": 4000.00,
+    "totalSubsYTD": 4000.00
   },
   "bonuses": {
     "bonusPaidYTD": 0.0,
-    "bonusDueForPeriod": 10500.00,
-    "totalBonusDueYTD": 10000.00,
+    "bonusDueForPeriod": 1050.00,
+    "totalBonusDueYTD": 1000.00,
     "claimReason": "Superseded Bonus"
   },
   "supersede": {
@@ -1149,13 +1149,13 @@
   "inboundPayments": {
     "newSubsForPeriod": 4000.00,
     "newSubsYTD": 4000.00,
-    "totalSubsForPeriod": 40000.00,
-    "totalSubsYTD": 40000.00
+    "totalSubsForPeriod": 4000.00,
+    "totalSubsYTD": 4000.00
   },
   "bonuses": {
     "bonusPaidYTD": 0.0,
-    "bonusDueForPeriod": 10000.00,
-    "totalBonusDueYTD": 10000.00,
+    "bonusDueForPeriod": 1000.00,
+    "totalBonusDueYTD": 1000.00,
     "claimReason": "Life Event"
   }
 }
