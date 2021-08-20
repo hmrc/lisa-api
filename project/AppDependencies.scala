@@ -9,20 +9,21 @@ object AppDependencies {
 
   val compile: Seq[ModuleID] = Seq(
     ws,
-    "uk.gov.hmrc" %% "bootstrap-backend-play-27" % "5.3.0",
-    "uk.gov.hmrc" %% "play-hmrc-api" % "6.2.0-play-27",
-    "com.typesafe.play" %% "play-json-joda" % "2.9.2",
+    "uk.gov.hmrc"        %% "bootstrap-backend-play-28"  % "5.12.0",
+    "uk.gov.hmrc"        %% "play-hmrc-api"              % "6.4.0-play-28",
+    "com.typesafe.play"  %% "play-json-joda"             % "2.9.2",
     compilerPlugin("com.github.ghik" % "silencer-plugin" % silencerVersion cross CrossVersion.full),
     "com.github.ghik" % "silencer-lib" % silencerVersion % Provided cross CrossVersion.full
   )
 
   val test: Seq[ModuleID] = Seq(
-    "org.scalatest" %% "scalatest" % "3.0.9",
-    "org.pegdown" % "pegdown" % "1.6.0",
-    "com.typesafe.play" %% "play-test" % PlayVersion.current,
-    "org.mockito" % "mockito-core" % "3.10.0",
-    "org.scalaj" %% "scalaj-http" % "2.4.2",
-    "org.scalatestplus.play" %% "scalatestplus-play" % "4.0.3"
+    "org.scalatest"           %%  "scalatest"          %  "3.2.9",
+    "org.scalatestplus"       %%  "mockito-3-4"        %  "3.2.9.0",
+    "org.scalatestplus.play"  %%  "scalatestplus-play" %  "5.1.0",
+    "com.typesafe.play"       %%  "play-test"          %  PlayVersion.current,
+    "org.scalaj"              %%  "scalaj-http"        %  "2.4.2",
+    "org.pegdown"             %   "pegdown"            %  "1.6.0",
+    "com.vladsch.flexmark"    %   "flexmark-all"       %  "0.36.8"
   ).map(_ % Test)
 
   def apply(): Seq[ModuleID] = compile ++ test
