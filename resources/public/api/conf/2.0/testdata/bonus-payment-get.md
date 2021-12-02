@@ -37,9 +37,9 @@
     "totalSubsYTD": 4000
   },
   "bonuses": {
-    "bonusPaidYTD": 0,
     "bonusDueForPeriod": 1000,
     "totalBonusDueYTD": 1000,
+    "bonusPaidYTD": 0,
     "claimReason": "Life Event"
   },
   "supersededBy": "0000456789"
@@ -62,6 +62,10 @@
 {
   "periodStartDate": "2017-04-06",
   "periodEndDate": "2017-05-05",
+  "htbTransfer": {
+    "htbTransferInForPeriod": 0,
+    "htbTransferTotalYTD": 0
+  },
   "inboundPayments": {
     "newSubsForPeriod": 4000,
     "newSubsYTD": 4000,
@@ -69,9 +73,9 @@
     "totalSubsYTD": 4000
   },
   "bonuses": {
-    "bonusPaidYTD": 0,
     "bonusDueForPeriod": 1000,
     "totalBonusDueYTD": 1000,
+    "bonusPaidYTD": 0,
     "claimReason": "Regular Bonus"
   },
   "supersededBy": "0000056789"
@@ -101,9 +105,9 @@
     "totalSubsYTD": 4000
   },
   "bonuses": {
-    "bonusPaidYTD": 0,
     "bonusDueForPeriod": 1000,
     "totalBonusDueYTD": 1000,
+    "bonusPaidYTD": 0,
     "claimReason": "Superseded Bonus"
   },
   "supersede": {
@@ -139,9 +143,9 @@
     "totalSubsYTD": 4000
   },
   "bonuses": {
-    "bonusPaidYTD": 0,
     "bonusDueForPeriod": 1000,
     "totalBonusDueYTD": 1000,
+    "bonusPaidYTD": 0,
     "claimReason": "Superseded Bonus"
   },
   "supersede": {

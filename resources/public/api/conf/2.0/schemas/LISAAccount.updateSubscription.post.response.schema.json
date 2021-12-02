@@ -2,15 +2,18 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "properties": {
+    "status": {
+      "description": "The HTTP status of the result of the API call. Always 200.",
+      "type": "number"
+    },
+    "success": {
+      "description": "Whether the API call was successful or not. Always true.",
+      "type": "boolean"
+    },
     "data" : {
       "description": "Response details.",
       "type": "object",
       "properties": {
-        "accountId": {
-          "description": "The provider’s own unique reference number for the investor’s LISA account.",
-          "type": "string",
-          "pattern": "^[a-zA-Z0-9 :/-]{1,20}$"
-        },
         "code": {
           "description": "A machine-readable code for the result of the API call. This is unique for each scenario.",
           "type": "string",
@@ -26,17 +29,14 @@
             "Successfully updated the firstSubscriptionDate for the LISA account",
             "Successfully updated the firstSubscriptionDate for the LISA account and changed the account status to void because the investor has another account with an earlier firstSubscriptionDate"
           ]
+        },
+        "accountId": {
+          "description": "The provider’s own unique reference number for the investor’s LISA account.",
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9 :/-]{1,20}$"
         }
       },
       "required": ["accountId", "code", "message"]
-    },
-    "success": {
-      "description": "Whether the API call was successful or not. Always true.",
-      "type": "boolean"
-    },
-    "status": {
-      "description": "The HTTP status of the result of the API call. Always 200.",
-      "type": "number"
     }
   },
   "required": ["data", "success", "status"]

@@ -170,11 +170,11 @@
   },
   {
     "lifeEventId": "5678900002",
-    "fundReleaseId": "3456789001",
-    "eventDate": "2017-10-10",
     "eventType": "Purchase outcome",
-    "propertyPurchaseResult": "Purchase completed",
+    "eventDate": "2017-10-10",
+    "fundReleaseId": "3456789001",
     "propertyPurchaseValue": 250000,
+    "propertyPurchaseResult": "Purchase completed",
     "supersede": {
       "originalLifeEventId": "5678900001",
       "originalEventDate": "2017-10-05"
@@ -214,9 +214,9 @@
   },
   {
     "lifeEventId": "5678900003",
-    "fundReleaseId": "3456789002",
-    "eventDate": "2017-10-10",
     "eventType": "Purchase outcome",
+    "eventDate": "2017-10-10",
+    "fundReleaseId": "3456789002",
     "propertyPurchaseResult": "Purchase failed"
   }
 ]
@@ -343,8 +343,8 @@
     "eventType": "Purchase outcome",
     "eventDate": "2017-10-05",
     "fundReleaseId": "3456789001",
-    "propertyPurchaseResult": "Purchase completed",
     "propertyPurchaseValue": 250000,
+    "propertyPurchaseResult": "Purchase completed",
     "supersededBy": "5678900002"
   }
 ]
@@ -369,8 +369,8 @@
     "eventType": "Purchase outcome",
     "eventDate": "2017-10-10",
     "fundReleaseId": "3456789001",
-    "propertyPurchaseResult": "Purchase completed",
     "propertyPurchaseValue": 250000,
+    "propertyPurchaseResult": "Purchase completed",
     "supersede": {
       "originalLifeEventId": "5678900001",
       "originalEventDate": "2017-10-05"

@@ -387,19 +387,19 @@
   "message": "Bad Request",
   "errors": [
     {
-      "code": "INVALID_DATA_TYPE",
-      "message": "Invalid data type has been used",
-      "path": "/lifeEventId"
-    },
-    {
-      "code": "INVALID_DATE",
-      "message": "Date is invalid",
-      "path": "/periodEndDate"
-    },
-    {
       "code": "INVALID_MONETARY_AMOUNT",
       "message": "Amount cannot be negative, and can only have up to 2 decimal places",
       "path": "/htbTransfer/htbTransferTotalYTD"
+    },
+    {
+      "code": "INVALID_FORMAT",
+      "message": "Invalid format has been used",
+      "path": "/supersede/reason"
+    },
+    {
+      "code": "INVALID_DATA_TYPE",
+      "message": "Invalid data type has been used",
+      "path": "/lifeEventId"
     },
     {
       "code": "MISSING_FIELD",
@@ -409,17 +409,12 @@
     {
       "code": "INVALID_FORMAT",
       "message": "Invalid format has been used",
-      "path": "/bonuses/claimReason"
+      "path": "/supersede/originalTransactionId"
     },
     {
       "code": "INVALID_FORMAT",
       "message": "Invalid format has been used",
-      "path": "/supersede/originalTransactionId"
-    },
-    {
-      "code": "INVALID_DATA_TYPE",
-      "message": "Invalid data type has been used",
-      "path": "/supersede/originalBonusDueForPeriod"
+      "path": "/bonuses/claimReason"
     },
     {
       "code": "INVALID_MONETARY_AMOUNT",
@@ -427,9 +422,14 @@
       "path": "/supersede/transactionResult"
     },
     {
-      "code": "INVALID_FORMAT",
-      "message": "Invalid format has been used",
-      "path": "/supersede/reason"
+      "code": "INVALID_DATA_TYPE",
+      "message": "Invalid data type has been used",
+      "path": "/supersede/originalBonusDueForPeriod"
+    },
+    {
+      "code": "INVALID_DATE",
+      "message": "Date is invalid",
+      "path": "/periodEndDate"
     }
   ]
 }
@@ -1161,11 +1161,11 @@
 }
 </pre>
             </td>
-            <td><p>HTTP status: <code class="code--slim">406 (Not Acceptable)</code></p>
+            <td><p>HTTP status: <code class="code--slim">404 (Not Found)</code></p>
 <pre class="code--block">
 {
-  "code": "ACCEPT_HEADER_INVALID",
-  "message": "The accept header is missing or invalid"
+  "code": "MATCHING_RESOURCE_NOT_FOUND",
+  "message": "A resource with the name in the request can not be found in the API"
 }
 </pre>
             </td>

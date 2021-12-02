@@ -21,6 +21,7 @@
                 </p>
             </td>
             <td>
+                <p>HTTP status: <code class="code--slim">200 (OK)</code></p>            
 <pre class="code--block">
 {
   "claimPeriodStartDate": "2017-12-06",
@@ -49,6 +50,7 @@
                 </p>
             </td>
             <td>
+                <p>HTTP status: <code class="code--slim">200 (OK)</code></p>            
 <pre class="code--block">
 {
   "claimPeriodStartDate": "2017-12-06",
@@ -76,6 +78,7 @@
                 </p>
             </td>
             <td>
+                <p>HTTP status: <code class="code--slim">200 (OK)</code></p>            
 <pre class="code--block">
 {
   "claimPeriodStartDate": "2017-12-06",
@@ -157,7 +160,7 @@
 <pre class="code--block">
 {
   "code": "INVESTOR_ACCOUNTID_NOT_FOUND",
-  "message": "accountId does not match HMRC’s records"
+  "message": "Enter a real accountId"
 }
 </pre>
             </td>

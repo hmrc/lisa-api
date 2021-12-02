@@ -76,11 +76,11 @@
                 <p>HTTP status: <code class="code--slim">201 (Created)</code></p>
 <pre class="code--block">
 {
-  "success": true,
   "status": 201,
+  "success": true,
   "data": {
-    "transactionId": "2345678902",
-    "message": "Unauthorised withdrawal transaction created - late notification"
+    "message": "Unauthorised withdrawal transaction created - late notification",
+    "transactionId": "2345678902"
   }
 }
 </pre>
@@ -120,11 +120,11 @@
                 <p>HTTP status: <code class="code--slim">201 (Created)</code></p>
 <pre class="code--block">
 {
-  "success": true,
   "status": 201,
+  "success": true,
   "data": {
-    "transactionId": "2345678903",
-    "message": "Unauthorised withdrawal transaction superseded"
+    "message": "Unauthorised withdrawal transaction superseded",
+    "transactionId": "2345678903"
   }
 }
 </pre>
@@ -161,6 +161,11 @@
   "message": "Bad Request",
   "errors": [
     {
+      "code": "MISSING_FIELD",
+      "message": "This field is required",
+      "path": "/withdrawalChargeAmount"
+    },
+    {
       "code": "INVALID_DATA_TYPE",
       "message": "Invalid data type has been used",
       "path": "/claimPeriodStartDate"
@@ -174,11 +179,6 @@
       "code": "INVALID_MONETARY_AMOUNT",
       "message": "Amount cannot be negative, and can only have up to 2 decimal places",
       "path": "/withdrawalAmount"
-    },
-    {
-      "code": "MISSING_FIELD",
-      "message": "This field is required",
-      "path": "/withdrawalChargeAmount"
     },
     {
       "code": "INVALID_FORMAT",
@@ -301,13 +301,13 @@
             "path": "/claimPeriodEndDate"
         },
         {
-            "code": "INVALID_MONETARY_AMOUNT",
-            "message": "automaticRecoveryAmount cannot be more than withdrawalChargeAmount",
+            "code": "AMOUNT_MISMATCH",
+            "message": "automaticRecoveryAmount and withdrawalChargeAmount must be the same",
             "path": "/automaticRecoveryAmount"
         },
         {
-            "code": "AMOUNT_MISMATCH",
-            "message": "automaticRecoveryAmount and withdrawalChargeAmount must be the same",
+            "code": "INVALID_MONETARY_AMOUNT",
+            "message": "automaticRecoveryAmount cannot be more than withdrawalChargeAmount",
             "path": "/automaticRecoveryAmount"
         }
     ]
@@ -540,7 +540,7 @@
 <pre class="code--block">
 {
   "code": "WITHDRAWAL_REPORTING_ERROR",
-  "message": "The withdrawal charge does not equal 25% of the withdrawal amount"
+  "message": "The withdrawal charge as a percentage of the withdrawal amount is incorrect. For withdrawals made between 06/03/2020 and 05/04/2021 the withdrawal charge is 20%. For all other withdrawals it is 25%."
 }
 </pre>
             </td>
@@ -607,11 +607,11 @@
 </pre>
             </td>
             <td>
-                <p>HTTP status: <code class="code--slim">406 (Not Acceptable)</code></p>
+                <p>HTTP status: <code class="code--slim">404 (Not Found)</code></p>
 <pre class="code--block">
 {
-  "code": "ACCEPT_HEADER_INVALID",
-  "message": "The accept header is missing or invalid"
+  "code": "MATCHING_RESOURCE_NOT_FOUND",
+  "message": "A resource with the name in the request can not be found in the API"
 }
 </pre>
             </td>

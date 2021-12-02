@@ -1,8 +1,8 @@
 {
-  "data": {
-    "transactionId": "0023456789",
-    "message": "Bonus transaction created - late notification"
-  },
+  "status": 201,
   "success": true,
-  "status": 201
+  "data": {
+    "message": "Bonus transaction created - late notification",
+    "transactionId": "0023456789"
+  }
 }

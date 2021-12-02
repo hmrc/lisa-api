@@ -20,9 +20,9 @@
         <p>HTTP status: <code class="code--slim">200 (OK)</code></p>
 <pre class="code--block">
 {
+  "accountId": "1234567890",
   "investorId": "9876543210",
   "creationReason": "New",
-  "accountId": "1234567890",
   "firstSubscriptionDate": "2017-04-06",
   "accountStatus": "OPEN",
   "subscriptionStatus": "ACTIVE"
@@ -42,9 +42,9 @@
         <p>HTTP status: <code class="code--slim">200 (OK)</code></p>
 <pre class="code--block">
 {
+  "accountId": "1234567891",
   "investorId": "9876543210",
   "creationReason": "Transferred",
-  "accountId": "1234567891",
   "firstSubscriptionDate": "2017-04-06",
   "accountStatus": "OPEN",
   "subscriptionStatus": "AVAILABLE",
@@ -69,9 +69,9 @@
         <p>HTTP status: <code class="code--slim">200 (OK)</code></p>
 <pre class="code--block">
 {
+  "accountId": "1234567892",
   "investorId": "9876543210",
   "creationReason": "Current year funds transferred",
-  "accountId": "1234567892",
   "firstSubscriptionDate": "2017-04-06",
   "accountStatus": "OPEN",
   "subscriptionStatus": "AVAILABLE",
@@ -96,9 +96,9 @@
         <p>HTTP status: <code class="code--slim">200 (OK)</code></p>
 <pre class="code--block">
 {
+  "accountId": "1234567893",
   "investorId": "9876543210",
   "creationReason": "Previous year funds transferred",
-  "accountId": "1234567893",
   "firstSubscriptionDate": "2017-04-06",
   "accountStatus": "OPEN",
   "subscriptionStatus": "AVAILABLE",
@@ -222,11 +222,11 @@
         </p>
       </td>
       <td>
-        <p>HTTP status: <code class="code--slim">406 (Not Acceptable)</code></p>
+        <p>HTTP status: <code class="code--slim">404 (Not Found)</code></p>
 <pre class="code--block">
 {
-  "code": "ACCEPT_HEADER_INVALID",
-  "message": "The accept header is missing or invalid"
+  "code": "MATCHING_RESOURCE_NOT_FOUND",
+  "message": "A resource with the name in the request can not be found in the API"
 }
 </pre>
       </td>

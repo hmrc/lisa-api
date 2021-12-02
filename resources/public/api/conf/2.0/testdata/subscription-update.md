@@ -22,13 +22,13 @@
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
 <pre class="code--block">
   {
+    "status": 200,
+    "success": true,
     "data": {
-      "message": "Successfully updated the firstSubscriptionDate for the LISA account",
       "code": "UPDATED",
+      "message": "Successfully updated the firstSubscriptionDate for the LISA account",
       "accountId": "1234567890"
     }
-    "success": true,
-    "status": 200
   }
 </pre>
             </td>
@@ -45,13 +45,13 @@
             <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
 <pre class="code--block">
 {
+  "status": 200,
+  "success": true,
   "data": {
-    "message": "Successfully updated the firstSubscriptionDate for the LISA account and changed the account status to void because the investor has another account with an earlier firstSubscriptionDate",
     "code": "UPDATED_AND_ACCOUNT_VOID",
+    "message": "Successfully updated the firstSubscriptionDate for the LISA account and changed the account status to void because the investor has another account with an earlier firstSubscriptionDate",
     "accountId": "1234567891"
   }
-  "success": true,
-  "status": 200
 }
 </pre>
             </td>
@@ -223,11 +223,11 @@
 }
 </pre>
             </td>
-            <td><p>HTTP status: <code class="code--slim">406 (Not Acceptable)</code></p>
+            <td><p>HTTP status: <code class="code--slim">404 (Not Found)</code></p>
 <pre class="code--block">
 {
-  "code": "ACCEPT_HEADER_INVALID",
-  "message": "The accept header is missing or invalid"
+  "code": "MATCHING_RESOURCE_NOT_FOUND",
+  "message": "A resource with the name in the request can not be found in the API"
 }
 </pre>
             </td>
