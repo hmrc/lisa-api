@@ -2,30 +2,30 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "properties": {
-    "data" : {
-      "description": "Response details.",
-      "type": "object",
-      "properties": {
-        "investorId": {
-          "description": "The investor’s ID reference number.  You must store this ID as it is needed for other API calls.",
-          "type": "string",
-          "pattern": "^\\d{10}$"
-        },
-        "message": {
-          "description": "A human-readable explanation for the result of the API call.",
-          "type": "string",
-          "enum": ["Investor created"]
-        }
-      },
-      "required": ["investorId", "message"]
+    "status": {
+      "description": "The HTTP status of the result of the API call. Always 201.",
+      "type": "number"
     },
     "success": {
       "description": "Whether the API call was successful or not. Always true.",
       "type": "boolean"
     },
-    "status": {
-      "description": "The HTTP status of the result of the API call. Always 201.",
-      "type": "number"
+    "data" : {
+      "description": "Response details.",
+      "type": "object",
+      "properties": {
+        "message": {
+          "description": "A human-readable explanation for the result of the API call.",
+          "type": "string",
+          "enum": ["Investor created"]
+        },
+        "investorId": {
+          "description": "The investor’s ID reference number.  You must store this ID as it is needed for other API calls.",
+          "type": "string",
+          "pattern": "^\\d{10}$"
+        }
+      },
+      "required": ["investorId", "message"]
     }
   },
   "required": ["data", "success", "status"]

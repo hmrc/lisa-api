@@ -49,7 +49,7 @@
   "status": 200,
   "success": true,
   "data": {
-    "message": "LISA Account Closed",
+    "message": "LISA account closed",
     "accountId": "1234567890"
   }
 }
@@ -262,11 +262,11 @@
 }
 </pre>
             </td>
-            <td><p>HTTP status: <code class="code--slim">406 (Not Acceptable)</code></p>
+            <td><p>HTTP status: <code class="code--slim">404 (Not Found)</code></p>
 <pre class="code--block">
 {
-  "code": "ACCEPT_HEADER_INVALID",
-  "message": "The accept header is missing or invalid"
+  "code": "MATCHING_RESOURCE_NOT_FOUND",
+  "message": "A resource with the name in the request can not be found in the API"
 }
 </pre>
             </td>

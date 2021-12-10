@@ -2,15 +2,18 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "properties": {
+    "status": {
+      "description": "The HTTP status of the result of the API call. Always 201.",
+      "type": "number"
+    },
+    "success": {
+      "description": "Whether the API call was successful or not. Always true.",
+      "type": "boolean"
+    },
     "data" : {
       "description": "Response details.",
       "type": "object",
       "properties": {
-        "lifeEventId": {
-          "description": "The fund release’s ID reference number. You must store this ID as it is needed for other API calls.",
-          "type": "string",
-          "pattern": "^\\d{10}$"
-        },
         "message": {
           "description": "A human-readable explanation for the result of the API call.",
           "type": "string",
@@ -18,17 +21,14 @@
             "Fund release created",
             "Fund release superseded"
           ]
+        },
+        "lifeEventId": {
+          "description": "The fund release’s ID reference number. You must store this ID as it is needed for other API calls.",
+          "type": "string",
+          "pattern": "^\\d{10}$"
         }
       },
       "required": ["lifeEventId", "message"]
-    },
-    "success": {
-      "description": "Whether the API call was successful or not. Always true.",
-      "type": "boolean"
-    },
-    "status": {
-      "description": "The HTTP status of the result of the API call. Always 201.",
-      "type": "number"
     }
   },
   "required": ["data", "success", "status"]

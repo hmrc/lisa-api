@@ -1,8 +1,8 @@
 {
-  "data": {
-    "accountId": "1234567890",
-    "message": "LISA account closed"
-  },
+  "status": 200,
   "success": true,
-  "status": 200
+  "data": {
+    "message": "LISA account closed",
+    "accountId": "1234567890"
+  }
 }

@@ -1,8 +1,8 @@
 {
-  "data": {
-    "lifeEventId": "3456789000",
-    "message": "Fund release created"
-  },
+  "status": 201,
   "success": true,
-  "status": 201
+  "data": {
+    "message": "Fund release created",
+    "lifeEventId": "3456789000"
+  }
 }

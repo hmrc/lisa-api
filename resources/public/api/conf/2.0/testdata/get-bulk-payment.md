@@ -27,7 +27,7 @@
             "status": "Paid",
             "paymentAmount": 10000,
             "paymentDate": "2017-06-01",
-            "paymentReference": "1040000872"
+            "paymentReference": "3350000253"
         },
         {
             "transactionType": "Payment",
@@ -40,7 +40,7 @@
             "status": "Collected",
             "paymentAmount": 1000,
             "paymentDate": "2017-08-04",
-            "paymentReference": "1040000985"
+            "paymentReference": "3350000253"
         },
         {
             "transactionType": "Debt",
@@ -76,6 +76,8 @@
                 <p>Request with an invalid LISA Manager reference number</p>
                 <p class="code--block">
                     lisaManagerReferenceNumber: 123456<br>
+                    startDate: 2017-04-06<br>
+                    endDate: 2017-04-06
                 </p>
             </td>
             <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
@@ -224,11 +226,11 @@
                     Accept: application/vnd.hmrc.1.0
                 </p>
             </td>
-            <td><p>HTTP status: <code class="code--slim">406 (Not Acceptable)</code></p>
+            <td><p>HTTP status: <code class="code--slim">404 (Not Found)</code></p>
 <pre class="code--block">
 {
-  "code": "ACCEPT_HEADER_INVALID",
-  "message": "The accept header is missing or invalid"
+  "code": "MATCHING_RESOURCE_NOT_FOUND",
+  "message": "A resource with the name in the request can not be found in the API"
 }
 </pre>
             </td>

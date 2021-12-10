@@ -32,8 +32,8 @@
   "status": 201,
   "success": true,
   "data": {
-    "lifeEventId": "5678900001",
-    "message": "Purchase outcome created"
+    "message": "Purchase outcome created",
+    "lifeEventId": "5678900001"
   }
 }               
 </pre>
@@ -64,8 +64,8 @@
   "status": 201,
   "success": true,
   "data": {
-    "lifeEventId": "5678900002",
-    "message": "Purchase outcome superseded"
+    "message": "Purchase outcome superseded",
+    "lifeEventId": "5678900002"
   }
 }        
 </pre>
@@ -92,8 +92,8 @@
   "status": 201,
   "success": true,
   "data": {
-    "lifeEventId": "5678900003",
-    "message": "Purchase outcome created"
+    "message": "Purchase outcome created",
+    "lifeEventId": "5678900003"
   }
 }
 </pre>

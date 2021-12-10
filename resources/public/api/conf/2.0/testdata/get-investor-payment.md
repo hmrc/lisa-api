@@ -169,11 +169,11 @@
         </tr>
         <tr>
             <td><p>Request with an invalid 'Accept' header</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 0123456789<br><br>Accept: application/vnd.hmrc.1.0</p></td>
-            <td><p>HTTP status: <code class="code--slim">406 (Not Acceptable)</code></p>
+            <td><p>HTTP status: <code class="code--slim">404 (Not Found)</code></p>
 <pre class="code--block">
 {
-  "code": "ACCEPT_HEADER_INVALID",
-  "message": "The accept header is missing or invalid"
+  "code": "MATCHING_RESOURCE_NOT_FOUND",
+  "message": "A resource with the name in the request can not be found in the API"
 }
 </pre>
             </td>

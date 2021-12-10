@@ -1,8 +1,8 @@
 {
-  "data": {
-    "lifeEventId": "3456789001",
-    "message": "Fund release superseded"
-  },
+  "status": 201,
   "success": true,
-  "status": 201
+  "data": {
+    "message": "Fund release superseded",
+    "lifeEventId": "3456789001"
+  }
 }
