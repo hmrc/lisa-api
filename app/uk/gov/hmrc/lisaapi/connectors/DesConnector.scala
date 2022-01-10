@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  */
 
 package uk.gov.hmrc.lisaapi.connectors
+
+import java.util.UUID.randomUUID
 
 import com.google.inject.Inject
 import org.joda.time.DateTime
@@ -40,12 +42,24 @@ class DesConnector @Inject()(
 
   implicit val httpReads: HttpReads[HttpResponse] = (method: String, url: String, response: HttpResponse) => response
 
-  private def desHeaders: Seq[(String, String)] = Seq(
+  private def desHeaders (implicit hc: HeaderCarrier): Seq[(String, String)] = Seq(
     "Environment" -> appContext.desUrlHeaderEnv,
-    "Authorization" -> s"Bearer ${appContext.desAuthToken}"
+    "Authorization" -> s"Bearer ${appContext.desAuthToken}",
+    "CorrelationId" -> correlationId
   )
 
-  private def desHeadersWithOriginator: Seq[(String, String)] = desHeaders :+ ("OriginatorId" -> "DA2_LISA")
+  private def correlationId(implicit hc: HeaderCarrier): String = {
+    val CorrelationIdPattern = """.*([A-Za-z0-9]{8}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}).*""".r
+    hc.requestId match {
+      case Some(requestId) => requestId.value match {
+        case CorrelationIdPattern(prefix) => prefix + "-" + randomUUID.toString.substring(24)
+        case _ => randomUUID.toString
+      }
+      case _ => randomUUID.toString
+    }
+  }
+
+  private def desHeadersWithOriginator(implicit hc: HeaderCarrier): Seq[(String, String)] = desHeaders :+ ("OriginatorId" -> "DA2_LISA")
 
   /**
     * Attempts to create a new LISA investor
