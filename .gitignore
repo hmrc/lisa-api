@@ -2,7 +2,7 @@
 
 !.gitignore
 !.github
-
+.bsp
 .cache
 /.classpath
 db
