@@ -25,7 +25,7 @@ Compile / unmanagedResourceDirectories += baseDirectory.value / "resources"
 Test    / fork                         := true
 
 ScoverageKeys.coverageExcludedPackages := "<empty>;testOnlyDoNotUseInAppConf.*;uk.gov.hmrc.lisaapi.views.txt;uk.gov.hmrc;definition;uk.gov.hmrc.lisaapi.config.*;uk.gov.hmrc.lisaapi.models.*;uk.gov.hmrc.lisaapi.metrics.*;prod"
-ScoverageKeys.coverageMinimum          := 90
+ScoverageKeys.coverageMinimum          := 89
 ScoverageKeys.coverageFailOnMinimum    := false
 ScoverageKeys.coverageHighlighting     := true
 
