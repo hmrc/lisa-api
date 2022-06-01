@@ -56,6 +56,15 @@ class WithdrawalServiceSpec extends ServiceTestFixture {
         }
       }
 
+      "given a successful late notification response from the DES connector with supersededRequest" in {
+        when(mockDesConnector.reportWithdrawalCharge(any(), any(), any())(any())).
+          thenReturn(Future.successful(DesTransactionResponse("AB123456", Some("Late"))))
+
+        doSupersededRequest { response =>
+          response mustBe ReportWithdrawalChargeSupersededResponse("AB123456")
+        }
+      }
+
     }
 
     "return a account not found response" when {
@@ -182,6 +191,24 @@ class WithdrawalServiceSpec extends ServiceTestFixture {
       500.00,
       true,
       "Regular Withdrawal"
+    )
+
+    val response = Await.result(withdrawalService.reportWithdrawalCharge("Z019283", "192837", request)(HeaderCarrier()), Duration.Inf)
+
+    callback(response)
+  }
+
+  private def doSupersededRequest(callback: (ReportWithdrawalChargeResponse) => Unit) = {
+    val request = models.SupersededWithdrawalChargeRequest(
+      Some(250.00),
+      new DateTime("2017-12-06"),
+      new DateTime("2018-01-05"),
+      1000.00,
+      250.00,
+      500.00,
+      true,
+      None,
+      "For work"
     )
 
     val response = Await.result(withdrawalService.reportWithdrawalCharge("Z019283", "192837", request)(HeaderCarrier()), Duration.Inf)
