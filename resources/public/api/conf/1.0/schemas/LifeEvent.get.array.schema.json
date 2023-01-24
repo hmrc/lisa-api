@@ -7,11 +7,11 @@
     "type": "object",
     "properties": {
       "lifeEventId": {
-        "$ref": "#/definitions/IDType"},
+        "$ref": "#/items/definitions/IDType"},
       "eventType" : {
-        "$ref": "#/definitions/eventType"},
+        "$ref": "#/items/definitions/eventType"},
       "eventDate" : {
-        "$ref": "#/definitions/ISO8601-Date"}
+        "$ref": "#/items/definitions/ISO8601-Date"}
     },
     "required": [
       "lifeEventId",
