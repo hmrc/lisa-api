@@ -1,0 +1,4314 @@
+openapi: 3.0.3
+info:
+  title: Lifetime ISA
+  description: When you report or get information from the API, you will get a unique reference number. You should save all reference numbers because you may need them for other API calls.
+  version: '2.0'
+servers:
+  - url: https://test-api.service.hmrc.gov.uk
+    description: Sandbox
+  - url: https://api.service.hmrc.gov.uk
+    description: Production
+paths:
+  /lifetime-isa/manager/{lisaManagerReferenceNumber}:
+    get:
+      summary: Get a list of all available endpoints
+      description: Use a LISA manager reference to get a list of all available endpoints.
+      operationId: getListOfAllAvailableEndpoints
+      parameters:
+      - $ref: '#/components/parameters/acceptHeader'
+      - $ref: '#/components/parameters/authorizationHeader'
+      - $ref: '#/components/parameters/lisaManagerReferenceNumber'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerResponse'
+              example:
+                lisaManagerReferenceNumber: Z543210
+                _links:
+                  self:
+                    href: /lifetime-isa/manager/{lisaManagerReferenceNumber}
+                    methods:
+                    - GET
+                  investors:
+                    href: /lifetime-isa/manager/{lisaManagerReferenceNumber}/investors
+                    methods:
+                    - POST
+                  accounts:
+                  - href: /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts
+                    methods:
+                    - POST
+                  - href: /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}
+                    methods:
+                    - GET
+                  close account:
+                    href: /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/close-account
+                    methods:
+                    - POST
+                  reinstate account:
+                    href: /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/reinstate-account
+                    methods:
+                    - POST
+                  update subscription:
+                    href: /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/update-subscription
+                    methods:
+                    - POST
+                  life events:
+                  - href: /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/events
+                    methods:
+                    - POST
+                  - href: /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/events/{lifeEventId}
+                    methods:
+                    - GET
+                  annual returns:
+                    href: /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/events/annual-returns
+                    methods:
+                    - POST
+                  bonus payments:
+                  - href: /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/transactions
+                    methods:
+                    - POST
+                  - href: /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/transactions/{transactionId}
+                    methods:
+                    - GET
+                  withdrawal charges:
+                  - href: /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/withdrawal-charges
+                    methods:
+                    - POST
+                  - href: /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/withdrawal-charges/{transactionId}
+                    methods:
+                    - GET
+                  property purchase fund release:
+                    href: /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/events/fund-releases
+                    methods:
+                    - POST
+                  property purchase extension:
+                    href: /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/events/purchase-extensions
+                    methods:
+                    - POST
+                  property purchase outcome:
+                    href: /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/events/purchase-outcomes
+                    methods:
+                    - POST
+                  bulk payments:
+                    href: /lifetime-isa/manager/{lisaManagerReferenceNumber}/payments?startDate={startDate}&endDate={endDate}
+                    methods:
+                    - GET
+                  bulk payment breakdown:
+                    href: /lifetime-isa/manager/$lisaManagerReferenceNumber/accounts/{accountId}/transactions/{transactionId}/payments
+                    methods:
+                    - GET
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerResponse400'
+              examples:
+                invalidLmrn:
+                  $ref: '#/components/examples/invalidLmrn'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerResponse400'
+              examples:
+                notOpenStatus:
+                  $ref: '#/components/examples/notOpenStatusUnauthorized'
+      deprecated: false
+      security:
+        - user-restricted:
+            - read:lisa
+  /lifetime-isa/manager/{lisaManagerReferenceNumber}/investors:
+    post:
+      summary: Create a LISA investor
+      description: Report a new LISA investor to HMRC to generate an investor ID. If the investor already exists, you will get their reference number.
+      operationId: createLisaInvestor
+      parameters:
+      - $ref: '#/components/parameters/acceptHeader'
+      - $ref: '#/components/parameters/contentTypeHeader'
+      - $ref: '#/components/parameters/authorizationHeader'
+      - $ref: '#/components/parameters/lisaManagerReferenceNumber'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/lifetimeIsaManagerInvestorsRequest'
+            example:
+              investorNINO: AB123456D
+              firstName: FirstName
+              lastName: LastName
+              dateOfBirth: 1973-03-24
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerInvestorsResponse'
+              example:
+                status: 201
+                success: true
+                data:
+                  message: Investor created
+                  investorId: '9876543210'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerInvestorsResponse400'
+              examples:
+                notOpenStatus:
+                  $ref: '#/components/examples/notOpenStatusBadRequest'
+                invalidLmrn:
+                  $ref: '#/components/examples/invalidLmrn'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerInvestorsResponse400'
+              examples:
+                notOpenStatus:
+                  $ref: '#/components/examples/notOpenStatusUnauthorized'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerInvestorsResponse400'
+              example:
+                code: INVESTOR_NOT_FOUND
+                message: The investor details given do not match with HMRC’s records.
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerInvestorsResponse400'
+              examples:
+                recordExists:
+                  value:
+                    code: INVESTOR_ALREADY_EXISTS
+                    message: The investor already has a record with HMRC.
+      deprecated: false
+      security:
+        - user-restricted:
+            - write:lisa
+  /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts:
+    post:
+      summary: Create or transfer a LISA account
+      description: Create a new account you’ve set up for an investor, or transfer an existing account from another LISA provider. If you’re creating a new account you’ll need to create a LISA investor first.
+      operationId: createOrTransferLisaAccount
+      parameters:
+      - $ref: '#/components/parameters/acceptHeader'
+      - $ref: '#/components/parameters/contentTypeHeader'
+      - $ref: '#/components/parameters/authorizationHeader'
+      - $ref: '#/components/parameters/lisaManagerReferenceNumber'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/lifetimeIsaManagerAccountsRequest'
+            examples:
+              example-1:
+                value:
+                  investorId: '9876543210'
+                  creationReason: New
+                  accountId: '1234567890'
+                  firstSubscriptionDate: 2017-04-06
+              example-2:
+                value:
+                  investorId: '9876543210'
+                  creationReason: Transferred
+                  accountId: '1234567891'
+                  firstSubscriptionDate: 2017-04-06
+                  transferAccount:
+                    transferredFromAccountId: '8765432100'
+                    transferredFromLMRN: Z654321
+                    transferInDate: 2017-04-06
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsResponse'
+              examples:
+                example-1:
+                  value:
+                    status: 201
+                    success: true
+                    data:
+                      message: Account created
+                      accountId: '1234567890'
+                example-2:
+                  value:
+                    status: 201
+                    success: true
+                    data:
+                      message: Account transferred
+                      accountId: '1234567891'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsResponse400'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/invalidLmrn'
+                invalidLmrn:
+                  $ref: '#/components/examples/invalidLmrn'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsResponse400'
+              examples:
+                notOpenStatus:
+                  $ref: '#/components/examples/notOpenStatusUnauthorized'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsResponse400'
+              examples:
+                investorNotFound:
+                  description: The investor details given do not match with HMRC’s records
+                  value:
+                    code: INVESTOR_NOT_FOUND
+                    message: 'invalid status: must create with open status'
+                outsideAgeRange:
+                  description: The investor is not eligible for a LISA account
+                  value:
+                    code: INVESTOR_ELIGIBILITY_CHECK_FAILED
+                    message: Can’t open a LISA if investor is older than 40 or younger than 18
+                complianceFail:
+                  value:
+                    code: INVESTOR_COMPLIANCE_CHECK_FAILED
+                    message: You cannot create or transfer a LISA account because the investor has failed a compliance check
+                prevAccntDoNoExists:
+                  description: The transferredFromAccountId and transferredFromLMRN given do not match an account on HMRC’s records
+                  value:
+                    code: PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST
+                    message: Previous Investor Account Doesn’t Exist
+                noTransferAccntData:
+                  description: You must give a transferredFromAccountId, transferredFromLMRN and transferInDate when the creationReason is transferred, current or previous year funds transferred
+                  value:
+                    code: TRANSFER_ACCOUNT_DATA_NOT_PROVIDED
+                    message: transfer account data not provided
+                transferAccntDataProvided:
+                  description: You must only give a transferredFromAccountId, transferredFromLMRN, and transferInDate when the creationReason is transferred, current or previous year funds transferred
+                  value:
+                    code: TRANSFER_ACCOUNT_DATA_PROVIDED
+                    message: transfer account data provided
+                accountClosed:
+                  $ref: '#/components/examples/accountClosed'
+                accountCancelled:
+                  $ref: '#/components/examples/accountCancelled'
+                accountVoid:
+                  $ref: '#/components/examples/accountVoid'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsResponse400'
+              example:
+                code: INVESTOR_ACCOUNT_ALREADY_EXISTS
+                message: This investor already has a LISA account
+                accountId: '1234567890'
+      deprecated: false
+      security:
+        - user-restricted:
+            - write:lisa
+  /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/reinstate-account:
+    post:
+      summary: Reinstate a LISA account
+      description: Re-open a LISA account that has been closed.
+      operationId: reinstateLisaAccount
+      parameters:
+      - $ref: '#/components/parameters/acceptHeader'
+      - $ref: '#/components/parameters/contentTypeHeader'
+      - $ref: '#/components/parameters/authorizationHeader'
+      - $ref: '#/components/parameters/lisaManagerReferenceNumber'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/lifetimeIsaManagerAccountsReinstateAccountRequest'
+            examples:
+              example-1:
+                value:
+                  accountId: '8765432100'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsReinstateAccountResponse'
+              example:
+                status: 200
+                success: true
+                data:
+                  message: This account has been reinstated
+                  accountId: '8765432100'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsReinstateAccountResponse400'
+              examples:
+                invalidPayload:
+                  value:
+                    code: BAD_REQUEST
+                    message: Bad Request
+                    errors:
+                    - code: INVALID_FORMAT
+                      message: Invalid format has been used
+                      path: /accountId
+                invalidLmrn:
+                  $ref: '#/components/examples/invalidLmrn'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsReinstateAccountResponse400'
+              examples:
+                notOpenStatus:
+                  $ref: '#/components/examples/notOpenStatusUnauthorized'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsReinstateAccountResponse400'
+              examples:
+                accountIdNotFound:
+                  $ref: '#/components/examples/accountIdNotFound'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsReinstateAccountResponse400'
+              examples:
+                accountClosed:
+                  value:
+                    code: INVESTOR_ACCOUNT_ALREADY_CLOSED
+                    message: You cannot reinstate this account because it was closed with a closure reason of transferred out
+                accountClosedCancelled:
+                  value:
+                    code: INVESTOR_ACCOUNT_ALREADY_CANCELLED
+                    message: You cannot reinstate this account because it was closed with a closure reason of cancellation
+                accountVoided:
+                  value:
+                    code: INVESTOR_ACCOUNT_ALREADY_OPEN
+                    message: You cannot reinstate this account because it is already open
+                complianceFail:
+                  value:
+                    code: INVESTOR_COMPLIANCE_CHECK_FAILED
+                    message: You cannot reinstate this account because the investor has failed a compliance check
+      deprecated: false
+      security:
+        - user-restricted:
+            - write:lisa
+  /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}:
+    get:
+      summary: Get account details
+      description: Use an account ID to get account details.
+      operationId: getAccountDetails
+      parameters:
+      - $ref: '#/components/parameters/acceptHeader'
+      - $ref: '#/components/parameters/contentTypeHeader'
+      - $ref: '#/components/parameters/authorizationHeader'
+      - $ref: '#/components/parameters/lisaManagerReferenceNumber'
+      - $ref: '#/components/parameters/accountId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsResponse1'
+              examples:
+                example-1:
+                  value:
+                    accountId: '1234567890'
+                    investorId: '9876543210'
+                    creationReason: New
+                    firstSubscriptionDate: 2017-04-06
+                    accountStatus: OPEN
+                    subscriptionStatus: ACTIVE
+                example-2:
+                  value:
+                    accountId: '1234567891'
+                    investorId: '9876543210'
+                    creationReason: Transferred
+                    firstSubscriptionDate: 2017-04-06
+                    accountStatus: OPEN
+                    subscriptionStatus: AVAILABLE
+                    transferAccount:
+                      transferredFromAccountId: '8765432100'
+                      transferredFromLMRN: Z654321
+                      transferInDate: 2017-04-06
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsResponse400'
+              examples:
+                invalidLmrn:
+                  $ref: '#/components/examples/invalidLmrn'
+                invalidAccountId:
+                  $ref: '#/components/examples/invalidAccountId'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsResponse400'
+              examples:
+                notOpenStatus:
+                  $ref: '#/components/examples/notOpenStatusUnauthorized'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsResponse400'
+              examples:
+                accountIdNotFound:
+                  $ref: '#/components/examples/accountIdNotFound'
+      deprecated: false
+      security:
+        - user-restricted:
+            - read:lisa
+  /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/close-account:
+    post:
+      summary: Close an existing LISA account
+      description: Close an account and report the reason and date.
+      operationId: closeExistingLisaAccount
+      parameters:
+      - $ref: '#/components/parameters/acceptHeader'
+      - $ref: '#/components/parameters/contentTypeHeader'
+      - $ref: '#/components/parameters/authorizationHeader'
+      - $ref: '#/components/parameters/lisaManagerReferenceNumber'
+      - $ref: '#/components/parameters/accountId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/lifetimeIsaManagerAccountsCloseAccountRequest'
+            examples:
+              example-1:
+                value:
+                  accountClosureReason: All funds withdrawn
+                  closureDate: 2017-05-20
+              example-2:
+                value:
+                  accountClosureReason: Cancellation
+                  closureDate: 2017-05-20
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/lifetimeIsaManagerAccountsCloseAccountResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsCloseAccountResponse400'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/invalidLmrn'
+                invalidLmrn:
+                  $ref: '#/components/examples/invalidLmrn'
+                invalidAccountId:
+                  $ref: '#/components/examples/invalidAccountId'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsCloseAccountResponse400'
+              examples:
+                notOpenStatus:
+                  $ref: '#/components/examples/notOpenStatusUnauthorized'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsCloseAccountResponse400'
+              examples:
+                accountVoid:
+                  $ref: '#/components/examples/accountVoid'
+                accountClosed:
+                  $ref: '#/components/examples/accountClosed'
+                accountCancellationPeriodExceeded:
+                  value:
+                    code: CANCELLATION_PERIOD_EXCEEDED
+                    message: You cannot close the account with cancellation as the reason because the cancellation period is over
+                accountWithinCancellationPeriod:
+                  value:
+                    code: ACCOUNT_WITHIN_CANCELLATION_PERIOD
+                    message: You cannot close the account with all funds withdrawn as the reason because it is within the cancellation period
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsCloseAccountResponse400'
+              examples:
+                accountIdNotFound:
+                  $ref: '#/components/examples/accountIdNotFound'
+      deprecated: false
+      security:
+        - user-restricted:
+            - write:lisa
+  /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/update-subscription:
+    post:
+      summary: Modify date of first subscription of a LISA account
+      description: Modify the date when the first deposit was paid after a LISA account was created.
+      operationId: modifyDateOfFirstSubscriptionOfLisaAccount
+      parameters:
+      - $ref: '#/components/parameters/acceptHeader'
+      - $ref: '#/components/parameters/contentTypeHeader'
+      - $ref: '#/components/parameters/authorizationHeader'
+      - $ref: '#/components/parameters/lisaManagerReferenceNumber'
+      - $ref: '#/components/parameters/accountId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/lifetimeIsaManagerAccountsUpdateSubscriptionRequest'
+            examples:
+              example-1:
+                value:
+                  firstSubscriptionDate: 2017-05-20
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsUpdateSubscriptionResponse'
+              examples:
+                example-1:
+                  value:
+                    status: 200
+                    success: true
+                    data:
+                      code: UPDATED
+                      message: Successfully updated the firstSubscriptionDate for the LISA account
+                      accountId: '1234567890'
+                example-2:
+                  value:
+                    status: 200
+                    success: true
+                    data:
+                      code: UPDATED_AND_ACCOUNT_VOID
+                      message: Successfully updated the firstSubscriptionDate for the LISA account and changed the account status to void because the investor has another account with an earlier firstSubscriptionDate
+                      accountId: '1234567891'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsUpdateSubscriptionResponse400'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/invalidLmrn'
+                invalidLmrn:
+                  $ref: '#/components/examples/invalidLmrn'
+                invalidAccountId:
+                  $ref: '#/components/examples/invalidAccountId'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsUpdateSubscriptionResponse400'
+              examples:
+                notOpenStatus:
+                  $ref: '#/components/examples/notOpenStatusUnauthorized'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsUpdateSubscriptionResponse400'
+              examples:
+                accountClosed:
+                  $ref: '#/components/examples/accountClosed'
+                accountCancelled:
+                  $ref: '#/components/examples/accountCancelled'
+                accountVoided:
+                  $ref: '#/components/examples/accountVoided'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsUpdateSubscriptionResponse400'
+              examples:
+                accountIdNotFound:
+                  $ref: '#/components/examples/accountIdNotFound'
+      deprecated: false
+      security:
+        - user-restricted:
+            - write:lisa
+  /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/events:
+    post:
+      summary: Report a death or terminal illness
+      description: Report to HMRC if an investor has been diagnosed with a terminal illness or died. You need to do this to get a lifeEventId before you can request a bonus payment from HMRC.
+      operationId: reportDeathOrTerminalIllness
+      parameters:
+      - $ref: '#/components/parameters/acceptHeader'
+      - $ref: '#/components/parameters/contentTypeHeader'
+      - $ref: '#/components/parameters/authorizationHeader'
+      - $ref: '#/components/parameters/lisaManagerReferenceNumber'
+      - $ref: '#/components/parameters/accountId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/lifetimeIsaManagerAccountsEventsRequest'
+            example:
+              eventType: LISA Investor Terminal Ill Health
+              eventDate: 2017-04-20
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsEventsResponse'
+              example:
+                status: 201
+                success: true
+                data:
+                  message: Life event created
+                  lifeEventId: '1234567891'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsEventsResponse400'
+              examples:
+                notOpenStatus:
+                  $ref: '#/components/examples/badRequest'
+                invalidLmrn:
+                  $ref: '#/components/examples/invalidLmrn'
+                invalidAccountId:
+                  $ref: '#/components/examples/invalidAccountId'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsEventsResponse400'
+              examples:
+                notOpenStatus:
+                  $ref: '#/components/examples/notOpenStatusUnauthorized'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsEventsResponse400'
+              examples:
+                lifeEventInvalid:
+                  value:
+                    code: LIFE_EVENT_INAPPROPRIATE
+                    message: The life event conflicts with a previous life event reported
+                accountClosed:
+                  $ref: '#/components/examples/accountClosed'
+                accountCancelled:
+                  $ref: '#/components/examples/accountCancelled'
+                accountVoided:
+                  $ref: '#/components/examples/accountVoided'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsEventsResponse400'
+              examples:
+                accountIdNotFound:
+                  $ref: '#/components/examples/accountIdNotFound'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsEventsResponse400'
+              examples:
+                lifeEventExists:
+                  $ref: '#/components/examples/lifeEventExists'
+      deprecated: false
+      security:
+        - user-restricted:
+            - write:lisa
+  /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/events/annual-returns:
+    post:
+      summary: Send an annual return of information
+      description: Report details to HMRC about LISA accounts you managed in the last tax year. You can also correct a previous return of information. You cannot send or correct a return of information if the investor account is cancelled or void.
+      operationId: sendAnnualReturnOfInformation
+      parameters:
+      - $ref: '#/components/parameters/acceptHeader'
+      - $ref: '#/components/parameters/contentTypeHeader'
+      - $ref: '#/components/parameters/authorizationHeader'
+      - $ref: '#/components/parameters/lisaManagerReferenceNumber'
+      - $ref: '#/components/parameters/accountId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/lifetimeIsaManagerAccountsEventsAnnualReturnsRequest'
+            examples:
+              initial-return:
+                value:
+                  eventDate: 2018-04-05
+                  lisaManagerName: Company Name
+                  taxYear: 2018
+                  marketValueCash: 0
+                  marketValueStocksAndShares: 55
+                  annualSubsCash: 0
+                  annualSubsStocksAndShares: 55
+              supersede-return:
+                value:
+                  eventDate: 2018-04-05
+                  lisaManagerName: Company Name
+                  taxYear: 2018
+                  marketValueCash: 0
+                  marketValueStocksAndShares: 65
+                  annualSubsCash: 0
+                  annualSubsStocksAndShares: 65
+                  supersede:
+                    originalLifeEventId: '7890000001'
+                    originalEventDate: 2018-04-05
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsEventsAnnualReturnsResponse'
+              examples:
+                lifeEventCreated:
+                  value:
+                    status: 201
+                    success: true
+                    data:
+                      message: Life event created
+                      lifeEventId: '7890000001'
+                lifeEventSuperseded:
+                  value:
+                    status: 201
+                    success: true
+                    data:
+                      message: Life event superseded
+                      lifeEventId: '7890000002'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsEventsAnnualReturnsResponse400'
+              examples:
+                notOpenStatus:
+                  $ref: '#/components/examples/badRequest'
+                invalidLmrn:
+                  $ref: '#/components/examples/invalidLmrn'
+                invalidAccountId:
+                  $ref: '#/components/examples/invalidAccountId'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsEventsAnnualReturnsResponse400'
+              examples:
+                notOpenStatus:
+                  $ref: '#/components/examples/notOpenStatusUnauthorized'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsEventsAnnualReturnsResponse400'
+              examples:
+                accountVoid:
+                  $ref: '#/components/examples/accountVoid'
+                accountCancelled:
+                  $ref: '#/components/examples/accountCancelled'
+                supersedingLifeEventMisMatchError:
+                  $ref: '#/components/examples/supersedingLifeEventMisMatchError'
+                accountClosed:
+                  $ref: '#/components/examples/accountClosed'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsEventsAnnualReturnsResponse400'
+              examples:
+                accountIdNotFound:
+                  $ref: '#/components/examples/accountIdNotFound'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsEventsAnnualReturnsResponse400'
+              examples:
+                supersedingLifeEventAlreadySuperseded:
+                  $ref: '#/components/examples/supersedingLifeEventAlreadySuperseded'
+                lifeEventExists:
+                  $ref: '#/components/examples/lifeEventExists'
+      deprecated: false
+      security:
+        - user-restricted:
+            - write:lisa
+  /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/events/fund-releases:
+    post:
+      summary: Request the release of funds to buy a property
+      description: Request the release of LISA funds to buy a property. You can also correct a request by changing the withdrawal amount or property purchase date. When you make a correction, you cannot change the property details or the conveyancer reference number.
+      operationId: requestReleaseOfFundsToBuyProperty
+      parameters:
+      - $ref: '#/components/parameters/acceptHeader'
+      - $ref: '#/components/parameters/contentTypeHeader'
+      - $ref: '#/components/parameters/authorizationHeader'
+      - $ref: '#/components/parameters/lisaManagerReferenceNumber'
+      - $ref: '#/components/parameters/accountId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/lifetimeIsaManagerAccountsEventsFundReleasesRequest'
+            examples:
+              example-1:
+                value:
+                  eventDate: 2017-05-10
+                  withdrawalAmount: 4000
+                  conveyancerReference: CR12345-6789
+                  propertyDetails:
+                    nameOrNumber: '1'
+                    postalCode: AA11 1AA
+              example-2:
+                value:
+                  eventDate: 2017-05-05
+                  withdrawalAmount: 5000
+                  supersede:
+                    originalLifeEventId: '3456789000'
+                    originalEventDate: 2017-05-10
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsEventsFundReleasesResponse'
+              examples:
+                lifeEventCreated:
+                  value:
+                    status: 201
+                    success: true
+                    data:
+                      message: Fund release created
+                      lifeEventId: '3456789000'
+                lifeEventSuperseded:
+                  value:
+                    status: 201
+                    success: true
+                    data:
+                      message: Fund release superseded
+                      lifeEventId: '3456789001'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsEventsFundReleasesResponse400'
+              examples:
+                invalidLmrn:
+                  $ref: '#/components/examples/invalidLmrn'
+                invalidAccountId:
+                  $ref: '#/components/examples/invalidAccountId'
+                invalidPayLoad:
+                  value:
+                    code: INVALID_PAYLOAD
+                    message: Submission has not passed validation
+                emptyNameOrNumber:
+                  value:
+                    code: BAD_REQUEST
+                    message: Bad Request
+                    errors:
+                    - code: INVALID_NAME_OR_NUMBER
+                      message: Enter nameOrNumber
+                      path: /propertyDetails/nameOrNumber
+                tooLongNameOrNumber:
+                  value:
+                    code: BAD_REQUEST
+                    message: Bad Request
+                    errors:
+                    - code: INVALID_NAME_OR_NUMBER
+                      message: nameOrNumber must be 35 characters or less
+                      path: /propertyDetails/nameOrNumber
+                invalidNameOrNumber:
+                  value:
+                    code: BAD_REQUEST
+                    message: Bad Request
+                    errors:
+                    - code: INVALID_NAME_OR_NUMBER
+                      message: nameOrNumber must only include letters a to z, numbers 0 to 9, colons, forward slashes, hyphen and spaces
+                      path: /propertyDetails/nameOrNumber
+                emptyPostalCode:
+                  value:
+                    code: BAD_REQUEST
+                    message: Bad Request
+                    errors:
+                    - code: INVALID_POSTAL_CODE
+                      message: Enter a postcode
+                      path: /propertyDetails/postalCode
+                invalidPostalCode:
+                  value:
+                    code: BAD_REQUEST
+                    message: Bad Request
+                    errors:
+                    - code: INVALID_POSTAL_CODE
+                      message: Postcode must only include letters a to z and numbers 0 to 9, like AA1 1AA
+                      path: /propertyDetails/postalCode
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsEventsFundReleasesResponse400'
+              examples:
+                notOpenStatus:
+                  $ref: '#/components/examples/notOpenStatusUnauthorized'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsEventsFundReleasesResponse400'
+              examples:
+                accountClosed:
+                  $ref: '#/components/examples/accountClosed'
+                accountVoid:
+                  $ref: '#/components/examples/accountVoid'
+                accountCancelled:
+                  $ref: '#/components/examples/accountCancelled'
+                complianceCheckNotOpenLongEnough:
+                  value:
+                    code: COMPLIANCE_ERROR_ACCOUNT_NOT_OPEN_LONG_ENOUGH
+                    message: The account has not been open for long enough
+                complianceCheckOtherPurchase:
+                  value:
+                    code: COMPLIANCE_ERROR_OTHER_PURCHASE_ON_RECORD
+                    message: Another property purchase is already recorded
+                supersedingLifeEventMisMatchError:
+                  $ref: '#/components/examples/supersedingLifeEventMisMatchError'
+                invalidDataProvided:
+                  value:
+                    code: INVALID_DATA_PROVIDED
+                    message: You can only change eventDate or withdrawalAmount when superseding a property purchase fund release
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsEventsFundReleasesResponse400'
+              examples:
+                accountIdNotFound:
+                  $ref: '#/components/examples/accountIdNotFound'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsEventsFundReleasesResponse400'
+              examples:
+                supersedingLifeEventAlreadySuperseded:
+                  $ref: '#/components/examples/supersedingLifeEventAlreadySuperseded'
+                lifeEventExists:
+                  $ref: '#/components/examples/lifeEventExists'
+      deprecated: false
+      security:
+        - user-restricted:
+            - write:lisa
+  /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/events/purchase-extensions:
+    post:
+      summary: Request a property purchase extension
+      description: Request an extension to your request to release funds to buy a property.
+      operationId: requestPropertyPurchaseExtension
+      parameters:
+      - $ref: '#/components/parameters/acceptHeader'
+      - $ref: '#/components/parameters/contentTypeHeader'
+      - $ref: '#/components/parameters/authorizationHeader'
+      - $ref: '#/components/parameters/lisaManagerReferenceNumber'
+      - $ref: '#/components/parameters/accountId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/lifetimeIsaManagerAccountsEventsPurchaseExtensionsRequest'
+            examples:
+              example-1:
+                value:
+                  fundReleaseId: '3456789001'
+                  eventDate: 2017-05-10
+                  eventType: Extension one
+              example-2:
+                value:
+                  eventDate: 2017-05-11
+                  eventType: Extension one
+                  supersede:
+                    originalEventDate: 2017-05-10
+                    originalLifeEventId: '6789000001'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsEventsPurchaseExtensionsResponse'
+              examples:
+                lifeEventCreated:
+                  value:
+                    status: 201
+                    success: true
+                    data:
+                      message: Extension created
+                      lifeEventId: '6789000001'
+                lifeEventSuperseded:
+                  value:
+                    status: 201
+                    success: true
+                    data:
+                      message: Extension superseded
+                      lifeEventId: '6789000002'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsEventsPurchaseExtensionsResponse403'
+              examples:
+                accountClosed:
+                  $ref: '#/components/examples/accountClosed'
+                accountCancelled:
+                  $ref: '#/components/examples/accountCancelled'
+                accountVoid:
+                  $ref: '#/components/examples/accountVoid'
+                extensionNotApproved:
+                  value:
+                    code: FIRST_EXTENSION_NOT_APPROVED
+                    message: A first extension has not yet been approved
+                firstExtensionAlreadyApproved:
+                  value:
+                    code: FIRST_EXTENSION_ALREADY_APPROVED
+                    message: A first extension has already been approved
+                secondExtensionAlreadyApproved:
+                  value:
+                    code: SECOND_EXTENSION_ALREADY_APPROVED
+                    message: A second extension has already been approved
+                supersedingLifeEventMisMatchError:
+                  $ref: '#/components/examples/supersedingLifeEventMisMatchError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsEventsPurchaseExtensionsResponse403'
+              examples:
+                accountIdNotFound:
+                  $ref: '#/components/examples/accountIdNotFound'
+                fundReleaseNotFound:
+                  $ref: '#/components/examples/fundReleaseNotFound'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsEventsPurchaseExtensionsResponse403'
+              examples:
+                lifeEventExists:
+                  $ref: '#/components/examples/lifeEventExists'
+                fundReleaseLifeEventAlreadySuperseded:
+                  $ref: '#/components/examples/fundReleaseLifeEventAlreadySuperseded'
+                supersedingLifeEventAlreadySuperseded:
+                  $ref: '#/components/examples/supersedingLifeEventAlreadySuperseded'
+      deprecated: false
+      security:
+        - user-restricted:
+            - write:lisa
+  /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/events/purchase-outcomes:
+    post:
+      summary: Report the outcome of a property purchase
+      description: Report to HMRC if a property purchase was completed or failed.
+      operationId: reportOutcomeOfPropertyPurchase
+      parameters:
+      - $ref: '#/components/parameters/acceptHeader'
+      - $ref: '#/components/parameters/contentTypeHeader'
+      - $ref: '#/components/parameters/authorizationHeader'
+      - $ref: '#/components/parameters/lisaManagerReferenceNumber'
+      - $ref: '#/components/parameters/accountId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/lifetimeIsaManagerAccountsEventsPurchaseOutcomesRequest'
+            examples:
+              example-1:
+                value:
+                  fundReleaseId: '3456789001'
+                  eventDate: 2017-10-10
+                  propertyPurchaseResult: Purchase completed
+                  propertyPurchaseValue: 250000
+              example-2:
+                value:
+                  eventDate: 2017-10-05
+                  propertyPurchaseResult: Purchase completed
+                  propertyPurchaseValue: 250000
+                  supersede:
+                    originalLifeEventId: '5678900001'
+                    originalEventDate: 2017-10-10
+              example-3:
+                value:
+                  fundReleaseId: '3456789002'
+                  eventDate: 2017-05-05
+                  propertyPurchaseResult: Purchase failed
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsEventsPurchaseOutcomesResponse'
+              examples:
+                lifeEventCreated:
+                  value:
+                    status: 201
+                    success: true
+                    data:
+                      message: Purchase outcome created
+                      lifeEventId: '5678900001'
+                lifeEventSuperseded:
+                  value:
+                    status: 201
+                    success: true
+                    data:
+                      message: Purchase outcome superseded
+                      lifeEventId: '5678900002'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsEventsPurchaseOutcomesResponse403'
+              examples:
+                mismatchError:
+                  value:
+                    code: SUPERSEDED_LIFE_EVENT_MISMATCH_ERROR
+                    message: originalLifeEventId and the originalEventDate do not match the information in the original request
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsEventsPurchaseOutcomesResponse403'
+              examples:
+                accountNotFound:
+                  value:
+                    code: INVESTOR_ACCOUNTID_NOT_FOUND
+                    message: The accountId does not match with HMRC’s records
+                fundReleaseNotFound:
+                  $ref: '#/components/examples/fundReleaseNotFound'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsEventsPurchaseOutcomesResponse403'
+              examples:
+                fundReleaseLifeEventAlreadySuperseded:
+                  $ref: '#/components/examples/fundReleaseLifeEventAlreadySuperseded'
+                supersedingLifeEventAlreadySuperseded:
+                  $ref: '#/components/examples/supersedingLifeEventAlreadySuperseded'
+                lifeEventExists:
+                  $ref: '#/components/examples/lifeEventExists'
+      deprecated: false
+      security:
+        - user-restricted:
+            - write:lisa
+  /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/events/{lifeEventId}:
+    get:
+      summary: View a life event
+      description: View life event data that has been submitted to HMRC. You can view death and terminal illness, property purchase funds release, property purchase extension, property purchase outcome, and annual return of information.
+      operationId: viewLifeEvent
+      parameters:
+      - $ref: '#/components/parameters/acceptHeader'
+      - $ref: '#/components/parameters/contentTypeHeader'
+      - $ref: '#/components/parameters/authorizationHeader'
+      - $ref: '#/components/parameters/lisaManagerReferenceNumber'
+      - $ref: '#/components/parameters/accountId'
+      - $ref: '#/components/parameters/lifeEventId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                maxItems: 4
+                minItems: 1
+                uniqueItems: true
+                type: array
+                items:
+                  $ref: '#/components/schemas/LifetimeIsaManagerAccountsEventsLifeEventIdResponse'
+              examples:
+                ill:
+                  value:
+                  - lifeEventId: '1234567891'
+                    eventType: LISA Investor Terminal Ill Health
+                    eventDate: 2017-04-20
+                return:
+                  value:
+                  - lifeEventId: '7890000001'
+                    eventType: Statutory Submission
+                    eventDate: 2018-04-05
+                    lisaManagerName: Company Name
+                    taxYear: 2018
+                    marketValueCash: 0
+                    marketValueStocksAndShares: 55
+                    annualSubsCash: 0
+                    annualSubsStocksAndShares: 55
+                    supersededBy: '7890000002'
+                property:
+                  value:
+                  - lifeEventId: '3456789001'
+                    eventType: Funds release
+                    eventDate: 2017-05-05
+                    withdrawalAmount: 5000
+                    conveyancerReference: CR12345-6789
+                    propertyDetails:
+                      nameOrNumber: '1'
+                      postalCode: AA11 1AA
+                    supersede:
+                      originalLifeEventId: '3456789000'
+                      originalEventDate: 2017-05-10
+                  - lifeEventId: '6789000002'
+                    eventType: Extension one
+                    eventDate: 2017-05-11
+                    fundReleaseId: '3456789001'
+                    supersede:
+                      originalEventDate: 2017-05-10
+                      originalLifeEventId: '6789000001'
+                  - lifeEventId: '6789000004'
+                    eventType: Extension two
+                    eventDate: 2017-08-11
+                    fundReleaseId: '3456789001'
+                    supersede:
+                      originalEventDate: 2017-08-10
+                      originalLifeEventId: '6789000003'
+                  - lifeEventId: '5678900002'
+                    eventType: Purchase outcome
+                    eventDate: 2017-06-10
+                    fundReleaseId: '3456789001'
+                    propertyPurchaseValue: 250000
+                    propertyPurchaseResult: Purchase completed
+                    supersede:
+                      originalLifeEventId: '5678900001'
+                      originalEventDate: 2017-05-05
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsEventsLifeEventIdResponse400'
+              examples:
+                invalidLmrn:
+                  $ref: '#/components/examples/invalidLmrn'
+                invalidAccountId:
+                  $ref: '#/components/examples/invalidAccountId'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsEventsLifeEventIdResponse400'
+              examples:
+                notOpenStatus:
+                  $ref: '#/components/examples/notOpenStatusUnauthorized'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsEventsLifeEventIdResponse400'
+              examples:
+                noTransaction:
+                  value:
+                    code: LIFE_EVENT_NOT_FOUND
+                    message: Enter a real lifeEventId
+                accountIdNotFound:
+                  $ref: '#/components/examples/accountIdNotFound'
+      deprecated: false
+      security:
+        - user-restricted:
+            - read:lisa
+  /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/withdrawal-charges:
+    post:
+      summary: Report a withdrawal charge
+      description: Tell HMRC that an investor has taken money out of a LISA account without an associated life event. You can also correct a previous withdrawal charge.
+      operationId: reportWithdrawalCharge
+      parameters:
+      - $ref: '#/components/parameters/acceptHeader'
+      - $ref: '#/components/parameters/contentTypeHeader'
+      - $ref: '#/components/parameters/authorizationHeader'
+      - $ref: '#/components/parameters/lisaManagerReferenceNumber'
+      - $ref: '#/components/parameters/accountId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/lifetimeIsaManagerAccountsWithdrawalChargesRequest'
+            examples:
+              example-1:
+                value:
+                  claimPeriodStartDate: 2017-12-06
+                  claimPeriodEndDate: 2018-01-05
+                  withdrawalAmount: 1000
+                  withdrawalChargeAmount: 250
+                  withdrawalChargeAmountYTD: 500
+                  fundsDeductedDuringWithdrawal: true
+                  withdrawalReason: Regular withdrawal
+                  automaticRecoveryAmount: 250
+              example-2:
+                value:
+                  claimPeriodStartDate: 2017-12-06
+                  claimPeriodEndDate: 2018-01-05
+                  withdrawalAmount: 2000
+                  withdrawalChargeAmount: 500
+                  withdrawalChargeAmountYTD: 750
+                  fundsDeductedDuringWithdrawal: true
+                  withdrawalReason: Superseded withdrawal
+                  automaticRecoveryAmount: 500
+                  supersede:
+                    originalTransactionId: '2345678901'
+                    originalWithdrawalChargeAmount: 250
+                    transactionResult: 250
+                    reason: Additional withdrawal
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsWithdrawalChargesResponse'
+              examples:
+                example-1:
+                  value:
+                    status: 201
+                    success: true
+                    data:
+                      message: Unauthorised withdrawal transaction created
+                      transactionId: '2345678901'
+                example-2:
+                  value:
+                    status: 201
+                    success: true
+                    data:
+                      message: Unauthorised withdrawal transaction created - late notification
+                      transactionId: '2345678902'
+                example-3:
+                  value:
+                    status: 201
+                    success: true
+                    data:
+                      message: Unauthorised withdrawal transaction superseded
+                      transactionId: '2345678903'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsWithdrawalChargesResponse400'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/invalidLmrn'
+                invalidLmrn:
+                  $ref: '#/components/examples/invalidLmrn'
+                invalidAccountId:
+                  $ref: '#/components/examples/invalidAccountId'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsWithdrawalChargesResponse400'
+              examples:
+                notOpenStatus:
+                  $ref: '#/components/examples/notOpenStatusUnauthorized'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsWithdrawalChargesResponse400'
+              examples:
+                forbidden:
+                  value:
+                    code: FORBIDDEN
+                    message: There is a problem with the request data
+                accountCancelled:
+                  $ref: '#/components/examples/accountCancelled'
+                accountVoid:
+                  $ref: '#/components/examples/accountVoid'
+                supersededMismatch:
+                  value:
+                    code: SUPERSEDED_WITHDRAWAL_CHARGE_ID_AMOUNT_MISMATCH
+                    message: originalTransactionId and the originalWithdrawalChargeAmount do not match the information in the original request
+                alreadySuperseded:
+                  value:
+                    code: WITHDRAWAL_CHARGE_ALREADY_SUPERSEDED
+                    message: This withdrawal charge has already been superseded
+                    transactionId: '2345678901'
+                supersededOutcomeError:
+                  value:
+                    code: SUPERSEDED_WITHDRAWAL_CHARGE_OUTCOME_ERROR
+                    message: The calculation from your superseded withdrawal charge is incorrect
+                timescalesExceeded:
+                  value:
+                    code: WITHDRAWAL_CHARGE_TIMESCALES_EXCEEDED
+                    message: The timescale for reporting a withdrawal charge has passed. The claim period lasts for 6 years and 14 days
+                reportingError:
+                  value:
+                    code: WITHDRAWAL_REPORTING_ERROR
+                    message: The withdrawal charge as a percentage of the withdrawal amount is incorrect. For withdrawals made between 06/03/2020 and 05/04/2021 the withdrawal charge is 20%. For all other withdrawals it is 25%.
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsWithdrawalChargesResponse400'
+              examples:
+                accountIdNotFound:
+                  $ref: '#/components/examples/accountIdNotFound'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsWithdrawalChargesResponse400'
+              examples:
+                withdrawalChargeExists:
+                  value:
+                    code: WITHDRAWAL_CHARGE_ALREADY_EXISTS
+                    message: A withdrawal charge with these details has already been requested for this investor
+                    transactionId: '2345678901'
+      deprecated: false
+      security:
+        - user-restricted:
+            - write:lisa
+  /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/withdrawal-charges/{transactionId}:
+    get:
+      summary: Get details of a withdrawal charge
+      description: Use an investor’s transaction ID to get a request for a withdrawal charge that has been submitted to HMRC.
+      operationId: getDetailsOfWithdrawalCharge
+      parameters:
+      - $ref: '#/components/parameters/acceptHeader'
+      - $ref: '#/components/parameters/contentTypeHeader'
+      - $ref: '#/components/parameters/authorizationHeader'
+      - $ref: '#/components/parameters/lisaManagerReferenceNumber'
+      - $ref: '#/components/parameters/accountId'
+      - $ref: '#/components/parameters/transactionId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsWithdrawalChargesTransactionIdResponse'
+              examples:
+                example:
+                  value:
+                    claimPeriodStartDate: 2017-12-06
+                    claimPeriodEndDate: 2018-01-05
+                    automaticRecoveryAmount: 250
+                    withdrawalAmount: 1000
+                    withdrawalChargeAmount: 250
+                    withdrawalChargeAmountYTD: 500
+                    fundsDeductedDuringWithdrawal: true
+                    withdrawalReason: Regular withdrawal
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsWithdrawalChargesTransactionIdResponse400'
+              examples:
+                invalidLmrn:
+                  $ref: '#/components/examples/invalidLmrn'
+                invalidAccountId:
+                  $ref: '#/components/examples/invalidAccountId'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsWithdrawalChargesTransactionIdResponse400'
+              examples:
+                notOpenStatus:
+                  $ref: '#/components/examples/notOpenStatusUnauthorized'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsWithdrawalChargesTransactionIdResponse400'
+              examples:
+                noTransaction:
+                  value:
+                    code: WITHDRAWAL_CHARGE_TRANSACTION_NOT_FOUND
+                    message: The transactionId does not match HMRC’s records
+                accountIdNotFound:
+                  $ref: '#/components/examples/accountIdNotFound'
+      deprecated: false
+      security:
+        - user-restricted:
+            - read:lisa
+  /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/transactions:
+    post:
+      summary: Request a bonus payment
+      description: Request a bonus payment from HMRC and provide a reason for the request. You can also correct a bonus claim during or after the claim reporting period. You can repay any overpaid amounts to HMRC and receive additional payments from corrected claims.
+      operationId: requestBonusPayment
+      parameters:
+      - $ref: '#/components/parameters/acceptHeader'
+      - $ref: '#/components/parameters/contentTypeHeader'
+      - $ref: '#/components/parameters/authorizationHeader'
+      - $ref: '#/components/parameters/lisaManagerReferenceNumber'
+      - $ref: '#/components/parameters/accountId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/lifetimeIsaManagerAccountsTransactionsRequest'
+            examples:
+              example-1:
+                value:
+                  lifeEventId: '1234567891'
+                  periodStartDate: 2017-04-06
+                  periodEndDate: 2017-05-05
+                  htbTransfer:
+                    htbTransferInForPeriod: 0
+                    htbTransferTotalYTD: 0
+                  inboundPayments:
+                    newSubsForPeriod: 4000
+                    newSubsYTD: 4000
+                    totalSubsForPeriod: 4000
+                    totalSubsYTD: 4000
+                  bonuses:
+                    bonusPaidYTD: 0
+                    bonusDueForPeriod: 1000
+                    totalBonusDueYTD: 1000
+                    claimReason: Life Event
+              example-2:
+                value:
+                  periodStartDate: 2017-04-06
+                  periodEndDate: 2017-05-05
+                  inboundPayments:
+                    newSubsForPeriod: 4000
+                    newSubsYTD: 4000
+                    totalSubsForPeriod: 4000
+                    totalSubsYTD: 4000
+                  bonuses:
+                    bonusPaidYTD: 0
+                    bonusDueForPeriod: 1000
+                    totalBonusDueYTD: 1000
+                    claimReason: Superseded Bonus
+                  supersede:
+                    automaticRecoveryAmount: 1000
+                    originalTransactionId: '0000456789'
+                    originalBonusDueForPeriod: 1000
+                    transactionResult: -1000
+                    reason: Bonus recovery
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsTransactionsResponse'
+              examples:
+                example-1:
+                  value:
+                    status: 201
+                    success: true
+                    data:
+                      message: Bonus transaction created
+                      transactionId: '0123456789'
+                example-2:
+                  value:
+                    status: 201
+                    success: true
+                    data:
+                      message: Bonus transaction created - late notification
+                      transactionId: '0023456789'
+                example-3:
+                  value:
+                    status: 201
+                    success: true
+                    data:
+                      message: Bonus transaction superseded
+                      transactionId: '0000456789'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsTransactionsResponse400'
+              examples:
+                badRequest:
+                  $ref: '#/components/examples/invalidLmrn'
+                invalidLmrn:
+                  $ref: '#/components/examples/invalidLmrn'
+                invalidAccountId:
+                  $ref: '#/components/examples/invalidAccountId'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsTransactionsResponse400'
+              examples:
+                notOpenStatus:
+                  $ref: '#/components/examples/notOpenStatusUnauthorized'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsTransactionsResponse400'
+              examples:
+                forbidden:
+                  value:
+                    code: FORBIDDEN
+                    message: There is a problem with the request data
+                lifeEventNotProvided:
+                  value:
+                    code: LIFE_EVENT_NOT_PROVIDED
+                    message: lifeEventId is required when the claimReason is a life event
+                bonusWrong:
+                  value:
+                    code: BONUS_CLAIM_ERROR
+                    message: The bonus amount given is above the maximum annual amount, or the qualifying deposits are above the maximum annual amount or the bonus claim does not equal the correct percentage of qualifying funds
+                accountClosed:
+                  $ref: '#/components/examples/accountClosed'
+                accountCancelled:
+                  $ref: '#/components/examples/accountCancelled'
+                accountVoid:
+                  $ref: '#/components/examples/accountVoid'
+                helpToBuyNotApplicable:
+                  value:
+                    code: HELP_TO_BUY_NOT_APPLICABLE
+                    message: Help to buy is only applicable for claims within the 2017-18 tax year
+                bonusClaimTimescalesExceeded:
+                  value:
+                    code: BONUS_CLAIM_TIMESCALES_EXCEEDED
+                    message: The timescale for claiming a bonus has passed. The claim period lasts for 6 years and 14 days
+                supersededBonusClaimAmountMismatch:
+                  value:
+                    code: SUPERSEDED_BONUS_CLAIM_AMOUNT_MISMATCH
+                    message: originalTransactionId and the originalBonusDueForPeriod amount do not match the information in the original bonus request
+                supersededBonusRequestOutcomeError:
+                  value:
+                    code: SUPERSEDED_BONUS_REQUEST_OUTCOME_ERROR
+                    message: The calculation from your superseded bonus claim is incorrect
+                noSubscriptionsError:
+                  value:
+                    code: ACCOUNT_ERROR_NO_SUBSCRIPTIONS_THIS_TAX_YEAR
+                    message: This account is not eligible for a bonus payment because the investor already has another LISA account
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsTransactionsResponse400'
+              examples:
+                noLifeEvent:
+                  value:
+                    code: LIFE_EVENT_NOT_FOUND
+                    message: The lifeEventId does not match with HMRC’s records
+                accountIdNotFound:
+                  $ref: '#/components/examples/accountIdNotFound'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsTransactionsResponse400'
+              examples:
+                noLifeEvent:
+                  value:
+                    code: BONUS_CLAIM_ALREADY_EXISTS
+                    message: The investor’s bonus payment has already been requested
+                bonusClaimAlreadySuperseded:
+                  value:
+                    code: BONUS_CLAIM_ALREADY_SUPERSEDED
+                    message: This bonus claim has already been superseded
+      deprecated: false
+      security:
+        - user-restricted:
+            - write:lisa
+  /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/transactions/{transactionId}:
+    get:
+      summary: Get details of a bonus request
+      description: Use an investor’s transaction ID to get a request for a bonus payment that has been submitted to HMRC.
+      operationId: getDetailsOfBonusRequest
+      parameters:
+      - $ref: '#/components/parameters/acceptHeader'
+      - $ref: '#/components/parameters/contentTypeHeader'
+      - $ref: '#/components/parameters/authorizationHeader'
+      - $ref: '#/components/parameters/lisaManagerReferenceNumber'
+      - $ref: '#/components/parameters/accountId'
+      - $ref: '#/components/parameters/transactionId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsTransactionsTransactionIdResponse'
+              examples:
+                withHtb:
+                  value:
+                    lifeEventId: '1234567891'
+                    periodStartDate: 2017-04-06
+                    periodEndDate: 2017-05-05
+                    htbTransfer:
+                      htbTransferInForPeriod: 0
+                      htbTransferTotalYTD: 0
+                    inboundPayments:
+                      newSubsForPeriod: 4000
+                      newSubsYTD: 4000
+                      totalSubsForPeriod: 4000
+                      totalSubsYTD: 4000
+                    bonuses:
+                      bonusDueForPeriod: 1000
+                      totalBonusDueYTD: 1000
+                      claimReason: Life Event
+                withoutHtb:
+                  value:
+                    periodStartDate: 2017-04-06
+                    periodEndDate: 2017-05-05
+                    inboundPayments:
+                      newSubsForPeriod: 4000
+                      newSubsYTD: 4000
+                      totalSubsForPeriod: 4000
+                      totalSubsYTD: 4000
+                    bonuses:
+                      bonusPaidYTD: 0
+                      bonusDueForPeriod: 1000
+                      totalBonusDueYTD: 1000
+                      claimReason: Regular Bonus
+                supersede:
+                  value:
+                    periodStartDate: 2018-04-06
+                    periodEndDate: 2018-05-05
+                    inboundPayments:
+                      newSubsForPeriod: 0
+                      newSubsYTD: 0
+                      totalSubsForPeriod: 0
+                      totalSubsYTD: 0
+                    bonuses:
+                      bonusDueForPeriod: 0
+                      totalBonusDueYTD: 0
+                      claimReason: Superseded Bonus
+                    supersede:
+                      automaticRecoveryAmount: 300
+                      originalTransactionId: '0000456789'
+                      originalBonusDueForPeriod: -300
+                      transactionResult: 300
+                      reason: Bonus recovery
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsTransactionsTransactionIdResponse400'
+              examples:
+                invalidLmrn:
+                  $ref: '#/components/examples/invalidLmrn'
+                invalidAccountId:
+                  $ref: '#/components/examples/invalidAccountId'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsTransactionsTransactionIdResponse400'
+              examples:
+                notOpenStatus:
+                  $ref: '#/components/examples/notOpenStatusUnauthorized'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsTransactionsTransactionIdResponse400'
+              examples:
+                noTransaction:
+                  value:
+                    code: BONUS_PAYMENT_TRANSACTION_NOT_FOUND
+                    message: The transactionId does not match HMRC’s records
+                accountIdNotFound:
+                  $ref: '#/components/examples/accountIdNotFound'
+      deprecated: false
+      security:
+        - user-restricted:
+            - read:lisa
+  /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/transactions/{transactionId}/payments:
+    get:
+      summary: Get the payment details for a bonus claim or withdrawal charge
+      description: Use an investor’s transaction ID to get payment details for a bonus claim or withdrawal charge, including when the amount is due to be paid or collected.
+      operationId: getPaymentDetailsForBonusClaimOrWithdrawalCharge
+      parameters:
+      - $ref: '#/components/parameters/acceptHeader'
+      - $ref: '#/components/parameters/contentTypeHeader'
+      - $ref: '#/components/parameters/authorizationHeader'
+      - $ref: '#/components/parameters/lisaManagerReferenceNumber'
+      - $ref: '#/components/parameters/accountId'
+      - $ref: '#/components/parameters/transactionId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsTransactionsTransactionIdPaymentsResponse'
+              examples:
+                paid:
+                  value:
+                    transactionId: '0123456789'
+                    transactionType: Payment
+                    paymentStatus: Paid
+                    paymentDate: 2017-05-20
+                    paymentReference: '002630000993'
+                    paymentAmount: 1000
+                pending:
+                  value:
+                    transactionId: '0000000200'
+                    paymentStatus: Pending
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsTransactionsTransactionIdPaymentsResponse400'
+              examples:
+                invalidLmrn:
+                  $ref: '#/components/examples/invalidLmrn'
+                invalidAccountId:
+                  $ref: '#/components/examples/invalidAccountId'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsTransactionsTransactionIdPaymentsResponse400'
+              examples:
+                notOpenStatus:
+                  $ref: '#/components/examples/notOpenStatusUnauthorized'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerAccountsTransactionsTransactionIdPaymentsResponse400'
+              examples:
+                noTransaction:
+                  value:
+                    code: TRANSACTION_NOT_FOUND
+                    message: The transactionId does not match HMRC’s records
+                accountIdNotFound:
+                  $ref: '#/components/examples/accountIdNotFound'
+      deprecated: false
+      security:
+        - user-restricted:
+            - read:lisa
+  /lifetime-isa/manager/{lisaManagerReferenceNumber}/payments:
+    get:
+      summary: Get a list of all payments and debts in a date range
+      description: Get a list of all pending and paid payments from HMRC and due and collected debts owed to HMRC in a specific date range.
+      operationId: getListOfAllPaymentsAndDebtsInDateRange
+      parameters:
+      - $ref: '#/components/parameters/acceptHeader'
+      - $ref: '#/components/parameters/contentTypeHeader'
+      - $ref: '#/components/parameters/authorizationHeader'
+      - $ref: '#/components/parameters/lisaManagerReferenceNumber'
+      - $ref: '#/components/parameters/startDate'
+      - $ref: '#/components/parameters/endDate'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerPaymentsResponse'
+              example:
+                lisaManagerReferenceNumber: Z123456
+                payments:
+                - transactionType: Payment
+                  status: Paid
+                  paymentAmount: 10000
+                  paymentDate: 2017-06-01
+                  paymentReference: '1040000872'
+                - transactionType: Payment
+                  status: Pending
+                  paymentAmount: 12000
+                  dueDate: 2017-07-04
+                - transactionType: Debt
+                  status: Collected
+                  paymentAmount: 1000
+                  paymentDate: 2017-08-04
+                  paymentReference: '1040000985'
+                - transactionType: Debt
+                  status: Due
+                  paymentAmount: 1100
+                  dueDate: 2017-09-04
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerPaymentsResponse400'
+              examples:
+                notOpenStatus:
+                  $ref: '#/components/examples/badRequest'
+                invalidLmrn:
+                  $ref: '#/components/examples/invalidLmrn'
+                invalidStartDate:
+                  value:
+                    code: BAD_REQUEST
+                    message: startDate is in the wrong format
+                invalidEndDate:
+                  value:
+                    code: BAD_REQUEST
+                    message: endDate is in the wrong format
+                invalidStartAndEndDates:
+                  value:
+                    code: BAD_REQUEST
+                    message: startDate and endDate are in the wrong format
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerPaymentsResponse400'
+              examples:
+                notOpenStatus:
+                  $ref: '#/components/examples/notOpenStatusUnauthorized'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerPaymentsResponse403'
+              examples:
+                endDateInFutureStatus:
+                  value:
+                    code: FORBIDDEN
+                    message: endDate cannot be in the future
+                endDateBeforeStartStatus:
+                  value:
+                    code: FORBIDDEN
+                    message: endDate cannot be before startDate
+                startDateBeforeAprilStatus:
+                  value:
+                    code: FORBIDDEN
+                    message: startDate cannot be before 6 April 2017
+                endDateOverYearAfterStatus:
+                  value:
+                    code: FORBIDDEN
+                    message: endDate cannot be more than a year after startDate
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/lifetimeIsaManagerPaymentsResponse403'
+              examples:
+                noTransactionsFound:
+                  value:
+                    code: TRANSACTION_NOT_FOUND
+                    message: No payments or debts exist for this date range
+      deprecated: false
+      security:
+        - user-restricted:
+            - read:lisa
+components:
+  parameters:
+    acceptHeader:
+      name: Accept
+      in: header
+      description: Specifies the response format and the [version](/api-documentation/docs/reference-guide#versioning) of the API to be used.
+      style: simple
+      schema:
+        type: string
+        enum:
+          - application/vnd.hmrc.2.0+json
+      required: true
+    contentTypeHeader:
+      name: Content-Type
+      in: header
+      description: Specifies the format of the request body, which must be JSON.
+      style: simple
+      schema:
+        type: string
+        enum:
+          - application/json
+      required: true
+    authorizationHeader:
+      name: Authorization
+      in: header
+      description: An [OAuth 2.0 Bearer Token](/api-documentation/docs/authorisation/user-restricted-endpoints) with appropriate scope.
+      style: simple
+      schema:
+        type: string
+        example: Bearer bb7fed3fe10dd235a2ccda3d50fb
+      required: true
+    lisaManagerReferenceNumber:
+      name: lisaManagerReferenceNumber
+      in: path
+      description: The reference given to the LISA provider when they applied for approval from HMRC.
+      required: true
+      style: simple
+      schema:
+        pattern: ^Z([0-9]{4}|[0-9]{6})$
+        type: string
+        example: Z1234
+    accountId:
+      name: accountId
+      in: path
+      description: The ID for the account. This will be generated by the LISA Manager and will only be unique when used in combination with lisaManagerReferenceNumber. Any special characters should be URL encoded.
+      required: true
+      style: simple
+      schema:
+        pattern: ^[a-zA-Z0-9 :/-]{1,20}$
+        type: string
+        example: ABC12345
+    transactionId:
+      name: transactionId
+      in: path
+      description: The ID for the transaction.
+      required: true
+      style: simple
+      schema:
+        pattern: ^\d{1,10}$
+        type: string
+        example: '1234567890'
+    startDate:
+      name: startDate
+      in: query
+      description: The first date in the claim period you want to search. This must be the 6th day of the month. This cannot be before 6 April 2017.
+      required: true
+      style: form
+      explode: true
+      schema:
+        pattern: ^\d{4}-\d{2}-\d{2}$
+        type: string
+        example: 2017-05-06
+    endDate:
+      name: endDate
+      in: query
+      description: The last date of the claim period you want to search. This must be the 5th day of the month. This cannot be in the future, before the startDate, or more than a year after the startDate. It must be at least one month after the startDate.
+      required: true
+      style: form
+      explode: true
+      schema:
+        pattern: ^\d{4}-\d{2}-\d{2}$
+        type: string
+        example: 2017-06-05
+    lifeEventId:
+      name: lifeEventId
+      in: path
+      description: The ID for the life event.
+      required: true
+      style: simple
+      schema:
+        pattern: ^\d{10}$
+        type: string
+        example: '1234567890'
+  securitySchemes:
+    user-restricted:
+      type: oauth2
+      description: HMRC supports OAuth 2.0 for authenticating [user-restricted](https://developer.service.hmrc.gov.uk/api-documentation/docs/authorisation/user-restricted-endpoints) API requests using an OAuth 2.0 Bearer Token in the Authorization header.
+      flows:
+        authorizationCode:
+          authorizationUrl: https://api.service.hmrc.gov.uk/oauth/authorize
+          tokenUrl: https://api.service.hmrc.gov.uk/oauth/token
+          refreshUrl: https://api.service.hmrc.gov.uk/oauth/refresh
+          scopes:
+            read:lisa: Access Lifetime ISA information
+            write:lisa: Create and update Lifetime ISA information
+  schemas:
+    lifetimeIsaManagerResponse:
+      title: LifetimeIsaManagerresponse
+      required:
+      - lisaManagerReferenceNumber
+      type: object
+      properties:
+        lisaManagerReferenceNumber:
+          pattern: ^Z([0-9]{4}|[0-9]{6})$
+          type: string
+          example: Z1234
+        _links:
+          type: object
+    error-codeType:
+      title: error-codeType
+      enum:
+      - ACCEPT_HEADER_INVALID
+      - ACCOUNT_ERROR_NO_SUBSCRIPTIONS_THIS_TAX_YEAR
+      - ACCOUNT_WITHIN_CANCELLATION_PERIOD
+      - BAD_REQUEST
+      - BONUS_CLAIM_ALREADY_EXISTS
+      - BONUS_CLAIM_ALREADY_SUPERSEDED
+      - BONUS_CLAIM_ERROR
+      - BONUS_CLAIM_TIMESCALES_EXCEEDED
+      - BONUS_PAYMENT_TRANSACTION_NOT_FOUND
+      - CANCELLATION_PERIOD_EXCEEDED
+      - COMPLIANCE_ERROR_ACCOUNT_NOT_OPEN_LONG_ENOUGH
+      - COMPLIANCE_ERROR_OTHER_PURCHASE_ON_RECORD
+      - EXTENSION_ALREADY_EXISTS
+      - FIRST_EXTENSION_ALREADY_APPROVED
+      - FIRST_EXTENSION_NOT_APPROVED
+      - FORBIDDEN
+      - FUND_RELEASE_NOT_FOUND
+      - FUND_RELEASE_SUPERSEDED
+      - HELP_TO_BUY_NOT_APPLICABLE
+      - INTERNAL_SERVER_ERROR
+      - INVALID_DATA_PROVIDED
+      - INVALID_PAYLOAD
+      - INVESTOR_ACCOUNT_ALREADY_CANCELLED
+      - INVESTOR_ACCOUNT_ALREADY_CLOSED
+      - INVESTOR_ACCOUNT_ALREADY_EXISTS
+      - INVESTOR_ACCOUNT_ALREADY_OPEN
+      - INVESTOR_ACCOUNT_ALREADY_VOID
+      - INVESTOR_ACCOUNT_CANNOT_BE_REINSTATED
+      - INVESTOR_ACCOUNTID_NOT_FOUND
+      - INVESTOR_ALREADY_EXISTS
+      - INVESTOR_COMPLIANCE_CHECK_FAILED
+      - INVESTOR_ELIGIBILITY_CHECK_FAILED
+      - INVESTOR_NOT_FOUND
+      - LIFE_EVENT_ALREADY_EXISTS
+      - LIFE_EVENT_INAPPROPRIATE
+      - LIFE_EVENT_NOT_FOUND
+      - LIFE_EVENT_NOT_PROVIDED
+      - NOT_FOUND
+      - PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST
+      - TRANSACTION_NOT_FOUND
+      - TRANSFER_ACCOUNT_DATA_NOT_PROVIDED
+      - TRANSFER_ACCOUNT_DATA_PROVIDED
+      - SECOND_EXTENSION_ALREADY_APPROVED
+      - SUPERSEDED_BONUS_CLAIM_AMOUNT_MISMATCH
+      - SUPERSEDED_BONUS_REQUEST_OUTCOME_ERROR
+      - SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED
+      - SUPERSEDED_LIFE_EVENT_MISMATCH_ERROR
+      - SUPERSEDED_WITHDRAWAL_CHARGE_ID_AMOUNT_MISMATCH
+      - SUPERSEDED_WITHDRAWAL_CHARGE_OUTCOME_ERROR
+      - WITHDRAWAL_CHARGE_ALREADY_EXISTS
+      - WITHDRAWAL_CHARGE_ALREADY_SUPERSEDED
+      - WITHDRAWAL_CHARGE_TIMESCALES_EXCEEDED
+      - WITHDRAWAL_CHARGE_TRANSACTION_NOT_FOUND
+      - WITHDRAWAL_REPORTING_ERROR
+      - UNAUTHORIZED
+      - INVALID_POSTAL_CODE
+      - INVALID_NAME_OR_NUMBER
+      type: string
+    lifetimeIsaManagerResponse400:
+      title: LifetimeIsaManagerresponse400
+      required:
+      - code
+      - message
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/error-codeType'
+        message:
+          type: string
+        accountId:
+          type: string
+        lifeEventId:
+          type: string
+        transactionId:
+          type: string
+    lifetimeIsaManagerInvestorsRequest:
+      title: LifetimeIsaManagerInvestorsrequest
+      required:
+      - investorNINO
+      - firstName
+      - lastName
+      - dateOfBirth
+      type: object
+      properties:
+        investorNINO:
+          pattern: ^((?!(BG|GB|KN|NK|NT|TN|ZZ)|(D|F|I|Q|U|V)[A-Z]|[A-Z](D|F|I|O|Q|U|V))[A-Z]{2})[0-9]{6}[A-D]?$
+          type: string
+          example: BC123456D
+        firstName:
+          pattern: ^[a-zA-Z &`\-\'^]{1,35}$
+          type: string
+          description: The investor’s first name.
+          example: FirstName
+        lastName:
+          pattern: ^[a-zA-Z &`\-\'^]{1,35}$
+          type: string
+          description: The investor’s last name.
+          example: LastName
+        dateOfBirth:
+          pattern: ^\d{4}-\d{2}-\d{2}$
+          type: string
+          example: 1989-04-22
+    lifetimeIsaManagerInvestorsResponse:
+      title: LifetimeIsaManagerInvestorsresponse
+      required:
+      - status
+      - success
+      - data
+      type: object
+      properties:
+        status:
+          type: number
+          description: The HTTP status of the result of the API call. Always 201.
+        success:
+          type: boolean
+          description: Whether the API call was successful or not. Always true.
+        data:
+          allOf:
+          - $ref: '#/components/schemas/Data'
+          - description: Response details.
+    Data:
+      title: Data
+      required:
+      - message
+      - investorId
+      type: object
+      properties:
+        message:
+          enum:
+          - Investor created
+          type: string
+          description: A human-readable explanation for the result of the API call.
+        investorId:
+          pattern: ^\d{10}$
+          type: string
+          description: The investor’s ID reference number.  You must store this ID as it is needed for other API calls.
+      description: Response details.
+    lifetimeIsaManagerInvestorsResponse400:
+      title: LifetimeIsaManagerInvestorsresponse400
+      required:
+      - code
+      - message
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/error-codeType'
+        message:
+          type: string
+        accountId:
+          type: string
+        lifeEventId:
+          type: string
+        transactionId:
+          type: string
+    lifetimeIsaManagerAccountsRequest:
+      title: LifetimeIsaManagerAccountsrequest
+      required:
+      - investorId
+      - accountId
+      - creationReason
+      - firstSubscriptionDate
+      type: object
+      properties:
+        investorId:
+          pattern: ^\d{10}$
+          type: string
+          example: '1234567890'
+        accountId:
+          pattern: ^[a-zA-Z0-9 :/-]{1,20}$
+          type: string
+          example: AB9876543210
+        creationReason:
+          allOf:
+          - $ref: '#/components/schemas/CreationReason'
+          - description: The reason the account was created.
+        firstSubscriptionDate:
+          pattern: ^\d{4}-\d{2}-\d{2}$
+          type: string
+          example: 2017-04-20
+        transferAccount:
+          allOf:
+          - $ref: '#/components/schemas/TransferAccount'
+          - description: If the creationReason is ‘Transferred’, 'Current year funds transferred', or 'Previous year funds transferred', then this is required.
+    CreationReason:
+      title: CreationReason
+      enum:
+      - New
+      - Transferred
+      - Current year funds transferred
+      - Previous year funds transferred
+      type: string
+      description: The reason the account was created.
+    TransferAccount:
+      title: TransferAccount
+      required:
+      - transferredFromAccountId
+      - transferredFromLMRN
+      - transferInDate
+      type: object
+      properties:
+        transferredFromAccountId:
+          pattern: ^[a-zA-Z0-9 :/-]{1,20}$
+          type: string
+          example: AB9876543210
+        transferredFromLMRN:
+          pattern: ^Z([0-9]{4}|[0-9]{6})$
+          type: string
+          example: Z1234
+        transferInDate:
+          pattern: ^\d{4}-\d{2}-\d{2}$
+          type: string
+          example: 2017-04-20
+      description: If the creationReason is ‘Transferred’, 'Current year funds transferred', or 'Previous year funds transferred', then this is required.
+    lifetimeIsaManagerAccountsResponse:
+      title: LifetimeIsaManagerAccountsresponse
+      required:
+      - status
+      - success
+      - data
+      type: object
+      properties:
+        status:
+          type: number
+          description: The HTTP status of the result of the API call. Always 201.
+        success:
+          type: boolean
+          description: Whether the API call was successful or not. Always true.
+        data:
+          allOf:
+          - $ref: '#/components/schemas/Data1'
+          - description: Response details.
+    Data1:
+      title: Data1
+      required:
+      - message
+      - accountId
+      type: object
+      properties:
+        message:
+          allOf:
+          - $ref: '#/components/schemas/Message'
+          - description: A human-readable explanation for the result of the API call.
+        accountId:
+          pattern: ^[a-zA-Z0-9 :/-]{1,20}$
+          type: string
+          description: The provider’s own unique reference number for the investor’s LISA account.
+      description: Response details.
+    Message:
+      title: Message
+      enum:
+      - Account created
+      - Account transferred
+      type: string
+      description: A human-readable explanation for the result of the API call.
+    lifetimeIsaManagerAccountsResponse400:
+      title: LifetimeIsaManagerAccountsresponse400
+      required:
+      - code
+      - message
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/error-codeType'
+        message:
+          type: string
+        accountId:
+          type: string
+        lifeEventId:
+          type: string
+        transactionId:
+          type: string
+    lifetimeIsaManagerAccountsReinstateAccountRequest:
+      title: lifetimeIsaManagerAccountsReinstateAccountRequest
+      required:
+      - accountId
+      type: object
+      properties:
+        accountId:
+          pattern: ^[a-zA-Z0-9 :/-]{1,20}$
+          type: string
+          example: AB9876543210
+    lifetimeIsaManagerAccountsReinstateAccountResponse:
+      title: LifetimeIsaManagerAccountsReinstateAccountresponse
+      required:
+      - status
+      - success
+      - data
+      type: object
+      properties:
+        status:
+          type: number
+          description: The HTTP status of the result of the API call. Always 200.
+        success:
+          type: boolean
+          description: Whether the API call was successful or not. Always true.
+        data:
+          allOf:
+          - $ref: '#/components/schemas/Data2'
+          - description: Response details.
+    Data2:
+      title: Data2
+      required:
+      - message
+      - accountId
+      type: object
+      properties:
+        message:
+          enum:
+          - This account has been reinstated
+          type: string
+          description: A human-readable explanation for the result of the API call.
+        accountId:
+          pattern: ^[a-zA-Z0-9 :/-]{1,20}$
+          type: string
+          description: The provider’s own unique reference number for the investor’s LISA account.
+      description: Response details.
+    lifetimeIsaManagerAccountsReinstateAccountResponse400:
+      title: LifetimeIsaManagerAccountsReinstateAccountresponse400
+      required:
+      - code
+      - message
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/error-codeType'
+        message:
+          type: string
+        accountId:
+          type: string
+        lifeEventId:
+          type: string
+        transactionId:
+          type: string
+    lifetimeIsaManagerAccountsResponse1:
+      title: LifetimeIsaManagerAccountsresponse1
+      required:
+      - investorId
+      - accountId
+      - creationReason
+      - firstSubscriptionDate
+      - accountStatus
+      - subscriptionStatus
+      type: object
+      properties:
+        investorId:
+          pattern: ^\d{10}$
+          type: string
+          example: '1234567890'
+        accountId:
+          pattern: ^[a-zA-Z0-9 :/-]{1,20}$
+          type: string
+          example: AB9876543210
+        creationReason:
+          allOf:
+          - $ref: '#/components/schemas/CreationReason1'
+          - description: The reason the account was created.
+        firstSubscriptionDate:
+          pattern: ^\d{4}-\d{2}-\d{2}$
+          type: string
+          example: 2017-04-20
+        accountStatus:
+          allOf:
+          - $ref: '#/components/schemas/AccountStatus'
+          - description: The status of the account.
+        subscriptionStatus:
+          allOf:
+          - $ref: '#/components/schemas/SubscriptionStatus'
+          - description: The subscription status for the current tax year.
+        accountClosureReason:
+          allOf:
+          - $ref: '#/components/schemas/AccountClosureReason'
+          - description: The reason the account was closed.
+        closureDate:
+          pattern: ^\d{4}-\d{2}-\d{2}$
+          type: string
+          example: 2017-04-20
+        transferAccount:
+          allOf:
+          - $ref: '#/components/schemas/TransferAccount1'
+          - description: Account transfer information.
+    CreationReason1:
+      title: CreationReason1
+      enum:
+      - New
+      - Transferred
+      - Current year funds transferred
+      - Previous year funds transferred
+      - Reinstated
+      type: string
+      description: The reason the account was created.
+    AccountStatus:
+      title: AccountStatus
+      enum:
+      - OPEN
+      - VOID
+      - CLOSED
+      type: string
+      description: The status of the account.
+    SubscriptionStatus:
+      title: SubscriptionStatus
+      enum:
+      - AVAILABLE
+      - ACTIVE
+      - LOCKED
+      - CANCELLED
+      - VOID
+      type: string
+      description: The subscription status for the current tax year.
+    AccountClosureReason:
+      title: AccountClosureReason
+      enum:
+      - All funds withdrawn
+      - Cancellation
+      - Transferred out
+      - Voided
+      type: string
+      description: The reason the account was closed.
+    TransferAccount1:
+      title: TransferAccount1
+      required:
+      - transferredFromAccountId
+      - transferredFromLMRN
+      - transferInDate
+      type: object
+      properties:
+        transferredFromAccountId:
+          pattern: ^[a-zA-Z0-9 :/-]{1,20}$
+          type: string
+          example: AB9876543210
+        transferredFromLMRN:
+          pattern: ^Z([0-9]{4}|[0-9]{6})$
+          type: string
+          example: Z1234
+        transferInDate:
+          pattern: ^\d{4}-\d{2}-\d{2}$
+          type: string
+          example: 2017-04-20
+      description: Account transfer information.
+    lifetimeIsaManagerAccountsCloseAccountRequest:
+      title: LifetimeIsaManagerAccountsCloseAccountrequest
+      required:
+      - accountClosureReason
+      - closureDate
+      type: object
+      properties:
+        accountClosureReason:
+          allOf:
+          - $ref: '#/components/schemas/AccountClosureReason1'
+          - description: The reason the account was closed.
+        closureDate:
+          pattern: ^\d{4}-\d{2}-\d{2}$
+          type: string
+          example: 2017-05-20
+    AccountClosureReason1:
+      title: AccountClosureReason1
+      enum:
+      - All funds withdrawn
+      - Cancellation
+      type: string
+      description: The reason the account was closed.
+    lifetimeIsaManagerAccountsCloseAccountResponse:
+      title: LifetimeIsaManagerAccountsCloseAccountresponse
+      required:
+      - status
+      - success
+      - data
+      type: object
+      properties:
+        status:
+          type: number
+          description: The HTTP status of the result of the API call. Always 200.
+        success:
+          type: boolean
+          description: Whether the API call was successful or not. Always true.
+        data:
+          allOf:
+          - $ref: '#/components/schemas/Data2'
+          - description: Response details.
+    lifetimeIsaManagerAccountsCloseAccountResponse400:
+      title: LifetimeIsaManagerAccountsCloseAccountresponse400
+      required:
+      - code
+      - message
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/error-codeType'
+        message:
+          type: string
+        accountId:
+          type: string
+        lifeEventId:
+          type: string
+        transactionId:
+          type: string
+    lifetimeIsaManagerAccountsUpdateSubscriptionRequest:
+      title: LifetimeIsaManagerAccountsUpdateSubscriptionrequest
+      required:
+      - firstSubscriptionDate
+      type: object
+      properties:
+        firstSubscriptionDate:
+          pattern: ^\d{4}-\d{2}-\d{2}$
+          type: string
+          example: 2017-05-20
+    lifetimeIsaManagerAccountsUpdateSubscriptionResponse:
+      title: LifetimeIsaManagerAccountsUpdateSubscriptionresponse
+      required:
+      - status
+      - success
+      - data
+      type: object
+      properties:
+        status:
+          type: number
+          description: The HTTP status of the result of the API call. Always 200.
+        success:
+          type: boolean
+          description: Whether the API call was successful or not. Always true.
+        data:
+          allOf:
+          - $ref: '#/components/schemas/Data4'
+          - description: Response details.
+    Data4:
+      title: Data4
+      required:
+      - code
+      - message
+      - accountId
+      type: object
+      properties:
+        code:
+          allOf:
+          - $ref: '#/components/schemas/Code'
+          - description: A machine-readable code for the result of the API call. This is unique for each scenario.
+        message:
+          allOf:
+          - $ref: '#/components/schemas/Message1'
+          - description: A human-readable explanation for the result of the API call.
+        accountId:
+          pattern: ^[a-zA-Z0-9 :/-]{1,20}$
+          type: string
+          description: The provider’s own unique reference number for the investor’s LISA account.
+      description: Response details.
+    Code:
+      title: Code
+      enum:
+      - UPDATED
+      - UPDATED_AND_ACCOUNT_VOID
+      type: string
+      description: A machine-readable code for the result of the API call. This is unique for each scenario.
+    Message1:
+      title: Message1
+      enum:
+      - Successfully updated the firstSubscriptionDate for the LISA account
+      - Successfully updated the firstSubscriptionDate for the LISA account and changed the account status to void because the investor has another account with an earlier firstSubscriptionDate
+      type: string
+      description: A human-readable explanation for the result of the API call.
+    lifetimeIsaManagerAccountsUpdateSubscriptionResponse400:
+      title: LifetimeIsaManagerAccountsUpdateSubscriptionresponse400
+      required:
+      - code
+      - message
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/error-codeType'
+        message:
+          type: string
+        accountId:
+          type: string
+        lifeEventId:
+          type: string
+        transactionId:
+          type: string
+    lifetimeIsaManagerAccountsEventsRequest:
+      title: LifetimeIsaManagerAccountsEventsrequest
+      required:
+      - eventType
+      - eventDate
+      type: object
+      properties:
+        eventType:
+          $ref: '#/components/schemas/eventType'
+        eventDate:
+          pattern: ^\d{4}-\d{2}-\d{2}$
+          type: string
+          example: 2017-05-20
+    eventType:
+      title: eventType
+      enum:
+      - LISA Investor Death
+      - LISA Investor Terminal Ill Health
+      type: string
+    lifetimeIsaManagerAccountsEventsResponse:
+      title: LifetimeIsaManagerAccountsEventsresponse
+      required:
+      - status
+      - success
+      - data
+      type: object
+      properties:
+        status:
+          type: number
+          description: The HTTP status of the result of the API call. Always 201.
+        success:
+          type: boolean
+          description: Whether the API call was successful or not. Always true.
+        data:
+          allOf:
+          - $ref: '#/components/schemas/Data5'
+          - description: Response details.
+    Data5:
+      title: Data5
+      required:
+      - message
+      - lifeEventId
+      type: object
+      properties:
+        message:
+          enum:
+          - Life event created
+          type: string
+          description: A human-readable explanation for the result of the API call.
+        lifeEventId:
+          pattern: ^\d{10}$
+          type: string
+          description: The life event’s ID reference number. You must store this ID as it is needed for other API calls.
+      description: Response details.
+    lifetimeIsaManagerAccountsEventsResponse400:
+      title: LifetimeIsaManagerAccountsEventsresponse400
+      required:
+      - code
+      - message
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/error-codeType'
+        message:
+          type: string
+        accountId:
+          type: string
+        lifeEventId:
+          type: string
+        transactionId:
+          type: string
+    lifetimeIsaManagerAccountsEventsAnnualReturnsRequest:
+      title: LifetimeIsaManagerAccountsEventsAnnualReturnsrequest
+      required:
+      - eventDate
+      - lisaManagerName
+      - taxYear
+      - marketValueCash
+      - marketValueStocksAndShares
+      - annualSubsCash
+      - annualSubsStocksAndShares
+      type: object
+      properties:
+        eventDate:
+          pattern: ^\d{4}-\d{2}-\d{2}$
+          type: string
+          example: 2018-03-31
+        lisaManagerName:
+          maxLength: 50
+          pattern: ^[a-zA-Z0-9 '/,&().-]{1,50}$
+          type: string
+          description: The name of the LISA provider.
+          example: Company Name
+        taxYear:
+          type: integer
+          description: The tax year for the return of information. You cannot give the current tax year. You can only send a return of information for a previous tax year. Give the year that the tax year ends in. For example, for the 2017 to 2018 tax year give 2018.
+          format: int32
+          example: 2018
+        marketValueCash:
+          maximum: 999999
+          minimum: 0
+          type: integer
+          format: int32
+          example: 1000
+        marketValueStocksAndShares:
+          maximum: 999999
+          minimum: 0
+          type: integer
+          format: int32
+          example: 1000
+        annualSubsCash:
+          maximum: 9999
+          minimum: 0
+          type: integer
+          format: int32
+          example: 100
+        annualSubsStocksAndShares:
+          maximum: 9999
+          minimum: 0
+          type: integer
+          format: int32
+          example: 100
+        supersede:
+          allOf:
+          - $ref: '#/components/schemas/Supersede'
+          - description: Correct an existing return of information.
+    Supersede:
+      title: Supersede
+      required:
+      - originalLifeEventId
+      - originalEventDate
+      type: object
+      properties:
+        originalLifeEventId:
+          pattern: ^\d{10}$
+          type: string
+          description: The lifeEventId of the original return of information affected by the correction. This is used together with the originalEventDate to make sure the right return of information is replaced.
+        originalEventDate:
+          pattern: ^\d{4}-\d{2}-\d{2}$
+          type: string
+          example: 2018-03-31
+      description: Correct an existing return of information.
+    lifetimeIsaManagerAccountsEventsAnnualReturnsResponse:
+      title: LifetimeIsaManagerAccountsEventsAnnualReturnsresponse
+      required:
+      - status
+      - success
+      - data
+      type: object
+      properties:
+        status:
+          type: number
+          description: The HTTP status of the result of the API call. Always 201.
+        success:
+          type: boolean
+          description: Whether the API call was successful or not. Always true.
+        data:
+          allOf:
+          - $ref: '#/components/schemas/Data6'
+          - description: Response details.
+    Data6:
+      title: Data6
+      required:
+      - message
+      - lifeEventId
+      type: object
+      properties:
+        message:
+          allOf:
+          - $ref: '#/components/schemas/Message2'
+          - description: A human-readable explanation for the result of the API call.
+        lifeEventId:
+          pattern: ^\d{10}$
+          type: string
+          description: The life event’s ID reference number. You must store this ID as it is needed for other API calls.
+      description: Response details.
+    Message2:
+      title: Message2
+      enum:
+      - Life event created
+      - Life event superseded
+      type: string
+      description: A human-readable explanation for the result of the API call.
+    lifetimeIsaManagerAccountsEventsAnnualReturnsResponse400:
+      title: LifetimeIsaManagerAccountsEventsAnnualReturnsresponse400
+      required:
+      - code
+      - message
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/error-codeType'
+        message:
+          type: string
+        accountId:
+          type: string
+        lifeEventId:
+          type: string
+        transactionId:
+          type: string
+    lifetimeIsaManagerAccountsEventsFundReleasesRequest:
+      title: LifetimeIsaManagerAccountsEventsFundReleasesrequest
+      required:
+      - eventDate
+      - withdrawalAmount
+      type: object
+      properties:
+        eventDate:
+          pattern: ^\d{4}-\d{2}-\d{2}$
+          type: string
+          example: 2017-05-06
+        withdrawalAmount:
+          type: number
+          description: This is the amount that the investor has withdrawn from the LISA account. You can include a value up to 2 decimal places.
+        conveyancerReference:
+          pattern: ^[a-zA-Z0-9 :/-]{1,20}$
+          type: string
+          description: This is the reference for the conveyancer involved with the property purchase.
+          example: CR12345-6789
+        propertyDetails:
+          allOf:
+          - $ref: '#/components/schemas/PropertyDetails'
+          - description: The details of the property that you are requesting funds to buy.
+        supersede:
+          allOf:
+          - $ref: '#/components/schemas/Supersede1'
+          - description: Correct an existing fund release with a new eventDate and withdrawalAmount.
+    PropertyDetails:
+      title: PropertyDetails
+      required:
+      - nameOrNumber
+      - postalCode
+      type: object
+      properties:
+        nameOrNumber:
+          pattern: ^[A-Za-z0-9 :/-]{1,35}$
+          type: string
+          description: The name or number of the property that you are requesting funds to buy.
+          example: Flat A
+        postalCode:
+          pattern: ^[A-Za-z0-9 ]{1,8}$
+          type: string
+          description: The postcode of the property that you are requesting funds to buy.
+          example: AA1 1AA
+      description: The details of the property that you are requesting funds to buy.
+    Supersede1:
+      title: Supersede1
+      required:
+      - originalLifeEventId
+      - originalEventDate
+      type: object
+      properties:
+        originalLifeEventId:
+          pattern: ^\d{10}$
+          type: string
+          example: '0987654321'
+        originalEventDate:
+          pattern: ^\d{4}-\d{2}-\d{2}$
+          type: string
+          example: 2017-05-06
+      description: Correct an existing fund release with a new eventDate and withdrawalAmount.
+    lifetimeIsaManagerAccountsEventsFundReleasesResponse:
+      title: LifetimeIsaManagerAccountsEventsFundReleasesresponse
+      required:
+      - status
+      - success
+      - data
+      type: object
+      properties:
+        status:
+          type: number
+          description: The HTTP status of the result of the API call. Always 201.
+        success:
+          type: boolean
+          description: Whether the API call was successful or not. Always true.
+        data:
+          allOf:
+          - $ref: '#/components/schemas/Data7'
+          - description: Response details.
+    Data7:
+      title: Data7
+      required:
+      - message
+      - lifeEventId
+      type: object
+      properties:
+        message:
+          allOf:
+          - $ref: '#/components/schemas/Message3'
+          - description: A human-readable explanation for the result of the API call.
+        lifeEventId:
+          pattern: ^\d{10}$
+          type: string
+          description: The fund release’s ID reference number. You must store this ID as it is needed for other API calls.
+      description: Response details.
+    Message3:
+      title: Message3
+      enum:
+      - Fund release created
+      - Fund release superseded
+      type: string
+      description: A human-readable explanation for the result of the API call.
+    lifetimeIsaManagerAccountsEventsFundReleasesResponse400:
+      title: LifetimeIsaManagerAccountsEventsFundReleasesresponse400
+      required:
+      - code
+      - message
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/error-codeType'
+        message:
+          type: string
+        accountId:
+          type: string
+        lifeEventId:
+          type: string
+        transactionId:
+          type: string
+    lifetimeIsaManagerAccountsEventsPurchaseExtensionsRequest:
+      title: LifetimeIsaManagerAccountsEventsPurchaseExtensionsrequest
+      required:
+      - eventDate
+      - eventType
+      type: object
+      properties:
+        fundReleaseId:
+          pattern: ^\d{10}$
+          type: string
+          example: '3456789000'
+        eventDate:
+          pattern: ^\d{4}-\d{2}-\d{2}$
+          type: string
+          example: 2017-05-10
+        eventType:
+          allOf:
+          - $ref: '#/components/schemas/EventType1'
+          - description: The type of extension.
+        supersede:
+          allOf:
+          - $ref: '#/components/schemas/Supersede2'
+          - description: Correct an existing extension.
+    EventType1:
+      title: EventType1
+      enum:
+      - Extension one
+      - Extension two
+      type: string
+      description: The type of extension.
+    Supersede2:
+      title: Supersede2
+      required:
+      - originalLifeEventId
+      - originalEventDate
+      type: object
+      properties:
+        originalLifeEventId:
+          pattern: ^\d{10}$
+          type: string
+          example: '6789000001'
+        originalEventDate:
+          pattern: ^\d{4}-\d{2}-\d{2}$
+          type: string
+          example: 2017-05-11
+      description: Correct an existing extension.
+    lifetimeIsaManagerAccountsEventsPurchaseExtensionsResponse:
+      title: LifetimeIsaManagerAccountsEventsPurchaseExtensionsresponse
+      required:
+      - status
+      - success
+      - data
+      type: object
+      properties:
+        status:
+          type: number
+          description: The HTTP status of the result of the API call. Always 201.
+        success:
+          type: boolean
+          description: Whether the API call was successful or not. Always true.
+        data:
+          allOf:
+          - $ref: '#/components/schemas/Data8'
+          - description: Response details.
+    Data8:
+      title: Data8
+      required:
+      - message
+      - lifeEventId
+      type: object
+      properties:
+        message:
+          allOf:
+          - $ref: '#/components/schemas/Message4'
+          - description: A human-readable explanation for the result of the API call.
+        lifeEventId:
+          pattern: ^\d{10}$
+          type: string
+          description: The extension’s ID reference number. You must store this ID as it is needed for other API calls.
+      description: Response details.
+    Message4:
+      title: Message4
+      enum:
+      - Extension created
+      - Extension superseded
+      type: string
+      description: A human-readable explanation for the result of the API call.
+    lifetimeIsaManagerAccountsEventsPurchaseExtensionsResponse403:
+      title: LifetimeIsaManagerAccountsEventsPurchaseExtensionsresponse403
+      required:
+      - code
+      - message
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/error-codeType'
+        message:
+          type: string
+        accountId:
+          type: string
+        lifeEventId:
+          type: string
+        transactionId:
+          type: string
+    lifetimeIsaManagerAccountsEventsPurchaseOutcomesRequest:
+      title: LifetimeIsaManagerAccountsEventsPurchaseOutcomesrequest
+      required:
+      - eventDate
+      - propertyPurchaseResult
+      type: object
+      properties:
+        fundReleaseId:
+          pattern: ^\d{10}$
+          type: string
+          example: '0987654321'
+        eventDate:
+          pattern: ^\d{4}-\d{2}-\d{2}$
+          type: string
+          example: 2017-05-06
+        propertyPurchaseResult:
+          allOf:
+          - $ref: '#/components/schemas/PropertyPurchaseResult'
+          - description: Whether a property purchase was completed or failed.
+        propertyPurchaseValue:
+          type: number
+          description: The value of the property that the investor purchased. Only include this information if the purchase was completed. You can include an amount up to 2 decimal places.
+        supersede:
+          allOf:
+          - $ref: '#/components/schemas/Supersede3'
+          - description: Correct an existing purchase outcome.
+    PropertyPurchaseResult:
+      title: PropertyPurchaseResult
+      enum:
+      - Purchase failed
+      - Purchase completed
+      type: string
+      description: Whether a property purchase was completed or failed.
+    Supersede3:
+      title: Supersede3
+      required:
+      - originalLifeEventId
+      - originalEventDate
+      type: object
+      properties:
+        originalLifeEventId:
+          pattern: ^\d{10}$
+          type: string
+          example: '0987654321'
+        originalEventDate:
+          pattern: ^\d{4}-\d{2}-\d{2}$
+          type: string
+          example: 2017-05-06
+      description: Correct an existing purchase outcome.
+    lifetimeIsaManagerAccountsEventsPurchaseOutcomesResponse:
+      title: LifetimeIsaManagerAccountsEventsPurchaseOutcomesresponse
+      required:
+      - status
+      - success
+      - data
+      type: object
+      properties:
+        status:
+          type: number
+          description: The HTTP status of the result of the API call. Always 201.
+        success:
+          type: boolean
+          description: Whether the API call was successful or not. Always true.
+        data:
+          allOf:
+          - $ref: '#/components/schemas/Data9'
+          - description: Response details.
+    Data9:
+      title: Data9
+      required:
+      - message
+      - lifeEventId
+      type: object
+      properties:
+        message:
+          allOf:
+          - $ref: '#/components/schemas/Message5'
+          - description: A human-readable explanation for the result of the API call.
+        lifeEventId:
+          pattern: ^\d{10}$
+          type: string
+          description: The purchase outcome’s ID reference number. You must store this ID as it is needed for other API calls.
+      description: Response details.
+    Message5:
+      title: Message5
+      enum:
+      - Purchase outcome created
+      - Purchase outcome superseded
+      type: string
+      description: A human-readable explanation for the result of the API call.
+    lifetimeIsaManagerAccountsEventsPurchaseOutcomesResponse403:
+      title: LifetimeIsaManagerAccountsEventsPurchaseOutcomesresponse403
+      required:
+      - code
+      - message
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/error-codeType'
+        message:
+          type: string
+        accountId:
+          type: string
+        lifeEventId:
+          type: string
+        transactionId:
+          type: string
+    LifetimeIsaManagerAccountsEventsLifeEventIdResponse:
+      title: LifetimeIsaManagerAccountsEventsLifeEventIdresponse
+      required:
+      - lifeEventId
+      - eventType
+      - eventDate
+      type: object
+      properties:
+        lifeEventId:
+          pattern: ^\d{10}$
+          type: string
+          example: '0987654321'
+        eventType:
+          $ref: '#/components/schemas/eventType2'
+        eventDate:
+          pattern: ^\d{4}-\d{2}-\d{2}$
+          type: string
+          example: 2017-05-20
+        lisaManagerName:
+          maxLength: 50
+          pattern: ^[a-zA-Z0-9 '/,&().-]{1,50}$
+          type: string
+          description: The name of the LISA provider.
+          example: Company Name
+        taxYear:
+          type: integer
+          description: The tax year for the return of information. This will be the year that the tax year ends in. For example, for the 2017 to 2018 tax year it will be 2018.
+          format: int32
+          example: 2018
+        marketValueCash:
+          maximum: 999999
+          minimum: 0
+          type: integer
+          format: int32
+          example: 1000
+        marketValueStocksAndShares:
+          maximum: 999999
+          minimum: 0
+          type: integer
+          format: int32
+          example: 1000
+        annualSubsCash:
+          maximum: 9999
+          minimum: 0
+          type: integer
+          format: int32
+          example: 100
+        annualSubsStocksAndShares:
+          maximum: 9999
+          minimum: 0
+          type: integer
+          format: int32
+          example: 100
+        withdrawalAmount:
+          type: number
+          description: This is the amount that the investor has withdrawn from the LISA account.
+        conveyancerReference:
+          pattern: ^[a-zA-Z0-9 :/-]{1,20}$
+          type: string
+          description: This is the reference for the conveyancer involved with the property purchase.
+          example: CR12345-6789
+        propertyDetails:
+          allOf:
+          - $ref: '#/components/schemas/PropertyDetails1'
+          - description: The details of the property that you requested funds to buy.
+        fundReleaseId:
+          pattern: ^\d{10}$
+          type: string
+          example: '0987654321'
+        propertyPurchaseValue:
+          type: number
+          description: The value of the property that the investor purchased. Only included if the purchase was completed.
+        propertyPurchaseResult:
+          allOf:
+          - $ref: '#/components/schemas/PropertyPurchaseResult'
+          - description: Whether a property purchase was completed or failed.
+        supersede:
+          allOf:
+          - $ref: '#/components/schemas/Supersede4'
+          - description: Shows that a life event was corrected.
+        supersededBy:
+          pattern: ^\d{10}$
+          type: string
+          example: '0987654321'
+    eventType2:
+      title: eventType2
+      enum:
+      - LISA Investor Death
+      - LISA Investor Terminal Ill Health
+      - Statutory Submission
+      - Funds release
+      - Extension one
+      - Extension two
+      - Purchase outcome
+      type: string
+    PropertyDetails1:
+      title: PropertyDetails1
+      required:
+      - nameOrNumber
+      - postalCode
+      type: object
+      properties:
+        nameOrNumber:
+          pattern: ^[A-Za-z0-9 :/-]{1,35}$
+          type: string
+          description: The name or number of the property that you requested funds to buy.
+          example: Flat A
+        postalCode:
+          pattern: ^[A-Za-z0-9 ]{1,8}$
+          type: string
+          description: The postcode of the property that you requested funds to buy.
+          example: AA1 1AA
+      description: The details of the property that you requested funds to buy.
+    Supersede4:
+      title: Supersede4
+      required:
+      - originalLifeEventId
+      - originalEventDate
+      type: object
+      properties:
+        originalLifeEventId:
+          pattern: ^\d{10}$
+          type: string
+          example: '0987654321'
+        originalEventDate:
+          pattern: ^\d{4}-\d{2}-\d{2}$
+          type: string
+          example: 2017-05-20
+      description: Shows that a life event was corrected.
+    lifetimeIsaManagerAccountsEventsLifeEventIdResponse400:
+      title: LifetimeIsaManagerAccountsEventsLifeEventIdresponse400
+      required:
+      - code
+      - message
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/error-codeType'
+        message:
+          type: string
+        accountId:
+          type: string
+        lifeEventId:
+          type: string
+        transactionId:
+          type: string
+    lifetimeIsaManagerAccountsWithdrawalChargesRequest:
+      title: LifetimeIsaManagerAccountsWithdrawalChargesrequest
+      required:
+      - claimPeriodStartDate
+      - claimPeriodEndDate
+      - withdrawalAmount
+      - withdrawalChargeAmount
+      - withdrawalChargeAmountYTD
+      - fundsDeductedDuringWithdrawal
+      - withdrawalReason
+      type: object
+      properties:
+        claimPeriodStartDate:
+          pattern: ^\d{4}-\d{2}-\d{2}$
+          type: string
+          description: This is the start date of the claim period for the withdrawal charge. It must be the sixth day of the month. You cannot enter a date in the future.
+          example: 2018-01-06
+        claimPeriodEndDate:
+          pattern: ^\d{4}-\d{2}-\d{2}$
+          type: string
+          description: This is the end date of the claim period for the withdrawal charge. It must be the fifth day of the month. It has to be the month after the claimPeriodStartDate.
+          example: 2018-02-05
+        withdrawalAmount:
+          type: number
+          description: This is the amount that the investor has withdrawn from the LISA account.  You can include a value up to 2 decimal places.
+        withdrawalChargeAmount:
+          type: number
+          description: This is the amount charged for the withdrawal. You can include a value up to 2 decimal places. If there is a charge made during withdrawal, withdrawalChargeAmount and automaticRecoveryAmount must be the same.
+        withdrawalChargeAmountYTD:
+          type: number
+          description: This is the total value of withdrawal charges reported to HMRC for the current tax year to date. You can include a value up to 2 decimal places.
+        fundsDeductedDuringWithdrawal:
+          type: boolean
+          description: This confirms if the investor was charged and funds were deducted at the time of the withdrawal.
+        withdrawalReason:
+          allOf:
+          - $ref: '#/components/schemas/WithdrawalReason'
+          - description: This is used by HMRC to decide how the withdrawal charge is processed.
+        automaticRecoveryAmount:
+          type: number
+          description: This is the amount HMRC can collect from the LISA manager when a withdrawal charge is due from the investor. This cannot be greater than the withdrawalChargeAmount. If there are no funds available, this value must be 0. If there is a charge made during withdrawal, automaticRecoveryAmount and withdrawalChargeAmount must be the same.
+        supersede:
+          allOf:
+          - $ref: '#/components/schemas/Supersede5'
+          - description: Correct an existing withdrawal charge. You can request an additional charge, reduce a charge, or refund a charge.
+    WithdrawalReason:
+      title: WithdrawalReason
+      enum:
+      - Regular withdrawal
+      - Superseded withdrawal
+      type: string
+      description: This is used by HMRC to decide how the withdrawal charge is processed.
+    Supersede5:
+      title: Supersede5
+      required:
+      - originalTransactionId
+      - originalWithdrawalChargeAmount
+      - transactionResult
+      - reason
+      type: object
+      properties:
+        originalTransactionId:
+          pattern: ^\d{1,10}$
+          type: string
+          example: '1234567890'
+        originalWithdrawalChargeAmount:
+          type: number
+          description: This is how much was in the withdrawalChargeAmount in the original request. You can include a value up to 2 decimal places.
+        transactionResult:
+          type: number
+          description: The amount to be added to or recovered from the original withdrawal charge.
+        reason:
+          allOf:
+          - $ref: '#/components/schemas/Reason'
+          - description: Confirm whether an additional charge is due or whether the investor is owed some money.
+      description: Correct an existing withdrawal charge. You can request an additional charge, reduce a charge, or refund a charge.
+    Reason:
+      title: Reason
+      enum:
+      - Additional withdrawal
+      - Withdrawal reduction
+      - Withdrawal refund
+      type: string
+      description: Confirm whether an additional charge is due or whether the investor is owed some money.
+    lifetimeIsaManagerAccountsWithdrawalChargesResponse:
+      title: LifetimeIsaManagerAccountsWithdrawalChargesresponse
+      required:
+      - status
+      - success
+      - data
+      type: object
+      properties:
+        status:
+          type: number
+          description: The HTTP status of the result of the API call. Always 201.
+        success:
+          type: boolean
+          description: Whether the API call was successful or not. Always true.
+        data:
+          allOf:
+          - $ref: '#/components/schemas/Data10'
+          - description: Response details.
+    Data10:
+      title: Data10
+      required:
+      - message
+      - transactionId
+      type: object
+      properties:
+        message:
+          allOf:
+          - $ref: '#/components/schemas/Message6'
+          - description: A human-readable explanation for the result of the API call.
+        transactionId:
+          pattern: ^\d{10}$
+          type: string
+          description: The transaction’s ID reference number. You must store this ID as it is needed for other API calls.
+      description: Response details.
+    Message6:
+      title: Message6
+      enum:
+      - Unauthorised withdrawal transaction created
+      - Unauthorised withdrawal transaction created - late notification
+      - Unauthorised withdrawal transaction superseded
+      type: string
+      description: A human-readable explanation for the result of the API call.
+    lifetimeIsaManagerAccountsWithdrawalChargesResponse400:
+      title: LifetimeIsaManagerAccountsWithdrawalChargesresponse400
+      required:
+      - code
+      - message
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/error-codeType'
+        message:
+          type: string
+        accountId:
+          type: string
+        lifeEventId:
+          type: string
+        transactionId:
+          type: string
+    lifetimeIsaManagerAccountsWithdrawalChargesTransactionIdResponse:
+      title: LifetimeIsaManagerAccountsWithdrawalChargesTransactionIdresponse
+      required:
+      - claimPeriodStartDate
+      - claimPeriodEndDate
+      - withdrawalAmount
+      - withdrawalChargeAmount
+      - withdrawalChargeAmountYTD
+      - fundsDeductedDuringWithdrawal
+      - withdrawalReason
+      type: object
+      properties:
+        claimPeriodStartDate:
+          pattern: ^\d{4}-\d{2}-\d{2}$
+          type: string
+          description: This is the start date of the claim period for the withdrawal charge. It must be the sixth day of the month. You cannot enter a date in the future.
+          example: 2018-01-06
+        claimPeriodEndDate:
+          pattern: ^\d{4}-\d{2}-\d{2}$
+          type: string
+          description: This is the end date of the claim period for the withdrawal charge. It must be the fifth day of the month. It has to be the month after the claimPeriodStartDate.
+          example: 2018-02-05
+        automaticRecoveryAmount:
+          type: number
+          description: This is the amount HMRC can collect from the LISA manager when there is a withdrawal charge. If there are no funds available, this value must be 0.
+        withdrawalAmount:
+          type: number
+          description: This is the amount that the investor has withdrawn from the LISA account.
+        withdrawalChargeAmount:
+          type: number
+          description: This is the amount charged for the withdrawal.
+        withdrawalChargeAmountYTD:
+          type: number
+          description: This is the total value of withdrawal charges reported to HMRC for the current tax year to date.
+        fundsDeductedDuringWithdrawal:
+          type: boolean
+          description: This confirms if the investor was charged and funds were deducted at the time of the withdrawal.
+        withdrawalReason:
+          allOf:
+          - $ref: '#/components/schemas/WithdrawalReason'
+          - description: This is used by HMRC to decide how the withdrawal charge is processed.
+        supersededBy:
+          pattern: ^\d{1,10}$
+          type: string
+          example: '1234567890'
+        supersede:
+          allOf:
+          - $ref: '#/components/schemas/Supersede6'
+          - description: Correct an existing withdrawal charge. You can request an additional charge, reduce a charge, or refund a charge.
+    Supersede6:
+      title: Supersede6
+      required:
+      - originalTransactionId
+      - originalWithdrawalChargeAmount
+      - transactionResult
+      - reason
+      type: object
+      properties:
+        originalTransactionId:
+          pattern: ^\d{1,10}$
+          type: string
+          example: '1234567890'
+        originalWithdrawalChargeAmount:
+          type: number
+          description: This is how much was in the withdrawalChargeAmount in the original request.
+        transactionResult:
+          type: number
+          description: The amount to be added to or recovered from the original withdrawal charge.
+        reason:
+          allOf:
+          - $ref: '#/components/schemas/Reason'
+          - description: Confirm whether an additional charge is due or whether the investor is owed some money.
+      description: Correct an existing withdrawal charge. You can request an additional charge, reduce a charge, or refund a charge.
+    lifetimeIsaManagerAccountsWithdrawalChargesTransactionIdResponse400:
+      title: LifetimeIsaManagerAccountsWithdrawalChargesTransactionIdresponse400
+      required:
+      - code
+      - message
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/error-codeType'
+        message:
+          type: string
+        accountId:
+          type: string
+        lifeEventId:
+          type: string
+        transactionId:
+          type: string
+    lifetimeIsaManagerAccountsTransactionsRequest:
+      title: LifetimeIsaManagerAccountsTransactionsrequest
+      required:
+      - periodStartDate
+      - periodEndDate
+      - inboundPayments
+      - bonuses
+      type: object
+      properties:
+        lifeEventId:
+          pattern: ^\d{10}$
+          type: string
+          example: '0987654321'
+        periodStartDate:
+          pattern: ^\d{4}-\d{2}-\d{2}$
+          type: string
+          example: 2017-05-06
+        periodEndDate:
+          pattern: ^\d{4}-\d{2}-\d{2}$
+          type: string
+          example: 2017-06-05
+        htbTransfer:
+          allOf:
+          - $ref: '#/components/schemas/HtbTransfer'
+          - description: Details about Help to Buy funds.
+        inboundPayments:
+          allOf:
+          - $ref: '#/components/schemas/InboundPayments'
+          - description: Details about qualifying deposits and account balance.
+        bonuses:
+          allOf:
+          - $ref: '#/components/schemas/Bonuses'
+          - description: Bonus payment details.
+        supersede:
+          allOf:
+          - $ref: '#/components/schemas/Supersede7'
+          - description: Correct an existing bonus claim with an additional bonus or a recovery of an overpaid amount.
+    HtbTransfer:
+      title: HtbTransfer
+      required:
+      - htbTransferInForPeriod
+      - htbTransferTotalYTD
+      type: object
+      properties:
+        htbTransferInForPeriod:
+          type: number
+          description: The total amount of Help to Buy funds in the account during the claim period. You can include an amount up to 2 decimal places.
+        htbTransferTotalYTD:
+          type: number
+          description: The total amount of Help to Buy funds in the account in the tax year to date. You can include an amount up to 2 decimal places. If there is a number in htbTransferInForPeriod, then the number in htbTransferTotalYTD must be greater than 0.
+      description: Details about Help to Buy funds.
+    InboundPayments:
+      title: InboundPayments
+      required:
+      - newSubsYTD
+      - totalSubsForPeriod
+      - totalSubsYTD
+      type: object
+      properties:
+        newSubsForPeriod:
+          type: number
+          description: The total value of new qualifying deposits paid in to the account during the claim period. You can include an amount up to 2 decimal places.
+        newSubsYTD:
+          type: number
+          description: The total value of new qualifying deposits paid in to the account during the tax year to date. You can include an amount up to 2 decimal places. If there is a number in newSubsForPeriod, then the number in newSubsYTD must be greater than 0.
+        totalSubsForPeriod:
+          type: number
+          description: The total amount in the account during the claim period that qualifies for a bonus payment. You can include an amount up to 2 decimal places. The totalSubsForPeriod must always be greater than 0 except when bonusDueForPeriod is 0.
+        totalSubsYTD:
+          type: number
+          description: The total amount in the account during the tax year to date that qualifies for a bonus payment. You can include an amount up to 2 decimal places. The totalSubsYTD must be the same as or more than totalSubsForPeriod.
+      description: Details about qualifying deposits and account balance.
+    Bonuses:
+      title: Bonuses
+      required:
+      - bonusDueForPeriod
+      - totalBonusDueYTD
+      - claimReason
+      type: object
+      properties:
+        bonusDueForPeriod:
+          type: number
+          description: The total bonus payment amount due for the claim period. You can include an amount up to 2 decimal places. If you supersede this claim and the supersededReason is ‘bonus recovery’, then the bonusDueForPeriod can be 0. If not, it must always be greater than 0.
+        totalBonusDueYTD:
+          type: number
+          description: The total bonus payment amount due for the tax year to date. You can include an amount up to 2 decimal places. This cannot be less than bonusDueForPeriod.
+        bonusPaidYTD:
+          type: number
+          description: The total bonus payment that has already been claimed and paid in the tax year to date. You can include an amount up to 2 decimal places.
+        claimReason:
+          $ref: '#/components/schemas/claimReasonType'
+      description: Bonus payment details.
+    claimReasonType:
+      title: claimReasonType
+      enum:
+      - Life Event
+      - Regular Bonus
+      - Superseded Bonus
+      type: string
+    Supersede7:
+      title: Supersede7
+      required:
+      - originalTransactionId
+      - originalBonusDueForPeriod
+      - transactionResult
+      - reason
+      type: object
+      properties:
+        automaticRecoveryAmount:
+          type: number
+          description: This is the amount HMRC can collect from the LISA manager in bonus recovery cases. If there are no funds available, this value must be 0.
+        originalTransactionId:
+          pattern: ^\d{1,10}$
+          type: string
+          example: '1234567890'
+        originalBonusDueForPeriod:
+          type: number
+          description: This is how much was in the bonusDueForPeriod in the original bonus request.
+        transactionResult:
+          type: number
+          description: The amount to be added to or recovered from the original bonus.
+        reason:
+          $ref: '#/components/schemas/supersededReasonType'
+      description: Correct an existing bonus claim with an additional bonus or a recovery of an overpaid amount.
+    supersededReasonType:
+      title: supersededReasonType
+      enum:
+      - Bonus recovery
+      - Additional bonus
+      type: string
+    lifetimeIsaManagerAccountsTransactionsResponse:
+      title: LifetimeIsaManagerAccountsTransactionsresponse
+      required:
+      - status
+      - success
+      - data
+      type: object
+      properties:
+        status:
+          type: number
+          description: The HTTP status of the result of the API call. Always 201.
+        success:
+          type: boolean
+          description: Whether the API call was successful or not. Always true.
+        data:
+          allOf:
+          - $ref: '#/components/schemas/Data11'
+          - description: Response details.
+    Data11:
+      title: Data11
+      required:
+      - message
+      - transactionId
+      type: object
+      properties:
+        message:
+          allOf:
+          - $ref: '#/components/schemas/Message7'
+          - description: A human-readable explanation for the result of the API call.
+        transactionId:
+          pattern: ^\d{10}$
+          type: string
+          description: The transaction’s ID reference number. You must store this ID as it is needed for other API calls.
+      description: Response details.
+    Message7:
+      title: Message7
+      enum:
+      - Bonus transaction created
+      - Bonus transaction created - late notification
+      - Bonus transaction superseded
+      type: string
+      description: A human-readable explanation for the result of the API call.
+    lifetimeIsaManagerAccountsTransactionsResponse400:
+      title: LifetimeIsaManagerAccountsTransactionsresponse400
+      required:
+      - code
+      - message
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/error-codeType'
+        message:
+          type: string
+        accountId:
+          type: string
+        lifeEventId:
+          type: string
+        transactionId:
+          type: string
+    lifetimeIsaManagerAccountsTransactionsTransactionIdResponse:
+      title: LifetimeIsaManagerAccountsTransactionsTransactionIdresponse
+      required:
+      - periodStartDate
+      - periodEndDate
+      - inboundPayments
+      - bonuses
+      type: object
+      properties:
+        lifeEventId:
+          pattern: ^\d{10}$
+          type: string
+          example: '0987654321'
+        periodStartDate:
+          pattern: ^\d{4}-\d{2}-\d{2}$
+          type: string
+          example: 2017-05-06
+        periodEndDate:
+          pattern: ^\d{4}-\d{2}-\d{2}$
+          type: string
+          example: 2017-06-05
+        htbTransfer:
+          allOf:
+          - $ref: '#/components/schemas/HtbTransfer1'
+          - description: Details about Help to Buy funds.
+        inboundPayments:
+          allOf:
+          - $ref: '#/components/schemas/InboundPayments1'
+          - description: Details about qualifying deposits and account balance.
+        bonuses:
+          allOf:
+          - $ref: '#/components/schemas/Bonuses1'
+          - description: Bonus payment details.
+        supersededBy:
+          pattern: ^\d{1,10}$
+          type: string
+          example: '1234567890'
+        supersede:
+          allOf:
+          - $ref: '#/components/schemas/Supersede7'
+          - description: Correct an existing bonus claim with an additional bonus or a recovery of an overpaid amount.
+    HtbTransfer1:
+      title: HtbTransfer1
+      required:
+      - htbTransferInForPeriod
+      - htbTransferTotalYTD
+      type: object
+      properties:
+        htbTransferInForPeriod:
+          type: number
+          description: The total amount of Help to Buy funds in the account during the claim period.
+        htbTransferTotalYTD:
+          type: number
+          description: The total amount of Help to Buy funds in the account in the tax year to date.
+      description: Details about Help to Buy funds.
+    InboundPayments1:
+      title: InboundPayments1
+      required:
+      - newSubsYTD
+      - totalSubsForPeriod
+      - totalSubsYTD
+      type: object
+      properties:
+        newSubsForPeriod:
+          type: number
+          description: The total value of new qualifying deposits paid in to the account during the claim period.
+        newSubsYTD:
+          type: number
+          description: The total value of new qualifying deposits paid in to the account during the tax year to date.
+        totalSubsForPeriod:
+          type: number
+          description: The total amount in the account during the claim period that qualifies for a bonus payment.
+        totalSubsYTD:
+          type: number
+          description: The total amount in the account during the tax year to date that qualifies for a bonus payment.
+      description: Details about qualifying deposits and account balance.
+    Bonuses1:
+      title: Bonuses1
+      required:
+      - bonusDueForPeriod
+      - totalBonusDueYTD
+      - claimReason
+      type: object
+      properties:
+        bonusDueForPeriod:
+          type: number
+          description: The total bonus payment amount due for the claim period.
+        totalBonusDueYTD:
+          type: number
+          description: The total bonus payment amount due for the tax year to date.
+        bonusPaidYTD:
+          type: number
+          description: The total bonus payment that has already been claimed and paid in the tax year to date.
+        claimReason:
+          $ref: '#/components/schemas/claimReasonType'
+      description: Bonus payment details.
+    lifetimeIsaManagerAccountsTransactionsTransactionIdResponse400:
+      title: LifetimeIsaManagerAccountsTransactionsTransactionIdresponse400
+      required:
+      - code
+      - message
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/error-codeType'
+        message:
+          type: string
+        accountId:
+          type: string
+        lifeEventId:
+          type: string
+        transactionId:
+          type: string
+    lifetimeIsaManagerAccountsTransactionsTransactionIdPaymentsResponse:
+      title: LifetimeIsaManagerAccountsTransactionsTransactionIdPaymentsresponse
+      required:
+      - transactionId
+      - paymentStatus
+      type: object
+      properties:
+        transactionId:
+          pattern: ^\d{1,10}$
+          type: string
+        transactionType:
+          allOf:
+          - $ref: '#/components/schemas/TransactionType'
+          - description: The type of transaction. This can be money owed to HMRC (Debt), or money paid out by HMRC (Payment).
+        paymentDate:
+          pattern: ^\d{4}-\d{2}-\d{2}$
+          type: string
+          example: 2017-05-20
+        paymentDueDate:
+          pattern: ^\d{4}-\d{2}-\d{2}$
+          type: string
+          example: 2017-05-20
+        paymentStatus:
+          allOf:
+          - $ref: '#/components/schemas/PaymentStatus'
+          - description: The status of the transaction being requested.
+            example: Paid
+        paymentReference:
+          pattern: ^.{1,16}$
+          type: string
+          description: The reference of the payment made.
+          example: '12345'
+        paymentAmount:
+          type: number
+          description: The amount paid for the transaction.
+          example: 1000
+        supersededBy:
+          pattern: ^\d{1,10}$
+          type: string
+    TransactionType:
+      title: TransactionType
+      enum:
+      - Payment
+      - Debt
+      type: string
+      description: The type of transaction. This can be money owed to HMRC (Debt), or money paid out by HMRC (Payment).
+    PaymentStatus:
+      title: PaymentStatus
+      enum:
+      - Paid
+      - Pending
+      - Due
+      - Collected
+      - Cancelled
+      - Void
+      - Superseded
+      - Charge refund cancelled
+      type: string
+      description: The status of the transaction being requested.
+      example: Paid
+    lifetimeIsaManagerAccountsTransactionsTransactionIdPaymentsResponse400:
+      title: LifetimeIsaManagerAccountsTransactionsTransactionIdPaymentsresponse400
+      required:
+      - code
+      - message
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/error-codeType'
+        message:
+          type: string
+        accountId:
+          type: string
+        lifeEventId:
+          type: string
+        transactionId:
+          type: string
+    lifetimeIsaManagerPaymentsResponse:
+      title: LifetimeIsaManagerPaymentsresponse
+      required:
+      - lisaManagerReferenceNumber
+      - payments
+      type: object
+      properties:
+        lisaManagerReferenceNumber:
+          pattern: ^Z([0-9]{4}|[0-9]{6})$
+          type: string
+          example: Z1234
+        payments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Payment'
+          description: Pending and paid payments from HMRC and due and collected debts owed to HMRC.
+    Payment:
+      title: Payment
+      required:
+      - transactionType
+      - status
+      - paymentAmount
+      type: object
+      properties:
+        transactionType:
+          allOf:
+          - $ref: '#/components/schemas/TransactionType'
+          - description: The type of transaction. This can be money owed to HMRC (Debt), or money paid out by HMRC (Payment).
+        status:
+          allOf:
+          - $ref: '#/components/schemas/Status'
+          - description: The status of the transaction being requested.
+        paymentAmount:
+          type: number
+          description: Amount pending or paid to the LISA provider, or the amount due or collected from the LISA provider.
+          example: 23456
+        paymentReference:
+          pattern: ^.{1,35}$
+          type: string
+          example: '1234567890'
+        paymentDate:
+          pattern: ^\d{4}-\d{2}-\d{2}$
+          type: string
+          example: 2017-05-20
+        dueDate:
+          pattern: ^\d{4}-\d{2}-\d{2}$
+          type: string
+          example: 2017-05-20
+    Status:
+      title: Status
+      enum:
+      - Pending
+      - Paid
+      - Due
+      - Collected
+      type: string
+      description: The status of the transaction being requested.
+    lifetimeIsaManagerPaymentsResponse400:
+      title: LifetimeIsaManagerPaymentsresponse400
+      required:
+      - code
+      - message
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/error-codeType'
+        message:
+          type: string
+        accountId:
+          type: string
+        lifeEventId:
+          type: string
+        transactionId:
+          type: string
+    lifetimeIsaManagerPaymentsResponse403:
+      title: LifetimeIsaManagerPaymentsresponse403
+      required:
+      - code
+      - message
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      example:
+        code: FORBIDDEN
+        message: endDate cannot be in the future
+  examples:
+    badRequest:
+      value:
+        code: BAD_REQUEST
+        message: Bad Request
+    invalidLmrn:
+      value:
+        code: BAD_REQUEST
+        message: Enter lisaManagerReferenceNumber in the correct format, like Z1234
+    notOpenStatusBadRequest:
+      value:
+        code: BAD_REQUEST
+        message: Bad Request
+    notOpenStatusUnauthorized:
+      value:
+        code: UNAUTHORIZED
+        message: Enter a real lisaManagerReferenceNumber
+    accountIdNotFound:
+      value:
+        code: INVESTOR_ACCOUNTID_NOT_FOUND
+        message: Enter a real accountId
+    invalidAccountId:
+      value:
+        code: BAD_REQUEST
+        message: Enter accountId in the correct format, like ABC12345
+    accountClosed:
+      value:
+        code: INVESTOR_ACCOUNT_ALREADY_CLOSED
+        message: The LISA account is already closed
+    accountCancelled:
+      value:
+        code: INVESTOR_ACCOUNT_ALREADY_CANCELLED
+        message: The LISA account is already cancelled
+    accountVoided:
+      value:
+        code: INVESTOR_ACCOUNT_ALREADY_VOID
+        message: The LISA account is already void
+    lifeEventExists:
+      value:
+        code: LIFE_EVENT_ALREADY_EXISTS
+        message: The investor’s life event has already been reported
+    supersedingLifeEventMisMatchError:
+      value:
+        code: SUPERSEDED_LIFE_EVENT_MISMATCH_ERROR
+        message: originalLifeEventId and the originalEventDate do not match the information in the original request
+    accountVoid:
+      value:
+        code: INVESTOR_ACCOUNT_ALREADY_VOID
+        message: The LISA account is already void
+    supersedingLifeEventAlreadySuperseded:
+      value:
+        code: SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED
+        message: This life event has already been superseded
+    fundReleaseNotFound:
+      value:
+        code: FUND_RELEASE_NOT_FOUND
+        message: The fundReleaseId does not match HMRC’s records
+    fundReleaseLifeEventAlreadySuperseded:
+      value:
+        code: FUND_RELEASE_SUPERSEDED
+        message: This fund release has already been superseded
