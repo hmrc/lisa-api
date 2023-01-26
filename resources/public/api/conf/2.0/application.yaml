@@ -12,6 +12,8 @@ servers:
 paths:
   /lifetime-isa/manager/{lisaManagerReferenceNumber}:
     get:
+      tags:
+        - LISA Endpoints
       summary: Get a list of all available endpoints
       description: |
         Use a LISA manager reference to get a list of all available endpoints.
@@ -41,7 +43,6 @@ paths:
                 </tr>
             </tbody>
         </table>
-
       operationId: getListOfAllAvailableEndpoints
       parameters:
       - $ref: '#/components/parameters/acceptHeader'
@@ -156,6 +157,8 @@ paths:
             - read:lisa
   /lifetime-isa/manager/{lisaManagerReferenceNumber}/investors:
     post:
+      tags:
+        - LISA Investors
       summary: Create a LISA investor
       description: |
         Report a new LISA investor to HMRC to generate an investor ID. If the investor already exists, you will get their reference number.
@@ -410,6 +413,8 @@ paths:
             - write:lisa
   /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts:
     post:
+      tags:
+        - LISA Accounts
       summary: Create or transfer a LISA account
       description: |
         Create a new account you’ve set up for an investor, or transfer an existing account from another LISA provider. If you’re creating a new account you’ll need to create a LISA investor first.
@@ -1018,6 +1023,8 @@ paths:
             - write:lisa
   /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/reinstate-account:
     post:
+      tags:
+        - LISA Accounts
       summary: Reinstate a LISA account
       description: |
         Re-open a LISA account that has been closed.
@@ -1298,6 +1305,8 @@ paths:
             - write:lisa
   /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}:
     get:
+      tags:
+        - LISA Accounts
       summary: Get account details
       description: |
         Use an account ID to get account details.
@@ -1613,6 +1622,8 @@ paths:
             - read:lisa
   /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/close-account:
     post:
+      tags:
+        - LISA Accounts
       summary: Close an existing LISA account
       description: |
         Close an account and report the reason and date.
@@ -1984,6 +1995,8 @@ paths:
             - write:lisa
   /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/update-subscription:
     post:
+      tags:
+        - LISA Accounts
       summary: Modify date of first subscription of a LISA account
       description: |
         Modify the date when the first deposit was paid after a LISA account was created.
@@ -2323,6 +2336,8 @@ paths:
             - write:lisa
   /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/events:
     post:
+      tags:
+        - Life Events
       summary: Report a death or terminal illness
       description: |
         Report to HMRC if an investor has been diagnosed with a terminal illness or died. You need to do this to get a lifeEventId before you can request a bonus payment from HMRC.
@@ -2694,6 +2709,8 @@ paths:
             - write:lisa
   /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/events/annual-returns:
     post:
+      tags:
+        - Life Events
       summary: Send an annual return of information
       description: |
         Report details to HMRC about LISA accounts you managed in the last tax year. You can also correct a previous return of information. You cannot send or correct a return of information if the investor account is cancelled or void.
@@ -3308,6 +3325,8 @@ paths:
             - write:lisa
   /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/events/fund-releases:
     post:
+      tags:
+        - Life Events
       summary: Request the release of funds to buy a property
       description: | 
         Request the release of LISA funds to buy a property. You can also correct a request by changing the withdrawal amount or property purchase date. When you make a correction, you cannot change the property details or the conveyancer reference number.
@@ -4003,6 +4022,8 @@ paths:
             - write:lisa
   /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/events/purchase-extensions:
     post:
+      tags:
+        - Life Events
       summary: Request a property purchase extension
       description: | 
         Request an extension to your request to release funds to buy a property.
@@ -4695,6 +4716,8 @@ paths:
             - write:lisa
   /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/events/purchase-outcomes:
     post:
+      tags:
+        - Life Events
       summary: Report the outcome of a property purchase
       description: | 
         Report to HMRC if a property purchase was completed or failed.
@@ -5116,6 +5139,8 @@ paths:
             - write:lisa
   /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/events/{lifeEventId}:
     get:
+      tags:
+        - Life Events
       summary: View a life event
       description: | 
         View life event data that has been submitted to HMRC. You can view death and terminal illness, property purchase funds release, property purchase extension, property purchase outcome, and annual return of information.
@@ -5625,7 +5650,7 @@ paths:
                 uniqueItems: true
                 type: array
                 items:
-                  $ref: '#/components/schemas/LifetimeIsaManagerAccountsEventsLifeEventIdResponse'
+                  $ref: '#/components/schemas/lifetimeIsaManagerAccountsEventsLifeEventIdResponse'
               examples:
                 ill:
                   value:
@@ -5722,6 +5747,8 @@ paths:
             - read:lisa
   /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/withdrawal-charges:
     post:
+      tags:
+        - Withdrawal Charges
       summary: Report a withdrawal charge
       description: | 
         Tell HMRC that an investor has taken money out of a LISA account without an associated life event. You can also correct a previous withdrawal charge.
@@ -6543,6 +6570,8 @@ paths:
             - write:lisa
   /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/withdrawal-charges/{transactionId}:
     get:
+      tags:
+        - Withdrawal Charges
       summary: Get details of a withdrawal charge
       description: | 
         Use an investor’s transaction ID to get a request for a withdrawal charge that has been submitted to HMRC.
@@ -6809,6 +6838,8 @@ paths:
             - read:lisa
   /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/transactions:
     post:
+      tags:
+        - Bonus Requests
       summary: Request a bonus payment
       description: |
         Request a bonus payment from HMRC and provide a reason for the request. You can also correct a bonus claim during or after the claim reporting period. You can repay any overpaid amounts to HMRC and receive additional payments from corrected claims.
@@ -8178,6 +8209,8 @@ paths:
             - write:lisa
   /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/transactions/{transactionId}:
     get:
+      tags:
+        - Bonus Requests
       summary: Get details of a bonus request
       description: | 
         Use an investor’s transaction ID to get a request for a bonus payment that has been submitted to HMRC.
@@ -8531,6 +8564,8 @@ paths:
             - read:lisa
   /lifetime-isa/manager/{lisaManagerReferenceNumber}/accounts/{accountId}/transactions/{transactionId}/payments:
     get:
+      tags:
+        - Payments and Debts
       summary: Get the payment details for a bonus claim or withdrawal charge
       description: | 
         Use an investor’s transaction ID to get payment details for a bonus claim or withdrawal charge, including when the amount is due to be paid or collected.
@@ -8790,6 +8825,8 @@ paths:
             - read:lisa
   /lifetime-isa/manager/{lisaManagerReferenceNumber}/payments:
     get:
+      tags:
+        - Payments and Debts
       summary: Get a list of all payments and debts in a date range
       description: | 
         Get a list of all pending and paid payments from HMRC and due and collected debts owed to HMRC in a specific date range.
@@ -9388,7 +9425,6 @@ components:
           - $ref: '#/components/schemas/data'
           - description: Response details.
     data:
-      title: Data
       required:
       - message
       - investorId
@@ -9434,7 +9470,6 @@ components:
           - $ref: '#/components/schemas/transferAccount'
           - description: If the creationReason is ‘Transferred’, 'Current year funds transferred', or 'Previous year funds transferred', then this is required.
     creationReason:
-      title: Creation Reason
       enum:
       - New
       - Transferred
@@ -9443,7 +9478,6 @@ components:
       type: string
       description: The reason the account was created.
     transferAccount:
-      title: Transfer Account
       required:
       - transferredFromAccountId
       - transferredFromLMRN
@@ -10034,7 +10068,6 @@ components:
       type: string
       description: The type of extension.
     supersede2:
-      title: Supersede2
       required:
       - originalLifeEventId
       - originalEventDate
@@ -10174,7 +10207,7 @@ components:
       - Purchase outcome superseded
       type: string
       description: A human-readable explanation for the result of the API call.
-    LifetimeIsaManagerAccountsEventsLifeEventIdResponse:
+    lifetimeIsaManagerAccountsEventsLifeEventIdResponse:
       title: Lifetime ISA Manager Accounts Events Life Event Id Response
       required:
       - lifeEventId
@@ -10924,3 +10957,11 @@ components:
       value:
         code: FUND_RELEASE_SUPERSEDED
         message: This fund release has already been superseded
+tags:
+  - name: LISA Endpoints
+  - name: LISA Investors
+  - name: LISA Accounts
+  - name: Life Events
+  - name: Withdrawal Charges
+  - name: Bonus Requests
+  - name: Payments and Debts
