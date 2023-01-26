@@ -4,7 +4,6 @@ import uk.gov.hmrc.DefaultBuildSettings.{defaultSettings, scalaSettings}
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 
 scalaSettings
-publishingSettings
 defaultSettings()
 
 name                     := "lisa-api"
