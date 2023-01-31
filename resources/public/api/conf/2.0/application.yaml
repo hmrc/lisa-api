@@ -2,7 +2,17 @@ openapi: 3.0.3
 info:
   title: Lifetime ISA
   description: |
+    # Save reference numbers
+    
     When you report or get information from the API, you will get a unique reference number. You should save all reference numbers because you may need them for other API calls.
+    
+    # Testing
+    
+    You can use the sandbox environment to [test this API](https://developer.service.hmrc.gov.uk/api-documentation/docs/testing).
+
+    It does not currently support [stateful behaviour](https://developer.service.hmrc.gov.uk/api-documentation/docs/testing/stateful-behaviour), but you can use the payloads described in **Test data** sections of each endpoint to test specific scenarios.
+
+    You must set up a test user which is an organisation for this API using the [Create Test User API](https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/api-platform-test-user/1.0#_create-a-test-user-which-is-an-organisation_post_accordion).
   version: '2.0'
 servers:
   - url: https://test-api.service.hmrc.gov.uk
@@ -18,7 +28,7 @@ paths:
       description: |
         Use a LISA manager reference to get a list of all available endpoints.
         
-        ## Test data
+        ### Test data
 
         <table style="font-family:Roboto, sans-serif; font-size:14px;">
             <col width="40%">
@@ -163,7 +173,7 @@ paths:
       description: |
         Report a new LISA investor to HMRC to generate an investor ID. If the investor already exists, you will get their reference number.
         
-        ## Test data
+        ### Test data
 
         <table style="font-family:Roboto, sans-serif; font-size:14px;">
             <col width="25%">
@@ -178,7 +188,7 @@ paths:
             </thead>
             <tbody>
                 <tr>
-                    <td><p>Request with a valid payload and LISA Manager reference number</p> <p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a></p></td>
+                    <td><p>Request with a valid payload and LISA Manager reference number</p> <p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a></p></td>
                     <td>
         <pre class="code--block">
         {
@@ -224,7 +234,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request containing invalid and/or missing data</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a></p></td>
+                    <td><p>Request containing invalid and/or missing data</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a></p></td>
                     <td>
         <pre class="code--block">
         {
@@ -266,7 +276,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request containing investor details which do not match HMRC’s records</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a></p></td>
+                    <td><p>Request containing investor details which do not match HMRC’s records</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a></p></td>
                     <td>
         <pre class="code--block">
         {
@@ -287,7 +297,7 @@ paths:
                      </td>
                 </tr>
                 <tr>
-                   <td><p>Request with an invalid 'Accept' header</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br><br>Accept: application/vnd.hmrc.1.0</p></td>
+                   <td><p>Request with an invalid 'Accept' header</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br><br>Accept: application/vnd.hmrc.1.0</p></td>
                    <td>
         <pre class="code--block">
         {
@@ -308,7 +318,7 @@ paths:
                    </td>
                 </tr>
                 <tr>
-                    <td><p>Request containing a pre-existing investor’s details</p> <p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a></p></td>
+                    <td><p>Request containing a pre-existing investor’s details</p> <p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a></p></td>
                     <td>
         <pre class="code--block">
         {
@@ -419,7 +429,7 @@ paths:
       description: |
         Create a new account you’ve set up for an investor, or transfer an existing account from another LISA provider. If you’re creating a new account you’ll need to create a LISA investor first.
         
-        ## Test data
+        ### Test data
 
         <table style="font-family:Roboto, sans-serif; font-size:14px;">
             <col width="25%">
@@ -434,7 +444,7 @@ paths:
             </thead>
             <tbody>
                 <tr>
-                    <td><p>Create request with a valid payload and LISA Manager reference number</p><p class ="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a></p></td>
+                    <td><p>Create request with a valid payload and LISA Manager reference number</p><p class ="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a></p></td>
                     <td>
         <pre class="code--block">
         {
@@ -459,7 +469,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Transfer request with a valid payload and LISA Manager reference number</p><p class ="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a></p></td>
+                    <td><p>Transfer request with a valid payload and LISA Manager reference number</p><p class ="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a></p></td>
                     <td>
         <pre class="code--block">
         {
@@ -489,7 +499,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Transfer current year request with a valid payload and LISA Manager reference number</p><p class ="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a></p></td>
+                    <td><p>Transfer current year request with a valid payload and LISA Manager reference number</p><p class ="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a></p></td>
                     <td>
         <pre class="code--block">
         {
@@ -519,7 +529,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Transfer previous year request with a valid payload and LISA Manager reference number</p><p class ="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a></p></td>
+                    <td><p>Transfer previous year request with a valid payload and LISA Manager reference number</p><p class ="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a></p></td>
                     <td>
         <pre class="code--block">
         {
@@ -570,7 +580,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request containing invalid and/or missing data</p><p class ="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a></p></td>
+                    <td><p>Request containing invalid and/or missing data</p><p class ="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a></p></td>
                     <td>
         <pre class="code--block">
         {
@@ -607,7 +617,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request containing dates before 6 April 2017</p><p class ="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a></p></td>
+                    <td><p>Request containing dates before 6 April 2017</p><p class ="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a></p></td>
                     <td>
         <pre class="code--block">
         {
@@ -645,7 +655,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request containing investor details which cannot be found</p><p class ="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a></p></td>
+                    <td><p>Request containing investor details which cannot be found</p><p class ="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a></p></td>
                     <td>
         <pre class="code--block">
         {
@@ -666,7 +676,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request containing an investor who is not eligible for a LISA account</p><p class ="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a></p></td>
+                    <td><p>Request containing an investor who is not eligible for a LISA account</p><p class ="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a></p></td>
                     <td>
         <pre class="code--block">
         {
@@ -687,7 +697,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request containing an investor who has not passed the compliance check</p><p class ="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a></p></td>
+                    <td><p>Request containing an investor who has not passed the compliance check</p><p class ="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a></p></td>
                     <td>
         <pre class="code--block">
         {
@@ -708,7 +718,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Transfer request containing transfer details which cannot be found in HMRC's records</p><p class ="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a></p></td>
+                    <td><p>Transfer request containing transfer details which cannot be found in HMRC's records</p><p class ="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a></p></td>
                     <td>
         <pre class="code--block">
         {
@@ -734,7 +744,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Transfer request without transfer details</p><p class ="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a></p></td>
+                    <td><p>Transfer request without transfer details</p><p class ="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a></p></td>
                     <td>
         <pre class="code--block">
         {
@@ -755,7 +765,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Create request containing transfer details</p><p class ="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a></p></td>
+                    <td><p>Create request containing transfer details</p><p class ="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a></p></td>
                     <td>
         <pre class="code--block">
         {
@@ -781,7 +791,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request containing a LISA account which has already been closed</p><p class ="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a></p></td>
+                    <td><p>Request containing a LISA account which has already been closed</p><p class ="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a></p></td>
                     <td>
         <pre class="code--block">
         {
@@ -802,7 +812,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request containing a LISA account which has already been cancelled</p><p class ="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a></p></td>
+                    <td><p>Request containing a LISA account which has already been cancelled</p><p class ="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a></p></td>
                     <td>
         <pre class="code--block">
         {
@@ -823,7 +833,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request containing a LISA account which has already been voided</p><p class ="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a></p></td>
+                    <td><p>Request containing a LISA account which has already been voided</p><p class ="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a></p></td>
                     <td>
         <pre class="code--block">
         {
@@ -844,7 +854,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request with an invalid 'Accept' header</p><p class ="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br><br>Accept: application/vnd.hmrc.1.0</p></td>
+                    <td><p>Request with an invalid 'Accept' header</p><p class ="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br><br>Accept: application/vnd.hmrc.1.0</p></td>
                     <td>
         <pre class="code--block">
         {
@@ -865,7 +875,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request for a pre-existing account</p><p class ="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a></p></td>
+                    <td><p>Request for a pre-existing account</p><p class ="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a></p></td>
                     <td>
         <pre class="code--block">
         {
@@ -1029,7 +1039,7 @@ paths:
       description: |
         Re-open a LISA account that has been closed.
         
-        ## Test data
+        ### Test data
 
         <table style="font-family:Roboto, sans-serif; font-size:14px;">
             <col width="25%">
@@ -1044,7 +1054,7 @@ paths:
             </thead>
             <tbody>
                 <tr>
-                    <td><p>Request with a valid payload, LISA Manager reference number and account ID</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a></p></td>
+                    <td><p>Request with a valid payload, LISA Manager reference number and account ID</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a></p></td>
                     <td>
         <pre class="code--block">
         {
@@ -1088,7 +1098,7 @@ paths:
                     <td>
                         <p>Request with a invalid payload</p>
                         <p class="code--block">
-                            lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a>
+                            lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a>
                         </p>
                     </td>
                     <td>
@@ -1115,7 +1125,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request for an account that is open or active</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a></p></td>
+                    <td><p>Request for an account that is open or active</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a></p></td>
                     <td>
         <pre class="code--block">
         {
@@ -1133,7 +1143,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request for an account that is closed with a closure reason as transferred out</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a></p></td>
+                    <td><p>Request for an account that is closed with a closure reason as transferred out</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a></p></td>
                     <td>
         <pre class="code--block">
         {
@@ -1151,7 +1161,7 @@ paths:
                     </td>
                 </tr>
                  <tr>
-                    <td><p>Request for an account that is closed with a closure reason as cancelled</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a></p></td>
+                    <td><p>Request for an account that is closed with a closure reason as cancelled</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a></p></td>
                     <td>
         <pre class="code--block">
         {
@@ -1169,7 +1179,7 @@ paths:
                     </td>
                 </tr>
                  <tr>
-                    <td><p>Request for an account that is closed with a closure reason as cancelled</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a></p></td>
+                    <td><p>Request for an account that is closed with a closure reason as cancelled</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a></p></td>
                     <td>
         <pre class="code--block">
         {
@@ -1187,7 +1197,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request containing an account ID that does not exist</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a></p></td>
+                    <td><p>Request containing an account ID that does not exist</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a></p></td>
                     <td>
         <pre class="code--block">
         {
@@ -1311,7 +1321,7 @@ paths:
       description: |
         Use an account ID to get account details.
         
-        ## Test data
+        ### Test data
 
         <table style="font-family:Roboto, sans-serif; font-size:14px;">
           <col width="40%">
@@ -1327,7 +1337,7 @@ paths:
               <td>
                 <p>Request with a valid LISA Manager reference number and account ID (open account)</p>
                 <p class="code--block">
-                  lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+                  lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>
                   accountId: 1234567890
                 </p>
               </td>
@@ -1349,7 +1359,7 @@ paths:
               <td>
                 <p>Request with a valid LISA Manager reference number and account ID (transferred account)</p>
                 <p class="code--block">
-                  lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+                  lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>
                   accountId: 1234567891
                 </p>
               </td>
@@ -1376,7 +1386,7 @@ paths:
               <td>
                 <p>Request with a valid LISA Manager reference number and account ID (Current year funds transferred)</p>
                 <p class="code--block">
-                  lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+                  lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>
                   accountId: 1234567892
                 </p>
               </td>
@@ -1403,7 +1413,7 @@ paths:
               <td>
                 <p>Request with a valid LISA Manager reference number and account ID (Previous year funds transferred)</p>
                 <p class="code--block">
-                  lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+                  lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>
                   accountId: 1234567893
                 </p>
               </td>
@@ -1430,7 +1440,7 @@ paths:
               <td>
                 <p>Request with a valid LISA Manager reference number and account ID (voided account)</p>
                 <p class="code--block">
-                  lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+                  lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>
                   accountId: 1000000200
                 </p>
               </td>
@@ -1452,7 +1462,7 @@ paths:
               <td>
                 <p>Request with a valid LISA Manager reference number and account ID (closed account)</p>
                 <p class="code--block">
-                  lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+                  lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>
                   accountId: 2000000200
                 </p>
               </td>
@@ -1494,7 +1504,7 @@ paths:
               <td>
                 <p>Request with a valid LISA Manager reference number, but an invalid account ID</p>
                 <p class="code--block">
-                  lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+                  lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>
                   accountId: 1234%3D5678
                 </p>
               </td>
@@ -1512,7 +1522,7 @@ paths:
                 <td>
                     <p>Request containing an account ID that does not exist</p>
                     <p class="code--block">
-                        lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+                        lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>
                         accountId: 0000000404
                     </p>
                 </td>
@@ -1530,7 +1540,7 @@ paths:
               <td>
                 <p>Request with an invalid 'Accept' header</p>
                 <p class="code--block">
-                  lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a>
+                  lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a>
                   <br>accountId: 1234567890<br>
                   <br>
                   Accept: application/vnd.hmrc.1.0
@@ -1628,7 +1638,7 @@ paths:
       description: |
         Close an account and report the reason and date.
         
-        ## Test data
+        ### Test data
 
         <table style="font-family:Roboto, sans-serif; font-size:14px;">
             <col width="25%">
@@ -1643,7 +1653,7 @@ paths:
             </thead>
             <tbody>
                 <tr>
-                    <td><p>Request with a valid payload, LISA Manager reference number and account ID</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
+                    <td><p>Request with a valid payload, LISA Manager reference number and account ID</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
                     <td>
         <pre class="code--block">
         {
@@ -1666,7 +1676,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request with a valid payload, LISA Manager reference number and account ID</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
+                    <td><p>Request with a valid payload, LISA Manager reference number and account ID</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
                     <td>
         <pre class="code--block">
         {
@@ -1711,7 +1721,7 @@ paths:
                     <td>
                         <p>Request with a valid payload and LISA Manager reference number, but an invalid account ID</p>
                         <p class="code--block">
-                            lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a>
+                            lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a>
                             <br>accountId: 1234%3D5678
                         </p>
                     </td>
@@ -1733,7 +1743,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request containing invalid and/or missing data</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
+                    <td><p>Request containing invalid and/or missing data</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
                     <td>
         <pre class="code--block">
         {
@@ -1763,7 +1773,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request containing a closure date before 6 April 2017</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
+                    <td><p>Request containing a closure date before 6 April 2017</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
                     <td>
         <pre class="code--block">
         {
@@ -1789,7 +1799,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request for an account that has already been voided</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: A1234560</p></td>
+                    <td><p>Request for an account that has already been voided</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: A1234560</p></td>
                     <td>
         <pre class="code--block">
         {
@@ -1808,7 +1818,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request for an account that has already been closed</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: A1234561</p></td>
+                    <td><p>Request for an account that has already been closed</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: A1234561</p></td>
                     <td>
         <pre class="code--block">
         {
@@ -1827,7 +1837,7 @@ paths:
                     </td>
                 </tr>
                  <tr>
-                    <td><p>Request to close an account with cancellation as the reason when the cancellation period is over</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: A1234568</p></td>
+                    <td><p>Request to close an account with cancellation as the reason when the cancellation period is over</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: A1234568</p></td>
                     <td>
         <pre class="code--block">
         {
@@ -1847,7 +1857,7 @@ paths:
                 </tr>
                 </tr>
                  <tr>
-                    <td><p>Request to close an account with all funds withdrawn as the reason and it is still within the cancellation period</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: A1234569</p></td>
+                    <td><p>Request to close an account with all funds withdrawn as the reason and it is still within the cancellation period</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: A1234569</p></td>
                     <td>
         <pre class="code--block">
         {
@@ -1866,7 +1876,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request containing an account ID that does not exist</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: A1234562</p></td>
+                    <td><p>Request containing an account ID that does not exist</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: A1234562</p></td>
                     <td>
         <pre class="code--block">
         {
@@ -1885,7 +1895,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request with an invalid 'Accept' header</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567890<br><br>Accept: application/vnd.hmrc.1.0</p></td>
+                    <td><p>Request with an invalid 'Accept' header</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 1234567890<br><br>Accept: application/vnd.hmrc.1.0</p></td>
                     <td>
         <pre class="code--block">
         {
@@ -2001,7 +2011,7 @@ paths:
       description: |
         Modify the date when the first deposit was paid after a LISA account was created.
         
-        ## Test data
+        ### Test data
 
         <table style="font-family:Roboto, sans-serif; font-size:14px;">
             <col width="25%">
@@ -2016,7 +2026,7 @@ paths:
             </thead>
             <tbody>
                 <tr>
-                    <td><p>Request with a valid payload, LISA Manager reference number and account ID</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
+                    <td><p>Request with a valid payload, LISA Manager reference number and account ID</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
                     <td>
         <pre class="code--block">
         {
@@ -2039,7 +2049,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request with a valid payload, LISA Manager reference number and account ID</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567891</p></td>
+                    <td><p>Request with a valid payload, LISA Manager reference number and account ID</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 1234567891</p></td>
                     <td>
         <pre class="code--block">
         {
@@ -2080,7 +2090,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request with a valid payload and LISA Manager reference number, but an invalid and account ID</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234%3D5678</p></td>
+                    <td><p>Request with a valid payload and LISA Manager reference number, but an invalid and account ID</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 1234%3D5678</p></td>
                     <td>
         <pre class="code--block">
         {
@@ -2098,7 +2108,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request containing invalid and/or missing data</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
+                    <td><p>Request containing invalid and/or missing data</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
                     <td>
         <pre class="code--block">
         {
@@ -2123,7 +2133,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request containing a first subscription date before 6 April 2017</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
+                    <td><p>Request containing a first subscription date before 6 April 2017</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
                     <td>
         <pre class="code--block">
         {
@@ -2148,7 +2158,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request for an account that has already been closed</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 0000000901</p></td>
+                    <td><p>Request for an account that has already been closed</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 0000000901</p></td>
                     <td>
         <pre class="code--block">
         {
@@ -2166,7 +2176,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request for an account that has already been cancelled</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 0000000903</p></td>
+                    <td><p>Request for an account that has already been cancelled</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 0000000903</p></td>
                     <td>
         <pre class="code--block">
         {
@@ -2184,7 +2194,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request for an account that has already been void</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 0000000902</p></td>
+                    <td><p>Request for an account that has already been void</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 0000000902</p></td>
                     <td>
         <pre class="code--block">
         {
@@ -2202,7 +2212,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request containing an account ID that does not exist</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 0000000404</p></td>
+                    <td><p>Request containing an account ID that does not exist</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 0000000404</p></td>
                     <td>
         <pre class="code--block">
         {
@@ -2220,7 +2230,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request with an invalid 'Accept' header</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567890<br><br>Accept: application/vnd.hmrc.1.0</p></td>
+                    <td><p>Request with an invalid 'Accept' header</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 1234567890<br><br>Accept: application/vnd.hmrc.1.0</p></td>
                     <td>
         <pre class="code--block">
         {
@@ -2342,7 +2352,7 @@ paths:
       description: |
         Report to HMRC if an investor has been diagnosed with a terminal illness or died. You need to do this to get a lifeEventId before you can request a bonus payment from HMRC.
         
-        ## Test data
+        ### Test data
 
         <table style="font-family:Roboto, sans-serif; font-size:14px;">
             <col width="25%">
@@ -2357,7 +2367,7 @@ paths:
             </thead>
             <tbody>
                 <tr>
-                    <td><p>Request with a valid payload, LISA Manager reference number and account ID</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
+                    <td><p>Request with a valid payload, LISA Manager reference number and account ID</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
                     <td>
         <pre class="code--block">
         {
@@ -2399,7 +2409,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request with a valid payload and LISA Manager reference number, but an invalid account ID</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234%3D5678</p></td>
+                    <td><p>Request with a valid payload and LISA Manager reference number, but an invalid account ID</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 1234%3D5678</p></td>
                     <td>
         <pre class="code--block">
         {
@@ -2418,7 +2428,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request containing invalid and/or missing data</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
+                    <td><p>Request containing invalid and/or missing data</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
                     <td>
         <pre class="code--block">
         {
@@ -2448,7 +2458,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request containing an event date before 6 April 2017</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
+                    <td><p>Request containing an event date before 6 April 2017</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
                     <td>
         <pre class="code--block">
         {
@@ -2474,7 +2484,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request containing a life event that conflicts with a previously reported event</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 0000000403</p></td>
+                    <td><p>Request containing a life event that conflicts with a previously reported event</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 0000000403</p></td>
                     <td>
         <pre class="code--block">
         {
@@ -2493,7 +2503,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request for an account that has already been closed</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1000000403</p></td>
+                    <td><p>Request for an account that has already been closed</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 1000000403</p></td>
                     <td>
         <pre class="code--block">
         {
@@ -2512,7 +2522,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request for an account that has already been cancelled</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 2000000403</p></td>
+                    <td><p>Request for an account that has already been cancelled</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 2000000403</p></td>
                     <td>
         <pre class="code--block">
         {
@@ -2531,7 +2541,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request for an account that has already been void</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 3000000403</p></td>
+                    <td><p>Request for an account that has already been void</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 3000000403</p></td>
                     <td>
         <pre class="code--block">
         {
@@ -2550,7 +2560,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request containing an account ID that does not exist</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 0000000404</p></td>
+                    <td><p>Request containing an account ID that does not exist</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 0000000404</p></td>
                     <td>
         <pre class="code--block">
         {
@@ -2569,7 +2579,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request with an invalid 'Accept' header</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567890<br><br>Accept: application/vnd.hmrc.1.0</p></td>
+                    <td><p>Request with an invalid 'Accept' header</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 1234567890<br><br>Accept: application/vnd.hmrc.1.0</p></td>
                     <td>
         <pre class="code--block">
         {
@@ -2588,7 +2598,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request containing an already reported event</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 0000000409</p></td>
+                    <td><p>Request containing an already reported event</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 0000000409</p></td>
                     <td>
         <pre class="code--block">
         {
@@ -2715,7 +2725,7 @@ paths:
       description: |
         Report details to HMRC about LISA accounts you managed in the last tax year. You can also correct a previous return of information. You cannot send or correct a return of information if the investor account is cancelled or void.
         
-        ## Test data
+        ### Test data
 
         <table style="font-family:Roboto, sans-serif; font-size:14px;">
             <col width="25%">
@@ -2730,7 +2740,7 @@ paths:
             </thead>
             <tbody>
                 <tr>
-                    <td><p>Successfully sent an annual return of information</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
+                    <td><p>Successfully sent an annual return of information</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
                     <td>
         <pre class="code--block">
         {
@@ -2758,7 +2768,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Successfully corrected an annual return of information</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
+                    <td><p>Successfully corrected an annual return of information</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
                     <td>
         <pre class="code--block">
         {
@@ -2814,7 +2824,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Account ID in the wrong format</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234%3D5678</p></td>
+                    <td><p>Account ID in the wrong format</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 1234%3D5678</p></td>
                     <td>
         <pre class="code--block">
         {
@@ -2838,7 +2848,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Wrong or missing data</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
+                    <td><p>Wrong or missing data</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
                     <td>
         <pre class="code--block">
         {
@@ -2883,7 +2893,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>A mixture of cash and stocks and shares in the same annual return</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
+                    <td><p>A mixture of cash and stocks and shares in the same annual return</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
                     <td>
         <pre class="code--block">
         {
@@ -2919,7 +2929,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Tax year before 2017</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
+                    <td><p>Tax year before 2017</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
                     <td>
         <pre class="code--block">
         {
@@ -2950,7 +2960,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Tax year in the future</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
+                    <td><p>Tax year in the future</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 1234567890</p></td>
                     <td>
         <pre class="code--block">
         {
@@ -2981,7 +2991,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Account cancelled</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 2000000403</p></td>
+                    <td><p>Account cancelled</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 2000000403</p></td>
                     <td>
         <pre class="code--block">
         {
@@ -3005,7 +3015,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Account void</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 3000000403</p></td>
+                    <td><p>Account void</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 3000000403</p></td>
                     <td>
         <pre class="code--block">
         {
@@ -3029,7 +3039,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                            <td><p>Account void</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1000000403</p></td>
+                            <td><p>Account void</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 1000000403</p></td>
                             <td>
         <pre class="code--block">
         {
@@ -3056,7 +3066,7 @@ paths:
                     <td>
                         <p>Supersede details do not match the original return of information</p>
                         <p class="code--block">
-                        lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a>
+                        lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a>
                         <br>
                         accountId: 5000000403
                         </p>
@@ -3088,7 +3098,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Account could not be found</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 0000000404</p></td>
+                    <td><p>Account could not be found</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 0000000404</p></td>
                     <td>
         <pre class="code--block">
         {
@@ -3112,7 +3122,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Accept header is missing or invalid</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567890<br><br>Accept: application/vnd.hmrc.1.0</p></td>
+                    <td><p>Accept header is missing or invalid</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 1234567890<br><br>Accept: application/vnd.hmrc.1.0</p></td>
                     <td>
         <pre class="code--block">
         {
@@ -3139,7 +3149,7 @@ paths:
                     <td>
                         <p>Life event already superseded</p>
                         <p class="code--block">
-                            lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a>
+                            lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a>
                             <br>
                             accountId: 1000000409
                         </p>
@@ -3172,7 +3182,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Life event already exists</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 0000000409</p></td>
+                    <td><p>Life event already exists</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 0000000409</p></td>
                     <td>
         <pre class="code--block">
         {
@@ -3331,7 +3341,7 @@ paths:
       description: | 
         Request the release of LISA funds to buy a property. You can also correct a request by changing the withdrawal amount or property purchase date. When you make a correction, you cannot change the property details or the conveyancer reference number.
         
-        ## Test data
+        ### Test data
 
         <table style="font-family:Roboto, sans-serif; font-size:14px;">
             <col width="20%">
@@ -3348,7 +3358,7 @@ paths:
                           <p>Fund release created</p>
                           <p class="code--block">
                           <strong>lisaManagerReferenceNumber:</strong><br>
-                          <a href="#testing">Use your test user profile</a><br>
+                          <a href="#section/Testing">Use your test user profile</a><br>
                            <br>
                                 <strong>accountId:</strong><br>1234567890
                           </p>
@@ -3385,7 +3395,7 @@ paths:
                                  <p>Fund release superseded</p>
                                  <p class="code--block">
                                     <strong>lisaManagerReferenceNumber:</strong><br>
-                                    <a href="#testing">Use your test user profile</a><br>
+                                    <a href="#section/Testing">Use your test user profile</a><br>
                                        <br>
                                            <strong>accountId:</strong><br>1234567890
                                    </p>
@@ -3454,7 +3464,7 @@ paths:
                                                             <p>Invalid Account ID</p>
                                                             <p class="code--block">
                                                                 <strong>lisaManagerReferenceNumber:</strong><br>
-                                                                <a href="#testing">Use your test user profile</a><br>
+                                                                <a href="#section/Testing">Use your test user profile</a><br>
                                                                 <br>
                                                                 <strong>accountId:</strong><br>1234%3D5678
                                                             </p>
@@ -3515,7 +3525,7 @@ paths:
                                                             <p>This LISA account is already closed</p>
                                                             <p class="code--block">
                                                                 <strong>lisaManagerReferenceNumber:</strong><br>
-                                                                <a href="#testing">Use your test user profile</a><br>
+                                                                <a href="#section/Testing">Use your test user profile</a><br>
                                                                 <br>
                                                                 <strong>accountId:</strong><br>1000000403
                                                             </p>
@@ -3548,7 +3558,7 @@ paths:
                                                                             <p>This LISA account is already void</p>
                                                                             <p class="code--block">
                                                                             <strong>lisaManagerReferenceNumber:</strong><br>
-                                                                            <a href="#testing">Use your test user profile</a><br>
+                                                                            <a href="#section/Testing">Use your test user profile</a><br>
                                                                              <br>
                                                                              <strong>accountId:</strong><br>3000000403
                                                                              </p>
@@ -3581,7 +3591,7 @@ paths:
                                                                                 <p>This LISA account is already cancelled</p>
                                                                                 <p class="code--block">
                                                                                 <strong>lisaManagerReferenceNumber:</strong><br>
-                                                                                <a href="#testing">Use your test user profile</a><br>
+                                                                                <a href="#section/Testing">Use your test user profile</a><br>
                                                                                   <br>
                                                                                       <strong>accountId:</strong><br>2000000403
                                                                                       </p>
@@ -3614,7 +3624,7 @@ paths:
                                                                                                     <p>Account not open long enough</p>
                                                                                                     <p class="code--block">
                                                                                                     <strong>lisaManagerReferenceNumber:</strong><br>
-                                                                                                    <a href="#testing">Use your test user profile</a><br>
+                                                                                                    <a href="#section/Testing">Use your test user profile</a><br>
                                                                                                     <br>
                                                                                                     <strong>accountId:</strong><br>4000000403
                                                                                                     </p>
@@ -3647,7 +3657,7 @@ paths:
                                                                                                           <p>Other purchase on record</p>
                                                                                                           <p class="code--block">
                                                                                                           <strong>lisaManagerReferenceNumber:</strong><br>
-                                                                                                          <a href="#testing">Use your test user profile</a><br>
+                                                                                                          <a href="#section/Testing">Use your test user profile</a><br>
                                                                                                            <br>
                                                                                                             <strong>accountId:</strong><br>6000000403
                                                                                                            </p>
@@ -3680,7 +3690,7 @@ paths:
                                                                                                           <p>Supersede details do not match the original request</p>
                                                                                                           <p class="code--block">
                                                                                                           <strong>lisaManagerReferenceNumber:</strong><br>
-                                                                                                          <a href="#testing">Use your test user profile</a><br>
+                                                                                                          <a href="#section/Testing">Use your test user profile</a><br>
                                                                                                        <br>
                                                                                                           <strong>accountId:</strong><br>5000000403
                                                                                                           </p>
@@ -3712,7 +3722,7 @@ paths:
                                                                                                                <p>Invalid Data Provided</p>
                                                                                                                <p class="code--block">
                                                                                                                <strong>lisaManagerReferenceNumber:</strong><br>
-                                                                                                               <a href="#testing">Use your test user profile</a><br>
+                                                                                                               <a href="#section/Testing">Use your test user profile</a><br>
                                                                                                                <br>
                                                                                                                <strong>accountId:</strong><br>1234567890
                                                                                                                </p>
@@ -3749,7 +3759,7 @@ paths:
                                                                                                                <p>Account ID does not exist</p>
                                                                                                                <p class="code--block">
                                                                                                                <strong>lisaManagerReferenceNumber:</strong><br>
-                                                                                                               <a href="#testing">Use your test user profile</a><br>
+                                                                                                               <a href="#section/Testing">Use your test user profile</a><br>
                                                                                                            <br>
                                                                                                                <strong>accountId:</strong><br>0000000404
                                                                                                                </p>
@@ -3782,7 +3792,7 @@ paths:
                                                                                                           <p>The fund release you are superseding has already been superseded</p>
                                                                                                           <p class="code--block">
                                                                                                           <strong>lisaManagerReferenceNumber:</strong><br>
-                                                                                                          <a href="#testing">Use your test user profile</a><br>
+                                                                                                          <a href="#section/Testing">Use your test user profile</a><br>
                                                                                                       <br>
                                                                                                       <strong>accountId:</strong><br>1000000409
                                                                                                       </p>
@@ -3815,7 +3825,7 @@ paths:
                                                                                                 <p>Fund release already exists</p>
                                                                                                 <p class="code--block">
                                                                                                 <strong>lisaManagerReferenceNumber:</strong><br>
-                                                                                                <a href="#testing">Use your test user profile</a><br>
+                                                                                                <a href="#section/Testing">Use your test user profile</a><br>
                                                                                                 <br>
                                                                                                 <strong>accountId:</strong><br>0000000409
                                                                                                 </p>
@@ -3850,7 +3860,6 @@ paths:
       operationId: requestReleaseOfFundsToBuyProperty
       parameters:
       - $ref: '#/components/parameters/acceptHeader'
-      - $ref: '#/components/parameters/contentTypeHeader'
       - $ref: '#/components/parameters/authorizationHeader'
       - $ref: '#/components/parameters/lisaManagerReferenceNumber'
       - $ref: '#/components/parameters/accountId'
@@ -4028,7 +4037,7 @@ paths:
       description: | 
         Request an extension to your request to release funds to buy a property.
         
-        ## Test data
+        ### Test data
 
         <table style="font-family:Roboto, sans-serif; font-size:14px;">
             <col width="25%">
@@ -4046,7 +4055,7 @@ paths:
                     <td>
                         <p>First purchase extension</p>
                         <p class="code--block">
-                            lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a>
+                            lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a>
                             <br>
                             accountId: 1234567890
                         </p>
@@ -4077,7 +4086,7 @@ paths:
                     <td>
                         <p>Superseded first purchase extension</p>
                         <p class="code--block">
-                            lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a>
+                            lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a>
                             <br>
                             accountId: 1234567890
                         </p>
@@ -4111,7 +4120,7 @@ paths:
                     <td>
                         <p>Second purchase extension</p>
                         <p class="code--block">
-                            lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a>
+                            lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a>
                             <br>
                             accountId: 1234567890
                         </p>
@@ -4142,7 +4151,7 @@ paths:
                     <td>
                         <p>Superseded second purchase extension</p>
                         <p class="code--block">
-                            lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a>
+                            lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a>
                             <br>
                             accountId: 1234567890
                         </p>
@@ -4203,7 +4212,7 @@ paths:
                     <td>
                         <p>Request with a valid payload and an invalid account ID</p>
                         <p class="code--block">
-                            lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a>
+                            lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a>
                             <br>
                             accountId: 1234%3D5678
                         </p>
@@ -4230,7 +4239,7 @@ paths:
                     <td>
                         <p>Request containing invalid and/or missing data</p>
                         <p class="code--block">
-                            lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a>
+                            lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a>
                             <br>
                             accountId: 1234567890
                         </p>
@@ -4273,7 +4282,7 @@ paths:
                     <td>
                         <p>The LISA account is already closed</p>
                         <p class="code--block">
-                            lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a>
+                            lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a>
                             <br>
                             accountId: 1000000403
                         </p>
@@ -4300,7 +4309,7 @@ paths:
                     <td>
                         <p>The LISA account is already cancelled</p>
                         <p class="code--block">
-                            lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a>
+                            lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a>
                             <br>
                             accountId: 2000000403
                         </p>
@@ -4327,7 +4336,7 @@ paths:
                     <td>
                         <p>The LISA account is already void</p>
                         <p class="code--block">
-                            lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a>
+                            lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a>
                             <br>
                             accountId: 3000000403
                         </p>
@@ -4354,7 +4363,7 @@ paths:
                     <td>
                         <p>A first extension has not yet been approved</p>
                         <p class="code--block">
-                            lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a>
+                            lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a>
                             <br>
                             accountId: 7000000403
                         </p>
@@ -4381,7 +4390,7 @@ paths:
                     <td>
                         <p>First extension already approved</p>
                         <p class="code--block">
-                            lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a>
+                            lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a>
                             <br>
                             accountId: 8000000403
                         </p>
@@ -4409,7 +4418,7 @@ paths:
                     <td>
                         <p>Second extension already approved</p>
                         <p class="code--block">
-                            lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a>
+                            lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a>
                             <br>
                             accountId: 9000000403
                         </p>
@@ -4437,7 +4446,7 @@ paths:
                     <td>
                         <p>Supersede details do not match the original request</p>
                         <p class="code--block">
-                            lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a>
+                            lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a>
                             <br>
                             accountId: 5000000403
                         </p>
@@ -4467,7 +4476,7 @@ paths:
                     <td>
                         <p>Account not found</p>
                         <p class="code--block">
-                            lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a>
+                            lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a>
                             <br>
                             accountId: 0000000404
                         </p>
@@ -4494,7 +4503,7 @@ paths:
                     <td>
                         <p>Fund release not found</p>
                         <p class="code--block">
-                            lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a>
+                            lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a>
                             <br>
                             accountId: 1000000404
                         </p>
@@ -4521,7 +4530,7 @@ paths:
                     <td>
                         <p>Extension already exists</p>
                         <p class="code--block">
-                            lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a>
+                            lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a>
                             <br>
                             accountId: 0000000409
                         </p>
@@ -4549,7 +4558,7 @@ paths:
                     <td>
                         <p>The associated fund release has been superseded</p>
                         <p class="code--block">
-                            lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a>
+                            lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a>
                             <br>
                             accountId: 2000000409
                         </p>
@@ -4577,7 +4586,7 @@ paths:
                     <td>
                         <p>The extension you are superseding has already been superseded</p>
                         <p class="code--block">
-                            lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a>
+                            lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a>
                             <br>
                             accountId: 1000000409
                         </p>
@@ -4609,7 +4618,6 @@ paths:
       operationId: requestPropertyPurchaseExtension
       parameters:
       - $ref: '#/components/parameters/acceptHeader'
-      - $ref: '#/components/parameters/contentTypeHeader'
       - $ref: '#/components/parameters/authorizationHeader'
       - $ref: '#/components/parameters/lisaManagerReferenceNumber'
       - $ref: '#/components/parameters/accountId'
@@ -4722,7 +4730,7 @@ paths:
       description: | 
         Report to HMRC if a property purchase was completed or failed.
         
-        ## Test data
+        ### Test data
 
         <table style="font-family:Roboto, sans-serif; font-size:14px;">
           <colgroup>
@@ -4739,7 +4747,7 @@ paths:
             <tr>
               <td>
                 <p>Successful purchase outcome</p>
-                <p class="code--block"> <strong>lisaManagerReferenceNumber:</strong><br /> <a href="#testing">Use your test user profile</a><br /> <br /> <strong>accountId:</strong><br />1234567890 </p>
+                <p class="code--block"> <strong>lisaManagerReferenceNumber:</strong><br /> <a href="#section/Testing">Use your test user profile</a><br /> <br /> <strong>accountId:</strong><br />1234567890 </p>
               </td>
               <td>
                 <pre class="code--block">
@@ -4768,7 +4776,7 @@ paths:
             <tr>
               <td>
                 <p>Purchase outcome superseded</p>
-                <p class="code--block"> <strong>lisaManagerReferenceNumber:</strong><br /> <a href="#testing">Use your test user profile</a><br /> <br /> <strong>accountId:</strong><br />1234567890 </p>
+                <p class="code--block"> <strong>lisaManagerReferenceNumber:</strong><br /> <a href="#section/Testing">Use your test user profile</a><br /> <br /> <strong>accountId:</strong><br />1234567890 </p>
               </td>
               <td>
                 <pre class="code--block">
@@ -4800,7 +4808,7 @@ paths:
             <tr>
               <td>
                 <p>Failed purchase outcome</p>
-                <p class="code--block"> <strong>lisaManagerReferenceNumber:</strong><br /> <a href="#testing">Use your test user profile</a><br /> <br /> <strong>accountId:</strong><br />1234567891 </p>
+                <p class="code--block"> <strong>lisaManagerReferenceNumber:</strong><br /> <a href="#section/Testing">Use your test user profile</a><br /> <br /> <strong>accountId:</strong><br />1234567891 </p>
               </td>
               <td>
         <pre class="code--block">
@@ -4853,7 +4861,7 @@ paths:
             <tr>
               <td>
                 <p>Invalid Account ID</p>
-                <p class="code--block"> <strong>lisaManagerReferenceNumber:</strong><br /> <a href="#testing">Use your test user profile</a><br /> <br /> <strong>accountId:</strong><br />1234%3D5678 </p>
+                <p class="code--block"> <strong>lisaManagerReferenceNumber:</strong><br /> <a href="#section/Testing">Use your test user profile</a><br /> <br /> <strong>accountId:</strong><br />1234%3D5678 </p>
               </td>
               <td>
                 <pre class="code--block">
@@ -4878,7 +4886,7 @@ paths:
             <tr>
               <td>
                 <p>Supersede details do not match the original request</p>
-                <p class="code--block"> <strong>lisaManagerReferenceNumber:</strong><br /> <a href="#testing">Use your test user profile</a><br /> <br /> <strong>accountId:</strong><br />5000000403 </p>
+                <p class="code--block"> <strong>lisaManagerReferenceNumber:</strong><br /> <a href="#section/Testing">Use your test user profile</a><br /> <br /> <strong>accountId:</strong><br />5000000403 </p>
               </td>
               <td>
                 <pre class="code--block">
@@ -4906,7 +4914,7 @@ paths:
             <tr>
               <td>
                 <p>Fund release not found</p>
-                <p class="code--block"> <strong>lisaManagerReferenceNumber:</strong><br /> <a href="#testing">Use your test user profile</a><br /> <br /> <strong>accountId:</strong><br />1000000404 </p>
+                <p class="code--block"> <strong>lisaManagerReferenceNumber:</strong><br /> <a href="#section/Testing">Use your test user profile</a><br /> <br /> <strong>accountId:</strong><br />1000000404 </p>
               </td>
               <td>
                 <pre class="code--block">
@@ -4931,7 +4939,7 @@ paths:
             <tr>
               <td>
                 <p>Investor account not found</p>
-                <p class="code--block"> <strong>lisaManagerReferenceNumber:</strong><br /> <a href="#testing">Use your test user profile</a><br /> <br /> <strong>accountId:</strong><br />0000000404 </p>
+                <p class="code--block"> <strong>lisaManagerReferenceNumber:</strong><br /> <a href="#section/Testing">Use your test user profile</a><br /> <br /> <strong>accountId:</strong><br />0000000404 </p>
               </td>
               <td>
                 <pre class="code--block">
@@ -4956,7 +4964,7 @@ paths:
             <tr>
               <td>
                 <p>The purchase outcome you are superseding has already been superseded</p>
-                <p class="code--block"> <strong>lisaManagerReferenceNumber:</strong><br /> <a href="#testing">Use your test user profile</a><br /> <br /> <strong>accountId:</strong><br />1000000409 </p>
+                <p class="code--block"> <strong>lisaManagerReferenceNumber:</strong><br /> <a href="#section/Testing">Use your test user profile</a><br /> <br /> <strong>accountId:</strong><br />1000000409 </p>
               </td>
               <td>
                 <pre class="code--block">
@@ -4985,7 +4993,7 @@ paths:
             <tr>
               <td>
                 <p>Purchase outcome already exists</p>
-                <p class="code--block"> <strong>lisaManagerReferenceNumber:</strong><br /> <a href="#testing">Use your test user profile</a><br /> <br /> <strong>accountId:</strong><br />0000000409 </p>
+                <p class="code--block"> <strong>lisaManagerReferenceNumber:</strong><br /> <a href="#section/Testing">Use your test user profile</a><br /> <br /> <strong>accountId:</strong><br />0000000409 </p>
               </td>
               <td>
                 <pre class="code--block">
@@ -5011,7 +5019,7 @@ paths:
             <tr>
               <td>
                 <p>The associated fund release has been superseded</p>
-                <p class="code--block"> <strong>lisaManagerReferenceNumber:</strong><br /> <a href="#testing">Use your test user profile</a><br /> <br /> <strong>accountId:</strong><br />2000000409 </p>
+                <p class="code--block"> <strong>lisaManagerReferenceNumber:</strong><br /> <a href="#section/Testing">Use your test user profile</a><br /> <br /> <strong>accountId:</strong><br />2000000409 </p>
               </td>
               <td>
                 <pre class="code--block">
@@ -5039,7 +5047,6 @@ paths:
       operationId: reportOutcomeOfPropertyPurchase
       parameters:
       - $ref: '#/components/parameters/acceptHeader'
-      - $ref: '#/components/parameters/contentTypeHeader'
       - $ref: '#/components/parameters/authorizationHeader'
       - $ref: '#/components/parameters/lisaManagerReferenceNumber'
       - $ref: '#/components/parameters/accountId'
@@ -5145,7 +5152,7 @@ paths:
       description: | 
         View life event data that has been submitted to HMRC. You can view death and terminal illness, property purchase funds release, property purchase extension, property purchase outcome, and annual return of information.
         
-        ## Test data
+        ### Test data
 
         <table style="font-family:Roboto, sans-serif; font-size:14px;">
           <col width="40%">
@@ -5161,7 +5168,7 @@ paths:
               <td>
                 <p>Terminal illness life event</p>
                 <p class="code--block">
-                  lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+                  lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>
                   accountId: 1234567890<br>
                   lifeEventId: 1234567891
                 </p>
@@ -5183,7 +5190,7 @@ paths:
               <td>
                 <p>Annual return of information which has been superseded</p>
                 <p class="code--block">
-                  lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+                  lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>
                   accountId: 1234567890<br>
                   lifeEventId: 7890000001
                 </p>
@@ -5212,7 +5219,7 @@ paths:
               <td>
                 <p>Annual return of information which supersedes another</p>
                 <p class="code--block">
-                  lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+                  lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>
                   accountId: 1234567890<br>
                   lifeEventId: 7890000002
                 </p>
@@ -5244,7 +5251,7 @@ paths:
               <td>
                 <p>Funds release which has been superseded</p>
                 <p class="code--block">
-                  lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+                  lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>
                   accountId: 1234567890<br>
                   lifeEventId: 3456789000
                 </p>
@@ -5273,7 +5280,7 @@ paths:
               <td>
                 <p>Funds release which has associated data and successful outcome</p>
                 <p class="code--block">
-                  lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+                  lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>
                   accountId: 1234567890<br>
                   lifeEventId: 3456789001
                 </p>
@@ -5337,7 +5344,7 @@ paths:
               <td>
                 <p>Funds release with failure outcome</p>
                 <p class="code--block">
-                  lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+                  lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>
                   accountId: 1234567891<br>
                   lifeEventId: 3456789002
                 </p>
@@ -5376,7 +5383,7 @@ paths:
               <td>
                 <p>Purchase extension one which has been superseded</p>
                 <p class="code--block">
-                  lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+                  lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>
                   accountId: 1234567890<br>
                   lifeEventId: 6789000001
                 </p>
@@ -5400,7 +5407,7 @@ paths:
               <td>
                 <p>Purchase extension one which supersedes another</p>
                 <p class="code--block">
-                  lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+                  lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>
                   accountId: 1234567890<br>
                   lifeEventId: 6789000002
                 </p>
@@ -5427,7 +5434,7 @@ paths:
               <td>
                 <p>Purchase extension two which has been superseded</p>
                 <p class="code--block">
-                  lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+                  lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>
                   accountId: 1234567890<br>
                   lifeEventId: 6789000003
                 </p>
@@ -5451,7 +5458,7 @@ paths:
               <td>
                 <p>Purchase extension two which supersedes another</p>
                 <p class="code--block">
-                  lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+                  lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>
                   accountId: 1234567890<br>
                   lifeEventId: 6789000004
                 </p>
@@ -5478,7 +5485,7 @@ paths:
               <td>
                 <p>Purchase outcome which has been superseded</p>
                 <p class="code--block">
-                  lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+                  lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>
                   accountId: 1234567890<br>
                   lifeEventId: 5678900001
                 </p>
@@ -5504,7 +5511,7 @@ paths:
               <td>
                 <p>Purchase outcome which supersedes another</p>
                 <p class="code--block">
-                  lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+                  lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>
                   accountId: 1234567890<br>
                   lifeEventId: 5678900002
                 </p>
@@ -5533,7 +5540,7 @@ paths:
               <td>
                 <p>Purchase outcome failure</p>
                 <p class="code--block">
-                  lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+                  lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>
                   accountId: 1234567891<br>
                   lifeEventId: 5678900003
                 </p>
@@ -5576,7 +5583,7 @@ paths:
                 <td>
                   <p>accountId is in the wrong format</p>
                   <p class="code--block">
-                    lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+                    lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>
                     accountId: 1234%3D5678<br>
                     lifeEventId: 1234567891
                   </p>
@@ -5595,7 +5602,7 @@ paths:
               <td>
                 <p>Account not found</p>
                 <p class="code--block">
-                  lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+                  lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>
                   accountId: 0000000404<br>
                   lifeEventId: 1234567891
                 </p>
@@ -5614,7 +5621,7 @@ paths:
               <td>
                 <p>Life event not found</p>
                 <p class="code--block">
-                  lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+                  lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>
                   accountId: 1234567890<br>
                   lifeEventId: 0000000404
                 </p>
@@ -5753,7 +5760,7 @@ paths:
       description: | 
         Tell HMRC that an investor has taken money out of a LISA account without an associated life event. You can also correct a previous withdrawal charge.
         
-        ## Test data
+        ### Test data
 
         <table style="font-family:Roboto, sans-serif; font-size:14px;">
             <col width="20%">
@@ -5772,7 +5779,7 @@ paths:
                         <p>Unauthorised withdrawal transaction created</p>
                         <p class="code--block">
                             <strong>lisaManagerReferenceNumber:</strong><br>
-                            <a href="#testing">Use your test user profile</a><br>
+                            <a href="#section/Testing">Use your test user profile</a><br>
                             <br>
                             <strong>accountId:</strong><br>1234567890
                         </p>
@@ -5810,7 +5817,7 @@ paths:
                         <p>Unauthorised withdrawal transaction created - late notification</p>
                         <p class="code--block">
                             <strong>lisaManagerReferenceNumber:</strong><br>
-                            <a href="#testing">Use your test user profile</a><br>
+                            <a href="#section/Testing">Use your test user profile</a><br>
                             <br>
                             <strong>accountId:</strong><br>1234567891
                         </p>
@@ -5848,7 +5855,7 @@ paths:
                         <p>Unauthorised withdrawal transaction superseded</p>
                         <p class="code--block">
                             <strong>lisaManagerReferenceNumber:</strong><br>
-                            <a href="#testing">Use your test user profile</a><br>
+                            <a href="#section/Testing">Use your test user profile</a><br>
                             <br>
                             <strong>accountId:</strong><br>1234567890
                         </p>
@@ -5892,7 +5899,7 @@ paths:
                         <p>Invalid and/or missing data</p>
                         <p class="code--block">
                             <strong>lisaManagerReferenceNumber:</strong><br>
-                            <a href="#testing">Use your test user profile</a><br>
+                            <a href="#section/Testing">Use your test user profile</a><br>
                             <br>
                             <strong>accountId:</strong><br>1234567890
                         </p>
@@ -5986,7 +5993,7 @@ paths:
                         <p>Invalid Account ID</p>
                         <p class="code--block">
                             <strong>lisaManagerReferenceNumber:</strong><br>
-                            <a href="#testing">Use your test user profile</a><br>
+                            <a href="#section/Testing">Use your test user profile</a><br>
                             <br>
                             <strong>accountId:</strong><br>1234%3D5678
                         </p>
@@ -6021,7 +6028,7 @@ paths:
                         <p>Invalid monetary amounts and/or invalid dates</p>
                         <p class="code--block">
                             <strong>lisaManagerReferenceNumber:</strong><br>
-                            <a href="#testing">Use your test user profile</a><br>
+                            <a href="#section/Testing">Use your test user profile</a><br>
                             <br>
                             <strong>accountId:</strong><br>1234567890
                         </p>
@@ -6077,7 +6084,7 @@ paths:
                         <p>This LISA account is already cancelled</p>
                         <p class="code--block">
                             <strong>lisaManagerReferenceNumber:</strong><br>
-                            <a href="#testing">Use your test user profile</a><br>
+                            <a href="#section/Testing">Use your test user profile</a><br>
                             <br>
                             <strong>accountId:</strong><br>1000000403
                         </p>
@@ -6111,7 +6118,7 @@ paths:
                         <p>This LISA account is already void</p>
                         <p class="code--block">
                             <strong>lisaManagerReferenceNumber:</strong><br>
-                            <a href="#testing">Use your test user profile</a><br>
+                            <a href="#section/Testing">Use your test user profile</a><br>
                             <br>
                             <strong>accountId:</strong><br>2000000403
                         </p>
@@ -6145,7 +6152,7 @@ paths:
                         <p>A superseded withdrawal report cannot be matched to the original</p>
                         <p class="code--block">
                             <strong>lisaManagerReferenceNumber:</strong><br>
-                            <a href="#testing">Use your test user profile</a><br>
+                            <a href="#section/Testing">Use your test user profile</a><br>
                             <br>
                             <strong>accountId:</strong><br>3000000403
                         </p>
@@ -6185,7 +6192,7 @@ paths:
                         <p>The withdrawal charge has already been superseded</p>
                         <p class="code--block">
                             <strong>lisaManagerReferenceNumber:</strong><br>
-                            <a href="#testing">Use your test user profile</a><br>
+                            <a href="#section/Testing">Use your test user profile</a><br>
                             <br>
                             <strong>accountId:</strong><br>4000000403
                         </p>
@@ -6226,7 +6233,7 @@ paths:
                         <p>The calculation from your superseded withdrawal charge is incorrect</p>
                         <p class="code--block">
                             <strong>lisaManagerReferenceNumber:</strong><br>
-                            <a href="#testing">Use your test user profile</a><br>
+                            <a href="#section/Testing">Use your test user profile</a><br>
                             <br>
                             <strong>accountId:</strong><br>5000000403
                         </p>
@@ -6267,7 +6274,7 @@ paths:
                         For withdrawals made between 06/03/2020 and 05/04/2021 the withdrawal charge is 20%. For all other withdrawals it is 25%.</p>
                         <p class="code--block">
                             <strong>lisaManagerReferenceNumber:</strong><br>
-                            <a href="#testing">Use your test user profile</a><br>
+                            <a href="#section/Testing">Use your test user profile</a><br>
                             <br>
                             <strong>accountId:</strong><br>6000000403
                         </p>
@@ -6307,7 +6314,7 @@ paths:
                         <p>Account ID does not exist</p>
                         <p class="code--block">
                             <strong>lisaManagerReferenceNumber:</strong><br>
-                            <a href="#testing">Use your test user profile</a><br>
+                            <a href="#section/Testing">Use your test user profile</a><br>
                             <br>
                             <strong>accountId:</strong><br>0000000404
                         </p>
@@ -6341,7 +6348,7 @@ paths:
                         <p>The accept header is invalid</p>
                         <p class="code--block">
                             <strong>lisaManagerReferenceNumber:</strong><br>
-                            <a href="#testing">Use your test user profile</a><br>
+                            <a href="#section/Testing">Use your test user profile</a><br>
                             <br>
                             <strong>accountId:</strong><br>1234567890
                             <br>
@@ -6378,7 +6385,7 @@ paths:
                         <p>Withdrawal charge has already been reported</p>
                         <p class="code--block">
                             <strong>lisaManagerReferenceNumber:</strong><br>
-                            <a href="#testing">Use your test user profile</a><br>
+                            <a href="#section/Testing">Use your test user profile</a><br>
                             <br>
                             <strong>accountId:</strong><br>0000000409
                         </p>
@@ -6576,7 +6583,7 @@ paths:
       description: | 
         Use an investor’s transaction ID to get a request for a withdrawal charge that has been submitted to HMRC.
         
-        ## Test data
+        ### Test data
 
         <table style="font-family:Roboto, sans-serif; font-size:14px;">
             <col width="40%">
@@ -6593,7 +6600,7 @@ paths:
                         <p>Withdrawal transaction which has been superseded</p>
                         <p class="code--block">
                             <strong>lisaManagerReferenceNumber:</strong><br>
-                            <a href="#testing">Use your test user profile</a><br>
+                            <a href="#section/Testing">Use your test user profile</a><br>
                             <br>
                             <strong>accountId:</strong><br>1234567890
                             <br>
@@ -6622,7 +6629,7 @@ paths:
                         <p>Withdrawal transaction which has not been superseded</p>
                         <p class="code--block">
                             <strong>lisaManagerReferenceNumber:</strong><br>
-                            <a href="#testing">Use your test user profile</a><br>
+                            <a href="#section/Testing">Use your test user profile</a><br>
                             <br>
                             <strong>accountId:</strong><br>1234567890
                             <br>
@@ -6650,7 +6657,7 @@ paths:
                         <p>Withdrawal transaction which supersedes another</p>
                         <p class="code--block">
                             <strong>lisaManagerReferenceNumber:</strong><br>
-                            <a href="#testing">Use your test user profile</a><br>
+                            <a href="#section/Testing">Use your test user profile</a><br>
                             <br>
                             <strong>accountId:</strong><br>1234567890
                             <br>
@@ -6706,7 +6713,7 @@ paths:
                         <p>Invalid Account ID</p>
                         <p class="code--block">
                             <strong>lisaManagerReferenceNumber:</strong><br>
-                            <a href="#testing">Use your test user profile</a><br>
+                            <a href="#section/Testing">Use your test user profile</a><br>
                             <br>
                             <strong>accountId:</strong><br>1234%3D5678
                             <br>
@@ -6728,7 +6735,7 @@ paths:
                         <p>Account ID does not exist</p>
                         <p class="code--block">
                             <strong>lisaManagerReferenceNumber:</strong><br>
-                            <a href="#testing">Use your test user profile</a><br>
+                            <a href="#section/Testing">Use your test user profile</a><br>
                             <br>
                             <strong>accountId:</strong><br>1234567890
                             <br>
@@ -6750,7 +6757,7 @@ paths:
                         <p>Transaction ID does not exist</p>
                         <p class="code--block">
                             <strong>lisaManagerReferenceNumber:</strong><br>
-                            <a href="#testing">Use your test user profile</a><br>
+                            <a href="#section/Testing">Use your test user profile</a><br>
                             <br>
                             <strong>accountId:</strong><br>1234567890
                             <br>
@@ -6844,7 +6851,7 @@ paths:
       description: |
         Request a bonus payment from HMRC and provide a reason for the request. You can also correct a bonus claim during or after the claim reporting period. You can repay any overpaid amounts to HMRC and receive additional payments from corrected claims.
         
-        ## Test data
+        ### Test data
 
         <table style="font-family:Roboto, sans-serif; font-size:14px;">
             <col width="20%">
@@ -6863,7 +6870,7 @@ paths:
                       <p>Request with a valid payload, LISA Manager reference number and account ID</p>
                       <p class="code--block">
                         <strong>lisaManagerReferenceNumber:</strong><br>
-                        <a href="#testing">Use your test user profile</a><br>
+                        <a href="#section/Testing">Use your test user profile</a><br>
                         <br>
                         <strong>accountId:</strong><br>
                         1234567890
@@ -6912,7 +6919,7 @@ paths:
                       <p>Request with a valid payload, LISA Manager reference number and account ID (late notification)</p>
                       <p class="code--block">
                         <strong>lisaManagerReferenceNumber:</strong><br>
-                        <a href="#testing">Use your test user profile</a><br>
+                        <a href="#section/Testing">Use your test user profile</a><br>
                         <br>
                         <strong>accountId:</strong><br>
                         1234567891
@@ -6957,7 +6964,7 @@ paths:
                       <p>Request with a valid payload, LISA Manager reference number and account ID (regular bonus)</p>
                       <p class="code--block">
                         <strong>lisaManagerReferenceNumber:</strong><br>
-                        <a href="#testing">Use your test user profile</a><br>
+                        <a href="#section/Testing">Use your test user profile</a><br>
                         <br>
                         <strong>accountId:</strong><br>
                         1234567890
@@ -7001,7 +7008,7 @@ paths:
                       <p>Superseded transaction - Bonus recovery</p>
                       <p class="code--block">
                         <strong>lisaManagerReferenceNumber:</strong><br>
-                        <a href="#testing">Use your test user profile</a><br>
+                        <a href="#section/Testing">Use your test user profile</a><br>
                         <br>
                         <strong>accountId:</strong><br>
                         1234567890
@@ -7052,7 +7059,7 @@ paths:
                       <p>Superseded transaction - Additional bonus</p>
                       <p class="code--block">
                         <strong>lisaManagerReferenceNumber:</strong><br>
-                        <a href="#testing">Use your test user profile</a><br>
+                        <a href="#section/Testing">Use your test user profile</a><br>
                         <br>
                         <strong>accountId:</strong><br>
                         1234567890
@@ -7147,7 +7154,7 @@ paths:
                       <p>Request with a valid payload and LISA Manager reference number, but an invalid account ID</p>
                       <p class ="code--block">
                         <strong>lisaManagerReferenceNumber:</strong><br>
-                        <a href="#testing">Use your test user profile</a><br>
+                        <a href="#section/Testing">Use your test user profile</a><br>
                         <br>
                         <strong>accountId:</strong><br>
                         1234%3D5678
@@ -7192,7 +7199,7 @@ paths:
                     <p>Request containing invalid and/or missing data</p>
                     <p class="code--block">
                       <strong>lisaManagerReferenceNumber:</strong><br>
-                      <a href="#testing">Use your test user profile</a><br>
+                      <a href="#section/Testing">Use your test user profile</a><br>
                       <br>
                       <strong>accountId:</strong><br>
                       1234567890
@@ -7289,7 +7296,7 @@ paths:
                       <p>Request with invalid monetary amounts and/or invalid dates</p>
                       <p class="code--block">
                         <strong>lisaManagerReferenceNumber:</strong><br>
-                        <a href="#testing">Use your test user profile</a><br>
+                        <a href="#section/Testing">Use your test user profile</a><br>
                         <br>
                         <strong>accountId:</strong><br>
                         1234567890
@@ -7381,7 +7388,7 @@ paths:
                     <p>Request with a 'claimReason' of 'Life Event', but without a lifeEventId</p>
                     <p class="code--block">
                       <strong>lisaManagerReferenceNumber:</strong><br>
-                      <a href="#testing">Use your test user profile</a><br>
+                      <a href="#section/Testing">Use your test user profile</a><br>
                       <br>
                       <strong>accountId:</strong><br>
                       1234567890
@@ -7425,7 +7432,7 @@ paths:
                       <p>Request containing invalid bonus payment figures</p>
                       <p class="code--block">
                         <strong>lisaManagerReferenceNumber:</strong><br>
-                        <a href="#testing">Use your test user profile</a><br>
+                        <a href="#section/Testing">Use your test user profile</a><br>
                         <br>
                         <strong>accountId:</strong><br>
                         0000000403
@@ -7470,7 +7477,7 @@ paths:
                       <p>Request for an account that has already been closed</p>
                       <p class="code--block">
                         <strong>lisaManagerReferenceNumber:</strong><br>
-                        <a href="#testing">Use your test user profile</a><br>
+                        <a href="#section/Testing">Use your test user profile</a><br>
                         <br>
                         <strong>accountId:</strong><br>
                         1000000903
@@ -7515,7 +7522,7 @@ paths:
                      <p>Request for an account that has already been voided</p>
                      <p class="code--block">
                        <strong>lisaManagerReferenceNumber:</strong><br>
-                       <a href="#testing">Use your test user profile</a><br>
+                       <a href="#section/Testing">Use your test user profile</a><br>
                        <br>
                        <strong>accountId:</strong><br>
                        2000000903
@@ -7561,7 +7568,7 @@ paths:
                      <p>Request for an account that has already been cancelled</p>
                      <p class="code--block">
                        <strong>lisaManagerReferenceNumber:</strong><br>
-                       <a href="#testing">Use your test user profile</a><br>
+                       <a href="#section/Testing">Use your test user profile</a><br>
                        <br>
                        <strong>accountId:</strong><br>
                        3000000903
@@ -7606,7 +7613,7 @@ paths:
                       <p>Request for a bonus claim after 5 April 2018 containing help to buy funds.</p>
                       <p class="code--block">
                         <strong>lisaManagerReferenceNumber:</strong><br>
-                        <a href="#testing">Use your test user profile</a><br>
+                        <a href="#section/Testing">Use your test user profile</a><br>
                         <br>
                         <strong>accountId:</strong><br>
                         1234567890
@@ -7650,7 +7657,7 @@ paths:
                       <p>Superseded transaction containing details which don't match an existing transaction</p>
                       <p class="code--block">
                         <strong>lisaManagerReferenceNumber:</strong><br>
-                        <a href="#testing">Use your test user profile</a><br>
+                        <a href="#section/Testing">Use your test user profile</a><br>
                         <br>
                         <strong>accountId:</strong><br>
                         1000000403
@@ -7697,7 +7704,7 @@ paths:
                       <p>Superseded transaction with an outcome error</p>
                       <p class="code--block">
                         <strong>lisaManagerReferenceNumber:</strong><br>
-                        <a href="#testing">Use your test user profile</a><br>
+                        <a href="#section/Testing">Use your test user profile</a><br>
                         <br>
                         <strong>accountId:</strong><br>
                         2000000403
@@ -7744,7 +7751,7 @@ paths:
                       <p>This account is not eligible for a bonus payment because the investor already has another LISA account</p>
                       <p class="code--block">
                         <strong>lisaManagerReferenceNumber:</strong><br>
-                        <a href="#testing">Use your test user profile</a><br>
+                        <a href="#section/Testing">Use your test user profile</a><br>
                         <br>
                         <strong>accountId:</strong><br>
                         3000000403
@@ -7791,7 +7798,7 @@ paths:
                       <p>Request containing a life event ID that does not exist</p>
                       <p class="code--block">
                         <strong>lisaManagerReferenceNumber:</strong><br>
-                        <a href="#testing">Use your test user profile</a><br>
+                        <a href="#section/Testing">Use your test user profile</a><br>
                         <br>
                         <strong>accountId:</strong><br>
                         1000000404
@@ -7836,7 +7843,7 @@ paths:
                       <p>Request containing an account ID that does not exist</p>
                       <p class="code--block">
                         <strong>lisaManagerReferenceNumber:</strong><br>
-                        <a href="#testing">Use your test user profile</a><br>
+                        <a href="#section/Testing">Use your test user profile</a><br>
                         <br>
                         <strong>accountId:</strong><br>
                         0000000404
@@ -7881,7 +7888,7 @@ paths:
                       <p>Request for a bonus claim that has already been requested</p>
                       <p class="code--block">
                         <strong>lisaManagerReferenceNumber:</strong><br>
-                        <a href="#testing">Use your test user profile</a><br>
+                        <a href="#section/Testing">Use your test user profile</a><br>
                         <br>
                         <strong>accountId:</strong><br>
                         0000000409
@@ -7927,7 +7934,7 @@ paths:
                       <p>Request to supersede a transaction that has already been superseded</p>
                       <p class="code--block">
                         <strong>lisaManagerReferenceNumber:</strong><br>
-                        <a href="#testing">Use your test user profile</a><br>
+                        <a href="#section/Testing">Use your test user profile</a><br>
                         <br>
                         <strong>accountId:</strong><br>
                         1000000409
@@ -7975,7 +7982,7 @@ paths:
                       <p>Request with an invalid 'Accept' header</p>
                       <p class="code--block">
                         <strong>lisaManagerReferenceNumber:</strong><br>
-                        <a href="#testing">Use your test user profile</a><br>
+                        <a href="#section/Testing">Use your test user profile</a><br>
                         <br>
                         <strong>accountId:</strong><br>
                         1234567890<br>
@@ -8215,7 +8222,7 @@ paths:
       description: | 
         Use an investor’s transaction ID to get a request for a bonus payment that has been submitted to HMRC.
         
-        ## Test data
+        ### Test data
 
         <table style="font-family:Roboto, sans-serif; font-size:14px;">
         	<colgroup>
@@ -8233,7 +8240,7 @@ paths:
         		    <td>
         		    	<p>Retrieve details for a bonus payment associated with a LISA account</p>
         		    	<p class ="code--block">
-        		    		<strong>lisaManagerReferenceNumber:</strong> <a href="#testing">Use your test user profile</a><br>
+        		    		<strong>lisaManagerReferenceNumber:</strong> <a href="#section/Testing">Use your test user profile</a><br>
         		    		<strong>accountId:</strong> 1234567890<br>
         		    		<strong>transactionId:</strong> 0123456789
         		    	</p>
@@ -8270,7 +8277,7 @@ paths:
         	    <td>
         		    	<p>Retrieve details for a bonus payment associated with a LISA account (regular bonus)</p>
         		    	<p class ="code--block">
-        		    		<strong>lisaManagerReferenceNumber:</strong> <a href="#testing">Use your test user profile</a><br>
+        		    		<strong>lisaManagerReferenceNumber:</strong> <a href="#section/Testing">Use your test user profile</a><br>
         		    		<strong>accountId:</strong> 1234567890<br>
         		    		<strong>transactionId:</strong> 0003456789
         		    	</p>
@@ -8306,7 +8313,7 @@ paths:
         	    <td>
         		    	<p>Retrieve a superseded transaction (bonus recovery)</p>
         		    	<p class="code--block">
-        		    		<strong>lisaManagerReferenceNumber:</strong> <a href="#testing">Use your test user profile</a><br>
+        		    		<strong>lisaManagerReferenceNumber:</strong> <a href="#section/Testing">Use your test user profile</a><br>
         		    		<strong>accountId:</strong> 1234567890<br>
         		    		<strong>transactionId:</strong> 0000456789
         		    	</p>
@@ -8344,7 +8351,7 @@ paths:
         	    <td>
         		    	<p>Retrieve a superseded transaction (additional bonus)</p>
         		    	<p class="code--block">
-        		    		<strong>lisaManagerReferenceNumber:</strong> <a href="#testing">Use your test user profile</a><br>
+        		    		<strong>lisaManagerReferenceNumber:</strong> <a href="#section/Testing">Use your test user profile</a><br>
         		    		<strong>accountId:</strong> 1234567890<br>
         		    		<strong>transactionId:</strong> 0000056789
         		    	</p>
@@ -8400,7 +8407,7 @@ paths:
         		    <td>
         		    	<p>Request with an invalid accountId</p>
         		    	<p class ="code--block">
-        		    		<strong>lisaManagerReferenceNumber:</strong> <a href="#testing">Use your test user profile</a><br>
+        		    		<strong>lisaManagerReferenceNumber:</strong> <a href="#section/Testing">Use your test user profile</a><br>
         		    		<strong>accountId:</strong> 1234%3D5678<br>
         		    		<strong>transactionId:</strong> 0123456789
         		    	</p>
@@ -8419,7 +8426,7 @@ paths:
         		    <td>
         		    	<p>Request with an invalid bonus payment transaction</p>
         		    	<p class ="code--block">
-        		    		<strong>lisaManagerReferenceNumber:</strong> <a href="#testing">Use your test user profile</a><br>
+        		    		<strong>lisaManagerReferenceNumber:</strong> <a href="#section/Testing">Use your test user profile</a><br>
         		    		<strong>accountId:</strong> 1234567890<br>
         		    		<strong>transactionId:</strong> 0000000404
         		    	</p>
@@ -8438,7 +8445,7 @@ paths:
         		    <td>
         		    	<p>Request with an invalid LISA account</p>
         		    	<p class ="code--block">
-        		    		<strong>lisaManagerReferenceNumber:</strong> <a href="#testing">Use your test user profile</a><br>
+        		    		<strong>lisaManagerReferenceNumber:</strong> <a href="#section/Testing">Use your test user profile</a><br>
         		    		<strong>accountId:</strong> 1234567899<br>
         		    		<strong>transactionId:</strong> 1000000404
         		    	</p>
@@ -8570,7 +8577,7 @@ paths:
       description: | 
         Use an investor’s transaction ID to get payment details for a bonus claim or withdrawal charge, including when the amount is due to be paid or collected.
         
-        ## Test data
+        ### Test data
 
         <table style="font-family:Roboto, sans-serif; font-size:14px;">
             <col width="40%">
@@ -8583,7 +8590,7 @@ paths:
             </thead>
             <tbody>
                 <tr>
-                    <td><p>Request for a paid payment</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 0123456789</p></td>
+                    <td><p>Request for a paid payment</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 0123456789</p></td>
                     <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
         <pre class="code--block">
         {
@@ -8598,7 +8605,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request for a pending transaction (payment or debt)</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 0000000200</p></td>
+                    <td><p>Request for a pending transaction (payment or debt)</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 0000000200</p></td>
                     <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
         <pre class="code--block">
         {
@@ -8609,7 +8616,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request for a pending payment with a due date</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 3000000200</p></td>
+                    <td><p>Request for a pending payment with a due date</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 3000000200</p></td>
                     <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
         <pre class="code--block">
         {
@@ -8622,7 +8629,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request for a cancelled transaction</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 1000000200</p></td>
+                    <td><p>Request for a cancelled transaction</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 1000000200</p></td>
                     <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
         <pre class="code--block">
         {
@@ -8633,7 +8640,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request for a void transaction</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 2000000200</p></td>
+                    <td><p>Request for a void transaction</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 2000000200</p></td>
                     <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
         <pre class="code--block">
         {
@@ -8644,7 +8651,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request for a debt which is due to be collected</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 2345678902</p></td>
+                    <td><p>Request for a debt which is due to be collected</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 2345678902</p></td>
                     <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
         <pre class="code--block">
         {
@@ -8659,7 +8666,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request for a debt which has been collected</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 2345678903</p></td>
+                    <td><p>Request for a debt which has been collected</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 2345678903</p></td>
                     <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
         <pre class="code--block">
         {
@@ -8674,7 +8681,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request for a transaction which was superseded before being paid</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 2345678901</p></td>
+                    <td><p>Request for a transaction which was superseded before being paid</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 2345678901</p></td>
                     <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
         <pre class="code--block">
         {
@@ -8686,7 +8693,7 @@ paths:
                     </td>
                </tr>
                <tr>
-                    <td><p>Request to refund withdrawal charge has been cancelled</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 0000000403</p></td>
+                    <td><p>Request to refund withdrawal charge has been cancelled</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 0000000403</p></td>
                     <td><p>HTTP status: <code class="code--slim">200 (OK)</code></p>
         <pre class="code--block">
         {
@@ -8709,7 +8716,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request with a valid LISA Manager reference number and Transaction ID, but an invalid account ID</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234%3D5678<br>transactionId: 0123456789</p></td>
+                    <td><p>Request with a valid LISA Manager reference number and Transaction ID, but an invalid account ID</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 1234%3D5678<br>transactionId: 0123456789</p></td>
                     <td><p>HTTP status: <code class="code--slim">400 (Bad Request)</code></p>
         <pre class="code--block">
         {
@@ -8720,7 +8727,7 @@ paths:
                     </td>
                </tr>
                 <tr>
-                    <td><p>Request for a transaction that does not exist</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 0000000404</p></td>
+                    <td><p>Request for a transaction that does not exist</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 0000000404</p></td>
                     <td><p>HTTP status: <code class="code--slim">404 (Not Found)</code></p>
         <pre class="code--block">
         {
@@ -8731,7 +8738,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request for an account that does not exist</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567899<br>transactionId: 1000000404</p></td>
+                    <td><p>Request for an account that does not exist</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 1234567899<br>transactionId: 1000000404</p></td>
                     <td><p>HTTP status: <code class="code--slim">404 (Not Found)</code></p>
         <pre class="code--block">
         {
@@ -8742,7 +8749,7 @@ paths:
                     </td>
                 </tr>
                 <tr>
-                    <td><p>Request with an invalid 'Accept' header</p><p class="code--block">lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 0123456789<br><br>Accept: application/vnd.hmrc.1.0</p></td>
+                    <td><p>Request with an invalid 'Accept' header</p><p class="code--block">lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>accountId: 1234567890<br>transactionId: 0123456789<br><br>Accept: application/vnd.hmrc.1.0</p></td>
                     <td><p>HTTP status: <code class="code--slim">404 (Not Found)</code></p>
         <pre class="code--block">
         {
@@ -8831,7 +8838,7 @@ paths:
       description: | 
         Get a list of all pending and paid payments from HMRC and due and collected debts owed to HMRC in a specific date range.
         
-        ## Test data
+        ### Test data
 
         <table style="font-family:Roboto, sans-serif; font-size:14px;">
             <col width="40%">
@@ -8847,7 +8854,7 @@ paths:
                     <td>
                         <p>Request for payments where some are found</p>
                         <p class="code--block">
-                            lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+                            lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>
                             startDate: 2017-05-20<br>
                             endDate: 2017-10-20
                         </p>
@@ -8892,7 +8899,7 @@ paths:
                     <td>
                         <p>Request for payments where none are found</p>
                         <p class="code--block">
-                            lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+                            lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>
                             startDate: 2017-04-06<br>
                             endDate: 2017-04-06
                         </p>
@@ -8928,7 +8935,7 @@ paths:
                     <td>
                         <p>Request with startDate in the wrong format</p>
                         <p class="code--block">
-                            lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+                            lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>
                             startDate: 20-05-2017<br>
                             endDate: 2017-05-20
                         </p>
@@ -8946,7 +8953,7 @@ paths:
                     <td>
                         <p>Request with endDate in the wrong format</p>
                         <p class="code--block">
-                            lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+                            lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>
                             startDate: 2017-05-20<br>
                             endDate: 20-05-2017
                         </p>
@@ -8964,7 +8971,7 @@ paths:
                     <td>
                         <p>Request with startDate and endDate in the wrong format</p>
                         <p class="code--block">
-                            lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+                            lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>
                             startDate: 20-05-2017<br>
                             endDate: 20-05-2017
                         </p>
@@ -8982,7 +8989,7 @@ paths:
                     <td>
                         <p>Request with and endDate in the future</p>
                         <p class="code--block">
-                            lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+                            lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>
                             startDate: (today's date)<br>
                             endDate: (any date in the future)
                         </p>
@@ -9000,7 +9007,7 @@ paths:
                     <td>
                         <p>Request with an endDate before the startDate</p>
                         <p class="code--block">
-                            lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+                            lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>
                             startDate: 2017-12-20<br>
                             endDate: 2017-12-19
                         </p>
@@ -9018,7 +9025,7 @@ paths:
                     <td>
                         <p>startDate cannot be before 6 April 2017</p>
                         <p class="code--block">
-                            lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+                            lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>
                             startDate: 2017-04-05<br>
                             endDate: 2017-04-06
                         </p>
@@ -9036,7 +9043,7 @@ paths:
                     <td>
                         <p>Request with an endDate over a year after startDate</p>
                         <p class="code--block">
-                            lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+                            lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>
                             startDate: 2017-04-06<br>
                             endDate: 2018-04-07
                         </p>
@@ -9054,7 +9061,7 @@ paths:
                     <td>
                         <p>Request with an invalid 'Accept' header</p>
                         <p class="code--block">
-                            lisaManagerReferenceNumber: <a href="#testing">Use your test user profile</a><br>
+                            lisaManagerReferenceNumber: <a href="#section/Testing">Use your test user profile</a><br>
                             startDate: 2017-04-06<br>
                             endDate: 2017-05-05
                             <br>
@@ -9075,7 +9082,6 @@ paths:
       operationId: getListOfAllPaymentsAndDebtsInDateRange
       parameters:
       - $ref: '#/components/parameters/acceptHeader'
-      - $ref: '#/components/parameters/contentTypeHeader'
       - $ref: '#/components/parameters/authorizationHeader'
       - $ref: '#/components/parameters/lisaManagerReferenceNumber'
       - $ref: '#/components/parameters/startDate'
