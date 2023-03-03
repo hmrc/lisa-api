@@ -1,10 +1,8 @@
 
 import scoverage.ScoverageKeys
 import uk.gov.hmrc.DefaultBuildSettings.{defaultSettings, scalaSettings}
-import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 
 scalaSettings
-publishingSettings
 defaultSettings()
 
 name                     := "lisa-api"
@@ -26,7 +24,7 @@ Test    / fork                         := true
 
 ScoverageKeys.coverageExcludedPackages := "<empty>;testOnlyDoNotUseInAppConf.*;uk.gov.hmrc.lisaapi.views.txt;uk.gov.hmrc;definition;uk.gov.hmrc.lisaapi.config.*;uk.gov.hmrc.lisaapi.models.*;uk.gov.hmrc.lisaapi.metrics.*;prod"
 ScoverageKeys.coverageMinimum          := 89
-ScoverageKeys.coverageFailOnMinimum    := false
+ScoverageKeys.coverageFailOnMinimum    := true
 ScoverageKeys.coverageHighlighting     := true
 
 scalacOptions ++= Seq(
