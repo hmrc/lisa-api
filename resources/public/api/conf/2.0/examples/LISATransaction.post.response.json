@@ -1,8 +1,0 @@
-{
-  "status": 201,
-  "success": true,
-  "data": {
-    "message": "Bonus transaction created",
-    "transactionId": "0123456789"
-  }
-}

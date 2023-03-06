@@ -11033,6 +11033,7 @@ components:
         code: SUPERSEDED_LIFE_EVENT_MISMATCH_ERROR
         message: originalLifeEventId and the originalEventDate do not match the information in the original request
     accountVoid:
+      description: The LISA account is already void
       value:
         code: INVESTOR_ACCOUNT_ALREADY_VOID
         message: The LISA account is already void

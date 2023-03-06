@@ -1,8 +1,0 @@
-{
-  "status": 201,
-  "success": true,
-  "data": {
-    "message": "Purchase outcome created",
-    "lifeEventId": "5678900001"
-  }
-}

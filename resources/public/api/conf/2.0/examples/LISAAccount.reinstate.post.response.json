@@ -1,8 +1,0 @@
-{
-  "status": 200,
-  "success": true,
-  "data": {
-    "message": "This account has been reinstated",
-    "accountId": "8765432100"
-  }
-}
