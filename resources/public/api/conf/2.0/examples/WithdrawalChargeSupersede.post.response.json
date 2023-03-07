@@ -1,8 +1,0 @@
-{
-  "status": 201,
-  "success": true,
-  "data": {
-    "message": "Unauthorised withdrawal transaction superseded",
-    "transactionId": "2345678903"
-  }
-}

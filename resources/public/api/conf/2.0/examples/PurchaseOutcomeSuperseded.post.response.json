@@ -1,8 +1,0 @@
-{
-  "status": 201,
-  "success": true,
-  "data": {
-    "message": "Purchase outcome superseded",
-    "lifeEventId": "5678900002"
-  }
-}

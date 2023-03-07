@@ -1,9 +1,0 @@
-{
-  "status": 200,
-  "success": true,
-  "data": {
-    "code": "UPDATED_AND_ACCOUNT_VOID",
-    "message": "Successfully updated the firstSubscriptionDate for the LISA account and changed the account status to void because the investor has another account with an earlier firstSubscriptionDate",
-    "accountId": "1234567891"
-  }
-}

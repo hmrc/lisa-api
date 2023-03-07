@@ -1,8 +1,0 @@
-{
-  "status": 201,
-  "success": true,
-  "data": {
-    "message": "Investor created",
-    "investorId": "9876543210"
-  }
-}
