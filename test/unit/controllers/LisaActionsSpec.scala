@@ -33,37 +33,37 @@ class LisaActionsSpec extends ControllerTestFixture {
   "The validateLMRNAction" must {
     "accept a valid 4 digit LMRN" in {
       val action: ActionRefiner[Request, LMRNRequest] = TestController.validateLMRN("Z1234")
-      val response = action.invokeBlock[AnyContent](FakeRequest(Helpers.GET, "/"), (_) => Future.successful(Results.Ok))
+      val response                                    = action.invokeBlock[AnyContent](FakeRequest(Helpers.GET, "/"), _ => Future.successful(Results.Ok))
       Await.result(response, 100 millis) mustBe Results.Ok
     }
 
     "accept a valid 6 digit LMRN" in {
       val action: ActionRefiner[Request, LMRNRequest] = TestController.validateLMRN("Z123456")
-      val response = action.invokeBlock[AnyContent](FakeRequest(Helpers.GET, "/"), (_) => Future.successful(Results.Ok))
+      val response                                    = action.invokeBlock[AnyContent](FakeRequest(Helpers.GET, "/"), _ => Future.successful(Results.Ok))
       Await.result(response, 100 millis) mustBe Results.Ok
     }
 
     "reject a LMRN without a leading Z" in {
       val action: ActionRefiner[Request, LMRNRequest] = TestController.validateLMRN("123456")
-      val response = action.invokeBlock[AnyContent](FakeRequest(Helpers.GET, "/"), (_) => Future.successful(Results.Ok))
+      val response                                    = action.invokeBlock[AnyContent](FakeRequest(Helpers.GET, "/"), _ => Future.successful(Results.Ok))
       Await.result(response, 100 millis) mustBe BadRequest(ErrorBadRequestLmrn.asJson)
     }
 
     "reject a LMRN with 3 digits" in {
       val action: ActionRefiner[Request, LMRNRequest] = TestController.validateLMRN("Z123")
-      val response = action.invokeBlock[AnyContent](FakeRequest(Helpers.GET, "/"), (_) => Future.successful(Results.Ok))
+      val response                                    = action.invokeBlock[AnyContent](FakeRequest(Helpers.GET, "/"), _ => Future.successful(Results.Ok))
       Await.result(response, 100 millis) mustBe BadRequest(ErrorBadRequestLmrn.asJson)
     }
 
     "reject a LMRN with 5 digits" in {
       val action: ActionRefiner[Request, LMRNRequest] = TestController.validateLMRN("Z12345")
-      val response = action.invokeBlock[AnyContent](FakeRequest(Helpers.GET, "/"), (_) => Future.successful(Results.Ok))
+      val response                                    = action.invokeBlock[AnyContent](FakeRequest(Helpers.GET, "/"), _ => Future.successful(Results.Ok))
       Await.result(response, 100 millis) mustBe BadRequest(ErrorBadRequestLmrn.asJson)
     }
 
     "reject a LMRN with 7 digits" in {
       val action: ActionRefiner[Request, LMRNRequest] = TestController.validateLMRN("Z1234567")
-      val response = action.invokeBlock[AnyContent](FakeRequest(Helpers.GET, "/"), (_) => Future.successful(Results.Ok))
+      val response                                    = action.invokeBlock[AnyContent](FakeRequest(Helpers.GET, "/"), _ => Future.successful(Results.Ok))
       Await.result(response, 100 millis) mustBe BadRequest(ErrorBadRequestLmrn.asJson)
     }
   }
@@ -71,31 +71,48 @@ class LisaActionsSpec extends ControllerTestFixture {
   "The validateAccountIdAction" must {
     "accept a valid account id with 1 character" in {
       val action: ActionRefiner[LMRNRequest, LMRNWithAccountRequest] = TestController.validateAccountId("1")
-      val response = action.invokeBlock[AnyContent](LMRNRequest(FakeRequest(Helpers.GET, "/"), "Z1234"), (_) => Future.successful(Results.Ok))
+      val response                                                   = action.invokeBlock[AnyContent](
+        LMRNRequest(FakeRequest(Helpers.GET, "/"), "Z1234"),
+        _ => Future.successful(Results.Ok)
+      )
       Await.result(response, 100 millis) mustBe Results.Ok
     }
 
     "accept a valid account id with 20 characters" in {
-      val action: ActionRefiner[LMRNRequest, LMRNWithAccountRequest] = TestController.validateAccountId("1234567890abcdefghij")
-      val response = action.invokeBlock[AnyContent](LMRNRequest(FakeRequest(Helpers.GET, "/"), "Z1234"), (_) => Future.successful(Results.Ok))
+      val action: ActionRefiner[LMRNRequest, LMRNWithAccountRequest] =
+        TestController.validateAccountId("1234567890abcdefghij")
+      val response                                                   = action.invokeBlock[AnyContent](
+        LMRNRequest(FakeRequest(Helpers.GET, "/"), "Z1234"),
+        _ => Future.successful(Results.Ok)
+      )
       Await.result(response, 100 millis) mustBe Results.Ok
     }
 
     "accept a valid account id with special characters" in {
       val action: ActionRefiner[LMRNRequest, LMRNWithAccountRequest] = TestController.validateAccountId("a b-c/123")
-      val response = action.invokeBlock[AnyContent](LMRNRequest(FakeRequest(Helpers.GET, "/"), "Z1234"), (_) => Future.successful(Results.Ok))
+      val response                                                   = action.invokeBlock[AnyContent](
+        LMRNRequest(FakeRequest(Helpers.GET, "/"), "Z1234"),
+        _ => Future.successful(Results.Ok)
+      )
       Await.result(response, 100 millis) mustBe Results.Ok
     }
 
     "reject an account id with 21 characters" in {
-      val action: ActionRefiner[LMRNRequest, LMRNWithAccountRequest] = TestController.validateAccountId("123456789012345678901")
-      val response = action.invokeBlock[AnyContent](LMRNRequest(FakeRequest(Helpers.GET, "/"), "Z1234"), (_) => Future.successful(Results.Ok))
+      val action: ActionRefiner[LMRNRequest, LMRNWithAccountRequest] =
+        TestController.validateAccountId("123456789012345678901")
+      val response                                                   = action.invokeBlock[AnyContent](
+        LMRNRequest(FakeRequest(Helpers.GET, "/"), "Z1234"),
+        _ => Future.successful(Results.Ok)
+      )
       Await.result(response, 100 millis) mustBe BadRequest(ErrorBadRequestAccountId.asJson)
     }
 
     "reject an account id with illegal characters" in {
       val action: ActionRefiner[LMRNRequest, LMRNWithAccountRequest] = TestController.validateAccountId("12345%67890")
-      val response = action.invokeBlock[AnyContent](LMRNRequest(FakeRequest(Helpers.GET, "/"), "Z1234"), (_) => Future.successful(Results.Ok))
+      val response                                                   = action.invokeBlock[AnyContent](
+        LMRNRequest(FakeRequest(Helpers.GET, "/"), "Z1234"),
+        _ => Future.successful(Results.Ok)
+      )
       Await.result(response, 100 millis) mustBe BadRequest(ErrorBadRequestAccountId.asJson)
     }
   }

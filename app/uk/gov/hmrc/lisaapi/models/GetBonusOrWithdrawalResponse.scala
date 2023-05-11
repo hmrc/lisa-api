@@ -31,7 +31,7 @@ case object GetBonusOrWithdrawalServiceUnavailableResponse extends GetBonusOrWit
 trait GetBonusOrWithdrawalSuccessResponse extends GetBonusOrWithdrawalResponse {
   val paymentStatus: String
   val supersededBy: Option[TransactionId]
-  def getBonusDueForPeriod : Option[Amount] = None
+  def getBonusDueForPeriod: Option[Amount] = None
 }
 
 case class GetBonusResponse(
@@ -50,43 +50,43 @@ case class GetBonusResponse(
 }
 
 case class GetWithdrawalResponse(
-                                  periodStartDate: DateTime,
-                                  periodEndDate: DateTime,
-                                  automaticRecoveryAmount: Option[Amount],
-                                  withdrawalAmount: Amount,
-                                  withdrawalChargeAmount: Amount,
-                                  withdrawalChargeAmountYtd: Amount,
-                                  fundsDeductedDuringWithdrawal: Boolean,
-                                  withdrawalReason: String,
-                                  supersededBy: Option[TransactionId] = None,
-                                  supersede: Option[WithdrawalSupersede] = None,
-                                  paymentStatus: String,
-                                  creationDate: DateTime
+  periodStartDate: DateTime,
+  periodEndDate: DateTime,
+  automaticRecoveryAmount: Option[Amount],
+  withdrawalAmount: Amount,
+  withdrawalChargeAmount: Amount,
+  withdrawalChargeAmountYtd: Amount,
+  fundsDeductedDuringWithdrawal: Boolean,
+  withdrawalReason: String,
+  supersededBy: Option[TransactionId] = None,
+  supersede: Option[WithdrawalSupersede] = None,
+  paymentStatus: String,
+  creationDate: DateTime
 ) extends GetBonusOrWithdrawalSuccessResponse
 
 object GetBonusOrWithdrawalResponse {
   implicit val bonusReads: Reads[GetBonusResponse] = (
     (JsPath \ "lifeEventId").readNullable(JsonReads.lifeEventId) and
-    (JsPath \ "claimPeriodStart").read(JsonReads.isoDate).map(new DateTime(_)) and
-    (JsPath \ "claimPeriodEnd").read(JsonReads.isoDate).map(new DateTime(_)) and
-    (JsPath \ "htbInAmountForPeriod").readNullable[Amount] and
-    (JsPath \ "htbInAmountYtd").readNullable[Amount] and
-    (JsPath \ "newSubsInPeriod").readNullable[Amount] and
-    (JsPath \ "newSubsYtd").read[Amount] and
-    (JsPath \ "totalSubsInPeriod").read[Amount] and
-    (JsPath \ "totalSubsYtd").read[Amount] and
-    (JsPath \ "bonusDueForPeriod").read[Amount] and
-    (JsPath \ "bonusDueYtd").read[Amount] and
-    (JsPath \ "bonusPaidYtd").readNullable[Amount] and
-    (JsPath \ "claimReason").read[BonusClaimReason] and
-    (JsPath \ "transactionSupersededById").readNullable(JsonReads.transactionId) and
-    (JsPath \ "supersededTransactionId").readNullable(JsonReads.transactionId) and
-    (JsPath \ "supersededTransactionAmount").readNullable[Amount] and
-    (JsPath \ "supersededTransactionResult").readNullable[Amount] and
-    (JsPath \ "supersededReason").readNullable[BonusClaimSupersedeReason] and
-    (JsPath \ "automaticRecoveryAmount").readNullable[Amount] and
-    (JsPath \ "paymentStatus").read[String] and
-    (JsPath \ "creationDate").read(JsonReads.isoDate).map(new DateTime(_))
+      (JsPath \ "claimPeriodStart").read(JsonReads.isoDate).map(new DateTime(_)) and
+      (JsPath \ "claimPeriodEnd").read(JsonReads.isoDate).map(new DateTime(_)) and
+      (JsPath \ "htbInAmountForPeriod").readNullable[Amount] and
+      (JsPath \ "htbInAmountYtd").readNullable[Amount] and
+      (JsPath \ "newSubsInPeriod").readNullable[Amount] and
+      (JsPath \ "newSubsYtd").read[Amount] and
+      (JsPath \ "totalSubsInPeriod").read[Amount] and
+      (JsPath \ "totalSubsYtd").read[Amount] and
+      (JsPath \ "bonusDueForPeriod").read[Amount] and
+      (JsPath \ "bonusDueYtd").read[Amount] and
+      (JsPath \ "bonusPaidYtd").readNullable[Amount] and
+      (JsPath \ "claimReason").read[BonusClaimReason] and
+      (JsPath \ "transactionSupersededById").readNullable(JsonReads.transactionId) and
+      (JsPath \ "supersededTransactionId").readNullable(JsonReads.transactionId) and
+      (JsPath \ "supersededTransactionAmount").readNullable[Amount] and
+      (JsPath \ "supersededTransactionResult").readNullable[Amount] and
+      (JsPath \ "supersededReason").readNullable[BonusClaimSupersedeReason] and
+      (JsPath \ "automaticRecoveryAmount").readNullable[Amount] and
+      (JsPath \ "paymentStatus").read[String] and
+      (JsPath \ "creationDate").read(JsonReads.isoDate).map(new DateTime(_))
   )(
     (
       lifeEventId,
@@ -117,7 +117,7 @@ object GetBonusOrWithdrawalResponse {
         periodEndDate = periodEndDate,
         htbTransfer = (htbInAmountForPeriod, htbInAmountYtd) match {
           case (Some(htbPeriod), Some(htbYtd)) => Some(HelpToBuyTransfer(htbPeriod, htbYtd))
-          case _ => None
+          case _                               => None
         },
         inboundPayments = InboundPayments(newSubsInPeriod, newSubsYtd, totalSubsInPeriod, totalSubsYtd),
         bonuses = Bonuses(
@@ -125,20 +125,28 @@ object GetBonusOrWithdrawalResponse {
           bonusDueYtd,
           bonusPaidYtd,
           claimReason match {
-            case "LIFE_EVENT" => "Life Event"
-            case "REGULAR_BONUS" => "Regular Bonus"
+            case "LIFE_EVENT"       => "Life Event"
+            case "REGULAR_BONUS"    => "Regular Bonus"
             case "SUPERSEDED_BONUS" => "Superseded Bonus"
           }
         ),
         supersededBy = supersededTransactionById,
-        supersede = (supersededTransactionId, supersededTransactionAmount, supersededTransactionResult, supersededReason, automaticRecoveryAmount) match {
-          case (Some(id), Some(amount), Some(result), Some("BONUS_RECOVERY"), Some(recovery)) => Some(
-            BonusRecovery(recovery, id, amount, result)
-          )
-          case (Some(id), Some(amount), Some(result), Some("ADDITIONAL_BONUS"), _) => Some(
-            AdditionalBonus(id, amount, result)
-          )
-          case _ => None
+        supersede = (
+          supersededTransactionId,
+          supersededTransactionAmount,
+          supersededTransactionResult,
+          supersededReason,
+          automaticRecoveryAmount
+        ) match {
+          case (Some(id), Some(amount), Some(result), Some("BONUS_RECOVERY"), Some(recovery)) =>
+            Some(
+              BonusRecovery(recovery, id, amount, result)
+            )
+          case (Some(id), Some(amount), Some(result), Some("ADDITIONAL_BONUS"), _)            =>
+            Some(
+              AdditionalBonus(id, amount, result)
+            )
+          case _                                                                              => None
         },
         paymentStatus = getPaymentStatus(paymentStatus),
         creationDate = creationDate
@@ -147,20 +155,20 @@ object GetBonusOrWithdrawalResponse {
 
   implicit val withdrawalReads: Reads[GetWithdrawalResponse] = (
     (JsPath \ "claimPeriodStart").read(JsonReads.isoDate).map(new DateTime(_)) and
-    (JsPath \ "claimPeriodEnd").read(JsonReads.isoDate).map(new DateTime(_)) and
-    (JsPath \ "automaticRecoveryAmount").readNullable[Amount] and
-    (JsPath \ "withdrawalAmount").read[Amount] and
-    (JsPath \ "withdrawalChargeAmount").read[Amount] and
-    (JsPath \ "withdrawalChargeAmountYtd").read[Amount] and
-    (JsPath \ "fundsDeductedDuringWithdrawal").read[String] and
-    (JsPath \ "withdrawalReason").read[WithdrawalReason] and
-    (JsPath \ "transactionSupersededById").readNullable(JsonReads.transactionId) and
-    (JsPath \ "supersededTransactionId").readNullable(JsonReads.transactionId) and
-    (JsPath \ "supersededTransactionAmount").readNullable[Amount] and
-    (JsPath \ "supersededTransactionResult").readNullable[Amount] and
-    (JsPath \ "supersededReason").readNullable[WithdrawalSupersedeReason] and
-    (JsPath \ "paymentStatus").read[String] and
-    (JsPath \ "creationDate").read(JsonReads.isoDate).map(new DateTime(_))
+      (JsPath \ "claimPeriodEnd").read(JsonReads.isoDate).map(new DateTime(_)) and
+      (JsPath \ "automaticRecoveryAmount").readNullable[Amount] and
+      (JsPath \ "withdrawalAmount").read[Amount] and
+      (JsPath \ "withdrawalChargeAmount").read[Amount] and
+      (JsPath \ "withdrawalChargeAmountYtd").read[Amount] and
+      (JsPath \ "fundsDeductedDuringWithdrawal").read[String] and
+      (JsPath \ "withdrawalReason").read[WithdrawalReason] and
+      (JsPath \ "transactionSupersededById").readNullable(JsonReads.transactionId) and
+      (JsPath \ "supersededTransactionId").readNullable(JsonReads.transactionId) and
+      (JsPath \ "supersededTransactionAmount").readNullable[Amount] and
+      (JsPath \ "supersededTransactionResult").readNullable[Amount] and
+      (JsPath \ "supersededReason").readNullable[WithdrawalSupersedeReason] and
+      (JsPath \ "paymentStatus").read[String] and
+      (JsPath \ "creationDate").read(JsonReads.isoDate).map(new DateTime(_))
   )(
     (
       periodStartDate,
@@ -188,46 +196,56 @@ object GetBonusOrWithdrawalResponse {
         withdrawalChargeAmountYtd = withdrawalChargeAmountYTD,
         fundsDeductedDuringWithdrawal = fundsDeductedDuringWithdrawal match {
           case "YES" => true
-          case "NO" => false
+          case "NO"  => false
         },
         withdrawalReason = withdrawalReason match {
-          case "REGULAR_WITHDRAWAL_CHARGE" => "Regular withdrawal"
+          case "REGULAR_WITHDRAWAL_CHARGE"    => "Regular withdrawal"
           case "SUPERSEDED_WITHDRAWAL_CHARGE" => "Superseded withdrawal"
         },
         supersededBy = supersededTransactionById,
-        supersede = (supersededTransactionId, supersededTransactionAmount, supersededTransactionResult, supersededReason) match {
-          case (Some(id), Some(amount), Some(result), Some(reason)) => Some(WithdrawalSuperseded(id, amount, result, reason match {
-            case "ADDITIONAL_WITHDRAWAL" => "Additional withdrawal"
-            case "WITHDRAWAL_REDUCTION" => "Withdrawal reduction"
-            case "WITHDRAWAL_REFUND" => "Withdrawal refund"
-          }))
-          case _ => None
-        },
+        supersede =
+          (supersededTransactionId, supersededTransactionAmount, supersededTransactionResult, supersededReason) match {
+            case (Some(id), Some(amount), Some(result), Some(reason)) =>
+              Some(
+                WithdrawalSuperseded(
+                  id,
+                  amount,
+                  result,
+                  reason match {
+                    case "ADDITIONAL_WITHDRAWAL" => "Additional withdrawal"
+                    case "WITHDRAWAL_REDUCTION"  => "Withdrawal reduction"
+                    case "WITHDRAWAL_REFUND"     => "Withdrawal refund"
+                  }
+                )
+              )
+            case _                                                    => None
+          },
         paymentStatus = getPaymentStatus(paymentStatus),
         creationDate = creationDate
       )
   )
 
-  implicit val bonusOrWithdrawalReads: Reads[GetBonusOrWithdrawalResponse] = Reads[GetBonusOrWithdrawalResponse] { json =>
-    val reason = (json \ "withdrawalReason").asOpt[String]
+  implicit val bonusOrWithdrawalReads: Reads[GetBonusOrWithdrawalResponse] = Reads[GetBonusOrWithdrawalResponse] {
+    json =>
+      val reason = (json \ "withdrawalReason").asOpt[String]
 
-    reason match {
-      case Some(_) => withdrawalReads.reads(json)
-      case None => bonusReads.reads(json)
-    }
+      reason match {
+        case Some(_) => withdrawalReads.reads(json)
+        case None    => bonusReads.reads(json)
+      }
   }
 
   implicit val bonusWrites: Writes[GetBonusResponse] = (
     (JsPath \ "lifeEventId").writeNullable[String] and
-    (JsPath \ "periodStartDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
-    (JsPath \ "periodEndDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
-    (JsPath \ "htbTransfer").writeNullable[HelpToBuyTransfer] and
-    (JsPath \ "inboundPayments").write[InboundPayments] and
-    (JsPath \ "bonuses").write[Bonuses] and
-    (JsPath \ "supersededBy").writeNullable[String] and
-    (JsPath \ "supersede").writeNullable[Supersede](Supersede.getSupersedeWrites)
-  ){
-    req: GetBonusResponse => (
+      (JsPath \ "periodStartDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
+      (JsPath \ "periodEndDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
+      (JsPath \ "htbTransfer").writeNullable[HelpToBuyTransfer] and
+      (JsPath \ "inboundPayments").write[InboundPayments] and
+      (JsPath \ "bonuses").write[Bonuses] and
+      (JsPath \ "supersededBy").writeNullable[String] and
+      (JsPath \ "supersede").writeNullable[Supersede](Supersede.getSupersedeWrites)
+  ) { req: GetBonusResponse =>
+    (
       req.lifeEventId,
       req.periodStartDate,
       req.periodEndDate,
@@ -240,7 +258,7 @@ object GetBonusOrWithdrawalResponse {
   }
 
   implicit val withdrawalWrites: Writes[GetWithdrawalResponse] = (
-      (JsPath \ "claimPeriodStartDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
+    (JsPath \ "claimPeriodStartDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
       (JsPath \ "claimPeriodEndDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
       (JsPath \ "automaticRecoveryAmount").writeNullable[Amount] and
       (JsPath \ "withdrawalAmount").write[Amount] and
@@ -250,8 +268,8 @@ object GetBonusOrWithdrawalResponse {
       (JsPath \ "withdrawalReason").write[WithdrawalReason] and
       (JsPath \ "supersededBy").writeNullable[TransactionId] and
       (JsPath \ "supersede").writeNullable[WithdrawalSupersede]
-    ){
-    req: GetWithdrawalResponse => (
+  ) { req: GetWithdrawalResponse =>
+    (
       req.periodStartDate,
       req.periodEndDate,
       req.automaticRecoveryAmount,
@@ -266,39 +284,38 @@ object GetBonusOrWithdrawalResponse {
   }
 
   implicit val bonusOrWithdrawalWrites: Writes[GetBonusOrWithdrawalResponse] = Writes[GetBonusOrWithdrawalResponse] {
-    case w:GetWithdrawalResponse => withdrawalWrites.writes(w)
-    case b:GetBonusResponse => bonusWrites.writes(b)
+    case w: GetWithdrawalResponse => withdrawalWrites.writes(w)
+    case b: GetBonusResponse      => bonusWrites.writes(b)
   }
 
-  private def getPaymentStatus(paymentStatus: String) = {
+  private def getPaymentStatus(paymentStatus: String) =
     paymentStatus match {
-      case "PENDING" => TransactionPaymentStatus.PENDING
-      case "PAID" => TransactionPaymentStatus.PAID
+      case "PENDING"           => TransactionPaymentStatus.PENDING
+      case "PAID"              => TransactionPaymentStatus.PAID
       case "COLLECTION_ACTION" => TransactionPaymentStatus.COLLECTED
-      case "VOID" => TransactionPaymentStatus.VOID
-      case "CANCELLED" => TransactionPaymentStatus.CANCELLED
-      case "SUPERSEDED" => TransactionPaymentStatus.SUPERSEDED
+      case "VOID"              => TransactionPaymentStatus.VOID
+      case "CANCELLED"         => TransactionPaymentStatus.CANCELLED
+      case "SUPERSEDED"        => TransactionPaymentStatus.SUPERSEDED
     }
-  }
 }
 
 object TransactionPaymentType {
   val PAYMENT = "Payment"
-  val DEBT = "Debt"
+  val DEBT    = "Debt"
 }
 
 object TransactionPaymentStatus {
   // payment
-  val PENDING = "Pending"
-  val PAID = "Paid"
+  val PENDING          = "Pending"
+  val PAID             = "Paid"
   val REFUND_CANCELLED = "Charge refund cancelled"
 
   // debt
-  val DUE = "Due"
+  val DUE       = "Due"
   val COLLECTED = "Collected"
 
   // common
-  val VOID = "Void"
-  val CANCELLED = "Cancelled"
+  val VOID       = "Void"
+  val CANCELLED  = "Cancelled"
   val SUPERSEDED = "Superseded"
 }

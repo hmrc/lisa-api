@@ -25,7 +25,7 @@ trait LisaActions {
 
   def validateLMRN(lisaManager: String)(implicit ec: ExecutionContext): ActionRefiner[Request, LMRNRequest] =
     new ActionRefiner[Request, LMRNRequest] {
-      override def executionContext: ExecutionContext = ec
+      override def executionContext: ExecutionContext       = ec
       override protected def refine[A](request: Request[A]) = Future.successful {
         if (lisaManager.matches("^Z([0-9]{4}|[0-9]{6})$")) {
           Right(LMRNRequest(request, lisaManager))
@@ -35,9 +35,11 @@ trait LisaActions {
       }
     }
 
-  def validateAccountId(accountId: String)(implicit ec: ExecutionContext): ActionRefiner[LMRNRequest, LMRNWithAccountRequest] =
+  def validateAccountId(
+    accountId: String
+  )(implicit ec: ExecutionContext): ActionRefiner[LMRNRequest, LMRNWithAccountRequest] =
     new ActionRefiner[LMRNRequest, LMRNWithAccountRequest] {
-      override def executionContext: ExecutionContext = ec
+      override def executionContext: ExecutionContext           = ec
       override protected def refine[A](request: LMRNRequest[A]) = Future.successful {
         if (accountId.matches("^[a-zA-Z0-9 :/-]{1,20}$")) {
           Right(LMRNWithAccountRequest(request.request, request.lmrn, accountId))
@@ -51,5 +53,5 @@ trait LisaActions {
 
 case class LMRNRequest[A](request: Request[A], lmrn: String) extends WrappedRequest[A](request)
 
-case class LMRNWithAccountRequest[A](request: Request[A], lmrn: String, accountId: String) extends WrappedRequest[A](request)
-
+case class LMRNWithAccountRequest[A](request: Request[A], lmrn: String, accountId: String)
+    extends WrappedRequest[A](request)

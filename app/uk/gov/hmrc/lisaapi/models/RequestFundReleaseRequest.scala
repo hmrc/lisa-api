@@ -28,35 +28,32 @@ object FundReleasePropertyDetails {
 
   private val postalCodeRegex = "^[A-Za-z0-9 ]{1,8}$"
 
-  private def toJsError(errorType : String) : JsError ={
+  private def toJsError(errorType: String): JsError =
     JsError(JsonValidationError(errorType))
-  }
 
-  private def getNameOrNumberErrorMessage(nameOrNumber : String) : JsError = {
+  private def getNameOrNumberErrorMessage(nameOrNumber: String): JsError =
     nameOrNumber match {
-      case name if name.isEmpty => toJsError("emptyNameOrNumber")
+      case name if name.isEmpty     => toJsError("emptyNameOrNumber")
       case name if name.length > 35 => toJsError("tooLongNameOrNumber")
-      case _ => toJsError("invalidNameOrNumber")
+      case _                        => toJsError("invalidNameOrNumber")
     }
-  }
 
   private def nameOrNumberValidator: Reads[String] = (nameOrNumberJsValue: JsValue) => {
     val nameOrNumber = nameOrNumberJsValue.as[String]
     if (nameOrNumber.matches(nameOrNumberRegex)) JsSuccess(nameOrNumber) else getNameOrNumberErrorMessage(nameOrNumber)
   }
 
-  private def postalCodeValidator: Reads[String] = (postalCode: JsValue) => {
+  private def postalCodeValidator: Reads[String] = (postalCode: JsValue) =>
     postalCode.as[String] match {
       case postalCode if postalCode.matches(postalCodeRegex) => JsSuccess(postalCode)
-      case postalCode if postalCode.isEmpty => toJsError("emptyPostalCode")
-      case _ => toJsError("invalidPostalCode")
+      case postalCode if postalCode.isEmpty                  => toJsError("emptyPostalCode")
+      case _                                                 => toJsError("invalidPostalCode")
     }
-  }
 
   implicit val reads: Reads[FundReleasePropertyDetails] = (
     (JsPath \ "nameOrNumber").read[String](nameOrNumberValidator) and
       (JsPath \ "postalCode").read[String](postalCodeValidator)
-    )(FundReleasePropertyDetails.apply _)
+  )(FundReleasePropertyDetails.apply _)
 
   implicit val writes: Writes[FundReleasePropertyDetails] = Json.writes[FundReleasePropertyDetails]
 }
@@ -64,8 +61,8 @@ object FundReleasePropertyDetails {
 case class FundReleaseSupersedeDetails(originalLifeEventId: LifeEventId, originalEventDate: DateTime)
 
 object FundReleaseSupersedeDetails {
-  implicit val dateReads: Reads[DateTime] = JodaReads.jodaDateReads("yyyy-MM-dd")
-  implicit val dateWrites: Writes[DateTime] = JodaWrites.jodaDateWrites("yyyy-MM-dd")
+  implicit val dateReads: Reads[DateTime]                    = JodaReads.jodaDateReads("yyyy-MM-dd")
+  implicit val dateWrites: Writes[DateTime]                  = JodaWrites.jodaDateWrites("yyyy-MM-dd")
   implicit val formats: OFormat[FundReleaseSupersedeDetails] = Json.format[FundReleaseSupersedeDetails]
 }
 
@@ -74,57 +71,70 @@ trait RequestFundReleaseRequest extends ReportLifeEventRequestBase {
   val withdrawalAmount: Amount
 }
 
-case class InitialFundReleaseRequest(eventDate: DateTime, withdrawalAmount: Amount, conveyancerReference: Option[String], propertyDetails: Option[FundReleasePropertyDetails]) extends RequestFundReleaseRequest
+case class InitialFundReleaseRequest(
+  eventDate: DateTime,
+  withdrawalAmount: Amount,
+  conveyancerReference: Option[String],
+  propertyDetails: Option[FundReleasePropertyDetails]
+) extends RequestFundReleaseRequest
 
-case class SupersedeFundReleaseRequest(eventDate: DateTime, withdrawalAmount: Amount, supersede: FundReleaseSupersedeDetails) extends RequestFundReleaseRequest
+case class SupersedeFundReleaseRequest(
+  eventDate: DateTime,
+  withdrawalAmount: Amount,
+  supersede: FundReleaseSupersedeDetails
+) extends RequestFundReleaseRequest
 
 object RequestFundReleaseRequest {
-  implicit val dateReads: Reads[DateTime] = JsonReads.notFutureDate
+  implicit val dateReads: Reads[DateTime]   = JsonReads.notFutureDate
   implicit val dateWrites: Writes[DateTime] = JodaWrites.jodaDateWrites("yyyy-MM-dd")
 
-  val initialReads = Json.reads[InitialFundReleaseRequest]
+  val initialReads: Reads[InitialFundReleaseRequest] = Json.reads[InitialFundReleaseRequest]
 
   implicit val initialWrites: Writes[InitialFundReleaseRequest] = (
     (JsPath \ "eventType").write[String] and
-    (JsPath \ "eventDate").write[DateTime] and
-    (JsPath \ "withdrawalAmount").write[Amount] and
-    (JsPath \ "conveyancerReference").writeNullable[String] and
-    (JsPath \ "propertyDetails").writeNullable[FundReleasePropertyDetails]
-  ){req: InitialFundReleaseRequest => (
-    "Funds Release",
-    req.eventDate,
-    req.withdrawalAmount,
-    req.conveyancerReference,
-    req.propertyDetails
-  )}
+      (JsPath \ "eventDate").write[DateTime] and
+      (JsPath \ "withdrawalAmount").write[Amount] and
+      (JsPath \ "conveyancerReference").writeNullable[String] and
+      (JsPath \ "propertyDetails").writeNullable[FundReleasePropertyDetails]
+  ) { req: InitialFundReleaseRequest =>
+    (
+      "Funds Release",
+      req.eventDate,
+      req.withdrawalAmount,
+      req.conveyancerReference,
+      req.propertyDetails
+    )
+  }
 
-  val supersedeReads = Json.reads[SupersedeFundReleaseRequest]
+  val supersedeReads: Reads[SupersedeFundReleaseRequest] = Json.reads[SupersedeFundReleaseRequest]
 
   implicit val supersedeWrites: Writes[SupersedeFundReleaseRequest] = (
     (JsPath \ "eventType").write[String] and
-    (JsPath \ "eventDate").write[DateTime] and
-    (JsPath \ "withdrawalAmount").write[Amount] and
-    (JsPath \ "supersededLifeEventDate").write[DateTime] and
-    (JsPath \ "supersededLifeEventID").write[LifeEventId]
-  ){req: SupersedeFundReleaseRequest => (
-    "Funds Release",
-    req.eventDate,
-    req.withdrawalAmount,
-    req.supersede.originalEventDate,
-    req.supersede.originalLifeEventId
-  )}
+      (JsPath \ "eventDate").write[DateTime] and
+      (JsPath \ "withdrawalAmount").write[Amount] and
+      (JsPath \ "supersededLifeEventDate").write[DateTime] and
+      (JsPath \ "supersededLifeEventID").write[LifeEventId]
+  ) { req: SupersedeFundReleaseRequest =>
+    (
+      "Funds Release",
+      req.eventDate,
+      req.withdrawalAmount,
+      req.supersede.originalEventDate,
+      req.supersede.originalLifeEventId
+    )
+  }
 
   implicit val traitReads: Reads[RequestFundReleaseRequest] = Reads[RequestFundReleaseRequest] { json =>
     val supersede = (json \ "supersede").asOpt[JsValue]
 
     supersede match {
       case Some(_) => supersedeReads.reads(json)
-      case _ => initialReads.reads(json)
+      case _       => initialReads.reads(json)
     }
   }
 
   val desWrites: Writes[RequestFundReleaseRequest] = Writes[RequestFundReleaseRequest] {
     case s: SupersedeFundReleaseRequest => supersedeWrites.writes(s)
-    case i: InitialFundReleaseRequest => initialWrites.writes(i)
+    case i: InitialFundReleaseRequest   => initialWrites.writes(i)
   }
 }

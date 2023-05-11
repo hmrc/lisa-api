@@ -31,53 +31,57 @@ import uk.gov.hmrc.lisaapi.utils.WithdrawalChargeValidator
 import scala.concurrent.{ExecutionContext, Future}
 
 class WithdrawalController @Inject() (
-                                       authConnector: AuthConnector,
-                                       appContext: AppContext,
-                                       postService: WithdrawalService,
-                                       getService: BonusOrWithdrawalService,
-                                       auditService: AuditService,
-                                       validator: WithdrawalChargeValidator,
-                                       dateTimeService: CurrentDateService,
-                                       lisaMetrics: LisaMetrics,
-                                       cc: ControllerComponents,
-                                       parse: PlayBodyParsers
-                                     )(implicit ec: ExecutionContext) extends LisaController (
-  cc: ControllerComponents,
-  lisaMetrics: LisaMetrics,
+  authConnector: AuthConnector,
   appContext: AppContext,
-  authConnector: AuthConnector
-) {
+  postService: WithdrawalService,
+  getService: BonusOrWithdrawalService,
+  auditService: AuditService,
+  validator: WithdrawalChargeValidator,
+  dateTimeService: CurrentDateService,
+  lisaMetrics: LisaMetrics,
+  cc: ControllerComponents,
+  parse: PlayBodyParsers
+)(implicit ec: ExecutionContext)
+    extends LisaController(
+      cc: ControllerComponents,
+      lisaMetrics: LisaMetrics,
+      appContext: AppContext,
+      authConnector: AuthConnector
+    ) {
 
   override val validateVersion: String => Boolean = _ == "2.0"
 
   def reportWithdrawalCharge(lisaManager: String, accountId: String): Action[AnyContent] =
-    (validateHeader(parse) andThen validateLMRN(lisaManager) andThen validateAccountId(accountId)).async { implicit request =>
-    implicit val startTime: Long = System.currentTimeMillis()
+    (validateHeader(parse) andThen validateLMRN(lisaManager) andThen validateAccountId(accountId)).async {
+      implicit request =>
+        implicit val startTime: Long = System.currentTimeMillis()
 
-    withValidJson[ReportWithdrawalChargeRequest](req =>
-      withValidData(req)(lisaManager, accountId) { () =>
-        withValidClaimPeriod(req)(lisaManager, accountId) { () =>
-          postService.reportWithdrawalCharge(lisaManager, accountId, req) map { res =>
-            logger.debug("reportWithdrawalCharge: The response is " + res.toString)
+        withValidJson[ReportWithdrawalChargeRequest](
+          req =>
+            withValidData(req)(lisaManager, accountId) { () =>
+              withValidClaimPeriod(req)(lisaManager, accountId) { () =>
+                postService.reportWithdrawalCharge(lisaManager, accountId, req) map { res =>
+                  logger.debug("reportWithdrawalCharge: The response is " + res.toString)
 
-            res match {
-              case successResponse: ReportWithdrawalChargeSuccessResponse =>
-                handleSuccess(lisaManager, accountId, req, successResponse)
-              case errorResponse: ReportWithdrawalChargeErrorResponse =>
-                handleFailure(lisaManager, accountId, req, errorResponse)
-            }
-          } recover {
-            case e: Exception =>
-              logger.error(s"reportWithdrawalCharge: An error occurred due to ${e.getMessage}, returning internal server error")
-              handleFailure(lisaManager, accountId, req, ReportWithdrawalChargeError)
-          }
-        }
-      },
-      lisaManager = lisaManager
-    )
-  }
+                  res match {
+                    case successResponse: ReportWithdrawalChargeSuccessResponse =>
+                      handleSuccess(lisaManager, accountId, req, successResponse)
+                    case errorResponse: ReportWithdrawalChargeErrorResponse     =>
+                      handleFailure(lisaManager, accountId, req, errorResponse)
+                  }
+                } recover { case e: Exception =>
+                  logger.error(
+                    s"reportWithdrawalCharge: An error occurred due to ${e.getMessage}, returning internal server error"
+                  )
+                  handleFailure(lisaManager, accountId, req, ReportWithdrawalChargeError)
+                }
+              }
+            },
+          lisaManager = lisaManager
+        )
+    }
 
-  def getWithdrawalCharge(lisaManager: String, accountId: String, transactionId: String): Action[AnyContent] = {
+  def getWithdrawalCharge(lisaManager: String, accountId: String, transactionId: String): Action[AnyContent] =
     validateHeader(parse).async { implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
       withValidLMRN(lisaManager) { () =>
@@ -89,17 +93,17 @@ class WithdrawalController @Inject() (
       }
 
     }
-  }
 
-  private def processGetWithdrawalCharge(lisaManager:String, accountId:String, transactionId: String)
-                                        (implicit hc: HeaderCarrier, startTime: Long) = {
-
+  private def processGetWithdrawalCharge(lisaManager: String, accountId: String, transactionId: String)(implicit
+    hc: HeaderCarrier,
+    startTime: Long
+  ) =
     getService.getBonusOrWithdrawal(lisaManager, accountId, transactionId).map {
-      case response: GetWithdrawalResponse =>
+      case response: GetWithdrawalResponse                 =>
         auditGetWithdrawalCharge(lisaManager, accountId, transactionId)
         lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.WITHDRAWAL_CHARGE)
         Ok(Json.toJson(response))
-      case _: GetBonusResponse =>
+      case _: GetBonusResponse                             =>
         auditGetWithdrawalCharge(lisaManager, accountId, transactionId, Some(ErrorWithdrawalNotFound.errorCode))
         lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.WITHDRAWAL_CHARGE)
         NotFound(ErrorWithdrawalNotFound.asJson)
@@ -107,27 +111,30 @@ class WithdrawalController @Inject() (
         auditGetWithdrawalCharge(lisaManager, accountId, transactionId, Some(ErrorWithdrawalNotFound.errorCode))
         lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.WITHDRAWAL_CHARGE)
         NotFound(ErrorWithdrawalNotFound.asJson)
-      case GetBonusOrWithdrawalInvestorNotFoundResponse =>
+      case GetBonusOrWithdrawalInvestorNotFoundResponse    =>
         auditGetWithdrawalCharge(lisaManager, accountId, transactionId, Some(ErrorAccountNotFound.errorCode))
         lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.WITHDRAWAL_CHARGE)
         NotFound(ErrorAccountNotFound.asJson)
-      case GetBonusOrWithdrawalServiceUnavailableResponse =>
+      case GetBonusOrWithdrawalServiceUnavailableResponse  =>
         auditGetWithdrawalCharge(lisaManager, accountId, transactionId, Some(ErrorServiceUnavailable.errorCode))
         lisaMetrics.incrementMetrics(startTime, SERVICE_UNAVAILABLE, LisaMetricKeys.WITHDRAWAL_CHARGE)
         ServiceUnavailable(ErrorServiceUnavailable.asJson)
-      case _ =>
+      case _                                               =>
         auditGetWithdrawalCharge(lisaManager, accountId, transactionId, Some(ErrorInternalServerError.errorCode))
         lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.WITHDRAWAL_CHARGE)
         InternalServerError(ErrorInternalServerError.asJson)
     }
-  }
 
-  private def auditGetWithdrawalCharge(lisaManager: String, accountId: String, transactionId: String, failureReason: Option[String] = None)
-                                  (implicit hc: HeaderCarrier) = {
-    val path = getWithdrawalChargeEndpointUrl(lisaManager, accountId, transactionId)
+  private def auditGetWithdrawalCharge(
+    lisaManager: String,
+    accountId: String,
+    transactionId: String,
+    failureReason: Option[String] = None
+  )(implicit hc: HeaderCarrier) = {
+    val path      = getWithdrawalChargeEndpointUrl(lisaManager, accountId, transactionId)
     val auditData = Map(
-      ZREF -> lisaManager,
-      "accountId" -> accountId,
+      ZREF            -> lisaManager,
+      "accountId"     -> accountId,
       "transactionId" -> transactionId
     )
 
@@ -144,12 +151,11 @@ class WithdrawalController @Inject() (
     )
   }
 
-  private def withValidClaimPeriod(data: ReportWithdrawalChargeRequest)
-                                  (lisaManager: String, accountId: String)
-                                  (callback: () => Future[Result])
-                                  (implicit hc: HeaderCarrier, startTime: Long) = {
+  private def withValidClaimPeriod(data: ReportWithdrawalChargeRequest)(lisaManager: String, accountId: String)(
+    callback: () => Future[Result]
+  )(implicit hc: HeaderCarrier, startTime: Long) = {
 
-    val lastClaimDate = dateTimeService.now().withTime(0, 0, 0, 0).minusYears(6).minusDays(14)
+    val lastClaimDate       = dateTimeService.now().withTime(0, 0, 0, 0).minusYears(6).minusDays(14)
     val claimCanStillBeMade = data.claimPeriodEndDate.isAfter(lastClaimDate.minusDays(1))
     if (claimCanStillBeMade) {
       callback()
@@ -162,10 +168,9 @@ class WithdrawalController @Inject() (
     }
   }
 
-  private def withValidData(data: ReportWithdrawalChargeRequest)
-                           (lisaManager: String, accountId: String)
-                           (callback: () => Future[Result])
-                           (implicit hc: HeaderCarrier, startTime: Long) = {
+  private def withValidData(data: ReportWithdrawalChargeRequest)(lisaManager: String, accountId: String)(
+    callback: () => Future[Result]
+  )(implicit hc: HeaderCarrier, startTime: Long) = {
     val errors = validator.validate(data)
     if (errors.isEmpty) {
       callback()
@@ -178,19 +183,32 @@ class WithdrawalController @Inject() (
     }
   }
 
-  private def handleSuccess(lisaManager: String, accountId: String, req: ReportWithdrawalChargeRequest, resp: ReportWithdrawalChargeSuccessResponse)
-                           (implicit hc: HeaderCarrier, startTime: Long) = {
+  private def handleSuccess(
+    lisaManager: String,
+    accountId: String,
+    req: ReportWithdrawalChargeRequest,
+    resp: ReportWithdrawalChargeSuccessResponse
+  )(implicit hc: HeaderCarrier, startTime: Long) = {
     logger.debug("Matched success response")
 
     val (responseData, notification) = resp match {
-      case _:ReportWithdrawalChargeOnTimeResponse =>
-        val data = ApiResponseData(message = "Unauthorised withdrawal transaction created", transactionId = Some(resp.transactionId))
+      case _: ReportWithdrawalChargeOnTimeResponse     =>
+        val data = ApiResponseData(
+          message = "Unauthorised withdrawal transaction created",
+          transactionId = Some(resp.transactionId)
+        )
         (data, Some("no"))
-      case _:ReportWithdrawalChargeLateResponse =>
-        val data = ApiResponseData(message = "Unauthorised withdrawal transaction created - late notification", transactionId = Some(resp.transactionId))
+      case _: ReportWithdrawalChargeLateResponse       =>
+        val data = ApiResponseData(
+          message = "Unauthorised withdrawal transaction created - late notification",
+          transactionId = Some(resp.transactionId)
+        )
         (data, Some("yes"))
-      case _:ReportWithdrawalChargeSupersededResponse =>
-        val data = ApiResponseData(message = "Unauthorised withdrawal transaction superseded", transactionId = Some(resp.transactionId))
+      case _: ReportWithdrawalChargeSupersededResponse =>
+        val data = ApiResponseData(
+          message = "Unauthorised withdrawal transaction superseded",
+          transactionId = Some(resp.transactionId)
+        )
         (data, None)
     }
 
@@ -211,9 +229,14 @@ class WithdrawalController @Inject() (
     Created(Json.toJson(ApiResponse(data = Some(responseData), success = true, status = CREATED)))
   }
 
-  private def handleFailure(lisaManager: String, accountId: String, req: ReportWithdrawalChargeRequest, errorResponse: ReportWithdrawalChargeErrorResponse)
-                           (implicit hc: HeaderCarrier, startTime: Long) = {
-    val error = errorOutcomes.applyOrElse(errorResponse, {_ : ReportWithdrawalChargeErrorResponse => ErrorInternalServerError})
+  private def handleFailure(
+    lisaManager: String,
+    accountId: String,
+    req: ReportWithdrawalChargeRequest,
+    errorResponse: ReportWithdrawalChargeErrorResponse
+  )(implicit hc: HeaderCarrier, startTime: Long) = {
+    val error =
+      errorOutcomes.applyOrElse(errorResponse, { _: ReportWithdrawalChargeErrorResponse => ErrorInternalServerError })
 
     auditReportWithdrawalChargeFailure(lisaManager, accountId, req, error.errorCode)
     lisaMetrics.incrementMetrics(startTime, error.httpStatusCode, LisaMetricKeys.WITHDRAWAL_CHARGE)
@@ -221,28 +244,36 @@ class WithdrawalController @Inject() (
     error.asResult
   }
 
-  val errorOutcomes:  PartialFunction[ReportWithdrawalChargeErrorResponse, ErrorResponse] = {
-    case ReportWithdrawalChargeServiceUnavailable => ErrorServiceUnavailable
-    case ReportWithdrawalChargeAlreadyExists(transactionId) => ErrorWithdrawalExists(transactionId)
-    case ReportWithdrawalChargeAccountNotFound => ErrorAccountNotFound
-    case ReportWithdrawalChargeSupersedeOutcomeError => ErrorWithdrawalSupersededOutcomeError
-    case ReportWithdrawalChargeSupersedeAmountMismatch => ErrorWithdrawalSupersededAmountMismatch
+  val errorOutcomes: PartialFunction[ReportWithdrawalChargeErrorResponse, ErrorResponse] = {
+    case ReportWithdrawalChargeServiceUnavailable               => ErrorServiceUnavailable
+    case ReportWithdrawalChargeAlreadyExists(transactionId)     => ErrorWithdrawalExists(transactionId)
+    case ReportWithdrawalChargeAccountNotFound                  => ErrorAccountNotFound
+    case ReportWithdrawalChargeSupersedeOutcomeError            => ErrorWithdrawalSupersededOutcomeError
+    case ReportWithdrawalChargeSupersedeAmountMismatch          => ErrorWithdrawalSupersededAmountMismatch
     case ReportWithdrawalChargeAlreadySuperseded(transactionId) => ErrorWithdrawalAlreadySuperseded(transactionId)
-    case ReportWithdrawalChargeReportingError => ErrorWithdrawalReportingError
-    case ReportWithdrawalChargeAccountVoid => ErrorAccountAlreadyVoided
-    case ReportWithdrawalChargeAccountCancelled => ErrorAccountAlreadyCancelled
+    case ReportWithdrawalChargeReportingError                   => ErrorWithdrawalReportingError
+    case ReportWithdrawalChargeAccountVoid                      => ErrorAccountAlreadyVoided
+    case ReportWithdrawalChargeAccountCancelled                 => ErrorAccountAlreadyCancelled
   }
 
-  private def auditReportWithdrawalChargeFailure(lisaManager: String, accountId: String, req: ReportWithdrawalChargeRequest, failureReason: String)
-                          (implicit hc: HeaderCarrier) = {
+  private def auditReportWithdrawalChargeFailure(
+    lisaManager: String,
+    accountId: String,
+    req: ReportWithdrawalChargeRequest,
+    failureReason: String
+  )(implicit hc: HeaderCarrier) =
     auditService.audit(
       auditType = "withdrawalChargeNotRequested",
       path = reportWithdrawalChargeEndpointUrl(lisaManager, accountId),
-      auditData = createReportWithdrawalChargeAuditData(lisaManager, accountId, req) ++ Map("reasonNotRequested" -> failureReason)
+      auditData =
+        createReportWithdrawalChargeAuditData(lisaManager, accountId, req) ++ Map("reasonNotRequested" -> failureReason)
     )
-  }
 
-  private def createReportWithdrawalChargeAuditData(lisaManager: String, accountId: String, req: ReportWithdrawalChargeRequest): Map[String, String] =
+  private def createReportWithdrawalChargeAuditData(
+    lisaManager: String,
+    accountId: String,
+    req: ReportWithdrawalChargeRequest
+  ): Map[String, String] =
     req.toStringMap ++ Map(ZREF -> lisaManager, "accountId" -> accountId)
 
   private def reportWithdrawalChargeEndpointUrl(lisaManager: String, accountId: String): String =

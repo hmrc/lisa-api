@@ -22,6 +22,6 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
 trait ServiceTestFixture extends BaseTestFixture with GuiceOneAppPerSuite {
 
-  val mockDesConnector: DesConnector = mock[DesConnector]
+  val mockDesConnector: DesConnector     = mock[DesConnector]
   val mockAuditConnector: AuditConnector = mock[AuditConnector]
 }

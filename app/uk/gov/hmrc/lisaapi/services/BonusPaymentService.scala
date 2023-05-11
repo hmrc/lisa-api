@@ -25,47 +25,50 @@ import scala.concurrent.{ExecutionContext, Future}
 import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 
-class BonusPaymentService @Inject()(desConnector: DesConnector)(implicit ec: ExecutionContext) extends Logging {
+class BonusPaymentService @Inject() (desConnector: DesConnector)(implicit ec: ExecutionContext) extends Logging {
 
-  def requestBonusPayment(lisaManager: String, accountId: String, request: RequestBonusPaymentRequest)
-                         (implicit hc: HeaderCarrier): Future[RequestBonusPaymentResponse] = {
+  def requestBonusPayment(lisaManager: String, accountId: String, request: RequestBonusPaymentRequest)(implicit
+    hc: HeaderCarrier
+  ): Future[RequestBonusPaymentResponse] =
     desConnector.requestBonusPayment(lisaManager, accountId, request) map {
-      case successResponse: DesTransactionResponse =>
+      case successResponse: DesTransactionResponse       =>
         logger.debug("Matched RequestBonusPaymentSuccessResponse and the message is " + successResponse.message)
         (request.bonuses.claimReason, successResponse.message) match {
           case ("Superseded Bonus", _) => RequestBonusPaymentSupersededResponse(successResponse.transactionID)
-          case (_, Some("Late")) => RequestBonusPaymentLateResponse(successResponse.transactionID)
-          case (_, _) => RequestBonusPaymentOnTimeResponse(successResponse.transactionID)
+          case (_, Some("Late"))       => RequestBonusPaymentLateResponse(successResponse.transactionID)
+          case (_, _)                  => RequestBonusPaymentOnTimeResponse(successResponse.transactionID)
         }
       case conflictResponse: DesTransactionExistResponse =>
         logger.debug("Matched DesTransactionExistResponse and the code is " + conflictResponse.code)
         conflictResponse.code match {
-          case "BONUS_CLAIM_ALREADY_EXISTS" => RequestBonusPaymentClaimAlreadyExists(conflictResponse.transactionID)
-          case "SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED" => RequestBonusPaymentAlreadySuperseded(conflictResponse.transactionID)
+          case "BONUS_CLAIM_ALREADY_EXISTS"                   => RequestBonusPaymentClaimAlreadyExists(conflictResponse.transactionID)
+          case "SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED" =>
+            RequestBonusPaymentAlreadySuperseded(conflictResponse.transactionID)
         }
-      case DesUnavailableResponse =>
+      case DesUnavailableResponse                        =>
         logger.debug("Matched DesUnavailableResponse")
         RequestBonusPaymentServiceUnavailable
-      case failureResponse: DesFailureResponse =>
+      case failureResponse: DesFailureResponse           =>
         logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
-        desFailures.getOrElse(failureResponse.code, {
-          logger.warn(s"Request bonus payment returned error: ${failureResponse.code}")
-          RequestBonusPaymentError
-        })
+        desFailures.getOrElse(
+          failureResponse.code, {
+            logger.warn(s"Request bonus payment returned error: ${failureResponse.code}")
+            RequestBonusPaymentError
+          }
+        )
     }
-  }
 
   private val desFailures = Map[String, RequestBonusPaymentErrorResponse](
-    "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID" -> RequestBonusPaymentAccountClosedOrVoid,
-  "INVESTOR_ACCOUNT_ALREADY_CLOSED" -> RequestBonusPaymentAccountClosed,
-  "INVESTOR_ACCOUNT_ALREADY_CANCELLED" -> RequestBonusPaymentAccountCancelled,
-  "INVESTOR_ACCOUNT_ALREADY_VOID" -> RequestBonusPaymentAccountVoid,
-  "LIFE_EVENT_NOT_FOUND" -> RequestBonusPaymentLifeEventNotFound,
-  "BONUS_CLAIM_ERROR" -> RequestBonusPaymentBonusClaimError,
-  "INVESTOR_ACCOUNTID_NOT_FOUND" -> RequestBonusPaymentAccountNotFound,
-  "SUPERSEDING_TRANSACTION_ID_AMOUNT_MISMATCH" -> RequestBonusPaymentSupersededAmountMismatch,
-  "SUPERSEDING_TRANSACTION_OUTCOME_ERROR" -> RequestBonusPaymentSupersededOutcomeError,
-  "ACCOUNT_ERROR_NO_SUBSCRIPTIONS_THIS_TAX_YEAR" -> RequestBonusPaymentNoSubscriptions
+    "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID"      -> RequestBonusPaymentAccountClosedOrVoid,
+    "INVESTOR_ACCOUNT_ALREADY_CLOSED"              -> RequestBonusPaymentAccountClosed,
+    "INVESTOR_ACCOUNT_ALREADY_CANCELLED"           -> RequestBonusPaymentAccountCancelled,
+    "INVESTOR_ACCOUNT_ALREADY_VOID"                -> RequestBonusPaymentAccountVoid,
+    "LIFE_EVENT_NOT_FOUND"                         -> RequestBonusPaymentLifeEventNotFound,
+    "BONUS_CLAIM_ERROR"                            -> RequestBonusPaymentBonusClaimError,
+    "INVESTOR_ACCOUNTID_NOT_FOUND"                 -> RequestBonusPaymentAccountNotFound,
+    "SUPERSEDING_TRANSACTION_ID_AMOUNT_MISMATCH"   -> RequestBonusPaymentSupersededAmountMismatch,
+    "SUPERSEDING_TRANSACTION_OUTCOME_ERROR"        -> RequestBonusPaymentSupersededOutcomeError,
+    "ACCOUNT_ERROR_NO_SUBSCRIPTIONS_THIS_TAX_YEAR" -> RequestBonusPaymentNoSubscriptions
   )
 
 }

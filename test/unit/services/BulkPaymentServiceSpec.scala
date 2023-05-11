@@ -33,19 +33,20 @@ class BulkPaymentServiceSpec extends ServiceTestFixture {
 
   val bulkPaymentService: BulkPaymentService = new BulkPaymentService(mockDesConnector)
 
-
   "Get Bulk Payment" must {
 
     "return payments" when {
       "the connector passes a success message with some payments" in {
-        val successResponse = GetBulkPaymentSuccessResponse(lmrn, List(
-          BulkPaymentPaid(950.2, Some(date), Some("12345"))
-        ))
+        val successResponse = GetBulkPaymentSuccessResponse(
+          lmrn,
+          List(
+            BulkPaymentPaid(950.2, Some(date), Some("12345"))
+          )
+        )
 
-        when(mockDesConnector.getBulkPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(successResponse))
+        when(mockDesConnector.getBulkPayment(any(), any(), any())(any())).thenReturn(Future.successful(successResponse))
 
-        doRequest{ response =>
+        doRequest { response =>
           response mustBe successResponse
         }
       }
@@ -53,42 +54,42 @@ class BulkPaymentServiceSpec extends ServiceTestFixture {
 
     "return payment not found" when {
       "the connector passes a not found response" in {
-        when(mockDesConnector.getBulkPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(GetBulkPaymentNotFoundResponse))
+        when(mockDesConnector.getBulkPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(GetBulkPaymentNotFoundResponse))
 
-        doRequest{ response =>
+        doRequest { response =>
           response mustBe GetBulkPaymentNotFoundResponse
         }
       }
       "the connector passes a success message with no payments" in {
-        when(mockDesConnector.getBulkPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(GetBulkPaymentSuccessResponse(lmrn, Nil)))
+        when(mockDesConnector.getBulkPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(GetBulkPaymentSuccessResponse(lmrn, Nil)))
 
-        doRequest{ response =>
+        doRequest { response =>
           response mustBe GetBulkPaymentNotFoundResponse
         }
       }
       "the connector returns a NOT_FOUND error" in {
-        when(mockDesConnector.getBulkPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("NOT_FOUND", "not found")))
+        when(mockDesConnector.getBulkPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesFailureResponse("NOT_FOUND", "not found")))
 
-        doRequest{ response =>
+        doRequest { response =>
           response mustBe GetBulkPaymentNotFoundResponse
         }
       }
       "the connector returns a INVALID_CALCULATEACCRUEDINTEREST error" in {
-        when(mockDesConnector.getBulkPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("INVALID_CALCULATEACCRUEDINTEREST", "not found")))
+        when(mockDesConnector.getBulkPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesFailureResponse("INVALID_CALCULATEACCRUEDINTEREST", "not found")))
 
-        doRequest{ response =>
+        doRequest { response =>
           response mustBe GetBulkPaymentNotFoundResponse
         }
       }
       "the connector returns a INVALID_CUSTOMERPAYMENTINFORMATION error" in {
-        when(mockDesConnector.getBulkPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("INVALID_CUSTOMERPAYMENTINFORMATION", "not found")))
+        when(mockDesConnector.getBulkPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesFailureResponse("INVALID_CUSTOMERPAYMENTINFORMATION", "not found")))
 
-        doRequest{ response =>
+        doRequest { response =>
           response mustBe GetBulkPaymentNotFoundResponse
         }
       }
@@ -96,10 +97,10 @@ class BulkPaymentServiceSpec extends ServiceTestFixture {
 
     "return service unavailable" when {
       "the connector returns a DesUnavailableResponse" in {
-        when(mockDesConnector.getBulkPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesUnavailableResponse))
+        when(mockDesConnector.getBulkPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesUnavailableResponse))
 
-        doRequest{ response =>
+        doRequest { response =>
           response mustBe GetBulkPaymentServiceUnavailableResponse
         }
       }
@@ -107,10 +108,10 @@ class BulkPaymentServiceSpec extends ServiceTestFixture {
 
     "return error" when {
       "the connector returns any other error" in {
-        when(mockDesConnector.getBulkPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("code", "reason")))
+        when(mockDesConnector.getBulkPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesFailureResponse("code", "reason")))
 
-        doRequest{ response =>
+        doRequest { response =>
           response mustBe GetBulkPaymentErrorResponse
         }
       }
@@ -118,7 +119,7 @@ class BulkPaymentServiceSpec extends ServiceTestFixture {
 
   }
 
-  private def doRequest(callback: (GetBulkPaymentResponse) => Unit) = {
+  private def doRequest(callback: GetBulkPaymentResponse => Unit): Unit = {
     val response = Await.result(bulkPaymentService.getBulkPayment(lmrn, date, date)(HeaderCarrier()), Duration.Inf)
 
     callback(response)

@@ -23,11 +23,11 @@ import uk.gov.hmrc.lisaapi.domain.APIAccess
 class APIAccessSpec extends PlaySpec {
 
   val expectedJson: JsValue = Json.parse(s"""{\"type\":\"PRIVATE\"}""")
-  val access: APIAccess = APIAccess("PRIVATE")
+  val access: APIAccess     = APIAccess("PRIVATE")
 
   "With APIAccess spec " should {
     "Write a valid json " in {
-      Json.toJson[APIAccess](access) must be (expectedJson)
+      Json.toJson[APIAccess](access) must be(expectedJson)
     }
   }
 }

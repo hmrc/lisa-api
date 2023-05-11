@@ -23,9 +23,13 @@ import uk.gov.hmrc.lisaapi.models.{AccountTransfer, CreateLisaAccountCreationReq
 
 class CreateLisaAccountRequestSpec extends PlaySpec {
 
-  val validAccountTransferJson = """{"transferredFromAccountId":"Z543210", "transferredFromLMRN":"Z543333", "transferInDate":"2015-12-13"}"""
+  val validAccountTransferJson: String =
+    """{
+      |"transferredFromAccountId":"Z543210",
+      |"transferredFromLMRN":"Z543333",
+      |"transferInDate":"2015-12-13"}""".stripMargin
 
-  val validAccountTransferRequest =
+  val validAccountTransferRequest: String =
     s"""{
        |"investorId": "9876543210",
        |"accountId": "8765432100",
@@ -34,7 +38,7 @@ class CreateLisaAccountRequestSpec extends PlaySpec {
        |"transferAccount": $validAccountTransferJson
        |}""".stripMargin
 
-  val validAccountCreationRequest =
+  val validAccountCreationRequest: String =
     s"""{
        |"investorId": "9876543210",
        |"accountId": "8765432100",
@@ -48,10 +52,10 @@ class CreateLisaAccountRequestSpec extends PlaySpec {
       val res = Json.parse(validAccountTransferRequest).validate[CreateLisaAccountRequest]
 
       res match {
-        case JsError(errors) => fail()
-        case JsSuccess(data, path) => {
+        case JsError(errors)       => fail()
+        case JsSuccess(data, path) =>
           data match {
-            case req: CreateLisaAccountTransferRequest => {
+            case req: CreateLisaAccountTransferRequest =>
               req.creationReason mustBe "Transferred"
               req.investorId mustBe "9876543210"
               req.accountId mustBe "8765432100"
@@ -59,23 +63,21 @@ class CreateLisaAccountRequestSpec extends PlaySpec {
               req.firstSubscriptionDate.getMonthOfYear mustBe 3
               req.firstSubscriptionDate.getDayOfMonth mustBe 23
               req.transferAccount mustBe AccountTransfer("Z543210", "Z543333", new DateTime("2015-12-13"))
-            }
-            case _ => fail()
+            case _                                     => fail()
           }
-        }
       }
     }
 
     "serialize transfer current year funds request from json" in {
-      val res = Json.
-                  parse(validAccountTransferRequest.replace("Transferred", "Current year funds transferred")).
-                  validate[CreateLisaAccountRequest]
+      val res = Json
+        .parse(validAccountTransferRequest.replace("Transferred", "Current year funds transferred"))
+        .validate[CreateLisaAccountRequest]
 
       res match {
-        case JsError(errors) => fail()
-        case JsSuccess(data, path) => {
+        case JsError(errors)       => fail()
+        case JsSuccess(data, path) =>
           data match {
-            case req: CreateLisaAccountTransferRequest => {
+            case req: CreateLisaAccountTransferRequest =>
               req.creationReason mustBe "Current year funds transferred"
               req.investorId mustBe "9876543210"
               req.accountId mustBe "8765432100"
@@ -83,23 +85,21 @@ class CreateLisaAccountRequestSpec extends PlaySpec {
               req.firstSubscriptionDate.getMonthOfYear mustBe 3
               req.firstSubscriptionDate.getDayOfMonth mustBe 23
               req.transferAccount mustBe AccountTransfer("Z543210", "Z543333", new DateTime("2015-12-13"))
-            }
-            case _ => fail()
+            case _                                     => fail()
           }
-        }
       }
     }
 
     "serialize transfer previous year funds request from json" in {
-      val res = Json.
-        parse(validAccountTransferRequest.replace("Transferred", "Previous year funds transferred")).
-        validate[CreateLisaAccountRequest]
+      val res = Json
+        .parse(validAccountTransferRequest.replace("Transferred", "Previous year funds transferred"))
+        .validate[CreateLisaAccountRequest]
 
       res match {
-        case JsError(errors) => fail()
-        case JsSuccess(data, path) => {
+        case JsError(errors)       => fail()
+        case JsSuccess(data, path) =>
           data match {
-            case req: CreateLisaAccountTransferRequest => {
+            case req: CreateLisaAccountTransferRequest =>
               req.creationReason mustBe "Previous year funds transferred"
               req.investorId mustBe "9876543210"
               req.accountId mustBe "8765432100"
@@ -107,10 +107,8 @@ class CreateLisaAccountRequestSpec extends PlaySpec {
               req.firstSubscriptionDate.getMonthOfYear mustBe 3
               req.firstSubscriptionDate.getDayOfMonth mustBe 23
               req.transferAccount mustBe AccountTransfer("Z543210", "Z543333", new DateTime("2015-12-13"))
-            }
-            case _ => fail()
+            case _                                     => fail()
           }
-        }
       }
     }
 
@@ -118,19 +116,17 @@ class CreateLisaAccountRequestSpec extends PlaySpec {
       val res = Json.parse(validAccountCreationRequest).validate[CreateLisaAccountRequest]
 
       res match {
-        case JsError(errors) => fail()
-        case JsSuccess(data, path) => {
+        case JsError(errors)       => fail()
+        case JsSuccess(data, path) =>
           data match {
-            case req: CreateLisaAccountCreationRequest => {
+            case req: CreateLisaAccountCreationRequest =>
               req.investorId mustBe "9876543210"
               req.accountId mustBe "8765432100"
               req.firstSubscriptionDate.getYear mustBe 2011
               req.firstSubscriptionDate.getMonthOfYear mustBe 3
               req.firstSubscriptionDate.getDayOfMonth mustBe 23
-            }
-            case _ => fail()
+            case _                                     => fail()
           }
-        }
       }
     }
 
@@ -160,9 +156,7 @@ class CreateLisaAccountRequestSpec extends PlaySpec {
       val json = Json.toJson[CreateLisaAccountRequest](request)
 
       json mustBe Json.parse(
-        validAccountTransferRequest.
-          replace("Id", "ID").
-          replace("Transferred", "CurrentYearFundsTransferred")
+        validAccountTransferRequest.replace("Id", "ID").replace("Transferred", "CurrentYearFundsTransferred")
       )
     }
 
@@ -178,9 +172,7 @@ class CreateLisaAccountRequestSpec extends PlaySpec {
       val json = Json.toJson[CreateLisaAccountRequest](request)
 
       json mustBe Json.parse(
-        validAccountTransferRequest.
-          replace("Id", "ID").
-          replace("Transferred", "PreviousYearFundsTransferred")
+        validAccountTransferRequest.replace("Id", "ID").replace("Transferred", "PreviousYearFundsTransferred")
       )
     }
 
@@ -201,14 +193,11 @@ class CreateLisaAccountRequestSpec extends PlaySpec {
       val res = Json.parse(req).validate[CreateLisaAccountRequest]
 
       res match {
-        case JsError(errors) => {
-          errors.count {
-            case (path: JsPath, errors: Seq[JsonValidationError]) => {
-              path.toString() == "/firstSubscriptionDate" && errors.contains(JsonValidationError("error.formatting.date"))
-            }
+        case JsError(errors) =>
+          errors.count { case (path: JsPath, errors: Seq[JsonValidationError]) =>
+            path.toString() == "/firstSubscriptionDate" && errors.contains(JsonValidationError("error.formatting.date"))
           } mustBe 1
-        }
-        case _ => fail()
+        case _               => fail()
       }
     }
 
@@ -217,14 +206,11 @@ class CreateLisaAccountRequestSpec extends PlaySpec {
       val res = Json.parse(req).validate[CreateLisaAccountRequest]
 
       res match {
-        case JsError(errors) => {
-          errors.count {
-            case (path: JsPath, errors: Seq[JsonValidationError]) => {
-              path.toString() == "/investorId" && errors.contains(JsonValidationError("error.formatting.investorId"))
-            }
+        case JsError(errors) =>
+          errors.count { case (path: JsPath, errors: Seq[JsonValidationError]) =>
+            path.toString() == "/investorId" && errors.contains(JsonValidationError("error.formatting.investorId"))
           } mustBe 1
-        }
-        case _ => fail()
+        case _               => fail()
       }
     }
 
@@ -233,10 +219,9 @@ class CreateLisaAccountRequestSpec extends PlaySpec {
       val res = Json.parse(req).validate[CreateLisaAccountRequest]
 
       res match {
-        case JsError(errors) => {
+        case JsError(errors) =>
           errors mustBe Seq((JsPath \ "creationReason", Seq(JsonValidationError("error.formatting.creationReason"))))
-        }
-        case _ => fail()
+        case _               => fail()
       }
     }
 
@@ -245,10 +230,9 @@ class CreateLisaAccountRequestSpec extends PlaySpec {
       val res = Json.parse(req).validate[CreateLisaAccountRequest]
 
       res match {
-        case JsError(errors) => {
+        case JsError(errors) =>
           errors mustBe Seq((JsPath \ "creationReason", Seq(JsonValidationError("error.expected.jsstring"))))
-        }
-        case _ => fail()
+        case _               => fail()
       }
     }
 
@@ -257,10 +241,9 @@ class CreateLisaAccountRequestSpec extends PlaySpec {
       val res = Json.parse(req).validate[CreateLisaAccountRequest]
 
       res match {
-        case JsError(errors) => {
+        case JsError(errors) =>
           errors mustBe Seq((JsPath \ "creationReason", Seq(JsonValidationError("error.path.missing"))))
-        }
-        case _ => fail()
+        case _               => fail()
       }
     }
 
@@ -269,29 +252,24 @@ class CreateLisaAccountRequestSpec extends PlaySpec {
       val res = Json.parse(req).validate[CreateLisaAccountRequest]
 
       res match {
-        case JsError(errors) => {
+        case JsError(errors) =>
           errors mustBe Seq((JsPath \ "transferAccount", Seq(JsonValidationError("error.path.missing"))))
-        }
-        case _ => fail()
+        case _               => fail()
       }
     }
 
     "fail if request has invalid date value " in {
-      val req = validAccountCreationRequest.replace("2011-03-23","2011-14-23")
+      val req = validAccountCreationRequest.replace("2011-03-23", "2011-14-23")
       val res = Json.parse(req).validate[CreateLisaAccountRequest]
 
       res match {
-        case JsError(errors) => {
-          errors.count {
-            case (path: JsPath, errors: Seq[JsonValidationError]) => {
-              path.toString() == "/firstSubscriptionDate" && errors.contains(JsonValidationError("error.formatting.date"))
-            }
+        case JsError(errors) =>
+          errors.count { case (path: JsPath, errors: Seq[JsonValidationError]) =>
+            path.toString() == "/firstSubscriptionDate" && errors.contains(JsonValidationError("error.formatting.date"))
           } mustBe 1
-        }
-        case _ => fail()
+        case _               => fail()
       }
     }
-
 
   }
 

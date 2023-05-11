@@ -29,7 +29,7 @@ case class MultipleDataTypes(str: String, num: Int, arr: List[SimpleClass], obj:
 
 class ErrorConverterSpec extends BaseTestFixture with GuiceOneAppPerSuite {
 
-  implicit val simpleFormats: OFormat[SimpleClass] = Json.format[SimpleClass]
+  implicit val simpleFormats: OFormat[SimpleClass]         = Json.format[SimpleClass]
   implicit val multipleFormats: OFormat[MultipleDataTypes] = Json.format[MultipleDataTypes]
 
   val errorConverter: ErrorConverter.type = ErrorConverter
@@ -39,7 +39,7 @@ class ErrorConverterSpec extends BaseTestFixture with GuiceOneAppPerSuite {
       val validate = Json.parse("""{"str": 1, "num": "text", "arr": {}, "obj": 123}""").validate[MultipleDataTypes]
 
       assert(validate.isInstanceOf[JsError])
-      val e = validate.asInstanceOf[JsError]
+      val e   = validate.asInstanceOf[JsError]
       val res = errorConverter.convert(e.errors)
 
       println(JsError.toFlatForm(e))
@@ -64,13 +64,11 @@ class ErrorConverterSpec extends BaseTestFixture with GuiceOneAppPerSuite {
 
       val validate = Json.parse(investorJson).validate[CreateLisaInvestorRequest]
 
-
       assert(validate.isInstanceOf[JsError])
-      val e = validate.asInstanceOf[JsError]
+      val e   = validate.asInstanceOf[JsError]
       val res = errorConverter.convert(e.errors)
       res.size mustBe 1
       res must contain(ErrorValidation("INVALID_DATE", "Date is invalid", Some("/dateOfBirth")))
-
 
     }
   }

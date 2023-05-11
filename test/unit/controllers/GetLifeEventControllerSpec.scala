@@ -33,26 +33,35 @@ import scala.concurrent.Future
 
 class GetLifeEventControllerSpec extends ControllerTestFixture {
 
-  val getLifeEventController: GetLifeEventController = new GetLifeEventController(mockAuthConnector, mockAppContext, mockLisaMetrics, mockLifeEventService, mockAuditService, mockControllerComponents, mockParser) {
+  val getLifeEventController: GetLifeEventController = new GetLifeEventController(
+    mockAuthConnector,
+    mockAppContext,
+    mockLisaMetrics,
+    mockLifeEventService,
+    mockAuditService,
+    mockControllerComponents,
+    mockParser
+  ) {
     override lazy val v2endpointsEnabled = true
   }
 
   val acceptHeaderV1: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
   val acceptHeaderV2: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.2.0+json")
-  val lisaManager = "Z019283"
-  val accountId = "ABC/12345"
-  val eventId = "1234567890"
+  val lisaManager                      = "Z019283"
+  val accountId                        = "ABC/12345"
+  val eventId                          = "1234567890"
 
-  override def beforeEach {
+  override def beforeEach(): Unit = {
     reset(mockAuditService)
-    when(mockAuthConnector.authorise[Option[String]](any(),any())(any(), any())).thenReturn(Future(Some("1234")))
+    when(mockAuthConnector.authorise[Option[String]](any(), any())(any(), any())).thenReturn(Future(Some("1234")))
   }
 
   "Get Life Event" should {
 
     "not be available for api version 1" in {
       val req = FakeRequest(Helpers.GET, "/")
-      val res = getLifeEventController.getLifeEvent(lisaManager, accountId, eventId).apply(req.withHeaders(acceptHeaderV1))
+      val res =
+        getLifeEventController.getLifeEvent(lisaManager, accountId, eventId).apply(req.withHeaders(acceptHeaderV1))
 
       status(res) mustBe NOT_ACCEPTABLE
     }
@@ -61,9 +70,12 @@ class GetLifeEventControllerSpec extends ControllerTestFixture {
       "given a successful response from the service layer" in {
         val annualReturn = GetLifeEventItem("12345", "STATUTORY_SUBMISSION", LocalDate.parse("2018-01-01"))
 
-        when(mockLifeEventService.getLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(Right(List(annualReturn))))
+        when(mockLifeEventService.getLifeEvent(any(), any(), any())(any()))
+          .thenReturn(Future.successful(Right(List(annualReturn))))
 
-        val res = getLifeEventController.getLifeEvent(lisaManager, accountId, eventId).apply(FakeRequest().withHeaders(acceptHeaderV2))
+        val res = getLifeEventController
+          .getLifeEvent(lisaManager, accountId, eventId)
+          .apply(FakeRequest().withHeaders(acceptHeaderV2))
 
         status(res) mustBe OK
         contentAsJson(res) mustBe Json.toJson[Seq[GetLifeEventItem]](List(annualReturn))
@@ -72,13 +84,16 @@ class GetLifeEventControllerSpec extends ControllerTestFixture {
 
     "return an error for api version 2" when {
       "given an error response from the service layer" in {
-        when(mockLifeEventService.getLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(Left(ErrorAccountNotFound)))
+        when(mockLifeEventService.getLifeEvent(any(), any(), any())(any()))
+          .thenReturn(Future.successful(Left(ErrorAccountNotFound)))
 
-        val res = getLifeEventController.getLifeEvent(lisaManager, accountId, eventId).apply(FakeRequest().withHeaders(acceptHeaderV2))
+        val res = getLifeEventController
+          .getLifeEvent(lisaManager, accountId, eventId)
+          .apply(FakeRequest().withHeaders(acceptHeaderV2))
 
         status(res) mustBe NOT_FOUND
         contentAsJson(res) mustBe Json.obj(
-          "code" -> ErrorAccountNotFound.errorCode,
+          "code"    -> ErrorAccountNotFound.errorCode,
           "message" -> ErrorAccountNotFound.message
         )
       }
@@ -88,36 +103,48 @@ class GetLifeEventControllerSpec extends ControllerTestFixture {
     "audit getLifeEventReported" when {
       "given a successful response from the service layer" in {
         val annualReturn = GetLifeEventItem("12345", "STATUTORY_SUBMISSION", LocalDate.parse("2018-01-01"))
-        when(mockLifeEventService.getLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(Right(List(annualReturn))))
+        when(mockLifeEventService.getLifeEvent(any(), any(), any())(any()))
+          .thenReturn(Future.successful(Right(List(annualReturn))))
 
-        val res = getLifeEventController.getLifeEvent(lisaManager, accountId, eventId).apply(FakeRequest().withHeaders(acceptHeaderV2))
+        val res = getLifeEventController
+          .getLifeEvent(lisaManager, accountId, eventId)
+          .apply(FakeRequest().withHeaders(acceptHeaderV2))
         await(res)
         verify(mockAuditService).audit(
           auditType = matchersEquals("getLifeEventReported"),
           path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/$eventId"),
-          auditData = matchersEquals(Map(
-            "lisaManagerReferenceNumber" -> lisaManager,
-            "accountId" -> accountId,
-            "lifeEventId" -> eventId
-          )))(any())
+          auditData = matchersEquals(
+            Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountId"                  -> accountId,
+              "lifeEventId"                -> eventId
+            )
+          )
+        )(any())
       }
     }
 
     "audit getLifeEventNotReported" when {
       "given an error response from the service layer" in {
-        when(mockLifeEventService.getLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(Left(ErrorAccountNotFound)))
+        when(mockLifeEventService.getLifeEvent(any(), any(), any())(any()))
+          .thenReturn(Future.successful(Left(ErrorAccountNotFound)))
 
-        val res = getLifeEventController.getLifeEvent(lisaManager, accountId, eventId).apply(FakeRequest().withHeaders(acceptHeaderV2))
+        val res = getLifeEventController
+          .getLifeEvent(lisaManager, accountId, eventId)
+          .apply(FakeRequest().withHeaders(acceptHeaderV2))
         await(res)
         verify(mockAuditService).audit(
           auditType = matchersEquals("getLifeEventNotReported"),
           path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/$eventId"),
-          auditData = matchersEquals(Map(
-            "lisaManagerReferenceNumber" -> lisaManager,
-            "accountId" -> accountId,
-            "lifeEventId" -> eventId,
-            "reasonNotReported" -> ErrorAccountNotFound.errorCode
-          )))(any())
+          auditData = matchersEquals(
+            Map(
+              "lisaManagerReferenceNumber" -> lisaManager,
+              "accountId"                  -> accountId,
+              "lifeEventId"                -> eventId,
+              "reasonNotReported"          -> ErrorAccountNotFound.errorCode
+            )
+          )
+        )(any())
       }
     }
 

@@ -23,19 +23,19 @@ import uk.gov.hmrc.lisaapi.config.APIAccessConfig
 
 class APIAccessConfigSpec extends BaseTestFixture {
 
-  val apiAccessConfigNone: APIAccessConfig = APIAccessConfig(None)
+  val apiAccessConfigNone: APIAccessConfig   = APIAccessConfig(None)
   val apiAccessConfigMocked: APIAccessConfig = APIAccessConfig(Some(mockConfiguration))
 
   "APIAccessConfig created with no Configuration" should {
     "return private for type" in {
-      apiAccessConfigNone.accessType must be ("PUBLIC")
+      apiAccessConfigNone.accessType must be("PUBLIC")
     }
   }
 
   "APIAccessConfig created with valid configuration" should {
     "return private for the access type" in {
       when(mockConfiguration.getOptional[String](any())(any())).thenReturn(Some("PRIVATE"))
-      apiAccessConfigMocked.accessType must be ("PRIVATE")
+      apiAccessConfigMocked.accessType must be("PRIVATE")
     }
   }
 }

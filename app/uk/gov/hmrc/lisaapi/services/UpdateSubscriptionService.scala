@@ -25,37 +25,41 @@ import uk.gov.hmrc.lisaapi.models.des._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class UpdateSubscriptionService @Inject()(desConnector: DesConnector)(implicit ec: ExecutionContext) extends Logging {
+class UpdateSubscriptionService @Inject() (desConnector: DesConnector)(implicit ec: ExecutionContext) extends Logging {
 
-  def updateSubscription(lisaManager: String, accountId: String, request: UpdateSubscriptionRequest)
-                        (implicit hc: HeaderCarrier): Future[UpdateSubscriptionResponse] = {
+  def updateSubscription(lisaManager: String, accountId: String, request: UpdateSubscriptionRequest)(implicit
+    hc: HeaderCarrier
+  ): Future[UpdateSubscriptionResponse] =
     desConnector.updateFirstSubDate(lisaManager, accountId, request) map {
       case successResponse: DesUpdateSubscriptionSuccessResponse =>
         logger.debug("Update subscription success response")
         if (successResponse.code == "SUCCESS") {
-          UpdateSubscriptionSuccessResponse("UPDATED", "Successfully updated the firstSubscriptionDate for the LISA account")
+          UpdateSubscriptionSuccessResponse(
+            "UPDATED",
+            "Successfully updated the firstSubscriptionDate for the LISA account"
+          )
         } else {
           val voidMsg = "Successfully updated the firstSubscriptionDate for the LISA account and changed" +
             " the account status to void because the investor has another account with an earlier firstSubscriptionDate"
           UpdateSubscriptionSuccessResponse("UPDATED_AND_ACCOUNT_VOID", voidMsg)
         }
-      case DesUnavailableResponse =>
+      case DesUnavailableResponse                                =>
         logger.debug("Update subscription des unavailable response")
         UpdateSubscriptionServiceUnavailableResponse
-      case failureResponse: DesFailureResponse =>
+      case failureResponse: DesFailureResponse                   =>
         logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
-        desFailures.getOrElse(failureResponse.code, {
-          logger.warn(s"Update date of first subscription returned error: ${failureResponse.code}")
-          UpdateSubscriptionErrorResponse
-        })
+        desFailures.getOrElse(
+          failureResponse.code, {
+            logger.warn(s"Update date of first subscription returned error: ${failureResponse.code}")
+            UpdateSubscriptionErrorResponse
+          }
+        )
     }
-  }
 
   private val desFailures = Map[String, UpdateSubscriptionResponse](
-  "INVESTOR_ACCOUNTID_NOT_FOUND" -> UpdateSubscriptionAccountNotFoundResponse,
-  "INVESTOR_ACCOUNT_ALREADY_CLOSED" -> UpdateSubscriptionAccountClosedResponse,
-  "INVESTOR_ACCOUNT_ALREADY_CANCELLED" -> UpdateSubscriptionAccountCancelledResponse,
-  "INVESTOR_ACCOUNT_ALREADY_VOID" -> UpdateSubscriptionAccountVoidedResponse
+    "INVESTOR_ACCOUNTID_NOT_FOUND"       -> UpdateSubscriptionAccountNotFoundResponse,
+    "INVESTOR_ACCOUNT_ALREADY_CLOSED"    -> UpdateSubscriptionAccountClosedResponse,
+    "INVESTOR_ACCOUNT_ALREADY_CANCELLED" -> UpdateSubscriptionAccountCancelledResponse,
+    "INVESTOR_ACCOUNT_ALREADY_VOID"      -> UpdateSubscriptionAccountVoidedResponse
   )
 }
-

@@ -29,14 +29,16 @@ case object CreateLisaInvestorServiceUnavailableResponse extends CreateLisaInves
 
 object CreateLisaInvestorResponse {
   implicit val successReads: Reads[CreateLisaInvestorSuccessResponse] =
-    (__ \ "investorID").read(JsonReads.investorId).map {investorId => CreateLisaInvestorSuccessResponse(investorId) }
+    (__ \ "investorID").read(JsonReads.investorId).map(investorId => CreateLisaInvestorSuccessResponse(investorId))
 
   implicit val successWrites: Writes[CreateLisaInvestorSuccessResponse] =
-    (__ \ "investorId").write[String].contramap {(resp: CreateLisaInvestorSuccessResponse) => resp.investorId }
+    (__ \ "investorId").write[String].contramap((resp: CreateLisaInvestorSuccessResponse) => resp.investorId)
 
   implicit val existsReads: Reads[CreateLisaInvestorAlreadyExistsResponse] =
-    (__ \ "investorID").read(JsonReads.investorId).map {investorId => CreateLisaInvestorAlreadyExistsResponse(investorId) }
+    (__ \ "investorID").read(JsonReads.investorId).map { investorId =>
+      CreateLisaInvestorAlreadyExistsResponse(investorId)
+    }
 
   implicit val existsWrites: Writes[CreateLisaInvestorAlreadyExistsResponse] =
-    (__ \ "investorId").write[String].contramap {(resp: CreateLisaInvestorAlreadyExistsResponse) => resp.investorId }
+    (__ \ "investorId").write[String].contramap((resp: CreateLisaInvestorAlreadyExistsResponse) => resp.investorId)
 }

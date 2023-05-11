@@ -18,17 +18,16 @@ package uk.gov.hmrc.lisaapi.models
 
 import play.api.libs.json._
 
-case class ReinstateLisaAccountRequest (accountId: AccountId)
-
-
+case class ReinstateLisaAccountRequest(accountId: AccountId)
 
 object ReinstateLisaAccountRequest {
 
-  implicit val reinstateLisaAccountRequestReads: Reads[ReinstateLisaAccountRequest] = (__ \ "accountId").
-    read(JsonReads.accountId).map {accountId => ReinstateLisaAccountRequest(accountId) }
+  implicit val reinstateLisaAccountRequestReads: Reads[ReinstateLisaAccountRequest] =
+    (__ \ "accountId").read(JsonReads.accountId).map(accountId => ReinstateLisaAccountRequest(accountId))
 
   implicit val reinstateLisaAccountRequestWrites: Writes[ReinstateLisaAccountRequest] =
-    (__ \ "accountId").write[String].contramap {(accountId:  ReinstateLisaAccountRequest) => accountId.accountId.toString}
+    (__ \ "accountId").write[String].contramap { (accountId: ReinstateLisaAccountRequest) =>
+      accountId.accountId
+    }
 
 }
-

@@ -37,18 +37,23 @@ class TransactionServiceSpec extends ServiceTestFixture {
 
     "return a Pending transaction" when {
       "ITMP returns a Pending transaction" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
-          thenReturn(Future.successful(GetBonusResponse(
-            lifeEventId = None,
-            periodStartDate = new DateTime("2001-01-01"),
-            periodEndDate = new DateTime("2002-01-01"),
-            htbTransfer = None,
-            inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
-            bonuses = Bonuses(1.0, 1.0, None, "X"),
-            creationDate = new DateTime("2000-01-01"),
-            paymentStatus = "Pending")))
+        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+          Future.successful(
+            GetBonusResponse(
+              lifeEventId = None,
+              periodStartDate = new DateTime("2001-01-01"),
+              periodEndDate = new DateTime("2002-01-01"),
+              htbTransfer = None,
+              inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
+              bonuses = Bonuses(1.0, 1.0, None, "X"),
+              creationDate = new DateTime("2000-01-01"),
+              paymentStatus = "Pending"
+            )
+          )
+        )
 
-        val result = Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
+        val result =
+          Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
 
         result mustBe GetTransactionSuccessResponse(
           transactionId = "12345",
@@ -57,21 +62,26 @@ class TransactionServiceSpec extends ServiceTestFixture {
         )
       }
       "ITMP returns a Paid status and ETMP returns a Pending status" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
-          thenReturn(Future.successful(GetBonusResponse(
-            lifeEventId = None,
-            periodStartDate = new DateTime("2001-01-01"),
-            periodEndDate = new DateTime("2002-01-01"),
-            htbTransfer = None,
-            inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
-            bonuses = Bonuses(1.0, 1.0, None, "X"),
-            creationDate = new DateTime("2000-01-01"),
-            paymentStatus = "Paid")))
+        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+          Future.successful(
+            GetBonusResponse(
+              lifeEventId = None,
+              periodStartDate = new DateTime("2001-01-01"),
+              periodEndDate = new DateTime("2002-01-01"),
+              htbTransfer = None,
+              inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
+              bonuses = Bonuses(1.0, 1.0, None, "X"),
+              creationDate = new DateTime("2000-01-01"),
+              paymentStatus = "Paid"
+            )
+          )
+        )
 
-        when(mockDesConnector.getTransaction(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesGetTransactionPending(new DateTime("2000-01-01"), None, None)))
+        when(mockDesConnector.getTransaction(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesGetTransactionPending(new DateTime("2000-01-01"), None, None)))
 
-        val result = Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
+        val result =
+          Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
 
         result mustBe GetTransactionSuccessResponse(
           transactionId = "12345",
@@ -82,21 +92,26 @@ class TransactionServiceSpec extends ServiceTestFixture {
         )
       }
       "ITMP returns a Paid status and ETMP returns a Not Found error" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
-          thenReturn(Future.successful(GetBonusResponse(
-            lifeEventId = None,
-            periodStartDate = new DateTime("2001-01-01"),
-            periodEndDate = new DateTime("2002-01-01"),
-            htbTransfer = None,
-            inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
-            bonuses = Bonuses(1.0, 1.0, None, "X"),
-            creationDate = new DateTime("2000-01-01"),
-            paymentStatus = "Paid")))
+        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+          Future.successful(
+            GetBonusResponse(
+              lifeEventId = None,
+              periodStartDate = new DateTime("2001-01-01"),
+              periodEndDate = new DateTime("2002-01-01"),
+              htbTransfer = None,
+              inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
+              bonuses = Bonuses(1.0, 1.0, None, "X"),
+              creationDate = new DateTime("2000-01-01"),
+              paymentStatus = "Paid"
+            )
+          )
+        )
 
-        when(mockDesConnector.getTransaction(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("NOT_FOUND")))
+        when(mockDesConnector.getTransaction(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesFailureResponse("NOT_FOUND")))
 
-        val result = Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
+        val result =
+          Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
 
         result mustBe GetTransactionSuccessResponse(
           transactionId = "12345",
@@ -108,26 +123,30 @@ class TransactionServiceSpec extends ServiceTestFixture {
 
     "return a Due transaction" when {
       "ITMP returns a Collected status and ETMP returns a Pending status" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
-          thenReturn(Future.successful(GetWithdrawalResponse(
-            new DateTime("2018-05-06"),
-            new DateTime("2018-06-05"),
-            Some(100),
-            100,
-            25,
-            0,
-            true,
-            "Regular withdrawal",
-            None,
-            None,
-            "Collected",
-            new DateTime("2018-06-21")
-          )))
+        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+          Future.successful(
+            GetWithdrawalResponse(
+              new DateTime("2018-05-06"),
+              new DateTime("2018-06-05"),
+              Some(100),
+              100,
+              25,
+              0,
+              fundsDeductedDuringWithdrawal = true,
+              "Regular withdrawal",
+              None,
+              None,
+              "Collected",
+              new DateTime("2018-06-21")
+            )
+          )
+        )
 
-        when(mockDesConnector.getTransaction(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesGetTransactionPending(new DateTime("2000-01-01"), Some("YREF"), Some(30))))
+        when(mockDesConnector.getTransaction(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesGetTransactionPending(new DateTime("2000-01-01"), Some("YREF"), Some(30))))
 
-        val result = Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
+        val result =
+          Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
 
         result mustBe GetTransactionSuccessResponse(
           transactionId = "12345",
@@ -139,26 +158,30 @@ class TransactionServiceSpec extends ServiceTestFixture {
         )
       }
       "ITMP returns a Collected status and ETMP returns a Not Found error" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
-          thenReturn(Future.successful(GetWithdrawalResponse(
-            new DateTime("2018-05-06"),
-            new DateTime("2018-06-05"),
-            Some(100),
-            100,
-            25,
-            0,
-            true,
-            "Regular withdrawal",
-            None,
-            None,
-            "Collected",
-            new DateTime("2018-06-21")
-          )))
+        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+          Future.successful(
+            GetWithdrawalResponse(
+              new DateTime("2018-05-06"),
+              new DateTime("2018-06-05"),
+              Some(100),
+              100,
+              25,
+              0,
+              fundsDeductedDuringWithdrawal = true,
+              "Regular withdrawal",
+              None,
+              None,
+              "Collected",
+              new DateTime("2018-06-21")
+            )
+          )
+        )
 
-        when(mockDesConnector.getTransaction(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("NOT_FOUND")))
+        when(mockDesConnector.getTransaction(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesFailureResponse("NOT_FOUND")))
 
-        val result = Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
+        val result =
+          Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
 
         result mustBe GetTransactionSuccessResponse(
           transactionId = "12345",
@@ -169,18 +192,23 @@ class TransactionServiceSpec extends ServiceTestFixture {
 
     "return a Cancelled transaction" when {
       "ITMP returns a Cancelled status" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
-          thenReturn(Future.successful(GetBonusResponse(
-            lifeEventId = None,
-            periodStartDate = new DateTime("2001-01-01"),
-            periodEndDate = new DateTime("2002-01-01"),
-            htbTransfer = None,
-            inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
-            bonuses = Bonuses(1.0, 1.0, None, "X"),
-            creationDate = new DateTime("2000-01-01"),
-            paymentStatus = "Cancelled")))
+        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+          Future.successful(
+            GetBonusResponse(
+              lifeEventId = None,
+              periodStartDate = new DateTime("2001-01-01"),
+              periodEndDate = new DateTime("2002-01-01"),
+              htbTransfer = None,
+              inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
+              bonuses = Bonuses(1.0, 1.0, None, "X"),
+              creationDate = new DateTime("2000-01-01"),
+              paymentStatus = "Cancelled"
+            )
+          )
+        )
 
-        val result = Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
+        val result =
+          Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
 
         result mustBe GetTransactionSuccessResponse(
           transactionId = "12345",
@@ -192,18 +220,23 @@ class TransactionServiceSpec extends ServiceTestFixture {
 
     "return a Void transaction" when {
       "ITMP returns a Void status" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
-          thenReturn(Future.successful(GetBonusResponse(
-            lifeEventId = None,
-            periodStartDate = new DateTime("2001-01-01"),
-            periodEndDate = new DateTime("2002-01-01"),
-            htbTransfer = None,
-            inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
-            bonuses = Bonuses(1.0, 1.0, None, "X"),
-            creationDate = new DateTime("2000-01-01"),
-            paymentStatus = "Void")))
+        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+          Future.successful(
+            GetBonusResponse(
+              lifeEventId = None,
+              periodStartDate = new DateTime("2001-01-01"),
+              periodEndDate = new DateTime("2002-01-01"),
+              htbTransfer = None,
+              inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
+              bonuses = Bonuses(1.0, 1.0, None, "X"),
+              creationDate = new DateTime("2000-01-01"),
+              paymentStatus = "Void"
+            )
+          )
+        )
 
-        val result = Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
+        val result =
+          Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
 
         result mustBe GetTransactionSuccessResponse(
           transactionId = "12345",
@@ -215,19 +248,24 @@ class TransactionServiceSpec extends ServiceTestFixture {
 
     "return a Superseded transaction" when {
       "ITMP returns a Superseded status" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
-          thenReturn(Future.successful(GetBonusResponse(
-            lifeEventId = None,
-            periodStartDate = new DateTime("2001-01-01"),
-            periodEndDate = new DateTime("2002-01-01"),
-            htbTransfer = None,
-            inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
-            bonuses = Bonuses(1.0, 1.0, None, "X"),
-            creationDate = new DateTime("2000-01-01"),
-            paymentStatus = "Superseded",
-            supersededBy = Some("123456"))))
+        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+          Future.successful(
+            GetBonusResponse(
+              lifeEventId = None,
+              periodStartDate = new DateTime("2001-01-01"),
+              periodEndDate = new DateTime("2002-01-01"),
+              htbTransfer = None,
+              inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
+              bonuses = Bonuses(1.0, 1.0, None, "X"),
+              creationDate = new DateTime("2000-01-01"),
+              paymentStatus = "Superseded",
+              supersededBy = Some("123456")
+            )
+          )
+        )
 
-        val result = Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
+        val result =
+          Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
 
         result mustBe GetTransactionSuccessResponse(
           transactionId = "12345",
@@ -239,24 +277,33 @@ class TransactionServiceSpec extends ServiceTestFixture {
 
     "return a Paid transaction" when {
       "ITMP returns a Paid status and ETMP returns a Paid status" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
-          thenReturn(Future.successful(GetBonusResponse(
-            lifeEventId = None,
-            periodStartDate = new DateTime("2001-01-01"),
-            periodEndDate = new DateTime("2002-01-01"),
-            htbTransfer = None,
-            inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
-            bonuses = Bonuses(1.0, 1.0, None, "X"),
-            creationDate = new DateTime("2000-01-01"),
-            paymentStatus = "Paid")))
+        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+          Future.successful(
+            GetBonusResponse(
+              lifeEventId = None,
+              periodStartDate = new DateTime("2001-01-01"),
+              periodEndDate = new DateTime("2002-01-01"),
+              htbTransfer = None,
+              inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
+              bonuses = Bonuses(1.0, 1.0, None, "X"),
+              creationDate = new DateTime("2000-01-01"),
+              paymentStatus = "Paid"
+            )
+          )
+        )
 
-        when(mockDesConnector.getTransaction(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesGetTransactionPaid(
-            paymentDate = new DateTime("2000-01-01"),
-            paymentReference = "002630000993",
-            paymentAmount = 1.0)))
+        when(mockDesConnector.getTransaction(any(), any(), any())(any())).thenReturn(
+          Future.successful(
+            DesGetTransactionPaid(
+              paymentDate = new DateTime("2000-01-01"),
+              paymentReference = "002630000993",
+              paymentAmount = 1.0
+            )
+          )
+        )
 
-        val result = Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
+        val result =
+          Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
 
         result mustBe GetTransactionSuccessResponse(
           transactionId = "12345",
@@ -272,26 +319,30 @@ class TransactionServiceSpec extends ServiceTestFixture {
 
     "return a Collected transaction" when {
       "ITMP returns a Collected status and ETMP returns a Paid status" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
-          thenReturn(Future.successful(GetWithdrawalResponse(
-            new DateTime("2018-05-06"),
-            new DateTime("2018-06-05"),
-            Some(100),
-            100,
-            25,
-            0,
-            true,
-            "Regular withdrawal",
-            None,
-            None,
-            "Collected",
-            new DateTime("2018-06-21")
-          )))
+        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+          Future.successful(
+            GetWithdrawalResponse(
+              new DateTime("2018-05-06"),
+              new DateTime("2018-06-05"),
+              Some(100),
+              100,
+              25,
+              0,
+              fundsDeductedDuringWithdrawal = true,
+              "Regular withdrawal",
+              None,
+              None,
+              "Collected",
+              new DateTime("2018-06-21")
+            )
+          )
+        )
 
-        when(mockDesConnector.getTransaction(any(), any(), any())(any())).
-          thenReturn(Future.successful(des.DesGetTransactionPaid(new DateTime("2000-01-01"), "XREF", 25)))
+        when(mockDesConnector.getTransaction(any(), any(), any())(any()))
+          .thenReturn(Future.successful(des.DesGetTransactionPaid(new DateTime("2000-01-01"), "XREF", 25)))
 
-        val result = Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
+        val result =
+          Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
 
         result mustBe GetTransactionSuccessResponse(
           transactionId = "12345",
@@ -306,21 +357,26 @@ class TransactionServiceSpec extends ServiceTestFixture {
 
     "return a Charge refund cancelled transaction" when {
       "ITMP returns a Paid status and ETMP returns a COULD_NOT_PROCESS error" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
-          thenReturn(Future.successful(GetBonusResponse(
-            lifeEventId = None,
-            periodStartDate = new DateTime("2001-01-01"),
-            periodEndDate = new DateTime("2002-01-01"),
-            htbTransfer = None,
-            inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
-            bonuses = Bonuses(1.0, 1.0, None, "X"),
-            creationDate = new DateTime("2000-01-01"),
-            paymentStatus = TransactionPaymentStatus.PAID)))
+        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+          Future.successful(
+            GetBonusResponse(
+              lifeEventId = None,
+              periodStartDate = new DateTime("2001-01-01"),
+              periodEndDate = new DateTime("2002-01-01"),
+              htbTransfer = None,
+              inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
+              bonuses = Bonuses(1.0, 1.0, None, "X"),
+              creationDate = new DateTime("2000-01-01"),
+              paymentStatus = TransactionPaymentStatus.PAID
+            )
+          )
+        )
 
-        when(mockDesConnector.getTransaction(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("COULD_NOT_PROCESS")))
+        when(mockDesConnector.getTransaction(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesFailureResponse("COULD_NOT_PROCESS")))
 
-        val result = Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
+        val result =
+          Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
 
         result mustBe GetTransactionSuccessResponse(
           transactionId = "12345",
@@ -332,10 +388,11 @@ class TransactionServiceSpec extends ServiceTestFixture {
 
     "return a Transaction Not Found error" when {
       "ITMP returns a Transaction Not Found error" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("TRANSACTION_ID_NOT_FOUND")))
+        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesFailureResponse("TRANSACTION_ID_NOT_FOUND")))
 
-        val result = Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
+        val result =
+          Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
 
         result mustBe GetTransactionTransactionNotFoundResponse
       }
@@ -343,10 +400,11 @@ class TransactionServiceSpec extends ServiceTestFixture {
 
     "return a Account Not Found error" when {
       "ITMP returns a Account Not Found error" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNTID_NOT_FOUND")))
+        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNTID_NOT_FOUND")))
 
-        val result = Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
+        val result =
+          Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
 
         result mustBe GetTransactionAccountNotFoundResponse
       }
@@ -354,48 +412,59 @@ class TransactionServiceSpec extends ServiceTestFixture {
 
     "return a Service Unavailable error" when {
       "ITMP returns a 503" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesUnavailableResponse))
+        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesUnavailableResponse))
 
-        val result = Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
+        val result =
+          Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
 
         result mustBe GetTransactionServiceUnavailableResponse
       }
       "ETMP returns a 503 for a paid transaction" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
-          thenReturn(Future.successful(GetBonusResponse(
-            lifeEventId = None,
-            periodStartDate = new DateTime("2001-01-01"),
-            periodEndDate = new DateTime("2002-01-01"),
-            htbTransfer = None,
-            inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
-            bonuses = Bonuses(1.0, 1.0, None, "X"),
-            creationDate = new DateTime("2000-01-01"),
-            paymentStatus = TransactionPaymentStatus.PAID)))
+        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+          Future.successful(
+            GetBonusResponse(
+              lifeEventId = None,
+              periodStartDate = new DateTime("2001-01-01"),
+              periodEndDate = new DateTime("2002-01-01"),
+              htbTransfer = None,
+              inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
+              bonuses = Bonuses(1.0, 1.0, None, "X"),
+              creationDate = new DateTime("2000-01-01"),
+              paymentStatus = TransactionPaymentStatus.PAID
+            )
+          )
+        )
 
-        when(mockDesConnector.getTransaction(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesUnavailableResponse))
+        when(mockDesConnector.getTransaction(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesUnavailableResponse))
 
-        val result = Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
+        val result =
+          Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
 
         result mustBe GetTransactionServiceUnavailableResponse
       }
       "ETMP returns a 503 for a collected transaction" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
-          thenReturn(Future.successful(GetBonusResponse(
-            lifeEventId = None,
-            periodStartDate = new DateTime("2001-01-01"),
-            periodEndDate = new DateTime("2002-01-01"),
-            htbTransfer = None,
-            inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
-            bonuses = Bonuses(1.0, 1.0, None, "X"),
-            creationDate = new DateTime("2000-01-01"),
-            paymentStatus = TransactionPaymentStatus.COLLECTED)))
+        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+          Future.successful(
+            GetBonusResponse(
+              lifeEventId = None,
+              periodStartDate = new DateTime("2001-01-01"),
+              periodEndDate = new DateTime("2002-01-01"),
+              htbTransfer = None,
+              inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
+              bonuses = Bonuses(1.0, 1.0, None, "X"),
+              creationDate = new DateTime("2000-01-01"),
+              paymentStatus = TransactionPaymentStatus.COLLECTED
+            )
+          )
+        )
 
-        when(mockDesConnector.getTransaction(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesUnavailableResponse))
+        when(mockDesConnector.getTransaction(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesUnavailableResponse))
 
-        val result = Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
+        val result =
+          Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
 
         result mustBe GetTransactionServiceUnavailableResponse
       }

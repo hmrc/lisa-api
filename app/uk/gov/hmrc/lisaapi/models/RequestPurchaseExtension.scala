@@ -25,64 +25,75 @@ abstract class RequestPurchaseExtension extends ReportLifeEventRequestBase {
   val eventType: LifeEventType
 }
 
-case class RequestStandardPurchaseExtension(fundReleaseId: LifeEventId, eventDate: DateTime, eventType: LifeEventType) extends RequestPurchaseExtension
-case class RequestSupersededPurchaseExtension(eventDate: DateTime, eventType: LifeEventType, supersede: RequestExtensionSupersedeDetails) extends RequestPurchaseExtension
+case class RequestStandardPurchaseExtension(fundReleaseId: LifeEventId, eventDate: DateTime, eventType: LifeEventType)
+    extends RequestPurchaseExtension
+case class RequestSupersededPurchaseExtension(
+  eventDate: DateTime,
+  eventType: LifeEventType,
+  supersede: RequestExtensionSupersedeDetails
+) extends RequestPurchaseExtension
 case class RequestExtensionSupersedeDetails(originalEventDate: DateTime, originalLifeEventId: LifeEventId)
 
 object RequestPurchaseExtension {
-  implicit val dateReads: Reads[DateTime] = JsonReads.notFutureDate
+  implicit val dateReads: Reads[DateTime]   = JsonReads.notFutureDate
   implicit val dateWrites: Writes[DateTime] = JodaWrites.jodaDateWrites("yyyy-MM-dd")
 
   implicit val supersedeDetailReads: Reads[RequestExtensionSupersedeDetails] = (
     (JsPath \ "originalEventDate").read(JsonReads.notFutureDate) and
-    (JsPath \ "originalLifeEventId").read[LifeEventId](JsonReads.lifeEventId)
+      (JsPath \ "originalLifeEventId").read[LifeEventId](JsonReads.lifeEventId)
   )(RequestExtensionSupersedeDetails.apply _)
 
   val standardReads: Reads[RequestStandardPurchaseExtension] = (
     (JsPath \ "fundReleaseId").read[LifeEventId](JsonReads.fundReleaseId) and
-    (JsPath \ "eventDate").read(JsonReads.notFutureDate) and
-    (JsPath \ "eventType").read(Reads.pattern("^(Extension one|Extension two)$".r, "error.formatting.extensionType"))
+      (JsPath \ "eventDate").read(JsonReads.notFutureDate) and
+      (JsPath \ "eventType").read(Reads.pattern("^(Extension one|Extension two)$".r, "error.formatting.extensionType"))
   )(RequestStandardPurchaseExtension.apply _)
 
   val standardWrites: Writes[RequestStandardPurchaseExtension] = (
     (JsPath \ "eventType").write[String] and
-    (JsPath \ "eventDate").write[DateTime] and
-    (JsPath \ "fundsReleaseLifeEventID").write[String]
-  ){req: RequestStandardPurchaseExtension => (
-    req.eventType,
-    req.eventDate,
-    req.fundReleaseId
-  )}
+      (JsPath \ "eventDate").write[DateTime] and
+      (JsPath \ "fundsReleaseLifeEventID").write[String]
+  ) { req: RequestStandardPurchaseExtension =>
+    (
+      req.eventType,
+      req.eventDate,
+      req.fundReleaseId
+    )
+  }
 
   val supersededReads: Reads[RequestSupersededPurchaseExtension] = (
     (JsPath \ "eventDate").read(JsonReads.notFutureDate) and
-    (JsPath \ "eventType").read(Reads.pattern("^(Extension one|Extension two)$".r, "error.formatting.extensionType")) and
-    (JsPath \ "supersede").read[RequestExtensionSupersedeDetails]
+      (JsPath \ "eventType").read(
+        Reads.pattern("^(Extension one|Extension two)$".r, "error.formatting.extensionType")
+      ) and
+      (JsPath \ "supersede").read[RequestExtensionSupersedeDetails]
   )(RequestSupersededPurchaseExtension.apply _)
 
   val supersededWrites: Writes[RequestSupersededPurchaseExtension] = (
     (JsPath \ "eventType").write[String] and
-    (JsPath \ "eventDate").write[DateTime] and
-    (JsPath \ "supersededLifeEventDate").write[DateTime] and
-    (JsPath \ "supersededLifeEventID").write[String]
-  ){req: RequestSupersededPurchaseExtension => (
-    req.eventType,
-    req.eventDate,
-    req.supersede.originalEventDate,
-    req.supersede.originalLifeEventId
-  )}
+      (JsPath \ "eventDate").write[DateTime] and
+      (JsPath \ "supersededLifeEventDate").write[DateTime] and
+      (JsPath \ "supersededLifeEventID").write[String]
+  ) { req: RequestSupersededPurchaseExtension =>
+    (
+      req.eventType,
+      req.eventDate,
+      req.supersede.originalEventDate,
+      req.supersede.originalLifeEventId
+    )
+  }
 
   implicit val reads: Reads[RequestPurchaseExtension] = Reads[RequestPurchaseExtension] { json =>
     val supersede = (json \ "supersede").asOpt[JsValue]
 
     supersede match {
       case Some(_) => supersededReads.reads(json)
-      case _ => standardReads.reads(json)
+      case _       => standardReads.reads(json)
     }
   }
 
   val desWrites: Writes[RequestPurchaseExtension] = Writes[RequestPurchaseExtension] {
-    case std: RequestStandardPurchaseExtension => standardWrites.writes(std)
+    case std: RequestStandardPurchaseExtension   => standardWrites.writes(std)
     case sup: RequestSupersededPurchaseExtension => supersededWrites.writes(sup)
   }
 

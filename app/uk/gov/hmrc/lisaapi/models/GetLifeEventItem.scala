@@ -24,16 +24,16 @@ import play.api.libs.json._
 
 case class GetLifeEventItemPropertyDetails(nameOrNumber: String, postalCode: String)
 object GetLifeEventItemPropertyDetails {
-  implicit val formats = Json.format[GetLifeEventItemPropertyDetails]
+  implicit val formats: OFormat[GetLifeEventItemPropertyDetails] = Json.format[GetLifeEventItemPropertyDetails]
 }
 
 case class GetLifeEventItemSupersede(originalLifeEventId: LifeEventId, originalEventDate: LocalDate)
 object GetLifeEventItemSupersede {
-  implicit val dateReads: Reads[LocalDate] = Reads.localDateReads(DateTimeFormatter.ISO_LOCAL_DATE)
-  implicit val dateWrites: Writes[LocalDate] = Writes {
-    date => JsString(date.format(DateTimeFormatter.ISO_LOCAL_DATE))
+  implicit val dateReads: Reads[LocalDate]   = Reads.localDateReads(DateTimeFormatter.ISO_LOCAL_DATE)
+  implicit val dateWrites: Writes[LocalDate] = Writes { date =>
+    JsString(date.format(DateTimeFormatter.ISO_LOCAL_DATE))
   }
-  implicit val formats = Json.format[GetLifeEventItemSupersede]
+  implicit val formats: OFormat[GetLifeEventItemSupersede] = Json.format[GetLifeEventItemSupersede]
 }
 
 case class GetLifeEventItem(
@@ -57,109 +57,111 @@ case class GetLifeEventItem(
 )
 
 object GetLifeEventItem {
-  implicit val dateReads: Reads[LocalDate] = Reads.localDateReads(DateTimeFormatter.ISO_LOCAL_DATE)
-  implicit val dateWrites: Writes[LocalDate] = Writes {
-    date => JsString(date.format(DateTimeFormatter.ISO_LOCAL_DATE))
+  implicit val dateReads: Reads[LocalDate]   = Reads.localDateReads(DateTimeFormatter.ISO_LOCAL_DATE)
+  implicit val dateWrites: Writes[LocalDate] = Writes { date =>
+    JsString(date.format(DateTimeFormatter.ISO_LOCAL_DATE))
   }
 
   implicit val reads: Reads[GetLifeEventItem] = (
     (JsPath \ "lifeEventId").read(JsonReads.lifeEventId) and
-    (JsPath \ "lifeEventType").read[String] and
-    (JsPath \ "lifeEventDate").read[LocalDate] and
-    (JsPath \ "isaManagerName").readNullable[String] and
-    (JsPath \ "taxYear").readNullable[String].map(_.map(_.toInt)) and
-    (JsPath \ "marketValueCash").readNullable[Int] and
-    (JsPath \ "marketValueStocksAndShares").readNullable[Int] and
-    (JsPath \ "annualSubsCash").readNullable[Int] and
-    (JsPath \ "annualSubsStocksAndShares").readNullable[Int] and
-    (JsPath \ "withdrawalAmount").readNullable[Amount] and
-    (JsPath \ "conveyancerReference").readNullable[String] and
-    (JsPath \ "fundsReleaseLifeEventId").readNullable[FundReleaseId] and
-    (JsPath \\ "purchaseValue").readNullable[Amount] and
-    (JsPath \\ "purchaseResult").readNullable[String] and
-    (JsPath \\ "nameOrNumber").readNullable[String] and
-    (JsPath \\ "postcode").readNullable[String] and
-    (JsPath \ "supersededLifeEventId").readNullable[LifeEventId] and
-    (JsPath \ "supersededLifeEventDate").readNullable[LocalDate] and
-    (JsPath \ "lifeEventSupersededById").readNullable[LifeEventId]
-  )((lifeEventId,
-     lifeEventType,
-     lifeEventDate,
-     isaManagerName,
-     taxYear,
-     marketValueCash,
-     marketValueStocksAndShares,
-     annualSubsCash,
-     annualSubsStocksAndShares,
-     withdrawalAmount,
-     conveyancerReference,
-     fundReleaseId,
-     propertyPurchaseValue,
-     propertyPurchaseResult,
-     nameOrNumber,
-     postalCode,
-     supersedeLifeEventId,
-     supersedeLifeEventDate,
-     supersededBy
-  ) =>
-    GetLifeEventItem(
-      lifeEventId = lifeEventId,
-      eventType = lifeEventType match {
-        case "TERMINAL_ILLNESS" => "LISA Investor Terminal Ill Health"
-        case "DEATH" => "LISA Investor Death"
-        case "PURCHASE_FUNDS_RELEASE" => "Funds release"
-        case "EXTENSION_ONE" => "Extension one"
-        case "EXTENSION_TWO" => "Extension two"
-        case "PURCHASE_RESULT" => "Purchase outcome"
-        case "STATUTORY_SUBMISSION" => "Statutory Submission"
-      },
-      eventDate = lifeEventDate,
-      lisaManagerName = isaManagerName,
-      taxYear = taxYear,
-      marketValueCash = marketValueCash,
-      marketValueStocksAndShares = marketValueStocksAndShares,
-      annualSubsCash = annualSubsCash,
-      annualSubsStocksAndShares = annualSubsStocksAndShares,
-      withdrawalAmount = withdrawalAmount,
-      conveyancerReference = conveyancerReference,
-      fundReleaseId = fundReleaseId,
-      propertyPurchaseValue = propertyPurchaseValue,
-      propertyPurchaseResult = propertyPurchaseResult match {
-        case Some("PURCHASE_COMPLETE") => Some("Purchase completed")
-        case Some("PURCHASE_FAILED") => Some("Purchase failed")
-        case _ => None
-      },
-      propertyDetails = (nameOrNumber, postalCode) match {
-        case (Some(name), Some(pc)) => Some(GetLifeEventItemPropertyDetails(name, pc))
-        case _ => None
-      },
-      supersede = (supersedeLifeEventId, supersedeLifeEventDate) match {
-        case (Some(id), Some(date)) => Some(GetLifeEventItemSupersede(id, date))
-        case _ => None
-      },
-      supersededBy = supersededBy
-    )
+      (JsPath \ "lifeEventType").read[String] and
+      (JsPath \ "lifeEventDate").read[LocalDate] and
+      (JsPath \ "isaManagerName").readNullable[String] and
+      (JsPath \ "taxYear").readNullable[String].map(_.map(_.toInt)) and
+      (JsPath \ "marketValueCash").readNullable[Int] and
+      (JsPath \ "marketValueStocksAndShares").readNullable[Int] and
+      (JsPath \ "annualSubsCash").readNullable[Int] and
+      (JsPath \ "annualSubsStocksAndShares").readNullable[Int] and
+      (JsPath \ "withdrawalAmount").readNullable[Amount] and
+      (JsPath \ "conveyancerReference").readNullable[String] and
+      (JsPath \ "fundsReleaseLifeEventId").readNullable[FundReleaseId] and
+      (JsPath \\ "purchaseValue").readNullable[Amount] and
+      (JsPath \\ "purchaseResult").readNullable[String] and
+      (JsPath \\ "nameOrNumber").readNullable[String] and
+      (JsPath \\ "postcode").readNullable[String] and
+      (JsPath \ "supersededLifeEventId").readNullable[LifeEventId] and
+      (JsPath \ "supersededLifeEventDate").readNullable[LocalDate] and
+      (JsPath \ "lifeEventSupersededById").readNullable[LifeEventId]
+  )(
+    (
+      lifeEventId,
+      lifeEventType,
+      lifeEventDate,
+      isaManagerName,
+      taxYear,
+      marketValueCash,
+      marketValueStocksAndShares,
+      annualSubsCash,
+      annualSubsStocksAndShares,
+      withdrawalAmount,
+      conveyancerReference,
+      fundReleaseId,
+      propertyPurchaseValue,
+      propertyPurchaseResult,
+      nameOrNumber,
+      postalCode,
+      supersedeLifeEventId,
+      supersedeLifeEventDate,
+      supersededBy
+    ) =>
+      GetLifeEventItem(
+        lifeEventId = lifeEventId,
+        eventType = lifeEventType match {
+          case "TERMINAL_ILLNESS"       => "LISA Investor Terminal Ill Health"
+          case "DEATH"                  => "LISA Investor Death"
+          case "PURCHASE_FUNDS_RELEASE" => "Funds release"
+          case "EXTENSION_ONE"          => "Extension one"
+          case "EXTENSION_TWO"          => "Extension two"
+          case "PURCHASE_RESULT"        => "Purchase outcome"
+          case "STATUTORY_SUBMISSION"   => "Statutory Submission"
+        },
+        eventDate = lifeEventDate,
+        lisaManagerName = isaManagerName,
+        taxYear = taxYear,
+        marketValueCash = marketValueCash,
+        marketValueStocksAndShares = marketValueStocksAndShares,
+        annualSubsCash = annualSubsCash,
+        annualSubsStocksAndShares = annualSubsStocksAndShares,
+        withdrawalAmount = withdrawalAmount,
+        conveyancerReference = conveyancerReference,
+        fundReleaseId = fundReleaseId,
+        propertyPurchaseValue = propertyPurchaseValue,
+        propertyPurchaseResult = propertyPurchaseResult match {
+          case Some("PURCHASE_COMPLETE") => Some("Purchase completed")
+          case Some("PURCHASE_FAILED")   => Some("Purchase failed")
+          case _                         => None
+        },
+        propertyDetails = (nameOrNumber, postalCode) match {
+          case (Some(name), Some(pc)) => Some(GetLifeEventItemPropertyDetails(name, pc))
+          case _                      => None
+        },
+        supersede = (supersedeLifeEventId, supersedeLifeEventDate) match {
+          case (Some(id), Some(date)) => Some(GetLifeEventItemSupersede(id, date))
+          case _                      => None
+        },
+        supersededBy = supersededBy
+      )
   )
 
   implicit val writes: Writes[GetLifeEventItem] = (
     (JsPath \ "lifeEventId").write[String] and
-    (JsPath \ "eventType").write[String] and
-    (JsPath \ "eventDate").write[LocalDate] and
-    (JsPath \ "lisaManagerName").writeNullable[String] and
-    (JsPath \ "taxYear").writeNullable[Int] and
-    (JsPath \ "marketValueCash").writeNullable[Int] and
-    (JsPath \ "marketValueStocksAndShares").writeNullable[Int] and
-    (JsPath \ "annualSubsCash").writeNullable[Int] and
-    (JsPath \ "annualSubsStocksAndShares").writeNullable[Int] and
-    (JsPath \ "withdrawalAmount").writeNullable[Amount] and
-    (JsPath \ "conveyancerReference").writeNullable[String] and
-    (JsPath \ "fundReleaseId").writeNullable[FundReleaseId] and
-    (JsPath \ "propertyPurchaseValue").writeNullable[Amount] and
-    (JsPath \ "propertyPurchaseResult").writeNullable[String] and
-    (JsPath \ "propertyDetails").writeNullable[GetLifeEventItemPropertyDetails] and
-    (JsPath \ "supersede").writeNullable[GetLifeEventItemSupersede] and
-    (JsPath \ "supersededBy").writeNullable[LifeEventId]
-  )((event: GetLifeEventItem) => {
+      (JsPath \ "eventType").write[String] and
+      (JsPath \ "eventDate").write[LocalDate] and
+      (JsPath \ "lisaManagerName").writeNullable[String] and
+      (JsPath \ "taxYear").writeNullable[Int] and
+      (JsPath \ "marketValueCash").writeNullable[Int] and
+      (JsPath \ "marketValueStocksAndShares").writeNullable[Int] and
+      (JsPath \ "annualSubsCash").writeNullable[Int] and
+      (JsPath \ "annualSubsStocksAndShares").writeNullable[Int] and
+      (JsPath \ "withdrawalAmount").writeNullable[Amount] and
+      (JsPath \ "conveyancerReference").writeNullable[String] and
+      (JsPath \ "fundReleaseId").writeNullable[FundReleaseId] and
+      (JsPath \ "propertyPurchaseValue").writeNullable[Amount] and
+      (JsPath \ "propertyPurchaseResult").writeNullable[String] and
+      (JsPath \ "propertyDetails").writeNullable[GetLifeEventItemPropertyDetails] and
+      (JsPath \ "supersede").writeNullable[GetLifeEventItemSupersede] and
+      (JsPath \ "supersededBy").writeNullable[LifeEventId]
+  ) { (event: GetLifeEventItem) =>
     (
       event.lifeEventId,
       event.eventType,
@@ -179,5 +181,5 @@ object GetLifeEventItem {
       event.supersede,
       event.supersededBy
     )
-  })
+  }
 }

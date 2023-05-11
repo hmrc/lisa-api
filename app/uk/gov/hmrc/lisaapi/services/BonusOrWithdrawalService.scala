@@ -25,27 +25,26 @@ import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesUnavailableRespons
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class BonusOrWithdrawalService @Inject()(desConnector: DesConnector)(implicit ec: ExecutionContext) extends Logging {
+class BonusOrWithdrawalService @Inject() (desConnector: DesConnector)(implicit ec: ExecutionContext) extends Logging {
 
-  def getBonusOrWithdrawal(lisaManager: String, accountId: String, transactionId: String)
-                          (implicit hc: HeaderCarrier): Future[GetBonusOrWithdrawalResponse] = {
-
+  def getBonusOrWithdrawal(lisaManager: String, accountId: String, transactionId: String)(implicit
+    hc: HeaderCarrier
+  ): Future[GetBonusOrWithdrawalResponse] =
     desConnector.getBonusOrWithdrawal(lisaManager, accountId, transactionId) map {
       case successResponse: GetBonusOrWithdrawalResponse =>
         logger.debug("Matched GetBonusOrWithdrawalResponse")
         successResponse
-      case DesUnavailableResponse =>
+      case DesUnavailableResponse                        =>
         logger.debug("Matched DesUnavailableResponse")
         GetBonusOrWithdrawalServiceUnavailableResponse
-      case failureResponse: DesFailureResponse =>
+      case failureResponse: DesFailureResponse           =>
         logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
         failureResponse.code match {
-          case "TRANSACTION_ID_NOT_FOUND" => GetBonusOrWithdrawalTransactionNotFoundResponse
+          case "TRANSACTION_ID_NOT_FOUND"     => GetBonusOrWithdrawalTransactionNotFoundResponse
           case "INVESTOR_ACCOUNTID_NOT_FOUND" => GetBonusOrWithdrawalInvestorNotFoundResponse
-          case _ =>
+          case _                              =>
             logger.warn(s"Get bonus payment or withdrawal returned error: ${failureResponse.code}")
             GetBonusOrWithdrawalErrorResponse
         }
     }
-  }
 }

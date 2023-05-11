@@ -29,19 +29,20 @@ import uk.gov.hmrc.lisaapi.services.{AuditService, TransactionService}
 import scala.concurrent.{ExecutionContext, Future}
 
 class TransactionController @Inject() (
-                                        authConnector: AuthConnector,
-                                        appContext: AppContext,
-                                        service: TransactionService,
-                                        auditService: AuditService,
-                                        lisaMetrics: LisaMetrics,
-                                        cc: ControllerComponents,
-                                        parse: PlayBodyParsers
-                                      )(implicit ec: ExecutionContext) extends LisaController(
-  cc: ControllerComponents,
-  lisaMetrics: LisaMetrics,
+  authConnector: AuthConnector,
   appContext: AppContext,
-  authConnector: AuthConnector
-) {
+  service: TransactionService,
+  auditService: AuditService,
+  lisaMetrics: LisaMetrics,
+  cc: ControllerComponents,
+  parse: PlayBodyParsers
+)(implicit ec: ExecutionContext)
+    extends LisaController(
+      cc: ControllerComponents,
+      lisaMetrics: LisaMetrics,
+      appContext: AppContext,
+      authConnector: AuthConnector
+    ) {
 
   def getTransaction(lisaManager: String, accountId: String, transactionId: String): Action[AnyContent] =
     validateHeader(parse).async { implicit request =>
@@ -52,14 +53,19 @@ class TransactionController @Inject() (
           withValidAccountId(accountId) { () =>
             withValidTransactionId(transactionId) { () =>
               service.getTransaction(lisaManager, accountId, transactionId) flatMap {
-                case success: GetTransactionSuccessResponse =>
+                case success: GetTransactionSuccessResponse    =>
                   logger.debug("Matched Valid Response")
                   lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.TRANSACTION)
 
                   withApiVersion {
                     case Some(VERSION_1) =>
                       if (success.paymentStatus == TransactionPaymentStatus.REFUND_CANCELLED) {
-                        auditGetTransaction(lisaManager, accountId, transactionId, Some(ErrorInternalServerError.errorCode))
+                        auditGetTransaction(
+                          lisaManager,
+                          accountId,
+                          transactionId,
+                          Some(ErrorInternalServerError.errorCode)
+                        )
                         Future.successful(ErrorInternalServerError.asResult)
                       } else {
                         auditGetTransaction(lisaManager, accountId, transactionId)
@@ -75,18 +81,31 @@ class TransactionController @Inject() (
 
                   withApiVersion {
                     case Some(VERSION_1) =>
-                      auditGetTransaction(lisaManager, accountId, transactionId, Some(ErrorBonusPaymentTransactionNotFound.errorCode))
+                      auditGetTransaction(
+                        lisaManager,
+                        accountId,
+                        transactionId,
+                        Some(ErrorBonusPaymentTransactionNotFound.errorCode)
+                      )
                       Future.successful(ErrorBonusPaymentTransactionNotFound.asResult)
                     case Some(VERSION_2) =>
-                      auditGetTransaction(lisaManager, accountId, transactionId, Some(ErrorTransactionNotFound.errorCode))
+                      auditGetTransaction(
+                        lisaManager,
+                        accountId,
+                        transactionId,
+                        Some(ErrorTransactionNotFound.errorCode)
+                      )
                       Future.successful(ErrorTransactionNotFound.asResult)
                   }
-                case res: GetTransactionResponse =>
+                case res: GetTransactionResponse               =>
                   logger.debug("Matched an error")
-                  val errorResponse = errors.applyOrElse(res, { _: GetTransactionResponse =>
-                    logger.debug(s"Matched an unexpected response: $res, returning a 500 error")
-                    ErrorInternalServerError
-                  })
+                  val errorResponse = errors.applyOrElse(
+                    res,
+                    { _: GetTransactionResponse =>
+                      logger.debug(s"Matched an unexpected response: $res, returning a 500 error")
+                      ErrorInternalServerError
+                    }
+                  )
                   auditGetTransaction(lisaManager, accountId, transactionId, Some(errorResponse.errorCode))
                   lisaMetrics.incrementMetrics(startTime, errorResponse.httpStatusCode, LisaMetricKeys.TRANSACTION)
                   Future.successful(errorResponse.asResult)
@@ -98,16 +117,20 @@ class TransactionController @Inject() (
     }
 
   private val errors: PartialFunction[GetTransactionResponse, ErrorResponse] = {
-    case GetTransactionAccountNotFoundResponse => ErrorAccountNotFound
+    case GetTransactionAccountNotFoundResponse    => ErrorAccountNotFound
     case GetTransactionServiceUnavailableResponse => ErrorServiceUnavailable
   }
 
-  private def auditGetTransaction(lisaManager: String, accountId: String, transactionId: String, failureReason: Option[String] = None)
-                                  (implicit hc: HeaderCarrier) = {
-    val path = getTransactionEndpointUrl(lisaManager, accountId, transactionId)
+  private def auditGetTransaction(
+    lisaManager: String,
+    accountId: String,
+    transactionId: String,
+    failureReason: Option[String] = None
+  )(implicit hc: HeaderCarrier) = {
+    val path      = getTransactionEndpointUrl(lisaManager, accountId, transactionId)
     val auditData = Map(
-      ZREF -> lisaManager,
-      "accountId" -> accountId,
+      ZREF            -> lisaManager,
+      "accountId"     -> accountId,
       "transactionId" -> transactionId
     )
 
@@ -124,7 +147,11 @@ class TransactionController @Inject() (
     )
   }
 
-  private def getTransactionEndpointUrl(lisaManagerReferenceNumber: String, accountId: String, transactionId: String): String =
+  private def getTransactionEndpointUrl(
+    lisaManagerReferenceNumber: String,
+    accountId: String,
+    transactionId: String
+  ): String =
     s"/manager/$lisaManagerReferenceNumber/accounts/$accountId/transactions/$transactionId/payments"
 
 }

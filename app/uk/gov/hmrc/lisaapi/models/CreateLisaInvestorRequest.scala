@@ -25,15 +25,15 @@ case class CreateLisaInvestorRequest(investorNINO: Nino, firstName: Name, lastNa
 object CreateLisaInvestorRequest {
   implicit val createLisaInvestorRequestReads: Reads[CreateLisaInvestorRequest] = (
     (JsPath \ "investorNINO").read[Nino](JsonReads.nino) and
-    (JsPath \ "firstName").read(JsonReads.name).map[String](_.toUpperCase.trim) and
-    (JsPath \ "lastName").read(JsonReads.name).map[String](_.toUpperCase.trim) and
-    (JsPath \ "dateOfBirth").read(JsonReads.notFutureDate).map(new DateTime(_))
+      (JsPath \ "firstName").read(JsonReads.name).map[String](_.toUpperCase.trim) and
+      (JsPath \ "lastName").read(JsonReads.name).map[String](_.toUpperCase.trim) and
+      (JsPath \ "dateOfBirth").read(JsonReads.notFutureDate).map(new DateTime(_))
   )(CreateLisaInvestorRequest.apply _)
 
   implicit val createLisaInvestorRequestWrites: Writes[CreateLisaInvestorRequest] = (
     (JsPath \ "investorNINO").write[String] and
-    (JsPath \ "firstName").write[String] and
-    (JsPath \ "lastName").write[String] and
-    (JsPath \ "dateOfBirth").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd"))
+      (JsPath \ "firstName").write[String] and
+      (JsPath \ "lastName").write[String] and
+      (JsPath \ "dateOfBirth").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd"))
   )(unlift(CreateLisaInvestorRequest.unapply))
 }

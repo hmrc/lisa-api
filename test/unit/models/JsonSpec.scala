@@ -23,13 +23,16 @@ import uk.gov.hmrc.lisaapi.models._
 
 class JsonSpec extends PlaySpec {
 
-  val property = "property"
+  val property            = "property"
   val currencyFormatError = "error.formatting.currencyNegativeDisallowed"
 
-  implicit val testMonetaryReads: Reads[TestMonetaryClass] = (JsPath \ property).read[Amount](JsonReads.nonNegativeAmount).map(TestMonetaryClass.apply)
-  implicit val testMonetaryWrites: Writes[TestMonetaryClass] = (JsPath \ property).write[Amount].contramap[TestMonetaryClass](_.property)
+  implicit val testMonetaryReads: Reads[TestMonetaryClass]   =
+    (JsPath \ property).read[Amount](JsonReads.nonNegativeAmount).map(TestMonetaryClass.apply)
+  implicit val testMonetaryWrites: Writes[TestMonetaryClass] =
+    (JsPath \ property).write[Amount].contramap[TestMonetaryClass](_.property)
 
-  implicit val testDateReads: Reads[TestDateClass] = (JsPath \ property).read[DateTime](JsonReads.isoDate).map(TestDateClass.apply)
+  implicit val testDateReads: Reads[TestDateClass] =
+    (JsPath \ property).read[DateTime](JsonReads.isoDate).map(TestDateClass.apply)
 
   "Monetary reads" must {
 
@@ -40,7 +43,7 @@ class JsonSpec extends PlaySpec {
 
         res match {
           case JsSuccess(data, _) => data.property mustBe 0d
-          case _ => fail("failed validation")
+          case _                  => fail("failed validation")
         }
       }
 
@@ -49,7 +52,7 @@ class JsonSpec extends PlaySpec {
 
         res match {
           case JsSuccess(data, _) => data.property mustBe 12d
-          case _ => fail("failed validation")
+          case _                  => fail("failed validation")
         }
       }
 
@@ -58,7 +61,7 @@ class JsonSpec extends PlaySpec {
 
         res match {
           case JsSuccess(data, _) => data.property mustBe 100.5d
-          case _ => fail("failed validation")
+          case _                  => fail("failed validation")
         }
       }
 
@@ -67,7 +70,7 @@ class JsonSpec extends PlaySpec {
 
         res match {
           case JsSuccess(data, _) => data.property mustBe 2.99d
-          case _ => fail("failed validation")
+          case _                  => fail("failed validation")
         }
       }
 
@@ -76,7 +79,7 @@ class JsonSpec extends PlaySpec {
 
         res match {
           case JsSuccess(data, _) => data.property mustBe 1000000000.01d
-          case _ => fail("failed validation")
+          case _                  => fail("failed validation")
         }
       }
 
@@ -88,21 +91,21 @@ class JsonSpec extends PlaySpec {
         val res = createJson("2.000").validate[TestMonetaryClass]
 
         res match {
-          case JsError(errors) => {
+          case JsError(errors) =>
             errors mustBe Seq((JsPath \ property, Seq(JsonValidationError(currencyFormatError))))
-          }
-          case _ => fail("passed validation")
+          case _               => fail("passed validation")
         }
       }
 
       "given a 100dp number" in {
-        val res = createJson("1.1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890").validate[TestMonetaryClass]
+        val res = createJson(
+          "1.1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
+        ).validate[TestMonetaryClass]
 
         res match {
-          case JsError(errors) => {
+          case JsError(errors) =>
             errors mustBe Seq((JsPath \ property, Seq(JsonValidationError(currencyFormatError))))
-          }
-          case _ => fail("passed validation")
+          case _               => fail("passed validation")
         }
       }
 
@@ -110,10 +113,9 @@ class JsonSpec extends PlaySpec {
         val res = createJson("100000000000000000000000000000000000.001").validate[TestMonetaryClass]
 
         res match {
-          case JsError(errors) => {
+          case JsError(errors) =>
             errors mustBe Seq((JsPath \ property, Seq(JsonValidationError(currencyFormatError))))
-          }
-          case _ => fail("passed validation")
+          case _               => fail("passed validation")
         }
       }
 
@@ -121,10 +123,9 @@ class JsonSpec extends PlaySpec {
         val res = createJson("-0.01").validate[TestMonetaryClass]
 
         res match {
-          case JsError(errors) => {
+          case JsError(errors) =>
             errors mustBe Seq((JsPath \ property, Seq(JsonValidationError(currencyFormatError))))
-          }
-          case _ => fail("passed validation")
+          case _               => fail("passed validation")
         }
       }
 
@@ -132,10 +133,9 @@ class JsonSpec extends PlaySpec {
         val res = createJson(""""x"""").validate[TestMonetaryClass]
 
         res match {
-          case JsError(errors) => {
+          case JsError(errors) =>
             errors mustBe Seq((JsPath \ property, Seq(JsonValidationError("error.expected.jsnumber"))))
-          }
-          case _ => fail("passed validation")
+          case _               => fail("passed validation")
         }
       }
 
@@ -143,10 +143,9 @@ class JsonSpec extends PlaySpec {
         val res = createJson(""""5"""").validate[TestMonetaryClass]
 
         res match {
-          case JsError(errors) => {
+          case JsError(errors) =>
             errors mustBe Seq((JsPath \ property, Seq(JsonValidationError("error.expected.jsnumber"))))
-          }
-          case _ => fail("passed validation")
+          case _               => fail("passed validation")
         }
       }
 
@@ -160,7 +159,7 @@ class JsonSpec extends PlaySpec {
 
       "given a 2dp value with 2 trailing zeros" in {
         val test = TestMonetaryClass(BigDecimal(0.00))
-        val res = Json.toJson[TestMonetaryClass](test).toString()
+        val res  = Json.toJson[TestMonetaryClass](test).toString()
 
         res mustBe createJsonString("0")
       }
@@ -171,7 +170,7 @@ class JsonSpec extends PlaySpec {
 
       "given a 2dp value with 1 trailing zeros" in {
         val test = TestMonetaryClass(BigDecimal(1.50))
-        val res = Json.toJson[TestMonetaryClass](test).toString()
+        val res  = Json.toJson[TestMonetaryClass](test).toString()
 
         res mustBe createJsonString("1.5")
       }
@@ -182,7 +181,7 @@ class JsonSpec extends PlaySpec {
 
       "given a 2dp value" in {
         val test = TestMonetaryClass(BigDecimal("2.99"))
-        val res = Json.toJson[TestMonetaryClass](test).toString()
+        val res  = Json.toJson[TestMonetaryClass](test).toString()
 
         res mustBe createJsonString("2.99")
       }
@@ -199,10 +198,9 @@ class JsonSpec extends PlaySpec {
         val res = createJson("true").validate[TestDateClass]
 
         res match {
-          case JsError(errors) => {
+          case JsError(errors) =>
             errors mustBe Seq((JsPath \ property, Seq(JsonValidationError("error.expected.jsstring"))))
-          }
-          case _ => fail("passed validation")
+          case _               => fail("passed validation")
         }
       }
 
@@ -214,10 +212,9 @@ class JsonSpec extends PlaySpec {
         val res = createJson("\"true\"").validate[TestDateClass]
 
         res match {
-          case JsError(errors) => {
+          case JsError(errors) =>
             errors mustBe Seq((JsPath \ property, Seq(JsonValidationError("error.formatting.date"))))
-          }
-          case _ => fail("passed validation")
+          case _               => fail("passed validation")
         }
       }
 
@@ -225,10 +222,9 @@ class JsonSpec extends PlaySpec {
         val res = createJson("\"90-01-20\"").validate[TestDateClass]
 
         res match {
-          case JsError(errors) => {
+          case JsError(errors) =>
             errors mustBe Seq((JsPath \ property, Seq(JsonValidationError("error.formatting.date"))))
-          }
-          case _ => fail("passed validation")
+          case _               => fail("passed validation")
         }
       }
 
@@ -236,10 +232,9 @@ class JsonSpec extends PlaySpec {
         val res = createJson("\"2000-02-30\"").validate[TestDateClass]
 
         res match {
-          case JsError(errors) => {
+          case JsError(errors) =>
             errors mustBe Seq((JsPath \ property, Seq(JsonValidationError("error.formatting.date"))))
-          }
-          case _ => fail("passed validation")
+          case _               => fail("passed validation")
         }
       }
 
@@ -247,13 +242,11 @@ class JsonSpec extends PlaySpec {
 
   }
 
-  private def createJson(value:String): JsValue = {
+  private def createJson(value: String): JsValue =
     Json.parse(createJsonString(value))
-  }
 
-  private def createJsonString(value:String): String = {
+  private def createJsonString(value: String): String =
     s"""{"$property":$value}"""
-  }
 
   case class TestMonetaryClass(property: Amount)
   case class TestDateClass(property: DateTime)

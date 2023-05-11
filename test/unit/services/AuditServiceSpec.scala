@@ -63,8 +63,8 @@ class AuditServiceSpec extends ServiceTestFixture with BeforeAndAfter {
 
       val event = captor.getValue
 
-      event.tags must contain ("path" -> "/create")
-      event.tags must contain ("transactionName" -> "investorCreated")
+      event.tags must contain("path" -> "/create")
+      event.tags must contain("transactionName" -> "investorCreated")
       event.tags must contain key "clientIP"
     }
 
@@ -76,12 +76,12 @@ class AuditServiceSpec extends ServiceTestFixture with BeforeAndAfter {
 
       val event = captor.getValue
 
-      event.detail must contain ("investorId" -> "1234567890")
-      event.detail must contain ("investorNINO" -> "AB123456D")
+      event.detail must contain("investorId" -> "1234567890")
+      event.detail must contain("investorNINO" -> "AB123456D")
     }
 
     "build an audit event with the correct detail when passed a RequestBonusPaymentRequest" in {
-      val data = RequestBonusPaymentRequest(
+      val data                              = RequestBonusPaymentRequest(
         lifeEventId = Some("1234567891"),
         periodStartDate = new DateTime("2017-04-06"),
         periodEndDate = new DateTime("2017-05-05"),
@@ -96,19 +96,19 @@ class AuditServiceSpec extends ServiceTestFixture with BeforeAndAfter {
 
       val event = captor.getValue
 
-      event.detail must contain ("lifeEventId" -> "1234567891")
-      event.detail must contain ("periodStartDate" -> "2017-04-06")
-      event.detail must contain ("periodEndDate" -> "2017-05-05")
-      event.detail must contain ("htbTransferInForPeriod" -> "1.0")
-      event.detail must contain ("htbTransferTotalYTD" -> "0.0")
-      event.detail must contain ("newSubsForPeriod" -> "4000.0")
-      event.detail must contain ("newSubsYTD" -> "4000.0")
-      event.detail must contain ("totalSubsForPeriod" -> "4000.0")
-      event.detail must contain ("totalSubsYTD" -> "4000.0")
-      event.detail must contain ("bonusDueForPeriod" -> "1000.0")
-      event.detail must contain ("totalBonusDueYTD" -> "1000.0")
-      event.detail must contain ("bonusPaidYTD" -> "1000.0")
-      event.detail must contain ("claimReason" -> "Life Event")
+      event.detail must contain("lifeEventId" -> "1234567891")
+      event.detail must contain("periodStartDate" -> "2017-04-06")
+      event.detail must contain("periodEndDate" -> "2017-05-05")
+      event.detail must contain("htbTransferInForPeriod" -> "1.0")
+      event.detail must contain("htbTransferTotalYTD" -> "0.0")
+      event.detail must contain("newSubsForPeriod" -> "4000.0")
+      event.detail must contain("newSubsYTD" -> "4000.0")
+      event.detail must contain("totalSubsForPeriod" -> "4000.0")
+      event.detail must contain("totalSubsYTD" -> "4000.0")
+      event.detail must contain("bonusDueForPeriod" -> "1000.0")
+      event.detail must contain("totalBonusDueYTD" -> "1000.0")
+      event.detail must contain("bonusPaidYTD" -> "1000.0")
+      event.detail must contain("claimReason" -> "Life Event")
     }
 
     "send an event via the audit connector" in {

@@ -31,12 +31,11 @@ class UpdateSubscriptionRequestSpec extends PlaySpec {
       val res = Json.parse(validRequestJson).validate[UpdateSubscriptionRequest]
 
       res match {
-        case JsError(errors) => fail()
-        case JsSuccess(data, path) => {
+        case JsError(errors)       => fail()
+        case JsSuccess(data, path) =>
           data.firstSubscriptionDate.getYear mustBe 2017
           data.firstSubscriptionDate.getMonthOfYear mustBe 1
           data.firstSubscriptionDate.getDayOfMonth mustBe 1
-        }
       }
     }
 
@@ -47,7 +46,6 @@ class UpdateSubscriptionRequestSpec extends PlaySpec {
 
       json mustBe Json.parse(validRequestJson)
     }
-
 
   }
 

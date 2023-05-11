@@ -32,19 +32,27 @@ import scala.concurrent.Future
 
 class AccountControllerSpec extends ControllerTestFixture {
 
-  val accountConnector: AccountController = new AccountController(mockAuthConnector, mockAppContext, mockAccountService, mockAuditService, mockLisaMetrics, mockControllerComponents, mockParser) {
+  val accountConnector: AccountController = new AccountController(
+    mockAuthConnector,
+    mockAppContext,
+    mockAccountService,
+    mockAuditService,
+    mockLisaMetrics,
+    mockControllerComponents,
+    mockParser
+  ) {
     override lazy val v2endpointsEnabled = true
   }
 
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
-  val lisaManager = "Z019283"
-  val accountId = "ABC/12345"
+  val lisaManager                    = "Z019283"
+  val accountId                      = "ABC/12345"
 
-  override def beforeEach() {
+  override def beforeEach(): Unit = {
     reset(mockAuditService)
   }
 
-  val validDate = "2017-04-06"
+  val validDate   = "2017-04-06"
   val invalidDate = "2015-04-05"
 
   val createAccountJson: String =
@@ -98,24 +106,27 @@ class AccountControllerSpec extends ControllerTestFixture {
        |  "firstSubscriptionDate" : "$validDate"
        |}""".stripMargin
 
-
   "The Create / Transfer Account endpoint" must {
 
     when(mockAuthConnector.authorise[Option[String]](any(), any())(any(), any())).thenReturn(Future(Some("1234")))
 
     "audit an accountCreated event" when {
       "submitted a valid create account request" in {
-        when(mockAccountService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountSuccessResponse(accountId)))
+        when(mockAccountService.createAccount(any(), any())(any()))
+          .thenReturn(Future.successful(CreateLisaAccountSuccessResponse(accountId)))
         doSyncCreateOrTransferRequest(createAccountJson) { _ =>
           verify(mockAuditService).audit(
             auditType = matchersEquals("accountCreated"),
             path = matchersEquals(s"/manager/$lisaManager/accounts"),
-            auditData = matchersEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "investorId" -> "9876543210",
-              "accountId" -> "8765/432100",
-              "firstSubscriptionDate" -> s"$validDate"
-            )))(any())
+            auditData = matchersEquals(
+              Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "investorId"                 -> "9876543210",
+                "accountId"                  -> "8765/432100",
+                "firstSubscriptionDate"      -> s"$validDate"
+              )
+            )
+          )(any())
         }
       }
     }
@@ -126,117 +137,139 @@ class AccountControllerSpec extends ControllerTestFixture {
           verify(mockAuditService).audit(
             auditType = matchersEquals("accountNotCreated"),
             path = matchersEquals(s"/manager/$lisaManager/accounts"),
-            auditData = matchersEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "investorId" -> "9876543210",
-              "accountId" -> "8765/432100",
-              "firstSubscriptionDate" -> invalidDate,
-              "reasonNotCreated" -> "FORBIDDEN"
-            )))(any())
+            auditData = matchersEquals(
+              Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "investorId"                 -> "9876543210",
+                "accountId"                  -> "8765/432100",
+                "firstSubscriptionDate"      -> invalidDate,
+                "reasonNotCreated"           -> "FORBIDDEN"
+              )
+            )
+          )(any())
         }
       }
       "the data service returns a CreateLisaAccountInvestorNotFoundResponse for a create request" in {
-        when(mockAccountService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorNotFoundResponse))
+        when(mockAccountService.createAccount(any(), any())(any()))
+          .thenReturn(Future.successful(CreateLisaAccountInvestorNotFoundResponse))
 
         doSyncCreateOrTransferRequest(createAccountJson) { _ =>
           verify(mockAuditService).audit(
             auditType = matchersEquals("accountNotCreated"),
             path = matchersEquals(s"/manager/$lisaManager/accounts"),
-            auditData = matchersEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "investorId" -> "9876543210",
-              "accountId" -> "8765/432100",
-              "firstSubscriptionDate" -> s"$validDate",
-              "reasonNotCreated" -> "INVESTOR_NOT_FOUND"
-            )))(any())
+            auditData = matchersEquals(
+              Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "investorId"                 -> "9876543210",
+                "accountId"                  -> "8765/432100",
+                "firstSubscriptionDate"      -> s"$validDate",
+                "reasonNotCreated"           -> "INVESTOR_NOT_FOUND"
+              )
+            )
+          )(any())
         }
       }
       "the data service returns a CreateLisaAccountInvestorNotEligibleResponse" in {
-        when(mockAccountService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorNotEligibleResponse))
+        when(mockAccountService.createAccount(any(), any())(any()))
+          .thenReturn(Future.successful(CreateLisaAccountInvestorNotEligibleResponse))
 
         doSyncCreateOrTransferRequest(createAccountJson) { _ =>
           verify(mockAuditService).audit(
             auditType = matchersEquals("accountNotCreated"),
             path = matchersEquals(s"/manager/$lisaManager/accounts"),
-            auditData = matchersEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "investorId" -> "9876543210",
-              "accountId" -> "8765/432100",
-              "firstSubscriptionDate" -> s"$validDate",
-              "reasonNotCreated" -> "INVESTOR_ELIGIBILITY_CHECK_FAILED"
-            ))
+            auditData = matchersEquals(
+              Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "investorId"                 -> "9876543210",
+                "accountId"                  -> "8765/432100",
+                "firstSubscriptionDate"      -> s"$validDate",
+                "reasonNotCreated"           -> "INVESTOR_ELIGIBILITY_CHECK_FAILED"
+              )
+            )
           )(any())
         }
       }
       "the data service returns a CreateLisaAccountInvestorComplianceCheckFailedResponse for a create request" in {
-        when(mockAccountService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorComplianceCheckFailedResponse))
+        when(mockAccountService.createAccount(any(), any())(any()))
+          .thenReturn(Future.successful(CreateLisaAccountInvestorComplianceCheckFailedResponse))
 
         doSyncCreateOrTransferRequest(createAccountJson) { _ =>
           verify(mockAuditService).audit(
             auditType = matchersEquals("accountNotCreated"),
             path = matchersEquals(s"/manager/$lisaManager/accounts"),
-            auditData = matchersEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "investorId" -> "9876543210",
-              "accountId" -> "8765/432100",
-              "firstSubscriptionDate" -> s"$validDate",
-              "reasonNotCreated" -> "INVESTOR_COMPLIANCE_CHECK_FAILED"
-            ))
+            auditData = matchersEquals(
+              Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "investorId"                 -> "9876543210",
+                "accountId"                  -> "8765/432100",
+                "firstSubscriptionDate"      -> s"$validDate",
+                "reasonNotCreated"           -> "INVESTOR_COMPLIANCE_CHECK_FAILED"
+              )
+            )
           )(any())
         }
       }
       "the data service returns a CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse for a create request" in {
-        when(mockAccountService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse))
+        when(mockAccountService.transferAccount(any(), any())(any()))
+          .thenReturn(Future.successful(CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse))
 
         doSyncCreateOrTransferRequest(transferAccountJson) { _ =>
           verify(mockAuditService).audit(
             auditType = matchersEquals("accountNotTransferred"),
             path = matchersEquals(s"/manager/$lisaManager/accounts"),
-            auditData = matchersEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "investorId" -> "9876543210",
-              "accountId" -> "8765/432100",
-              "firstSubscriptionDate" -> s"$validDate",
-              "creationReason" -> "Transferred",
-              "transferredFromAccountId" -> "Z54/3210",
-              "transferredFromLMRN" -> "Z543333",
-              "transferInDate" -> s"$validDate",
-              "reasonNotCreated" -> "PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST"
-            ))
+            auditData = matchersEquals(
+              Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "investorId"                 -> "9876543210",
+                "accountId"                  -> "8765/432100",
+                "firstSubscriptionDate"      -> s"$validDate",
+                "creationReason"             -> "Transferred",
+                "transferredFromAccountId"   -> "Z54/3210",
+                "transferredFromLMRN"        -> "Z543333",
+                "transferInDate"             -> s"$validDate",
+                "reasonNotCreated"           -> "PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST"
+              )
+            )
           )(any())
         }
       }
       "the data service returns a CreateLisaAccountAlreadyExistsResponse for a create request" in {
-        when(mockAccountService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountAlreadyExistsResponse))
+        when(mockAccountService.createAccount(any(), any())(any()))
+          .thenReturn(Future.successful(CreateLisaAccountAlreadyExistsResponse))
 
         doSyncCreateOrTransferRequest(createAccountJson) { _ =>
           verify(mockAuditService).audit(
             auditType = matchersEquals("accountNotCreated"),
             path = matchersEquals(s"/manager/$lisaManager/accounts"),
-            auditData = matchersEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "investorId" -> "9876543210",
-              "accountId" -> "8765/432100",
-              "firstSubscriptionDate" -> s"$validDate",
-              "reasonNotCreated" -> "INVESTOR_ACCOUNT_ALREADY_EXISTS"
-            ))
+            auditData = matchersEquals(
+              Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "investorId"                 -> "9876543210",
+                "accountId"                  -> "8765/432100",
+                "firstSubscriptionDate"      -> s"$validDate",
+                "reasonNotCreated"           -> "INVESTOR_ACCOUNT_ALREADY_EXISTS"
+              )
+            )
           )(any())
         }
       }
       "the data service returns an error for a create request" in {
-        when(mockAccountService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountErrorResponse))
+        when(mockAccountService.createAccount(any(), any())(any()))
+          .thenReturn(Future.successful(CreateLisaAccountErrorResponse))
 
         doSyncCreateOrTransferRequest(createAccountJson) { _ =>
           verify(mockAuditService).audit(
             auditType = matchersEquals("accountNotCreated"),
             path = matchersEquals(s"/manager/$lisaManager/accounts"),
-            auditData = matchersEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "investorId" -> "9876543210",
-              "accountId" -> "8765/432100",
-              "firstSubscriptionDate" -> s"$validDate",
-              "reasonNotCreated" -> "INTERNAL_SERVER_ERROR"
-            ))
+            auditData = matchersEquals(
+              Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "investorId"                 -> "9876543210",
+                "accountId"                  -> "8765/432100",
+                "firstSubscriptionDate"      -> s"$validDate",
+                "reasonNotCreated"           -> "INTERNAL_SERVER_ERROR"
+              )
+            )
           )(any())
         }
       }
@@ -244,21 +277,25 @@ class AccountControllerSpec extends ControllerTestFixture {
 
     "audit an accountTransferred event" when {
       "submitted a valid transfer account request" in {
-        when(mockAccountService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountSuccessResponse(accountId)))
+        when(mockAccountService.transferAccount(any(), any())(any()))
+          .thenReturn(Future.successful(CreateLisaAccountSuccessResponse(accountId)))
         doSyncCreateOrTransferRequest(transferAccountJson) { res =>
           verify(mockAuditService).audit(
             auditType = matchersEquals("accountTransferred"),
             path = matchersEquals(s"/manager/$lisaManager/accounts"),
-            auditData = matchersEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "investorId" -> "9876543210",
-              "accountId" -> "8765/432100",
-              "firstSubscriptionDate" -> s"$validDate",
-              "creationReason" -> "Transferred",
-              "transferredFromAccountId" -> "Z54/3210",
-              "transferredFromLMRN" -> "Z543333",
-              "transferInDate" -> s"$validDate"
-            )))(any())
+            auditData = matchersEquals(
+              Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "investorId"                 -> "9876543210",
+                "accountId"                  -> "8765/432100",
+                "firstSubscriptionDate"      -> s"$validDate",
+                "creationReason"             -> "Transferred",
+                "transferredFromAccountId"   -> "Z54/3210",
+                "transferredFromLMRN"        -> "Z543333",
+                "transferInDate"             -> s"$validDate"
+              )
+            )
+          )(any())
         }
       }
     }
@@ -269,175 +306,208 @@ class AccountControllerSpec extends ControllerTestFixture {
           verify(mockAuditService).audit(
             auditType = matchersEquals("accountNotTransferred"),
             path = matchersEquals(s"/manager/$lisaManager/accounts"),
-            auditData = matchersEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "investorId" -> "9876543210",
-              "accountId" -> "8765/432100",
-              "creationReason" -> "Transferred",
-              "firstSubscriptionDate" -> invalidDate,
-              "transferredFromAccountId" -> "Z54/3210",
-              "transferredFromLMRN" -> "Z543333",
-              "transferInDate" -> invalidDate,
-              "reasonNotCreated" -> "FORBIDDEN"
-            )))(any())
+            auditData = matchersEquals(
+              Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "investorId"                 -> "9876543210",
+                "accountId"                  -> "8765/432100",
+                "creationReason"             -> "Transferred",
+                "firstSubscriptionDate"      -> invalidDate,
+                "transferredFromAccountId"   -> "Z54/3210",
+                "transferredFromLMRN"        -> "Z543333",
+                "transferInDate"             -> invalidDate,
+                "reasonNotCreated"           -> "FORBIDDEN"
+              )
+            )
+          )(any())
         }
       }
       "the data service returns a CreateLisaAccountInvestorNotFoundResponse for a transfer request" in {
-        when(mockAccountService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorNotFoundResponse))
+        when(mockAccountService.transferAccount(any(), any())(any()))
+          .thenReturn(Future.successful(CreateLisaAccountInvestorNotFoundResponse))
 
         doSyncCreateOrTransferRequest(transferAccountJson) { res =>
           verify(mockAuditService).audit(
             auditType = matchersEquals("accountNotTransferred"),
             path = matchersEquals(s"/manager/$lisaManager/accounts"),
-            auditData = matchersEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "investorId" -> "9876543210",
-              "accountId" -> "8765/432100",
-              "creationReason" -> "Transferred",
-              "firstSubscriptionDate" -> s"$validDate",
-              "transferredFromAccountId" -> "Z54/3210",
-              "transferredFromLMRN" -> "Z543333",
-              "transferInDate" -> s"$validDate",
-              "reasonNotCreated" -> "INVESTOR_NOT_FOUND"
-            )))(any())
+            auditData = matchersEquals(
+              Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "investorId"                 -> "9876543210",
+                "accountId"                  -> "8765/432100",
+                "creationReason"             -> "Transferred",
+                "firstSubscriptionDate"      -> s"$validDate",
+                "transferredFromAccountId"   -> "Z54/3210",
+                "transferredFromLMRN"        -> "Z543333",
+                "transferInDate"             -> s"$validDate",
+                "reasonNotCreated"           -> "INVESTOR_NOT_FOUND"
+              )
+            )
+          )(any())
         }
       }
       "the data service returns a CreateLisaAccountInvestorComplianceCheckFailedResponse for a transfer request" in {
-        when(mockAccountService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorComplianceCheckFailedResponse))
+        when(mockAccountService.transferAccount(any(), any())(any()))
+          .thenReturn(Future.successful(CreateLisaAccountInvestorComplianceCheckFailedResponse))
 
         doSyncCreateOrTransferRequest(transferAccountJson) { res =>
           verify(mockAuditService).audit(
             auditType = matchersEquals("accountNotTransferred"),
             path = matchersEquals(s"/manager/$lisaManager/accounts"),
-            auditData = matchersEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "investorId" -> "9876543210",
-              "accountId" -> "8765/432100",
-              "creationReason" -> "Transferred",
-              "firstSubscriptionDate" -> s"$validDate",
-              "transferredFromAccountId" -> "Z54/3210",
-              "transferredFromLMRN" -> "Z543333",
-              "transferInDate" -> s"$validDate",
-              "reasonNotCreated" -> "INVESTOR_COMPLIANCE_CHECK_FAILED"
-            )))(any())
+            auditData = matchersEquals(
+              Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "investorId"                 -> "9876543210",
+                "accountId"                  -> "8765/432100",
+                "creationReason"             -> "Transferred",
+                "firstSubscriptionDate"      -> s"$validDate",
+                "transferredFromAccountId"   -> "Z54/3210",
+                "transferredFromLMRN"        -> "Z543333",
+                "transferInDate"             -> s"$validDate",
+                "reasonNotCreated"           -> "INVESTOR_COMPLIANCE_CHECK_FAILED"
+              )
+            )
+          )(any())
         }
       }
       "the data service returns a CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse for a transfer request" in {
-        when(mockAccountService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse))
+        when(mockAccountService.transferAccount(any(), any())(any()))
+          .thenReturn(Future.successful(CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse))
 
         doSyncCreateOrTransferRequest(transferAccountJson) { res =>
           verify(mockAuditService).audit(
             auditType = matchersEquals("accountNotTransferred"),
             path = matchersEquals(s"/manager/$lisaManager/accounts"),
-            auditData = matchersEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "investorId" -> "9876543210",
-              "accountId" -> "8765/432100",
-              "creationReason" -> "Transferred",
-              "firstSubscriptionDate" -> s"$validDate",
-              "transferredFromAccountId" -> "Z54/3210",
-              "transferredFromLMRN" -> "Z543333",
-              "transferInDate" -> s"$validDate",
-              "reasonNotCreated" -> "PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST"
-            )))(any())
+            auditData = matchersEquals(
+              Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "investorId"                 -> "9876543210",
+                "accountId"                  -> "8765/432100",
+                "creationReason"             -> "Transferred",
+                "firstSubscriptionDate"      -> s"$validDate",
+                "transferredFromAccountId"   -> "Z54/3210",
+                "transferredFromLMRN"        -> "Z543333",
+                "transferInDate"             -> s"$validDate",
+                "reasonNotCreated"           -> "PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST"
+              )
+            )
+          )(any())
         }
       }
       "the data service returns a CreateLisaAccountInvestorAccountAlreadyClosed for a transfer request" in {
-        when(mockAccountService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorAccountAlreadyClosedResponse))
+        when(mockAccountService.transferAccount(any(), any())(any()))
+          .thenReturn(Future.successful(CreateLisaAccountInvestorAccountAlreadyClosedResponse))
 
         doSyncCreateOrTransferRequest(transferAccountJson) { res =>
           verify(mockAuditService).audit(
             auditType = matchersEquals("accountNotTransferred"),
             path = matchersEquals(s"/manager/$lisaManager/accounts"),
-            auditData = matchersEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "investorId" -> "9876543210",
-              "accountId" -> "8765/432100",
-              "creationReason" -> "Transferred",
-              "firstSubscriptionDate" -> s"$validDate",
-              "transferredFromAccountId" -> "Z54/3210",
-              "transferredFromLMRN" -> "Z543333",
-              "transferInDate" -> s"$validDate",
-              "reasonNotCreated" -> "INVESTOR_ACCOUNT_ALREADY_CLOSED"
-            )))(any())
+            auditData = matchersEquals(
+              Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "investorId"                 -> "9876543210",
+                "accountId"                  -> "8765/432100",
+                "creationReason"             -> "Transferred",
+                "firstSubscriptionDate"      -> s"$validDate",
+                "transferredFromAccountId"   -> "Z54/3210",
+                "transferredFromLMRN"        -> "Z543333",
+                "transferInDate"             -> s"$validDate",
+                "reasonNotCreated"           -> "INVESTOR_ACCOUNT_ALREADY_CLOSED"
+              )
+            )
+          )(any())
         }
       }
       "the data service returns a CreateLisaAccountInvestorAccountAlreadyVoid for a transfer request" in {
-        when(mockAccountService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorAccountAlreadyVoidResponse))
+        when(mockAccountService.transferAccount(any(), any())(any()))
+          .thenReturn(Future.successful(CreateLisaAccountInvestorAccountAlreadyVoidResponse))
 
         doSyncCreateOrTransferRequest(transferAccountJson) { res =>
           verify(mockAuditService).audit(
             auditType = matchersEquals("accountNotTransferred"),
             path = matchersEquals(s"/manager/$lisaManager/accounts"),
-            auditData = matchersEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "investorId" -> "9876543210",
-              "accountId" -> "8765/432100",
-              "creationReason" -> "Transferred",
-              "firstSubscriptionDate" -> s"$validDate",
-              "transferredFromAccountId" -> "Z54/3210",
-              "transferredFromLMRN" -> "Z543333",
-              "transferInDate" -> s"$validDate",
-              "reasonNotCreated" -> "INVESTOR_ACCOUNT_ALREADY_VOID"
-            )))(any())
+            auditData = matchersEquals(
+              Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "investorId"                 -> "9876543210",
+                "accountId"                  -> "8765/432100",
+                "creationReason"             -> "Transferred",
+                "firstSubscriptionDate"      -> s"$validDate",
+                "transferredFromAccountId"   -> "Z54/3210",
+                "transferredFromLMRN"        -> "Z543333",
+                "transferInDate"             -> s"$validDate",
+                "reasonNotCreated"           -> "INVESTOR_ACCOUNT_ALREADY_VOID"
+              )
+            )
+          )(any())
         }
       }
       "the data service returns a CreateLisaAccountAlreadyExistsResponse for a transfer request" in {
-        when(mockAccountService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountAlreadyExistsResponse))
+        when(mockAccountService.transferAccount(any(), any())(any()))
+          .thenReturn(Future.successful(CreateLisaAccountAlreadyExistsResponse))
 
         doSyncCreateOrTransferRequest(transferAccountJson) { res =>
           verify(mockAuditService).audit(
             auditType = matchersEquals("accountNotTransferred"),
             path = matchersEquals(s"/manager/$lisaManager/accounts"),
-            auditData = matchersEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "investorId" -> "9876543210",
-              "accountId" -> "8765/432100",
-              "creationReason" -> "Transferred",
-              "firstSubscriptionDate" -> s"$validDate",
-              "transferredFromAccountId" -> "Z54/3210",
-              "transferredFromLMRN" -> "Z543333",
-              "transferInDate" -> s"$validDate",
-              "reasonNotCreated" -> "INVESTOR_ACCOUNT_ALREADY_EXISTS"
-            )))(any())
+            auditData = matchersEquals(
+              Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "investorId"                 -> "9876543210",
+                "accountId"                  -> "8765/432100",
+                "creationReason"             -> "Transferred",
+                "firstSubscriptionDate"      -> s"$validDate",
+                "transferredFromAccountId"   -> "Z54/3210",
+                "transferredFromLMRN"        -> "Z543333",
+                "transferInDate"             -> s"$validDate",
+                "reasonNotCreated"           -> "INVESTOR_ACCOUNT_ALREADY_EXISTS"
+              )
+            )
+          )(any())
         }
       }
       "the data service returns an error for a transfer request" in {
-        when(mockAccountService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountErrorResponse))
+        when(mockAccountService.transferAccount(any(), any())(any()))
+          .thenReturn(Future.successful(CreateLisaAccountErrorResponse))
 
         doSyncCreateOrTransferRequest(transferAccountJson) { res =>
           verify(mockAuditService).audit(
             auditType = matchersEquals("accountNotTransferred"),
             path = matchersEquals(s"/manager/$lisaManager/accounts"),
-            auditData = matchersEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "investorId" -> "9876543210",
-              "accountId" -> "8765/432100",
-              "creationReason" -> "Transferred",
-              "firstSubscriptionDate" -> s"$validDate",
-              "transferredFromAccountId" -> "Z54/3210",
-              "transferredFromLMRN" -> "Z543333",
-              "transferInDate" -> s"$validDate",
-              "reasonNotCreated" -> "INTERNAL_SERVER_ERROR"
-            )))(any())
+            auditData = matchersEquals(
+              Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "investorId"                 -> "9876543210",
+                "accountId"                  -> "8765/432100",
+                "creationReason"             -> "Transferred",
+                "firstSubscriptionDate"      -> s"$validDate",
+                "transferredFromAccountId"   -> "Z54/3210",
+                "transferredFromLMRN"        -> "Z543333",
+                "transferInDate"             -> s"$validDate",
+                "reasonNotCreated"           -> "INTERNAL_SERVER_ERROR"
+              )
+            )
+          )(any())
         }
       }
     }
 
     "return with status 201 created and an account Id" when {
       "submitted a valid create account request" in {
-        when(mockAccountService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountSuccessResponse(accountId)))
+        when(mockAccountService.createAccount(any(), any())(any()))
+          .thenReturn(Future.successful(CreateLisaAccountSuccessResponse(accountId)))
         doCreateOrTransferRequest(createAccountJson) { res =>
-          status(res) mustBe (CREATED)
-          (contentAsJson(res) \ "data" \ "accountId").as[String] mustBe (accountId)
+          status(res) mustBe CREATED
+          (contentAsJson(res) \ "data" \ "accountId").as[String] mustBe accountId
         }
       }
       "submitted a valid transfer account request" in {
-        when(mockAccountService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountSuccessResponse(accountId)))
+        when(mockAccountService.transferAccount(any(), any())(any()))
+          .thenReturn(Future.successful(CreateLisaAccountSuccessResponse(accountId)))
 
         doCreateOrTransferRequest(transferAccountJson) { res =>
-          status(res) mustBe (CREATED)
-          (contentAsJson(res) \ "data" \ "accountId").as[String] mustBe (accountId)
+          status(res) mustBe CREATED
+          (contentAsJson(res) \ "data" \ "accountId").as[String] mustBe accountId
         }
       }
     }
@@ -447,25 +517,27 @@ class AccountControllerSpec extends ControllerTestFixture {
         val invalidJson = createAccountJson.replace("9876543210", "")
 
         doCreateOrTransferRequest(invalidJson) { res =>
-          status(res) mustBe (BAD_REQUEST)
-          (contentAsJson(res) \ "code").as[String] mustBe ("BAD_REQUEST")
+          status(res) mustBe BAD_REQUEST
+          (contentAsJson(res) \ "code").as[String] mustBe "BAD_REQUEST"
         }
       }
       "invalid lmrn is sent" in {
-        when(mockAccountService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountSuccessResponse(accountId)))
+        when(mockAccountService.createAccount(any(), any())(any()))
+          .thenReturn(Future.successful(CreateLisaAccountSuccessResponse(accountId)))
 
         doCreateOrTransferRequest(createAccountJson, "ZZ1234") { res =>
-          status(res) mustBe (BAD_REQUEST)
+          status(res) mustBe BAD_REQUEST
           val json = contentAsJson(res)
           (json \ "code").as[String] mustBe ErrorBadRequestLmrn.errorCode
           (json \ "message").as[String] mustBe ErrorBadRequestLmrn.message
         }
       }
       "invalid accountId is sent" in {
-        when(mockAccountService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountSuccessResponse(accountId)))
+        when(mockAccountService.createAccount(any(), any())(any()))
+          .thenReturn(Future.successful(CreateLisaAccountSuccessResponse(accountId)))
 
         doCreateOrTransferRequest(transferAccountJson.replace("/", "\\\\")) { res =>
-          status(res) mustBe (BAD_REQUEST)
+          status(res) mustBe BAD_REQUEST
 
           val json = contentAsJson(res)
           (json \ "code").as[String] mustBe "BAD_REQUEST"
@@ -473,20 +545,29 @@ class AccountControllerSpec extends ControllerTestFixture {
 
           val errors = (json \ "errors").as[List[JsObject]]
 
-          errors must contain(Json.obj("code" -> "INVALID_FORMAT", "message" -> "Invalid format has been used", "path" -> "/accountId"))
-          errors must contain(Json.obj("code" -> "INVALID_FORMAT", "message" -> "Invalid format has been used", "path" -> "/transferAccount/transferredFromAccountId"))
+          errors must contain(
+            Json.obj("code" -> "INVALID_FORMAT", "message" -> "Invalid format has been used", "path" -> "/accountId")
+          )
+          errors must contain(
+            Json.obj(
+              "code"    -> "INVALID_FORMAT",
+              "message" -> "Invalid format has been used",
+              "path"    -> "/transferAccount/transferredFromAccountId"
+            )
+          )
         }
       }
     }
 
     "return with status 403 forbidden and a code of FORBIDDEN" when {
       "given a firstSubscriptionDate prior to 6 April 2017" in {
-        when(mockAccountService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountSuccessResponse(accountId)))
+        when(mockAccountService.createAccount(any(), any())(any()))
+          .thenReturn(Future.successful(CreateLisaAccountSuccessResponse(accountId)))
 
         val invalidJson = createAccountJson.replace(s"$validDate", "2017-04-05")
 
         doCreateOrTransferRequest(invalidJson) { res =>
-          status(res) mustBe (FORBIDDEN)
+          status(res) mustBe FORBIDDEN
 
           val json = contentAsJson(res)
 
@@ -497,12 +578,13 @@ class AccountControllerSpec extends ControllerTestFixture {
         }
       }
       "given a firstSubscriptionDate and transferInDate prior to 6 April 2017" in {
-        when(mockAccountService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountSuccessResponse(accountId)))
+        when(mockAccountService.createAccount(any(), any())(any()))
+          .thenReturn(Future.successful(CreateLisaAccountSuccessResponse(accountId)))
 
         val invalidJson = transferAccountJson.replace(s"$validDate", "2017-04-05")
 
         doCreateOrTransferRequest(invalidJson) { res =>
-          status(res) mustBe (FORBIDDEN)
+          status(res) mustBe FORBIDDEN
 
           val json = contentAsJson(res)
 
@@ -519,61 +601,66 @@ class AccountControllerSpec extends ControllerTestFixture {
 
     "return with status 403 forbidden and a code of INVESTOR_NOT_FOUND" when {
       "the data service returns a CreateLisaAccountInvestorNotFoundResponse for a create request" in {
-        when(mockAccountService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorNotFoundResponse))
+        when(mockAccountService.createAccount(any(), any())(any()))
+          .thenReturn(Future.successful(CreateLisaAccountInvestorNotFoundResponse))
 
         doCreateOrTransferRequest(createAccountJson) { res =>
-
-          status(res) mustBe (FORBIDDEN)
-          (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_NOT_FOUND")
+          status(res) mustBe FORBIDDEN
+          (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_NOT_FOUND"
         }
       }
       "the data service returns a CreateLisaAccountInvestorNotFoundResponse for a transfer request" in {
-        when(mockAccountService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorNotFoundResponse))
+        when(mockAccountService.transferAccount(any(), any())(any()))
+          .thenReturn(Future.successful(CreateLisaAccountInvestorNotFoundResponse))
 
         doCreateOrTransferRequest(transferAccountJson) { res =>
-          status(res) mustBe (FORBIDDEN)
-          (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_NOT_FOUND")
+          status(res) mustBe FORBIDDEN
+          (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_NOT_FOUND"
         }
       }
     }
 
     "return with status 403 forbidden and a code of INVESTOR_ELIGIBILITY_CHECK_FAILED" when {
       "the data service returns a CreateLisaAccountInvestorNotEligibleResponse" in {
-        when(mockAccountService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorNotEligibleResponse))
+        when(mockAccountService.createAccount(any(), any())(any()))
+          .thenReturn(Future.successful(CreateLisaAccountInvestorNotEligibleResponse))
 
         doCreateOrTransferRequest(createAccountJson) { res =>
-          status(res) mustBe (FORBIDDEN)
-          (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ELIGIBILITY_CHECK_FAILED")
+          status(res) mustBe FORBIDDEN
+          (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ELIGIBILITY_CHECK_FAILED"
         }
       }
     }
 
     "return with status 403 forbidden and a code of INVESTOR_COMPLIANCE_CHECK_FAILED" when {
       "the data service returns a CreateLisaAccountInvestorComplianceCheckFailedResponse for a create request" in {
-        when(mockAccountService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorComplianceCheckFailedResponse))
+        when(mockAccountService.createAccount(any(), any())(any()))
+          .thenReturn(Future.successful(CreateLisaAccountInvestorComplianceCheckFailedResponse))
 
         doCreateOrTransferRequest(createAccountJson) { res =>
-          status(res) mustBe (FORBIDDEN)
-          (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_COMPLIANCE_CHECK_FAILED")
+          status(res) mustBe FORBIDDEN
+          (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_COMPLIANCE_CHECK_FAILED"
         }
       }
       "the data service returns a CreateLisaAccountInvestorComplianceCheckFailedResponse for a transfer request" in {
-        when(mockAccountService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorComplianceCheckFailedResponse))
+        when(mockAccountService.transferAccount(any(), any())(any()))
+          .thenReturn(Future.successful(CreateLisaAccountInvestorComplianceCheckFailedResponse))
 
         doCreateOrTransferRequest(transferAccountJson) { res =>
-          status(res) mustBe (FORBIDDEN)
-          (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_COMPLIANCE_CHECK_FAILED")
+          status(res) mustBe FORBIDDEN
+          (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_COMPLIANCE_CHECK_FAILED"
         }
       }
     }
 
     "return with status 403 forbidden and a code of PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST" when {
       "the data service returns a CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse for a transfer request" in {
-        when(mockAccountService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse))
+        when(mockAccountService.transferAccount(any(), any())(any()))
+          .thenReturn(Future.successful(CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse))
 
         doCreateOrTransferRequest(transferAccountJson) { res =>
-          status(res) mustBe (FORBIDDEN)
-          (contentAsJson(res) \ "code").as[String] mustBe ("PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST")
+          status(res) mustBe FORBIDDEN
+          (contentAsJson(res) \ "code").as[String] mustBe "PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST"
         }
       }
     }
@@ -581,8 +668,8 @@ class AccountControllerSpec extends ControllerTestFixture {
     "return with status 403 forbidden and a code of TRANSFER_ACCOUNT_DATA_NOT_PROVIDED" when {
       "sent a transfer request json with no transferAccount data" in {
         doCreateOrTransferRequest(transferAccountJsonIncomplete) { res =>
-          status(res) mustBe (FORBIDDEN)
-          (contentAsJson(res) \ "code").as[String] mustBe ("TRANSFER_ACCOUNT_DATA_NOT_PROVIDED")
+          status(res) mustBe FORBIDDEN
+          (contentAsJson(res) \ "code").as[String] mustBe "TRANSFER_ACCOUNT_DATA_NOT_PROVIDED"
         }
       }
     }
@@ -590,84 +677,93 @@ class AccountControllerSpec extends ControllerTestFixture {
     "return with status 403 forbidden and a code of TRANSFER_ACCOUNT_DATA_PROVIDED" when {
       "sent a create request json with full transferAccount data" in {
         doCreateOrTransferRequest(createAccountJsonWithTransfer) { res =>
-          status(res) mustBe (FORBIDDEN)
-          (contentAsJson(res) \ "code").as[String] mustBe ("TRANSFER_ACCOUNT_DATA_PROVIDED")
+          status(res) mustBe FORBIDDEN
+          (contentAsJson(res) \ "code").as[String] mustBe "TRANSFER_ACCOUNT_DATA_PROVIDED"
         }
       }
       "sent a create request json with partial transferAccount data" in {
-        doCreateOrTransferRequest(createAccountJsonWithTransfer.replace("\"transferredFromAccountID\": \"Z543210\",", "")) { res =>
-          status(res) mustBe (FORBIDDEN)
-          (contentAsJson(res) \ "code").as[String] mustBe ("TRANSFER_ACCOUNT_DATA_PROVIDED")
+        doCreateOrTransferRequest(
+          createAccountJsonWithTransfer.replace("\"transferredFromAccountID\": \"Z543210\",", "")
+        ) { res =>
+          status(res) mustBe FORBIDDEN
+          (contentAsJson(res) \ "code").as[String] mustBe "TRANSFER_ACCOUNT_DATA_PROVIDED"
         }
       }
       "sent a create request json with invalid transferAccount data" in {
         doCreateOrTransferRequest(createAccountJsonWithInvalidTransfer) { res =>
-          status(res) mustBe (FORBIDDEN)
-          (contentAsJson(res) \ "code").as[String] mustBe ("TRANSFER_ACCOUNT_DATA_PROVIDED")
+          status(res) mustBe FORBIDDEN
+          (contentAsJson(res) \ "code").as[String] mustBe "TRANSFER_ACCOUNT_DATA_PROVIDED"
         }
       }
     }
 
     "return with status 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_CLOSED" when {
       "the data service returns a CreateLisaAccountInvestorAccountAlreadyClosedResponse for a create request" in {
-        when(mockAccountService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorAccountAlreadyClosedResponse))
+        when(mockAccountService.createAccount(any(), any())(any()))
+          .thenReturn(Future.successful(CreateLisaAccountInvestorAccountAlreadyClosedResponse))
 
         doCreateOrTransferRequest(createAccountJson) { res =>
-          status(res) mustBe (FORBIDDEN)
-          (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ACCOUNT_ALREADY_CLOSED")
+          status(res) mustBe FORBIDDEN
+          (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CLOSED"
         }
       }
       "the data service returns a CreateLisaAccountInvestorAccountAlreadyClosedResponse for a transfer request" in {
-        when(mockAccountService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorAccountAlreadyClosedResponse))
+        when(mockAccountService.transferAccount(any(), any())(any()))
+          .thenReturn(Future.successful(CreateLisaAccountInvestorAccountAlreadyClosedResponse))
 
         doCreateOrTransferRequest(transferAccountJson) { res =>
-          status(res) mustBe (FORBIDDEN)
-          (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ACCOUNT_ALREADY_CLOSED")
+          status(res) mustBe FORBIDDEN
+          (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CLOSED"
         }
       }
     }
 
     "return with status 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_CANCELLED" when {
       "the data service returns a CreateLisaAccountInvestorAccountAlreadyCancelledResponse for a create request" in {
-        when(mockAccountService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorAccountAlreadyCancelledResponse))
+        when(mockAccountService.createAccount(any(), any())(any()))
+          .thenReturn(Future.successful(CreateLisaAccountInvestorAccountAlreadyCancelledResponse))
 
         doCreateOrTransferRequest(createAccountJson) { res =>
-          status(res) mustBe (FORBIDDEN)
-          (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ACCOUNT_ALREADY_CANCELLED")
+          status(res) mustBe FORBIDDEN
+          (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CANCELLED"
         }
       }
       "the data service returns a CreateLisaAccountInvestorAccountAlreadyCancelledResponse for a transfer request" in {
-        when(mockAccountService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorAccountAlreadyCancelledResponse))
+        when(mockAccountService.transferAccount(any(), any())(any()))
+          .thenReturn(Future.successful(CreateLisaAccountInvestorAccountAlreadyCancelledResponse))
 
         doCreateOrTransferRequest(transferAccountJson) { res =>
-          status(res) mustBe (FORBIDDEN)
-          (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ACCOUNT_ALREADY_CANCELLED")
+          status(res) mustBe FORBIDDEN
+          (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CANCELLED"
         }
       }
     }
 
     "return with status 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_VOID" when {
       "the data service returns a CreateLisaAccountInvestorAccountAlreadyVoidResponse for a create request" in {
-        when(mockAccountService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorAccountAlreadyVoidResponse))
+        when(mockAccountService.createAccount(any(), any())(any()))
+          .thenReturn(Future.successful(CreateLisaAccountInvestorAccountAlreadyVoidResponse))
 
         doCreateOrTransferRequest(createAccountJson) { res =>
-          status(res) mustBe (FORBIDDEN)
-          (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ACCOUNT_ALREADY_VOID")
+          status(res) mustBe FORBIDDEN
+          (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_VOID"
         }
       }
       "the data service returns a CreateLisaAccountInvestorAccountAlreadyVoidResponse for a transfer request" in {
-        when(mockAccountService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorAccountAlreadyVoidResponse))
+        when(mockAccountService.transferAccount(any(), any())(any()))
+          .thenReturn(Future.successful(CreateLisaAccountInvestorAccountAlreadyVoidResponse))
 
         doCreateOrTransferRequest(transferAccountJson) { res =>
-          status(res) mustBe (FORBIDDEN)
-          (contentAsJson(res) \ "code").as[String] mustBe ("INVESTOR_ACCOUNT_ALREADY_VOID")
+          status(res) mustBe FORBIDDEN
+          (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_VOID"
         }
       }
     }
 
     "return with status 409 conflict and a code of INVESTOR_ACCOUNT_ALREADY_EXISTS" when {
       "the data service returns a CreateLisaAccountAlreadyExistsResponse for a create request" in {
-        when(mockAccountService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountAlreadyExistsResponse))
+        when(mockAccountService.createAccount(any(), any())(any()))
+          .thenReturn(Future.successful(CreateLisaAccountAlreadyExistsResponse))
 
         doCreateOrTransferRequest(createAccountJson) { res =>
           status(res) mustBe CONFLICT
@@ -677,7 +773,8 @@ class AccountControllerSpec extends ControllerTestFixture {
         }
       }
       "the data service returns a CreateLisaAccountAlreadyExistsResponse for a transfer request" in {
-        when(mockAccountService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountAlreadyExistsResponse))
+        when(mockAccountService.transferAccount(any(), any())(any()))
+          .thenReturn(Future.successful(CreateLisaAccountAlreadyExistsResponse))
 
         doCreateOrTransferRequest(transferAccountJson) { res =>
           status(res) mustBe CONFLICT
@@ -690,59 +787,67 @@ class AccountControllerSpec extends ControllerTestFixture {
 
     "return with status 500 internal server error" when {
       "the data service returns an error for a create request" in {
-        when(mockAccountService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountErrorResponse))
+        when(mockAccountService.createAccount(any(), any())(any()))
+          .thenReturn(Future.successful(CreateLisaAccountErrorResponse))
 
         doCreateOrTransferRequest(createAccountJson) { res =>
-          status(res) mustBe (INTERNAL_SERVER_ERROR)
+          status(res) mustBe INTERNAL_SERVER_ERROR
         }
       }
       "the data service returns an error for a transfer request" in {
-        when(mockAccountService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountErrorResponse))
+        when(mockAccountService.transferAccount(any(), any())(any()))
+          .thenReturn(Future.successful(CreateLisaAccountErrorResponse))
 
         doCreateOrTransferRequest(transferAccountJson) { res =>
-          status(res) mustBe (INTERNAL_SERVER_ERROR)
+          status(res) mustBe INTERNAL_SERVER_ERROR
         }
       }
       "the data service throws an exception for a create request" in {
-        when(mockAccountService.createAccount(any(), any())(any())).thenReturn(Future.failed(new RuntimeException("Test")))
+        when(mockAccountService.createAccount(any(), any())(any()))
+          .thenReturn(Future.failed(new RuntimeException("Test")))
 
         doCreateOrTransferRequest(createAccountJson) { res =>
-          status(res) mustBe (INTERNAL_SERVER_ERROR)
+          status(res) mustBe INTERNAL_SERVER_ERROR
         }
       }
       "the data service throws an exception for a transfer request" in {
-        when(mockAccountService.transferAccount(any(), any())(any())).thenReturn(Future.failed(new RuntimeException("Test")))
+        when(mockAccountService.transferAccount(any(), any())(any()))
+          .thenReturn(Future.failed(new RuntimeException("Test")))
 
         doCreateOrTransferRequest(transferAccountJson) { res =>
-          status(res) mustBe (INTERNAL_SERVER_ERROR)
+          status(res) mustBe INTERNAL_SERVER_ERROR
         }
       }
       "the data service returns a CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse for a create request" in {
-        when(mockAccountService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse))
+        when(mockAccountService.createAccount(any(), any())(any()))
+          .thenReturn(Future.successful(CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse))
 
         doCreateOrTransferRequest(createAccountJson) { res =>
-          status(res) mustBe (INTERNAL_SERVER_ERROR)
+          status(res) mustBe INTERNAL_SERVER_ERROR
         }
       }
       "the data service returns a CreateLisaAccountInvestorNotEligibleResponse for a transfer request" in {
-        when(mockAccountService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountInvestorNotEligibleResponse))
+        when(mockAccountService.transferAccount(any(), any())(any()))
+          .thenReturn(Future.successful(CreateLisaAccountInvestorNotEligibleResponse))
 
         doCreateOrTransferRequest(transferAccountJson) { res =>
-          status(res) mustBe (INTERNAL_SERVER_ERROR)
+          status(res) mustBe INTERNAL_SERVER_ERROR
         }
       }
     }
 
     "return with status 503 service unavailable" when {
       "the data service returns a CreateLisaAccountServiceUnavailableResponse for a create request" in {
-        when(mockAccountService.createAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountServiceUnavailableResponse))
+        when(mockAccountService.createAccount(any(), any())(any()))
+          .thenReturn(Future.successful(CreateLisaAccountServiceUnavailableResponse))
 
         doCreateOrTransferRequest(createAccountJson) { res =>
           status(res) mustBe SERVICE_UNAVAILABLE
         }
       }
       "the data service returns a CreateLisaAccountServiceUnavailableResponse for a transfer request" in {
-        when(mockAccountService.transferAccount(any(), any())(any())).thenReturn(Future.successful(CreateLisaAccountServiceUnavailableResponse))
+        when(mockAccountService.transferAccount(any(), any())(any()))
+          .thenReturn(Future.successful(CreateLisaAccountServiceUnavailableResponse))
 
         doCreateOrTransferRequest(transferAccountJson) { res =>
           status(res) mustBe SERVICE_UNAVAILABLE
@@ -751,16 +856,22 @@ class AccountControllerSpec extends ControllerTestFixture {
     }
   }
 
-  def doCreateOrTransferRequest(jsonString: String, lmrn: String = lisaManager)(callback: (Future[Result]) => Unit) {
-    val res = accountConnector.createOrTransferLisaAccount(lmrn).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
-      withBody(AnyContentAsJson(Json.parse(jsonString))))
+  def doCreateOrTransferRequest(jsonString: String, lmrn: String = lisaManager)(callback: Future[Result] => Unit): Unit = {
+    val res = accountConnector
+      .createOrTransferLisaAccount(lmrn)
+      .apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).withBody(AnyContentAsJson(Json.parse(jsonString))))
 
     callback(res)
   }
 
-  def doSyncCreateOrTransferRequest(jsonString: String)(callback: (Result) => Unit) {
-    val res = await(accountConnector.createOrTransferLisaAccount(lisaManager).apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).
-      withBody(AnyContentAsJson(Json.parse(jsonString)))))
+  def doSyncCreateOrTransferRequest(jsonString: String)(callback: Result => Unit): Unit = {
+    val res = await(
+      accountConnector
+        .createOrTransferLisaAccount(lisaManager)
+        .apply(
+          FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).withBody(AnyContentAsJson(Json.parse(jsonString)))
+        )
+    )
 
     callback(res)
   }

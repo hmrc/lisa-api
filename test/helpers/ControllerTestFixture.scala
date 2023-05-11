@@ -27,33 +27,37 @@ import uk.gov.hmrc.lisaapi.models.AnnualReturnValidator
 import uk.gov.hmrc.lisaapi.services._
 import uk.gov.hmrc.lisaapi.utils.{BonusPaymentValidator, ErrorConverter, WithdrawalChargeValidator}
 
-trait ControllerTestFixture extends BaseTestFixture with GuiceOneAppPerSuite with BeforeAndAfterEach with LisaConstants {
+trait ControllerTestFixture
+    extends BaseTestFixture
+    with GuiceOneAppPerSuite
+    with BeforeAndAfterEach
+    with LisaConstants {
 
-  val injector: Injector = app.injector
+  val injector: Injector                             = app.injector
   val mockControllerComponents: ControllerComponents = injector.instanceOf[ControllerComponents]
-  val mockParser: PlayBodyParsers = injector.instanceOf[PlayBodyParsers]
+  val mockParser: PlayBodyParsers                    = injector.instanceOf[PlayBodyParsers]
 
-  val mockAccountService: AccountService = mock[AccountService]
-  val mockAuditService: AuditService = mock[AuditService]
-  val mockLifeEventService: LifeEventService = mock[LifeEventService]
-  val mockDateTimeService: CurrentDateService = mock[CurrentDateService]
-  val mockBonusPaymentService: BonusPaymentService = mock[BonusPaymentService]
-  val mockBonusOrWithdrawalService: BonusOrWithdrawalService = mock[BonusOrWithdrawalService]
-  val mockBulkPaymentService: BulkPaymentService = mock[BulkPaymentService]
-  val mockInvestorService: InvestorService = mock[InvestorService]
-  val mockReinstateAccountService: ReinstateAccountService = mock[ReinstateAccountService]
-  val mockTransactionService: TransactionService = mock[TransactionService]
+  val mockAccountService: AccountService                      = mock[AccountService]
+  val mockAuditService: AuditService                          = mock[AuditService]
+  val mockLifeEventService: LifeEventService                  = mock[LifeEventService]
+  val mockDateTimeService: CurrentDateService                 = mock[CurrentDateService]
+  val mockBonusPaymentService: BonusPaymentService            = mock[BonusPaymentService]
+  val mockBonusOrWithdrawalService: BonusOrWithdrawalService  = mock[BonusOrWithdrawalService]
+  val mockBulkPaymentService: BulkPaymentService              = mock[BulkPaymentService]
+  val mockInvestorService: InvestorService                    = mock[InvestorService]
+  val mockReinstateAccountService: ReinstateAccountService    = mock[ReinstateAccountService]
+  val mockTransactionService: TransactionService              = mock[TransactionService]
   val mockUpdateSubscritionService: UpdateSubscriptionService = mock[UpdateSubscriptionService]
-  val mockWithdrawalService: WithdrawalService = mock[WithdrawalService]
+  val mockWithdrawalService: WithdrawalService                = mock[WithdrawalService]
 
   val mockAuthConnector: AuthConnector = mock[AuthConnector]
 
   val mockErrorConverter: ErrorConverter = mock[ErrorConverter]
 
   val mockLisaMetrics: LisaMetrics = mock[LisaMetrics]
-  
-  val mockAnnualReturnValidator: AnnualReturnValidator = mock[AnnualReturnValidator]
-  val mockBonusPaymentValidator: BonusPaymentValidator = mock[BonusPaymentValidator]
+
+  val mockAnnualReturnValidator: AnnualReturnValidator         = mock[AnnualReturnValidator]
+  val mockBonusPaymentValidator: BonusPaymentValidator         = mock[BonusPaymentValidator]
   val mockWithdrawalChargeValidator: WithdrawalChargeValidator = mock[WithdrawalChargeValidator]
 
 }

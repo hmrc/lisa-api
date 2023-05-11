@@ -25,11 +25,11 @@ case class CloseLisaAccountRequest(accountClosureReason: AccountClosureReason, c
 object CloseLisaAccountRequest {
   implicit val closeLisaAccountRequestReads: Reads[CloseLisaAccountRequest] = (
     (JsPath \ "accountClosureReason").read(JsonReads.accountClosureReason) and
-    (JsPath \ "closureDate").read(JsonReads.notFutureDate).map(new DateTime(_))
+      (JsPath \ "closureDate").read(JsonReads.notFutureDate).map(new DateTime(_))
   )(CloseLisaAccountRequest.apply _)
 
   implicit val closeLisaAccountRequestWrites: Writes[CloseLisaAccountRequest] = (
     (JsPath \ "accountClosureReason").write[String] and
-    (JsPath \ "closureDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd"))
+      (JsPath \ "closureDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd"))
   )(unlift(CloseLisaAccountRequest.unapply))
 }

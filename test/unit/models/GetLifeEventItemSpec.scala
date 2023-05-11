@@ -17,38 +17,37 @@
 package unit.models
 
 import java.time.LocalDate
-
 import org.scalatestplus.play.PlaySpec
-import play.api.libs.json.{JsSuccess, Json}
+import play.api.libs.json.{JsObject, JsSuccess, Json}
 import uk.gov.hmrc.lisaapi.models.{GetLifeEventItem, GetLifeEventItemPropertyDetails, GetLifeEventItemSupersede}
 
 class GetLifeEventItemSpec extends PlaySpec {
 
-  val validInputJson = Json.obj(fields =
-    "lifeEventId" -> "1234567890",
-    "lifeEventType" -> "TERMINAL_ILLNESS",
-    "lifeEventDate" -> "2018-01-30",
-    "isaManagerName" -> "Company Name",
-    "taxYear" -> "2018",
-    "marketValueCash" -> 1,
+  val validInputJson: JsObject = Json.obj(
+    fields = "lifeEventId" -> "1234567890",
+    "lifeEventType"              -> "TERMINAL_ILLNESS",
+    "lifeEventDate"              -> "2018-01-30",
+    "isaManagerName"             -> "Company Name",
+    "taxYear"                    -> "2018",
+    "marketValueCash"            -> 1,
     "marketValueStocksAndShares" -> 2,
-    "annualSubsCash" -> 3,
-    "annualSubsStocksAndShares" -> 4,
-    "withdrawalAmount" -> 5.5,
-    "conveyancerReference" -> "X",
-    "fundsReleaseLifeEventId" -> "1",
-    "propertyDetails" -> Json.obj(fields =
-      "nameOrNumber" -> "1",
-      "postcode" -> "AB1 1AB",
-      "purchaseValue" -> 6,
+    "annualSubsCash"             -> 3,
+    "annualSubsStocksAndShares"  -> 4,
+    "withdrawalAmount"           -> 5.5,
+    "conveyancerReference"       -> "X",
+    "fundsReleaseLifeEventId"    -> "1",
+    "propertyDetails"            -> Json.obj(
+      fields = "nameOrNumber" -> "1",
+      "postcode"       -> "AB1 1AB",
+      "purchaseValue"  -> 6,
       "purchaseResult" -> "PURCHASE_COMPLETE"
     ),
-    "supersededLifeEventId" -> "3",
-    "supersededLifeEventDate" -> "2018-01-30",
-    "lifeEventSupersededById" -> "5"
+    "supersededLifeEventId"      -> "3",
+    "supersededLifeEventDate"    -> "2018-01-30",
+    "lifeEventSupersededById"    -> "5"
   )
 
-  val validItemWithAllFields = GetLifeEventItem(
+  val validItemWithAllFields: GetLifeEventItem = GetLifeEventItem(
     lifeEventId = "1234567890",
     eventType = "LISA Investor Terminal Ill Health",
     eventDate = LocalDate.parse("2018-01-30"),
@@ -63,18 +62,22 @@ class GetLifeEventItemSpec extends PlaySpec {
     fundReleaseId = Some("1"),
     propertyPurchaseValue = Some(6),
     propertyPurchaseResult = Some("Purchase completed"),
-    propertyDetails = Some(GetLifeEventItemPropertyDetails(
-      nameOrNumber = "1",
-      postalCode = "AB1 1AB"
-    )),
-    supersede = Some(GetLifeEventItemSupersede(
-      originalLifeEventId = "3",
-      originalEventDate = LocalDate.parse("2018-01-30")
-    )),
+    propertyDetails = Some(
+      GetLifeEventItemPropertyDetails(
+        nameOrNumber = "1",
+        postalCode = "AB1 1AB"
+      )
+    ),
+    supersede = Some(
+      GetLifeEventItemSupersede(
+        originalLifeEventId = "3",
+        originalEventDate = LocalDate.parse("2018-01-30")
+      )
+    ),
     supersededBy = Some("5")
   )
 
-  val validItemWithMinimumFields = GetLifeEventItem(
+  val validItemWithMinimumFields: GetLifeEventItem = GetLifeEventItem(
     lifeEventId = "1234567890",
     eventType = "Extension one",
     eventDate = LocalDate.parse("2018-01-01")
@@ -91,37 +94,30 @@ class GetLifeEventItemSpec extends PlaySpec {
     "deserialize to json" in {
       val json = Json.toJson[GetLifeEventItem](validItemWithAllFields)
 
-      json mustBe Json.obj(fields =
-        "lifeEventId" -> "1234567890",
-        "eventType" -> "LISA Investor Terminal Ill Health",
-        "eventDate" -> "2018-01-30",
-        "lisaManagerName" -> "Company Name",
-        "taxYear" -> 2018,
-        "marketValueCash" -> 1,
+      json mustBe Json.obj(
+        fields = "lifeEventId" -> "1234567890",
+        "eventType"                  -> "LISA Investor Terminal Ill Health",
+        "eventDate"                  -> "2018-01-30",
+        "lisaManagerName"            -> "Company Name",
+        "taxYear"                    -> 2018,
+        "marketValueCash"            -> 1,
         "marketValueStocksAndShares" -> 2,
-        "annualSubsCash" -> 3,
-        "annualSubsStocksAndShares" -> 4,
-        "withdrawalAmount" -> 5.5,
-        "conveyancerReference" -> "X",
-        "fundReleaseId" -> "1",
-        "propertyPurchaseValue" -> 6,
-        "propertyPurchaseResult" -> "Purchase completed",
-        "propertyDetails" -> Json.obj(fields =
-          "nameOrNumber" -> "1",
-          "postalCode" -> "AB1 1AB"
-        ),
-        "supersede" -> Json.obj(fields =
-          "originalLifeEventId" -> "3",
-          "originalEventDate" -> "2018-01-30"
-        ),
-        "supersededBy" -> "5"
+        "annualSubsCash"             -> 3,
+        "annualSubsStocksAndShares"  -> 4,
+        "withdrawalAmount"           -> 5.5,
+        "conveyancerReference"       -> "X",
+        "fundReleaseId"              -> "1",
+        "propertyPurchaseValue"      -> 6,
+        "propertyPurchaseResult"     -> "Purchase completed",
+        "propertyDetails"            -> Json.obj(fields = "nameOrNumber" -> "1", "postalCode" -> "AB1 1AB"),
+        "supersede"                  -> Json.obj(fields = "originalLifeEventId" -> "3", "originalEventDate" -> "2018-01-30"),
+        "supersededBy"               -> "5"
       )
     }
 
     "map event types correctly" in {
-      val eventOfType: (String) => GetLifeEventItem = (eventType: String) => {
-        (validInputJson ++ Json.obj(fields = "lifeEventType" -> eventType)).as[GetLifeEventItem]
-      }
+      val eventOfType: String => GetLifeEventItem =
+        (eventType: String) => (validInputJson ++ Json.obj(fields = "lifeEventType" -> eventType)).as[GetLifeEventItem]
 
       eventOfType("TERMINAL_ILLNESS").eventType mustBe "LISA Investor Terminal Ill Health"
       eventOfType("DEATH").eventType mustBe "LISA Investor Death"
@@ -133,24 +129,23 @@ class GetLifeEventItemSpec extends PlaySpec {
     }
 
     "map purchase results correctly" in {
-      val eventOfResult: (String) => GetLifeEventItem = (purchaseResult: String) => {
+      val eventOfResult: String => GetLifeEventItem = (purchaseResult: String) =>
         (validInputJson ++ Json.obj(fields =
-          "propertyDetails" -> Json.obj(fields =
-            "purchaseResult" -> purchaseResult
-          )
+          "propertyDetails" -> Json.obj(fields = "purchaseResult" -> purchaseResult)
         )).as[GetLifeEventItem]
-      }
 
       eventOfResult("PURCHASE_COMPLETE").propertyPurchaseResult mustBe Some("Purchase completed")
       eventOfResult("PURCHASE_FAILED").propertyPurchaseResult mustBe Some("Purchase failed")
     }
 
     "serialize with the minimum fields required" in {
-      val res = Json.obj(fields =
-        "lifeEventId" -> "1234567890",
-        "lifeEventType" -> "EXTENSION_ONE",
-        "lifeEventDate" -> "2018-01-01"
-      ).validate[GetLifeEventItem]
+      val res = Json
+        .obj(
+          fields = "lifeEventId" -> "1234567890",
+          "lifeEventType" -> "EXTENSION_ONE",
+          "lifeEventDate" -> "2018-01-01"
+        )
+        .validate[GetLifeEventItem]
 
       res mustBe JsSuccess(validItemWithMinimumFields)
     }
@@ -158,8 +153,8 @@ class GetLifeEventItemSpec extends PlaySpec {
     "deserialize with the minimum fields required" in {
       val json = Json.toJson[GetLifeEventItem](validItemWithMinimumFields)
 
-      json mustBe Json.obj(fields =
-        "lifeEventId" -> "1234567890",
+      json mustBe Json.obj(
+        fields = "lifeEventId" -> "1234567890",
         "eventType" -> "Extension one",
         "eventDate" -> "2018-01-01"
       )

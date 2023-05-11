@@ -30,7 +30,7 @@ import scala.io.Source
 
 class BonusPaymentValidatorSpec extends BaseTestFixture with BeforeAndAfter {
 
-  val mockDateService: CurrentDateService = mock[CurrentDateService]
+  val mockDateService: CurrentDateService          = mock[CurrentDateService]
   val bonusPaymentValidator: BonusPaymentValidator = new BonusPaymentValidator(mockDateService)
 
   before {
@@ -38,7 +38,9 @@ class BonusPaymentValidatorSpec extends BaseTestFixture with BeforeAndAfter {
     when(mockDateService.now()).thenReturn(DateTime.now)
   }
 
-  val validBonusPaymentJson: String = Source.fromInputStream(getClass().getResourceAsStream("/json/request.valid.bonus-payment.additional-bonus.json")).mkString
+  val validBonusPaymentJson: String                 = Source
+    .fromInputStream(getClass.getResourceAsStream("/json/request.valid.bonus-payment.additional-bonus.json"))
+    .mkString
   val validBonusPayment: RequestBonusPaymentRequest = Json.parse(validBonusPaymentJson).as[RequestBonusPaymentRequest]
 
   "newSubsForPeriod and htbTransferForPeriod" should {
@@ -46,25 +48,25 @@ class BonusPaymentValidatorSpec extends BaseTestFixture with BeforeAndAfter {
     "return two errors" when {
 
       "they are both 0" in {
-        val ibp = validBonusPayment.inboundPayments.copy(newSubsForPeriod = Some(0))
-        val htb = validBonusPayment.htbTransfer.get.copy(htbTransferInForPeriod = 0)
+        val ibp     = validBonusPayment.inboundPayments.copy(newSubsForPeriod = Some(0))
+        val htb     = validBonusPayment.htbTransfer.get.copy(htbTransferInForPeriod = 0)
         val request = validBonusPayment.copy(inboundPayments = ibp, htbTransfer = Some(htb))
 
         val errors = bonusPaymentValidator.validate(request)
 
         errors.size mustBe 2
-        errors(0).path mustBe Some("/inboundPayments/newSubsForPeriod")
+        errors.head.path mustBe Some("/inboundPayments/newSubsForPeriod")
         errors(1).path mustBe Some("/htbTransfer/htbTransferInForPeriod")
       }
 
       "they are both none" in {
-        val ibp = validBonusPayment.inboundPayments.copy(newSubsForPeriod = None)
+        val ibp     = validBonusPayment.inboundPayments.copy(newSubsForPeriod = None)
         val request = validBonusPayment.copy(inboundPayments = ibp, htbTransfer = None)
 
         val errors = bonusPaymentValidator.validate(request)
 
         errors.size mustBe 2
-        errors(0).path mustBe Some("/inboundPayments/newSubsForPeriod")
+        errors.head.path mustBe Some("/inboundPayments/newSubsForPeriod")
         errors(1).path mustBe Some("/htbTransfer/htbTransferInForPeriod")
       }
 
@@ -73,24 +75,24 @@ class BonusPaymentValidatorSpec extends BaseTestFixture with BeforeAndAfter {
     "return one error" when {
 
       "newSubsForPeriod is 0 and htbTransfer is none" in {
-        val ibp = validBonusPayment.inboundPayments.copy(newSubsForPeriod = Some(0))
+        val ibp     = validBonusPayment.inboundPayments.copy(newSubsForPeriod = Some(0))
         val request = validBonusPayment.copy(inboundPayments = ibp, htbTransfer = None)
 
         val errors = bonusPaymentValidator.validate(request)
 
         errors.size mustBe 1
-        errors(0).path mustBe Some("/inboundPayments/newSubsForPeriod")
+        errors.head.path mustBe Some("/inboundPayments/newSubsForPeriod")
       }
 
       "htbTransfer is 0 and newSubsForPeriod is none" in {
-        val ibp = validBonusPayment.inboundPayments.copy(newSubsForPeriod = None)
-        val htb = validBonusPayment.htbTransfer.get.copy(htbTransferInForPeriod = 0)
+        val ibp     = validBonusPayment.inboundPayments.copy(newSubsForPeriod = None)
+        val htb     = validBonusPayment.htbTransfer.get.copy(htbTransferInForPeriod = 0)
         val request = validBonusPayment.copy(inboundPayments = ibp, htbTransfer = Some(htb))
 
         val errors = bonusPaymentValidator.validate(request)
 
         errors.size mustBe 1
-        errors(0).path mustBe Some("/htbTransfer/htbTransferInForPeriod")
+        errors.head.path mustBe Some("/htbTransfer/htbTransferInForPeriod")
       }
 
     }
@@ -102,13 +104,13 @@ class BonusPaymentValidatorSpec extends BaseTestFixture with BeforeAndAfter {
     "return an error" when {
 
       "it is zero and newSubsForPeriod is not" in {
-        val ibp = validBonusPayment.inboundPayments.copy(newSubsForPeriod = Some(1), newSubsYTD = 0)
+        val ibp     = validBonusPayment.inboundPayments.copy(newSubsForPeriod = Some(1), newSubsYTD = 0)
         val request = validBonusPayment.copy(inboundPayments = ibp)
 
         val errors = bonusPaymentValidator.validate(request)
 
         errors.size mustBe 1
-        errors(0).path mustBe Some("/inboundPayments/newSubsYTD")
+        errors.head.path mustBe Some("/inboundPayments/newSubsYTD")
       }
 
     }
@@ -120,13 +122,13 @@ class BonusPaymentValidatorSpec extends BaseTestFixture with BeforeAndAfter {
     "return an error" when {
 
       "it is zero and htbTransferInForPeriod is not" in {
-        val htb = validBonusPayment.htbTransfer.get.copy(htbTransferInForPeriod = 1, htbTransferTotalYTD = 0)
+        val htb     = validBonusPayment.htbTransfer.get.copy(htbTransferInForPeriod = 1, htbTransferTotalYTD = 0)
         val request = validBonusPayment.copy(htbTransfer = Some(htb))
 
         val errors = bonusPaymentValidator.validate(request)
 
         errors.size mustBe 1
-        errors(0).path mustBe Some("/htbTransfer/htbTransferTotalYTD")
+        errors.head.path mustBe Some("/htbTransfer/htbTransferTotalYTD")
       }
 
     }
@@ -138,13 +140,13 @@ class BonusPaymentValidatorSpec extends BaseTestFixture with BeforeAndAfter {
     "return an error" when {
 
       "it is zero" in {
-        val ibp = validBonusPayment.inboundPayments.copy(totalSubsForPeriod = 0)
+        val ibp     = validBonusPayment.inboundPayments.copy(totalSubsForPeriod = 0)
         val request = validBonusPayment.copy(inboundPayments = ibp)
 
         val errors = bonusPaymentValidator.validate(request)
 
         errors.size mustBe 1
-        errors(0).path mustBe Some("/inboundPayments/totalSubsForPeriod")
+        errors.head.path mustBe Some("/inboundPayments/totalSubsForPeriod")
       }
 
     }
@@ -156,13 +158,13 @@ class BonusPaymentValidatorSpec extends BaseTestFixture with BeforeAndAfter {
     "return an error" when {
 
       "it is less than totalSubsForPeriod" in {
-        val ibp = validBonusPayment.inboundPayments.copy(totalSubsForPeriod = 10, totalSubsYTD = 5)
+        val ibp     = validBonusPayment.inboundPayments.copy(totalSubsForPeriod = 10, totalSubsYTD = 5)
         val request = validBonusPayment.copy(inboundPayments = ibp)
 
         val errors = bonusPaymentValidator.validate(request)
 
         errors.size mustBe 1
-        errors(0).path mustBe Some("/inboundPayments/totalSubsYTD")
+        errors.head.path mustBe Some("/inboundPayments/totalSubsYTD")
       }
 
     }
@@ -174,13 +176,13 @@ class BonusPaymentValidatorSpec extends BaseTestFixture with BeforeAndAfter {
     "return an error" when {
 
       "it is zero or less" in {
-        val bon = validBonusPayment.bonuses.copy(bonusDueForPeriod = 0)
+        val bon     = validBonusPayment.bonuses.copy(bonusDueForPeriod = 0)
         val request = validBonusPayment.copy(bonuses = bon)
 
         val errors = bonusPaymentValidator.validate(request)
 
         errors.size mustBe 1
-        errors(0).path mustBe Some("/bonuses/bonusDueForPeriod")
+        errors.head.path mustBe Some("/bonuses/bonusDueForPeriod")
       }
 
     }
@@ -192,13 +194,13 @@ class BonusPaymentValidatorSpec extends BaseTestFixture with BeforeAndAfter {
     "return an error" when {
 
       "it is zero or less" in {
-        val bon = validBonusPayment.bonuses.copy(totalBonusDueYTD = 0)
+        val bon     = validBonusPayment.bonuses.copy(totalBonusDueYTD = 0)
         val request = validBonusPayment.copy(bonuses = bon)
 
         val errors = bonusPaymentValidator.validate(request)
 
         errors.size mustBe 1
-        errors(0).path mustBe Some("/bonuses/totalBonusDueYTD")
+        errors.head.path mustBe Some("/bonuses/totalBonusDueYTD")
       }
 
     }
@@ -210,7 +212,7 @@ class BonusPaymentValidatorSpec extends BaseTestFixture with BeforeAndAfter {
     "validate correctly" when {
 
       "the current date is the sixth and they're submitting for today" in {
-        val today = new DateTime("2017-04-06")
+        val today         = new DateTime("2017-04-06")
         val periodEndDate = new DateTime("2017-05-05")
 
         reset(mockDateService)
@@ -229,8 +231,8 @@ class BonusPaymentValidatorSpec extends BaseTestFixture with BeforeAndAfter {
 
       "it is not the 6th day of the month" in {
         val periodStartDate = new DateTime("2017-05-01")
-        val periodEndDate = new DateTime("2017-06-05")
-        val request = validBonusPayment.copy(periodStartDate = periodStartDate, periodEndDate = periodEndDate)
+        val periodEndDate   = new DateTime("2017-06-05")
+        val request         = validBonusPayment.copy(periodStartDate = periodStartDate, periodEndDate = periodEndDate)
 
         val errors = bonusPaymentValidator.validate(request)
 
@@ -244,9 +246,9 @@ class BonusPaymentValidatorSpec extends BaseTestFixture with BeforeAndAfter {
       }
 
       "the supplied date is in the future" in {
-        val nextMonth = DateTime.now.plusMonths(1).withDayOfMonth(6)
+        val nextMonth     = DateTime.now.plusMonths(1).withDayOfMonth(6)
         val periodEndDate = nextMonth.plusMonths(1).withDayOfMonth(5)
-        val request = validBonusPayment.copy(periodStartDate = nextMonth, periodEndDate = periodEndDate)
+        val request       = validBonusPayment.copy(periodStartDate = nextMonth, periodEndDate = periodEndDate)
 
         val errors = bonusPaymentValidator.validate(request)
 
@@ -261,8 +263,8 @@ class BonusPaymentValidatorSpec extends BaseTestFixture with BeforeAndAfter {
 
       "the supplied date is prior to 6 April 2017" in {
         val periodStartDate = new DateTime("2017-03-06")
-        val periodEndDate = new DateTime("2017-04-05")
-        val request = validBonusPayment.copy(periodStartDate = periodStartDate, periodEndDate = periodEndDate)
+        val periodEndDate   = new DateTime("2017-04-05")
+        val request         = validBonusPayment.copy(periodStartDate = periodStartDate, periodEndDate = periodEndDate)
 
         val errors = bonusPaymentValidator.validate(request)
 
@@ -285,8 +287,8 @@ class BonusPaymentValidatorSpec extends BaseTestFixture with BeforeAndAfter {
 
       "the end date crosses into another year" in {
         val periodStartDate = new DateTime("2017-12-06")
-        val periodEndDate = new DateTime("2018-01-05")
-        val request = validBonusPayment.copy(periodStartDate = periodStartDate, periodEndDate = periodEndDate)
+        val periodEndDate   = new DateTime("2018-01-05")
+        val request         = validBonusPayment.copy(periodStartDate = periodStartDate, periodEndDate = periodEndDate)
 
         val errors = bonusPaymentValidator.validate(request)
 
@@ -313,8 +315,8 @@ class BonusPaymentValidatorSpec extends BaseTestFixture with BeforeAndAfter {
 
       "it is two months after the periodStartDate" in {
         val periodStartDate = new DateTime("2017-12-06")
-        val periodEndDate = new DateTime("2018-02-05")
-        val request = validBonusPayment.copy(periodStartDate = periodStartDate, periodEndDate = periodEndDate)
+        val periodEndDate   = new DateTime("2018-02-05")
+        val request         = validBonusPayment.copy(periodStartDate = periodStartDate, periodEndDate = periodEndDate)
 
         val errors = bonusPaymentValidator.validate(request)
 
@@ -329,8 +331,8 @@ class BonusPaymentValidatorSpec extends BaseTestFixture with BeforeAndAfter {
 
       "it is before the periodStartDate" in {
         val periodStartDate = new DateTime("2017-06-06")
-        val periodEndDate = new DateTime("2017-05-05")
-        val request = validBonusPayment.copy(periodStartDate = periodStartDate, periodEndDate = periodEndDate)
+        val periodEndDate   = new DateTime("2017-05-05")
+        val request         = validBonusPayment.copy(periodStartDate = periodStartDate, periodEndDate = periodEndDate)
 
         val errors = bonusPaymentValidator.validate(request)
 
@@ -345,8 +347,8 @@ class BonusPaymentValidatorSpec extends BaseTestFixture with BeforeAndAfter {
 
       "the supplied date is prior to 6 April 2017" in {
         val periodStartDate = new DateTime("2017-03-06")
-        val periodEndDate = new DateTime("2017-04-05")
-        val request = validBonusPayment.copy(periodStartDate = periodStartDate, periodEndDate = periodEndDate)
+        val periodEndDate   = new DateTime("2017-04-05")
+        val request         = validBonusPayment.copy(periodStartDate = periodStartDate, periodEndDate = periodEndDate)
 
         val errors = bonusPaymentValidator.validate(request)
 
@@ -383,7 +385,8 @@ class BonusPaymentValidatorSpec extends BaseTestFixture with BeforeAndAfter {
     "return an error" when {
 
       "it is not populated and the claimReason is 'Superseded Bonus'" in {
-        val request = validBonusPayment.copy(supersede = None, bonuses = Bonuses(10f, 10f, Some(10f), "Superseded Bonus"))
+        val request =
+          validBonusPayment.copy(supersede = None, bonuses = Bonuses(10f, 10f, Some(10f), "Superseded Bonus"))
 
         val errors = bonusPaymentValidator.validate(request)
 
@@ -434,14 +437,15 @@ class BonusPaymentValidatorSpec extends BaseTestFixture with BeforeAndAfter {
     "return multiple errors" when {
 
       "validation fails multiple conditions" in {
-        val ibp = validBonusPayment.inboundPayments.copy(newSubsForPeriod = Some(1), newSubsYTD = 0, totalSubsForPeriod = 0)
-        val htb = validBonusPayment.htbTransfer.get.copy(htbTransferInForPeriod = 1, htbTransferTotalYTD = 0)
+        val ibp     =
+          validBonusPayment.inboundPayments.copy(newSubsForPeriod = Some(1), newSubsYTD = 0, totalSubsForPeriod = 0)
+        val htb     = validBonusPayment.htbTransfer.get.copy(htbTransferInForPeriod = 1, htbTransferTotalYTD = 0)
         val request = validBonusPayment.copy(inboundPayments = ibp, htbTransfer = Some(htb))
 
         val errors = bonusPaymentValidator.validate(request)
 
         errors.size mustBe 3
-        errors(0).path mustBe Some("/htbTransfer/htbTransferTotalYTD")
+        errors.head.path mustBe Some("/htbTransfer/htbTransferTotalYTD")
         errors(1).path mustBe Some("/inboundPayments/newSubsYTD")
         errors(2).path mustBe Some("/inboundPayments/totalSubsForPeriod")
       }

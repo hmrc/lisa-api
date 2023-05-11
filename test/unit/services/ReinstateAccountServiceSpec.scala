@@ -46,7 +46,7 @@ class ReinstateAccountServiceSpec extends ServiceTestFixture {
           )
 
         doReinstateRequest { response =>
-          response mustBe ReinstateLisaAccountSuccessResponse ("code", "reason")
+          response mustBe ReinstateLisaAccountSuccessResponse("code", "reason")
         }
       }
 
@@ -116,7 +116,6 @@ class ReinstateAccountServiceSpec extends ServiceTestFixture {
         }
       }
 
-
       "given failureResponse for a Account Not Found Response" in {
         when(mockDesConnector.reinstateAccount(any(), any())(any()))
           .thenReturn(
@@ -127,7 +126,6 @@ class ReinstateAccountServiceSpec extends ServiceTestFixture {
           response mustBe ReinstateLisaAccountNotFoundResponse
         }
       }
-
 
       "given failureResponse for any other error" in {
         when(mockDesConnector.reinstateAccount(any(), any())(any()))
@@ -143,10 +141,9 @@ class ReinstateAccountServiceSpec extends ServiceTestFixture {
 
   }
 
-
-
-  private def doReinstateRequest(callback: (ReinstateLisaAccountResponse) => Unit) = {
-    val response = Await.result(reinstateAccountService.reinstateAccountService(testLMRN, "A123456")(HeaderCarrier()), Duration.Inf)
+  private def doReinstateRequest(callback: ReinstateLisaAccountResponse => Unit): Unit = {
+    val response =
+      Await.result(reinstateAccountService.reinstateAccountService(testLMRN, "A123456")(HeaderCarrier()), Duration.Inf)
 
     callback(response)
   }

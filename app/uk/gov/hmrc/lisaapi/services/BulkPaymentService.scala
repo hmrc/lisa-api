@@ -26,25 +26,24 @@ import uk.gov.hmrc.lisaapi.models._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class BulkPaymentService @Inject()(desConnector: DesConnector)(implicit ec: ExecutionContext) extends Logging {
+class BulkPaymentService @Inject() (desConnector: DesConnector)(implicit ec: ExecutionContext) extends Logging {
 
-  def getBulkPayment(lisaManager: String, startDate: DateTime, endDate: DateTime)
-                    (implicit hc: HeaderCarrier): Future[GetBulkPaymentResponse] = {
+  def getBulkPayment(lisaManager: String, startDate: DateTime, endDate: DateTime)(implicit
+    hc: HeaderCarrier
+  ): Future[GetBulkPaymentResponse] =
     desConnector.getBulkPayment(lisaManager, startDate, endDate) map {
-      case GetBulkPaymentNotFoundResponse => GetBulkPaymentNotFoundResponse
+      case GetBulkPaymentNotFoundResponse                         => GetBulkPaymentNotFoundResponse
       case s: GetBulkPaymentSuccessResponse if s.payments.isEmpty => GetBulkPaymentNotFoundResponse
-      case s: GetBulkPaymentSuccessResponse => s
-      case DesUnavailableResponse => GetBulkPaymentServiceUnavailableResponse
-      case f: DesFailureResponse =>
+      case s: GetBulkPaymentSuccessResponse                       => s
+      case DesUnavailableResponse                                 => GetBulkPaymentServiceUnavailableResponse
+      case f: DesFailureResponse                                  =>
         f.code match {
-          case "NOT_FOUND" |
-               "INVALID_CALCULATEACCRUEDINTEREST" |
-               "INVALID_CUSTOMERPAYMENTINFORMATION" => GetBulkPaymentNotFoundResponse
-          case _ =>
+          case "NOT_FOUND" | "INVALID_CALCULATEACCRUEDINTEREST" | "INVALID_CUSTOMERPAYMENTINFORMATION" =>
+            GetBulkPaymentNotFoundResponse
+          case _                                                                                       =>
             logger.warn(s"Get bulk payment returned error: ${f.code}")
             GetBulkPaymentErrorResponse
         }
     }
-  }
 
 }

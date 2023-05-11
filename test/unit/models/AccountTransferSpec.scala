@@ -23,7 +23,8 @@ import uk.gov.hmrc.lisaapi.models.AccountTransfer
 
 class AccountTransferSpec extends PlaySpec {
 
-  val validAccountTransferJson = """{"transferredFromAccountId":"Z543210", "transferredFromLMRN":"Z543333", "transferInDate":"2015-12-13"}"""
+  val validAccountTransferJson =
+    """{"transferredFromAccountId":"Z543210", "transferredFromLMRN":"Z543333", "transferInDate":"2015-12-13"}"""
 
   "AccountTransfer" must {
 
@@ -31,14 +32,13 @@ class AccountTransferSpec extends PlaySpec {
       val res = Json.parse(validAccountTransferJson).validate[AccountTransfer]
 
       res match {
-        case JsError(errors) => fail()
-        case JsSuccess(data, path) => {
+        case JsError(errors)       => fail()
+        case JsSuccess(data, path) =>
           data.transferredFromAccountId mustBe "Z543210"
           data.transferredFromLMRN mustBe "Z543333"
           data.transferInDate.getYear mustBe 2015
           data.transferInDate.getMonthOfYear mustBe 12
           data.transferInDate.getDayOfMonth mustBe 13
-        }
       }
     }
 
@@ -51,34 +51,30 @@ class AccountTransferSpec extends PlaySpec {
     }
 
     "catch an invalid transferredFromLMRN" in {
-      val req = """{"transferredFromAccountId":"Z543210", "transferredFromLMRN":"A12345", "transferInDate":"2015-12-13"}"""
+      val req =
+        """{"transferredFromAccountId":"Z543210", "transferredFromLMRN":"A12345", "transferInDate":"2015-12-13"}"""
       val res = Json.parse(req).validate[AccountTransfer]
 
       res match {
-        case JsError(errors) => {
-          errors.count {
-            case (path: JsPath, errors: Seq[JsonValidationError]) => {
-              path.toString() == "/transferredFromLMRN" && errors.contains(JsonValidationError("error.formatting.lmrn"))
-            }
+        case JsError(errors) =>
+          errors.count { case (path: JsPath, errors: Seq[JsonValidationError]) =>
+            path.toString() == "/transferredFromLMRN" && errors.contains(JsonValidationError("error.formatting.lmrn"))
           } mustBe 1
-        }
-        case _ => fail()
+        case _               => fail()
       }
     }
 
     "catch an invalid transferInDate" in {
-      val req = """{"transferredFromAccountId":"Z543210", "transferredFromLMRN":"Z543333", "transferInDate":"12/13/2015"}"""
+      val req =
+        """{"transferredFromAccountId":"Z543210", "transferredFromLMRN":"Z543333", "transferInDate":"12/13/2015"}"""
       val res = Json.parse(req).validate[AccountTransfer]
 
       res match {
-        case JsError(errors) => {
-          errors.count {
-            case (path: JsPath, errors: Seq[JsonValidationError]) => {
-              path.toString() == "/transferInDate" && errors.contains(JsonValidationError("error.formatting.date"))
-            }
+        case JsError(errors) =>
+          errors.count { case (path: JsPath, errors: Seq[JsonValidationError]) =>
+            path.toString() == "/transferInDate" && errors.contains(JsonValidationError("error.formatting.date"))
           } mustBe 1
-        }
-        case _ => fail()
+        case _               => fail()
       }
     }
 

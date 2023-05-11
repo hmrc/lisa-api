@@ -38,8 +38,8 @@ class BonusPaymentServiceSpec extends ServiceTestFixture {
     "return a success response" when {
 
       "given a successful on time response from the DES connector" in {
-        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesTransactionResponse("AB123456", Some("On Time"))))
+        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesTransactionResponse("AB123456", Some("On Time"))))
 
         doRequest { response =>
           response mustBe RequestBonusPaymentOnTimeResponse("AB123456")
@@ -47,8 +47,8 @@ class BonusPaymentServiceSpec extends ServiceTestFixture {
       }
 
       "given a successful late notification response from the DES connector" in {
-        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesTransactionResponse("AB123456", Some("Late"))))
+        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesTransactionResponse("AB123456", Some("Late"))))
 
         doRequest { response =>
           response mustBe RequestBonusPaymentLateResponse("AB123456")
@@ -56,19 +56,21 @@ class BonusPaymentServiceSpec extends ServiceTestFixture {
       }
 
       "given a successful superseded response from the DES connector" in {
-        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesTransactionResponse("AB123456", None)))
+        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesTransactionResponse("AB123456", None)))
 
         doRequest(
-          response => { response mustBe RequestBonusPaymentSupersededResponse("AB123456") },
-          Some(RequestBonusPaymentRequest(
-            lifeEventId = Some("1234567891"),
-            periodStartDate = new DateTime("2017-04-06"),
-            periodEndDate = new DateTime("2017-05-05"),
-            htbTransfer = Some(HelpToBuyTransfer(0f, 0f)),
-            inboundPayments = InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
-            bonuses = Bonuses(1000f, 1000f, None, "Superseded Bonus")
-          ))
+          response => response mustBe RequestBonusPaymentSupersededResponse("AB123456"),
+          Some(
+            RequestBonusPaymentRequest(
+              lifeEventId = Some("1234567891"),
+              periodStartDate = new DateTime("2017-04-06"),
+              periodEndDate = new DateTime("2017-05-05"),
+              htbTransfer = Some(HelpToBuyTransfer(0f, 0f)),
+              inboundPayments = InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
+              bonuses = Bonuses(1000f, 1000f, None, "Superseded Bonus")
+            )
+          )
         )
       }
 
@@ -76,8 +78,8 @@ class BonusPaymentServiceSpec extends ServiceTestFixture {
 
     "return a account closed or void response" when {
       "given the code INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID from the DES connector" in {
-        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID", "x")))
+        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID", "x")))
 
         doRequest { response =>
           response mustBe RequestBonusPaymentAccountClosedOrVoid
@@ -87,8 +89,8 @@ class BonusPaymentServiceSpec extends ServiceTestFixture {
 
     "return a account closed response" when {
       "given the code INVESTOR_ACCOUNT_ALREADY_CLOSED from the DES connector" in {
-        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_CLOSED", "x")))
+        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_CLOSED", "x")))
 
         doRequest { response =>
           response mustBe RequestBonusPaymentAccountClosed
@@ -98,8 +100,8 @@ class BonusPaymentServiceSpec extends ServiceTestFixture {
 
     "return a account cancelled response" when {
       "given the code INVESTOR_ACCOUNT_ALREADY_CANCELLED from the DES connector" in {
-        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_CANCELLED", "x")))
+        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_CANCELLED", "x")))
 
         doRequest { response =>
           response mustBe RequestBonusPaymentAccountCancelled
@@ -109,8 +111,8 @@ class BonusPaymentServiceSpec extends ServiceTestFixture {
 
     "return a account void response" when {
       "given the code INVESTOR_ACCOUNT_ALREADY_VOID from the DES connector" in {
-        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_VOID", "x")))
+        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_VOID", "x")))
 
         doRequest { response =>
           response mustBe RequestBonusPaymentAccountVoid
@@ -120,8 +122,8 @@ class BonusPaymentServiceSpec extends ServiceTestFixture {
 
     "return a life event not found response" when {
       "given the code LIFE_EVENT_NOT_FOUND from the DES connector" in {
-        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("LIFE_EVENT_NOT_FOUND", "xx")))
+        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesFailureResponse("LIFE_EVENT_NOT_FOUND", "xx")))
 
         doRequest { response =>
           response mustBe RequestBonusPaymentLifeEventNotFound
@@ -131,8 +133,8 @@ class BonusPaymentServiceSpec extends ServiceTestFixture {
 
     "return a bonus claim error response" when {
       "given the code BONUS_CLAIM_ERROR from the DES connector" in {
-        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("BONUS_CLAIM_ERROR", "xxx")))
+        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesFailureResponse("BONUS_CLAIM_ERROR", "xxx")))
 
         doRequest { response =>
           response mustBe RequestBonusPaymentBonusClaimError
@@ -142,8 +144,8 @@ class BonusPaymentServiceSpec extends ServiceTestFixture {
 
     "return a account not found response" when {
       "given the code INVESTOR_ACCOUNTID_NOT_FOUND from the DES connector" in {
-        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNTID_NOT_FOUND", "xxxx")))
+        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNTID_NOT_FOUND", "xxxx")))
 
         doRequest { response =>
           response mustBe RequestBonusPaymentAccountNotFound
@@ -153,8 +155,8 @@ class BonusPaymentServiceSpec extends ServiceTestFixture {
 
     "return a bonus claim already exists response" when {
       "given the code BONUS_CLAIM_ALREADY_EXISTS from the DES connector" in {
-        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesTransactionExistResponse("BONUS_CLAIM_ALREADY_EXISTS", "xxxxx", "987654")))
+        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesTransactionExistResponse("BONUS_CLAIM_ALREADY_EXISTS", "xxxxx", "987654")))
 
         doRequest { response =>
           response mustBe RequestBonusPaymentClaimAlreadyExists("987654")
@@ -164,8 +166,8 @@ class BonusPaymentServiceSpec extends ServiceTestFixture {
 
     "return a superseded bonus request amount mismatch response" when {
       "given the code SUPERSEDING_TRANSACTION_ID_AMOUNT_MISMATCH from the DES connector" in {
-        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("SUPERSEDING_TRANSACTION_ID_AMOUNT_MISMATCH", "xxxxx")))
+        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesFailureResponse("SUPERSEDING_TRANSACTION_ID_AMOUNT_MISMATCH", "xxxxx")))
 
         doRequest { response =>
           response mustBe RequestBonusPaymentSupersededAmountMismatch
@@ -175,8 +177,8 @@ class BonusPaymentServiceSpec extends ServiceTestFixture {
 
     "return a superseded bonus request outcome error response" when {
       "given the code SUPERSEDING_TRANSACTION_OUTCOME_ERROR from the DES connector" in {
-        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("SUPERSEDING_TRANSACTION_OUTCOME_ERROR", "xxxxx")))
+        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesFailureResponse("SUPERSEDING_TRANSACTION_OUTCOME_ERROR", "xxxxx")))
 
         doRequest { response =>
           response mustBe RequestBonusPaymentSupersededOutcomeError
@@ -186,8 +188,11 @@ class BonusPaymentServiceSpec extends ServiceTestFixture {
 
     "return a already superseded response" when {
       "given the code SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED from the DES connector" in {
-        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesTransactionExistResponse("SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED", "xxxxx", "12345")))
+        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).thenReturn(
+          Future.successful(
+            DesTransactionExistResponse("SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED", "xxxxx", "12345")
+          )
+        )
 
         doRequest { response =>
           response mustBe RequestBonusPaymentAlreadySuperseded("12345")
@@ -197,8 +202,8 @@ class BonusPaymentServiceSpec extends ServiceTestFixture {
 
     "return a no subscriptions response" when {
       "given the code ACCOUNT_ERROR_NO_SUBSCRIPTIONS_THIS_TAX_YEAR from the DES connector" in {
-        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("ACCOUNT_ERROR_NO_SUBSCRIPTIONS_THIS_TAX_YEAR", "xxxxx")))
+        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesFailureResponse("ACCOUNT_ERROR_NO_SUBSCRIPTIONS_THIS_TAX_YEAR", "xxxxx")))
 
         doRequest { response =>
           response mustBe RequestBonusPaymentNoSubscriptions
@@ -208,8 +213,8 @@ class BonusPaymentServiceSpec extends ServiceTestFixture {
 
     "return a generic error response" when {
       "given any other error code from the DES connector" in {
-        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("SOMETHING_ELSE", "xxxxx")))
+        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesFailureResponse("SOMETHING_ELSE", "xxxxx")))
 
         doRequest { response =>
           response mustBe RequestBonusPaymentError
@@ -219,8 +224,8 @@ class BonusPaymentServiceSpec extends ServiceTestFixture {
 
     "return a service unavailable response" when {
       "given a DesUnavailableResponse from the DES connector" in {
-        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesUnavailableResponse))
+        when(mockDesConnector.requestBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesUnavailableResponse))
 
         doRequest { response =>
           response mustBe RequestBonusPaymentServiceUnavailable
@@ -230,10 +235,13 @@ class BonusPaymentServiceSpec extends ServiceTestFixture {
 
   }
 
-  private def doRequest(callback: (RequestBonusPaymentResponse) => Unit, data: Option[RequestBonusPaymentRequest] = None) = {
+  private def doRequest(
+    callback: RequestBonusPaymentResponse => Unit,
+    data: Option[RequestBonusPaymentRequest] = None
+  ): Unit = {
     val request = data match {
       case Some(req) => req
-      case None => {
+      case None      =>
         RequestBonusPaymentRequest(
           lifeEventId = Some("1234567891"),
           periodStartDate = new DateTime("2017-04-06"),
@@ -242,10 +250,10 @@ class BonusPaymentServiceSpec extends ServiceTestFixture {
           inboundPayments = InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
           bonuses = Bonuses(1000f, 1000f, None, "Life Event")
         )
-      }
     }
 
-    val response = Await.result(bonusPaymentService.requestBonusPayment("Z019283", "192837", request)(HeaderCarrier()), Duration.Inf)
+    val response =
+      Await.result(bonusPaymentService.requestBonusPayment("Z019283", "192837", request)(HeaderCarrier()), Duration.Inf)
 
     callback(response)
   }

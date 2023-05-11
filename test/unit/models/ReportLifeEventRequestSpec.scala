@@ -31,18 +31,17 @@ class ReportLifeEventRequestSpec extends PlaySpec {
       val res = Json.parse(validRequestJson).validate[ReportLifeEventRequest]
 
       res match {
-        case JsError(errors) => fail()
-        case JsSuccess(data, path) => {
+        case JsError(errors)       => fail()
+        case JsSuccess(data, path) =>
           data.eventType mustBe "LISA Investor Terminal Ill Health"
           data.eventDate.getYear mustBe 2017
           data.eventDate.getMonthOfYear mustBe 1
           data.eventDate.getDayOfMonth mustBe 1
-        }
       }
     }
 
     "deserialize to json" in {
-      val request = ReportLifeEventRequest( "LISA Investor Terminal Ill Health", new DateTime("2017-01-01"))
+      val request = ReportLifeEventRequest("LISA Investor Terminal Ill Health", new DateTime("2017-01-01"))
 
       val json = Json.toJson[ReportLifeEventRequestBase](request)
 
@@ -54,7 +53,7 @@ class ReportLifeEventRequestSpec extends PlaySpec {
   "ReportLifeEventRequestBase" must {
 
     "correctly serialise a standard life event" in {
-      val input = ReportLifeEventRequest( "LISA Investor Terminal Ill Health", new DateTime("2017-01-01"))
+      val input  = ReportLifeEventRequest("LISA Investor Terminal Ill Health", new DateTime("2017-01-01"))
       val output = Json.toJson[ReportLifeEventRequestBase](input)
 
       output mustBe Json.obj(
@@ -64,54 +63,58 @@ class ReportLifeEventRequestSpec extends PlaySpec {
     }
 
     "correctly serialise a standard fund release" in {
-      val input = InitialFundReleaseRequest(
+      val input  = InitialFundReleaseRequest(
         eventDate = new DateTime("2017-05-10"),
         withdrawalAmount = 4000,
         conveyancerReference = Some("CR12345-6789"),
-        propertyDetails = Some(FundReleasePropertyDetails(
-          nameOrNumber = "1",
-          postalCode = "AA11 1AA"
-        ))
+        propertyDetails = Some(
+          FundReleasePropertyDetails(
+            nameOrNumber = "1",
+            postalCode = "AA11 1AA"
+          )
+        )
       )
       val output = Json.toJson[ReportLifeEventRequestBase](input)
 
       output mustBe Json.obj(
-        "eventType" -> "Funds Release",
-        "eventDate" -> "2017-05-10",
-        "withdrawalAmount" -> 4000,
+        "eventType"            -> "Funds Release",
+        "eventDate"            -> "2017-05-10",
+        "withdrawalAmount"     -> 4000,
         "conveyancerReference" -> "CR12345-6789",
-        "propertyDetails" -> Json.obj(
+        "propertyDetails"      -> Json.obj(
           "nameOrNumber" -> "1",
-          "postalCode" -> "AA11 1AA"
+          "postalCode"   -> "AA11 1AA"
         )
       )
     }
 
     "correctly serialise a standard fund release without conveyancerReference" in {
-      val input = InitialFundReleaseRequest(
+      val input  = InitialFundReleaseRequest(
         eventDate = new DateTime("2017-05-10"),
         withdrawalAmount = 4000,
         conveyancerReference = None,
-        propertyDetails = Some(FundReleasePropertyDetails(
-          nameOrNumber = "1",
-          postalCode = "AA11 1AA"
-        ))
+        propertyDetails = Some(
+          FundReleasePropertyDetails(
+            nameOrNumber = "1",
+            postalCode = "AA11 1AA"
+          )
+        )
       )
       val output = Json.toJson[ReportLifeEventRequestBase](input)
 
       output mustBe Json.obj(
-        "eventType" -> "Funds Release",
-        "eventDate" -> "2017-05-10",
+        "eventType"        -> "Funds Release",
+        "eventDate"        -> "2017-05-10",
         "withdrawalAmount" -> 4000,
-        "propertyDetails" -> Json.obj(
+        "propertyDetails"  -> Json.obj(
           "nameOrNumber" -> "1",
-          "postalCode" -> "AA11 1AA"
+          "postalCode"   -> "AA11 1AA"
         )
       )
     }
 
     "correctly serialise a standard fund release without propertyDetails" in {
-      val input = InitialFundReleaseRequest(
+      val input  = InitialFundReleaseRequest(
         eventDate = new DateTime("2017-05-10"),
         withdrawalAmount = 4000,
         conveyancerReference = Some("CR12345-6789"),
@@ -120,15 +123,15 @@ class ReportLifeEventRequestSpec extends PlaySpec {
       val output = Json.toJson[ReportLifeEventRequestBase](input)
 
       output mustBe Json.obj(
-        "eventType" -> "Funds Release",
-        "eventDate" -> "2017-05-10",
-        "withdrawalAmount" -> 4000,
+        "eventType"            -> "Funds Release",
+        "eventDate"            -> "2017-05-10",
+        "withdrawalAmount"     -> 4000,
         "conveyancerReference" -> "CR12345-6789"
       )
     }
 
     "correctly serialise a superseded fund release" in {
-      val input = SupersedeFundReleaseRequest(
+      val input  = SupersedeFundReleaseRequest(
         eventDate = new DateTime("2017-05-05"),
         withdrawalAmount = 5000,
         supersede = FundReleaseSupersedeDetails(
@@ -139,16 +142,16 @@ class ReportLifeEventRequestSpec extends PlaySpec {
       val output = Json.toJson[ReportLifeEventRequestBase](input)
 
       output mustBe Json.obj(
-        "eventType" -> "Funds Release",
-        "eventDate" -> "2017-05-05",
-        "withdrawalAmount" -> 5000,
+        "eventType"               -> "Funds Release",
+        "eventDate"               -> "2017-05-05",
+        "withdrawalAmount"        -> 5000,
         "supersededLifeEventDate" -> "2017-05-10",
-        "supersededLifeEventID" -> "3456789000"
+        "supersededLifeEventID"   -> "3456789000"
       )
     }
 
     "correctly serialise a standard purchase extension" in {
-      val input = RequestStandardPurchaseExtension(
+      val input  = RequestStandardPurchaseExtension(
         eventDate = new DateTime("2017-05-10"),
         eventType = "Extension one",
         fundReleaseId = "3456789001"
@@ -156,14 +159,14 @@ class ReportLifeEventRequestSpec extends PlaySpec {
       val output = Json.toJson[ReportLifeEventRequestBase](input)
 
       output mustBe Json.obj(
-        "eventType" -> "Extension one",
-        "eventDate" -> "2017-05-10",
+        "eventType"               -> "Extension one",
+        "eventDate"               -> "2017-05-10",
         "fundsReleaseLifeEventID" -> "3456789001"
       )
     }
 
     "correctly serialise a superseded purchase extension" in {
-      val input = RequestSupersededPurchaseExtension(
+      val input  = RequestSupersededPurchaseExtension(
         eventDate = new DateTime("2017-05-10"),
         eventType = "Extension two",
         supersede = RequestExtensionSupersedeDetails(
@@ -174,15 +177,15 @@ class ReportLifeEventRequestSpec extends PlaySpec {
       val output = Json.toJson[ReportLifeEventRequestBase](input)
 
       output mustBe Json.obj(
-        "eventType" -> "Extension two",
-        "eventDate" -> "2017-05-10",
-        "supersededLifeEventID" -> "6789000001",
+        "eventType"               -> "Extension two",
+        "eventDate"               -> "2017-05-10",
+        "supersededLifeEventID"   -> "6789000001",
         "supersededLifeEventDate" -> "2017-05-10"
       )
     }
 
     "correctly serialise a standard purchase outcome" in {
-      val input = RequestPurchaseOutcomeCompletedRequest(
+      val input  = RequestPurchaseOutcomeCompletedRequest(
         fundReleaseId = "3456789000",
         eventDate = new DateTime("2017-05-05"),
         propertyPurchaseResult = "Purchase completed",
@@ -191,18 +194,18 @@ class ReportLifeEventRequestSpec extends PlaySpec {
       val output = Json.toJson[ReportLifeEventRequestBase](input)
 
       output mustBe Json.obj(
-        "eventType" -> "Purchase Result",
-        "eventDate" -> "2017-05-05",
+        "eventType"               -> "Purchase Result",
+        "eventDate"               -> "2017-05-05",
         "fundsReleaseLifeEventID" -> "3456789000",
-        "propertyDetails" -> Json.obj(
+        "propertyDetails"         -> Json.obj(
           "purchaseResult" -> "Purchase completed",
-          "purchaseValue" -> 250000
+          "purchaseValue"  -> 250000
         )
       )
     }
 
     "correctly serialise a superseded purchase outcome" in {
-      val input = RequestPurchaseOutcomeSupersededCompletedRequest(
+      val input  = RequestPurchaseOutcomeSupersededCompletedRequest(
         eventDate = new DateTime("2017-06-10"),
         propertyPurchaseResult = "Purchase completed",
         propertyPurchaseValue = 250000,
@@ -214,13 +217,13 @@ class ReportLifeEventRequestSpec extends PlaySpec {
       val output = Json.toJson[ReportLifeEventRequestBase](input)
 
       output mustBe Json.obj(
-        "eventType" -> "Purchase Result",
-        "eventDate" -> "2017-06-10",
-        "propertyDetails" -> Json.obj(
+        "eventType"               -> "Purchase Result",
+        "eventDate"               -> "2017-06-10",
+        "propertyDetails"         -> Json.obj(
           "purchaseResult" -> "Purchase completed",
-          "purchaseValue" -> 250000
+          "purchaseValue"  -> 250000
         ),
-        "supersededLifeEventID" -> "5678900001",
+        "supersededLifeEventID"   -> "5678900001",
         "supersededLifeEventDate" -> "2017-05-05"
       )
     }
@@ -237,14 +240,14 @@ class ReportLifeEventRequestSpec extends PlaySpec {
       )
 
       Json.toJson[ReportLifeEventRequestBase](input) mustBe Json.obj(
-        "eventType" -> "Statutory Submission",
-        "eventDate" -> "2018-04-05",
-        "isaManagerName" -> "ISA Manager",
-        "lisaAnnualCashSubs" -> 0,
-        "lisaAnnualStocksAndSharesSubs" -> 55,
-        "lisaMarketValueCash" -> 0,
+        "eventType"                      -> "Statutory Submission",
+        "eventDate"                      -> "2018-04-05",
+        "isaManagerName"                 -> "ISA Manager",
+        "lisaAnnualCashSubs"             -> 0,
+        "lisaAnnualStocksAndSharesSubs"  -> 55,
+        "lisaMarketValueCash"            -> 0,
         "lisaMarketValueStocksAndShares" -> 65,
-        "taxYear" -> "2018"
+        "taxYear"                        -> "2018"
       )
     }
 
@@ -266,16 +269,16 @@ class ReportLifeEventRequestSpec extends PlaySpec {
       )
 
       Json.toJson[ReportLifeEventRequestBase](input) mustBe Json.obj(
-        "eventType" -> "Statutory Submission",
-        "eventDate" -> "2018-04-05",
-        "isaManagerName" -> "ISA Manager",
-        "lisaAnnualCashSubs" -> 0,
-        "lisaAnnualStocksAndSharesSubs" -> 55,
-        "lisaMarketValueCash" -> 0,
+        "eventType"                      -> "Statutory Submission",
+        "eventDate"                      -> "2018-04-05",
+        "isaManagerName"                 -> "ISA Manager",
+        "lisaAnnualCashSubs"             -> 0,
+        "lisaAnnualStocksAndSharesSubs"  -> 55,
+        "lisaMarketValueCash"            -> 0,
         "lisaMarketValueStocksAndShares" -> 65,
-        "taxYear" -> "2018",
-        "supersededLifeEventID" -> "1234567890",
-        "supersededLifeEventDate" -> "2017-04-01"
+        "taxYear"                        -> "2018",
+        "supersededLifeEventID"          -> "1234567890",
+        "supersededLifeEventDate"        -> "2017-04-01"
       )
     }
 

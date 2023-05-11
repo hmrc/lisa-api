@@ -33,23 +33,22 @@ case class RequestBonusPaymentRequest(
 object RequestBonusPaymentRequest {
   implicit val requestBonusPaymentReadsV2: Reads[RequestBonusPaymentRequest] = (
     (JsPath \ "lifeEventId").readNullable(JsonReads.lifeEventId) and
-    (JsPath \ "periodStartDate").read(JsonReads.isoDate).map(new DateTime(_)) and
-    (JsPath \ "periodEndDate").read(JsonReads.isoDate).map(new DateTime(_)) and
-    (JsPath \ "htbTransfer").readNullable[HelpToBuyTransfer] and
-    (JsPath \ "inboundPayments").read[InboundPayments] and
-    (JsPath \ "bonuses").read[Bonuses] and
-    (JsPath \ "supersede").readNullable[Supersede]
+      (JsPath \ "periodStartDate").read(JsonReads.isoDate).map(new DateTime(_)) and
+      (JsPath \ "periodEndDate").read(JsonReads.isoDate).map(new DateTime(_)) and
+      (JsPath \ "htbTransfer").readNullable[HelpToBuyTransfer] and
+      (JsPath \ "inboundPayments").read[InboundPayments] and
+      (JsPath \ "bonuses").read[Bonuses] and
+      (JsPath \ "supersede").readNullable[Supersede]
   )(RequestBonusPaymentRequest.apply _)
 
   val requestBonusPaymentReadsV1: Reads[RequestBonusPaymentRequest] = (
     (JsPath \ "lifeEventId").readNullable(JsonReads.lifeEventId) and
-    (JsPath \ "periodStartDate").read(JsonReads.isoDate).map(new DateTime(_)) and
-    (JsPath \ "periodEndDate").read(JsonReads.isoDate).map(new DateTime(_)) and
-    (JsPath \ "htbTransfer").readNullable[HelpToBuyTransfer] and
-    (JsPath \ "inboundPayments").read[InboundPayments] and
-    (JsPath \ "bonuses").read[Bonuses](Bonuses.bonusesReadsV1)
-  )(
-    (lifeEventId, periodStartDate, periodEndDate, htbTransfer, inboundPayments, bonuses) =>
+      (JsPath \ "periodStartDate").read(JsonReads.isoDate).map(new DateTime(_)) and
+      (JsPath \ "periodEndDate").read(JsonReads.isoDate).map(new DateTime(_)) and
+      (JsPath \ "htbTransfer").readNullable[HelpToBuyTransfer] and
+      (JsPath \ "inboundPayments").read[InboundPayments] and
+      (JsPath \ "bonuses").read[Bonuses](Bonuses.bonusesReadsV1)
+  )((lifeEventId, periodStartDate, periodEndDate, htbTransfer, inboundPayments, bonuses) =>
     RequestBonusPaymentRequest(
       lifeEventId = lifeEventId,
       periodStartDate = periodStartDate,
@@ -63,15 +62,15 @@ object RequestBonusPaymentRequest {
 
   implicit val requestBonusPaymentWrites: Writes[RequestBonusPaymentRequest] = (
     (JsPath \ "lifeEventId").writeNullable[String] and
-    (JsPath \ "periodStartDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
-    (JsPath \ "periodEndDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
-    (JsPath \ "transactionType").write[String] and
-    (JsPath \ "htbTransfer").writeNullable[HelpToBuyTransfer] and
-    (JsPath \ "inboundPayments").write[InboundPayments] and
-    (JsPath \ "bonuses").write[Bonuses] and
-    (JsPath \ "supersededDetail").writeNullable[Supersede]
-  ){
-    req: RequestBonusPaymentRequest => (
+      (JsPath \ "periodStartDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
+      (JsPath \ "periodEndDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
+      (JsPath \ "transactionType").write[String] and
+      (JsPath \ "htbTransfer").writeNullable[HelpToBuyTransfer] and
+      (JsPath \ "inboundPayments").write[InboundPayments] and
+      (JsPath \ "bonuses").write[Bonuses] and
+      (JsPath \ "supersededDetail").writeNullable[Supersede]
+  ) { req: RequestBonusPaymentRequest =>
+    (
       req.lifeEventId,
       req.periodStartDate,
       req.periodEndDate,

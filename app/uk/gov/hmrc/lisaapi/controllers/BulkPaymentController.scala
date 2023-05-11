@@ -29,23 +29,25 @@ import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models.{GetBulkPaymentNotFoundResponse, GetBulkPaymentServiceUnavailableResponse, GetBulkPaymentSuccessResponse}
 import uk.gov.hmrc.lisaapi.services.{AuditService, BulkPaymentService, CurrentDateService}
 
+import scala.collection.immutable
 import scala.concurrent.{ExecutionContext, Future}
 
-class BulkPaymentController @Inject()(
-                                       authConnector: AuthConnector,
-                                       appContext: AppContext,
-                                       currentDateService: CurrentDateService,
-                                       service: BulkPaymentService,
-                                       auditService: AuditService,
-                                       lisaMetrics: LisaMetrics,
-                                       cc: ControllerComponents,
-                                       parse: PlayBodyParsers
-                                     )(implicit ec: ExecutionContext) extends LisaController(
-  cc: ControllerComponents,
-  lisaMetrics: LisaMetrics,
+class BulkPaymentController @Inject() (
+  authConnector: AuthConnector,
   appContext: AppContext,
-  authConnector: AuthConnector
-) {
+  currentDateService: CurrentDateService,
+  service: BulkPaymentService,
+  auditService: AuditService,
+  lisaMetrics: LisaMetrics,
+  cc: ControllerComponents,
+  parse: PlayBodyParsers
+)(implicit ec: ExecutionContext)
+    extends LisaController(
+      cc: ControllerComponents,
+      lisaMetrics: LisaMetrics,
+      appContext: AppContext,
+      authConnector: AuthConnector
+    ) {
 
   def getBulkPayment(lisaManager: String, startDate: String, endDate: String): Action[AnyContent] =
     validateHeader(parse).async { implicit request =>
@@ -56,14 +58,14 @@ class BulkPaymentController @Inject()(
             val response = service.getBulkPayment(lisaManager, start, end)
 
             response flatMap {
-              case s: GetBulkPaymentSuccessResponse =>
+              case s: GetBulkPaymentSuccessResponse         =>
                 getBulkPaymentAudit(lisaManager)
                 lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.TRANSACTION)
                 withApiVersion {
                   case Some(VERSION_1) => Future.successful(transformV1Response(Json.toJson(s)))
                   case Some(VERSION_2) => Future.successful(Ok(Json.toJson(s)))
                 }
-              case GetBulkPaymentNotFoundResponse =>
+              case GetBulkPaymentNotFoundResponse           =>
                 lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.TRANSACTION)
                 withApiVersion {
                   case Some(VERSION_1) =>
@@ -76,7 +78,7 @@ class BulkPaymentController @Inject()(
               case GetBulkPaymentServiceUnavailableResponse =>
                 getBulkPaymentAudit(lisaManager, Some(ErrorServiceUnavailable.errorCode))
                 Future.successful(ErrorServiceUnavailable.asResult)
-              case _ =>
+              case _                                        =>
                 getBulkPaymentAudit(lisaManager, Some(ErrorInternalServerError.errorCode))
                 lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.TRANSACTION)
                 Future.successful(InternalServerError(ErrorInternalServerError.asJson))
@@ -87,50 +89,52 @@ class BulkPaymentController @Inject()(
     }
 
   def transformV1Response(json: JsValue): Result = {
-    val jsonTransformer = (__ \ 'payments).json.update(
-      of[JsArray] map {
-        case JsArray(arr) => JsArray(arr map {
-          case JsObject(o) => JsObject(o - "transactionType" - "status")
+    val jsonTransformer = (__ \ Symbol("payments")).json.update(
+      of[JsArray] map { case JsArray(arr) =>
+        JsArray(arr map { case JsObject(o) =>
+          JsObject(o.to(immutable.Map) -- Set("transactionType", "status"))
         })
       }
     )
 
-    json.transform(jsonTransformer).fold(
-      _ => InternalServerError(ErrorInternalServerError.asJson),
-      success => Ok(Json.toJson(success))
-    )
+    json
+      .transform(jsonTransformer)
+      .fold(
+        _ => InternalServerError(ErrorInternalServerError.asJson),
+        success => Ok(Json.toJson(success))
+      )
   }
 
-  private def withValidDates(startDate: String, endDate: String, lisaManager: String)
-                            (success: (DateTime, DateTime) => Future[Result])
-                            (implicit hc: HeaderCarrier, startTime: Long): Future[Result] = {
+  private def withValidDates(startDate: String, endDate: String, lisaManager: String)(
+    success: (DateTime, DateTime) => Future[Result]
+  )(implicit hc: HeaderCarrier, startTime: Long): Future[Result] = {
 
     val start = parseDate(startDate)
-    val end = parseDate(endDate)
+    val end   = parseDate(endDate)
 
     (start, end) match {
       case (Some(s), Some(e)) =>
         withDatesWithinBusinessRules(s, e, lisaManager) { () =>
           success(s, e)
         }
-      case (None, Some(_)) =>
+      case (None, Some(_))    =>
         getBulkPaymentAudit(lisaManager, Some(ErrorBadRequestStart.errorCode))
         lisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.TRANSACTION)
         Future.successful(BadRequest(ErrorBadRequestStart.asJson))
-      case (Some(_), None) =>
+      case (Some(_), None)    =>
         getBulkPaymentAudit(lisaManager, Some(ErrorBadRequestEnd.errorCode))
         lisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.TRANSACTION)
         Future.successful(BadRequest(ErrorBadRequestEnd.asJson))
-      case _ =>
+      case _                  =>
         getBulkPaymentAudit(lisaManager, Some(ErrorBadRequestStartEnd.errorCode))
         lisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.TRANSACTION)
         Future.successful(BadRequest(ErrorBadRequestStartEnd.asJson))
     }
   }
 
-  private def withDatesWithinBusinessRules(startDate: DateTime, endDate: DateTime, lisaManager: String)
-                                          (success: () => Future[Result])
-                                          (implicit hc: HeaderCarrier, startTime: Long): Future[Result] = {
+  private def withDatesWithinBusinessRules(startDate: DateTime, endDate: DateTime, lisaManager: String)(
+    success: () => Future[Result]
+  )(implicit hc: HeaderCarrier, startTime: Long): Future[Result] = {
     val errorResponse: Option[ErrorResponse] = if (endDate.isAfter(currentDateService.now())) {
       Some(ErrorBadRequestEndInFuture)
     } else if (endDate.isBefore(startDate)) {
@@ -143,16 +147,19 @@ class BulkPaymentController @Inject()(
       None
     }
 
-    errorResponse.map{ error =>
-      getBulkPaymentAudit(lisaManager, Some(error.errorCode))
-      lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.TRANSACTION)
-      Future.successful(Forbidden(error.asJson))
-    }.getOrElse(success())
+    errorResponse
+      .map { error =>
+        getBulkPaymentAudit(lisaManager, Some(error.errorCode))
+        lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.TRANSACTION)
+        Future.successful(Forbidden(error.asJson))
+      }
+      .getOrElse(success())
   }
 
-  private def getBulkPaymentAudit(lisaManager: String, failureReason: Option[String] = None)
-                                  (implicit hc: HeaderCarrier) = {
-    val path = getBulkPaymentEndpointUrl(lisaManager)
+  private def getBulkPaymentAudit(lisaManager: String, failureReason: Option[String] = None)(implicit
+    hc: HeaderCarrier
+  ) = {
+    val path      = getBulkPaymentEndpointUrl(lisaManager)
     val auditData = Map(ZREF -> lisaManager)
 
     failureReason map { reason =>

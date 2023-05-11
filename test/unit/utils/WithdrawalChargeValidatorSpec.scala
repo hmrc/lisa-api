@@ -28,10 +28,9 @@ import uk.gov.hmrc.lisaapi.utils.WithdrawalChargeValidator
 
 import scala.io.Source
 
-class WithdrawalChargeValidatorSpec extends BaseTestFixture
-  with BeforeAndAfter {
+class WithdrawalChargeValidatorSpec extends BaseTestFixture with BeforeAndAfter {
 
-  val mockDateService: CurrentDateService = mock[CurrentDateService]
+  val mockDateService: CurrentDateService                  = mock[CurrentDateService]
   val withdrawalChargeValidator: WithdrawalChargeValidator = new WithdrawalChargeValidator(mockDateService)
 
   before {
@@ -39,15 +38,17 @@ class WithdrawalChargeValidatorSpec extends BaseTestFixture
     when(mockDateService.now()).thenReturn(DateTime.now)
   }
 
-  val validWithdrawalJson: String = Source.fromInputStream(getClass().getResourceAsStream("/json/request.valid.withdrawal-charge.json")).mkString
-  val validWithdrawal: SupersededWithdrawalChargeRequest = Json.parse(validWithdrawalJson).as[SupersededWithdrawalChargeRequest]
+  val validWithdrawalJson: String                        =
+    Source.fromInputStream(getClass.getResourceAsStream("/json/request.valid.withdrawal-charge.json")).mkString
+  val validWithdrawal: SupersededWithdrawalChargeRequest =
+    Json.parse(validWithdrawalJson).as[SupersededWithdrawalChargeRequest]
 
   "claimPeriodStartDate" should {
 
     "pass validation" when {
 
       "the current date is the sixth and they're submitting for today" in {
-        val today = new DateTime("2017-04-06")
+        val today         = new DateTime("2017-04-06")
         val periodEndDate = new DateTime("2017-05-05")
 
         reset(mockDateService)
@@ -66,8 +67,8 @@ class WithdrawalChargeValidatorSpec extends BaseTestFixture
 
       "it is not the 6th day of the month" in {
         val periodStartDate = new DateTime("2017-05-01")
-        val periodEndDate = new DateTime("2017-06-05")
-        val request = validWithdrawal.copy(claimPeriodStartDate = periodStartDate, claimPeriodEndDate = periodEndDate)
+        val periodEndDate   = new DateTime("2017-06-05")
+        val request         = validWithdrawal.copy(claimPeriodStartDate = periodStartDate, claimPeriodEndDate = periodEndDate)
 
         val errors = withdrawalChargeValidator.validate(request)
 
@@ -81,9 +82,9 @@ class WithdrawalChargeValidatorSpec extends BaseTestFixture
       }
 
       "the supplied date is in the future" in {
-        val nextMonth = DateTime.now.plusMonths(1).withDayOfMonth(6)
+        val nextMonth     = DateTime.now.plusMonths(1).withDayOfMonth(6)
         val periodEndDate = nextMonth.plusMonths(1).withDayOfMonth(5)
-        val request = validWithdrawal.copy(claimPeriodStartDate = nextMonth, claimPeriodEndDate = periodEndDate)
+        val request       = validWithdrawal.copy(claimPeriodStartDate = nextMonth, claimPeriodEndDate = periodEndDate)
 
         val errors = withdrawalChargeValidator.validate(request)
 
@@ -98,8 +99,8 @@ class WithdrawalChargeValidatorSpec extends BaseTestFixture
 
       "the supplied date is prior to 6 April 2017" in {
         val periodStartDate = new DateTime("2017-03-06")
-        val periodEndDate = new DateTime("2017-04-05")
-        val request = validWithdrawal.copy(claimPeriodStartDate = periodStartDate, claimPeriodEndDate = periodEndDate)
+        val periodEndDate   = new DateTime("2017-04-05")
+        val request         = validWithdrawal.copy(claimPeriodStartDate = periodStartDate, claimPeriodEndDate = periodEndDate)
 
         val errors = withdrawalChargeValidator.validate(request)
 
@@ -122,8 +123,8 @@ class WithdrawalChargeValidatorSpec extends BaseTestFixture
 
       "the end date crosses into another year" in {
         val periodStartDate = new DateTime("2017-12-06")
-        val periodEndDate = new DateTime("2018-01-05")
-        val request = validWithdrawal.copy(claimPeriodStartDate = periodStartDate, claimPeriodEndDate = periodEndDate)
+        val periodEndDate   = new DateTime("2018-01-05")
+        val request         = validWithdrawal.copy(claimPeriodStartDate = periodStartDate, claimPeriodEndDate = periodEndDate)
 
         val errors = withdrawalChargeValidator.validate(request)
 
@@ -142,7 +143,8 @@ class WithdrawalChargeValidatorSpec extends BaseTestFixture
         errors mustBe List(
           ErrorValidation(
             errorCode = "INVALID_DATE",
-            message = "The claimPeriodEndDate must be the 5th day of the month which occurs after the claimPeriodStartDate",
+            message =
+              "The claimPeriodEndDate must be the 5th day of the month which occurs after the claimPeriodStartDate",
             path = Some("/claimPeriodEndDate")
           )
         )
@@ -150,15 +152,16 @@ class WithdrawalChargeValidatorSpec extends BaseTestFixture
 
       "it is two months after the claimPeriodStartDate" in {
         val periodStartDate = new DateTime("2017-12-06")
-        val periodEndDate = new DateTime("2018-02-05")
-        val request = validWithdrawal.copy(claimPeriodStartDate = periodStartDate, claimPeriodEndDate = periodEndDate)
+        val periodEndDate   = new DateTime("2018-02-05")
+        val request         = validWithdrawal.copy(claimPeriodStartDate = periodStartDate, claimPeriodEndDate = periodEndDate)
 
         val errors = withdrawalChargeValidator.validate(request)
 
         errors mustBe List(
           ErrorValidation(
             errorCode = "INVALID_DATE",
-            message = "The claimPeriodEndDate must be the 5th day of the month which occurs after the claimPeriodStartDate",
+            message =
+              "The claimPeriodEndDate must be the 5th day of the month which occurs after the claimPeriodStartDate",
             path = Some("/claimPeriodEndDate")
           )
         )
@@ -166,15 +169,16 @@ class WithdrawalChargeValidatorSpec extends BaseTestFixture
 
       "it is before the claimPeriodStartDate" in {
         val periodStartDate = new DateTime("2017-06-06")
-        val periodEndDate = new DateTime("2017-05-05")
-        val request = validWithdrawal.copy(claimPeriodStartDate = periodStartDate, claimPeriodEndDate = periodEndDate)
+        val periodEndDate   = new DateTime("2017-05-05")
+        val request         = validWithdrawal.copy(claimPeriodStartDate = periodStartDate, claimPeriodEndDate = periodEndDate)
 
         val errors = withdrawalChargeValidator.validate(request)
 
         errors mustBe List(
           ErrorValidation(
             errorCode = "INVALID_DATE",
-            message = "The claimPeriodEndDate must be the 5th day of the month which occurs after the claimPeriodStartDate",
+            message =
+              "The claimPeriodEndDate must be the 5th day of the month which occurs after the claimPeriodStartDate",
             path = Some("/claimPeriodEndDate")
           )
         )
@@ -182,8 +186,8 @@ class WithdrawalChargeValidatorSpec extends BaseTestFixture
 
       "the supplied date is prior to 6 April 2017" in {
         val periodStartDate = new DateTime("2017-03-06")
-        val periodEndDate = new DateTime("2017-04-05")
-        val request = validWithdrawal.copy(claimPeriodStartDate = periodStartDate, claimPeriodEndDate = periodEndDate)
+        val periodEndDate   = new DateTime("2017-04-05")
+        val request         = validWithdrawal.copy(claimPeriodStartDate = periodStartDate, claimPeriodEndDate = periodEndDate)
 
         val errors = withdrawalChargeValidator.validate(request)
 
@@ -213,12 +217,17 @@ class WithdrawalChargeValidatorSpec extends BaseTestFixture
 
     "return an error" when {
       "withdrawalReason is Regular withdrawal and supersede is set" in {
-        val request = validWithdrawal.copy(withdrawalReason = "Regular withdrawal", supersede = Some(WithdrawalIncrease(
-          "2345678901",
-          250.00,
-          250.00,
-          "Additional Withdrawal"
-        )))
+        val request = validWithdrawal.copy(
+          withdrawalReason = "Regular withdrawal",
+          supersede = Some(
+            WithdrawalIncrease(
+              "2345678901",
+              250.00,
+              250.00,
+              "Additional Withdrawal"
+            )
+          )
+        )
 
         val errors = withdrawalChargeValidator.validate(request)
 
@@ -246,7 +255,10 @@ class WithdrawalChargeValidatorSpec extends BaseTestFixture
       }
 
       "it is less than the withdrawalChargeAmount and fundsDeductedDuringWithdrawal is false" in {
-        val request = validWithdrawal.copy(automaticRecoveryAmount = Some(validWithdrawal.withdrawalChargeAmount - 0.01), fundsDeductedDuringWithdrawal = false)
+        val request = validWithdrawal.copy(
+          automaticRecoveryAmount = Some(validWithdrawal.withdrawalChargeAmount - 0.01),
+          fundsDeductedDuringWithdrawal = false
+        )
 
         val errors = withdrawalChargeValidator.validate(request)
 
@@ -266,7 +278,10 @@ class WithdrawalChargeValidatorSpec extends BaseTestFixture
     "return an error" when {
 
       "it is greater than the withdrawalChargeAmount and fundsDeductedDuringWithdrawal is false" in {
-        val request = validWithdrawal.copy(automaticRecoveryAmount = Some(validWithdrawal.withdrawalChargeAmount + 0.01), fundsDeductedDuringWithdrawal = false)
+        val request = validWithdrawal.copy(
+          automaticRecoveryAmount = Some(validWithdrawal.withdrawalChargeAmount + 0.01),
+          fundsDeductedDuringWithdrawal = false
+        )
 
         val errors = withdrawalChargeValidator.validate(request)
 
@@ -280,7 +295,10 @@ class WithdrawalChargeValidatorSpec extends BaseTestFixture
       }
 
       "it is greater than the withdrawalChargeAmount and fundsDeductedDuringWithdrawal is true" in {
-        val request = validWithdrawal.copy(automaticRecoveryAmount = Some(validWithdrawal.withdrawalChargeAmount + 0.01), fundsDeductedDuringWithdrawal = true)
+        val request = validWithdrawal.copy(
+          automaticRecoveryAmount = Some(validWithdrawal.withdrawalChargeAmount + 0.01),
+          fundsDeductedDuringWithdrawal = true
+        )
 
         val errors = withdrawalChargeValidator.validate(request)
 
@@ -299,7 +317,10 @@ class WithdrawalChargeValidatorSpec extends BaseTestFixture
       }
 
       "it is less than the withdrawalChargeAmount and fundsDeductedDuringWithdrawal is true" in {
-        val request = validWithdrawal.copy(automaticRecoveryAmount = Some(validWithdrawal.withdrawalChargeAmount - 0.01), fundsDeductedDuringWithdrawal = true)
+        val request = validWithdrawal.copy(
+          automaticRecoveryAmount = Some(validWithdrawal.withdrawalChargeAmount - 0.01),
+          fundsDeductedDuringWithdrawal = true
+        )
 
         val errors = withdrawalChargeValidator.validate(request)
 
@@ -329,13 +350,13 @@ class WithdrawalChargeValidatorSpec extends BaseTestFixture
     "return multiple errors" when {
       "validation fails multiple conditions" in {
         val periodStartDate = new DateTime("2018-03-01")
-        val periodEndDate = new DateTime("2018-05-01")
-        val request = validWithdrawal.copy(claimPeriodStartDate = periodStartDate, claimPeriodEndDate = periodEndDate)
+        val periodEndDate   = new DateTime("2018-05-01")
+        val request         = validWithdrawal.copy(claimPeriodStartDate = periodStartDate, claimPeriodEndDate = periodEndDate)
 
         val errors = withdrawalChargeValidator.validate(request)
 
         errors.size mustBe 2
-        errors(0).path mustBe Some("/claimPeriodStartDate")
+        errors.head.path mustBe Some("/claimPeriodStartDate")
         errors(1).path mustBe Some("/claimPeriodEndDate")
       }
     }

@@ -20,7 +20,7 @@ import helpers.ControllerTestFixture
 import org.joda.time.DateTime
 import org.mockito.ArgumentMatchers.{eq => MatcherEquals, _}
 import org.mockito.Mockito._
-import play.api.libs.json.Json
+import play.api.libs.json.{JsObject, Json}
 import play.api.mvc.{AnyContentAsJson, Result}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
@@ -34,26 +34,39 @@ import scala.io.Source
 
 class BonusPaymentControllerSpec extends ControllerTestFixture {
 
-  val bonusPaymentController: BonusPaymentController = new BonusPaymentController(mockAuthConnector, mockAppContext, mockBonusOrWithdrawalService, mockBonusPaymentService, mockAuditService, mockBonusPaymentValidator, mockDateTimeService, mockLisaMetrics, mockControllerComponents, mockParser) {
+  val bonusPaymentController: BonusPaymentController = new BonusPaymentController(
+    mockAuthConnector,
+    mockAppContext,
+    mockBonusOrWithdrawalService,
+    mockBonusPaymentService,
+    mockAuditService,
+    mockBonusPaymentValidator,
+    mockDateTimeService,
+    mockLisaMetrics,
+    mockControllerComponents,
+    mockParser
+  ) {
     override lazy val v2endpointsEnabled = true
   }
 
   case object TestBonusPaymentResponse extends RequestBonusPaymentResponse
 
-  val acceptHeaderV1: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
-  val acceptHeaderV2: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.2.0+json")
-  val lisaManager = "Z019283"
-  val accountId = "ABC/12345"
-  val transactionId = "1234567890"
-  val validBonusPaymentJson: String = Source.fromInputStream(getClass().getResourceAsStream("/json/request.valid.bonus-payment.json")).mkString
-  val validBonusPaymentMinimumFieldsJson: String = Source.fromInputStream(getClass().getResourceAsStream("/json/request.valid.bonus-payment.min.json")).mkString
+  val acceptHeaderV1: (String, String)           = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
+  val acceptHeaderV2: (String, String)           = (HeaderNames.ACCEPT, "application/vnd.hmrc.2.0+json")
+  val lisaManager                                = "Z019283"
+  val accountId                                  = "ABC/12345"
+  val transactionId                              = "1234567890"
+  val validBonusPaymentJson: String              =
+    Source.fromInputStream(getClass.getResourceAsStream("/json/request.valid.bonus-payment.json")).mkString
+  val validBonusPaymentMinimumFieldsJson: String =
+    Source.fromInputStream(getClass.getResourceAsStream("/json/request.valid.bonus-payment.min.json")).mkString
 
-  override def beforeEach() {
+  override def beforeEach(): Unit = {
     reset(mockAuditService)
     reset(mockDateTimeService)
     reset(mockBonusPaymentValidator)
 
-    when(mockAuthConnector.authorise[Option[String]](any(),any())(any(), any())).thenReturn(Future(Some("1234")))
+    when(mockAuthConnector.authorise[Option[String]](any(), any())(any(), any())).thenReturn(Future(Some("1234")))
     when(mockDateTimeService.now()).thenReturn(new DateTime("2018-01-01"))
     when(mockBonusPaymentValidator.validate(any())).thenReturn(Nil)
   }
@@ -63,33 +76,33 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
     "return with status 201 created" when {
 
       "given a RequestBonusPaymentOnTimeResponse from the service layer" in {
-        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(RequestBonusPaymentOnTimeResponse("1928374")))
+        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(RequestBonusPaymentOnTimeResponse("1928374")))
 
         doRequest(validBonusPaymentJson) { res =>
-          status(res) mustBe (CREATED)
+          status(res) mustBe CREATED
           (contentAsJson(res) \ "data" \ "transactionId").as[String] mustBe "1928374"
           (contentAsJson(res) \ "data" \ "message").as[String] mustBe "Bonus transaction created"
         }
       }
 
       "given a RequestBonusPaymentLateResponse from the service layer" in {
-        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(RequestBonusPaymentLateResponse("1928374")))
+        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(RequestBonusPaymentLateResponse("1928374")))
 
         doRequest(validBonusPaymentJson) { res =>
-          status(res) mustBe (CREATED)
+          status(res) mustBe CREATED
           (contentAsJson(res) \ "data" \ "transactionId").as[String] mustBe "1928374"
           (contentAsJson(res) \ "data" \ "message").as[String] mustBe "Bonus transaction created - late notification"
         }
       }
 
       "given a RequestBonusPaymentSupersededResponse from the service layer" in {
-        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(RequestBonusPaymentSupersededResponse("1928374")))
+        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(RequestBonusPaymentSupersededResponse("1928374")))
 
         doRequest(validBonusPaymentJson) { res =>
-          status(res) mustBe (CREATED)
+          status(res) mustBe CREATED
           (contentAsJson(res) \ "data" \ "transactionId").as[String] mustBe "1928374"
           (contentAsJson(res) \ "data" \ "message").as[String] mustBe "Bonus transaction superseded"
         }
@@ -100,16 +113,16 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
     "return with status 400 bad request" when {
 
       "provided an invalid json object" in {
-        doRequest(validBonusPaymentJson.replace("1234567891","X")) { res =>
-          status(res) mustBe (BAD_REQUEST)
-          (contentAsJson(res) \ "code").as[String] mustBe ("BAD_REQUEST")
-          (contentAsJson(res) \ "message").as[String] mustBe ("Bad Request")
+        doRequest(validBonusPaymentJson.replace("1234567891", "X")) { res =>
+          status(res) mustBe BAD_REQUEST
+          (contentAsJson(res) \ "code").as[String] mustBe "BAD_REQUEST"
+          (contentAsJson(res) \ "message").as[String] mustBe "Bad Request"
         }
       }
 
       "provided an invalid lmrn" in {
         doRequest(validBonusPaymentJson, "Z1234567") { res =>
-          status(res) mustBe (BAD_REQUEST)
+          status(res) mustBe BAD_REQUEST
           val json = contentAsJson(res)
           (json \ "code").as[String] mustBe ErrorBadRequestLmrn.errorCode
           (json \ "message").as[String] mustBe ErrorBadRequestLmrn.message
@@ -139,7 +152,8 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
         doRequest(validBonusPaymentJson.replace(""""lifeEventId": "1234567891",""", "")) { res =>
           status(res) mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "LIFE_EVENT_NOT_PROVIDED"
-          (contentAsJson(res) \ "message").as[String] mustBe "lifeEventId is required when the claimReason is a life event"
+          (contentAsJson(res) \ "message")
+            .as[String] mustBe "lifeEventId is required when the claimReason is a life event"
         }
       }
 
@@ -178,11 +192,11 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
 
         when(mockDateTimeService.now()).thenReturn(now)
 
-        val testEndDate = now.minusYears(6).withDayOfMonth(5)
+        val testEndDate   = now.minusYears(6).withDayOfMonth(5)
         val testStartDate = testEndDate.minusMonths(1).plusDays(1)
 
         val validBonusPayment = Json.parse(validBonusPaymentJson).as[RequestBonusPaymentRequest]
-        val request = validBonusPayment.copy(periodStartDate = testStartDate, periodEndDate = testEndDate)
+        val request           = validBonusPayment.copy(periodStartDate = testStartDate, periodEndDate = testEndDate)
 
         doRequest(Json.toJson(request).toString()) { res =>
           status(res) mustBe FORBIDDEN
@@ -190,13 +204,18 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
           val json = contentAsJson(res)
 
           (json \ "code").as[String] mustBe "BONUS_CLAIM_TIMESCALES_EXCEEDED"
-          (json \ "message").as[String] mustBe "The timescale for claiming a bonus has passed. The claim period lasts for 6 years and 14 days"
+          (json \ "message").as[
+            String
+          ] mustBe "The timescale for claiming a bonus has passed. The claim period lasts for 6 years and 14 days"
         }
       }
 
       "help to buy is populated for a claim with a start date of 6 April 2018 or after" in {
         val validBonusPayment = Json.parse(validBonusPaymentJson).as[RequestBonusPaymentRequest]
-        val request = validBonusPayment.copy(periodStartDate = new DateTime("2018-04-06"), periodEndDate = new DateTime("2018-05-05"))
+        val request           = validBonusPayment.copy(
+          periodStartDate = new DateTime("2018-04-06"),
+          periodEndDate = new DateTime("2018-05-05")
+        )
 
         doRequest(Json.toJson(request).toString()) { res =>
           status(res) mustBe FORBIDDEN
@@ -209,37 +228,39 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
       }
 
       "given a RequestBonusPaymentBonusClaimError response from the service layer" in {
-        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(RequestBonusPaymentBonusClaimError))
+        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(RequestBonusPaymentBonusClaimError))
 
         doRequest(validBonusPaymentJson) { res =>
           status(res) mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "BONUS_CLAIM_ERROR"
-          (contentAsJson(res) \ "message").as[String] mustBe "The bonus amount given is above the maximum annual amount, " +
-          "or the qualifying deposits are above the maximum annual amount or the bonus claim does not equal the correct " +
-          "percentage of qualifying funds"
+          (contentAsJson(res) \ "message")
+            .as[String] mustBe "The bonus amount given is above the maximum annual amount, " +
+            "or the qualifying deposits are above the maximum annual amount or the bonus claim does not equal the correct " +
+            "percentage of qualifying funds"
         }
       }
 
       "given a RequestBonusPaymentAccountClosedOrVoid response from the service layer for v1" in {
-        when(mockBonusPaymentService.requestBonusPayment(any(), any(),any())(any())).thenReturn(
-          Future.successful(RequestBonusPaymentAccountClosedOrVoid))
+        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(RequestBonusPaymentAccountClosedOrVoid))
 
         doRequest(validBonusPaymentJson)(
           res => {
             status(res) mustBe FORBIDDEN
             (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID"
-            (contentAsJson(res) \ "message").as[String] mustBe "This LISA account has already been closed or been made void by HMRC"
+            (contentAsJson(res) \ "message")
+              .as[String] mustBe "This LISA account has already been closed or been made void by HMRC"
           },
           acceptHeaderV1
         )
       }
 
       "given a RequestBonusPaymentAccountClosed response from the service layer" in {
-        when(mockBonusPaymentService.requestBonusPayment(any(), any(),any())(any())).thenReturn(
-          Future.successful(RequestBonusPaymentAccountClosed))
+        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(RequestBonusPaymentAccountClosed))
 
-        doRequest(validBonusPaymentJson)  { res =>
+        doRequest(validBonusPaymentJson) { res =>
           status(res) mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CLOSED"
           (contentAsJson(res) \ "message").as[String] mustBe "The LISA account is already closed"
@@ -247,10 +268,10 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
       }
 
       "given a RequestBonusPaymentAccountCancelled response from the service layer" in {
-        when(mockBonusPaymentService.requestBonusPayment(any(), any(),any())(any())).thenReturn(
-          Future.successful(RequestBonusPaymentAccountCancelled))
+        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(RequestBonusPaymentAccountCancelled))
 
-        doRequest(validBonusPaymentJson)  { res =>
+        doRequest(validBonusPaymentJson) { res =>
           status(res) mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CANCELLED"
           (contentAsJson(res) \ "message").as[String] mustBe "The LISA account is already cancelled"
@@ -258,10 +279,10 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
       }
 
       "given a RequestBonusPaymentAccountVoid response from the service layer" in {
-        when(mockBonusPaymentService.requestBonusPayment(any(), any(),any())(any())).thenReturn(
-          Future.successful(RequestBonusPaymentAccountVoid))
+        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(RequestBonusPaymentAccountVoid))
 
-        doRequest(validBonusPaymentJson)  { res =>
+        doRequest(validBonusPaymentJson) { res =>
           status(res) mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_VOID"
           (contentAsJson(res) \ "message").as[String] mustBe "The LISA account is already void"
@@ -269,37 +290,40 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
       }
 
       "given a RequestBonusPaymentSupersededAmountMismatch response from the service layer" in {
-        when(mockBonusPaymentService.requestBonusPayment(any(), any(),any())(any())).thenReturn(
-          Future.successful(RequestBonusPaymentSupersededAmountMismatch))
+        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(RequestBonusPaymentSupersededAmountMismatch))
 
-        doRequest(validBonusPaymentJson)  { res =>
+        doRequest(validBonusPaymentJson) { res =>
           status(res) mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "SUPERSEDED_BONUS_CLAIM_AMOUNT_MISMATCH"
-          (contentAsJson(res) \ "message").as[String] mustBe "originalTransactionId and the originalBonusDueForPeriod amount do not match the information in the original bonus request"
+          (contentAsJson(res) \ "message")
+            .as[String] mustBe "originalTransactionId and the originalBonusDueForPeriod amount do not match the information in the original bonus request"
         }
 
       }
 
       "given a RequestBonusPaymentSupersededOutcomeError response from the service layer" in {
-        when(mockBonusPaymentService.requestBonusPayment(any(), any(),any())(any())).thenReturn(
-          Future.successful(RequestBonusPaymentSupersededOutcomeError))
+        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(RequestBonusPaymentSupersededOutcomeError))
 
-        doRequest(validBonusPaymentJson)  { res =>
+        doRequest(validBonusPaymentJson) { res =>
           status(res) mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "SUPERSEDED_BONUS_REQUEST_OUTCOME_ERROR"
-          (contentAsJson(res) \ "message").as[String] mustBe "The calculation from your superseded bonus claim is incorrect"
+          (contentAsJson(res) \ "message")
+            .as[String] mustBe "The calculation from your superseded bonus claim is incorrect"
         }
 
       }
 
       "given a RequestBonusPaymentNoSubscriptions response from the service layer" in {
-        when(mockBonusPaymentService.requestBonusPayment(any(), any(),any())(any())).thenReturn(
-          Future.successful(RequestBonusPaymentNoSubscriptions))
+        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(RequestBonusPaymentNoSubscriptions))
 
-        doRequest(validBonusPaymentJson)  { res =>
+        doRequest(validBonusPaymentJson) { res =>
           status(res) mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "ACCOUNT_ERROR_NO_SUBSCRIPTIONS_THIS_TAX_YEAR"
-          (contentAsJson(res) \ "message").as[String] mustBe "This account is not eligible for a bonus payment because the investor already has another LISA account"
+          (contentAsJson(res) \ "message")
+            .as[String] mustBe "This account is not eligible for a bonus payment because the investor already has another LISA account"
         }
 
       }
@@ -309,8 +333,8 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
     "return with status 404 not found" when {
 
       "given a RequestBonusPaymentAccountNotFound response from the service layer" in {
-        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(RequestBonusPaymentAccountNotFound))
+        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(RequestBonusPaymentAccountNotFound))
 
         doRequest(validBonusPaymentJson) { res =>
           status(res) mustBe NOT_FOUND
@@ -320,8 +344,8 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
       }
 
       "given a RequestBonusPaymentLifeEventNotFound response from the service layer" in {
-        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(RequestBonusPaymentLifeEventNotFound))
+        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(RequestBonusPaymentLifeEventNotFound))
 
         doRequest(validBonusPaymentJson) { res =>
           status(res) mustBe NOT_FOUND
@@ -335,8 +359,8 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
     "return with status 409 conflict" when {
 
       "given a RequestBonusPaymentClaimAlreadyExists response from the service layer for api v2" in {
-        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(RequestBonusPaymentClaimAlreadyExists(transactionId)))
+        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(RequestBonusPaymentClaimAlreadyExists(transactionId)))
 
         doRequest(validBonusPaymentJson) { res =>
           status(res) mustBe CONFLICT
@@ -348,8 +372,8 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
       }
 
       "given a RequestBonusPaymentAlreadySuperseded response from the service layer for v2" in {
-        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(RequestBonusPaymentAlreadySuperseded(transactionId)))
+        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(RequestBonusPaymentAlreadySuperseded(transactionId)))
 
         doRequest(validBonusPaymentJson) { res =>
           status(res) mustBe CONFLICT
@@ -365,8 +389,8 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
     "return with status 500 internal server error" when {
 
       "a exception gets thrown" in {
-        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any())).
-          thenThrow(new RuntimeException("Test"))
+        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any()))
+          .thenThrow(new RuntimeException("Test"))
 
         doRequest(validBonusPaymentJson) { res =>
           reset(mockBonusPaymentService) // removes the thenThrow
@@ -376,8 +400,8 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
       }
 
       "a unexpected result comes back from the service" in {
-        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(TestBonusPaymentResponse))
+        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(TestBonusPaymentResponse))
 
         doRequest(validBonusPaymentJson) { res =>
           status(res) mustBe INTERNAL_SERVER_ERROR
@@ -386,8 +410,8 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
       }
 
       "a RequestBonusPaymentError response is received" in {
-        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(RequestBonusPaymentError))
+        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(RequestBonusPaymentError))
 
         doRequest(validBonusPaymentJson) { res =>
           status(res) mustBe INTERNAL_SERVER_ERROR
@@ -396,8 +420,8 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
       }
 
       "a RequestBonusPaymentAccountClosed response is received for version 1 of the api" in {
-        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any())).thenReturn(
-          Future.successful(RequestBonusPaymentAccountClosed))
+        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(RequestBonusPaymentAccountClosed))
 
         doRequest(validBonusPaymentJson)(
           res => {
@@ -409,8 +433,8 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
       }
 
       "a RequestBonusPaymentAccountCancelled response is received for version 1 of the api" in {
-        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any())).thenReturn(
-          Future.successful(RequestBonusPaymentAccountCancelled))
+        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(RequestBonusPaymentAccountCancelled))
 
         doRequest(validBonusPaymentJson)(
           res => {
@@ -422,8 +446,8 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
       }
 
       "a RequestBonusPaymentAccountVoid response is received for version 1 of the api" in {
-        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any())).thenReturn(
-          Future.successful(RequestBonusPaymentAccountVoid))
+        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(RequestBonusPaymentAccountVoid))
 
         doRequest(validBonusPaymentJson)(
           res => {
@@ -435,8 +459,8 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
       }
 
       "a RequestBonusPaymentSupersededAmountMismatch response is received for version 1 of the api" in {
-        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any())).thenReturn(
-          Future.successful(RequestBonusPaymentSupersededAmountMismatch))
+        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(RequestBonusPaymentSupersededAmountMismatch))
 
         doRequest(validBonusPaymentJson)(
           res => {
@@ -448,8 +472,8 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
       }
 
       "a RequestBonusPaymentSupersededOutcomeError response is received for version 1 of the api" in {
-        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any())).thenReturn(
-          Future.successful(RequestBonusPaymentSupersededOutcomeError))
+        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(RequestBonusPaymentSupersededOutcomeError))
 
         doRequest(validBonusPaymentJson)(
           res => {
@@ -461,8 +485,8 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
       }
 
       "a RequestBonusPaymentClaimAlreadyExists response is received for version 1 of the api" in {
-        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(RequestBonusPaymentClaimAlreadyExists(transactionId)))
+        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(RequestBonusPaymentClaimAlreadyExists(transactionId)))
 
         doRequest(validBonusPaymentJson)(
           res => {
@@ -474,8 +498,8 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
       }
 
       "a RequestBonusPaymentAlreadySuperseded response is received for version 1 of the api" in {
-        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(RequestBonusPaymentAlreadySuperseded(transactionId)))
+        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(RequestBonusPaymentAlreadySuperseded(transactionId)))
 
         doRequest(validBonusPaymentJson)(
           res => {
@@ -487,8 +511,8 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
       }
 
       "a RequestBonusPaymentAccountClosedOrVoid response is received for version 2 of the api" in {
-        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any())).thenReturn(
-          Future.successful(RequestBonusPaymentAccountClosedOrVoid))
+        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(RequestBonusPaymentAccountClosedOrVoid))
 
         doRequest(validBonusPaymentJson)(
           res => {
@@ -504,8 +528,8 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
     "return with status 503 service unavailable" when {
 
       "a exception gets thrown" in {
-        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(RequestBonusPaymentServiceUnavailable))
+        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(RequestBonusPaymentServiceUnavailable))
 
         doRequest(validBonusPaymentJson) { res =>
           status(res) mustBe SERVICE_UNAVAILABLE
@@ -519,80 +543,84 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
 
       "given a success response from the service layer and all optional fields" when {
         "using v1 of the API" in {
-          when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any())).
-            thenReturn(Future.successful(RequestBonusPaymentOnTimeResponse("1928374")))
+          when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any()))
+            .thenReturn(Future.successful(RequestBonusPaymentOnTimeResponse("1928374")))
 
           doSyncRequest(validBonusPaymentJson)(
             _ => {
-              val json = Json.parse(validBonusPaymentJson)
-              val htb = json \ "htbTransfer"
+              val json            = Json.parse(validBonusPaymentJson)
+              val htb             = json \ "htbTransfer"
               val inboundPayments = json \ "inboundPayments"
-              val bonuses = json \ "bonuses"
+              val bonuses         = json \ "bonuses"
 
               verify(mockAuditService).audit(
                 auditType = MatcherEquals("bonusPaymentRequested"),
                 path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions"),
-                auditData = MatcherEquals(Map(
-                  "lisaManagerReferenceNumber" -> lisaManager,
-                  "accountId" -> accountId,
-                  "lateNotification" -> "no",
-                  "lifeEventId" -> (json \ "lifeEventId").as[String],
-                  "periodStartDate" -> (json \ "periodStartDate").as[String],
-                  "periodEndDate" -> (json \ "periodEndDate").as[String],
-                  "htbTransferInForPeriod" -> (htb \ "htbTransferInForPeriod").as[Amount].toString,
-                  "htbTransferTotalYTD" -> (htb \ "htbTransferTotalYTD").as[Amount].toString,
-                  "newSubsForPeriod" -> (inboundPayments \ "newSubsForPeriod").as[Amount].toString,
-                  "newSubsYTD" -> (inboundPayments \ "newSubsYTD").as[Amount].toString,
-                  "totalSubsForPeriod" -> (inboundPayments \ "totalSubsForPeriod").as[Amount].toString,
-                  "totalSubsYTD" -> (inboundPayments \ "totalSubsYTD").as[Amount].toString,
-                  "bonusDueForPeriod" -> (bonuses \ "bonusDueForPeriod").as[Amount].toString,
-                  "bonusPaidYTD" -> (bonuses \ "bonusPaidYTD").as[Amount].toString,
-                  "totalBonusDueYTD" -> (bonuses \ "totalBonusDueYTD").as[Amount].toString,
-                  "claimReason" -> (bonuses \ "claimReason").as[String]
-                ))
+                auditData = MatcherEquals(
+                  Map(
+                    "lisaManagerReferenceNumber" -> lisaManager,
+                    "accountId"                  -> accountId,
+                    "lateNotification"           -> "no",
+                    "lifeEventId"                -> (json \ "lifeEventId").as[String],
+                    "periodStartDate"            -> (json \ "periodStartDate").as[String],
+                    "periodEndDate"              -> (json \ "periodEndDate").as[String],
+                    "htbTransferInForPeriod"     -> (htb \ "htbTransferInForPeriod").as[Amount].toString,
+                    "htbTransferTotalYTD"        -> (htb \ "htbTransferTotalYTD").as[Amount].toString,
+                    "newSubsForPeriod"           -> (inboundPayments \ "newSubsForPeriod").as[Amount].toString,
+                    "newSubsYTD"                 -> (inboundPayments \ "newSubsYTD").as[Amount].toString,
+                    "totalSubsForPeriod"         -> (inboundPayments \ "totalSubsForPeriod").as[Amount].toString,
+                    "totalSubsYTD"               -> (inboundPayments \ "totalSubsYTD").as[Amount].toString,
+                    "bonusDueForPeriod"          -> (bonuses \ "bonusDueForPeriod").as[Amount].toString,
+                    "bonusPaidYTD"               -> (bonuses \ "bonusPaidYTD").as[Amount].toString,
+                    "totalBonusDueYTD"           -> (bonuses \ "totalBonusDueYTD").as[Amount].toString,
+                    "claimReason"                -> (bonuses \ "claimReason").as[String]
+                  )
+                )
               )(any())
             },
             acceptHeaderV1
           )
         }
         "using v2 of the API" in {
-          when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any())).
-            thenReturn(Future.successful(RequestBonusPaymentOnTimeResponse("1928374")))
+          when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any()))
+            .thenReturn(Future.successful(RequestBonusPaymentOnTimeResponse("1928374")))
 
           doSyncRequest(validBonusPaymentJson)(
             _ => {
-              val json = Json.parse(validBonusPaymentJson)
-              val htb = json \ "htbTransfer"
+              val json            = Json.parse(validBonusPaymentJson)
+              val htb             = json \ "htbTransfer"
               val inboundPayments = json \ "inboundPayments"
-              val bonuses = json \ "bonuses"
-              val supersede = json \ "supersede"
+              val bonuses         = json \ "bonuses"
+              val supersede       = json \ "supersede"
 
               verify(mockAuditService).audit(
                 auditType = MatcherEquals("bonusPaymentRequested"),
                 path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions"),
-                auditData = MatcherEquals(Map(
-                  "lisaManagerReferenceNumber" -> lisaManager,
-                  "accountId" -> accountId,
-                  "lateNotification" -> "no",
-                  "lifeEventId" -> (json \ "lifeEventId").as[String],
-                  "periodStartDate" -> (json \ "periodStartDate").as[String],
-                  "periodEndDate" -> (json \ "periodEndDate").as[String],
-                  "htbTransferInForPeriod" -> (htb \ "htbTransferInForPeriod").as[Amount].toString,
-                  "htbTransferTotalYTD" -> (htb \ "htbTransferTotalYTD").as[Amount].toString,
-                  "newSubsForPeriod" -> (inboundPayments \ "newSubsForPeriod").as[Amount].toString,
-                  "newSubsYTD" -> (inboundPayments \ "newSubsYTD").as[Amount].toString,
-                  "totalSubsForPeriod" -> (inboundPayments \ "totalSubsForPeriod").as[Amount].toString,
-                  "totalSubsYTD" -> (inboundPayments \ "totalSubsYTD").as[Amount].toString,
-                  "bonusDueForPeriod" -> (bonuses \ "bonusDueForPeriod").as[Amount].toString,
-                  "bonusPaidYTD" -> (bonuses \ "bonusPaidYTD").as[Amount].toString,
-                  "totalBonusDueYTD" -> (bonuses \ "totalBonusDueYTD").as[Amount].toString,
-                  "claimReason" -> (bonuses \ "claimReason").as[String],
-                  "automaticRecoveryAmount" -> (supersede \ "automaticRecoveryAmount").as[Amount].toString,
-                  "originalTransactionId" -> (supersede \ "originalTransactionId").as[String],
-                  "originalBonusDueForPeriod" -> (supersede \ "originalBonusDueForPeriod").as[Amount].toString,
-                  "transactionResult" -> (supersede \ "transactionResult").as[Amount].toString,
-                  "reason" -> (supersede \ "reason").as[String]
-                ))
+                auditData = MatcherEquals(
+                  Map(
+                    "lisaManagerReferenceNumber" -> lisaManager,
+                    "accountId"                  -> accountId,
+                    "lateNotification"           -> "no",
+                    "lifeEventId"                -> (json \ "lifeEventId").as[String],
+                    "periodStartDate"            -> (json \ "periodStartDate").as[String],
+                    "periodEndDate"              -> (json \ "periodEndDate").as[String],
+                    "htbTransferInForPeriod"     -> (htb \ "htbTransferInForPeriod").as[Amount].toString,
+                    "htbTransferTotalYTD"        -> (htb \ "htbTransferTotalYTD").as[Amount].toString,
+                    "newSubsForPeriod"           -> (inboundPayments \ "newSubsForPeriod").as[Amount].toString,
+                    "newSubsYTD"                 -> (inboundPayments \ "newSubsYTD").as[Amount].toString,
+                    "totalSubsForPeriod"         -> (inboundPayments \ "totalSubsForPeriod").as[Amount].toString,
+                    "totalSubsYTD"               -> (inboundPayments \ "totalSubsYTD").as[Amount].toString,
+                    "bonusDueForPeriod"          -> (bonuses \ "bonusDueForPeriod").as[Amount].toString,
+                    "bonusPaidYTD"               -> (bonuses \ "bonusPaidYTD").as[Amount].toString,
+                    "totalBonusDueYTD"           -> (bonuses \ "totalBonusDueYTD").as[Amount].toString,
+                    "claimReason"                -> (bonuses \ "claimReason").as[String],
+                    "automaticRecoveryAmount"    -> (supersede \ "automaticRecoveryAmount").as[Amount].toString,
+                    "originalTransactionId"      -> (supersede \ "originalTransactionId").as[String],
+                    "originalBonusDueForPeriod"  -> (supersede \ "originalBonusDueForPeriod").as[Amount].toString,
+                    "transactionResult"          -> (supersede \ "transactionResult").as[Amount].toString,
+                    "reason"                     -> (supersede \ "reason").as[String]
+                  )
+                )
               )(any())
             },
             acceptHeaderV2
@@ -601,33 +629,35 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
       }
 
       "given a success response from the service layer and no optional fields" in {
-        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(RequestBonusPaymentLateResponse("1928374")))
+        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(RequestBonusPaymentLateResponse("1928374")))
 
         doSyncRequest(validBonusPaymentMinimumFieldsJson)(
           _ => {
-            val json = Json.parse(validBonusPaymentMinimumFieldsJson)
+            val json            = Json.parse(validBonusPaymentMinimumFieldsJson)
             val inboundPayments = json \ "inboundPayments"
-            val bonuses = json \ "bonuses"
+            val bonuses         = json \ "bonuses"
 
             verify(mockAuditService).audit(
               auditType = MatcherEquals("bonusPaymentRequested"),
               path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions"),
-              auditData = MatcherEquals(Map(
-                "lisaManagerReferenceNumber" -> lisaManager,
-                "accountId" -> accountId,
-                "lateNotification" -> "yes",
-                "periodStartDate" -> (json \ "periodStartDate").as[String],
-                "periodEndDate" -> (json \ "periodEndDate").as[String],
-                "newSubsForPeriod" -> (inboundPayments \ "newSubsForPeriod").as[Amount].toString,
-                "newSubsYTD" -> (inboundPayments \ "newSubsYTD").as[Amount].toString,
-                "totalSubsForPeriod" -> (inboundPayments \ "totalSubsForPeriod").as[Amount].toString,
-                "totalSubsYTD" -> (inboundPayments \ "totalSubsYTD").as[Amount].toString,
-                "bonusDueForPeriod" -> (bonuses \ "bonusDueForPeriod").as[Amount].toString,
-                "totalBonusDueYTD" -> (bonuses \ "totalBonusDueYTD").as[Amount].toString,
-                "claimReason" -> (bonuses \ "claimReason").as[String]
+              auditData = MatcherEquals(
+                Map(
+                  "lisaManagerReferenceNumber" -> lisaManager,
+                  "accountId"                  -> accountId,
+                  "lateNotification"           -> "yes",
+                  "periodStartDate"            -> (json \ "periodStartDate").as[String],
+                  "periodEndDate"              -> (json \ "periodEndDate").as[String],
+                  "newSubsForPeriod"           -> (inboundPayments \ "newSubsForPeriod").as[Amount].toString,
+                  "newSubsYTD"                 -> (inboundPayments \ "newSubsYTD").as[Amount].toString,
+                  "totalSubsForPeriod"         -> (inboundPayments \ "totalSubsForPeriod").as[Amount].toString,
+                  "totalSubsYTD"               -> (inboundPayments \ "totalSubsYTD").as[Amount].toString,
+                  "bonusDueForPeriod"          -> (bonuses \ "bonusDueForPeriod").as[Amount].toString,
+                  "totalBonusDueYTD"           -> (bonuses \ "totalBonusDueYTD").as[Amount].toString,
+                  "claimReason"                -> (bonuses \ "claimReason").as[String]
+                )
               )
-              ))(any())
+            )(any())
           },
           acceptHeaderV1
         )
@@ -638,77 +668,80 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
     "audit bonusPaymentNotRequested" when {
 
       "given an error response from the service layer" in {
-        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.successful(RequestBonusPaymentLifeEventNotFound))
+        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(RequestBonusPaymentLifeEventNotFound))
 
         doSyncRequest(validBonusPaymentMinimumFieldsJson) { res =>
-
-          val json = Json.parse(validBonusPaymentMinimumFieldsJson)
+          val json            = Json.parse(validBonusPaymentMinimumFieldsJson)
           val inboundPayments = json \ "inboundPayments"
-          val bonuses = json \ "bonuses"
+          val bonuses         = json \ "bonuses"
 
           verify(mockAuditService).audit(
             auditType = MatcherEquals("bonusPaymentNotRequested"),
             path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions"),
-            auditData = MatcherEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "accountId" -> accountId,
-              "periodStartDate" -> (json \ "periodStartDate").as[String],
-              "periodEndDate" -> (json \ "periodEndDate").as[String],
-              "newSubsForPeriod" -> (inboundPayments \ "newSubsForPeriod").as[Amount].toString,
-              "newSubsYTD" -> (inboundPayments \ "newSubsYTD").as[Amount].toString,
-              "totalSubsForPeriod" -> (inboundPayments \ "totalSubsForPeriod").as[Amount].toString,
-              "totalSubsYTD" -> (inboundPayments \ "totalSubsYTD").as[Amount].toString,
-              "bonusDueForPeriod" -> (bonuses \ "bonusDueForPeriod").as[Amount].toString,
-              "totalBonusDueYTD" -> (bonuses \ "totalBonusDueYTD").as[Amount].toString,
-              "claimReason" -> (bonuses \ "claimReason").as[String],
-              "reasonNotRequested" -> "LIFE_EVENT_NOT_FOUND"
+            auditData = MatcherEquals(
+              Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "accountId"                  -> accountId,
+                "periodStartDate"            -> (json \ "periodStartDate").as[String],
+                "periodEndDate"              -> (json \ "periodEndDate").as[String],
+                "newSubsForPeriod"           -> (inboundPayments \ "newSubsForPeriod").as[Amount].toString,
+                "newSubsYTD"                 -> (inboundPayments \ "newSubsYTD").as[Amount].toString,
+                "totalSubsForPeriod"         -> (inboundPayments \ "totalSubsForPeriod").as[Amount].toString,
+                "totalSubsYTD"               -> (inboundPayments \ "totalSubsYTD").as[Amount].toString,
+                "bonusDueForPeriod"          -> (bonuses \ "bonusDueForPeriod").as[Amount].toString,
+                "totalBonusDueYTD"           -> (bonuses \ "totalBonusDueYTD").as[Amount].toString,
+                "claimReason"                -> (bonuses \ "claimReason").as[String],
+                "reasonNotRequested"         -> "LIFE_EVENT_NOT_FOUND"
+              )
             )
-            ))(any())
+          )(any())
         }
       }
 
       "the bonus claim reason is life event and no life event id is provided" in {
-        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.failed(new RuntimeException("Test")))
+        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.failed(new RuntimeException("Test")))
 
         val invalidJson = validBonusPaymentJson.replace("\"lifeEventId\": \"1234567891\",", "")
 
         doSyncRequest(invalidJson) { res =>
           reset(mockBonusPaymentService) // removes the thenThrow
 
-          val json = Json.parse(invalidJson)
-          val htb = json \ "htbTransfer"
+          val json            = Json.parse(invalidJson)
+          val htb             = json \ "htbTransfer"
           val inboundPayments = json \ "inboundPayments"
-          val bonuses = json \ "bonuses"
-          val supersede = json \ "supersede"
+          val bonuses         = json \ "bonuses"
+          val supersede       = json \ "supersede"
 
           verify(mockAuditService).audit(
             auditType = MatcherEquals("bonusPaymentNotRequested"),
             path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions"),
-            auditData = MatcherEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "accountId" -> accountId,
-              "periodStartDate" -> (json \ "periodStartDate").as[String],
-              "periodEndDate" -> (json \ "periodEndDate").as[String],
-              "htbTransferInForPeriod" -> (htb \ "htbTransferInForPeriod").as[Amount].toString,
-              "htbTransferTotalYTD" -> (htb \ "htbTransferTotalYTD").as[Amount].toString,
-              "newSubsForPeriod" -> (inboundPayments \ "newSubsForPeriod").as[Amount].toString,
-              "newSubsYTD" -> (inboundPayments \ "newSubsYTD").as[Amount].toString,
-              "totalSubsForPeriod" -> (inboundPayments \ "totalSubsForPeriod").as[Amount].toString,
-              "totalSubsYTD" -> (inboundPayments \ "totalSubsYTD").as[Amount].toString,
-              "bonusDueForPeriod" -> (bonuses \ "bonusDueForPeriod").as[Amount].toString,
-              "bonusPaidYTD" -> (bonuses \ "bonusPaidYTD").as[Amount].toString,
-              "totalBonusDueYTD" -> (bonuses \ "totalBonusDueYTD").as[Amount].toString,
-              "claimReason" -> (bonuses \ "claimReason").as[String],
-              "reasonNotRequested" -> "LIFE_EVENT_NOT_PROVIDED",
-              "automaticRecoveryAmount" -> (supersede \ "automaticRecoveryAmount").as[Amount].toString,
-              "originalTransactionId" -> (supersede \ "originalTransactionId").as[String],
-              "originalBonusDueForPeriod" -> (supersede \ "originalBonusDueForPeriod").as[Amount].toString,
-              "transactionResult" -> (supersede \ "transactionResult").as[Amount].toString,
-              "reason" -> (supersede \ "reason").as[String]
+            auditData = MatcherEquals(
+              Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "accountId"                  -> accountId,
+                "periodStartDate"            -> (json \ "periodStartDate").as[String],
+                "periodEndDate"              -> (json \ "periodEndDate").as[String],
+                "htbTransferInForPeriod"     -> (htb \ "htbTransferInForPeriod").as[Amount].toString,
+                "htbTransferTotalYTD"        -> (htb \ "htbTransferTotalYTD").as[Amount].toString,
+                "newSubsForPeriod"           -> (inboundPayments \ "newSubsForPeriod").as[Amount].toString,
+                "newSubsYTD"                 -> (inboundPayments \ "newSubsYTD").as[Amount].toString,
+                "totalSubsForPeriod"         -> (inboundPayments \ "totalSubsForPeriod").as[Amount].toString,
+                "totalSubsYTD"               -> (inboundPayments \ "totalSubsYTD").as[Amount].toString,
+                "bonusDueForPeriod"          -> (bonuses \ "bonusDueForPeriod").as[Amount].toString,
+                "bonusPaidYTD"               -> (bonuses \ "bonusPaidYTD").as[Amount].toString,
+                "totalBonusDueYTD"           -> (bonuses \ "totalBonusDueYTD").as[Amount].toString,
+                "claimReason"                -> (bonuses \ "claimReason").as[String],
+                "reasonNotRequested"         -> "LIFE_EVENT_NOT_PROVIDED",
+                "automaticRecoveryAmount"    -> (supersede \ "automaticRecoveryAmount").as[Amount].toString,
+                "originalTransactionId"      -> (supersede \ "originalTransactionId").as[String],
+                "originalBonusDueForPeriod"  -> (supersede \ "originalBonusDueForPeriod").as[Amount].toString,
+                "transactionResult"          -> (supersede \ "transactionResult").as[Amount].toString,
+                "reason"                     -> (supersede \ "reason").as[String]
+              )
             )
-            ))(any())
+          )(any())
         }
       }
 
@@ -729,69 +762,73 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
         when(mockBonusPaymentValidator.validate(any())).thenReturn(errors)
 
         val request = Json.parse(validBonusPaymentJson).as[RequestBonusPaymentRequest]
-        val json = Json.toJson(request)
+        val json    = Json.toJson(request)
 
         reset(mockBonusPaymentService)
 
         doSyncRequest(json.toString()) { _ =>
           val inboundPayments = json \ "inboundPayments"
-          val bonuses = json \ "bonuses"
-          val htb = json \ "htbTransfer"
+          val bonuses         = json \ "bonuses"
+          val htb             = json \ "htbTransfer"
 
           verify(mockAuditService).audit(
             auditType = MatcherEquals("bonusPaymentNotRequested"),
             path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions"),
-            auditData = MatcherEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "accountId" -> accountId,
-              "lifeEventId" -> (json \ "lifeEventId").as[String],
-              "periodStartDate" -> (json \ "periodStartDate").as[String],
-              "periodEndDate" -> (json \ "periodEndDate").as[String],
-              "htbTransferInForPeriod" -> (htb \ "htbTransferInForPeriod").as[Int].toString,
-              "htbTransferTotalYTD" -> (htb \ "htbTransferTotalYTD").as[Int].toString,
-              "newSubsForPeriod" -> (inboundPayments \ "newSubsForPeriod").as[Int].toString,
-              "newSubsYTD" -> (inboundPayments \ "newSubsYTD").as[Int].toString,
-              "totalSubsForPeriod" -> (inboundPayments \ "totalSubsForPeriod").as[Int].toString,
-              "totalSubsYTD" -> (inboundPayments \ "totalSubsYTD").as[Int].toString,
-              "bonusDueForPeriod" -> (bonuses \ "bonusDueForPeriod").as[Int].toString,
-              "bonusPaidYTD" -> (bonuses \ "bonusPaidYTD").as[Int].toString,
-              "totalBonusDueYTD" -> (bonuses \ "totalBonusDueYTD").as[Int].toString,
-              "claimReason" -> (bonuses \ "claimReason").as[String],
-              "reasonNotRequested" -> "FORBIDDEN"
-            ))
+            auditData = MatcherEquals(
+              Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "accountId"                  -> accountId,
+                "lifeEventId"                -> (json \ "lifeEventId").as[String],
+                "periodStartDate"            -> (json \ "periodStartDate").as[String],
+                "periodEndDate"              -> (json \ "periodEndDate").as[String],
+                "htbTransferInForPeriod"     -> (htb \ "htbTransferInForPeriod").as[Int].toString,
+                "htbTransferTotalYTD"        -> (htb \ "htbTransferTotalYTD").as[Int].toString,
+                "newSubsForPeriod"           -> (inboundPayments \ "newSubsForPeriod").as[Int].toString,
+                "newSubsYTD"                 -> (inboundPayments \ "newSubsYTD").as[Int].toString,
+                "totalSubsForPeriod"         -> (inboundPayments \ "totalSubsForPeriod").as[Int].toString,
+                "totalSubsYTD"               -> (inboundPayments \ "totalSubsYTD").as[Int].toString,
+                "bonusDueForPeriod"          -> (bonuses \ "bonusDueForPeriod").as[Int].toString,
+                "bonusPaidYTD"               -> (bonuses \ "bonusPaidYTD").as[Int].toString,
+                "totalBonusDueYTD"           -> (bonuses \ "totalBonusDueYTD").as[Int].toString,
+                "claimReason"                -> (bonuses \ "claimReason").as[String],
+                "reasonNotRequested"         -> "FORBIDDEN"
+              )
+            )
           )(any())
         }
       }
 
       "an error occurs" in {
-        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any())).
-          thenReturn(Future.failed(new RuntimeException("Test")))
+        when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any()))
+          .thenReturn(Future.failed(new RuntimeException("Test")))
 
         doSyncRequest(validBonusPaymentMinimumFieldsJson) { _ =>
           reset(mockBonusPaymentService) // removes the thenThrow
 
-          val json = Json.parse(validBonusPaymentMinimumFieldsJson)
+          val json            = Json.parse(validBonusPaymentMinimumFieldsJson)
           val inboundPayments = json \ "inboundPayments"
-          val bonuses = json \ "bonuses"
+          val bonuses         = json \ "bonuses"
 
           verify(mockAuditService).audit(
             auditType = MatcherEquals("bonusPaymentNotRequested"),
             path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions"),
-            auditData = MatcherEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "accountId" -> accountId,
-              "periodStartDate" -> (json \ "periodStartDate").as[String],
-              "periodEndDate" -> (json \ "periodEndDate").as[String],
-              "newSubsForPeriod" -> (inboundPayments \ "newSubsForPeriod").as[Amount].toString,
-              "newSubsYTD" -> (inboundPayments \ "newSubsYTD").as[Amount].toString,
-              "totalSubsForPeriod" -> (inboundPayments \ "totalSubsForPeriod").as[Amount].toString,
-              "totalSubsYTD" -> (inboundPayments \ "totalSubsYTD").as[Amount].toString,
-              "bonusDueForPeriod" -> (bonuses \ "bonusDueForPeriod").as[Amount].toString,
-              "totalBonusDueYTD" -> (bonuses \ "totalBonusDueYTD").as[Amount].toString,
-              "claimReason" -> (bonuses \ "claimReason").as[String],
-              "reasonNotRequested" -> "INTERNAL_SERVER_ERROR"
+            auditData = MatcherEquals(
+              Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "accountId"                  -> accountId,
+                "periodStartDate"            -> (json \ "periodStartDate").as[String],
+                "periodEndDate"              -> (json \ "periodEndDate").as[String],
+                "newSubsForPeriod"           -> (inboundPayments \ "newSubsForPeriod").as[Amount].toString,
+                "newSubsYTD"                 -> (inboundPayments \ "newSubsYTD").as[Amount].toString,
+                "totalSubsForPeriod"         -> (inboundPayments \ "totalSubsForPeriod").as[Amount].toString,
+                "totalSubsYTD"               -> (inboundPayments \ "totalSubsYTD").as[Amount].toString,
+                "bonusDueForPeriod"          -> (bonuses \ "bonusDueForPeriod").as[Amount].toString,
+                "totalBonusDueYTD"           -> (bonuses \ "totalBonusDueYTD").as[Amount].toString,
+                "claimReason"                -> (bonuses \ "claimReason").as[String],
+                "reasonNotRequested"         -> "INTERNAL_SERVER_ERROR"
+              )
             )
-            ))(any())
+          )(any())
         }
       }
 
@@ -803,93 +840,99 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
 
     "return 200 success response with all supersede data" when {
       "given an api version of 2" in {
-        when(mockBonusOrWithdrawalService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusResponse(
-          Some("1234567891"),
-          new DateTime("2017-04-06"),
-          new DateTime("2017-05-05"),
-          Some(HelpToBuyTransfer(0f, 10f)),
-          InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
-          Bonuses(1000f, 1000f, Some(1000f), "Life Event"),
-          Some("1234567892"),
-          Some(BonusRecovery(100, "1234567890", 1100, -100)),
-          "Paid",
-          new DateTime("2017-05-20"))
-        ))
-
-        doGetBonusPaymentTransactionRequest(
-          res => {
-            status(res) mustBe OK
-            contentAsJson(res) mustBe Json.obj(
-              "lifeEventId" -> "1234567891",
-              "periodStartDate" -> "2017-04-06",
-              "periodEndDate" -> "2017-05-05",
-              "htbTransfer" -> Json.obj(
-                "htbTransferInForPeriod" -> 0,
-                "htbTransferTotalYTD" -> 10
-              ),
-              "inboundPayments" -> Json.obj(
-                "newSubsForPeriod" -> 4000,
-                "newSubsYTD" -> 4000,
-                "totalSubsForPeriod" -> 4000,
-                "totalSubsYTD" -> 4000
-              ),
-              "bonuses" -> Json.obj(
-                "bonusDueForPeriod" -> 1000,
-                "totalBonusDueYTD" -> 1000,
-                "bonusPaidYTD" -> 1000,
-                "claimReason" -> "Life Event"
-              ),
-              "supersede" -> Json.obj(
-                "automaticRecoveryAmount" -> 100,
-                "originalTransactionId" -> "1234567890",
-                "originalBonusDueForPeriod" -> 1100,
-                "transactionResult" -> -100,
-                "reason" -> "Bonus recovery"
-              ),
-              "supersededBy" -> "1234567892"
+        when(mockBonusOrWithdrawalService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+          Future.successful(
+            GetBonusResponse(
+              Some("1234567891"),
+              new DateTime("2017-04-06"),
+              new DateTime("2017-05-05"),
+              Some(HelpToBuyTransfer(0f, 10f)),
+              InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
+              Bonuses(1000f, 1000f, Some(1000f), "Life Event"),
+              Some("1234567892"),
+              Some(BonusRecovery(100, "1234567890", 1100, -100)),
+              "Paid",
+              new DateTime("2017-05-20")
             )
-          }
+          )
         )
+
+        doGetBonusPaymentTransactionRequest { res =>
+          status(res) mustBe OK
+          contentAsJson(res) mustBe Json.obj(
+            "lifeEventId"     -> "1234567891",
+            "periodStartDate" -> "2017-04-06",
+            "periodEndDate"   -> "2017-05-05",
+            "htbTransfer"     -> Json.obj(
+              "htbTransferInForPeriod" -> 0,
+              "htbTransferTotalYTD"    -> 10
+            ),
+            "inboundPayments" -> Json.obj(
+              "newSubsForPeriod"   -> 4000,
+              "newSubsYTD"         -> 4000,
+              "totalSubsForPeriod" -> 4000,
+              "totalSubsYTD"       -> 4000
+            ),
+            "bonuses"         -> Json.obj(
+              "bonusDueForPeriod" -> 1000,
+              "totalBonusDueYTD"  -> 1000,
+              "bonusPaidYTD"      -> 1000,
+              "claimReason"       -> "Life Event"
+            ),
+            "supersede"       -> Json.obj(
+              "automaticRecoveryAmount"   -> 100,
+              "originalTransactionId"     -> "1234567890",
+              "originalBonusDueForPeriod" -> 1100,
+              "transactionResult"         -> -100,
+              "reason"                    -> "Bonus recovery"
+            ),
+            "supersededBy"    -> "1234567892"
+          )
+        }
       }
     }
 
     "return 200 success response without supersededBy data" when {
       "given an api version of 1 for a request which has been superseded" in {
-        when(mockBonusOrWithdrawalService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusResponse(
-          Some("1234567891"),
-          new DateTime("2017-04-06"),
-          new DateTime("2017-05-05"),
-          Some(HelpToBuyTransfer(0f, 10f)),
-          InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
-          Bonuses(1000f, 1000f, Some(1000f), "Life Event"),
-          Some("1234567892"),
-          None,
-          "Paid",
-          new DateTime("2017-05-20"))
-        ))
+        when(mockBonusOrWithdrawalService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+          Future.successful(
+            GetBonusResponse(
+              Some("1234567891"),
+              new DateTime("2017-04-06"),
+              new DateTime("2017-05-05"),
+              Some(HelpToBuyTransfer(0f, 10f)),
+              InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
+              Bonuses(1000f, 1000f, Some(1000f), "Life Event"),
+              Some("1234567892"),
+              None,
+              "Paid",
+              new DateTime("2017-05-20")
+            )
+          )
+        )
 
         doGetBonusPaymentTransactionRequest(
           res => {
             status(res) mustBe OK
             contentAsJson(res) mustBe Json.obj(
-              "lifeEventId" -> "1234567891",
+              "lifeEventId"     -> "1234567891",
               "periodStartDate" -> "2017-04-06",
-              "periodEndDate" -> "2017-05-05",
-              "htbTransfer" -> Json.obj(
+              "periodEndDate"   -> "2017-05-05",
+              "htbTransfer"     -> Json.obj(
                 "htbTransferInForPeriod" -> 0,
-                "htbTransferTotalYTD" -> 10
+                "htbTransferTotalYTD"    -> 10
               ),
               "inboundPayments" -> Json.obj(
-                "newSubsForPeriod" -> 4000,
-                "newSubsYTD" -> 4000,
+                "newSubsForPeriod"   -> 4000,
+                "newSubsYTD"         -> 4000,
                 "totalSubsForPeriod" -> 4000,
-                "totalSubsYTD" -> 4000
+                "totalSubsYTD"       -> 4000
               ),
-              "bonuses" -> Json.obj(
+              "bonuses"         -> Json.obj(
                 "bonusDueForPeriod" -> 1000,
-                "totalBonusDueYTD" -> 1000,
-                "bonusPaidYTD" -> 1000,
-                "claimReason" -> "Life Event"
+                "totalBonusDueYTD"  -> 1000,
+                "bonusPaidYTD"      -> 1000,
+                "claimReason"       -> "Life Event"
               )
             )
           },
@@ -899,72 +942,81 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
     }
 
     "return 404 status invalid lisa account (investor id not found)" in {
-      when(mockBonusOrWithdrawalService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusOrWithdrawalInvestorNotFoundResponse))
-      doGetBonusPaymentTransactionRequest(res => {
-        status(res) mustBe (NOT_FOUND)
+      when(mockBonusOrWithdrawalService.getBonusOrWithdrawal(any(), any(), any())(any()))
+        .thenReturn(Future.successful(GetBonusOrWithdrawalInvestorNotFoundResponse))
+      doGetBonusPaymentTransactionRequest { res =>
+        status(res) mustBe NOT_FOUND
         val json = contentAsJson(res)
         (json \ "code").as[String] mustBe ErrorAccountNotFound.errorCode
         (json \ "message").as[String] mustBe ErrorAccountNotFound.message
-      })
+      }
     }
 
     "return 404 transaction not found" when {
 
       "given a transaction not found error from the connector" in {
-        when(mockBonusOrWithdrawalService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusOrWithdrawalTransactionNotFoundResponse))
-        doGetBonusPaymentTransactionRequest(res => {
-          status(res) mustBe (NOT_FOUND)
+        when(mockBonusOrWithdrawalService.getBonusOrWithdrawal(any(), any(), any())(any()))
+          .thenReturn(Future.successful(GetBonusOrWithdrawalTransactionNotFoundResponse))
+        doGetBonusPaymentTransactionRequest { res =>
+          status(res) mustBe NOT_FOUND
           val json = contentAsJson(res)
           (json \ "code").as[String] mustBe ErrorBonusPaymentTransactionNotFound.errorCode
           (json \ "message").as[String] mustBe ErrorBonusPaymentTransactionNotFound.message
-        })
+        }
       }
 
       "given a withdrawal charge transaction from the connector" in {
-        when(mockBonusOrWithdrawalService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetWithdrawalResponse(
-          new DateTime("2017-05-06"),
-          new DateTime("2017-06-05"),
-          None,
-          1000,
-          250,
-          250,
-          true,
-          "",
-          None,
-          None,
-          "Collected",
-          new DateTime("2017-06-19")
-        )))
-        doGetBonusPaymentTransactionRequest(res => {
-          status(res) mustBe (NOT_FOUND)
+        when(mockBonusOrWithdrawalService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+          Future.successful(
+            GetWithdrawalResponse(
+              new DateTime("2017-05-06"),
+              new DateTime("2017-06-05"),
+              None,
+              1000,
+              250,
+              250,
+              fundsDeductedDuringWithdrawal = true,
+              "",
+              None,
+              None,
+              "Collected",
+              new DateTime("2017-06-19")
+            )
+          )
+        )
+        doGetBonusPaymentTransactionRequest { res =>
+          status(res) mustBe NOT_FOUND
           val json = contentAsJson(res)
           (json \ "code").as[String] mustBe ErrorBonusPaymentTransactionNotFound.errorCode
           (json \ "message").as[String] mustBe ErrorBonusPaymentTransactionNotFound.message
-        })
+        }
       }
 
     }
 
     "return a internal server error response" when {
       "an error is returned from the service layer" in {
-        when(mockBonusOrWithdrawalService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusOrWithdrawalErrorResponse))
-        doGetBonusPaymentTransactionRequest(res => {
-          contentAsJson(res) mustBe internalServerError
-        })
+        when(mockBonusOrWithdrawalService.getBonusOrWithdrawal(any(), any(), any())(any()))
+          .thenReturn(Future.successful(GetBonusOrWithdrawalErrorResponse))
+        doGetBonusPaymentTransactionRequest(res => contentAsJson(res) mustBe internalServerError)
       }
       "given an api version of 1 for a request which supersedes another" in {
-        when(mockBonusOrWithdrawalService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusResponse(
-          Some("1234567891"),
-          new DateTime("2017-04-06"),
-          new DateTime("2017-05-05"),
-          Some(HelpToBuyTransfer(0f, 10f)),
-          InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
-          Bonuses(1000f, 1000f, Some(1000f), "Superseded Bonus"),
-          Some("1234567892"),
-          Some(BonusRecovery(100, "1234567890", 1100, -100)),
-          "Paid",
-          new DateTime("2017-05-20"))
-        ))
+        when(mockBonusOrWithdrawalService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+          Future.successful(
+            GetBonusResponse(
+              Some("1234567891"),
+              new DateTime("2017-04-06"),
+              new DateTime("2017-05-05"),
+              Some(HelpToBuyTransfer(0f, 10f)),
+              InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
+              Bonuses(1000f, 1000f, Some(1000f), "Superseded Bonus"),
+              Some("1234567892"),
+              Some(BonusRecovery(100, "1234567890", 1100, -100)),
+              "Paid",
+              new DateTime("2017-05-20")
+            )
+          )
+        )
 
         doGetBonusPaymentTransactionRequest(
           res => {
@@ -979,59 +1031,67 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
     "return a service unavailable response" when {
 
       "GetBonusOrWithdrawalServiceUnavailableResponse is returned from the service layer" in {
-        when(mockBonusOrWithdrawalService.getBonusOrWithdrawal(any(), any(), any())(any())).
-          thenReturn(Future.successful(GetBonusOrWithdrawalServiceUnavailableResponse))
+        when(mockBonusOrWithdrawalService.getBonusOrWithdrawal(any(), any(), any())(any()))
+          .thenReturn(Future.successful(GetBonusOrWithdrawalServiceUnavailableResponse))
 
-        doGetBonusPaymentTransactionRequest(res => {
+        doGetBonusPaymentTransactionRequest { res =>
           status(res) mustBe SERVICE_UNAVAILABLE
           (contentAsJson(res) \ "code").as[String] mustBe "SERVER_ERROR"
-        })
+        }
       }
     }
 
     "audit getBonusPaymentReported" when {
       "given an api version of 2" in {
-        when(mockBonusOrWithdrawalService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusResponse(
-          Some("1234567891"),
-          new DateTime("2017-04-06"),
-          new DateTime("2017-05-05"),
-          Some(HelpToBuyTransfer(0f, 10f)),
-          InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
-          Bonuses(1000f, 1000f, Some(1000f), "Life Event"),
-          Some("1234567892"),
-          Some(BonusRecovery(100, "1234567890", 1100, -100)),
-          "Paid",
-          new DateTime("2017-05-20"))
-        ))
-
-        doGetBonusPaymentTransactionRequest(
-          res => {
-            await(res)
-            verify(mockAuditService).audit(
-              auditType = MatcherEquals("getBonusPaymentReported"),
-              path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions/$transactionId"),
-              auditData = MatcherEquals(Map(
-                "lisaManagerReferenceNumber" -> lisaManager,
-                "accountId" -> accountId,
-                "transactionId" -> transactionId
-              ))
-            )(any())
-          }
+        when(mockBonusOrWithdrawalService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+          Future.successful(
+            GetBonusResponse(
+              Some("1234567891"),
+              new DateTime("2017-04-06"),
+              new DateTime("2017-05-05"),
+              Some(HelpToBuyTransfer(0f, 10f)),
+              InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
+              Bonuses(1000f, 1000f, Some(1000f), "Life Event"),
+              Some("1234567892"),
+              Some(BonusRecovery(100, "1234567890", 1100, -100)),
+              "Paid",
+              new DateTime("2017-05-20")
+            )
+          )
         )
+
+        doGetBonusPaymentTransactionRequest { res =>
+          await(res)
+          verify(mockAuditService).audit(
+            auditType = MatcherEquals("getBonusPaymentReported"),
+            path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions/$transactionId"),
+            auditData = MatcherEquals(
+              Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "accountId"                  -> accountId,
+                "transactionId"              -> transactionId
+              )
+            )
+          )(any())
+        }
       }
       "given an api version of 1 for a request which has been superseded" in {
-        when(mockBonusOrWithdrawalService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusResponse(
-          Some("1234567891"),
-          new DateTime("2017-04-06"),
-          new DateTime("2017-05-05"),
-          Some(HelpToBuyTransfer(0f, 10f)),
-          InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
-          Bonuses(1000f, 1000f, Some(1000f), "Life Event"),
-          Some("1234567892"),
-          None,
-          "Paid",
-          new DateTime("2017-05-20"))
-        ))
+        when(mockBonusOrWithdrawalService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+          Future.successful(
+            GetBonusResponse(
+              Some("1234567891"),
+              new DateTime("2017-04-06"),
+              new DateTime("2017-05-05"),
+              Some(HelpToBuyTransfer(0f, 10f)),
+              InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
+              Bonuses(1000f, 1000f, Some(1000f), "Life Event"),
+              Some("1234567892"),
+              None,
+              "Paid",
+              new DateTime("2017-05-20")
+            )
+          )
+        )
 
         doGetBonusPaymentTransactionRequest(
           res => {
@@ -1039,11 +1099,13 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
             verify(mockAuditService).audit(
               auditType = MatcherEquals("getBonusPaymentReported"),
               path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions/$transactionId"),
-              auditData = MatcherEquals(Map(
-                "lisaManagerReferenceNumber" -> lisaManager,
-                "accountId" -> accountId,
-                "transactionId" -> transactionId
-              ))
+              auditData = MatcherEquals(
+                Map(
+                  "lisaManagerReferenceNumber" -> lisaManager,
+                  "accountId"                  -> accountId,
+                  "transactionId"              -> transactionId
+                )
+              )
             )(any())
           },
           acceptHeaderV1
@@ -1053,151 +1115,187 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
 
     "audit getBonusPaymentNotReported" when {
       "given an investor id not found" in {
-        when(mockBonusOrWithdrawalService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusOrWithdrawalInvestorNotFoundResponse))
-        doGetBonusPaymentTransactionRequest(res => {
+        when(mockBonusOrWithdrawalService.getBonusOrWithdrawal(any(), any(), any())(any()))
+          .thenReturn(Future.successful(GetBonusOrWithdrawalInvestorNotFoundResponse))
+        doGetBonusPaymentTransactionRequest { res =>
           await(res)
           verify(mockAuditService).audit(
             auditType = MatcherEquals("getBonusPaymentNotReported"),
             path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions/$transactionId"),
-            auditData = MatcherEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "accountId" -> accountId,
-              "transactionId" -> transactionId,
-              "reasonNotReported" -> ErrorAccountNotFound.errorCode
-            ))
+            auditData = MatcherEquals(
+              Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "accountId"                  -> accountId,
+                "transactionId"              -> transactionId,
+                "reasonNotReported"          -> ErrorAccountNotFound.errorCode
+              )
+            )
           )(any())
-        })
+        }
       }
       "given a transaction not found error from the connector" in {
-        when(mockBonusOrWithdrawalService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusOrWithdrawalTransactionNotFoundResponse))
-        doGetBonusPaymentTransactionRequest(res => {
+        when(mockBonusOrWithdrawalService.getBonusOrWithdrawal(any(), any(), any())(any()))
+          .thenReturn(Future.successful(GetBonusOrWithdrawalTransactionNotFoundResponse))
+        doGetBonusPaymentTransactionRequest { res =>
           await(res)
           verify(mockAuditService).audit(
             auditType = MatcherEquals("getBonusPaymentNotReported"),
             path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions/$transactionId"),
-            auditData = MatcherEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "accountId" -> accountId,
-              "transactionId" -> transactionId,
-              "reasonNotReported" -> ErrorBonusPaymentTransactionNotFound.errorCode
-            ))
+            auditData = MatcherEquals(
+              Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "accountId"                  -> accountId,
+                "transactionId"              -> transactionId,
+                "reasonNotReported"          -> ErrorBonusPaymentTransactionNotFound.errorCode
+              )
+            )
           )(any())
-        })
+        }
       }
       "given a withdrawal charge transaction from the connector" in {
-        when(mockBonusOrWithdrawalService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetWithdrawalResponse(
-          new DateTime("2017-05-06"),
-          new DateTime("2017-06-05"),
-          None,
-          1000,
-          250,
-          250,
-          true,
-          "",
-          None,
-          None,
-          "Collected",
-          new DateTime("2017-06-19")
-        )))
-        doGetBonusPaymentTransactionRequest(res => {
+        when(mockBonusOrWithdrawalService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+          Future.successful(
+            GetWithdrawalResponse(
+              new DateTime("2017-05-06"),
+              new DateTime("2017-06-05"),
+              None,
+              1000,
+              250,
+              250,
+              fundsDeductedDuringWithdrawal = true,
+              "",
+              None,
+              None,
+              "Collected",
+              new DateTime("2017-06-19")
+            )
+          )
+        )
+        doGetBonusPaymentTransactionRequest { res =>
           await(res)
           verify(mockAuditService).audit(
             auditType = MatcherEquals("getBonusPaymentNotReported"),
             path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions/$transactionId"),
-            auditData = MatcherEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "accountId" -> accountId,
-              "transactionId" -> transactionId,
-              "reasonNotReported" -> ErrorBonusPaymentTransactionNotFound.errorCode
-            ))
+            auditData = MatcherEquals(
+              Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "accountId"                  -> accountId,
+                "transactionId"              -> transactionId,
+                "reasonNotReported"          -> ErrorBonusPaymentTransactionNotFound.errorCode
+              )
+            )
           )(any())
-        })
+        }
       }
       "an error is returned from the service layer" in {
-        when(mockBonusOrWithdrawalService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusOrWithdrawalErrorResponse))
-        doGetBonusPaymentTransactionRequest(res => {
+        when(mockBonusOrWithdrawalService.getBonusOrWithdrawal(any(), any(), any())(any()))
+          .thenReturn(Future.successful(GetBonusOrWithdrawalErrorResponse))
+        doGetBonusPaymentTransactionRequest { res =>
           await(res)
           verify(mockAuditService).audit(
             auditType = MatcherEquals("getBonusPaymentNotReported"),
             path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions/$transactionId"),
-            auditData = MatcherEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "accountId" -> accountId,
-              "transactionId" -> transactionId,
-              "reasonNotReported" -> "INTERNAL_SERVER_ERROR"
-            ))
+            auditData = MatcherEquals(
+              Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "accountId"                  -> accountId,
+                "transactionId"              -> transactionId,
+                "reasonNotReported"          -> "INTERNAL_SERVER_ERROR"
+              )
+            )
           )(any())
-        })
+        }
       }
       "given an api version of 1 for a request which supersedes another" in {
-        when(mockBonusOrWithdrawalService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(Future.successful(GetBonusResponse(
-          Some("1234567891"),
-          new DateTime("2017-04-06"),
-          new DateTime("2017-05-05"),
-          Some(HelpToBuyTransfer(0f, 10f)),
-          InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
-          Bonuses(1000f, 1000f, Some(1000f), "Superseded Bonus"),
-          Some("1234567892"),
-          Some(BonusRecovery(100, "1234567890", 1100, -100)),
-          "Paid",
-          new DateTime("2017-05-20"))
-        ))
+        when(mockBonusOrWithdrawalService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+          Future.successful(
+            GetBonusResponse(
+              Some("1234567891"),
+              new DateTime("2017-04-06"),
+              new DateTime("2017-05-05"),
+              Some(HelpToBuyTransfer(0f, 10f)),
+              InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
+              Bonuses(1000f, 1000f, Some(1000f), "Superseded Bonus"),
+              Some("1234567892"),
+              Some(BonusRecovery(100, "1234567890", 1100, -100)),
+              "Paid",
+              new DateTime("2017-05-20")
+            )
+          )
+        )
 
-        doGetBonusPaymentTransactionRequest(res => {
-          await(res)
-          verify(mockAuditService).audit(
+        doGetBonusPaymentTransactionRequest(
+          res => {
+            await(res)
+            verify(mockAuditService).audit(
               auditType = MatcherEquals("getBonusPaymentNotReported"),
               path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions/$transactionId"),
-              auditData = MatcherEquals(Map(
-                "lisaManagerReferenceNumber" -> lisaManager,
-                "accountId" -> accountId,
-                "transactionId" -> transactionId,
-                "reasonNotReported" -> "INTERNAL_SERVER_ERROR"
-              ))
+              auditData = MatcherEquals(
+                Map(
+                  "lisaManagerReferenceNumber" -> lisaManager,
+                  "accountId"                  -> accountId,
+                  "transactionId"              -> transactionId,
+                  "reasonNotReported"          -> "INTERNAL_SERVER_ERROR"
+                )
+              )
             )(any())
           },
           acceptHeaderV1
         )
       }
       "GetBonusOrWithdrawalServiceUnavailableResponse is returned from the service layer" in {
-        when(mockBonusOrWithdrawalService.getBonusOrWithdrawal(any(), any(), any())(any())).
-          thenReturn(Future.successful(GetBonusOrWithdrawalServiceUnavailableResponse))
+        when(mockBonusOrWithdrawalService.getBonusOrWithdrawal(any(), any(), any())(any()))
+          .thenReturn(Future.successful(GetBonusOrWithdrawalServiceUnavailableResponse))
 
-        doGetBonusPaymentTransactionRequest(res => {
+        doGetBonusPaymentTransactionRequest { res =>
           await(res)
           verify(mockAuditService).audit(
             auditType = MatcherEquals("getBonusPaymentNotReported"),
             path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions/$transactionId"),
-            auditData = MatcherEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "accountId" -> accountId,
-              "transactionId" -> transactionId,
-              "reasonNotReported" -> "SERVER_ERROR"
-            ))
+            auditData = MatcherEquals(
+              Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "accountId"                  -> accountId,
+                "transactionId"              -> transactionId,
+                "reasonNotReported"          -> "SERVER_ERROR"
+              )
+            )
           )(any())
-        })
+        }
       }
     }
   }
 
-  val internalServerError = Json.obj("code" -> "INTERNAL_SERVER_ERROR", "message" -> "Internal server error")
+  val internalServerError: JsObject = Json.obj("code" -> "INTERNAL_SERVER_ERROR", "message" -> "Internal server error")
 
-  def doRequest(jsonString: String, lmrn: String = lisaManager)(callback: (Future[Result]) =>  Unit, header: (String, String) = acceptHeaderV2): Unit = {
-    val res = bonusPaymentController.requestBonusPayment(lmrn, accountId).apply(FakeRequest(Helpers.PUT, "/").withHeaders(header).
-      withBody(AnyContentAsJson(Json.parse(jsonString))))
-
-    callback(res)
-  }
-
-  def doSyncRequest(jsonString: String)(callback: (Result) =>  Unit, header: (String, String) = acceptHeaderV2): Unit = {
-    val res = await(bonusPaymentController.requestBonusPayment(lisaManager, accountId).apply(FakeRequest(Helpers.PUT, "/").withHeaders(header).
-      withBody(AnyContentAsJson(Json.parse(jsonString)))))
+  def doRequest(
+    jsonString: String,
+    lmrn: String = lisaManager
+  )(callback: Future[Result] => Unit, header: (String, String) = acceptHeaderV2): Unit = {
+    val res = bonusPaymentController
+      .requestBonusPayment(lmrn, accountId)
+      .apply(FakeRequest(Helpers.PUT, "/").withHeaders(header).withBody(AnyContentAsJson(Json.parse(jsonString))))
 
     callback(res)
   }
 
-  def doGetBonusPaymentTransactionRequest(callback: (Future[Result]) => Unit, header: (String, String) = acceptHeaderV2) {
-    val res = bonusPaymentController.getBonusPayment(lisaManager, accountId, transactionId).apply(FakeRequest(Helpers.GET, "/").withHeaders(header))
+  def doSyncRequest(jsonString: String)(callback: Result => Unit, header: (String, String) = acceptHeaderV2): Unit = {
+    val res = await(
+      bonusPaymentController
+        .requestBonusPayment(lisaManager, accountId)
+        .apply(FakeRequest(Helpers.PUT, "/").withHeaders(header).withBody(AnyContentAsJson(Json.parse(jsonString))))
+    )
+
+    callback(res)
+  }
+
+  def doGetBonusPaymentTransactionRequest(
+    callback: Future[Result] => Unit,
+    header: (String, String) = acceptHeaderV2
+  ): Unit = {
+    val res = bonusPaymentController
+      .getBonusPayment(lisaManager, accountId, transactionId)
+      .apply(FakeRequest(Helpers.GET, "/").withHeaders(header))
     callback(res)
   }
 }
