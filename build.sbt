@@ -12,6 +12,7 @@ PlayKeys.playDefaultPort := 9667
 lazy val lisaapi = project in file(".")
 
 enablePlugins(PlayScala, SbtDistributablesPlugin)
+disablePlugins(JUnitXmlReportPlugin) //Required to prevent https://github.com/scalatest/scalatest/issues/1427
 
 libraryDependencies ++= AppDependencies()
 libraryDependencySchemes ++= Seq("org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always)
