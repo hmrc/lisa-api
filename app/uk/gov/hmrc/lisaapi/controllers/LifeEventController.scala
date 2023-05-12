@@ -29,111 +29,132 @@ import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class LifeEventController @Inject()(
-                                     authConnector: AuthConnector,
-                                     appContext: AppContext,
-                                     service: LifeEventService,
-                                     auditService: AuditService,
-                                     lisaMetrics: LisaMetrics,
-                                     cc: ControllerComponents,
-                                     parse: PlayBodyParsers
-                                   )(implicit ec: ExecutionContext) extends LisaController(
-  cc: ControllerComponents,
-  lisaMetrics: LisaMetrics,
+class LifeEventController @Inject() (
+  authConnector: AuthConnector,
   appContext: AppContext,
-  authConnector: AuthConnector
-) {
+  service: LifeEventService,
+  auditService: AuditService,
+  lisaMetrics: LisaMetrics,
+  cc: ControllerComponents,
+  parse: PlayBodyParsers
+)(implicit ec: ExecutionContext)
+    extends LisaController(
+      cc: ControllerComponents,
+      lisaMetrics: LisaMetrics,
+      appContext: AppContext,
+      authConnector: AuthConnector
+    ) {
 
   def reportLisaLifeEvent(lisaManager: String, accountId: String): Action[AnyContent] =
-    (validateHeader(parse) andThen validateLMRN(lisaManager) andThen validateAccountId(accountId)).async { implicit request =>
-      implicit val startTime: Long = System.currentTimeMillis()
-      withValidJson[ReportLifeEventRequest](
-        req => {
-          withValidDates(lisaManager, accountId, req) { () =>
-            service.reportLifeEvent(lisaManager, accountId, req) flatMap { res =>
-              logger.debug("Entering LifeEvent Controller and the response is " + res.toString)
-              res match {
-                case ReportLifeEventSuccessResponse(lifeEventId) =>
-                  logger.debug("Matched Valid Response ")
-                  auditReportLifeEvent(lisaManager, accountId, req, success = true)
-                  lisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.EVENT)
-                  val data = ApiResponseData(message = "Life event created", lifeEventId = Some(lifeEventId))
-                  Future.successful(Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED))))
-                case res: ReportLifeEventResponse =>
-                  withApiVersion {
-                    case Some(VERSION_1) =>
-                      val errorResponse = v1errors.applyOrElse(res, { _: ReportLifeEventResponse =>
-                        logger.debug(s"Matched an unexpected response: $res, returning a 500 error")
-                        ErrorInternalServerError
-                      })
-                      Future.successful(error(errorResponse, lisaManager, accountId, req))
-                    case Some(VERSION_2) =>
-                      val errorResponse = v2errors.applyOrElse(res, { _: ReportLifeEventResponse =>
-                        logger.debug(s"Matched an unexpected response: $res, returning a 500 error")
-                        ErrorInternalServerError
-                      })
-                      Future.successful(error(errorResponse, lisaManager, accountId, req))
-                  }
+    (validateHeader(parse) andThen validateLMRN(lisaManager) andThen validateAccountId(accountId)).async {
+      implicit request =>
+        implicit val startTime: Long = System.currentTimeMillis()
+        withValidJson[ReportLifeEventRequest](
+          req =>
+            withValidDates(lisaManager, accountId, req) { () =>
+              service.reportLifeEvent(lisaManager, accountId, req) flatMap { res =>
+                logger.debug("Entering LifeEvent Controller and the response is " + res.toString)
+                res match {
+                  case ReportLifeEventSuccessResponse(lifeEventId) =>
+                    logger.debug("Matched Valid Response ")
+                    auditReportLifeEvent(lisaManager, accountId, req, success = true)
+                    lisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.EVENT)
+                    val data = ApiResponseData(message = "Life event created", lifeEventId = Some(lifeEventId))
+                    Future.successful(
+                      Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
+                    )
+                  case res: ReportLifeEventResponse                =>
+                    withApiVersion {
+                      case Some(VERSION_1) =>
+                        val errorResponse = v1errors.applyOrElse(
+                          res,
+                          { _: ReportLifeEventResponse =>
+                            logger.debug(s"Matched an unexpected response: $res, returning a 500 error")
+                            ErrorInternalServerError
+                          }
+                        )
+                        Future.successful(error(errorResponse, lisaManager, accountId, req))
+                      case Some(VERSION_2) =>
+                        val errorResponse = v2errors.applyOrElse(
+                          res,
+                          { _: ReportLifeEventResponse =>
+                            logger.debug(s"Matched an unexpected response: $res, returning a 500 error")
+                            ErrorInternalServerError
+                          }
+                        )
+                        Future.successful(error(errorResponse, lisaManager, accountId, req))
+                    }
+                }
               }
-            }
-          }
-        }, lisaManager = lisaManager
-      )
+            },
+          lisaManager = lisaManager
+        )
     }
 
   private val commonErrors: PartialFunction[ReportLifeEventResponse, ErrorResponse] = {
-    case ReportLifeEventInappropriateResponse => ErrorLifeEventInappropriate
+    case ReportLifeEventInappropriateResponse              => ErrorLifeEventInappropriate
     case ReportLifeEventAlreadyExistsResponse(lifeEventId) => ErrorLifeEventAlreadyExists(lifeEventId)
-    case ReportLifeEventAccountNotFoundResponse => ErrorAccountNotFound
-    case ReportLifeEventServiceUnavailableResponse => ErrorServiceUnavailable
+    case ReportLifeEventAccountNotFoundResponse            => ErrorAccountNotFound
+    case ReportLifeEventServiceUnavailableResponse         => ErrorServiceUnavailable
   }
 
-  private val v1errors: PartialFunction[ReportLifeEventResponse, ErrorResponse] = commonErrors.orElse({
+  private val v1errors: PartialFunction[ReportLifeEventResponse, ErrorResponse] = commonErrors.orElse {
     case ReportLifeEventAccountClosedOrVoidResponse => ErrorAccountAlreadyClosedOrVoid
-  })
+  }
 
-  private val v2errors: PartialFunction[ReportLifeEventResponse, ErrorResponse] = commonErrors.orElse({
-    case ReportLifeEventAccountClosedResponse => ErrorAccountAlreadyClosed
+  private val v2errors: PartialFunction[ReportLifeEventResponse, ErrorResponse] = commonErrors.orElse {
+    case ReportLifeEventAccountClosedResponse    => ErrorAccountAlreadyClosed
     case ReportLifeEventAccountCancelledResponse => ErrorAccountAlreadyCancelled
-    case ReportLifeEventAccountVoidResponse => ErrorAccountAlreadyVoided
-  })
+    case ReportLifeEventAccountVoidResponse      => ErrorAccountAlreadyVoided
+  }
 
-  private def error(e: ErrorResponse, lisaManager: String, accountId: String, req: ReportLifeEventRequest)
-                   (implicit hc: HeaderCarrier, startTime: Long): Result = {
+  private def error(e: ErrorResponse, lisaManager: String, accountId: String, req: ReportLifeEventRequest)(implicit
+    hc: HeaderCarrier,
+    startTime: Long
+  ): Result = {
     logger.debug("Matched an error response")
     auditReportLifeEvent(lisaManager, accountId, req, success = false, Map("reasonNotReported" -> e.errorCode))
     lisaMetrics.incrementMetrics(startTime, e.httpStatusCode, LisaMetricKeys.EVENT)
     e.asResult
   }
 
-  private def auditReportLifeEvent(lisaManager: String, accountId: String, req: ReportLifeEventRequest, success: Boolean, extraData: Map[String, String] = Map())
-                     (implicit hc: HeaderCarrier) = {
+  private def auditReportLifeEvent(
+    lisaManager: String,
+    accountId: String,
+    req: ReportLifeEventRequest,
+    success: Boolean,
+    extraData: Map[String, String] = Map()
+  )(implicit hc: HeaderCarrier) =
     auditService.audit(
       auditType = if (success) "lifeEventReported" else "lifeEventNotReported",
       path = reportLifeEventEndpointUrl(lisaManager, accountId),
       auditData = req.toStringMap ++ Map(
         "lisaManagerReferenceNumber" -> lisaManager,
-        "accountID" -> accountId
+        "accountID"                  -> accountId
       ) ++ extraData
     )
-  }
 
-  private def withValidDates(lisaManager: String, accountId: String, req: ReportLifeEventRequest)
-                            (success: () => Future[Result])
-                            (implicit hc: HeaderCarrier, startTime: Long) = {
+  private def withValidDates(lisaManager: String, accountId: String, req: ReportLifeEventRequest)(
+    success: () => Future[Result]
+  )(implicit hc: HeaderCarrier, startTime: Long) =
     if (req.eventDate.isBefore(LISA_START_DATE)) {
       logger.debug("Life event not reported - invalid event date")
 
       auditReportLifeEvent(lisaManager, accountId, req, success = false, Map("reasonNotReported" -> "FORBIDDEN"))
       lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.EVENT)
 
-      Future.successful(Forbidden(ErrorForbidden(List(
-        ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("eventDate"), Some("/eventDate"))
-      )).asJson))
+      Future.successful(
+        Forbidden(
+          ErrorForbidden(
+            List(
+              ErrorValidation(DATE_ERROR, LISA_START_DATE_ERROR.format("eventDate"), Some("/eventDate"))
+            )
+          ).asJson
+        )
+      )
     } else {
       success()
     }
-  }
 
   private def reportLifeEventEndpointUrl(lisaManager: String, accountId: String): String =
     s"/manager/$lisaManager/accounts/$accountId/events"

@@ -37,63 +37,87 @@ class UpdateSubscriptionServiceSpec extends ServiceTestFixture {
 
     "return a Success response" when {
       "given a success response with code SUCCESS from the DES connector" in {
-        when(mockDesConnector.updateFirstSubDate(any(), any(),any())(any())).thenReturn(Future.successful(DesUpdateSubscriptionSuccessResponse("SUCCESS","message")))
+        when(mockDesConnector.updateFirstSubDate(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesUpdateSubscriptionSuccessResponse("SUCCESS", "message")))
 
-        doRequest{response => response mustBe UpdateSubscriptionSuccessResponse("UPDATED",
-          "Successfully updated the firstSubscriptionDate for the LISA account")}
+        doRequest { response =>
+          response mustBe UpdateSubscriptionSuccessResponse(
+            "UPDATED",
+            "Successfully updated the firstSubscriptionDate for the LISA account"
+          )
+        }
       }
       "given a success response with code INVESTOR_ACCOUNT_NOW_VOID from the DES connector" in {
-        when(mockDesConnector.updateFirstSubDate(any(), any(),any())(any())).thenReturn(Future.successful(DesUpdateSubscriptionSuccessResponse("INVESTOR_ACCOUNT_NOW_VOID","message")))
+        when(mockDesConnector.updateFirstSubDate(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesUpdateSubscriptionSuccessResponse("INVESTOR_ACCOUNT_NOW_VOID", "message")))
 
-        doRequest{response => response mustBe UpdateSubscriptionSuccessResponse("UPDATED_AND_ACCOUNT_VOID",
-          "Successfully updated the firstSubscriptionDate for the LISA account and changed the account status to void because the investor has another account with an earlier firstSubscriptionDate")}
+        doRequest { response =>
+          response mustBe UpdateSubscriptionSuccessResponse(
+            "UPDATED_AND_ACCOUNT_VOID",
+            "Successfully updated the firstSubscriptionDate for the LISA account and changed the account status to void because the investor has another account with an earlier firstSubscriptionDate"
+          )
+        }
       }
     }
 
     "return a Not Found response" when {
       "given DesFailureReponse and status 404" in {
-        when(mockDesConnector.updateFirstSubDate(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNTID_NOT_FOUND","The accountID given does not match with HMRC’s records")))
+        when(mockDesConnector.updateFirstSubDate(any(), any(), any())(any())).thenReturn(
+          Future.successful(
+            DesFailureResponse("INVESTOR_ACCOUNTID_NOT_FOUND", "The accountID given does not match with HMRC’s records")
+          )
+        )
         doRequest(response => response mustBe UpdateSubscriptionAccountNotFoundResponse)
       }
     }
 
     "return a Forbidden account closed response" when {
       "given DesFailureReponse and status 403" in {
-        when(mockDesConnector.updateFirstSubDate(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_CLOSED","The LISA account is already closed")))
+        when(mockDesConnector.updateFirstSubDate(any(), any(), any())(any())).thenReturn(
+          Future.successful(DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_CLOSED", "The LISA account is already closed"))
+        )
         doRequest(response => response mustBe UpdateSubscriptionAccountClosedResponse)
       }
     }
 
     "return a Forbidden account cancelled response" when {
       "given DesFailureReponse and status 403 for cancelled account" in {
-        when(mockDesConnector.updateFirstSubDate(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_CANCELLED","The LISA account is already cancelled")))
+        when(mockDesConnector.updateFirstSubDate(any(), any(), any())(any())).thenReturn(
+          Future.successful(
+            DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_CANCELLED", "The LISA account is already cancelled")
+          )
+        )
         doRequest(response => response mustBe UpdateSubscriptionAccountCancelledResponse)
       }
     }
 
     "return a Forbidden account voided response" when {
       "given DesFailureReponse and status 403" in {
-        when(mockDesConnector.updateFirstSubDate(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_VOID","The LISA account is already voided")))
+        when(mockDesConnector.updateFirstSubDate(any(), any(), any())(any())).thenReturn(
+          Future.successful(DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_VOID", "The LISA account is already voided"))
+        )
         doRequest(response => response mustBe UpdateSubscriptionAccountVoidedResponse)
       }
     }
 
     "return a Internal Server Error response" when {
       "When INTERNAL_SERVER_ERROR sent" in {
-        when(mockDesConnector.updateFirstSubDate(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("INTERNAL_SERVER_ERROR","Internal Error")))
+        when(mockDesConnector.updateFirstSubDate(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesFailureResponse("INTERNAL_SERVER_ERROR", "Internal Error")))
         doRequest(response => response mustBe UpdateSubscriptionErrorResponse)
       }
 
       "When Invalid Code Sent" in {
-        when(mockDesConnector.updateFirstSubDate(any(), any(),any())(any())).thenReturn(Future.successful(DesFailureResponse("INVALID","Invalid Code")))
+        when(mockDesConnector.updateFirstSubDate(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesFailureResponse("INVALID", "Invalid Code")))
         doRequest(response => response mustBe UpdateSubscriptionErrorResponse)
       }
     }
 
     "return a Service Unavailable response" when {
       "a DesUnavailableResponse is returned" in {
-        when(mockDesConnector.updateFirstSubDate(any(), any(),any())(any())).
-          thenReturn(Future.successful(DesUnavailableResponse))
+        when(mockDesConnector.updateFirstSubDate(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesUnavailableResponse))
 
         doRequest(response => response mustBe UpdateSubscriptionServiceUnavailableResponse)
       }
@@ -101,9 +125,12 @@ class UpdateSubscriptionServiceSpec extends ServiceTestFixture {
 
   }
 
-  private def doRequest(callback: (UpdateSubscriptionResponse) => Unit): Unit = {
-    val request = UpdateSubscriptionRequest( new DateTime("2017-04-06"))
-    val response = Await.result(updateSubscriptionService.updateSubscription("Z019283", "192837", request)(HeaderCarrier()), Duration.Inf)
+  private def doRequest(callback: UpdateSubscriptionResponse => Unit): Unit = {
+    val request  = UpdateSubscriptionRequest(new DateTime("2017-04-06"))
+    val response = Await.result(
+      updateSubscriptionService.updateSubscription("Z019283", "192837", request)(HeaderCarrier()),
+      Duration.Inf
+    )
 
     callback(response)
   }

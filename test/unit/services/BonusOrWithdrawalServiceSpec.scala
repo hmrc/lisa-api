@@ -52,8 +52,8 @@ class BonusOrWithdrawalServiceSpec extends ServiceTestFixture {
           creationDate = new DateTime("2018-02-10")
         )
 
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
-          thenReturn(Future.successful(desResponse))
+        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any()))
+          .thenReturn(Future.successful(desResponse))
 
         doRequest { response =>
           response mustBe desResponse
@@ -63,8 +63,8 @@ class BonusOrWithdrawalServiceSpec extends ServiceTestFixture {
 
     "return a transaction not found response" when {
       "given the code TRANSACTION_ID_NOT_FOUND from the DES connector" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("TRANSACTION_ID_NOT_FOUND", "xxxx")))
+        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesFailureResponse("TRANSACTION_ID_NOT_FOUND", "xxxx")))
 
         doRequest { response =>
           response mustBe GetBonusOrWithdrawalTransactionNotFoundResponse
@@ -74,8 +74,8 @@ class BonusOrWithdrawalServiceSpec extends ServiceTestFixture {
 
     "return a account not found response" when {
       "given the code INVESTOR_ACCOUNTID_NOT_FOUND from the DES connector" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNTID_NOT_FOUND", "xxxx")))
+        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNTID_NOT_FOUND", "xxxx")))
 
         doRequest { response =>
           response mustBe GetBonusOrWithdrawalInvestorNotFoundResponse
@@ -85,8 +85,8 @@ class BonusOrWithdrawalServiceSpec extends ServiceTestFixture {
 
     "return a service unavailable response" when {
       "given a DesUnavailableResponse from the DES connector" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesUnavailableResponse))
+        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesUnavailableResponse))
 
         doRequest { response =>
           response mustBe GetBonusOrWithdrawalServiceUnavailableResponse
@@ -96,8 +96,8 @@ class BonusOrWithdrawalServiceSpec extends ServiceTestFixture {
 
     "return a generic error response" when {
       "given any other error code from the DES connector" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("SOMETHING_ELSE", "xxxxx")))
+        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesFailureResponse("SOMETHING_ELSE", "xxxxx")))
 
         doRequest { response =>
           response mustBe GetBonusOrWithdrawalErrorResponse
@@ -106,8 +106,11 @@ class BonusOrWithdrawalServiceSpec extends ServiceTestFixture {
     }
   }
 
-  private def doRequest(callback: (GetBonusOrWithdrawalResponse) => Unit): Unit = {
-    val response = Await.result(bonusOrWithdrawalService.getBonusOrWithdrawal("Z019283", "192837", "789")(HeaderCarrier()), Duration.Inf)
+  private def doRequest(callback: GetBonusOrWithdrawalResponse => Unit): Unit = {
+    val response = Await.result(
+      bonusOrWithdrawalService.getBonusOrWithdrawal("Z019283", "192837", "789")(HeaderCarrier()),
+      Duration.Inf
+    )
 
     callback(response)
   }

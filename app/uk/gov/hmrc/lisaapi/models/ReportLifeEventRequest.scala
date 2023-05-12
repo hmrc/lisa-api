@@ -22,26 +22,27 @@ import play.api.libs.json.{JsPath, Reads, Writes}
 
 trait ReportLifeEventRequestBase extends Product
 
-case class ReportLifeEventRequest(eventType: LifeEventType,  eventDate: DateTime) extends ReportLifeEventRequestBase
+case class ReportLifeEventRequest(eventType: LifeEventType, eventDate: DateTime) extends ReportLifeEventRequestBase
 
 object ReportLifeEventRequestBase {
   implicit val writes: Writes[ReportLifeEventRequestBase] = Writes[ReportLifeEventRequestBase] {
-    case deathTerminalIllness: ReportLifeEventRequest => ReportLifeEventRequest.desWrites.writes(deathTerminalIllness)
-    case fundRelease: RequestFundReleaseRequest => RequestFundReleaseRequest.desWrites.writes(fundRelease)
-    case purchaseExtension: RequestPurchaseExtension => RequestPurchaseExtension.desWrites.writes(purchaseExtension)
-    case purchaseOutcome: RequestPurchaseOutcomeRequest => RequestPurchaseOutcomeRequest.desWrites.writes(purchaseOutcome)
-    case annualReturn: AnnualReturn => AnnualReturn.desWrites.writes(annualReturn)
+    case deathTerminalIllness: ReportLifeEventRequest   => ReportLifeEventRequest.desWrites.writes(deathTerminalIllness)
+    case fundRelease: RequestFundReleaseRequest         => RequestFundReleaseRequest.desWrites.writes(fundRelease)
+    case purchaseExtension: RequestPurchaseExtension    => RequestPurchaseExtension.desWrites.writes(purchaseExtension)
+    case purchaseOutcome: RequestPurchaseOutcomeRequest =>
+      RequestPurchaseOutcomeRequest.desWrites.writes(purchaseOutcome)
+    case annualReturn: AnnualReturn                     => AnnualReturn.desWrites.writes(annualReturn)
   }
 }
 
 object ReportLifeEventRequest {
   implicit val userReads: Reads[ReportLifeEventRequest] = (
     (JsPath \ "eventType").read(JsonReads.lifeEventType) and
-    (JsPath \ "eventDate").read(JsonReads.notFutureDate).map(new DateTime(_))
+      (JsPath \ "eventDate").read(JsonReads.notFutureDate).map(new DateTime(_))
   )(ReportLifeEventRequest.apply _)
 
   val desWrites: Writes[ReportLifeEventRequest] = (
     (JsPath \ "eventType").write[String] and
-    (JsPath \ "eventDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd"))
+      (JsPath \ "eventDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd"))
   )(unlift(ReportLifeEventRequest.unapply))
 }

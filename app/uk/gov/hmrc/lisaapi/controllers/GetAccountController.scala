@@ -28,49 +28,52 @@ import uk.gov.hmrc.lisaapi.services.{AccountService, AuditService}
 
 import scala.concurrent.ExecutionContext
 
-class GetAccountController @Inject()(
-                                      authConnector: AuthConnector,
-                                      appContext: AppContext,
-                                      service: AccountService,
-                                      auditService: AuditService,
-                                      lisaMetrics: LisaMetrics,
-                                      cc: ControllerComponents,
-                                      parse: PlayBodyParsers
-                                    )(implicit ec: ExecutionContext) extends LisaController(
-  cc: ControllerComponents,
-  lisaMetrics: LisaMetrics,
+class GetAccountController @Inject() (
+  authConnector: AuthConnector,
   appContext: AppContext,
-  authConnector: AuthConnector
-) {
+  service: AccountService,
+  auditService: AuditService,
+  lisaMetrics: LisaMetrics,
+  cc: ControllerComponents,
+  parse: PlayBodyParsers
+)(implicit ec: ExecutionContext)
+    extends LisaController(
+      cc: ControllerComponents,
+      lisaMetrics: LisaMetrics,
+      appContext: AppContext,
+      authConnector: AuthConnector
+    ) {
 
   def getAccountDetails(lisaManager: String, accountId: String): Action[AnyContent] =
-    (validateHeader(parse) andThen validateLMRN(lisaManager) andThen validateAccountId(accountId)).async { implicit request =>
-      implicit val startTime: Long = System.currentTimeMillis()
-      withEnrolment(lisaManager) { (_) =>
-        service.getAccount(lisaManager, accountId).map {
-          case response: GetLisaAccountSuccessResponse =>
-            auditGetAccount(lisaManager, accountId)
-            lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.ACCOUNT)
-            Ok(Json.toJson(response))
-          case GetLisaAccountDoesNotExistResponse =>
-            auditGetAccount(lisaManager, accountId, Some(ErrorAccountNotFound.errorCode))
-            lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.ACCOUNT)
-            NotFound(ErrorAccountNotFound.asJson)
-          case GetLisaAccountServiceUnavailable =>
-            auditGetAccount(lisaManager, accountId, Some(ErrorServiceUnavailable.errorCode))
-            lisaMetrics.incrementMetrics(startTime, SERVICE_UNAVAILABLE, LisaMetricKeys.ACCOUNT)
-            ServiceUnavailable(ErrorServiceUnavailable.asJson)
-          case _ =>
-            auditGetAccount(lisaManager, accountId, Some(ErrorInternalServerError.errorCode))
-            lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.ACCOUNT)
-            InternalServerError(ErrorInternalServerError.asJson)
+    (validateHeader(parse) andThen validateLMRN(lisaManager) andThen validateAccountId(accountId)).async {
+      implicit request =>
+        implicit val startTime: Long = System.currentTimeMillis()
+        withEnrolment(lisaManager) { _ =>
+          service.getAccount(lisaManager, accountId).map {
+            case response: GetLisaAccountSuccessResponse =>
+              auditGetAccount(lisaManager, accountId)
+              lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.ACCOUNT)
+              Ok(Json.toJson(response))
+            case GetLisaAccountDoesNotExistResponse      =>
+              auditGetAccount(lisaManager, accountId, Some(ErrorAccountNotFound.errorCode))
+              lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.ACCOUNT)
+              NotFound(ErrorAccountNotFound.asJson)
+            case GetLisaAccountServiceUnavailable        =>
+              auditGetAccount(lisaManager, accountId, Some(ErrorServiceUnavailable.errorCode))
+              lisaMetrics.incrementMetrics(startTime, SERVICE_UNAVAILABLE, LisaMetricKeys.ACCOUNT)
+              ServiceUnavailable(ErrorServiceUnavailable.asJson)
+            case _                                       =>
+              auditGetAccount(lisaManager, accountId, Some(ErrorInternalServerError.errorCode))
+              lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.ACCOUNT)
+              InternalServerError(ErrorInternalServerError.asJson)
+          }
         }
-      }
     }
 
-  private def auditGetAccount(lisaManager: String, accountId: String, failureReason: Option[String] = None)
-                                 (implicit hc: HeaderCarrier) = {
-    val path = getAccountEndpointUrl(lisaManager, accountId)
+  private def auditGetAccount(lisaManager: String, accountId: String, failureReason: Option[String] = None)(implicit
+    hc: HeaderCarrier
+  ) = {
+    val path      = getAccountEndpointUrl(lisaManager, accountId)
     val auditData = Map(ZREF -> lisaManager, "accountId" -> accountId)
 
     failureReason map { reason =>
@@ -86,8 +89,7 @@ class GetAccountController @Inject()(
     )
   }
 
-  private def getAccountEndpointUrl(lisaManagerReferenceNumber: String, accountId: String): String = {
+  private def getAccountEndpointUrl(lisaManagerReferenceNumber: String, accountId: String): String =
     s"/manager/$lisaManagerReferenceNumber/accounts/$accountId"
-  }
 
 }

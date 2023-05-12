@@ -25,21 +25,22 @@ import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesUnavailableRespons
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class InvestorService @Inject()(desConnector: DesConnector)(implicit ec: ExecutionContext) extends Logging {
+class InvestorService @Inject() (desConnector: DesConnector)(implicit ec: ExecutionContext) extends Logging {
 
-  def createInvestor(lisaManager: String, request: CreateLisaInvestorRequest)(implicit hc: HeaderCarrier) : Future[CreateLisaInvestorResponse] = {
+  def createInvestor(lisaManager: String, request: CreateLisaInvestorRequest)(implicit
+    hc: HeaderCarrier
+  ): Future[CreateLisaInvestorResponse] =
     desConnector.createInvestor(lisaManager, request) map {
-      case successResponse: CreateLisaInvestorSuccessResponse => successResponse
+      case successResponse: CreateLisaInvestorSuccessResponse      => successResponse
       case existsResponse: CreateLisaInvestorAlreadyExistsResponse => existsResponse
-      case DesUnavailableResponse => CreateLisaInvestorServiceUnavailableResponse
-      case error: DesFailureResponse =>
+      case DesUnavailableResponse                                  => CreateLisaInvestorServiceUnavailableResponse
+      case error: DesFailureResponse                               =>
         error.code match {
           case "INVESTOR_NOT_FOUND" => CreateLisaInvestorInvestorNotFoundResponse
-          case _ =>
+          case _                    =>
             logger.warn(s"Create investor returned error code ${error.code}")
             CreateLisaInvestorErrorResponse
         }
     }
-  }
 
 }

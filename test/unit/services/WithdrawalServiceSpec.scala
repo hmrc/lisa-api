@@ -39,8 +39,8 @@ class WithdrawalServiceSpec extends ServiceTestFixture {
     "return a success response" when {
 
       "given a successful on time response from the DES connector" in {
-        when(mockDesConnector.reportWithdrawalCharge(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesTransactionResponse("AB123456", Some("On Time"))))
+        when(mockDesConnector.reportWithdrawalCharge(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesTransactionResponse("AB123456", Some("On Time"))))
 
         doRequest { response =>
           response mustBe ReportWithdrawalChargeOnTimeResponse("AB123456")
@@ -48,8 +48,8 @@ class WithdrawalServiceSpec extends ServiceTestFixture {
       }
 
       "given a successful late notification response from the DES connector" in {
-        when(mockDesConnector.reportWithdrawalCharge(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesTransactionResponse("AB123456", Some("Late"))))
+        when(mockDesConnector.reportWithdrawalCharge(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesTransactionResponse("AB123456", Some("Late"))))
 
         doRequest { response =>
           response mustBe ReportWithdrawalChargeLateResponse("AB123456")
@@ -57,8 +57,8 @@ class WithdrawalServiceSpec extends ServiceTestFixture {
       }
 
       "given a successful late notification response from the DES connector with supersededRequest" in {
-        when(mockDesConnector.reportWithdrawalCharge(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesTransactionResponse("AB123456", Some("Late"))))
+        when(mockDesConnector.reportWithdrawalCharge(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesTransactionResponse("AB123456", Some("Late"))))
 
         doSupersededRequest { response =>
           response mustBe ReportWithdrawalChargeSupersededResponse("AB123456")
@@ -69,8 +69,8 @@ class WithdrawalServiceSpec extends ServiceTestFixture {
 
     "return a account not found response" when {
       "given the code INVESTOR_ACCOUNTID_NOT_FOUND from the DES connector" in {
-        when(mockDesConnector.reportWithdrawalCharge(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNTID_NOT_FOUND", "xxxx")))
+        when(mockDesConnector.reportWithdrawalCharge(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNTID_NOT_FOUND", "xxxx")))
 
         doRequest { response =>
           response mustBe ReportWithdrawalChargeAccountNotFound
@@ -80,8 +80,8 @@ class WithdrawalServiceSpec extends ServiceTestFixture {
 
     "return a account void response" when {
       "given the code INVESTOR_ACCOUNT_ALREADY_VOID from the DES connector" in {
-        when(mockDesConnector.reportWithdrawalCharge(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_VOID", "xxxx")))
+        when(mockDesConnector.reportWithdrawalCharge(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_VOID", "xxxx")))
 
         doRequest { response =>
           response mustBe ReportWithdrawalChargeAccountVoid
@@ -91,8 +91,8 @@ class WithdrawalServiceSpec extends ServiceTestFixture {
 
     "return a account cancelled response" when {
       "given the code INVESTOR_ACCOUNT_ALREADY_CANCELLED from the DES connector" in {
-        when(mockDesConnector.reportWithdrawalCharge(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_CANCELLED", "xxxx")))
+        when(mockDesConnector.reportWithdrawalCharge(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNT_ALREADY_CANCELLED", "xxxx")))
 
         doRequest { response =>
           response mustBe ReportWithdrawalChargeAccountCancelled
@@ -103,8 +103,11 @@ class WithdrawalServiceSpec extends ServiceTestFixture {
     "return a charge already exists response" when {
       "given the code WITHDRAWAL_CHARGE_ALREADY_EXISTS from the DES connector" in {
         val originalTransactionId: String = "originalTransactionId"
-        when(mockDesConnector.reportWithdrawalCharge(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesWithdrawalChargeAlreadyExistsResponse("WITHDRAWAL_CHARGE_ALREADY_EXISTS", "xxxx", originalTransactionId)))
+        when(mockDesConnector.reportWithdrawalCharge(any(), any(), any())(any())).thenReturn(
+          Future.successful(
+            DesWithdrawalChargeAlreadyExistsResponse("WITHDRAWAL_CHARGE_ALREADY_EXISTS", "xxxx", originalTransactionId)
+          )
+        )
 
         doRequest { response =>
           response mustBe ReportWithdrawalChargeAlreadyExists(originalTransactionId)
@@ -114,8 +117,8 @@ class WithdrawalServiceSpec extends ServiceTestFixture {
 
     "return a reporting error response" when {
       "given the code WITHDRAWAL_REPORTING_ERROR from the DES connector" in {
-        when(mockDesConnector.reportWithdrawalCharge(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("WITHDRAWAL_REPORTING_ERROR", "xxxx")))
+        when(mockDesConnector.reportWithdrawalCharge(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesFailureResponse("WITHDRAWAL_REPORTING_ERROR", "xxxx")))
 
         doRequest { response =>
           response mustBe ReportWithdrawalChargeReportingError
@@ -126,8 +129,15 @@ class WithdrawalServiceSpec extends ServiceTestFixture {
     "return a already superseded response" when {
       "given the code SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED from the DES connector" in {
         val originalTransactionId: String = "originalTransactionId"
-        when(mockDesConnector.reportWithdrawalCharge(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesWithdrawalChargeAlreadySupersededResponse("SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED", "xxxx", originalTransactionId)))
+        when(mockDesConnector.reportWithdrawalCharge(any(), any(), any())(any())).thenReturn(
+          Future.successful(
+            DesWithdrawalChargeAlreadySupersededResponse(
+              "SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED",
+              "xxxx",
+              originalTransactionId
+            )
+          )
+        )
 
         doRequest { response =>
           response mustBe ReportWithdrawalChargeAlreadySuperseded(originalTransactionId)
@@ -137,8 +147,8 @@ class WithdrawalServiceSpec extends ServiceTestFixture {
 
     "return a superseded amount mismatch response" when {
       "given the code SUPERSEDING_TRANSACTION_ID_AMOUNT_MISMATCH from the DES connector" in {
-        when(mockDesConnector.reportWithdrawalCharge(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("SUPERSEDING_TRANSACTION_ID_AMOUNT_MISMATCH", "xxxx")))
+        when(mockDesConnector.reportWithdrawalCharge(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesFailureResponse("SUPERSEDING_TRANSACTION_ID_AMOUNT_MISMATCH", "xxxx")))
 
         doRequest { response =>
           response mustBe ReportWithdrawalChargeSupersedeAmountMismatch
@@ -148,8 +158,8 @@ class WithdrawalServiceSpec extends ServiceTestFixture {
 
     "return a superseded transaction outcome response" when {
       "given the code SUPERSEDING_TRANSACTION_OUTCOME_ERROR from the DES connector" in {
-        when(mockDesConnector.reportWithdrawalCharge(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("SUPERSEDING_TRANSACTION_OUTCOME_ERROR", "xxxx")))
+        when(mockDesConnector.reportWithdrawalCharge(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesFailureResponse("SUPERSEDING_TRANSACTION_OUTCOME_ERROR", "xxxx")))
 
         doRequest { response =>
           response mustBe ReportWithdrawalChargeSupersedeOutcomeError
@@ -159,8 +169,8 @@ class WithdrawalServiceSpec extends ServiceTestFixture {
 
     "return a service unavailable response" when {
       "given a DesUnavailableResponse from the DES connector" in {
-        when(mockDesConnector.reportWithdrawalCharge(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesUnavailableResponse))
+        when(mockDesConnector.reportWithdrawalCharge(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesUnavailableResponse))
 
         doRequest { response =>
           response mustBe ReportWithdrawalChargeServiceUnavailable
@@ -170,8 +180,8 @@ class WithdrawalServiceSpec extends ServiceTestFixture {
 
     "return a generic error response" when {
       "given any other error code from the DES connector" in {
-        when(mockDesConnector.reportWithdrawalCharge(any(), any(), any())(any())).
-          thenReturn(Future.successful(DesFailureResponse("SOMETHING_ELSE", "xxxxx")))
+        when(mockDesConnector.reportWithdrawalCharge(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesFailureResponse("SOMETHING_ELSE", "xxxxx")))
 
         doRequest { response =>
           response mustBe ReportWithdrawalChargeError
@@ -181,7 +191,7 @@ class WithdrawalServiceSpec extends ServiceTestFixture {
 
   }
 
-  private def doRequest(callback: (ReportWithdrawalChargeResponse) => Unit) = {
+  private def doRequest(callback: ReportWithdrawalChargeResponse => Unit): Unit = {
     val request = models.RegularWithdrawalChargeRequest(
       Some(250.00),
       new DateTime("2017-12-06"),
@@ -189,16 +199,19 @@ class WithdrawalServiceSpec extends ServiceTestFixture {
       1000.00,
       250.00,
       500.00,
-      true,
+      fundsDeductedDuringWithdrawal = true,
       "Regular Withdrawal"
     )
 
-    val response = Await.result(withdrawalService.reportWithdrawalCharge("Z019283", "192837", request)(HeaderCarrier()), Duration.Inf)
+    val response = Await.result(
+      withdrawalService.reportWithdrawalCharge("Z019283", "192837", request)(HeaderCarrier()),
+      Duration.Inf
+    )
 
     callback(response)
   }
 
-  private def doSupersededRequest(callback: (ReportWithdrawalChargeResponse) => Unit) = {
+  private def doSupersededRequest(callback: ReportWithdrawalChargeResponse => Unit): Unit = {
     val request = models.SupersededWithdrawalChargeRequest(
       Some(250.00),
       new DateTime("2017-12-06"),
@@ -206,12 +219,15 @@ class WithdrawalServiceSpec extends ServiceTestFixture {
       1000.00,
       250.00,
       500.00,
-      true,
+      fundsDeductedDuringWithdrawal = true,
       None,
       "For work"
     )
 
-    val response = Await.result(withdrawalService.reportWithdrawalCharge("Z019283", "192837", request)(HeaderCarrier()), Duration.Inf)
+    val response = Await.result(
+      withdrawalService.reportWithdrawalCharge("Z019283", "192837", request)(HeaderCarrier()),
+      Duration.Inf
+    )
 
     callback(response)
   }

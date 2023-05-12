@@ -23,7 +23,7 @@ import uk.gov.hmrc.lisaapi.models._
 
 class GetBulkPaymentResponseSpec extends PlaySpec {
 
-  val paidResponse = """{
+  val paidResponse: String = """{
                        |  "clearedAmount": -1000,
                        |  "items": [
                        |    {
@@ -33,7 +33,7 @@ class GetBulkPaymentResponseSpec extends PlaySpec {
                        |  ]
                        |}""".stripMargin
 
-  val paidResponseMissing = """{
+  val paidResponseMissing: String = """{
                        |  "clearedAmount": -1000,
                        |  "items": [
                        |    {
@@ -42,7 +42,7 @@ class GetBulkPaymentResponseSpec extends PlaySpec {
                        |  ]
                        |}""".stripMargin
 
-  val pendingResponse = """{
+  val pendingResponse: String = """{
                        |  "outstandingAmount": -1000,
                        |  "items": [
                        |    {
@@ -51,7 +51,7 @@ class GetBulkPaymentResponseSpec extends PlaySpec {
                        |  ]
                        |}""".stripMargin
 
-  val pendingResponseMissing = """{
+  val pendingResponseMissing: String = """{
                                  |  "outstandingAmount": -1000,
                                  |  "items": [
                                  |    {
@@ -60,7 +60,7 @@ class GetBulkPaymentResponseSpec extends PlaySpec {
                                  |  ]
                                  |}""".stripMargin
 
-  val collectedResponse = """{
+  val collectedResponse: String = """{
                        |  "clearedAmount": 1000,
                        |  "items": [
                        |    {
@@ -70,7 +70,7 @@ class GetBulkPaymentResponseSpec extends PlaySpec {
                        |  ]
                        |}""".stripMargin
 
-  val collectedResponseNoReference = """{
+  val collectedResponseNoReference: String = """{
                             |  "clearedAmount": 1000,
                             |  "items": [
                             |    {
@@ -79,7 +79,7 @@ class GetBulkPaymentResponseSpec extends PlaySpec {
                             |  ]
                             |}""".stripMargin
 
-  val dueResponse = """{
+  val dueResponse: String = """{
                           |  "outstandingAmount": 1000,
                           |  "items": [
                           |    {
@@ -88,7 +88,7 @@ class GetBulkPaymentResponseSpec extends PlaySpec {
                           |  ]
                           |}""".stripMargin
 
-  val dueResponseMissing = """{
+  val dueResponseMissing: String = """{
                       |  "outstandingAmount": 1000,
                       |  "items": [
                       |  {
@@ -103,29 +103,29 @@ class GetBulkPaymentResponseSpec extends PlaySpec {
       val paid = Json.parse(paidResponse).as[BulkPayment]
 
       paid match {
-        case _:BulkPaymentPaid =>
-        case _ => fail("Parsed a paid response as a pending")
+        case _: BulkPaymentPaid =>
+        case _                  => fail("Parsed a paid response as a pending")
       }
 
       val pending = Json.parse(pendingResponse).as[BulkPayment]
 
       pending match {
-        case _:BulkPaymentPending =>
-        case _ => fail("Parsed a pending response as a paid")
+        case _: BulkPaymentPending =>
+        case _                     => fail("Parsed a pending response as a paid")
       }
 
       val collected = Json.parse(collectedResponse).as[BulkPayment]
 
       collected match {
-        case _:BulkPaymentCollected =>
-        case _ => fail("Parsed a paid response as a pending")
+        case _: BulkPaymentCollected =>
+        case _                       => fail("Parsed a paid response as a pending")
       }
 
       val due = Json.parse(dueResponse).as[BulkPayment]
 
       due match {
-        case _:BulkPaymentDue =>
-        case _ => fail("Parsed a pending response as a paid")
+        case _: BulkPaymentDue =>
+        case _                 => fail("Parsed a pending response as a paid")
       }
     }
 
@@ -137,12 +137,11 @@ class GetBulkPaymentResponseSpec extends PlaySpec {
       val res = Json.parse(paidResponse).validate[BulkPaymentPaid]
 
       res match {
-        case errors: JsError => fail(s"Json validation failed: ${JsError.toFlatForm(errors)}")
-        case JsSuccess(data, _) => {
+        case errors: JsError    => fail(s"Json validation failed: ${JsError.toFlatForm(errors)}")
+        case JsSuccess(data, _) =>
           data.paymentAmount mustBe 1000.0
           data.paymentDate mustBe Some(new DateTime("2017-06-01"))
           data.paymentReference mustBe Some("ABC123456789")
-        }
       }
     }
 
@@ -160,12 +159,11 @@ class GetBulkPaymentResponseSpec extends PlaySpec {
       val res = Json.parse(paidResponseMissing).validate[BulkPaymentPaid]
 
       res match {
-        case errors: JsError => fail(s"Json validation failed: ${JsError.toFlatForm(errors)}")
-        case JsSuccess(data, _) => {
+        case errors: JsError    => fail(s"Json validation failed: ${JsError.toFlatForm(errors)}")
+        case JsSuccess(data, _) =>
           data.paymentAmount mustBe 1000.0
           data.paymentDate mustBe None
           data.paymentReference mustBe None
-        }
       }
     }
 
@@ -187,11 +185,10 @@ class GetBulkPaymentResponseSpec extends PlaySpec {
       val res = Json.parse(pendingResponse).validate[BulkPaymentPending]
 
       res match {
-        case errors: JsError => fail(s"Json validation failed: ${JsError.toFlatForm(errors)}")
-        case JsSuccess(data, _) => {
+        case errors: JsError    => fail(s"Json validation failed: ${JsError.toFlatForm(errors)}")
+        case JsSuccess(data, _) =>
           data.paymentAmount mustBe 1000.0
           data.dueDate mustBe Some(new DateTime("2017-06-01"))
-        }
       }
     }
 
@@ -208,11 +205,10 @@ class GetBulkPaymentResponseSpec extends PlaySpec {
       val res = Json.parse(pendingResponseMissing).validate[BulkPaymentPending]
 
       res match {
-        case errors: JsError => fail(s"Json validation failed: ${JsError.toFlatForm(errors)}")
-        case JsSuccess(data, _) => {
+        case errors: JsError    => fail(s"Json validation failed: ${JsError.toFlatForm(errors)}")
+        case JsSuccess(data, _) =>
           data.paymentAmount mustBe 1000.0
           data.dueDate mustBe None
-        }
       }
     }
 
@@ -232,12 +228,11 @@ class GetBulkPaymentResponseSpec extends PlaySpec {
       val res = Json.parse(collectedResponse).validate[BulkPaymentCollected]
 
       res match {
-        case errors: JsError => fail(s"Json validation failed: ${JsError.toFlatForm(errors)}")
-        case JsSuccess(data, _) => {
+        case errors: JsError    => fail(s"Json validation failed: ${JsError.toFlatForm(errors)}")
+        case JsSuccess(data, _) =>
           data.paymentAmount mustBe 1000.0
           data.paymentDate mustBe Some(new DateTime("2017-06-01"))
           data.paymentReference mustBe Some("ABC123456789")
-        }
       }
     }
 
@@ -255,12 +250,11 @@ class GetBulkPaymentResponseSpec extends PlaySpec {
       val res = Json.parse(collectedResponseNoReference).validate[BulkPaymentCollected]
 
       res match {
-        case errors: JsError => fail(s"Json validation failed: ${JsError.toFlatForm(errors)}")
-        case JsSuccess(data, _) => {
+        case errors: JsError    => fail(s"Json validation failed: ${JsError.toFlatForm(errors)}")
+        case JsSuccess(data, _) =>
           data.paymentAmount mustBe 1000.0
           data.paymentDate mustBe Some(new DateTime("2017-06-01"))
           data.paymentReference mustBe None
-        }
       }
     }
 
@@ -281,11 +275,10 @@ class GetBulkPaymentResponseSpec extends PlaySpec {
       val res = Json.parse(dueResponse).validate[BulkPaymentDue]
 
       res match {
-        case errors: JsError => fail(s"Json validation failed: ${JsError.toFlatForm(errors)}")
-        case JsSuccess(data, _) => {
+        case errors: JsError    => fail(s"Json validation failed: ${JsError.toFlatForm(errors)}")
+        case JsSuccess(data, _) =>
           data.paymentAmount mustBe 1000.0
           data.dueDate mustBe Some(new DateTime("2017-06-01"))
-        }
       }
     }
 
@@ -302,11 +295,10 @@ class GetBulkPaymentResponseSpec extends PlaySpec {
       val res = Json.parse(dueResponseMissing).validate[BulkPaymentDue]
 
       res match {
-        case errors: JsError => fail(s"Json validation failed: ${JsError.toFlatForm(errors)}")
-        case JsSuccess(data, _) => {
+        case errors: JsError    => fail(s"Json validation failed: ${JsError.toFlatForm(errors)}")
+        case JsSuccess(data, _) =>
           data.paymentAmount mustBe 1000.0
           data.dueDate mustBe None
-        }
       }
     }
 

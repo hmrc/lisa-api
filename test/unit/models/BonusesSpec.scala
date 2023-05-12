@@ -22,7 +22,8 @@ import uk.gov.hmrc.lisaapi.models.Bonuses
 
 class BonusesSpec extends PlaySpec {
 
-  val validBonusJson = """{"bonusDueForPeriod": 1000.50, "totalBonusDueYTD": 1000.50, "bonusPaidYTD": 500.50, "claimReason": "Life Event"}"""
+  val validBonusJson =
+    """{"bonusDueForPeriod": 1000.50, "totalBonusDueYTD": 1000.50, "bonusPaidYTD": 500.50, "claimReason": "Life Event"}"""
 
   "Bonuses" must {
 
@@ -32,27 +33,25 @@ class BonusesSpec extends PlaySpec {
         val res = Json.parse(validBonusJson).validate[Bonuses]
 
         res match {
-          case JsError(errors) => fail()
-          case JsSuccess(data, path) => {
+          case JsError(errors)       => fail()
+          case JsSuccess(data, path) =>
             data.bonusDueForPeriod mustBe 1000.5f
             data.totalBonusDueYTD mustBe 1000.5f
             data.bonusPaidYTD mustBe Some(500.5f)
             data.claimReason mustBe "Life Event"
-          }
         }
       }
 
       "sent a valid request without the optional field" in {
-        val res = Json.parse(validBonusJson.replace("\"bonusPaidYTD\": 500.50,","")).validate[Bonuses]
+        val res = Json.parse(validBonusJson.replace("\"bonusPaidYTD\": 500.50,", "")).validate[Bonuses]
 
         res match {
-          case JsError(errors) => fail()
-          case JsSuccess(data, path) => {
+          case JsError(errors)       => fail()
+          case JsSuccess(data, path) =>
             data.bonusDueForPeriod mustBe 1000.5f
             data.totalBonusDueYTD mustBe 1000.5f
             data.bonusPaidYTD mustBe None
             data.claimReason mustBe "Life Event"
-          }
         }
       }
 
@@ -71,14 +70,11 @@ class BonusesSpec extends PlaySpec {
       val res = Json.parse(req).validate[Bonuses]
 
       res match {
-        case JsError(errors) => {
-          errors.count {
-            case (path: JsPath, errors: Seq[JsonValidationError]) => {
-              path.toString() == "/claimReason" && errors.contains(JsonValidationError("error.formatting.claimReason"))
-            }
+        case JsError(errors) =>
+          errors.count { case (path: JsPath, errors: Seq[JsonValidationError]) =>
+            path.toString() == "/claimReason" && errors.contains(JsonValidationError("error.formatting.claimReason"))
           } mustBe 1
-        }
-        case _ => fail()
+        case _               => fail()
       }
     }
 

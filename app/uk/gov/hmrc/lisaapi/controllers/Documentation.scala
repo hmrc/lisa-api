@@ -25,31 +25,31 @@ import uk.gov.hmrc.lisaapi.config.{APIAccessConfig, AppContext}
 import uk.gov.hmrc.lisaapi.domain.APIAccess
 import uk.gov.hmrc.lisaapi.views._
 
-class Documentation @Inject()(
-                               appContext: AppContext,
-                               assets: Assets,
-                               errorHandler: HttpErrorHandler,
-                               cc: ControllerComponents
-                             ) extends DocumentationController(cc, assets, errorHandler) {
+class Documentation @Inject() (
+  appContext: AppContext,
+  assets: Assets,
+  errorHandler: HttpErrorHandler,
+  cc: ControllerComponents
+) extends DocumentationController(cc, assets, errorHandler) {
 
-  override def documentation(version: String, endpointName: String): Action[AnyContent] = {
+  override def documentation(version: String, endpointName: String): Action[AnyContent] =
     assets.at(s"/public/api/documentation/$version", s"${endpointName.replaceAll(" ", "-")}.xml")
-  }
 
   override def definition(): Action[AnyContent] = Action {
-    Ok(txt.definition(
-      appContext.apiContext,
-      appContext.v1apiStatus,
-      appContext.v2apiStatus,
-      buildAccess(),
-      appContext.v1endpointsEnabled,
-      appContext.v2endpointsEnabled
-    ))
+    Ok(
+      txt.definition(
+        appContext.apiContext,
+        appContext.v1apiStatus,
+        appContext.v2apiStatus,
+        buildAccess(),
+        appContext.v1endpointsEnabled,
+        appContext.v2endpointsEnabled
+      )
+    )
   }
 
-  def specification(version: String, file: String): Action[AnyContent] = {
+  def specification(version: String, file: String): Action[AnyContent] =
     assets.at(s"/public/api/conf/$version", file)
-  }
 
   private def buildAccess() = {
     val access = APIAccessConfig(appContext.access)

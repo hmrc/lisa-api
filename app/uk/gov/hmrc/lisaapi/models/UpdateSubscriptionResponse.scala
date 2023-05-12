@@ -18,7 +18,7 @@ package uk.gov.hmrc.lisaapi.models
 
 trait UpdateSubscriptionResponse
 
-case class UpdateSubscriptionSuccessResponse (code: String, message: String) extends UpdateSubscriptionResponse
+case class UpdateSubscriptionSuccessResponse(code: String, message: String) extends UpdateSubscriptionResponse
 case object UpdateSubscriptionErrorResponse extends UpdateSubscriptionResponse
 case object UpdateSubscriptionServiceUnavailableResponse extends UpdateSubscriptionResponse
 case object UpdateSubscriptionAccountNotFoundResponse extends UpdateSubscriptionResponse

@@ -22,76 +22,81 @@ import play.api.libs.json._
 
 sealed trait CreateLisaAccountRequest
 
-case class CreateLisaAccountCreationRequest (
-                                              investorId: InvestorId,
-                                              accountId: AccountId,
-                                              firstSubscriptionDate: DateTime
+case class CreateLisaAccountCreationRequest(
+  investorId: InvestorId,
+  accountId: AccountId,
+  firstSubscriptionDate: DateTime
 ) extends CreateLisaAccountRequest
 
-case class CreateLisaAccountTransferRequest (
-                                              creationReason: String,
-                                              investorId: InvestorId,
-                                              accountId: AccountId,
-                                              firstSubscriptionDate: DateTime,
-                                              transferAccount: AccountTransfer
+case class CreateLisaAccountTransferRequest(
+  creationReason: String,
+  investorId: InvestorId,
+  accountId: AccountId,
+  firstSubscriptionDate: DateTime,
+  transferAccount: AccountTransfer
 ) extends CreateLisaAccountRequest
 
 //scalastyle:off multiple.string.literals
 object CreateLisaAccountRequest {
   implicit val createLisaAccountCreationRequestReads: Reads[CreateLisaAccountCreationRequest] = (
     (JsPath \ "investorId").read(JsonReads.investorId) and
-    (JsPath \ "accountId").read(JsonReads.accountId) and
-    (JsPath \ "firstSubscriptionDate").read(JsonReads.notFutureDate).map(new DateTime(_)) and
-    (JsPath \ "creationReason").read[String](Reads.pattern("New".r, "error.formatting.creationReason"))
-  )((investorId, accountId, firstSubscriptionDate, _) => CreateLisaAccountCreationRequest(investorId, accountId, firstSubscriptionDate))
+      (JsPath \ "accountId").read(JsonReads.accountId) and
+      (JsPath \ "firstSubscriptionDate").read(JsonReads.notFutureDate).map(new DateTime(_)) and
+      (JsPath \ "creationReason").read[String](Reads.pattern("New".r, "error.formatting.creationReason"))
+  )((investorId, accountId, firstSubscriptionDate, _) =>
+    CreateLisaAccountCreationRequest(investorId, accountId, firstSubscriptionDate)
+  )
 
   implicit val createLisaAccountTransferRequestReads: Reads[CreateLisaAccountTransferRequest] = (
     (JsPath \ "investorId").read(JsonReads.investorId) and
-    (JsPath \ "accountId").read(JsonReads.accountId) and
-    (JsPath \ "firstSubscriptionDate").read(JsonReads.notFutureDate).map(new DateTime(_)) and
-    (JsPath \ "transferAccount").read[AccountTransfer] and
-    (JsPath \ "creationReason").read[String](
-      Reads.pattern("Transferred|Current year funds transferred|Previous year funds transferred".r, "error.formatting.creationReason")
-    )
-  )(
-    (investorId, accountId, firstSubscriptionDate, transferAccount, creationReason) =>
-      CreateLisaAccountTransferRequest(creationReason, investorId, accountId, firstSubscriptionDate, transferAccount)
+      (JsPath \ "accountId").read(JsonReads.accountId) and
+      (JsPath \ "firstSubscriptionDate").read(JsonReads.notFutureDate).map(new DateTime(_)) and
+      (JsPath \ "transferAccount").read[AccountTransfer] and
+      (JsPath \ "creationReason").read[String](
+        Reads.pattern(
+          "Transferred|Current year funds transferred|Previous year funds transferred".r,
+          "error.formatting.creationReason"
+        )
+      )
+  )((investorId, accountId, firstSubscriptionDate, transferAccount, creationReason) =>
+    CreateLisaAccountTransferRequest(creationReason, investorId, accountId, firstSubscriptionDate, transferAccount)
   )
 
-  implicit val createLisaAccountRequestReads: Reads[CreateLisaAccountRequest] = Reads[CreateLisaAccountRequest] { json =>
-    val creationReason = (json \ "creationReason").asOpt[String]
+  implicit val createLisaAccountRequestReads: Reads[CreateLisaAccountRequest] = Reads[CreateLisaAccountRequest] {
+    json =>
+      val creationReason = (json \ "creationReason").asOpt[String]
 
-    creationReason match {
-      case Some("Transferred") | Some("Current year funds transferred") | Some ("Previous year funds transferred") =>
-        createLisaAccountTransferRequestReads.reads(json)
-      case _ =>
-        createLisaAccountCreationRequestReads.reads(json)
-    }
+      creationReason match {
+        case Some("Transferred") | Some("Current year funds transferred") | Some("Previous year funds transferred") =>
+          createLisaAccountTransferRequestReads.reads(json)
+        case _                                                                                                      =>
+          createLisaAccountCreationRequestReads.reads(json)
+      }
   }
 
   implicit val createLisaAccountCreationRequestWrites: Writes[CreateLisaAccountCreationRequest] = (
     (JsPath \ "investorID").write[InvestorId] and
-    (JsPath \ "accountID").write[AccountId] and
-    (JsPath \ "firstSubscriptionDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
-    (JsPath \ "creationReason").write[String]
-  ){req: CreateLisaAccountCreationRequest => (req.investorId, req.accountId, req.firstSubscriptionDate, "New")}
+      (JsPath \ "accountID").write[AccountId] and
+      (JsPath \ "firstSubscriptionDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
+      (JsPath \ "creationReason").write[String]
+  ) { req: CreateLisaAccountCreationRequest => (req.investorId, req.accountId, req.firstSubscriptionDate, "New") }
 
   implicit val createLisaAccountTransferRequestWrites: Writes[CreateLisaAccountTransferRequest] = (
     (JsPath \ "investorID").write[InvestorId] and
-    (JsPath \ "accountID").write[AccountId] and
-    (JsPath \ "firstSubscriptionDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
-    (JsPath \ "transferAccount").write[AccountTransfer] and
-    (JsPath \ "creationReason").write[String]
-  ){
-    req: CreateLisaAccountTransferRequest => (
+      (JsPath \ "accountID").write[AccountId] and
+      (JsPath \ "firstSubscriptionDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
+      (JsPath \ "transferAccount").write[AccountTransfer] and
+      (JsPath \ "creationReason").write[String]
+  ) { req: CreateLisaAccountTransferRequest =>
+    (
       req.investorId,
       req.accountId,
       req.firstSubscriptionDate,
       req.transferAccount,
       req.creationReason match {
-        case "Current year funds transferred" => "CurrentYearFundsTransferred"
+        case "Current year funds transferred"  => "CurrentYearFundsTransferred"
         case "Previous year funds transferred" => "PreviousYearFundsTransferred"
-        case _ => "Transferred"
+        case _                                 => "Transferred"
       }
     )
   }

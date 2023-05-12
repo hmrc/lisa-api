@@ -19,7 +19,7 @@ package uk.gov.hmrc.lisaapi.services
 import com.google.inject.Inject
 import org.joda.time.DateTime
 
-class CurrentDateService @Inject()() {
+class CurrentDateService @Inject() () {
   def now(): DateTime = DateTime.now
 }
 

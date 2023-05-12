@@ -16,12 +16,10 @@
 
 package uk.gov.hmrc.lisaapi.domain
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class APIAccess(`type`: String)
 
 object APIAccess {
-  implicit val apiAccessFormats = Json.format[APIAccess]
+  implicit val apiAccessFormats: OFormat[APIAccess] = Json.format[APIAccess]
 }
-
-

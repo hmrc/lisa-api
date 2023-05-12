@@ -33,18 +33,26 @@ import scala.concurrent.Future
 
 class PropertyPurchaseControllerSpec extends ControllerTestFixture {
 
-  val propertyPurchaseController: PropertyPurchaseController = new PropertyPurchaseController(mockAuthConnector, mockAppContext, mockLifeEventService, mockAuditService, mockLisaMetrics, mockControllerComponents, mockParser) {
+  val propertyPurchaseController: PropertyPurchaseController = new PropertyPurchaseController(
+    mockAuthConnector,
+    mockAppContext,
+    mockLifeEventService,
+    mockAuditService,
+    mockLisaMetrics,
+    mockControllerComponents,
+    mockParser
+  ) {
     override lazy val v2endpointsEnabled = true
   }
 
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.2.0+json")
-  val lisaManager = "Z019283"
-  val accountId = "ABC/12345"
-  val eventDate = "2017-04-06"
+  val lisaManager                    = "Z019283"
+  val accountId                      = "ABC/12345"
+  val eventDate                      = "2017-04-06"
 
-  override def beforeEach {
+  override def beforeEach(): Unit = {
     reset(mockAuditService)
-    when(mockAuthConnector.authorise[Option[String]](any(),any())(any(), any())).thenReturn(Future(Some("1234")))
+    when(mockAuthConnector.authorise[Option[String]](any(), any())(any(), any())).thenReturn(Future(Some("1234")))
   }
 
   val fundReleaseJson = """
@@ -114,39 +122,45 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
 
     "audit fundReleaseReported" when {
       "a initial fund release request has been successful" in {
-        when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
+        when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+          .thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
         doFundReleaseRequest(fundReleaseJson) { res =>
           await(res)
           verify(mockAuditService).audit(
             auditType = matchersEquals("fundReleaseReported"),
             path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/fund-releases"),
-            auditData = matchersEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "accountID" -> accountId,
-              "eventDate" -> "2017-05-10",
-              "withdrawalAmount" -> "4000.00",
-              "conveyancerReference" -> "CR12345-6789",
-              "nameOrNumber" -> "1",
-              "postalCode" -> "AA11 1AA"
-            ))
+            auditData = matchersEquals(
+              Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "accountID"                  -> accountId,
+                "eventDate"                  -> "2017-05-10",
+                "withdrawalAmount"           -> "4000.00",
+                "conveyancerReference"       -> "CR12345-6789",
+                "nameOrNumber"               -> "1",
+                "postalCode"                 -> "AA11 1AA"
+              )
+            )
           )(any())
         }
       }
       "a superseded fund release request has been successful" in {
-        when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
+        when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+          .thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
         doFundReleaseRequest(supersededFundReleaseJson) { res =>
           await(res)
           verify(mockAuditService).audit(
             auditType = matchersEquals("fundReleaseReported"),
             path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/fund-releases"),
-            auditData = matchersEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "accountID" -> accountId,
-              "eventDate" -> "2017-05-05",
-              "withdrawalAmount" -> "5000.00",
-              "originalLifeEventId" -> "3456789000",
-              "originalEventDate" -> "2017-05-10"
-            ))
+            auditData = matchersEquals(
+              Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "accountID"                  -> accountId,
+                "eventDate"                  -> "2017-05-05",
+                "withdrawalAmount"           -> "5000.00",
+                "originalLifeEventId"        -> "3456789000",
+                "originalEventDate"          -> "2017-05-10"
+              )
+            )
           )(any())
         }
       }
@@ -162,37 +176,42 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
           verify(mockAuditService).audit(
             auditType = matchersEquals("fundReleaseNotReported"),
             path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/fund-releases"),
-            auditData = matchersEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "accountID" -> accountId,
-              "eventDate" -> "2017-05-10",
-              "withdrawalAmount" -> "4000.00",
-              "conveyancerReference" -> "CR12345-6789",
-              "nameOrNumber" -> "1",
-              "postalCode" -> "AA11 1AA",
-              "reasonNotReported" -> "INTERNAL_SERVER_ERROR"
-            ))
+            auditData = matchersEquals(
+              Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "accountID"                  -> accountId,
+                "eventDate"                  -> "2017-05-10",
+                "withdrawalAmount"           -> "4000.00",
+                "conveyancerReference"       -> "CR12345-6789",
+                "nameOrNumber"               -> "1",
+                "postalCode"                 -> "AA11 1AA",
+                "reasonNotReported"          -> "INTERNAL_SERVER_ERROR"
+              )
+            )
           )(any())
         }
       }
       "given a eventDate prior to 6 April 2017" in {
-        when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
+        when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+          .thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
 
         doFundReleaseRequest(fundReleaseJson.replace("2017-05-10", "2017-04-05")) { res =>
           await(res)
           verify(mockAuditService).audit(
             auditType = matchersEquals("fundReleaseNotReported"),
             path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/fund-releases"),
-            auditData = matchersEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "accountID" -> accountId,
-              "eventDate" -> "2017-04-05",
-              "withdrawalAmount" -> "4000.00",
-              "conveyancerReference" -> "CR12345-6789",
-              "nameOrNumber" -> "1",
-              "postalCode" -> "AA11 1AA",
-              "reasonNotReported" -> "FORBIDDEN"
-            ))
+            auditData = matchersEquals(
+              Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "accountID"                  -> accountId,
+                "eventDate"                  -> "2017-04-05",
+                "withdrawalAmount"           -> "4000.00",
+                "conveyancerReference"       -> "CR12345-6789",
+                "nameOrNumber"               -> "1",
+                "postalCode"                 -> "AA11 1AA",
+                "reasonNotReported"          -> "FORBIDDEN"
+              )
+            )
           )(any())
         }
       }
@@ -200,7 +219,8 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
 
     "return with 201 created" when {
       "a initial fund release is successful" in {
-        when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
+        when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+          .thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
         doFundReleaseRequest(fundReleaseJson) { res =>
           status(res) mustBe CREATED
           (contentAsJson(res) \ "data" \ "lifeEventId").as[String] mustBe "1928374"
@@ -208,7 +228,8 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
         }
       }
       "a superseded fund release is successful" in {
-        when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
+        when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+          .thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
         doFundReleaseRequest(supersededFundReleaseJson) { res =>
           status(res) mustBe CREATED
           (contentAsJson(res) \ "data" \ "lifeEventId").as[String] mustBe "1928374"
@@ -218,7 +239,8 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
     }
 
     "return with 400 bad request and a code of INVALID_PAYLOAD" in {
-      when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventInvalidPayload))
+      when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+        .thenReturn(Future.successful(ReportLifeEventInvalidPayload))
       doFundReleaseRequest(fundReleaseJson) { res =>
         status(res) mustBe BAD_REQUEST
         (contentAsJson(res) \ "code").as[String] mustBe "INVALID_PAYLOAD"
@@ -259,7 +281,8 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
 
     "return with 403 forbidden and a code of FORBIDDEN" when {
       "given a eventDate prior to 6 April 2017" in {
-        when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
+        when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+          .thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
 
         doFundReleaseRequest(fundReleaseJson.replace("2017-05-10", "2017-04-05")) { res =>
           status(res) mustBe FORBIDDEN
@@ -273,8 +296,9 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
     }
 
     "return with 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_CLOSED" in {
-      when(mockLifeEventService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventAccountClosedResponse))
-      doFundReleaseRequest(fundReleaseJson){ res =>
+      when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+        .thenReturn(Future.successful(ReportLifeEventAccountClosedResponse))
+      doFundReleaseRequest(fundReleaseJson) { res =>
         status(res) mustBe FORBIDDEN
         (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CLOSED"
         (contentAsJson(res) \ "message").as[String] mustBe "The LISA account is already closed"
@@ -282,8 +306,9 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
     }
 
     "return with 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_CANCELLED" in {
-      when(mockLifeEventService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventAccountCancelledResponse))
-      doFundReleaseRequest(fundReleaseJson){ res =>
+      when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+        .thenReturn(Future.successful(ReportLifeEventAccountCancelledResponse))
+      doFundReleaseRequest(fundReleaseJson) { res =>
         status(res) mustBe FORBIDDEN
         (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CANCELLED"
         (contentAsJson(res) \ "message").as[String] mustBe "The LISA account is already cancelled"
@@ -291,8 +316,9 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
     }
 
     "return with 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_VOID" in {
-      when(mockLifeEventService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventAccountVoidResponse))
-      doFundReleaseRequest(fundReleaseJson){ res =>
+      when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+        .thenReturn(Future.successful(ReportLifeEventAccountVoidResponse))
+      doFundReleaseRequest(fundReleaseJson) { res =>
         status(res) mustBe FORBIDDEN
         (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_VOID"
         (contentAsJson(res) \ "message").as[String] mustBe "The LISA account is already void"
@@ -300,17 +326,21 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
     }
 
     "return with 403 forbidden and a code of SUPERSEDED_LIFE_EVENT_MISMATCH_ERROR" in {
-      when(mockLifeEventService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventMismatchResponse))
-      doFundReleaseRequest(fundReleaseJson){ res =>
+      when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+        .thenReturn(Future.successful(ReportLifeEventMismatchResponse))
+      doFundReleaseRequest(fundReleaseJson) { res =>
         status(res) mustBe FORBIDDEN
         (contentAsJson(res) \ "code").as[String] mustBe "SUPERSEDED_LIFE_EVENT_MISMATCH_ERROR"
-        (contentAsJson(res) \ "message").as[String] mustBe "originalLifeEventId and the originalEventDate do not match the information in the original request"
+        (contentAsJson(res) \ "message").as[
+          String
+        ] mustBe "originalLifeEventId and the originalEventDate do not match the information in the original request"
       }
     }
 
     "return with 403 forbidden and a code of COMPLIANCE_ERROR_ACCOUNT_NOT_OPEN_LONG_ENOUGH" in {
-      when(mockLifeEventService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventAccountNotOpenLongEnoughResponse))
-      doFundReleaseRequest(fundReleaseJson){ res =>
+      when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+        .thenReturn(Future.successful(ReportLifeEventAccountNotOpenLongEnoughResponse))
+      doFundReleaseRequest(fundReleaseJson) { res =>
         status(res) mustBe FORBIDDEN
         (contentAsJson(res) \ "code").as[String] mustBe "COMPLIANCE_ERROR_ACCOUNT_NOT_OPEN_LONG_ENOUGH"
         (contentAsJson(res) \ "message").as[String] mustBe "The account has not been open for long enough"
@@ -318,8 +348,9 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
     }
 
     "return with 403 forbidden and a code of COMPLIANCE_ERROR_OTHER_PURCHASE_ON_RECORD" in {
-      when(mockLifeEventService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventOtherPurchaseOnRecordResponse))
-      doFundReleaseRequest(fundReleaseJson){ res =>
+      when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+        .thenReturn(Future.successful(ReportLifeEventOtherPurchaseOnRecordResponse))
+      doFundReleaseRequest(fundReleaseJson) { res =>
         status(res) mustBe FORBIDDEN
         (contentAsJson(res) \ "code").as[String] mustBe "COMPLIANCE_ERROR_OTHER_PURCHASE_ON_RECORD"
         (contentAsJson(res) \ "message").as[String] mustBe "Another property purchase is already recorded"
@@ -330,20 +361,23 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
       val json = Json.parse(fundReleaseJson).as[JsObject] ++ Json.obj(
         "supersede" -> Json.obj(
           "originalLifeEventId" -> "3456789000",
-          "originalEventDate" -> "2017-05-10"
+          "originalEventDate"   -> "2017-05-10"
         )
       )
 
-      doFundReleaseRequest(json.toString()){ res =>
+      doFundReleaseRequest(json.toString()) { res =>
         status(res) mustBe FORBIDDEN
         (contentAsJson(res) \ "code").as[String] mustBe "INVALID_DATA_PROVIDED"
-        (contentAsJson(res) \ "message").as[String] mustBe "You can only change eventDate or withdrawalAmount when superseding a property purchase fund release"
+        (contentAsJson(res) \ "message").as[
+          String
+        ] mustBe "You can only change eventDate or withdrawalAmount when superseding a property purchase fund release"
       }
     }
 
     "return with 404 not found and a code of INVESTOR_ACCOUNTID_NOT_FOUND" in {
-      when(mockLifeEventService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventAccountNotFoundResponse))
-      doFundReleaseRequest(fundReleaseJson){ res =>
+      when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+        .thenReturn(Future.successful(ReportLifeEventAccountNotFoundResponse))
+      doFundReleaseRequest(fundReleaseJson) { res =>
         status(res) mustBe NOT_FOUND
         (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNTID_NOT_FOUND"
         (contentAsJson(res) \ "message").as[String] mustBe "Enter a real accountId"
@@ -355,14 +389,16 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
         doFundReleaseRequest(fundReleaseJson, header = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")) { res =>
           status(res) mustBe NOT_ACCEPTABLE
           (contentAsJson(res) \ "code").as[String] mustBe "ACCEPT_HEADER_INVALID"
-          (contentAsJson(res) \ "message").as[String] mustBe "The accept header has an invalid version for this endpoint"
+          (contentAsJson(res) \ "message")
+            .as[String] mustBe "The accept header has an invalid version for this endpoint"
         }
       }
     }
 
     "return with 409 conflict and a code of LIFE_EVENT_ALREADY_EXISTS" in {
-      when(mockLifeEventService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventAlreadyExistsResponse("123")))
-      doFundReleaseRequest(fundReleaseJson){ res =>
+      when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+        .thenReturn(Future.successful(ReportLifeEventAlreadyExistsResponse("123")))
+      doFundReleaseRequest(fundReleaseJson) { res =>
         status(res) mustBe CONFLICT
         (contentAsJson(res) \ "code").as[String] mustBe "LIFE_EVENT_ALREADY_EXISTS"
         (contentAsJson(res) \ "message").as[String] mustBe "The investor’s life event has already been reported"
@@ -371,8 +407,9 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
     }
 
     "return with 409 conflict and a code of SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED" in {
-      when(mockLifeEventService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventAlreadySupersededResponse("123")))
-      doFundReleaseRequest(fundReleaseJson){ res =>
+      when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+        .thenReturn(Future.successful(ReportLifeEventAlreadySupersededResponse("123")))
+      doFundReleaseRequest(fundReleaseJson) { res =>
         status(res) mustBe CONFLICT
         (contentAsJson(res) \ "code").as[String] mustBe "SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED"
         (contentAsJson(res) \ "message").as[String] mustBe "This life event has already been superseded"
@@ -381,8 +418,9 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
     }
 
     "return with 500 internal server error and a code of INTERNAL_SERVER_ERROR" in {
-      when(mockLifeEventService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventErrorResponse))
-      doFundReleaseRequest(fundReleaseJson){ res =>
+      when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+        .thenReturn(Future.successful(ReportLifeEventErrorResponse))
+      doFundReleaseRequest(fundReleaseJson) { res =>
         status(res) mustBe INTERNAL_SERVER_ERROR
         (contentAsJson(res) \ "code").as[String] mustBe "INTERNAL_SERVER_ERROR"
         (contentAsJson(res) \ "message").as[String] mustBe "Internal server error"
@@ -390,10 +428,10 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
     }
 
     "return with 503 service unavailable and a code of SERVER_ERROR" in {
-      when(mockLifeEventService.reportLifeEvent(any(), any(),any())(any())).
-        thenReturn(Future.successful(ReportLifeEventServiceUnavailableResponse))
+      when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+        .thenReturn(Future.successful(ReportLifeEventServiceUnavailableResponse))
 
-      doFundReleaseRequest(fundReleaseJson){ res =>
+      doFundReleaseRequest(fundReleaseJson) { res =>
         status(res) mustBe SERVICE_UNAVAILABLE
         (contentAsJson(res) \ "code").as[String] mustBe "SERVER_ERROR"
         (contentAsJson(res) \ "message").as[String] mustBe "Service unavailable"
@@ -406,37 +444,43 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
 
     "audit extensionReported" when {
       "a initial extension request has been successful" in {
-        when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
+        when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+          .thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
         doExtensionRequest(extensionJson) { res =>
           await(res)
           verify(mockAuditService).audit(
             auditType = matchersEquals("extensionReported"),
             path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/purchase-extensions"),
-            auditData = matchersEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "accountID" -> accountId,
-              "fundReleaseId" -> "3456789001",
-              "eventDate" -> "2017-05-10",
-              "eventType" -> "Extension one"
-            ))
+            auditData = matchersEquals(
+              Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "accountID"                  -> accountId,
+                "fundReleaseId"              -> "3456789001",
+                "eventDate"                  -> "2017-05-10",
+                "eventType"                  -> "Extension one"
+              )
+            )
           )(any())
         }
       }
       "a superseded extension request has been successful" in {
-        when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
+        when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+          .thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
         doExtensionRequest(supersededExtensionJson) { res =>
           await(res)
           verify(mockAuditService).audit(
             auditType = matchersEquals("extensionReported"),
             path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/purchase-extensions"),
-            auditData = matchersEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "accountID" -> accountId,
-              "eventDate" -> "2017-05-11",
-              "eventType" -> "Extension one",
-              "originalEventDate" -> "2017-05-10",
-              "originalLifeEventId" -> "6789000001"
-            ))
+            auditData = matchersEquals(
+              Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "accountID"                  -> accountId,
+                "eventDate"                  -> "2017-05-11",
+                "eventType"                  -> "Extension one",
+                "originalEventDate"          -> "2017-05-10",
+                "originalLifeEventId"        -> "6789000001"
+              )
+            )
           )(any())
         }
       }
@@ -452,33 +496,38 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
           verify(mockAuditService).audit(
             auditType = matchersEquals("extensionNotReported"),
             path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/purchase-extensions"),
-            auditData = matchersEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "accountID" -> accountId,
-              "fundReleaseId" -> "3456789001",
-              "eventDate" -> "2017-05-10",
-              "eventType" -> "Extension one",
-              "reasonNotReported" -> "INTERNAL_SERVER_ERROR"
-            ))
+            auditData = matchersEquals(
+              Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "accountID"                  -> accountId,
+                "fundReleaseId"              -> "3456789001",
+                "eventDate"                  -> "2017-05-10",
+                "eventType"                  -> "Extension one",
+                "reasonNotReported"          -> "INTERNAL_SERVER_ERROR"
+              )
+            )
           )(any())
         }
       }
       "given a eventDate prior to 6 April 2017" in {
-        when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
+        when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+          .thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
 
         doExtensionRequest(extensionJson.replace("2017-05-10", "2017-04-05")) { res =>
           await(res)
           verify(mockAuditService).audit(
             auditType = matchersEquals("extensionNotReported"),
             path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/purchase-extensions"),
-            auditData = matchersEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "accountID" -> accountId,
-              "fundReleaseId" -> "3456789001",
-              "eventDate" -> "2017-04-05",
-              "eventType" -> "Extension one",
-              "reasonNotReported" -> "FORBIDDEN"
-            ))
+            auditData = matchersEquals(
+              Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "accountID"                  -> accountId,
+                "fundReleaseId"              -> "3456789001",
+                "eventDate"                  -> "2017-04-05",
+                "eventType"                  -> "Extension one",
+                "reasonNotReported"          -> "FORBIDDEN"
+              )
+            )
           )(any())
         }
       }
@@ -486,7 +535,8 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
 
     "return with 201 created" when {
       "a initial extension is successful" in {
-        when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
+        when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+          .thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
         doExtensionRequest(extensionJson) { res =>
           status(res) mustBe CREATED
           (contentAsJson(res) \ "data" \ "lifeEventId").as[String] mustBe "1928374"
@@ -494,7 +544,8 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
         }
       }
       "a superseded extension is successful" in {
-        when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
+        when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+          .thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
         doExtensionRequest(supersededExtensionJson) { res =>
           status(res) mustBe CREATED
           (contentAsJson(res) \ "data" \ "lifeEventId").as[String] mustBe "1928374"
@@ -541,7 +592,8 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
 
     "return with 403 forbidden and a code of FORBIDDEN" when {
       "given a eventDate prior to 6 April 2017" in {
-        when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
+        when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+          .thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
 
         doExtensionRequest(extensionJson.replace("2017-05-10", "2017-04-05")) { res =>
           status(res) mustBe FORBIDDEN
@@ -555,8 +607,9 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
     }
 
     "return with 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_CLOSED" in {
-      when(mockLifeEventService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventAccountClosedResponse))
-      doExtensionRequest(extensionJson){ res =>
+      when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+        .thenReturn(Future.successful(ReportLifeEventAccountClosedResponse))
+      doExtensionRequest(extensionJson) { res =>
         status(res) mustBe FORBIDDEN
         (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CLOSED"
         (contentAsJson(res) \ "message").as[String] mustBe "The LISA account is already closed"
@@ -564,8 +617,9 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
     }
 
     "return with 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_VOID" in {
-      when(mockLifeEventService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventAccountVoidResponse))
-      doExtensionRequest(extensionJson){ res =>
+      when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+        .thenReturn(Future.successful(ReportLifeEventAccountVoidResponse))
+      doExtensionRequest(extensionJson) { res =>
         status(res) mustBe FORBIDDEN
         (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_VOID"
         (contentAsJson(res) \ "message").as[String] mustBe "The LISA account is already void"
@@ -573,8 +627,9 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
     }
 
     "return with 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_CANCELLED" in {
-      when(mockLifeEventService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventAccountCancelledResponse))
-      doExtensionRequest(extensionJson){ res =>
+      when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+        .thenReturn(Future.successful(ReportLifeEventAccountCancelledResponse))
+      doExtensionRequest(extensionJson) { res =>
         status(res) mustBe FORBIDDEN
         (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CANCELLED"
         (contentAsJson(res) \ "message").as[String] mustBe "The LISA account is already cancelled"
@@ -582,8 +637,9 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
     }
 
     "return with 403 forbidden and a code of FIRST_EXTENSION_NOT_APPROVED" in {
-      when(mockLifeEventService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventExtensionOneNotYetApprovedResponse))
-      doExtensionRequest(extensionJson){ res =>
+      when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+        .thenReturn(Future.successful(ReportLifeEventExtensionOneNotYetApprovedResponse))
+      doExtensionRequest(extensionJson) { res =>
         status(res) mustBe FORBIDDEN
         (contentAsJson(res) \ "code").as[String] mustBe "FIRST_EXTENSION_NOT_APPROVED"
         (contentAsJson(res) \ "message").as[String] mustBe "A first extension has not yet been approved"
@@ -591,8 +647,9 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
     }
 
     "return with 403 forbidden and a code of FIRST_EXTENSION_ALREADY_APPROVED" in {
-      when(mockLifeEventService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventExtensionOneAlreadyApprovedResponse("123")))
-      doExtensionRequest(extensionJson){ res =>
+      when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+        .thenReturn(Future.successful(ReportLifeEventExtensionOneAlreadyApprovedResponse("123")))
+      doExtensionRequest(extensionJson) { res =>
         status(res) mustBe FORBIDDEN
         (contentAsJson(res) \ "code").as[String] mustBe "FIRST_EXTENSION_ALREADY_APPROVED"
         (contentAsJson(res) \ "message").as[String] mustBe "A first extension has already been approved"
@@ -601,8 +658,9 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
     }
 
     "return with 403 forbidden and a code of SECOND_EXTENSION_ALREADY_APPROVED" in {
-      when(mockLifeEventService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventExtensionTwoAlreadyApprovedResponse("321")))
-      doExtensionRequest(extensionJson){ res =>
+      when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+        .thenReturn(Future.successful(ReportLifeEventExtensionTwoAlreadyApprovedResponse("321")))
+      doExtensionRequest(extensionJson) { res =>
         status(res) mustBe FORBIDDEN
         (contentAsJson(res) \ "code").as[String] mustBe "SECOND_EXTENSION_ALREADY_APPROVED"
         (contentAsJson(res) \ "message").as[String] mustBe "A second extension has already been approved"
@@ -611,17 +669,21 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
     }
 
     "return with 403 forbidden and a code of SUPERSEDED_LIFE_EVENT_MISMATCH_ERROR" in {
-      when(mockLifeEventService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventMismatchResponse))
-      doExtensionRequest(extensionJson){ res =>
+      when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+        .thenReturn(Future.successful(ReportLifeEventMismatchResponse))
+      doExtensionRequest(extensionJson) { res =>
         status(res) mustBe FORBIDDEN
         (contentAsJson(res) \ "code").as[String] mustBe "SUPERSEDED_LIFE_EVENT_MISMATCH_ERROR"
-        (contentAsJson(res) \ "message").as[String] mustBe "originalLifeEventId and the originalEventDate do not match the information in the original request"
+        (contentAsJson(res) \ "message").as[
+          String
+        ] mustBe "originalLifeEventId and the originalEventDate do not match the information in the original request"
       }
     }
 
     "return with 404 not found and a code of INVESTOR_ACCOUNTID_NOT_FOUND" in {
-      when(mockLifeEventService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventAccountNotFoundResponse))
-      doExtensionRequest(extensionJson){ res =>
+      when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+        .thenReturn(Future.successful(ReportLifeEventAccountNotFoundResponse))
+      doExtensionRequest(extensionJson) { res =>
         status(res) mustBe NOT_FOUND
         (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNTID_NOT_FOUND"
         (contentAsJson(res) \ "message").as[String] mustBe "Enter a real accountId"
@@ -629,8 +691,9 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
     }
 
     "return with 404 not found and a code of FUND_RELEASE_NOT_FOUND" in {
-      when(mockLifeEventService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventFundReleaseNotFoundResponse))
-      doExtensionRequest(extensionJson){ res =>
+      when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+        .thenReturn(Future.successful(ReportLifeEventFundReleaseNotFoundResponse))
+      doExtensionRequest(extensionJson) { res =>
         status(res) mustBe NOT_FOUND
         (contentAsJson(res) \ "code").as[String] mustBe "FUND_RELEASE_NOT_FOUND"
         (contentAsJson(res) \ "message").as[String] mustBe "The fundReleaseId does not match HMRC’s records"
@@ -642,14 +705,16 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
         doExtensionRequest(extensionJson, header = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")) { res =>
           status(res) mustBe NOT_ACCEPTABLE
           (contentAsJson(res) \ "code").as[String] mustBe "ACCEPT_HEADER_INVALID"
-          (contentAsJson(res) \ "message").as[String] mustBe "The accept header has an invalid version for this endpoint"
+          (contentAsJson(res) \ "message")
+            .as[String] mustBe "The accept header has an invalid version for this endpoint"
         }
       }
     }
 
     "return with 409 conflict and a code of LIFE_EVENT_ALREADY_EXISTS" in {
-      when(mockLifeEventService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventAlreadyExistsResponse("123")))
-      doExtensionRequest(extensionJson){ res =>
+      when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+        .thenReturn(Future.successful(ReportLifeEventAlreadyExistsResponse("123")))
+      doExtensionRequest(extensionJson) { res =>
         status(res) mustBe CONFLICT
         (contentAsJson(res) \ "code").as[String] mustBe "LIFE_EVENT_ALREADY_EXISTS"
         (contentAsJson(res) \ "message").as[String] mustBe "The investor’s life event has already been reported"
@@ -658,8 +723,9 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
     }
 
     "return with 409 conflict and a code of FUND_RELEASE_SUPERSEDED" in {
-      when(mockLifeEventService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventFundReleaseSupersededResponse("666")))
-      doExtensionRequest(extensionJson){ res =>
+      when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+        .thenReturn(Future.successful(ReportLifeEventFundReleaseSupersededResponse("666")))
+      doExtensionRequest(extensionJson) { res =>
         status(res) mustBe CONFLICT
         (contentAsJson(res) \ "code").as[String] mustBe "FUND_RELEASE_SUPERSEDED"
         (contentAsJson(res) \ "message").as[String] mustBe "This fund release has already been superseded"
@@ -668,8 +734,9 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
     }
 
     "return with 409 conflict and a code of SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED" in {
-      when(mockLifeEventService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventAlreadySupersededResponse("321")))
-      doExtensionRequest(extensionJson){ res =>
+      when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+        .thenReturn(Future.successful(ReportLifeEventAlreadySupersededResponse("321")))
+      doExtensionRequest(extensionJson) { res =>
         status(res) mustBe CONFLICT
         (contentAsJson(res) \ "code").as[String] mustBe "SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED"
         (contentAsJson(res) \ "message").as[String] mustBe "This life event has already been superseded"
@@ -678,8 +745,9 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
     }
 
     "return with 500 internal server error and a code of INTERNAL_SERVER_ERROR" in {
-      when(mockLifeEventService.reportLifeEvent(any(), any(),any())(any())).thenReturn(Future.successful(ReportLifeEventErrorResponse))
-      doExtensionRequest(extensionJson){ res =>
+      when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+        .thenReturn(Future.successful(ReportLifeEventErrorResponse))
+      doExtensionRequest(extensionJson) { res =>
         status(res) mustBe INTERNAL_SERVER_ERROR
         (contentAsJson(res) \ "code").as[String] mustBe "INTERNAL_SERVER_ERROR"
         (contentAsJson(res) \ "message").as[String] mustBe "Internal server error"
@@ -687,10 +755,10 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
     }
 
     "return with 503 service unavailable and a code of SERVER_ERROR" in {
-      when(mockLifeEventService.reportLifeEvent(any(), any(),any())(any())).
-        thenReturn(Future.successful(ReportLifeEventServiceUnavailableResponse))
+      when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+        .thenReturn(Future.successful(ReportLifeEventServiceUnavailableResponse))
 
-      doExtensionRequest(extensionJson){ res =>
+      doExtensionRequest(extensionJson) { res =>
         status(res) mustBe SERVICE_UNAVAILABLE
         (contentAsJson(res) \ "code").as[String] mustBe "SERVER_ERROR"
         (contentAsJson(res) \ "message").as[String] mustBe "Service unavailable"
@@ -703,39 +771,45 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
 
     "audit purchaseOutcomeReported" when {
       "a initial purchase outcome request has been successful" in {
-        when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
+        when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+          .thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
         doOutcomeRequest(outcomeJson) { res =>
           await(res)
           verify(mockAuditService).audit(
             auditType = matchersEquals("purchaseOutcomeReported"),
             path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/purchase-outcomes"),
-            auditData = matchersEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "accountID" -> accountId,
-              "fundReleaseId" -> "3456789000",
-              "eventDate" -> "2017-05-05",
-              "propertyPurchaseResult" -> "Purchase completed",
-              "propertyPurchaseValue" -> "250000"
-            ))
+            auditData = matchersEquals(
+              Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "accountID"                  -> accountId,
+                "fundReleaseId"              -> "3456789000",
+                "eventDate"                  -> "2017-05-05",
+                "propertyPurchaseResult"     -> "Purchase completed",
+                "propertyPurchaseValue"      -> "250000"
+              )
+            )
           )(any())
         }
       }
       "a superseded purchase outcome request has been successful" in {
-        when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
+        when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+          .thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
         doOutcomeRequest(supersededOutcomeJson) { res =>
           await(res)
           verify(mockAuditService).audit(
             auditType = matchersEquals("purchaseOutcomeReported"),
             path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/purchase-outcomes"),
-            auditData = matchersEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "accountID" -> accountId,
-              "eventDate" -> "2017-06-10",
-              "propertyPurchaseResult" -> "Purchase completed",
-              "propertyPurchaseValue" -> "250000",
-              "originalLifeEventId" -> "5678900001",
-              "originalEventDate" -> "2017-05-05"
-            ))
+            auditData = matchersEquals(
+              Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "accountID"                  -> accountId,
+                "eventDate"                  -> "2017-06-10",
+                "propertyPurchaseResult"     -> "Purchase completed",
+                "propertyPurchaseValue"      -> "250000",
+                "originalLifeEventId"        -> "5678900001",
+                "originalEventDate"          -> "2017-05-05"
+              )
+            )
           )(any())
         }
       }
@@ -751,35 +825,40 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
           verify(mockAuditService).audit(
             auditType = matchersEquals("purchaseOutcomeNotReported"),
             path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/purchase-outcomes"),
-            auditData = matchersEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "accountID" -> accountId,
-              "fundReleaseId" -> "3456789000",
-              "eventDate" -> "2017-05-05",
-              "propertyPurchaseResult" -> "Purchase completed",
-              "propertyPurchaseValue" -> "250000",
-              "reasonNotReported" -> "INTERNAL_SERVER_ERROR"
-            ))
+            auditData = matchersEquals(
+              Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "accountID"                  -> accountId,
+                "fundReleaseId"              -> "3456789000",
+                "eventDate"                  -> "2017-05-05",
+                "propertyPurchaseResult"     -> "Purchase completed",
+                "propertyPurchaseValue"      -> "250000",
+                "reasonNotReported"          -> "INTERNAL_SERVER_ERROR"
+              )
+            )
           )(any())
         }
       }
       "given a eventDate prior to 6 April 2017" in {
-        when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
+        when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+          .thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
 
         doOutcomeRequest(outcomeJson.replace("2017-05-05", "2017-04-05")) { res =>
           await(res)
           verify(mockAuditService).audit(
             auditType = matchersEquals("purchaseOutcomeNotReported"),
             path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/purchase-outcomes"),
-            auditData = matchersEquals(Map(
-              "lisaManagerReferenceNumber" -> lisaManager,
-              "accountID" -> accountId,
-              "fundReleaseId" -> "3456789000",
-              "eventDate" -> "2017-04-05",
-              "propertyPurchaseResult" -> "Purchase completed",
-              "propertyPurchaseValue" -> "250000",
-              "reasonNotReported" -> "FORBIDDEN"
-            ))
+            auditData = matchersEquals(
+              Map(
+                "lisaManagerReferenceNumber" -> lisaManager,
+                "accountID"                  -> accountId,
+                "fundReleaseId"              -> "3456789000",
+                "eventDate"                  -> "2017-04-05",
+                "propertyPurchaseResult"     -> "Purchase completed",
+                "propertyPurchaseValue"      -> "250000",
+                "reasonNotReported"          -> "FORBIDDEN"
+              )
+            )
           )(any())
         }
       }
@@ -787,7 +866,8 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
 
     "return with 201 created" when {
       "a initial extension is successful" in {
-        when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
+        when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+          .thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
         doOutcomeRequest(outcomeJson) { res =>
           status(res) mustBe CREATED
           (contentAsJson(res) \ "data" \ "lifeEventId").as[String] mustBe "1928374"
@@ -795,7 +875,8 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
         }
       }
       "a superseded extension is successful" in {
-        when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
+        when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+          .thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
         doOutcomeRequest(supersededOutcomeJson) { res =>
           status(res) mustBe CREATED
           (contentAsJson(res) \ "data" \ "lifeEventId").as[String] mustBe "1928374"
@@ -841,16 +922,20 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
     }
 
     "return with 403 forbidden and a code of SUPERSEDED_LIFE_EVENT_MISMATCH_ERROR" in {
-      when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventMismatchResponse))
+      when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+        .thenReturn(Future.successful(ReportLifeEventMismatchResponse))
       doOutcomeRequest(outcomeJson) { res =>
         status(res) mustBe FORBIDDEN
         (contentAsJson(res) \ "code").as[String] mustBe "SUPERSEDED_LIFE_EVENT_MISMATCH_ERROR"
-        (contentAsJson(res) \ "message").as[String] mustBe "originalLifeEventId and the originalEventDate do not match the information in the original request"
+        (contentAsJson(res) \ "message").as[
+          String
+        ] mustBe "originalLifeEventId and the originalEventDate do not match the information in the original request"
       }
     }
 
     "return with 404 not found and a code of FUND_RELEASE_NOT_FOUND" in {
-      when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventFundReleaseNotFoundResponse))
+      when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+        .thenReturn(Future.successful(ReportLifeEventFundReleaseNotFoundResponse))
       doOutcomeRequest(outcomeJson) { res =>
         status(res) mustBe NOT_FOUND
         (contentAsJson(res) \ "code").as[String] mustBe "FUND_RELEASE_NOT_FOUND"
@@ -863,13 +948,15 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
         doOutcomeRequest(outcomeJson, header = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")) { res =>
           status(res) mustBe NOT_ACCEPTABLE
           (contentAsJson(res) \ "code").as[String] mustBe "ACCEPT_HEADER_INVALID"
-          (contentAsJson(res) \ "message").as[String] mustBe "The accept header has an invalid version for this endpoint"
+          (contentAsJson(res) \ "message")
+            .as[String] mustBe "The accept header has an invalid version for this endpoint"
         }
       }
     }
 
     "return with 404 not found and a code of INVESTOR_ACCOUNTID_NOT_FOUND" in {
-      when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventAccountNotFoundResponse))
+      when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+        .thenReturn(Future.successful(ReportLifeEventAccountNotFoundResponse))
       doOutcomeRequest(outcomeJson) { res =>
         status(res) mustBe NOT_FOUND
         (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNTID_NOT_FOUND"
@@ -878,7 +965,8 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
     }
 
     "return with 409 conflict and a code of FUND_RELEASE_SUPERSEDED" in {
-      when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventFundReleaseSupersededResponse("555")))
+      when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+        .thenReturn(Future.successful(ReportLifeEventFundReleaseSupersededResponse("555")))
       doOutcomeRequest(outcomeJson) { res =>
         status(res) mustBe CONFLICT
         (contentAsJson(res) \ "code").as[String] mustBe "FUND_RELEASE_SUPERSEDED"
@@ -888,7 +976,8 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
     }
 
     "return with 409 conflict and a code of SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED" in {
-      when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventAlreadySupersededResponse("789")))
+      when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+        .thenReturn(Future.successful(ReportLifeEventAlreadySupersededResponse("789")))
       doOutcomeRequest(outcomeJson) { res =>
         status(res) mustBe CONFLICT
         (contentAsJson(res) \ "code").as[String] mustBe "SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED"
@@ -898,7 +987,8 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
     }
 
     "return with 409 conflict and a code of LIFE_EVENT_ALREADY_EXISTS" in {
-      when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventAlreadyExistsResponse("123")))
+      when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+        .thenReturn(Future.successful(ReportLifeEventAlreadyExistsResponse("123")))
       doOutcomeRequest(outcomeJson) { res =>
         status(res) mustBe CONFLICT
         (contentAsJson(res) \ "code").as[String] mustBe "LIFE_EVENT_ALREADY_EXISTS"
@@ -909,7 +999,8 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
 
     "return with 500 internal server error and a code of INTERNAL_SERVER_ERROR" when {
       "given a generic error response from the service layer" in {
-        when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventErrorResponse))
+        when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+          .thenReturn(Future.successful(ReportLifeEventErrorResponse))
         doOutcomeRequest(outcomeJson) { res =>
           status(res) mustBe INTERNAL_SERVER_ERROR
           (contentAsJson(res) \ "code").as[String] mustBe "INTERNAL_SERVER_ERROR"
@@ -918,7 +1009,8 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
       }
       "given a unexpected error response from the service layer" in {
         // you shouldn't get an account closed error for a purchase completion request
-        when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any())).thenReturn(Future.successful(ReportLifeEventAccountClosedResponse))
+        when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+          .thenReturn(Future.successful(ReportLifeEventAccountClosedResponse))
         doOutcomeRequest(outcomeJson) { res =>
           status(res) mustBe INTERNAL_SERVER_ERROR
           (contentAsJson(res) \ "code").as[String] mustBe "INTERNAL_SERVER_ERROR"
@@ -928,8 +1020,8 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
     }
 
     "return with 503 service unavailable and a code of SERVER_ERROR" in {
-      when(mockLifeEventService.reportLifeEvent(any(), any(),any())(any())).
-        thenReturn(Future.successful(ReportLifeEventServiceUnavailableResponse))
+      when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+        .thenReturn(Future.successful(ReportLifeEventServiceUnavailableResponse))
 
       doOutcomeRequest(outcomeJson) { res =>
         status(res) mustBe SERVICE_UNAVAILABLE
@@ -940,26 +1032,44 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
 
   }
 
-  def doFundReleaseRequest(jsonString: String, lmrn: String = lisaManager, accId: String = accountId, header: (String, String) = acceptHeader)(callback: (Future[Result]) =>  Unit): Unit = {
+  def doFundReleaseRequest(
+    jsonString: String,
+    lmrn: String = lisaManager,
+    accId: String = accountId,
+    header: (String, String) = acceptHeader
+  )(callback: Future[Result] => Unit): Unit = {
     val req = FakeRequest(Helpers.POST, "/")
-    val res = propertyPurchaseController.requestFundRelease(lmrn, accId).apply(req.withHeaders(header).
-      withBody(AnyContentAsJson(Json.parse(jsonString))))
+    val res = propertyPurchaseController
+      .requestFundRelease(lmrn, accId)
+      .apply(req.withHeaders(header).withBody(AnyContentAsJson(Json.parse(jsonString))))
 
     callback(res)
   }
 
-  def doExtensionRequest(jsonString: String, lmrn: String = lisaManager, accId: String = accountId, header: (String, String) = acceptHeader)(callback: (Future[Result]) =>  Unit): Unit = {
+  def doExtensionRequest(
+    jsonString: String,
+    lmrn: String = lisaManager,
+    accId: String = accountId,
+    header: (String, String) = acceptHeader
+  )(callback: Future[Result] => Unit): Unit = {
     val req = FakeRequest(Helpers.POST, "/")
-    val res = propertyPurchaseController.requestExtension(lmrn, accId).apply(req.withHeaders(header).
-      withBody(AnyContentAsJson(Json.parse(jsonString))))
+    val res = propertyPurchaseController
+      .requestExtension(lmrn, accId)
+      .apply(req.withHeaders(header).withBody(AnyContentAsJson(Json.parse(jsonString))))
 
     callback(res)
   }
 
-  def doOutcomeRequest(jsonString: String, lmrn: String = lisaManager, accId: String = accountId, header: (String, String) = acceptHeader)(callback: (Future[Result]) =>  Unit): Unit = {
+  def doOutcomeRequest(
+    jsonString: String,
+    lmrn: String = lisaManager,
+    accId: String = accountId,
+    header: (String, String) = acceptHeader
+  )(callback: Future[Result] => Unit): Unit = {
     val req = FakeRequest(Helpers.POST, "/")
-    val res = propertyPurchaseController.reportPurchaseOutcome(lmrn, accId).apply(req.withHeaders(header).
-      withBody(AnyContentAsJson(Json.parse(jsonString))))
+    val res = propertyPurchaseController
+      .reportPurchaseOutcome(lmrn, accId)
+      .apply(req.withHeaders(header).withBody(AnyContentAsJson(Json.parse(jsonString))))
 
     callback(res)
   }

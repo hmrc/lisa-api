@@ -33,7 +33,6 @@ class InvestorServiceSpec extends ServiceTestFixture {
 
   val investorService: InvestorService = new InvestorService(mockDesConnector)
 
-
   "InvestorService" must {
 
     "return a Success Response" when {
@@ -56,7 +55,7 @@ class InvestorServiceSpec extends ServiceTestFixture {
         when(mockDesConnector.createInvestor(any(), any())(any()))
           .thenReturn(Future.successful(CreateLisaInvestorAlreadyExistsResponse(investorId)))
 
-        doRequest{response =>
+        doRequest { response =>
           response mustBe CreateLisaInvestorAlreadyExistsResponse(investorId)
         }
       }
@@ -71,7 +70,7 @@ class InvestorServiceSpec extends ServiceTestFixture {
             Future.successful(DesFailureResponse("INVESTOR_NOT_FOUND"))
           )
 
-        doRequest{response =>
+        doRequest { response =>
           response mustBe CreateLisaInvestorInvestorNotFoundResponse
         }
       }
@@ -83,7 +82,7 @@ class InvestorServiceSpec extends ServiceTestFixture {
         when(mockDesConnector.createInvestor(any(), any())(any()))
           .thenReturn(Future.successful(DesUnavailableResponse))
 
-        doRequest{response =>
+        doRequest { response =>
           response mustBe CreateLisaInvestorServiceUnavailableResponse
         }
       }
@@ -96,7 +95,7 @@ class InvestorServiceSpec extends ServiceTestFixture {
             Future.successful(DesFailureResponse("INVALID_PAYLOAD", "Submission has not passed validation."))
           )
 
-        doRequest{response =>
+        doRequest { response =>
           response mustBe CreateLisaInvestorErrorResponse
         }
       }
@@ -104,8 +103,8 @@ class InvestorServiceSpec extends ServiceTestFixture {
 
   }
 
-  private def doRequest(callback: (CreateLisaInvestorResponse) => Unit) = {
-    val request = CreateLisaInvestorRequest("AB123456A", "A", "B", new DateTime("2000-01-01"))
+  private def doRequest(callback: CreateLisaInvestorResponse => Unit): Unit = {
+    val request  = CreateLisaInvestorRequest("AB123456A", "A", "B", new DateTime("2000-01-01"))
     val response = Await.result(investorService.createInvestor("Z019283", request)(HeaderCarrier()), Duration.Inf)
 
     callback(response)

@@ -68,7 +68,7 @@ class AccountServiceSpec extends ServiceTestFixture {
       }
       "a INTERNAL_SERVER_ERROR response comes from DES" in {
         when(mockDesConnector.createAccount(any(), any())(any()))
-          .thenReturn(Future.successful(DesFailureResponse(code = "INTERNAL_SERVER_ERROR")))
+          .thenReturn(Future.successful(DesFailureResponse()))
 
         doCreateRequest { response =>
           response mustBe CreateLisaAccountErrorResponse
@@ -187,7 +187,7 @@ class AccountServiceSpec extends ServiceTestFixture {
       }
       "a INTERNAL_SERVER_ERROR response comes from DES" in {
         when(mockDesConnector.transferAccount(any(), any())(any()))
-          .thenReturn(Future.successful(DesFailureResponse(code = "INTERNAL_SERVER_ERROR")))
+          .thenReturn(Future.successful(DesFailureResponse()))
 
         doTransferRequest { response =>
           response mustBe CreateLisaAccountErrorResponse
@@ -279,9 +279,9 @@ class AccountServiceSpec extends ServiceTestFixture {
       "given no rds code and an account id" in {
         when(mockDesConnector.closeAccount(any(), any(), any())(any()))
           .thenReturn(
-            Future.successful((
-             DesEmptySuccessResponse
-            ))
+            Future.successful(
+              DesEmptySuccessResponse
+            )
           )
 
         doCloseRequest { response =>
@@ -404,7 +404,17 @@ class AccountServiceSpec extends ServiceTestFixture {
     "return a Success Response" when {
 
       "given a success response" in {
-        val successResponse = GetLisaAccountSuccessResponse("123", "456", "All funds withdrawn", new DateTime("201-04-06"), "OPEN", "AVAILABLE", None, None, None)
+        val successResponse = GetLisaAccountSuccessResponse(
+          "123",
+          "456",
+          "All funds withdrawn",
+          new DateTime("201-04-06"),
+          "OPEN",
+          "AVAILABLE",
+          None,
+          None,
+          None
+        )
 
         when(mockDesConnector.getAccountInformation(any(), any())(any()))
           .thenReturn(Future.successful(successResponse))
@@ -447,24 +457,25 @@ class AccountServiceSpec extends ServiceTestFixture {
     }
   }
 
-  private def doCreateRequest(callback: (CreateLisaAccountResponse) => Unit): Unit = {
-    val request = CreateLisaAccountCreationRequest("1234567890",  "9876543210", testDate)
+  private def doCreateRequest(callback: CreateLisaAccountResponse => Unit): Unit = {
+    val request  = CreateLisaAccountCreationRequest("1234567890", "9876543210", testDate)
     val response = Await.result(accountService.createAccount(testLMRN, request)(HeaderCarrier()), Duration.Inf)
 
     callback(response)
   }
 
-  private def doTransferRequest(callback: (CreateLisaAccountResponse) => Unit): Unit = {
+  private def doTransferRequest(callback: CreateLisaAccountResponse => Unit): Unit = {
     val accountTransfer = AccountTransfer("123456", "123456", testDate)
-    val request = CreateLisaAccountTransferRequest("Transferred", "1234567890", "9876543210", testDate, accountTransfer)
-    val response = Await.result(accountService.transferAccount(testLMRN, request)(HeaderCarrier()), Duration.Inf)
+    val request         = CreateLisaAccountTransferRequest("Transferred", "1234567890", "9876543210", testDate, accountTransfer)
+    val response        = Await.result(accountService.transferAccount(testLMRN, request)(HeaderCarrier()), Duration.Inf)
 
     callback(response)
   }
 
-  private def doCloseRequest(callback: (CloseLisaAccountResponse) => Unit): Unit = {
-    val request = CloseLisaAccountRequest("All funds withdrawn", testDate)
-    val response = Await.result(accountService.closeAccount(testLMRN, "A123456", request)(HeaderCarrier()), Duration.Inf)
+  private def doCloseRequest(callback: CloseLisaAccountResponse => Unit): Unit = {
+    val request  = CloseLisaAccountRequest("All funds withdrawn", testDate)
+    val response =
+      Await.result(accountService.closeAccount(testLMRN, "A123456", request)(HeaderCarrier()), Duration.Inf)
 
     callback(response)
   }

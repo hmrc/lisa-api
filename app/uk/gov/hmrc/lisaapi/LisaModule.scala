@@ -22,10 +22,9 @@ import uk.gov.hmrc.lisaapi.models.AnnualReturnValidator
 import uk.gov.hmrc.lisaapi.services._
 
 class LisaModule extends Module {
-  override def bindings(environment: Environment, configuration: Configuration): Seq[Binding[_]] = {
+  override def bindings(environment: Environment, configuration: Configuration): Seq[Binding[_]] =
     Seq(
       bind[AnnualReturnValidator] toInstance AnnualReturnValidator,
       bind[CurrentDateService] toInstance CurrentDateService
     )
-  }
 }

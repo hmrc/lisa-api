@@ -78,8 +78,8 @@ class APIVersioningSpec extends ControllerTestFixture {
     }
 
     "handle a v2 request when v2 endpoints are disabled" in {
-      val request = FakeRequest(Helpers.GET, "/").withHeaders((ACCEPT, "application/vnd.hmrc.2.0+json"))
-      val builder = APIVersioningImplV2Disabled.validateHeader(mockParser)
+      val request  = FakeRequest(Helpers.GET, "/").withHeaders((ACCEPT, "application/vnd.hmrc.2.0+json"))
+      val builder  = APIVersioningImplV2Disabled.validateHeader(mockParser)
       val response = builder.invokeBlock[AnyContent](request, _ => Future.successful(Results.Ok))
       Await.result(response, 100 millis) mustBe ErrorAcceptHeaderVersionInvalid.asResult
     }
@@ -100,41 +100,37 @@ class APIVersioningSpec extends ControllerTestFixture {
   }
 
   object APIVersioningImpl extends APIVersioning {
-    override val validateVersion: String => Boolean = List("1.0", "2.0") contains _
+    override val validateVersion: String => Boolean     = List("1.0", "2.0") contains _
     override val validateContentType: String => Boolean = _ == "json"
-    override lazy val v2endpointsEnabled: Boolean = true
+    override lazy val v2endpointsEnabled: Boolean       = true
 
     override protected def appContext: AppContext = mockAppContext
   }
 
   object APIVersioningImplV2Disabled extends APIVersioning {
-    override val validateVersion: String => Boolean = List("1.0", "2.0") contains _
+    override val validateVersion: String => Boolean     = List("1.0", "2.0") contains _
     override val validateContentType: String => Boolean = _ == "json"
-    override lazy val v2endpointsEnabled: Boolean = false
+    override lazy val v2endpointsEnabled: Boolean       = false
 
     override protected def appContext: AppContext = mockAppContext
   }
 
   def withApiVersionTest[A](request: Request[A]): Result = {
-    val response = APIVersioningImpl.withApiVersion {
-      case Some("1.0") => Future.successful(Results.Ok)
+    val response = APIVersioningImpl.withApiVersion { case Some("1.0") =>
+      Future.successful(Results.Ok)
     }(request)
     Await.result(response, 100 millis)
   }
 
   def validateHeaderTest[A](request: Request[A]): Result = {
-    val builder = APIVersioningImpl.validateHeader(mockParser)
-    val response = builder.invokeBlock[A](
-      request,
-      (_) => Future.successful(Results.Ok))
+    val builder  = APIVersioningImpl.validateHeader(mockParser)
+    val response = builder.invokeBlock[A](request, _ => Future.successful(Results.Ok))
     Await.result(response, 100 millis)
   }
 
   def isEndpointEnabledTest[A](request: Request[A]): Result = {
-    val builder = APIVersioningImpl.isEndpointEnabled("test", mockParser)
-    val response = builder.invokeBlock[A](
-      request,
-      (_) => Future.successful(Results.Ok))
+    val builder  = APIVersioningImpl.isEndpointEnabled("test", mockParser)
+    val response = builder.invokeBlock[A](request, _ => Future.successful(Results.Ok))
     Await.result(response, 100 millis)
   }
 }

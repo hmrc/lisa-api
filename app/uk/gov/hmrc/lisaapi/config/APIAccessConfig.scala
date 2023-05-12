@@ -22,11 +22,10 @@ case class APIAccessConfig(value: Option[Configuration]) {
 
   val PUBLIC = "PUBLIC"
 
-  def accessType: String = {
+  def accessType: String =
     value match {
       case Some(config) => config.getOptional[String]("type").getOrElse(PUBLIC)
-      case None => PUBLIC
+      case None         => PUBLIC
     }
-  }
 
 }

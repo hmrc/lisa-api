@@ -2,7 +2,7 @@
 
 ## Requirements
 
-This service is written in [Scala 2.12](http://www.scala-lang.org/) and [Play](http://playframework.com/), so needs at least a [JRE 1.8](http://www.oracle.com/technetwork/java/javase/downloads/index.html) to run.
+This service is written in [Scala 2.13](http://www.scala-lang.org/) and [Play](http://playframework.com/), needs at least a Java 11 to run.
 
 ## Description
 
@@ -68,7 +68,7 @@ This service is written in [Scala](http://www.scala-lang.org/) and [Play](http:/
 
 Install [Service Manager](https://github.com/hmrc/service-manager), then start dependencies:
 
-    sm --start GG_AUTH_SERVICES LISA_STUB
+    sm2 --start GG_AUTH_SERVICES LISA_STUB
 
 Start the app:
 

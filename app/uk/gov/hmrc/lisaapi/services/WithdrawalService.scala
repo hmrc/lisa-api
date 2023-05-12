@@ -25,15 +25,16 @@ import uk.gov.hmrc.lisaapi.models.des._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class WithdrawalService @Inject()(desConnector: DesConnector)(implicit ec: ExecutionContext) extends Logging {
+class WithdrawalService @Inject() (desConnector: DesConnector)(implicit ec: ExecutionContext) extends Logging {
 
-  def reportWithdrawalCharge(lisaManager: String, accountId: String, request: ReportWithdrawalChargeRequest)
-                            (implicit hc: HeaderCarrier): Future[ReportWithdrawalChargeResponse] = {
+  def reportWithdrawalCharge(lisaManager: String, accountId: String, request: ReportWithdrawalChargeRequest)(implicit
+    hc: HeaderCarrier
+  ): Future[ReportWithdrawalChargeResponse] =
     desConnector.reportWithdrawalCharge(lisaManager, accountId, request) map {
-      case successResponse: DesTransactionResponse =>
+      case successResponse: DesTransactionResponse                                 =>
         logger.debug("Matched ReportWithdrawalChargeSuccessResponse and the message is " + successResponse.message)
         request match {
-          case _: RegularWithdrawalChargeRequest =>
+          case _: RegularWithdrawalChargeRequest    =>
             if (successResponse.message.contains("Late")) {
               ReportWithdrawalChargeLateResponse(successResponse.transactionID)
             } else {
@@ -42,30 +43,33 @@ class WithdrawalService @Inject()(desConnector: DesConnector)(implicit ec: Execu
           case _: SupersededWithdrawalChargeRequest =>
             ReportWithdrawalChargeSupersededResponse(successResponse.transactionID)
         }
-      case DesUnavailableResponse =>
+      case DesUnavailableResponse                                                  =>
         logger.debug("Matched DesUnavailableResponse")
         ReportWithdrawalChargeServiceUnavailable
-      case alreadyExistsResponse: DesWithdrawalChargeAlreadyExistsResponse =>
+      case alreadyExistsResponse: DesWithdrawalChargeAlreadyExistsResponse         =>
         logger.debug("Matched DesWithdrawalChargeAlreadyExistsResponse and the code is " + alreadyExistsResponse.code)
         ReportWithdrawalChargeAlreadyExists(alreadyExistsResponse.investorTransactionID)
       case alreadySupersededResponse: DesWithdrawalChargeAlreadySupersededResponse =>
-        logger.debug("Matched DesWithdrawalChargeAlreadySupersededResponse and the code is " + alreadySupersededResponse.code)
+        logger.debug(
+          "Matched DesWithdrawalChargeAlreadySupersededResponse and the code is " + alreadySupersededResponse.code
+        )
         ReportWithdrawalChargeAlreadySuperseded(alreadySupersededResponse.supersededTransactionByID)
-      case failureResponse: DesFailureResponse =>
+      case failureResponse: DesFailureResponse                                     =>
         logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
-        desFailures.getOrElse(failureResponse.code, {
-          logger.warn(s"Request bonus payment returned error: ${failureResponse.code}")
-          ReportWithdrawalChargeError
-        })
+        desFailures.getOrElse(
+          failureResponse.code, {
+            logger.warn(s"Request bonus payment returned error: ${failureResponse.code}")
+            ReportWithdrawalChargeError
+          }
+        )
     }
-  }
 
   private val desFailures = Map[String, ReportWithdrawalChargeErrorResponse](
-    "INVESTOR_ACCOUNTID_NOT_FOUND" -> ReportWithdrawalChargeAccountNotFound,
-    "INVESTOR_ACCOUNT_ALREADY_VOID" -> ReportWithdrawalChargeAccountVoid,
-    "INVESTOR_ACCOUNT_ALREADY_CANCELLED" -> ReportWithdrawalChargeAccountCancelled,
-    "WITHDRAWAL_REPORTING_ERROR" -> ReportWithdrawalChargeReportingError,
+    "INVESTOR_ACCOUNTID_NOT_FOUND"               -> ReportWithdrawalChargeAccountNotFound,
+    "INVESTOR_ACCOUNT_ALREADY_VOID"              -> ReportWithdrawalChargeAccountVoid,
+    "INVESTOR_ACCOUNT_ALREADY_CANCELLED"         -> ReportWithdrawalChargeAccountCancelled,
+    "WITHDRAWAL_REPORTING_ERROR"                 -> ReportWithdrawalChargeReportingError,
     "SUPERSEDING_TRANSACTION_ID_AMOUNT_MISMATCH" -> ReportWithdrawalChargeSupersedeAmountMismatch,
-    "SUPERSEDING_TRANSACTION_OUTCOME_ERROR" -> ReportWithdrawalChargeSupersedeOutcomeError
+    "SUPERSEDING_TRANSACTION_OUTCOME_ERROR"      -> ReportWithdrawalChargeSupersedeOutcomeError
   )
 }

@@ -25,25 +25,26 @@ import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class DiscoverController @Inject()(
-                                    authConnector: AuthConnector,
-                                    appContext: AppContext,
-                                    lisaMetrics: LisaMetrics,
-                                    cc: ControllerComponents,
-                                    parse: PlayBodyParsers
-                                  )(implicit ec: ExecutionContext) extends LisaController(
-  cc: ControllerComponents,
-  lisaMetrics: LisaMetrics,
+class DiscoverController @Inject() (
+  authConnector: AuthConnector,
   appContext: AppContext,
-  authConnector: AuthConnector
-) {
+  lisaMetrics: LisaMetrics,
+  cc: ControllerComponents,
+  parse: PlayBodyParsers
+)(implicit ec: ExecutionContext)
+    extends LisaController(
+      cc: ControllerComponents,
+      lisaMetrics: LisaMetrics,
+      appContext: AppContext,
+      authConnector: AuthConnector
+    ) {
 
   def discover(lisaManagerReferenceNumber: String): Action[AnyContent] =
     (validateHeader(parse) andThen
       validateLMRN(lisaManagerReferenceNumber)).async { implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
 
-      withEnrolment(lisaManagerReferenceNumber) { (_) =>
+      withEnrolment(lisaManagerReferenceNumber) { _ =>
         val result = withApiVersion {
           case Some(VERSION_1) => Future.successful(Ok(Json.parse(v1(lisaManagerReferenceNumber))))
           case Some(VERSION_2) => Future.successful(Ok(Json.parse(v2(lisaManagerReferenceNumber))))
@@ -54,8 +55,7 @@ class DiscoverController @Inject()(
       }
     }
 
-  private val v1: String => String = (lisaManagerReferenceNumber: String) =>
-    s"""{
+  private val v1: String => String = (lisaManagerReferenceNumber: String) => s"""{
     "lisaManagerReferenceNumber": "$lisaManagerReferenceNumber",
     "_links":
     {
@@ -79,8 +79,7 @@ class DiscoverController @Inject()(
       "bulk payment breakdown": {"href": "/lifetime-isa/manager/$lisaManagerReferenceNumber/accounts/{accountId}/transactions/{transactionId}/payments", "methods": ["GET"]}
     }
   }"""
-  private val v2: String => String = (lisaManagerReferenceNumber: String) =>
-    s"""{
+  private val v2: String => String = (lisaManagerReferenceNumber: String) => s"""{
     "lisaManagerReferenceNumber": "$lisaManagerReferenceNumber",
     "_links":
     {

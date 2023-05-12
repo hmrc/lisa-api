@@ -31,69 +31,68 @@ trait APIVersioning extends Logging {
 
   protected def appContext: AppContext
 
-  def isEndpointEnabled(endpoint: String, parse: PlayBodyParsers)(implicit ec: ExecutionContext): ActionBuilder[Request, AnyContent] = new ActionBuilder[Request, AnyContent] {
-    override def parser: BodyParser[AnyContent] = parse.defaultBodyParser
-    override protected def executionContext: ExecutionContext = ec
-    override def invokeBlock[A](request: Request[A], block: Request[A] => Future[Result]): Future[Result] = {
+  def isEndpointEnabled(endpoint: String, parse: PlayBodyParsers)(implicit
+    ec: ExecutionContext
+  ): ActionBuilder[Request, AnyContent] = new ActionBuilder[Request, AnyContent] {
+    override def parser: BodyParser[AnyContent]                                                           = parse.defaultBodyParser
+    override protected def executionContext: ExecutionContext                                             = ec
+    override def invokeBlock[A](request: Request[A], block: Request[A] => Future[Result]): Future[Result] =
       if (appContext.endpointIsDisabled(endpoint)) {
         logger.info(s"User attempted to use an endpoint which is not available ($endpoint)")
         Future.successful(ErrorApiNotAvailable.asResult)
       } else {
         block(request)
       }
-    }
   }
 
-  def validateHeader(parse: PlayBodyParsers)(implicit ec: ExecutionContext): ActionBuilder[Request, AnyContent] = new ActionBuilder[Request, AnyContent] {
-    override def parser: BodyParser[AnyContent] = parse.defaultBodyParser
-    override protected def executionContext: ExecutionContext = ec
-    override def invokeBlock[A](request: Request[A], block: Request[A] => Future[Result]) = {
-      extractAcceptHeader(request) match {
-        case Some(AcceptHeader(version, content)) => {
-          val version2NotEnabled = version == "2.0" && !v2endpointsEnabled
-          if (version2NotEnabled) {
-            logger.info(s"Request accept header has invalid version: $version")
-            Future.successful(ErrorAcceptHeaderVersionInvalid.asResult)
-          } else {
-            (validateVersion(version), validateContentType(content)) match {
-              case (true, true) => block(request)
-              case (false, _) =>
-                logger.info(s"Request accept header has invalid version: $version")
-                Future.successful(ErrorAcceptHeaderVersionInvalid.asResult)
-              case (_, false) =>
-                logger.info(s"Request accept header has invalid content type: $content")
-                Future.successful(ErrorAcceptHeaderContentInvalid.asResult)
+  def validateHeader(parse: PlayBodyParsers)(implicit ec: ExecutionContext): ActionBuilder[Request, AnyContent] =
+    new ActionBuilder[Request, AnyContent] {
+      override def parser: BodyParser[AnyContent]                                           = parse.defaultBodyParser
+      override protected def executionContext: ExecutionContext                             = ec
+      override def invokeBlock[A](request: Request[A], block: Request[A] => Future[Result]): Future[Result] =
+        extractAcceptHeader(request) match {
+          case Some(AcceptHeader(version, content)) =>
+            val version2NotEnabled = version == "2.0" && !v2endpointsEnabled
+            if (version2NotEnabled) {
+              logger.info(s"Request accept header has invalid version: $version")
+              Future.successful(ErrorAcceptHeaderVersionInvalid.asResult)
+            } else {
+              (validateVersion(version), validateContentType(content)) match {
+                case (true, true) => block(request)
+                case (false, _)   =>
+                  logger.info(s"Request accept header has invalid version: $version")
+                  Future.successful(ErrorAcceptHeaderVersionInvalid.asResult)
+                case (_, false)   =>
+                  logger.info(s"Request accept header has invalid content type: $content")
+                  Future.successful(ErrorAcceptHeaderContentInvalid.asResult)
+              }
             }
-          }
+          case _                                    =>
+            logger.info("Request accept header is missing or invalid")
+            Future.successful(ErrorAcceptHeaderInvalid.asResult)
         }
-        case _ =>
-          logger.info("Request accept header is missing or invalid")
-          Future.successful(ErrorAcceptHeaderInvalid.asResult)
-      }
     }
-  }
 
-  def withApiVersion[A](pf: PartialFunction[Option[String], Future[Result]])
-                    (implicit request: Request[A]): Future[Result] = {
+  def withApiVersion[A](
+    pf: PartialFunction[Option[String], Future[Result]]
+  )(implicit request: Request[A]): Future[Result] =
     pf.orElse[Option[String], Future[Result]] {
       case Some(version) =>
         logger.info(s"Request accept header has unimplemented version: $version")
         Future.successful(ErrorAcceptHeaderVersionInvalid.asResult)
-      case None =>
+      case None          =>
         logger.info("Request accept header is missing or invalid")
         Future.successful(ErrorAcceptHeaderInvalid.asResult)
     }(extractAcceptHeader(request).map(_.version))
-  }
 
-  def getAPIVersionFromRequest(implicit request: Request[AnyContent]): Option[String] = {
+  def getAPIVersionFromRequest(implicit request: Request[AnyContent]): Option[String] =
     extractAcceptHeader(request).map(header => header.version)
-  }
 
   def extractAcceptHeader[A](req: Request[A]): Option[AcceptHeader] = {
     val versionRegex = """^application/vnd\.hmrc\.(\d\.\d)\+(.*)$""".r
     req.headers.get(ACCEPT).flatMap {
       case versionRegex(version, contentType) => Some(AcceptHeader(version, contentType))
-      case _ => None
+      case _                                  => None
     }
   }
 

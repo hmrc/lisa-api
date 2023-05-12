@@ -29,70 +29,74 @@ import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AnnualReturnController @Inject()(
-                                       authConnector: AuthConnector,
-                                       appContext: AppContext,
-                                       service: LifeEventService,
-                                       auditService: AuditService,
-                                       validator: AnnualReturnValidator,
-                                       lisaMetrics: LisaMetrics,
-                                       cc: ControllerComponents,
-                                       parse: PlayBodyParsers
-                                      )(implicit ec: ExecutionContext) extends LisaController(
-  cc: ControllerComponents,
-  lisaMetrics: LisaMetrics,
+class AnnualReturnController @Inject() (
+  authConnector: AuthConnector,
   appContext: AppContext,
-  authConnector: AuthConnector
-) {
+  service: LifeEventService,
+  auditService: AuditService,
+  validator: AnnualReturnValidator,
+  lisaMetrics: LisaMetrics,
+  cc: ControllerComponents,
+  parse: PlayBodyParsers
+)(implicit ec: ExecutionContext)
+    extends LisaController(
+      cc: ControllerComponents,
+      lisaMetrics: LisaMetrics,
+      appContext: AppContext,
+      authConnector: AuthConnector
+    ) {
 
   override val validateVersion: String => Boolean = _ == "2.0"
 
-  def submitReturn(lisaManager: String, accountId: String): Action[AnyContent] = (validateHeader(parse) andThen isEndpointEnabled("annual-returns", parse)).async {
-    implicit request =>
+  def submitReturn(lisaManager: String, accountId: String): Action[AnyContent] =
+    (validateHeader(parse) andThen isEndpointEnabled("annual-returns", parse)).async { implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
 
       withValidLMRN(lisaManager) { () =>
         withValidAccountId(accountId) { () =>
-          withValidJson[AnnualReturn]( req =>
-            withValidData(req)(lisaManager, accountId) { () =>
-              service.reportLifeEvent(lisaManager, accountId, req) map { res =>
-                logger.debug("submitAnnualReturn: The response is " + res.toString)
+          withValidJson[AnnualReturn](
+            req =>
+              withValidData(req)(lisaManager, accountId) { () =>
+                service.reportLifeEvent(lisaManager, accountId, req) map { res =>
+                  logger.debug("submitAnnualReturn: The response is " + res.toString)
 
-                res match {
-                  case success: ReportLifeEventSuccessResponse =>
-                    val message = if (req.supersede.isEmpty) "Life event created" else "Life event superseded"
-                    val data = ApiResponseData(message = message, lifeEventId = Some(success.lifeEventId))
+                  res match {
+                    case success: ReportLifeEventSuccessResponse =>
+                      val message = if (req.supersede.isEmpty) "Life event created" else "Life event superseded"
+                      val data    = ApiResponseData(message = message, lifeEventId = Some(success.lifeEventId))
 
-                    audit(lisaManager, accountId, req)
-                    lisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.EVENT)
-                    Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
-                  case error: ReportLifeEventResponse =>
-                    val response = getErrorResponse(error)
+                      audit(lisaManager, accountId, req)
+                      lisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.EVENT)
+                      Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
+                    case error: ReportLifeEventResponse          =>
+                      val response = getErrorResponse(error)
 
-                    audit(lisaManager, accountId, req, Some(response.errorCode))
-                    lisaMetrics.incrementMetrics(startTime, response.httpStatusCode, LisaMetricKeys.EVENT)
-                    response.asResult
-                }
-              } recover {
-                case e: Exception =>
-                  logger.error(s"submitAnnualReturn: An error occurred due to ${e.getMessage}, returning internal server error")
+                      audit(lisaManager, accountId, req, Some(response.errorCode))
+                      lisaMetrics.incrementMetrics(startTime, response.httpStatusCode, LisaMetricKeys.EVENT)
+                      response.asResult
+                  }
+                } recover { case e: Exception =>
+                  logger.error(
+                    s"submitAnnualReturn: An error occurred due to ${e.getMessage}, returning internal server error"
+                  )
 
                   audit(lisaManager, accountId, req, Some("INTERNAL_SERVER_ERROR"))
                   lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.EVENT)
                   InternalServerError(ErrorInternalServerError.asJson)
-              }
-            },
+                }
+              },
             lisaManager = lisaManager
           )
         }
       }
-  }
+    }
 
-  private def audit(lisaManager: String, accountId: String, req: AnnualReturn, failureCode: Option[String] = None)
-                   (implicit hc: HeaderCarrier) = {
+  private def audit(lisaManager: String, accountId: String, req: AnnualReturn, failureCode: Option[String] = None)(
+    implicit hc: HeaderCarrier
+  ) = {
     val (auditType, auditData) = failureCode map { code =>
       ("lifeEventNotRequested", req.toStringMap ++ Map("reasonNotRequested" -> code))
-    } getOrElse(("lifeEventRequested", req.toStringMap))
+    } getOrElse (("lifeEventRequested", req.toStringMap))
 
     auditService.audit(
       auditType = auditType,
@@ -101,24 +105,22 @@ class AnnualReturnController @Inject()(
     )
   }
 
-  private def getErrorResponse(response: ReportLifeEventResponse): ErrorResponse = {
+  private def getErrorResponse(response: ReportLifeEventResponse): ErrorResponse =
     response match {
-      case ReportLifeEventAccountNotFoundResponse => ErrorAccountNotFound
-      case ReportLifeEventAccountVoidResponse => ErrorAccountAlreadyVoided
-      case ReportLifeEventAccountCancelledResponse => ErrorAccountAlreadyCancelled
-      case ReportLifeEventMismatchResponse => ErrorLifeEventMismatch
+      case ReportLifeEventAccountNotFoundResponse                => ErrorAccountNotFound
+      case ReportLifeEventAccountVoidResponse                    => ErrorAccountAlreadyVoided
+      case ReportLifeEventAccountCancelledResponse               => ErrorAccountAlreadyCancelled
+      case ReportLifeEventMismatchResponse                       => ErrorLifeEventMismatch
       case ReportLifeEventAlreadySupersededResponse(lifeEventId) => ErrorLifeEventAlreadySuperseded(lifeEventId)
-      case ReportLifeEventAlreadyExistsResponse(lifeEventId) => ErrorLifeEventAlreadyExists(lifeEventId)
-      case ReportLifeEventServiceUnavailableResponse => ErrorServiceUnavailable
-      case ReportLifeEventAccountClosedResponse => ErrorAccountAlreadyClosed
-      case _ => ErrorInternalServerError
+      case ReportLifeEventAlreadyExistsResponse(lifeEventId)     => ErrorLifeEventAlreadyExists(lifeEventId)
+      case ReportLifeEventServiceUnavailableResponse             => ErrorServiceUnavailable
+      case ReportLifeEventAccountClosedResponse                  => ErrorAccountAlreadyClosed
+      case _                                                     => ErrorInternalServerError
     }
-  }
 
-  private def withValidData(req: AnnualReturn)
-                           (lisaManager: String, accountId: String)
-                           (callback: () => Future[Result])
-                           (implicit hc: HeaderCarrier, startTime: Long) = {
+  private def withValidData(req: AnnualReturn)(lisaManager: String, accountId: String)(
+    callback: () => Future[Result]
+  )(implicit hc: HeaderCarrier, startTime: Long) = {
     val errors = validator.validate(req)
 
     if (errors.isEmpty) {

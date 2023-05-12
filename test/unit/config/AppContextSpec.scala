@@ -26,9 +26,9 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 class AppContextSpec extends PlaySpec with MockitoSugar {
 
-  val mockConfiguration: Configuration = mock[Configuration]
+  val mockConfiguration: Configuration   = mock[Configuration]
   val mockServicesConfig: ServicesConfig = mock[ServicesConfig]
-  val appContext: AppContext = new AppContext(mockConfiguration, mockServicesConfig)
+  val appContext: AppContext             = new AppContext(mockConfiguration, mockServicesConfig)
 
   "endpointIsDisabled" must {
 
@@ -45,10 +45,10 @@ class AppContextSpec extends PlaySpec with MockitoSugar {
     }
 
     "return true if the named endpoint is in the disabled list" in {
-      when(mockConfiguration.getOptional[Seq[String]](any())(any())).thenReturn(Some(Seq[String]("test1", "test2", "test3")))
+      when(mockConfiguration.getOptional[Seq[String]](any())(any()))
+        .thenReturn(Some(Seq[String]("test1", "test2", "test3")))
 
       appContext.endpointIsDisabled("test3") mustBe true
     }
   }
 }
-

@@ -20,8 +20,7 @@ import helpers.BaseTestFixture
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
 
-class LisaExtensionsSpec  extends BaseTestFixture
-  with GuiceOneAppPerSuite {
+class LisaExtensionsSpec extends BaseTestFixture with GuiceOneAppPerSuite {
 
   "LisaExtension" must {
 
@@ -39,7 +38,7 @@ class LisaExtensionsSpec  extends BaseTestFixture
     }
 
     "Return Map with int and option int converted to strings" in {
-      val testints = TestInts(1,Some(1))
+      val testints = TestInts(1, Some(1))
       testints.toStringMap mustBe Map("anInt" -> "1", "anOpInt" -> "1")
     }
 

@@ -33,66 +33,73 @@ trait DesConnectorTestHelper extends BaseTestFixture with GuiceOneAppPerSuite {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  val validBonusPaymentResponseJson: String = Source.fromInputStream(getClass.getResourceAsStream("/json/request.valid.bonus-payment-response.json")).mkString
+  val validBonusPaymentResponseJson: String =
+    Source.fromInputStream(getClass.getResourceAsStream("/json/request.valid.bonus-payment-response.json")).mkString
 
   val desConnector: DesConnector = new DesConnector(mockHttp, mockAppContext)
 
-  def doCreateInvestorRequest(callback: (DesResponse) => Unit): Unit = {
-    val request = CreateLisaInvestorRequest("AB123456A", "A", "B", new DateTime("2000-01-01"))
+  def doCreateInvestorRequest(callback: DesResponse => Unit): Unit = {
+    val request  = CreateLisaInvestorRequest("AB123456A", "A", "B", new DateTime("2000-01-01"))
     val response = Await.result(desConnector.createInvestor("Z019283", request), Duration.Inf)
 
     callback(response)
   }
 
-  def doCreateAccountRequest(callback: (DesResponse) => Unit): Unit = {
-    val request = CreateLisaAccountCreationRequest("1234567890", "9876543210", new DateTime("2000-01-01"))
+  def doCreateAccountRequest(callback: DesResponse => Unit): Unit = {
+    val request  = CreateLisaAccountCreationRequest("1234567890", "9876543210", new DateTime("2000-01-01"))
     val response = Await.result(desConnector.createAccount("Z019283", request), Duration.Inf)
 
     callback(response)
   }
 
-  def doTransferAccountRequest(callback: (DesResponse) => Unit): Unit = {
+  def doTransferAccountRequest(callback: DesResponse => Unit): Unit = {
     val transferAccount = AccountTransfer("1234", "1234", new DateTime("2000-01-01"))
-    val request = CreateLisaAccountTransferRequest("Transferred", "1234567890", "9876543210", new DateTime("2000-01-01"), transferAccount)
-    val response = Await.result(desConnector.transferAccount("Z019283", request), Duration.Inf)
+    val request         = CreateLisaAccountTransferRequest(
+      "Transferred",
+      "1234567890",
+      "9876543210",
+      new DateTime("2000-01-01"),
+      transferAccount
+    )
+    val response        = Await.result(desConnector.transferAccount("Z019283", request), Duration.Inf)
 
     callback(response)
   }
 
-  def doCloseAccountRequest(callback: (DesResponse) => Unit): Unit = {
-    val request = CloseLisaAccountRequest("All funds withdrawn", new DateTime("2000-01-01"))
+  def doCloseAccountRequest(callback: DesResponse => Unit): Unit = {
+    val request  = CloseLisaAccountRequest("All funds withdrawn", new DateTime("2000-01-01"))
     val response = Await.result(desConnector.closeAccount("Z123456", "ABC12345", request), Duration.Inf)
 
     callback(response)
   }
 
-  def doReinstateAccountRequest(callback: (DesResponse) => Unit): Unit = {
+  def doReinstateAccountRequest(callback: DesResponse => Unit): Unit = {
     val response = Await.result(desConnector.reinstateAccount("Z123456", "ABC12345"), Duration.Inf)
 
     callback(response)
   }
 
-  def updateFirstSubscriptionDateRequest(callback: (DesResponse) => Unit): Unit = {
-    val request = UpdateSubscriptionRequest(new DateTime("2000-01-01"))
+  def updateFirstSubscriptionDateRequest(callback: DesResponse => Unit): Unit = {
+    val request  = UpdateSubscriptionRequest(new DateTime("2000-01-01"))
     val response = Await.result(desConnector.updateFirstSubDate("Z019283", "123456789", request), Duration.Inf)
 
     callback(response)
   }
 
-  def doReportLifeEventRequest(callback: (DesResponse) => Unit): Unit = {
-    val request = ReportLifeEventRequest("LISA Investor Terminal Ill Health", new DateTime("2000-01-01"))
+  def doReportLifeEventRequest(callback: DesResponse => Unit): Unit = {
+    val request  = ReportLifeEventRequest("LISA Investor Terminal Ill Health", new DateTime("2000-01-01"))
     val response = Await.result(desConnector.reportLifeEvent("Z123456", "ABC12345", request), Duration.Inf)
 
     callback(response)
   }
 
-  def doRetrieveLifeEventRequest(callback: (Either[DesFailure, Seq[GetLifeEventItem]]) => Unit): Unit = {
+  def doRetrieveLifeEventRequest(callback: Either[DesFailure, Seq[GetLifeEventItem]] => Unit): Unit = {
     val response = Await.result(desConnector.getLifeEvent("Z123456", "ABC12345", "1234567890"), Duration.Inf)
 
     callback(response)
   }
 
-  def doRequestBonusPaymentRequest(callback: (DesResponse) => Unit): Unit = {
+  def doRequestBonusPaymentRequest(callback: DesResponse => Unit): Unit = {
     val request = RequestBonusPaymentRequest(
       lifeEventId = Some("1234567891"),
       periodStartDate = new DateTime("2017-04-06"),
@@ -107,31 +114,34 @@ trait DesConnectorTestHelper extends BaseTestFixture with GuiceOneAppPerSuite {
     callback(response)
   }
 
-  def doRetrieveBonusPaymentRequest(callback: (DesResponse) => Unit): Unit = {
+  def doRetrieveBonusPaymentRequest(callback: DesResponse => Unit): Unit = {
     val response = Await.result(desConnector.getBonusOrWithdrawal("Z123456", "ABC12345", "123456"), Duration.Inf)
 
     callback(response)
   }
 
-  def doRetrieveTransactionRequest(callback: (DesResponse) => Unit): Unit = {
+  def doRetrieveTransactionRequest(callback: DesResponse => Unit): Unit = {
     val response = Await.result(desConnector.getTransaction("Z123456", "ABC12345", "123456"), Duration.Inf)
 
     callback(response)
   }
 
-  def doRetrieveBulkPaymentRequest(callback: (DesResponse) => Unit): Unit = {
-    val response = Await.result(desConnector.getBulkPayment("Z123456", new DateTime("2018-01-01"), new DateTime("2018-01-01")), Duration.Inf)
+  def doRetrieveBulkPaymentRequest(callback: DesResponse => Unit): Unit = {
+    val response = Await.result(
+      desConnector.getBulkPayment("Z123456", new DateTime("2018-01-01"), new DateTime("2018-01-01")),
+      Duration.Inf
+    )
 
     callback(response)
   }
 
-  def doRetrieveAccountRequest(callback: (DesResponse) => Unit): Unit = {
+  def doRetrieveAccountRequest(callback: DesResponse => Unit): Unit = {
     val response = Await.result(desConnector.getAccountInformation("Z123456", "123456"), Duration.Inf)
 
     callback(response)
   }
 
-  def doReportWithdrawalRequest(callback: (DesResponse) => Unit): Unit = {
+  def doReportWithdrawalRequest(callback: DesResponse => Unit): Unit = {
     val request = SupersededWithdrawalChargeRequest(
       Some(250.00),
       new DateTime("2017-12-06"),
@@ -139,13 +149,15 @@ trait DesConnectorTestHelper extends BaseTestFixture with GuiceOneAppPerSuite {
       1000.00,
       250.00,
       500.00,
-      true,
-      Some(WithdrawalIncrease(
-        "2345678901",
-        250.00,
-        250.00,
-        "Additional withdrawal"
-      )),
+      fundsDeductedDuringWithdrawal = true,
+      Some(
+        WithdrawalIncrease(
+          "2345678901",
+          250.00,
+          250.00,
+          "Additional withdrawal"
+        )
+      ),
       "Superseded withdrawal"
     )
 

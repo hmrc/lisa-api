@@ -25,9 +25,11 @@ import scala.io.Source
 
 class RequestBonusPaymentRequestSpec extends PlaySpec {
 
-  val validBonusPaymentJson = Source.fromInputStream(getClass().getResourceAsStream("/json/request.valid.bonus-payment.json")).mkString
-  val validBonusPaymentDesJson = Source.fromInputStream(getClass().getResourceAsStream("/json/request.valid.bonus-payment.des.json")).mkString
-  val validBonusPayment = RequestBonusPaymentRequest(
+  val validBonusPaymentJson: String =
+    Source.fromInputStream(getClass.getResourceAsStream("/json/request.valid.bonus-payment.json")).mkString
+  val validBonusPaymentDesJson: String =
+    Source.fromInputStream(getClass.getResourceAsStream("/json/request.valid.bonus-payment.des.json")).mkString
+  val validBonusPayment: RequestBonusPaymentRequest = RequestBonusPaymentRequest(
     lifeEventId = Some("1234567891"),
     periodStartDate = new DateTime("2017-04-06"),
     periodEndDate = new DateTime("2017-05-05"),
@@ -55,14 +57,11 @@ class RequestBonusPaymentRequestSpec extends PlaySpec {
       val res = Json.parse(validBonusPaymentJson.replace("1234567891", "X")).validate[RequestBonusPaymentRequest]
 
       res match {
-        case JsError(errors) => {
-          errors.count {
-            case (path: JsPath, errors: Seq[JsonValidationError]) => {
-              path.toString() == "/lifeEventId" && errors.contains(JsonValidationError("error.formatting.lifeEventId"))
-            }
+        case JsError(errors) =>
+          errors.count { case (path: JsPath, errors: Seq[JsonValidationError]) =>
+            path.toString() == "/lifeEventId" && errors.contains(JsonValidationError("error.formatting.lifeEventId"))
           } mustBe 1
-        }
-        case _ => fail()
+        case _               => fail()
       }
     }
 
