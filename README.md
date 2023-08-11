@@ -66,13 +66,23 @@ Test data for each LISA API is available on the [HMRC Developer Hub](https://dev
 
 This service is written in [Scala](http://www.scala-lang.org/) and [Play](http://playframework.com/), so needs a [JRE](http://www.oracle.com/technetwork/java/javase/overview/index.html) to run.
 
-Install [Service Manager](https://github.com/hmrc/service-manager), then start dependencies:
+Install [Service Manager](https://github.com/hmrc/sm2), then start dependencies:
 
     sm2 --start GG_AUTH_SERVICES LISA_STUB
 
 Start the app:
 
     sbt run
+
+## Testing the Service
+
+This service uses [sbt-scoverage](https://github.com/scoverage/sbt-scoverage) to provide test coverage reports.
+
+Run this script before raising a PR to ensure your code changes pass the Jenkins pipeline. This runs all the unit tests with scalastyle and checks for dependency updates:
+
+```
+./run_all_tests.sh
+```
 
 ## Support
 

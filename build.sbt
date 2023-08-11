@@ -6,7 +6,7 @@ defaultSettings()
 
 name := "lisa-api"
 majorVersion := 2
-scalaVersion := "2.13.10"
+scalaVersion := "2.13.11"
 PlayKeys.playDefaultPort := 9667
 
 lazy val lisaapi = project in file(".")
@@ -32,4 +32,4 @@ scalacOptions ++= Seq(
   "-Wconf:msg=match may not be exhaustive:s"
 )
 
-addCommandAlias("scalastyleAll", "all scalastyle test:scalastyle")
+addCommandAlias("scalastyleAll", "all scalastyle Test/scalastyle")
