@@ -16,8 +16,9 @@
 
 package uk.gov.hmrc.lisaapi
 
-import org.joda.time.DateTime
 import play.api.libs.json.{Json, Writes}
+
+import java.time.LocalDate
 
 package object controllers {
 
@@ -44,7 +45,7 @@ trait LisaConstants {
   val DATE_ERROR            = "INVALID_DATE"
   val MISSING_ERROR         = "MISSING_FIELD"
   val MONETARY_ERROR        = "INVALID_MONETARY_AMOUNT"
-  val LISA_START_DATE       = new DateTime("2017-04-06")
+  val LISA_START_DATE       = LocalDate.parse("2017-04-06")
   val LISA_START_DATE_ERROR = "The %s cannot be before 6 April 2017"
   val VERSION_1             = "1.0"
   val VERSION_2             = "2.0"

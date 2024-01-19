@@ -16,27 +16,27 @@
 
 package uk.gov.hmrc.lisaapi.models
 
-import org.joda.time.DateTime
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 
+import java.time.LocalDate
+
 abstract class RequestPurchaseExtension extends ReportLifeEventRequestBase {
-  val eventDate: DateTime
+  val eventDate: LocalDate
   val eventType: LifeEventType
 }
 
-case class RequestStandardPurchaseExtension(fundReleaseId: LifeEventId, eventDate: DateTime, eventType: LifeEventType)
+case class RequestStandardPurchaseExtension(fundReleaseId: LifeEventId, eventDate: LocalDate, eventType: LifeEventType)
     extends RequestPurchaseExtension
 case class RequestSupersededPurchaseExtension(
-  eventDate: DateTime,
+  eventDate: LocalDate,
   eventType: LifeEventType,
   supersede: RequestExtensionSupersedeDetails
 ) extends RequestPurchaseExtension
-case class RequestExtensionSupersedeDetails(originalEventDate: DateTime, originalLifeEventId: LifeEventId)
+case class RequestExtensionSupersedeDetails(originalEventDate: LocalDate, originalLifeEventId: LifeEventId)
 
 object RequestPurchaseExtension {
-  implicit val dateReads: Reads[DateTime]   = JsonReads.notFutureDate
-  implicit val dateWrites: Writes[DateTime] = JodaWrites.jodaDateWrites("yyyy-MM-dd")
+  implicit val dateReads: Reads[LocalDate]   = JsonReads.notFutureDate
 
   implicit val supersedeDetailReads: Reads[RequestExtensionSupersedeDetails] = (
     (JsPath \ "originalEventDate").read(JsonReads.notFutureDate) and
@@ -51,7 +51,7 @@ object RequestPurchaseExtension {
 
   val standardWrites: Writes[RequestStandardPurchaseExtension] = (
     (JsPath \ "eventType").write[String] and
-      (JsPath \ "eventDate").write[DateTime] and
+      (JsPath \ "eventDate").write[LocalDate] and
       (JsPath \ "fundsReleaseLifeEventID").write[String]
   ) { req: RequestStandardPurchaseExtension =>
     (
@@ -71,8 +71,8 @@ object RequestPurchaseExtension {
 
   val supersededWrites: Writes[RequestSupersededPurchaseExtension] = (
     (JsPath \ "eventType").write[String] and
-      (JsPath \ "eventDate").write[DateTime] and
-      (JsPath \ "supersededLifeEventDate").write[DateTime] and
+      (JsPath \ "eventDate").write[LocalDate] and
+      (JsPath \ "supersededLifeEventDate").write[LocalDate] and
       (JsPath \ "supersededLifeEventID").write[String]
   ) { req: RequestSupersededPurchaseExtension =>
     (

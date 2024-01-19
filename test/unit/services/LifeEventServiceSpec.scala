@@ -16,10 +16,7 @@
 
 package unit.services
 
-import java.time.LocalDate
-
 import helpers.ServiceTestFixture
-import org.joda.time.DateTime
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import uk.gov.hmrc.http.HeaderCarrier
@@ -28,6 +25,7 @@ import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des._
 import uk.gov.hmrc.lisaapi.services.LifeEventService
 
+import java.time.LocalDate
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
@@ -281,7 +279,7 @@ class LifeEventServiceSpec extends ServiceTestFixture {
   }
 
   private def doPostRequest(callback: ReportLifeEventResponse => Unit): Unit = {
-    val request  = ReportLifeEventRequest("LISA Investor Terminal Ill Health", new DateTime("2017-04-06"))
+    val request  = ReportLifeEventRequest("LISA Investor Terminal Ill Health", LocalDate.parse("2017-04-06"))
     val response =
       Await.result(lifeEventService.reportLifeEvent("Z019283", "192837", request)(HeaderCarrier()), Duration.Inf)
 

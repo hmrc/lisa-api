@@ -17,7 +17,6 @@
 package unit.utils
 
 import helpers.BaseTestFixture
-import org.joda.time.DateTime
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 import play.api.libs.json.Json
@@ -26,6 +25,7 @@ import uk.gov.hmrc.lisaapi.models.{SupersededWithdrawalChargeRequest, Withdrawal
 import uk.gov.hmrc.lisaapi.services.CurrentDateService
 import uk.gov.hmrc.lisaapi.utils.WithdrawalChargeValidator
 
+import java.time.LocalDate
 import scala.io.Source
 
 class WithdrawalChargeValidatorSpec extends BaseTestFixture with BeforeAndAfter {
@@ -35,7 +35,7 @@ class WithdrawalChargeValidatorSpec extends BaseTestFixture with BeforeAndAfter 
 
   before {
     reset(mockDateService)
-    when(mockDateService.now()).thenReturn(DateTime.now)
+    when(mockDateService.now()).thenReturn(LocalDate.now)
   }
 
   val validWithdrawalJson: String                        =
@@ -48,8 +48,8 @@ class WithdrawalChargeValidatorSpec extends BaseTestFixture with BeforeAndAfter 
     "pass validation" when {
 
       "the current date is the sixth and they're submitting for today" in {
-        val today         = new DateTime("2017-04-06")
-        val periodEndDate = new DateTime("2017-05-05")
+        val today         = LocalDate.parse("2017-04-06")
+        val periodEndDate = LocalDate.parse("2017-05-05")
 
         reset(mockDateService)
         when(mockDateService.now()).thenReturn(today)
@@ -66,8 +66,8 @@ class WithdrawalChargeValidatorSpec extends BaseTestFixture with BeforeAndAfter 
     "return an error" when {
 
       "it is not the 6th day of the month" in {
-        val periodStartDate = new DateTime("2017-05-01")
-        val periodEndDate   = new DateTime("2017-06-05")
+        val periodStartDate = LocalDate.parse("2017-05-01")
+        val periodEndDate   = LocalDate.parse("2017-06-05")
         val request         = validWithdrawal.copy(claimPeriodStartDate = periodStartDate, claimPeriodEndDate = periodEndDate)
 
         val errors = withdrawalChargeValidator.validate(request)
@@ -82,7 +82,7 @@ class WithdrawalChargeValidatorSpec extends BaseTestFixture with BeforeAndAfter 
       }
 
       "the supplied date is in the future" in {
-        val nextMonth     = DateTime.now.plusMonths(1).withDayOfMonth(6)
+        val nextMonth     = LocalDate.now.plusMonths(1).withDayOfMonth(6)
         val periodEndDate = nextMonth.plusMonths(1).withDayOfMonth(5)
         val request       = validWithdrawal.copy(claimPeriodStartDate = nextMonth, claimPeriodEndDate = periodEndDate)
 
@@ -98,8 +98,8 @@ class WithdrawalChargeValidatorSpec extends BaseTestFixture with BeforeAndAfter 
       }
 
       "the supplied date is prior to 6 April 2017" in {
-        val periodStartDate = new DateTime("2017-03-06")
-        val periodEndDate   = new DateTime("2017-04-05")
+        val periodStartDate = LocalDate.parse("2017-03-06")
+        val periodEndDate   = LocalDate.parse("2017-04-05")
         val request         = validWithdrawal.copy(claimPeriodStartDate = periodStartDate, claimPeriodEndDate = periodEndDate)
 
         val errors = withdrawalChargeValidator.validate(request)
@@ -122,8 +122,8 @@ class WithdrawalChargeValidatorSpec extends BaseTestFixture with BeforeAndAfter 
     "pass validation" when {
 
       "the end date crosses into another year" in {
-        val periodStartDate = new DateTime("2017-12-06")
-        val periodEndDate   = new DateTime("2018-01-05")
+        val periodStartDate = LocalDate.parse("2017-12-06")
+        val periodEndDate   = LocalDate.parse("2018-01-05")
         val request         = validWithdrawal.copy(claimPeriodStartDate = periodStartDate, claimPeriodEndDate = periodEndDate)
 
         val errors = withdrawalChargeValidator.validate(request)
@@ -136,7 +136,7 @@ class WithdrawalChargeValidatorSpec extends BaseTestFixture with BeforeAndAfter 
     "return an error" when {
 
       "it is not the 5th day of the month" in {
-        val request = validWithdrawal.copy(claimPeriodEndDate = new DateTime("2017-05-01"))
+        val request = validWithdrawal.copy(claimPeriodEndDate = LocalDate.parse("2017-05-01"))
 
         val errors = withdrawalChargeValidator.validate(request)
 
@@ -151,8 +151,8 @@ class WithdrawalChargeValidatorSpec extends BaseTestFixture with BeforeAndAfter 
       }
 
       "it is two months after the claimPeriodStartDate" in {
-        val periodStartDate = new DateTime("2017-12-06")
-        val periodEndDate   = new DateTime("2018-02-05")
+        val periodStartDate = LocalDate.parse("2017-12-06")
+        val periodEndDate   = LocalDate.parse("2018-02-05")
         val request         = validWithdrawal.copy(claimPeriodStartDate = periodStartDate, claimPeriodEndDate = periodEndDate)
 
         val errors = withdrawalChargeValidator.validate(request)
@@ -168,8 +168,8 @@ class WithdrawalChargeValidatorSpec extends BaseTestFixture with BeforeAndAfter 
       }
 
       "it is before the claimPeriodStartDate" in {
-        val periodStartDate = new DateTime("2017-06-06")
-        val periodEndDate   = new DateTime("2017-05-05")
+        val periodStartDate = LocalDate.parse("2017-06-06")
+        val periodEndDate   = LocalDate.parse("2017-05-05")
         val request         = validWithdrawal.copy(claimPeriodStartDate = periodStartDate, claimPeriodEndDate = periodEndDate)
 
         val errors = withdrawalChargeValidator.validate(request)
@@ -185,8 +185,8 @@ class WithdrawalChargeValidatorSpec extends BaseTestFixture with BeforeAndAfter 
       }
 
       "the supplied date is prior to 6 April 2017" in {
-        val periodStartDate = new DateTime("2017-03-06")
-        val periodEndDate   = new DateTime("2017-04-05")
+        val periodStartDate = LocalDate.parse("2017-03-06")
+        val periodEndDate   = LocalDate.parse("2017-04-05")
         val request         = validWithdrawal.copy(claimPeriodStartDate = periodStartDate, claimPeriodEndDate = periodEndDate)
 
         val errors = withdrawalChargeValidator.validate(request)
@@ -349,8 +349,8 @@ class WithdrawalChargeValidatorSpec extends BaseTestFixture with BeforeAndAfter 
 
     "return multiple errors" when {
       "validation fails multiple conditions" in {
-        val periodStartDate = new DateTime("2018-03-01")
-        val periodEndDate   = new DateTime("2018-05-01")
+        val periodStartDate = LocalDate.parse("2018-03-01")
+        val periodEndDate   = LocalDate.parse("2018-05-01")
         val request         = validWithdrawal.copy(claimPeriodStartDate = periodStartDate, claimPeriodEndDate = periodEndDate)
 
         val errors = withdrawalChargeValidator.validate(request)

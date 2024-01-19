@@ -42,8 +42,6 @@ class ErrorConverterSpec extends BaseTestFixture with GuiceOneAppPerSuite {
       val e   = validate.asInstanceOf[JsError]
       val res = errorConverter.convert(e.errors)
 
-      println(JsError.toFlatForm(e))
-
       res.size mustBe 4
 
       res must contain(ErrorValidation("INVALID_DATA_TYPE", "Invalid data type has been used", Some("/str")))

@@ -16,23 +16,24 @@
 
 package uk.gov.hmrc.lisaapi.models
 
-import org.joda.time.DateTime
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
+
+import java.time.LocalDate
 
 sealed trait CreateLisaAccountRequest
 
 case class CreateLisaAccountCreationRequest(
   investorId: InvestorId,
   accountId: AccountId,
-  firstSubscriptionDate: DateTime
+  firstSubscriptionDate: LocalDate
 ) extends CreateLisaAccountRequest
 
 case class CreateLisaAccountTransferRequest(
   creationReason: String,
   investorId: InvestorId,
   accountId: AccountId,
-  firstSubscriptionDate: DateTime,
+  firstSubscriptionDate: LocalDate,
   transferAccount: AccountTransfer
 ) extends CreateLisaAccountRequest
 
@@ -41,7 +42,7 @@ object CreateLisaAccountRequest {
   implicit val createLisaAccountCreationRequestReads: Reads[CreateLisaAccountCreationRequest] = (
     (JsPath \ "investorId").read(JsonReads.investorId) and
       (JsPath \ "accountId").read(JsonReads.accountId) and
-      (JsPath \ "firstSubscriptionDate").read(JsonReads.notFutureDate).map(new DateTime(_)) and
+      (JsPath \ "firstSubscriptionDate").read(JsonReads.notFutureDate) and
       (JsPath \ "creationReason").read[String](Reads.pattern("New".r, "error.formatting.creationReason"))
   )((investorId, accountId, firstSubscriptionDate, _) =>
     CreateLisaAccountCreationRequest(investorId, accountId, firstSubscriptionDate)
@@ -50,7 +51,7 @@ object CreateLisaAccountRequest {
   implicit val createLisaAccountTransferRequestReads: Reads[CreateLisaAccountTransferRequest] = (
     (JsPath \ "investorId").read(JsonReads.investorId) and
       (JsPath \ "accountId").read(JsonReads.accountId) and
-      (JsPath \ "firstSubscriptionDate").read(JsonReads.notFutureDate).map(new DateTime(_)) and
+      (JsPath \ "firstSubscriptionDate").read(JsonReads.notFutureDate) and
       (JsPath \ "transferAccount").read[AccountTransfer] and
       (JsPath \ "creationReason").read[String](
         Reads.pattern(
@@ -77,14 +78,14 @@ object CreateLisaAccountRequest {
   implicit val createLisaAccountCreationRequestWrites: Writes[CreateLisaAccountCreationRequest] = (
     (JsPath \ "investorID").write[InvestorId] and
       (JsPath \ "accountID").write[AccountId] and
-      (JsPath \ "firstSubscriptionDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
+      (JsPath \ "firstSubscriptionDate").write[LocalDate] and
       (JsPath \ "creationReason").write[String]
   ) { req: CreateLisaAccountCreationRequest => (req.investorId, req.accountId, req.firstSubscriptionDate, "New") }
 
   implicit val createLisaAccountTransferRequestWrites: Writes[CreateLisaAccountTransferRequest] = (
     (JsPath \ "investorID").write[InvestorId] and
       (JsPath \ "accountID").write[AccountId] and
-      (JsPath \ "firstSubscriptionDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
+      (JsPath \ "firstSubscriptionDate").write[LocalDate] and
       (JsPath \ "transferAccount").write[AccountTransfer] and
       (JsPath \ "creationReason").write[String]
   ) { req: CreateLisaAccountTransferRequest =>

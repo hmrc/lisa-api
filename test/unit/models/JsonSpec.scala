@@ -16,10 +16,11 @@
 
 package unit.models
 
-import org.joda.time.DateTime
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json._
 import uk.gov.hmrc.lisaapi.models._
+
+import java.time.LocalDate
 
 class JsonSpec extends PlaySpec {
 
@@ -32,7 +33,7 @@ class JsonSpec extends PlaySpec {
     (JsPath \ property).write[Amount].contramap[TestMonetaryClass](_.property)
 
   implicit val testDateReads: Reads[TestDateClass] =
-    (JsPath \ property).read[DateTime](JsonReads.isoDate).map(TestDateClass.apply)
+    (JsPath \ property).read[LocalDate](JsonReads.isoDate).map(TestDateClass.apply)
 
   "Monetary reads" must {
 
@@ -249,8 +250,6 @@ class JsonSpec extends PlaySpec {
     s"""{"$property":$value}"""
 
   case class TestMonetaryClass(property: Amount)
-  case class TestDateClass(property: DateTime)
-
-  object SUT {}
+  case class TestDateClass(property: LocalDate)
 
 }

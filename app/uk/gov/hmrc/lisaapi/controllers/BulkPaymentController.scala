@@ -17,8 +17,6 @@
 package uk.gov.hmrc.lisaapi.controllers
 
 import com.google.inject.Inject
-import org.joda.time.DateTime
-import org.joda.time.format.DateTimeFormat
 import play.api.libs.json.Reads.of
 import play.api.libs.json._
 import play.api.mvc._
@@ -29,6 +27,8 @@ import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models.{GetBulkPaymentNotFoundResponse, GetBulkPaymentServiceUnavailableResponse, GetBulkPaymentSuccessResponse}
 import uk.gov.hmrc.lisaapi.services.{AuditService, BulkPaymentService, CurrentDateService}
 
+import java.time.LocalDate
+import java.time.format.{DateTimeFormatter, DateTimeParseException}
 import scala.collection.immutable
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -106,7 +106,7 @@ class BulkPaymentController @Inject() (
   }
 
   private def withValidDates(startDate: String, endDate: String, lisaManager: String)(
-    success: (DateTime, DateTime) => Future[Result]
+    success: (LocalDate, LocalDate) => Future[Result]
   )(implicit hc: HeaderCarrier, startTime: Long): Future[Result] = {
 
     val start = parseDate(startDate)
@@ -132,7 +132,7 @@ class BulkPaymentController @Inject() (
     }
   }
 
-  private def withDatesWithinBusinessRules(startDate: DateTime, endDate: DateTime, lisaManager: String)(
+  private def withDatesWithinBusinessRules(startDate: LocalDate, endDate: LocalDate, lisaManager: String)(
     success: () => Future[Result]
   )(implicit hc: HeaderCarrier, startTime: Long): Future[Result] = {
     val errorResponse: Option[ErrorResponse] = if (endDate.isAfter(currentDateService.now())) {
@@ -175,11 +175,15 @@ class BulkPaymentController @Inject() (
     )
   }
 
-  private def parseDate(input: String): Option[DateTime] = {
-    val dateFormat = "yyyy-MM-dd"
+  private def parseDate(input: String): Option[LocalDate] = {
+    val dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
     if (input.matches("[0-9]{4}-[0-9]{2}-[0-9]{2}")) {
-      scala.util.control.Exception.allCatch[DateTime] opt DateTime.parse(input, DateTimeFormat.forPattern(dateFormat))
+      try {
+        Some(LocalDate.parse(input, dateFormat))
+      } catch {
+        case _: DateTimeParseException => None
+      }
     } else {
       None
     }

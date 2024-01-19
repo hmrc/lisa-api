@@ -16,11 +16,11 @@
 
 package unit.models
 
-import org.joda.time.DateTime
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json._
 import uk.gov.hmrc.lisaapi.models._
 
+import java.time.LocalDate
 import scala.io.Source
 
 class RequestBonusPaymentRequestSpec extends PlaySpec {
@@ -31,8 +31,8 @@ class RequestBonusPaymentRequestSpec extends PlaySpec {
     Source.fromInputStream(getClass.getResourceAsStream("/json/request.valid.bonus-payment.des.json")).mkString
   val validBonusPayment: RequestBonusPaymentRequest = RequestBonusPaymentRequest(
     lifeEventId = Some("1234567891"),
-    periodStartDate = new DateTime("2017-04-06"),
-    periodEndDate = new DateTime("2017-05-05"),
+    periodStartDate = LocalDate.parse("2017-04-06"),
+    periodEndDate = LocalDate.parse("2017-05-05"),
     htbTransfer = Some(HelpToBuyTransfer(10f, 10f)),
     inboundPayments = InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
     bonuses = Bonuses(1000f, 1000f, Some(1000f), "Life Event"),

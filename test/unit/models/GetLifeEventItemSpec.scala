@@ -16,10 +16,11 @@
 
 package unit.models
 
-import java.time.LocalDate
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsObject, JsSuccess, Json}
 import uk.gov.hmrc.lisaapi.models.{GetLifeEventItem, GetLifeEventItemPropertyDetails, GetLifeEventItemSupersede}
+
+import java.time.LocalDate
 
 class GetLifeEventItemSpec extends PlaySpec {
 

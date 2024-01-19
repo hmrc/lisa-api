@@ -16,10 +16,11 @@
 
 package unit.models
 
-import org.joda.time.DateTime
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsSuccess, Json}
 import uk.gov.hmrc.lisaapi.models.UpdateSubscriptionRequest
+
+import java.time.LocalDate
 
 class UpdateSubscriptionRequestSpec extends PlaySpec {
 
@@ -34,13 +35,13 @@ class UpdateSubscriptionRequestSpec extends PlaySpec {
         case JsError(errors)       => fail()
         case JsSuccess(data, path) =>
           data.firstSubscriptionDate.getYear mustBe 2017
-          data.firstSubscriptionDate.getMonthOfYear mustBe 1
+          data.firstSubscriptionDate.getMonthValue mustBe 1
           data.firstSubscriptionDate.getDayOfMonth mustBe 1
       }
     }
 
     "deserialize to json" in {
-      val request = UpdateSubscriptionRequest(new DateTime("2017-01-01"))
+      val request = UpdateSubscriptionRequest(LocalDate.parse("2017-01-01"))
 
       val json = Json.toJson[UpdateSubscriptionRequest](request)
 

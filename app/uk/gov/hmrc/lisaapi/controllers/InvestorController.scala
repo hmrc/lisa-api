@@ -77,7 +77,7 @@ class InvestorController @Inject() (
       auditData = Map(
         ZREF           -> lisaManager,
         "investorNINO" -> createRequest.investorNINO,
-        "dateOfBirth"  -> createRequest.dateOfBirth.toString("yyyy-MM-dd"),
+        "dateOfBirth"  -> createRequest.dateOfBirth.toString,
         "investorID"   -> investorId
       )
     )
@@ -104,7 +104,7 @@ class InvestorController @Inject() (
       auditData = Map(
         ZREF               -> lisaManager,
         "investorNINO"     -> createRequest.investorNINO,
-        "dateOfBirth"      -> createRequest.dateOfBirth.toString("yyyy-MM-dd"),
+        "dateOfBirth"      -> createRequest.dateOfBirth.toString,
         "reasonNotCreated" -> response.errorCode
       ) ++ additionalAuditData
     )

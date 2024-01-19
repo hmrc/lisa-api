@@ -21,7 +21,7 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsPath, Json, Reads}
-import play.api.mvc.{AnyContentAsJson, _}
+import play.api.mvc._
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames

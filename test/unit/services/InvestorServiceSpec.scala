@@ -17,7 +17,6 @@
 package unit.services
 
 import helpers.ServiceTestFixture
-import org.joda.time.DateTime
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito.when
 import uk.gov.hmrc.http.HeaderCarrier
@@ -25,6 +24,7 @@ import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesUnavailableResponse}
 import uk.gov.hmrc.lisaapi.services.InvestorService
 
+import java.time.LocalDate
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
@@ -104,7 +104,7 @@ class InvestorServiceSpec extends ServiceTestFixture {
   }
 
   private def doRequest(callback: CreateLisaInvestorResponse => Unit): Unit = {
-    val request  = CreateLisaInvestorRequest("AB123456A", "A", "B", new DateTime("2000-01-01"))
+    val request  = CreateLisaInvestorRequest("AB123456A", "A", "B", LocalDate.parse("2000-01-01"))
     val response = Await.result(investorService.createInvestor("Z019283", request)(HeaderCarrier()), Duration.Inf)
 
     callback(response)

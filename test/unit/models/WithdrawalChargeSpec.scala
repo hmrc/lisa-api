@@ -16,10 +16,11 @@
 
 package unit.models
 
-import org.joda.time.DateTime
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsObject, JsPath, Json, JsonValidationError}
 import uk.gov.hmrc.lisaapi.models._
+
+import java.time.LocalDate
 
 class WithdrawalChargeSpec extends PlaySpec {
 
@@ -57,8 +58,8 @@ class WithdrawalChargeSpec extends PlaySpec {
 
       result mustBe RegularWithdrawalChargeRequest(
         None,
-        new DateTime("2017-12-06"),
-        new DateTime("2018-01-05"),
+        LocalDate.parse("2017-12-06"),
+        LocalDate.parse("2018-01-05"),
         1000.00,
         250.00,
         500.00,
@@ -72,8 +73,8 @@ class WithdrawalChargeSpec extends PlaySpec {
 
       result mustBe SupersededWithdrawalChargeRequest(
         Some(250.00),
-        new DateTime("2017-12-06"),
-        new DateTime("2018-01-05"),
+        LocalDate.parse("2017-12-06"),
+        LocalDate.parse("2018-01-05"),
         1000.00,
         250.00,
         500.00,
@@ -103,8 +104,8 @@ class WithdrawalChargeSpec extends PlaySpec {
 
       result mustBe SupersededWithdrawalChargeRequest(
         Some(250.00),
-        new DateTime("2017-12-06"),
-        new DateTime("2018-01-05"),
+        LocalDate.parse("2017-12-06"),
+        LocalDate.parse("2018-01-05"),
         1000.00,
         250.00,
         500.00,
@@ -126,8 +127,8 @@ class WithdrawalChargeSpec extends PlaySpec {
         val result = Json.toJson(
           SupersededWithdrawalChargeRequest(
             Some(250.00),
-            new DateTime("2017-12-06"),
-            new DateTime("2018-01-05"),
+            LocalDate.parse("2017-12-06"),
+            LocalDate.parse("2018-01-05"),
             1000.00,
             250.00,
             500.00,

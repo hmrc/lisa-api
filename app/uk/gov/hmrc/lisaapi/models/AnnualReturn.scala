@@ -16,22 +16,22 @@
 
 package uk.gov.hmrc.lisaapi.models
 
-import org.joda.time.DateTime
 import play.api.libs.functional.syntax._
-import play.api.libs.json.{JodaWrites, JsPath, Json, OFormat, OWrites, Reads, Writes}
+import play.api.libs.json._
 import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.controllers.ErrorValidation
 import uk.gov.hmrc.lisaapi.services.CurrentDateService
 
+import java.time.LocalDate
 import scala.collection.mutable.ListBuffer
 
 case class AnnualReturnSupersede(
   originalLifeEventId: LifeEventId,
-  originalEventDate: DateTime
+  originalEventDate: LocalDate
 )
 
 case class AnnualReturn(
-  eventDate: DateTime,
+  eventDate: LocalDate,
   lisaManagerName: LisaManagerName,
   taxYear: Int,
   marketValueCash: Int,
@@ -42,15 +42,12 @@ case class AnnualReturn(
 ) extends ReportLifeEventRequestBase
 
 object AnnualReturnSupersede {
-  implicit val dateReads: Reads[DateTime]              = JsonReads.notFutureDate
-  implicit val dateWrites: Writes[DateTime]            = JodaWrites.jodaDateWrites("yyyy-MM-dd")
-  implicit val lifeEventReads: Reads[LifeEventId]      = JsonReads.lifeEventId
+  implicit val dateReads: Reads[LocalDate] = JsonReads.notFutureDate
+  implicit val lifeEventReads: Reads[LifeEventId] = JsonReads.lifeEventId
   implicit val formats: OFormat[AnnualReturnSupersede] = Json.format[AnnualReturnSupersede]
 }
 
 object AnnualReturn {
-  implicit val dateWrites: Writes[DateTime] = JodaWrites.jodaDateWrites("yyyy-MM-dd")
-
   implicit val reads: Reads[AnnualReturn] = (
     (JsPath \ "eventDate").read(JsonReads.notFutureDate) and
       (JsPath \ "lisaManagerName").read(JsonReads.lisaManagerName) and
@@ -66,14 +63,14 @@ object AnnualReturn {
 
   val desWrites: Writes[AnnualReturn] = (
     (JsPath \ "eventType").write[String] and
-      (JsPath \ "eventDate").write[DateTime] and
+      (JsPath \ "eventDate").write[LocalDate] and
       (JsPath \ "taxYear").write[String] and
       (JsPath \ "isaManagerName").write[String] and
       (JsPath \ "lisaMarketValueCash").write[Int] and
       (JsPath \ "lisaMarketValueStocksAndShares").write[Int] and
       (JsPath \ "lisaAnnualCashSubs").write[Int] and
       (JsPath \ "lisaAnnualStocksAndSharesSubs").write[Int] and
-      (JsPath \ "supersededLifeEventDate").writeNullable[DateTime] and
+      (JsPath \ "supersededLifeEventDate").writeNullable[LocalDate] and
       (JsPath \ "supersededLifeEventID").writeNullable[LifeEventId]
   ) { req: AnnualReturn =>
     val supersededLifeEventDate = req.supersede match {
@@ -123,10 +120,10 @@ trait AnnualReturnValidator extends LisaConstants {
 
   private val taxYearIsNotCurrent: PartialFunction[ValidationRequest, ValidationRequest] = {
     case req: ValidationRequest =>
-      val now                 = currentDateService.now()
-      val currentYear         = now.getYear
-      val currentTaxYearStart = new DateTime(currentYear, TAX_YEAR_START_MONTH, TAX_YEAR_START_DAY, 0, 0)
-      val currentTaxYear      = if (now.isBefore(currentTaxYearStart)) currentYear else currentYear + 1
+      val now = currentDateService.now()
+      val currentYear = now.getYear
+      val currentTaxYearStart = LocalDate.of(currentYear, TAX_YEAR_START_MONTH, TAX_YEAR_START_DAY)
+      val currentTaxYear = if (now.isBefore(currentTaxYearStart)) currentYear else currentYear + 1
 
       if (req.data.taxYear == currentTaxYear) {
         req.copy(errors =

@@ -17,7 +17,6 @@
 package uk.gov.hmrc.lisaapi.controllers
 
 import com.google.inject.Inject
-import org.joda.time.DateTime
 import play.api.libs.json.{Json, Reads}
 import play.api.mvc._
 import uk.gov.hmrc.auth.core.AuthConnector
@@ -29,6 +28,7 @@ import uk.gov.hmrc.lisaapi.services.{AuditService, BonusOrWithdrawalService, Bon
 import uk.gov.hmrc.lisaapi.utils.BonusPaymentValidator
 import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
 
+import java.time.LocalDate
 import scala.concurrent.{ExecutionContext, Future}
 
 class BonusPaymentController @Inject() (
@@ -219,7 +219,7 @@ class BonusPaymentController @Inject() (
     callback: () => Future[Result]
   )(implicit hc: HeaderCarrier, startTime: Long) = {
 
-    val lastClaimDate = dateTimeService.now().withTime(0, 0, 0, 0).minusYears(6).minusDays(14)
+    val lastClaimDate = dateTimeService.now().minusYears(6).minusDays(14)
 
     val claimCanStillBeMade = data.periodEndDate.isAfter(lastClaimDate.minusDays(1))
 
@@ -237,7 +237,7 @@ class BonusPaymentController @Inject() (
   private def withValidHtb(data: RequestBonusPaymentRequest)(lisaManager: String, accountId: String)(
     callback: () => Future[Result]
   )(implicit hc: HeaderCarrier, startTime: Long) = {
-    val lastValidHtbStartDate = new DateTime("2018-03-06")
+    val lastValidHtbStartDate = LocalDate.parse("2018-03-06")
 
     val htbResponse = for {
       htb                 <- data.htbTransfer

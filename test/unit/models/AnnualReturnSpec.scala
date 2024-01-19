@@ -16,7 +16,6 @@
 
 package unit.models
 
-import org.joda.time.DateTime
 import org.mockito.Mockito.{reset, when}
 import org.scalatest.BeforeAndAfter
 import org.scalatestplus.mockito.MockitoSugar
@@ -26,6 +25,8 @@ import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.controllers.ErrorValidation
 import uk.gov.hmrc.lisaapi.models.{AnnualReturn, AnnualReturnSupersede, AnnualReturnValidator}
 import uk.gov.hmrc.lisaapi.services.CurrentDateService
+
+import java.time.LocalDate
 
 class AnnualReturnSpec extends PlaySpec with LisaConstants with MockitoSugar with BeforeAndAfter {
 
@@ -38,13 +39,13 @@ class AnnualReturnSpec extends PlaySpec with LisaConstants with MockitoSugar wit
 
     "serialize from json" in {
       val expected =
-        AnnualReturnSupersede(originalLifeEventId = "1234567890", originalEventDate = new DateTime("2018-05-01"))
+        AnnualReturnSupersede(originalLifeEventId = "1234567890", originalEventDate = LocalDate.parse("2018-05-01"))
 
       validJson.as[AnnualReturnSupersede] mustBe expected
     }
     "deserialize to json" in {
       val input =
-        AnnualReturnSupersede(originalLifeEventId = "1234567890", originalEventDate = new DateTime("2018-05-01"))
+        AnnualReturnSupersede(originalLifeEventId = "1234567890", originalEventDate = LocalDate.parse("2018-05-01"))
 
       Json.toJson[AnnualReturnSupersede](input) mustBe validJson
     }
@@ -100,7 +101,7 @@ class AnnualReturnSpec extends PlaySpec with LisaConstants with MockitoSugar wit
 
     "serialize from json" in {
       val expected = AnnualReturn(
-        eventDate = new DateTime("2018-04-05"),
+        eventDate = LocalDate.parse("2018-04-05"),
         lisaManagerName = "ISA Manager",
         taxYear = 2018,
         marketValueCash = 0,
@@ -114,7 +115,7 @@ class AnnualReturnSpec extends PlaySpec with LisaConstants with MockitoSugar wit
     }
     "deserialize to json" in {
       val input = AnnualReturn(
-        eventDate = new DateTime("2018-04-05"),
+        eventDate = LocalDate.parse("2018-04-05"),
         lisaManagerName = "ISA Manager",
         taxYear = 2018,
         marketValueCash = 0,
@@ -272,12 +273,12 @@ class AnnualReturnSpec extends PlaySpec with LisaConstants with MockitoSugar wit
 
     before {
       reset(mockDateService)
-      when(mockDateService.now()).thenReturn(new DateTime("2018-04-06")) // first day of 2019 tax year
+      when(mockDateService.now()).thenReturn(LocalDate.parse("2018-04-06")) // first day of 2019 tax year
     }
 
     "return no errors for a valid return" in {
       val req = AnnualReturn(
-        eventDate = new DateTime("2018-04-05"),
+        eventDate = LocalDate.parse("2018-04-05"),
         lisaManagerName = "ISA Manager",
         taxYear = 2018,
         marketValueCash = 0,
@@ -290,7 +291,7 @@ class AnnualReturnSpec extends PlaySpec with LisaConstants with MockitoSugar wit
     }
     "return an error for a taxYear before the start of lisa" in {
       val req = AnnualReturn(
-        eventDate = new DateTime("2018-04-05"),
+        eventDate = LocalDate.parse("2018-04-05"),
         lisaManagerName = "ISA Manager",
         taxYear = 2016,
         marketValueCash = 0,
@@ -302,10 +303,10 @@ class AnnualReturnSpec extends PlaySpec with LisaConstants with MockitoSugar wit
       SUT.validate(req) mustBe List(ErrorValidation(DATE_ERROR, "The taxYear cannot be before 2017", Some("/taxYear")))
     }
     "return an error if the taxYear is the current tax year" in {
-      when(mockDateService.now()).thenReturn(new DateTime("2018-04-05")) // final day of the 2018 tax year
+      when(mockDateService.now()).thenReturn(LocalDate.parse("2018-04-05")) // final day of the 2018 tax year
 
       val req = AnnualReturn(
-        eventDate = new DateTime("2018-12-10"),
+        eventDate = LocalDate.parse("2018-12-10"),
         lisaManagerName = "ISA Manager",
         taxYear = 2018,
         marketValueCash = 0,
@@ -319,10 +320,10 @@ class AnnualReturnSpec extends PlaySpec with LisaConstants with MockitoSugar wit
       )
     }
     "return an error for a taxYear after the current year" in {
-      when(mockDateService.now()).thenReturn(new DateTime("2018-04-05")) // final day of the 2018 tax year
+      when(mockDateService.now()).thenReturn(LocalDate.parse("2018-04-05")) // final day of the 2018 tax year
 
       val req = AnnualReturn(
-        eventDate = new DateTime("2018-04-05"),
+        eventDate = LocalDate.parse("2018-04-05"),
         lisaManagerName = "ISA Manager",
         taxYear = 2019,
         marketValueCash = 0,
@@ -337,7 +338,7 @@ class AnnualReturnSpec extends PlaySpec with LisaConstants with MockitoSugar wit
     }
     "return an error if marketValueCash and marketValueStocksAndShares are specified" in {
       val req = AnnualReturn(
-        eventDate = new DateTime("2018-04-05"),
+        eventDate = LocalDate.parse("2018-04-05"),
         lisaManagerName = "ISA Manager",
         taxYear = 2018,
         marketValueCash = 55,
@@ -353,7 +354,7 @@ class AnnualReturnSpec extends PlaySpec with LisaConstants with MockitoSugar wit
     }
     "return an error if annualSubsCash and annualSubsStocksAndShares are specified" in {
       val req = AnnualReturn(
-        eventDate = new DateTime("2018-04-05"),
+        eventDate = LocalDate.parse("2018-04-05"),
         lisaManagerName = "ISA Manager",
         taxYear = 2018,
         marketValueCash = 0,
@@ -369,7 +370,7 @@ class AnnualReturnSpec extends PlaySpec with LisaConstants with MockitoSugar wit
     }
     "return an error if a mix of cash and stocks and shares are specified" in {
       val req = AnnualReturn(
-        eventDate = new DateTime("2018-04-05"),
+        eventDate = LocalDate.parse("2018-04-05"),
         lisaManagerName = "ISA Manager",
         taxYear = 2018,
         marketValueCash = 55,

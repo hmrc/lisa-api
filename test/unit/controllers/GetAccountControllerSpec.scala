@@ -17,7 +17,6 @@
 package unit.controllers
 
 import helpers.ControllerTestFixture
-import org.joda.time.DateTime
 import org.mockito.ArgumentMatchers.{any, eq => matchersEquals}
 import org.mockito.Mockito.{reset, verify, when}
 import play.api.libs.json.JsObject
@@ -26,8 +25,9 @@ import play.api.test.Helpers._
 import play.api.test._
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.lisaapi.controllers.GetAccountController
-import uk.gov.hmrc.lisaapi.models.{GetLisaAccountDoesNotExistResponse, GetLisaAccountErrorResponse, GetLisaAccountSuccessResponse, GetLisaAccountTransferAccount, _}
+import uk.gov.hmrc.lisaapi.models._
 
+import java.time.LocalDate
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -67,7 +67,7 @@ class GetAccountControllerSpec extends ControllerTestFixture {
               investorId = "9876543210",
               accountId = "8765432100",
               creationReason = "New",
-              firstSubscriptionDate = new DateTime(validDate),
+              firstSubscriptionDate = LocalDate.parse(validDate),
               accountStatus = "OPEN",
               subscriptionStatus = "AVAILABLE",
               accountClosureReason = None,
@@ -99,11 +99,11 @@ class GetAccountControllerSpec extends ControllerTestFixture {
               investorId = "9876543210",
               accountId = "8765432100",
               creationReason = "New",
-              firstSubscriptionDate = new DateTime(validDate),
+              firstSubscriptionDate = LocalDate.parse(validDate),
               accountStatus = "CLOSED",
               subscriptionStatus = "ACTIVE",
               accountClosureReason = Some("All funds withdrawn"),
-              closureDate = Some(new DateTime(validDate)),
+              closureDate = Some(LocalDate.parse(validDate)),
               transferAccount = None
             )
           )
@@ -132,7 +132,7 @@ class GetAccountControllerSpec extends ControllerTestFixture {
               investorId = "9876543210",
               accountId = "8765432100",
               creationReason = "Transferred",
-              firstSubscriptionDate = new DateTime(validDate),
+              firstSubscriptionDate = LocalDate.parse(validDate),
               accountStatus = "OPEN",
               subscriptionStatus = "ACTIVE",
               accountClosureReason = None,
@@ -141,7 +141,7 @@ class GetAccountControllerSpec extends ControllerTestFixture {
                 GetLisaAccountTransferAccount(
                   "8765432102",
                   "Z543333",
-                  new DateTime(validDate)
+                  LocalDate.parse(validDate)
                 )
               )
             )
@@ -173,7 +173,7 @@ class GetAccountControllerSpec extends ControllerTestFixture {
               investorId = "9876543210",
               accountId = "8765432100",
               creationReason = "New",
-              firstSubscriptionDate = new DateTime(validDate),
+              firstSubscriptionDate = LocalDate.parse(validDate),
               accountStatus = "VOID",
               subscriptionStatus = "ACTIVE",
               accountClosureReason = None,
@@ -231,11 +231,11 @@ class GetAccountControllerSpec extends ControllerTestFixture {
               investorId = "9876543210",
               accountId = accountId,
               creationReason = "New",
-              firstSubscriptionDate = new DateTime(validDate),
+              firstSubscriptionDate = LocalDate.parse(validDate),
               accountStatus = "CLOSED",
               subscriptionStatus = "ACTIVE",
               accountClosureReason = Some("All funds withdrawn"),
-              closureDate = Some(new DateTime(validDate)),
+              closureDate = Some(LocalDate.parse(validDate)),
               transferAccount = None
             )
           )

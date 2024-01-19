@@ -16,10 +16,11 @@
 
 package unit.models
 
-import org.joda.time.DateTime
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsPath, Json}
 import uk.gov.hmrc.lisaapi.models._
+
+import java.time.LocalDate
 
 class RequestPurchaseOutcomeRequestSpec extends PlaySpec {
 
@@ -31,7 +32,7 @@ class RequestPurchaseOutcomeRequestSpec extends PlaySpec {
     "serialise from json" in {
       Json.parse(standardJson).as[RequestPurchaseOutcomeRequest] mustBe RequestPurchaseOutcomeCompletedRequest(
         fundReleaseId = "3456789000",
-        eventDate = new DateTime("2017-05-05"),
+        eventDate = LocalDate.parse("2017-05-05"),
         propertyPurchaseResult = "Purchase completed",
         propertyPurchaseValue = 250000
       )
@@ -40,7 +41,7 @@ class RequestPurchaseOutcomeRequestSpec extends PlaySpec {
     "serialise to json" in {
       val input = RequestPurchaseOutcomeCompletedRequest(
         fundReleaseId = "3456789000",
-        eventDate = new DateTime("2017-05-05"),
+        eventDate = LocalDate.parse("2017-05-05"),
         propertyPurchaseResult = "Purchase completed",
         propertyPurchaseValue = 250000
       )
@@ -109,7 +110,7 @@ class RequestPurchaseOutcomeRequestSpec extends PlaySpec {
     "serialise from json" in {
       failedRequest.as[RequestPurchaseOutcomeRequest] mustBe RequestPurchaseOutcomeFailedRequest(
         fundReleaseId = "3456789000",
-        eventDate = new DateTime("2017-05-05"),
+        eventDate = LocalDate.parse("2017-05-05"),
         propertyPurchaseResult = "Purchase failed"
       )
     }
@@ -117,7 +118,7 @@ class RequestPurchaseOutcomeRequestSpec extends PlaySpec {
     "serialise to json" in {
       val input = RequestPurchaseOutcomeFailedRequest(
         fundReleaseId = "3456789000",
-        eventDate = new DateTime("2017-05-05"),
+        eventDate = LocalDate.parse("2017-05-05"),
         propertyPurchaseResult = "Purchase failed"
       )
 
@@ -168,24 +169,24 @@ class RequestPurchaseOutcomeRequestSpec extends PlaySpec {
       val json = supersededJson
 
       Json.parse(json).as[RequestPurchaseOutcomeRequest] mustBe RequestPurchaseOutcomeSupersededCompletedRequest(
-        eventDate = new DateTime("2017-06-10"),
+        eventDate = LocalDate.parse("2017-06-10"),
         propertyPurchaseResult = "Purchase completed",
         propertyPurchaseValue = 250000,
         supersede = PurchaseOutcomeSupersede(
           originalLifeEventId = "5678900001",
-          originalEventDate = new DateTime("2017-05-05")
+          originalEventDate = LocalDate.parse("2017-05-05")
         )
       )
     }
 
     "serialise to json" in {
       val input = RequestPurchaseOutcomeSupersededCompletedRequest(
-        eventDate = new DateTime("2017-06-10"),
+        eventDate = LocalDate.parse("2017-06-10"),
         propertyPurchaseResult = "Purchase completed",
         propertyPurchaseValue = 250000,
         supersede = PurchaseOutcomeSupersede(
           originalLifeEventId = "5678900001",
-          originalEventDate = new DateTime("2017-05-05")
+          originalEventDate = LocalDate.parse("2017-05-05")
         )
       )
 
@@ -274,22 +275,22 @@ class RequestPurchaseOutcomeRequestSpec extends PlaySpec {
 
     "serialise from json" in {
       supersededFailedRequest.as[RequestPurchaseOutcomeRequest] mustBe RequestPurchaseOutcomeSupersededFailedRequest(
-        eventDate = new DateTime("2017-06-10"),
+        eventDate = LocalDate.parse("2017-06-10"),
         propertyPurchaseResult = "Purchase failed",
         supersede = PurchaseOutcomeSupersede(
           originalLifeEventId = "5678900001",
-          originalEventDate = new DateTime("2017-05-05")
+          originalEventDate = LocalDate.parse("2017-05-05")
         )
       )
     }
 
     "serialise to json" in {
       val input = RequestPurchaseOutcomeSupersededFailedRequest(
-        eventDate = new DateTime("2017-06-10"),
+        eventDate = LocalDate.parse("2017-06-10"),
         propertyPurchaseResult = "Purchase failed",
         supersede = PurchaseOutcomeSupersede(
           originalLifeEventId = "5678900001",
-          originalEventDate = new DateTime("2017-05-05")
+          originalEventDate = LocalDate.parse("2017-05-05")
         )
       )
 

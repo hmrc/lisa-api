@@ -17,7 +17,6 @@
 package unit.controllers
 
 import helpers.ControllerTestFixture
-import org.joda.time.DateTime
 import org.mockito.ArgumentMatchers.{any, eq => matchersEquals}
 import org.mockito.Mockito._
 import play.api.libs.json.Json
@@ -27,6 +26,7 @@ import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.lisaapi.controllers._
 import uk.gov.hmrc.lisaapi.models._
 
+import java.time.LocalDate
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -46,7 +46,7 @@ class BulkPaymentControllerSpec extends ControllerTestFixture {
   }
 
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.2.0+json")
-  val currentDate                    = new DateTime("2020-01-01")
+  val currentDate                    = LocalDate.parse("2020-01-01")
   val validDate                      = "2018-01-01"
   val invalidDate                    = "01-01-2018"
   val lmrn                           = "Z123456"
@@ -67,7 +67,7 @@ class BulkPaymentControllerSpec extends ControllerTestFixture {
         when(mockBulkPaymentService.getBulkPayment(any(), any(), any())(any()))
           .thenReturn(Future.successful(successResponse))
 
-        val oneYearInFuture = new DateTime(validDate).plusYears(1).toString("yyyy-MM-dd")
+        val oneYearInFuture = LocalDate.parse(validDate).plusYears(1).toString
         val result          = mockBulkPaymentController
           .getBulkPayment(lmrn, validDate, oneYearInFuture)
           .apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
@@ -84,7 +84,7 @@ class BulkPaymentControllerSpec extends ControllerTestFixture {
           .asInstanceOf[BulkPaymentPaid]
           .paymentDate
           .get
-          .toString("yyyy-MM-dd")
+          .toString
         (json \ "payments" \ 0 \ "paymentReference")
           .as[String] mustBe successResponse.payments.head.asInstanceOf[BulkPaymentPaid].paymentReference.get
       }
@@ -143,7 +143,7 @@ class BulkPaymentControllerSpec extends ControllerTestFixture {
 
     "return 403 FORBIDDEN" when {
       "the endDate parameter is in the future" in {
-        val futureDate = currentDate.plusDays(1).toString("yyyy-MM-dd")
+        val futureDate = currentDate.plusDays(1).toString
         val result     = mockBulkPaymentController
           .getBulkPayment(lmrn, validDate, futureDate)
           .apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
@@ -156,7 +156,7 @@ class BulkPaymentControllerSpec extends ControllerTestFixture {
         (json \ "message").as[String] mustBe ErrorBadRequestEndInFuture.message
       }
       "the endDate is before the startDate" in {
-        val beforeDate = new DateTime(validDate).minusDays(1).toString("yyyy-MM-dd")
+        val beforeDate = LocalDate.parse(validDate).minusDays(1).toString
         val result     = mockBulkPaymentController
           .getBulkPayment(lmrn, validDate, beforeDate)
           .apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
@@ -181,7 +181,7 @@ class BulkPaymentControllerSpec extends ControllerTestFixture {
         (json \ "message").as[String] mustBe ErrorBadRequestStartBefore6April2017.message
       }
       "there's more than a year between startDate and endDate" in {
-        val futureDate = new DateTime(validDate).plusYears(1).plusDays(1).toString("yyyy-MM-dd")
+        val futureDate = LocalDate.parse(validDate).plusYears(1).plusDays(1).toString
         val result     = mockBulkPaymentController
           .getBulkPayment(lmrn, validDate, futureDate)
           .apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
@@ -309,7 +309,7 @@ class BulkPaymentControllerSpec extends ControllerTestFixture {
       when(mockBulkPaymentService.getBulkPayment(any(), any(), any())(any()))
         .thenReturn(Future.successful(successResponse))
 
-      val oneYearInFuture = new DateTime(validDate).plusYears(1).toString("yyyy-MM-dd")
+      val oneYearInFuture = LocalDate.parse(validDate).plusYears(1).toString
       val result          = mockBulkPaymentController
         .getBulkPayment(lmrn, validDate, oneYearInFuture)
         .apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
@@ -381,7 +381,7 @@ class BulkPaymentControllerSpec extends ControllerTestFixture {
       )(any())
     }
     "the endDate parameter is in the future" in {
-      val futureDate = currentDate.plusDays(1).toString("yyyy-MM-dd")
+      val futureDate = currentDate.plusDays(1).toString
       val result     = mockBulkPaymentController
         .getBulkPayment(lmrn, validDate, futureDate)
         .apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
@@ -399,7 +399,7 @@ class BulkPaymentControllerSpec extends ControllerTestFixture {
       )(any())
     }
     "the endDate is before the startDate" in {
-      val beforeDate = new DateTime(validDate).minusDays(1).toString("yyyy-MM-dd")
+      val beforeDate = LocalDate.parse(validDate).minusDays(1).toString
       val result     = mockBulkPaymentController
         .getBulkPayment(lmrn, validDate, beforeDate)
         .apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
@@ -434,7 +434,7 @@ class BulkPaymentControllerSpec extends ControllerTestFixture {
       )(any())
     }
     "there's more than a year between startDate and endDate" in {
-      val futureDate = new DateTime(validDate).plusYears(1).plusDays(1).toString("yyyy-MM-dd")
+      val futureDate = LocalDate.parse(validDate).plusYears(1).plusDays(1).toString
       val result     = mockBulkPaymentController
         .getBulkPayment(lmrn, validDate, futureDate)
         .apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
@@ -516,8 +516,8 @@ class BulkPaymentControllerSpec extends ControllerTestFixture {
   val successResponse: GetBulkPaymentSuccessResponse = GetBulkPaymentSuccessResponse(
     lmrn,
     List(
-      BulkPaymentPaid(75.15, Some(new DateTime("2018-01-01")), Some("123")),
-      BulkPaymentPending(100.0, Some(new DateTime("2018-02-02")))
+      BulkPaymentPaid(75.15, Some(LocalDate.parse("2018-01-01")), Some("123")),
+      BulkPaymentPending(100.0, Some(LocalDate.parse("2018-02-02")))
     )
   )
 }

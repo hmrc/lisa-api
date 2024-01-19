@@ -17,14 +17,14 @@
 package unit.services
 
 import helpers.ServiceTestFixture
-import org.joda.time.DateTime
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.models.des._
-import uk.gov.hmrc.lisaapi.models.{des, _}
+import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.TransactionService
 
+import java.time.LocalDate
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
@@ -41,12 +41,12 @@ class TransactionServiceSpec extends ServiceTestFixture {
           Future.successful(
             GetBonusResponse(
               lifeEventId = None,
-              periodStartDate = new DateTime("2001-01-01"),
-              periodEndDate = new DateTime("2002-01-01"),
+              periodStartDate = LocalDate.parse("2001-01-01"),
+              periodEndDate = LocalDate.parse("2002-01-01"),
               htbTransfer = None,
               inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
               bonuses = Bonuses(1.0, 1.0, None, "X"),
-              creationDate = new DateTime("2000-01-01"),
+              creationDate = LocalDate.parse("2000-01-01"),
               paymentStatus = "Pending"
             )
           )
@@ -66,19 +66,19 @@ class TransactionServiceSpec extends ServiceTestFixture {
           Future.successful(
             GetBonusResponse(
               lifeEventId = None,
-              periodStartDate = new DateTime("2001-01-01"),
-              periodEndDate = new DateTime("2002-01-01"),
+              periodStartDate = LocalDate.parse("2001-01-01"),
+              periodEndDate = LocalDate.parse("2002-01-01"),
               htbTransfer = None,
               inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
               bonuses = Bonuses(1.0, 1.0, None, "X"),
-              creationDate = new DateTime("2000-01-01"),
+              creationDate = LocalDate.parse("2000-01-01"),
               paymentStatus = "Paid"
             )
           )
         )
 
         when(mockDesConnector.getTransaction(any(), any(), any())(any()))
-          .thenReturn(Future.successful(DesGetTransactionPending(new DateTime("2000-01-01"), None, None)))
+          .thenReturn(Future.successful(DesGetTransactionPending(LocalDate.parse("2000-01-01"), None, None)))
 
         val result =
           Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
@@ -86,7 +86,7 @@ class TransactionServiceSpec extends ServiceTestFixture {
         result mustBe GetTransactionSuccessResponse(
           transactionId = "12345",
           paymentStatus = "Pending",
-          paymentDueDate = Some(new DateTime("2000-01-01")),
+          paymentDueDate = Some(LocalDate.parse("2000-01-01")),
           transactionType = Some("Payment"),
           bonusDueForPeriod = Some(1.0)
         )
@@ -96,12 +96,12 @@ class TransactionServiceSpec extends ServiceTestFixture {
           Future.successful(
             GetBonusResponse(
               lifeEventId = None,
-              periodStartDate = new DateTime("2001-01-01"),
-              periodEndDate = new DateTime("2002-01-01"),
+              periodStartDate = LocalDate.parse("2001-01-01"),
+              periodEndDate = LocalDate.parse("2002-01-01"),
               htbTransfer = None,
               inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
               bonuses = Bonuses(1.0, 1.0, None, "X"),
-              creationDate = new DateTime("2000-01-01"),
+              creationDate = LocalDate.parse("2000-01-01"),
               paymentStatus = "Paid"
             )
           )
@@ -126,8 +126,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetWithdrawalResponse(
-              new DateTime("2018-05-06"),
-              new DateTime("2018-06-05"),
+              LocalDate.parse("2018-05-06"),
+              LocalDate.parse("2018-06-05"),
               Some(100),
               100,
               25,
@@ -137,13 +137,13 @@ class TransactionServiceSpec extends ServiceTestFixture {
               None,
               None,
               "Collected",
-              new DateTime("2018-06-21")
+              LocalDate.parse("2018-06-21")
             )
           )
         )
 
         when(mockDesConnector.getTransaction(any(), any(), any())(any()))
-          .thenReturn(Future.successful(DesGetTransactionPending(new DateTime("2000-01-01"), Some("YREF"), Some(30))))
+          .thenReturn(Future.successful(DesGetTransactionPending(LocalDate.parse("2000-01-01"), Some("YREF"), Some(30))))
 
         val result =
           Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
@@ -151,7 +151,7 @@ class TransactionServiceSpec extends ServiceTestFixture {
         result mustBe GetTransactionSuccessResponse(
           transactionId = "12345",
           paymentStatus = "Due",
-          paymentDueDate = Some(new DateTime("2000-01-01")),
+          paymentDueDate = Some(LocalDate.parse("2000-01-01")),
           transactionType = Some("Debt"),
           paymentReference = Some("YREF"),
           paymentAmount = Some(30)
@@ -161,8 +161,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetWithdrawalResponse(
-              new DateTime("2018-05-06"),
-              new DateTime("2018-06-05"),
+              LocalDate.parse("2018-05-06"),
+              LocalDate.parse("2018-06-05"),
               Some(100),
               100,
               25,
@@ -172,7 +172,7 @@ class TransactionServiceSpec extends ServiceTestFixture {
               None,
               None,
               "Collected",
-              new DateTime("2018-06-21")
+              LocalDate.parse("2018-06-21")
             )
           )
         )
@@ -196,12 +196,12 @@ class TransactionServiceSpec extends ServiceTestFixture {
           Future.successful(
             GetBonusResponse(
               lifeEventId = None,
-              periodStartDate = new DateTime("2001-01-01"),
-              periodEndDate = new DateTime("2002-01-01"),
+              periodStartDate = LocalDate.parse("2001-01-01"),
+              periodEndDate = LocalDate.parse("2002-01-01"),
               htbTransfer = None,
               inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
               bonuses = Bonuses(1.0, 1.0, None, "X"),
-              creationDate = new DateTime("2000-01-01"),
+              creationDate = LocalDate.parse("2000-01-01"),
               paymentStatus = "Cancelled"
             )
           )
@@ -224,12 +224,12 @@ class TransactionServiceSpec extends ServiceTestFixture {
           Future.successful(
             GetBonusResponse(
               lifeEventId = None,
-              periodStartDate = new DateTime("2001-01-01"),
-              periodEndDate = new DateTime("2002-01-01"),
+              periodStartDate = LocalDate.parse("2001-01-01"),
+              periodEndDate = LocalDate.parse("2002-01-01"),
               htbTransfer = None,
               inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
               bonuses = Bonuses(1.0, 1.0, None, "X"),
-              creationDate = new DateTime("2000-01-01"),
+              creationDate = LocalDate.parse("2000-01-01"),
               paymentStatus = "Void"
             )
           )
@@ -252,12 +252,12 @@ class TransactionServiceSpec extends ServiceTestFixture {
           Future.successful(
             GetBonusResponse(
               lifeEventId = None,
-              periodStartDate = new DateTime("2001-01-01"),
-              periodEndDate = new DateTime("2002-01-01"),
+              periodStartDate = LocalDate.parse("2001-01-01"),
+              periodEndDate = LocalDate.parse("2002-01-01"),
               htbTransfer = None,
               inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
               bonuses = Bonuses(1.0, 1.0, None, "X"),
-              creationDate = new DateTime("2000-01-01"),
+              creationDate = LocalDate.parse("2000-01-01"),
               paymentStatus = "Superseded",
               supersededBy = Some("123456")
             )
@@ -281,12 +281,12 @@ class TransactionServiceSpec extends ServiceTestFixture {
           Future.successful(
             GetBonusResponse(
               lifeEventId = None,
-              periodStartDate = new DateTime("2001-01-01"),
-              periodEndDate = new DateTime("2002-01-01"),
+              periodStartDate = LocalDate.parse("2001-01-01"),
+              periodEndDate = LocalDate.parse("2002-01-01"),
               htbTransfer = None,
               inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
               bonuses = Bonuses(1.0, 1.0, None, "X"),
-              creationDate = new DateTime("2000-01-01"),
+              creationDate = LocalDate.parse("2000-01-01"),
               paymentStatus = "Paid"
             )
           )
@@ -295,7 +295,7 @@ class TransactionServiceSpec extends ServiceTestFixture {
         when(mockDesConnector.getTransaction(any(), any(), any())(any())).thenReturn(
           Future.successful(
             DesGetTransactionPaid(
-              paymentDate = new DateTime("2000-01-01"),
+              paymentDate = LocalDate.parse("2000-01-01"),
               paymentReference = "002630000993",
               paymentAmount = 1.0
             )
@@ -308,7 +308,7 @@ class TransactionServiceSpec extends ServiceTestFixture {
         result mustBe GetTransactionSuccessResponse(
           transactionId = "12345",
           paymentStatus = "Paid",
-          paymentDate = Some(new DateTime("2000-01-01")),
+          paymentDate = Some(LocalDate.parse("2000-01-01")),
           paymentReference = Some("002630000993"),
           paymentAmount = Some(1.0),
           transactionType = Some("Payment"),
@@ -322,8 +322,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetWithdrawalResponse(
-              new DateTime("2018-05-06"),
-              new DateTime("2018-06-05"),
+              LocalDate.parse("2018-05-06"),
+              LocalDate.parse("2018-06-05"),
               Some(100),
               100,
               25,
@@ -333,13 +333,13 @@ class TransactionServiceSpec extends ServiceTestFixture {
               None,
               None,
               "Collected",
-              new DateTime("2018-06-21")
+              LocalDate.parse("2018-06-21")
             )
           )
         )
 
         when(mockDesConnector.getTransaction(any(), any(), any())(any()))
-          .thenReturn(Future.successful(des.DesGetTransactionPaid(new DateTime("2000-01-01"), "XREF", 25)))
+          .thenReturn(Future.successful(des.DesGetTransactionPaid(LocalDate.parse("2000-01-01"), "XREF", 25)))
 
         val result =
           Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
@@ -347,7 +347,7 @@ class TransactionServiceSpec extends ServiceTestFixture {
         result mustBe GetTransactionSuccessResponse(
           transactionId = "12345",
           paymentStatus = "Collected",
-          paymentDate = Some(new DateTime("2000-01-01")),
+          paymentDate = Some(LocalDate.parse("2000-01-01")),
           paymentReference = Some("XREF"),
           paymentAmount = Some(25),
           transactionType = Some("Debt")
@@ -361,12 +361,12 @@ class TransactionServiceSpec extends ServiceTestFixture {
           Future.successful(
             GetBonusResponse(
               lifeEventId = None,
-              periodStartDate = new DateTime("2001-01-01"),
-              periodEndDate = new DateTime("2002-01-01"),
+              periodStartDate = LocalDate.parse("2001-01-01"),
+              periodEndDate = LocalDate.parse("2002-01-01"),
               htbTransfer = None,
               inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
               bonuses = Bonuses(1.0, 1.0, None, "X"),
-              creationDate = new DateTime("2000-01-01"),
+              creationDate = LocalDate.parse("2000-01-01"),
               paymentStatus = TransactionPaymentStatus.PAID
             )
           )
@@ -425,12 +425,12 @@ class TransactionServiceSpec extends ServiceTestFixture {
           Future.successful(
             GetBonusResponse(
               lifeEventId = None,
-              periodStartDate = new DateTime("2001-01-01"),
-              periodEndDate = new DateTime("2002-01-01"),
+              periodStartDate = LocalDate.parse("2001-01-01"),
+              periodEndDate = LocalDate.parse("2002-01-01"),
               htbTransfer = None,
               inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
               bonuses = Bonuses(1.0, 1.0, None, "X"),
-              creationDate = new DateTime("2000-01-01"),
+              creationDate = LocalDate.parse("2000-01-01"),
               paymentStatus = TransactionPaymentStatus.PAID
             )
           )
@@ -449,12 +449,12 @@ class TransactionServiceSpec extends ServiceTestFixture {
           Future.successful(
             GetBonusResponse(
               lifeEventId = None,
-              periodStartDate = new DateTime("2001-01-01"),
-              periodEndDate = new DateTime("2002-01-01"),
+              periodStartDate = LocalDate.parse("2001-01-01"),
+              periodEndDate = LocalDate.parse("2002-01-01"),
               htbTransfer = None,
               inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
               bonuses = Bonuses(1.0, 1.0, None, "X"),
-              creationDate = new DateTime("2000-01-01"),
+              creationDate = LocalDate.parse("2000-01-01"),
               paymentStatus = TransactionPaymentStatus.COLLECTED
             )
           )

@@ -17,7 +17,6 @@
 package unit.controllers
 
 import helpers.ControllerTestFixture
-import org.joda.time.DateTime
 import org.mockito.ArgumentMatchers.{eq => matchersEquals, _}
 import org.mockito.Mockito._
 import play.api.libs.json.Json
@@ -28,6 +27,7 @@ import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountAlreadyCancelled, ErrorAccountAlreadyClosed, ErrorAccountAlreadyVoided, ErrorBadRequestAccountId, ErrorBadRequestLmrn, LifeEventController}
 import uk.gov.hmrc.lisaapi.models._
 
+import java.time.LocalDate
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -210,7 +210,7 @@ class LifeEventControllerSpec extends ControllerTestFixture {
         }
       }
       "given a future eventDate" in {
-        val invalidJson = reportLifeEventJson.replace(s"$validDate", DateTime.now.plusDays(1).toString("yyyy-MM-dd"))
+        val invalidJson = reportLifeEventJson.replace(s"$validDate", LocalDate.now.plusDays(1).toString)
 
         doReportLifeEventRequest(invalidJson) { res =>
           status(res) mustBe BAD_REQUEST

@@ -16,51 +16,52 @@
 
 package uk.gov.hmrc.lisaapi.models
 
-import org.joda.time.DateTime
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 
+import java.time.LocalDate
+
 trait RequestPurchaseOutcomeRequest extends ReportLifeEventRequestBase {
-  val eventDate: DateTime
+  val eventDate: LocalDate
 }
 
 case class RequestPurchaseOutcomeCompletedRequest(
   fundReleaseId: FundReleaseId,
-  eventDate: DateTime,
+  eventDate: LocalDate,
   propertyPurchaseResult: String,
   propertyPurchaseValue: Amount
 ) extends RequestPurchaseOutcomeRequest
 
 case class RequestPurchaseOutcomeFailedRequest(
   fundReleaseId: FundReleaseId,
-  eventDate: DateTime,
+  eventDate: LocalDate,
   propertyPurchaseResult: String
 ) extends RequestPurchaseOutcomeRequest
 
 case class RequestPurchaseOutcomeSupersededCompletedRequest(
-  eventDate: DateTime,
+  eventDate: LocalDate,
   propertyPurchaseResult: String,
   propertyPurchaseValue: Amount,
   supersede: PurchaseOutcomeSupersede
 ) extends RequestPurchaseOutcomeRequest
 
 case class RequestPurchaseOutcomeSupersededFailedRequest(
-  eventDate: DateTime,
+  eventDate: LocalDate,
   propertyPurchaseResult: String,
   supersede: PurchaseOutcomeSupersede
 ) extends RequestPurchaseOutcomeRequest
 
 case class PurchaseOutcomeSupersede(
   originalLifeEventId: LifeEventId,
-  originalEventDate: DateTime
+  originalEventDate: LocalDate
 )
 
 object PurchaseOutcomeSupersede {
-  implicit val dateReads: Reads[DateTime] = JsonReads.notFutureDate
+  implicit val dateReads: Reads[LocalDate] = JsonReads.notFutureDate
 
   implicit val reads: Reads[PurchaseOutcomeSupersede] = (
     (JsPath \ "originalLifeEventId").read(JsonReads.lifeEventId) and
-      (JsPath \ "originalEventDate").read(JsonReads.notFutureDate).map(new DateTime(_))
+      (JsPath \ "originalEventDate").read(JsonReads.notFutureDate)
   )(PurchaseOutcomeSupersede.apply _)
 }
 
@@ -68,7 +69,7 @@ object RequestPurchaseOutcomeRequest {
 
   val initialCompletedReads: Reads[RequestPurchaseOutcomeCompletedRequest] = (
     (JsPath \ "fundReleaseId").read(JsonReads.fundReleaseId) and
-      (JsPath \ "eventDate").read(JsonReads.notFutureDate).map(new DateTime(_)) and
+      (JsPath \ "eventDate").read(JsonReads.notFutureDate) and
       (JsPath \ "propertyPurchaseResult").read(
         Reads.pattern("Purchase completed".r, "error.formatting.propertyPurchaseResult")
       ) and
@@ -77,7 +78,7 @@ object RequestPurchaseOutcomeRequest {
 
   val initialFailedReads: Reads[RequestPurchaseOutcomeFailedRequest] = (
     (JsPath \ "fundReleaseId").read(JsonReads.fundReleaseId) and
-      (JsPath \ "eventDate").read(JsonReads.notFutureDate).map(new DateTime(_)) and
+      (JsPath \ "eventDate").read(JsonReads.notFutureDate) and
       (JsPath \ "propertyPurchaseResult").read(
         Reads.pattern("Purchase failed".r, "error.formatting.propertyPurchaseResult")
       )
@@ -85,13 +86,13 @@ object RequestPurchaseOutcomeRequest {
 
   val initialCompletedWrites: Writes[RequestPurchaseOutcomeCompletedRequest] = (
     (JsPath \ "eventType").write[String] and
-      (JsPath \ "eventDate").write[String] and
+      (JsPath \ "eventDate").write[LocalDate] and
       (JsPath \ "fundsReleaseLifeEventID").write[String] and
       (JsPath \ "propertyDetails").write[JsObject]
   ) { req: RequestPurchaseOutcomeCompletedRequest =>
     (
       "Purchase Result",
-      req.eventDate.toString("yyyy-MM-dd"),
+      req.eventDate,
       req.fundReleaseId,
       Json.obj(
         "purchaseResult" -> req.propertyPurchaseResult,
@@ -102,13 +103,13 @@ object RequestPurchaseOutcomeRequest {
 
   val initialFailedWrites: Writes[RequestPurchaseOutcomeFailedRequest] = (
     (JsPath \ "eventType").write[String] and
-      (JsPath \ "eventDate").write[String] and
+      (JsPath \ "eventDate").write[LocalDate] and
       (JsPath \ "fundsReleaseLifeEventID").write[String] and
       (JsPath \ "propertyDetails").write[JsObject]
   ) { req: RequestPurchaseOutcomeFailedRequest =>
     (
       "Purchase Result",
-      req.eventDate.toString("yyyy-MM-dd"),
+      req.eventDate,
       req.fundReleaseId,
       Json.obj(
         "purchaseResult" -> req.propertyPurchaseResult
@@ -117,7 +118,7 @@ object RequestPurchaseOutcomeRequest {
   }
 
   val supersedeCompletedReads: Reads[RequestPurchaseOutcomeSupersededCompletedRequest] = (
-    (JsPath \ "eventDate").read(JsonReads.notFutureDate).map(new DateTime(_)) and
+    (JsPath \ "eventDate").read(JsonReads.notFutureDate) and
       (JsPath \ "propertyPurchaseResult").read(
         Reads.pattern("Purchase completed".r, "error.formatting.propertyPurchaseResult")
       ) and
@@ -126,7 +127,7 @@ object RequestPurchaseOutcomeRequest {
   )(RequestPurchaseOutcomeSupersededCompletedRequest.apply _)
 
   val supersedeFailedReads: Reads[RequestPurchaseOutcomeSupersededFailedRequest] = (
-    (JsPath \ "eventDate").read(JsonReads.notFutureDate).map(new DateTime(_)) and
+    (JsPath \ "eventDate").read(JsonReads.notFutureDate) and
       (JsPath \ "propertyPurchaseResult").read(
         Reads.pattern("Purchase failed".r, "error.formatting.propertyPurchaseResult")
       ) and
@@ -135,38 +136,38 @@ object RequestPurchaseOutcomeRequest {
 
   val supersedeCompletedWrites: Writes[RequestPurchaseOutcomeSupersededCompletedRequest] = (
     (JsPath \ "eventType").write[String] and
-      (JsPath \ "eventDate").write[String] and
+      (JsPath \ "eventDate").write[LocalDate] and
       (JsPath \ "propertyDetails").write[JsObject] and
       (JsPath \ "supersededLifeEventID").write[String] and
-      (JsPath \ "supersededLifeEventDate").write[String]
+      (JsPath \ "supersededLifeEventDate").write[LocalDate]
   ) { req: RequestPurchaseOutcomeSupersededCompletedRequest =>
     (
       "Purchase Result",
-      req.eventDate.toString("yyyy-MM-dd"),
+      req.eventDate,
       Json.obj(
         "purchaseResult" -> req.propertyPurchaseResult,
         "purchaseValue"  -> req.propertyPurchaseValue
       ),
       req.supersede.originalLifeEventId,
-      req.supersede.originalEventDate.toString("yyyy-MM-dd")
+      req.supersede.originalEventDate
     )
   }
 
   val supersedeFailedWrites: Writes[RequestPurchaseOutcomeSupersededFailedRequest] = (
     (JsPath \ "eventType").write[String] and
-      (JsPath \ "eventDate").write[String] and
+      (JsPath \ "eventDate").write[LocalDate] and
       (JsPath \ "propertyDetails").write[JsObject] and
       (JsPath \ "supersededLifeEventID").write[String] and
-      (JsPath \ "supersededLifeEventDate").write[String]
+      (JsPath \ "supersededLifeEventDate").write[LocalDate]
   ) { req: RequestPurchaseOutcomeSupersededFailedRequest =>
     (
       "Purchase Result",
-      req.eventDate.toString("yyyy-MM-dd"),
+      req.eventDate,
       Json.obj(
         "purchaseResult" -> req.propertyPurchaseResult
       ),
       req.supersede.originalLifeEventId,
-      req.supersede.originalEventDate.toString("yyyy-MM-dd")
+      req.supersede.originalEventDate
     )
   }
 

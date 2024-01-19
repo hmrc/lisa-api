@@ -16,14 +16,15 @@
 
 package uk.gov.hmrc.lisaapi.models
 
-import org.joda.time.DateTime
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsPath, Reads, Writes}
 
+import java.time.LocalDate
+
 case class RequestBonusPaymentRequest(
   lifeEventId: Option[LifeEventId],
-  periodStartDate: DateTime,
-  periodEndDate: DateTime,
+  periodStartDate: LocalDate,
+  periodEndDate: LocalDate,
   htbTransfer: Option[HelpToBuyTransfer],
   inboundPayments: InboundPayments,
   bonuses: Bonuses,
@@ -33,8 +34,8 @@ case class RequestBonusPaymentRequest(
 object RequestBonusPaymentRequest {
   implicit val requestBonusPaymentReadsV2: Reads[RequestBonusPaymentRequest] = (
     (JsPath \ "lifeEventId").readNullable(JsonReads.lifeEventId) and
-      (JsPath \ "periodStartDate").read(JsonReads.isoDate).map(new DateTime(_)) and
-      (JsPath \ "periodEndDate").read(JsonReads.isoDate).map(new DateTime(_)) and
+      (JsPath \ "periodStartDate").read(JsonReads.isoDate) and
+      (JsPath \ "periodEndDate").read(JsonReads.isoDate) and
       (JsPath \ "htbTransfer").readNullable[HelpToBuyTransfer] and
       (JsPath \ "inboundPayments").read[InboundPayments] and
       (JsPath \ "bonuses").read[Bonuses] and
@@ -43,8 +44,8 @@ object RequestBonusPaymentRequest {
 
   val requestBonusPaymentReadsV1: Reads[RequestBonusPaymentRequest] = (
     (JsPath \ "lifeEventId").readNullable(JsonReads.lifeEventId) and
-      (JsPath \ "periodStartDate").read(JsonReads.isoDate).map(new DateTime(_)) and
-      (JsPath \ "periodEndDate").read(JsonReads.isoDate).map(new DateTime(_)) and
+      (JsPath \ "periodStartDate").read(JsonReads.isoDate) and
+      (JsPath \ "periodEndDate").read(JsonReads.isoDate) and
       (JsPath \ "htbTransfer").readNullable[HelpToBuyTransfer] and
       (JsPath \ "inboundPayments").read[InboundPayments] and
       (JsPath \ "bonuses").read[Bonuses](Bonuses.bonusesReadsV1)
@@ -62,8 +63,8 @@ object RequestBonusPaymentRequest {
 
   implicit val requestBonusPaymentWrites: Writes[RequestBonusPaymentRequest] = (
     (JsPath \ "lifeEventId").writeNullable[String] and
-      (JsPath \ "periodStartDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
-      (JsPath \ "periodEndDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
+      (JsPath \ "periodStartDate").write[LocalDate] and
+      (JsPath \ "periodEndDate").write[LocalDate] and
       (JsPath \ "transactionType").write[String] and
       (JsPath \ "htbTransfer").writeNullable[HelpToBuyTransfer] and
       (JsPath \ "inboundPayments").write[InboundPayments] and

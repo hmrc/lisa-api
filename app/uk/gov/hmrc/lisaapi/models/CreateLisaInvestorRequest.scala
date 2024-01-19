@@ -16,24 +16,25 @@
 
 package uk.gov.hmrc.lisaapi.models
 
-import org.joda.time.DateTime
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsPath, Reads, Writes}
 
-case class CreateLisaInvestorRequest(investorNINO: Nino, firstName: Name, lastName: Name, dateOfBirth: DateTime)
+import java.time.LocalDate
+
+case class CreateLisaInvestorRequest(investorNINO: Nino, firstName: Name, lastName: Name, dateOfBirth: LocalDate)
 
 object CreateLisaInvestorRequest {
   implicit val createLisaInvestorRequestReads: Reads[CreateLisaInvestorRequest] = (
     (JsPath \ "investorNINO").read[Nino](JsonReads.nino) and
       (JsPath \ "firstName").read(JsonReads.name).map[String](_.toUpperCase.trim) and
       (JsPath \ "lastName").read(JsonReads.name).map[String](_.toUpperCase.trim) and
-      (JsPath \ "dateOfBirth").read(JsonReads.notFutureDate).map(new DateTime(_))
+      (JsPath \ "dateOfBirth").read(JsonReads.notFutureDate)
   )(CreateLisaInvestorRequest.apply _)
 
   implicit val createLisaInvestorRequestWrites: Writes[CreateLisaInvestorRequest] = (
     (JsPath \ "investorNINO").write[String] and
       (JsPath \ "firstName").write[String] and
       (JsPath \ "lastName").write[String] and
-      (JsPath \ "dateOfBirth").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd"))
+      (JsPath \ "dateOfBirth").write[LocalDate]
   )(unlift(CreateLisaInvestorRequest.unapply))
 }

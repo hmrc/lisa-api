@@ -16,10 +16,11 @@
 
 package unit.models
 
-import org.joda.time.DateTime
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json._
 import uk.gov.hmrc.lisaapi.models.CloseLisaAccountRequest
+
+import java.time.LocalDate
 
 class CloseLisaAccountSpec extends PlaySpec {
 
@@ -36,7 +37,7 @@ class CloseLisaAccountSpec extends PlaySpec {
         case JsSuccess(data, _) =>
           data.accountClosureReason mustBe "All funds withdrawn"
           data.closureDate.getYear mustBe 2000
-          data.closureDate.getMonthOfYear mustBe 1
+          data.closureDate.getMonthValue mustBe 1
           data.closureDate.getDayOfMonth mustBe 1
       }
     }
@@ -49,13 +50,13 @@ class CloseLisaAccountSpec extends PlaySpec {
         case JsSuccess(data, _) =>
           data.accountClosureReason mustBe "Cancellation"
           data.closureDate.getYear mustBe 2000
-          data.closureDate.getMonthOfYear mustBe 1
+          data.closureDate.getMonthValue mustBe 1
           data.closureDate.getDayOfMonth mustBe 1
       }
     }
 
     "deserialize to json" in {
-      val request = CloseLisaAccountRequest("All funds withdrawn", new DateTime("2000-01-01"))
+      val request = CloseLisaAccountRequest("All funds withdrawn", LocalDate.parse("2000-01-01"))
 
       val json = Json.toJson[CloseLisaAccountRequest](request)
 
@@ -102,7 +103,7 @@ class CloseLisaAccountSpec extends PlaySpec {
       }
 
       "given a closure date in the future" in {
-        val futureDate = DateTime.now().plusDays(1).toString("yyyy-MM-dd")
+        val futureDate = LocalDate.now().plusDays(1).toString
         val req        = validClosedRequestJson.replace("2000-01-01", futureDate)
 
         validateRequest(req) { errors =>

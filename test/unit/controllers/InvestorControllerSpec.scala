@@ -17,7 +17,6 @@
 package unit.controllers
 
 import helpers.ControllerTestFixture
-import org.joda.time.DateTime
 import org.mockito.ArgumentMatchers.{eq => matchersEquals, _}
 import org.mockito.Mockito._
 import play.api.libs.json.Json
@@ -28,6 +27,7 @@ import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.lisaapi.controllers._
 import uk.gov.hmrc.lisaapi.models._
 
+import java.time.LocalDate
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -213,7 +213,7 @@ class InvestorControllerSpec extends ControllerTestFixture {
               investorNINO = "AB123456D",
               firstName = "RICK",
               lastName = "SANCHEZ",
-              dateOfBirth = new DateTime("1973-03-24")
+              dateOfBirth = LocalDate.parse("1973-03-24")
             )
           )
         )(any())

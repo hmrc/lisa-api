@@ -16,8 +16,6 @@
 
 package unit.controllers
 
-import java.time.LocalDate
-
 import helpers.ControllerTestFixture
 import org.mockito.ArgumentMatchers.{any, eq => matchersEquals}
 import org.mockito.Mockito._
@@ -28,6 +26,7 @@ import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountNotFound, GetLifeEventController}
 import uk.gov.hmrc.lisaapi.models._
 
+import java.time.LocalDate
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 

@@ -16,10 +16,11 @@
 
 package unit.models
 
-import org.joda.time.DateTime
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json._
 import uk.gov.hmrc.lisaapi.models.CreateLisaInvestorRequest
+
+import java.time.LocalDate
 
 class CreateLisaInvestorRequestSpec extends PlaySpec {
 
@@ -39,7 +40,7 @@ class CreateLisaInvestorRequestSpec extends PlaySpec {
           data.firstName mustBe "A"
           data.lastName mustBe "B"
           data.dateOfBirth.getYear mustBe 2000
-          data.dateOfBirth.getMonthOfYear mustBe 2
+          data.dateOfBirth.getMonthValue mustBe 2
           data.dateOfBirth.getDayOfMonth mustBe 29
       }
     }
@@ -54,13 +55,13 @@ class CreateLisaInvestorRequestSpec extends PlaySpec {
           data.firstName mustBe "A"
           data.lastName mustBe "C"
           data.dateOfBirth.getYear mustBe 2000
-          data.dateOfBirth.getMonthOfYear mustBe 2
+          data.dateOfBirth.getMonthValue mustBe 2
           data.dateOfBirth.getDayOfMonth mustBe 29
       }
     }
 
     "deserialize to json" in {
-      val request = CreateLisaInvestorRequest("AB123456A", "A", "B", new DateTime("2000-02-29"))
+      val request = CreateLisaInvestorRequest("AB123456A", "A", "B", LocalDate.parse("2000-02-29"))
 
       val json = Json.toJson[CreateLisaInvestorRequest](request)
 
@@ -122,7 +123,7 @@ class CreateLisaInvestorRequestSpec extends PlaySpec {
       }
 
       "the date is in the future" in {
-        val futureDate = DateTime.now().plusDays(1).toString("yyyy-MM-dd")
+        val futureDate = LocalDate.now().plusDays(1).toString
 
         hasCorrectValidationError(
           validRequestJson.replace("2000-02-29", futureDate),

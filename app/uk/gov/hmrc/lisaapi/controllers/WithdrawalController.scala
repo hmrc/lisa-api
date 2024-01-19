@@ -155,7 +155,9 @@ class WithdrawalController @Inject() (
     callback: () => Future[Result]
   )(implicit hc: HeaderCarrier, startTime: Long) = {
 
-    val lastClaimDate       = dateTimeService.now().withTime(0, 0, 0, 0).minusYears(6).minusDays(14)
+    //the deadline for making a monthly bonus claim to HMRC is the 20th day of the month following the end of the claim period - therefore 14 days
+    //LISA Bonus claims can be made to HMRC or corrected by an ISA manager within 6 years after the end of the original bonus claim period - therefore 6 years
+    val lastClaimDate       = dateTimeService.now().minusYears(6).minusDays(14)
     val claimCanStillBeMade = data.claimPeriodEndDate.isAfter(lastClaimDate.minusDays(1))
     if (claimCanStillBeMade) {
       callback()

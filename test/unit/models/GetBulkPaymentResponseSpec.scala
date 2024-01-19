@@ -16,10 +16,11 @@
 
 package unit.models
 
-import org.joda.time.DateTime
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsSuccess, Json}
 import uk.gov.hmrc.lisaapi.models._
+
+import java.time.LocalDate
 
 class GetBulkPaymentResponseSpec extends PlaySpec {
 
@@ -140,13 +141,13 @@ class GetBulkPaymentResponseSpec extends PlaySpec {
         case errors: JsError    => fail(s"Json validation failed: ${JsError.toFlatForm(errors)}")
         case JsSuccess(data, _) =>
           data.paymentAmount mustBe 1000.0
-          data.paymentDate mustBe Some(new DateTime("2017-06-01"))
+          data.paymentDate mustBe Some(LocalDate.parse("2017-06-01"))
           data.paymentReference mustBe Some("ABC123456789")
       }
     }
 
     "deserialize to json" in {
-      val data = BulkPaymentPaid(1000.0, Some(new DateTime("2017-06-01")), Some("ABC123"))
+      val data = BulkPaymentPaid(1000.0, Some(LocalDate.parse("2017-06-01")), Some("ABC123"))
       val json = Json.toJson(data)
       (json \ "paymentAmount").as[BigDecimal] mustBe 1000.0
       (json \ "paymentDate").as[String] mustBe "2017-06-01"
@@ -188,12 +189,12 @@ class GetBulkPaymentResponseSpec extends PlaySpec {
         case errors: JsError    => fail(s"Json validation failed: ${JsError.toFlatForm(errors)}")
         case JsSuccess(data, _) =>
           data.paymentAmount mustBe 1000.0
-          data.dueDate mustBe Some(new DateTime("2017-06-01"))
+          data.dueDate mustBe Some(LocalDate.parse("2017-06-01"))
       }
     }
 
     "deserialize to json" in {
-      val data = BulkPaymentPending(1000.0, Some(new DateTime("2017-06-01")))
+      val data = BulkPaymentPending(1000.0, Some(LocalDate.parse("2017-06-01")))
       val json = Json.toJson(data)
       (json \ "paymentAmount").as[BigDecimal] mustBe 1000.0
       (json \ "dueDate").as[String] mustBe "2017-06-01"
@@ -231,13 +232,13 @@ class GetBulkPaymentResponseSpec extends PlaySpec {
         case errors: JsError    => fail(s"Json validation failed: ${JsError.toFlatForm(errors)}")
         case JsSuccess(data, _) =>
           data.paymentAmount mustBe 1000.0
-          data.paymentDate mustBe Some(new DateTime("2017-06-01"))
+          data.paymentDate mustBe Some(LocalDate.parse("2017-06-01"))
           data.paymentReference mustBe Some("ABC123456789")
       }
     }
 
     "deserialize to json" in {
-      val data = BulkPaymentCollected(1000.0, Some(new DateTime("2017-06-01")), Some("ABC123"))
+      val data = BulkPaymentCollected(1000.0, Some(LocalDate.parse("2017-06-01")), Some("ABC123"))
       val json = Json.toJson(data)
       (json \ "paymentAmount").as[BigDecimal] mustBe 1000.0
       (json \ "paymentDate").as[String] mustBe "2017-06-01"
@@ -253,13 +254,13 @@ class GetBulkPaymentResponseSpec extends PlaySpec {
         case errors: JsError    => fail(s"Json validation failed: ${JsError.toFlatForm(errors)}")
         case JsSuccess(data, _) =>
           data.paymentAmount mustBe 1000.0
-          data.paymentDate mustBe Some(new DateTime("2017-06-01"))
+          data.paymentDate mustBe Some(LocalDate.parse("2017-06-01"))
           data.paymentReference mustBe None
       }
     }
 
     "deserialize to json missing reference" in {
-      val data = BulkPaymentCollected(1000.0, Some(new DateTime("2017-06-01")), None)
+      val data = BulkPaymentCollected(1000.0, Some(LocalDate.parse("2017-06-01")), None)
       val json = Json.toJson(data)
       (json \ "paymentAmount").as[BigDecimal] mustBe 1000.0
       (json \ "paymentDate").as[String] mustBe "2017-06-01"
@@ -278,12 +279,12 @@ class GetBulkPaymentResponseSpec extends PlaySpec {
         case errors: JsError    => fail(s"Json validation failed: ${JsError.toFlatForm(errors)}")
         case JsSuccess(data, _) =>
           data.paymentAmount mustBe 1000.0
-          data.dueDate mustBe Some(new DateTime("2017-06-01"))
+          data.dueDate mustBe Some(LocalDate.parse("2017-06-01"))
       }
     }
 
     "deserialize to json" in {
-      val data = BulkPaymentDue(1000.0, Some(new DateTime("2017-06-01")))
+      val data = BulkPaymentDue(1000.0, Some(LocalDate.parse("2017-06-01")))
       val json = Json.toJson(data)
       (json \ "paymentAmount").as[BigDecimal] mustBe 1000.0
       (json \ "dueDate").as[String] mustBe "2017-06-01"

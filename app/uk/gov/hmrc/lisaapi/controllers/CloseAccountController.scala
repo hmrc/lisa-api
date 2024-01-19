@@ -84,7 +84,7 @@ class CloseAccountController @Inject() (
 
   private def hasValidDatesForClosure(lisaManager: String, accountId: String, req: CloseLisaAccountRequest)(
     success: () => Future[Result]
-  )(implicit hc: HeaderCarrier, startTime: Long): Future[Result] =
+  )(implicit hc: HeaderCarrier, startTime: Long): Future[Result] = {
     if (req.closureDate.isBefore(LISA_START_DATE)) {
       auditService.audit(
         auditType = "accountNotClosed",
@@ -107,6 +107,7 @@ class CloseAccountController @Inject() (
     } else {
       success()
     }
+  }
 
   private def handleFailure(
     lisaManager: String,

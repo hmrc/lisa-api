@@ -17,7 +17,6 @@
 package unit.controllers
 
 import helpers.ControllerTestFixture
-import org.joda.time.DateTime
 import org.mockito.ArgumentMatchers.{any, eq => MatcherEquals}
 import org.mockito.Mockito.{reset, verify, when}
 import play.api.libs.json.Json
@@ -28,6 +27,7 @@ import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountAlreadyCancelled, ErrorAccountAlreadyVoided, ErrorAccountNotFound, ErrorInternalServerError, ErrorServiceUnavailable, ErrorValidation, ErrorWithdrawalNotFound, ErrorWithdrawalTimescalesExceeded, WithdrawalController}
 import uk.gov.hmrc.lisaapi.models._
 
+import java.time.LocalDate
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.io.Source
@@ -62,7 +62,7 @@ class WithdrawalControllerSpec extends ControllerTestFixture {
     reset(mockWithdrawalChargeValidator)
 
     when(mockAuthConnector.authorise[Option[String]](any(), any())(any(), any())).thenReturn(Future(Some("1234")))
-    when(mockDateTimeService.now()).thenReturn(new DateTime("2018-01-01"))
+    when(mockDateTimeService.now()).thenReturn(LocalDate.parse("2018-01-01"))
     when(mockWithdrawalChargeValidator.validate(any())).thenReturn(Nil)
   }
 
@@ -191,7 +191,7 @@ class WithdrawalControllerSpec extends ControllerTestFixture {
       }
 
       "the claimPeriodEndDate is more than 6 years and 14 days in the past" in {
-        val now = new DateTime("2050-01-20")
+        val now = LocalDate.parse("2050-01-20")
 
         when(mockDateTimeService.now()).thenReturn(now)
 
@@ -647,7 +647,7 @@ class WithdrawalControllerSpec extends ControllerTestFixture {
         }
       }
       "the claimPeriodEndDate is more than 6 years and 14 days in the past" in {
-        val now = new DateTime("2050-01-20")
+        val now = LocalDate.parse("2050-01-20")
 
         when(mockDateTimeService.now()).thenReturn(now)
 
@@ -835,8 +835,8 @@ class WithdrawalControllerSpec extends ControllerTestFixture {
       when(mockBonusOrWithdrawalService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
         Future.successful(
           GetWithdrawalResponse(
-            periodStartDate = new DateTime("2017-05-06"),
-            periodEndDate = new DateTime("2017-06-05"),
+            periodStartDate = LocalDate.parse("2017-05-06"),
+            periodEndDate = LocalDate.parse("2017-06-05"),
             automaticRecoveryAmount = Some(250),
             withdrawalAmount = 2000,
             withdrawalChargeAmount = 500,
@@ -846,7 +846,7 @@ class WithdrawalControllerSpec extends ControllerTestFixture {
             supersededBy = Some("1234567892"),
             supersede = Some(WithdrawalSuperseded("1234567890", 250, 250, "Additional withdrawal")),
             paymentStatus = "Collected",
-            creationDate = new DateTime("2017-06-19")
+            creationDate = LocalDate.parse("2017-06-19")
           )
         )
       )
@@ -902,15 +902,15 @@ class WithdrawalControllerSpec extends ControllerTestFixture {
           Future.successful(
             GetBonusResponse(
               Some("1234567891"),
-              new DateTime("2017-04-06"),
-              new DateTime("2017-05-05"),
+              LocalDate.parse("2017-04-06"),
+              LocalDate.parse("2017-05-05"),
               Some(HelpToBuyTransfer(0, 10)),
               InboundPayments(Some(4000), 4000, 4000, 4000),
               Bonuses(1000, 1000, Some(1000), "Life Event"),
               Some("1234567892"),
               Some(BonusRecovery(100, "1234567890", 1100, -100)),
               "Paid",
-              new DateTime("2017-05-20")
+              LocalDate.parse("2017-05-20")
             )
           )
         )
@@ -963,8 +963,8 @@ class WithdrawalControllerSpec extends ControllerTestFixture {
         when(mockBonusOrWithdrawalService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetWithdrawalResponse(
-              periodStartDate = new DateTime("2017-05-06"),
-              periodEndDate = new DateTime("2017-06-05"),
+              periodStartDate = LocalDate.parse("2017-05-06"),
+              periodEndDate = LocalDate.parse("2017-06-05"),
               automaticRecoveryAmount = Some(250),
               withdrawalAmount = 2000,
               withdrawalChargeAmount = 500,
@@ -974,7 +974,7 @@ class WithdrawalControllerSpec extends ControllerTestFixture {
               supersededBy = Some("1234567892"),
               supersede = Some(WithdrawalSuperseded("1234567890", 250, 250, "Additional withdrawal")),
               paymentStatus = "Collected",
-              creationDate = new DateTime("2017-06-19")
+              creationDate = LocalDate.parse("2017-06-19")
             )
           )
         )
@@ -1041,15 +1041,15 @@ class WithdrawalControllerSpec extends ControllerTestFixture {
           Future.successful(
             GetBonusResponse(
               Some("1234567891"),
-              new DateTime("2017-04-06"),
-              new DateTime("2017-05-05"),
+              LocalDate.parse("2017-04-06"),
+              LocalDate.parse("2017-05-05"),
               Some(HelpToBuyTransfer(0, 10)),
               InboundPayments(Some(4000), 4000, 4000, 4000),
               Bonuses(1000, 1000, Some(1000), "Life Event"),
               Some("1234567892"),
               Some(BonusRecovery(100, "1234567890", 1100, -100)),
               "Paid",
-              new DateTime("2017-05-20")
+              LocalDate.parse("2017-05-20")
             )
           )
         )

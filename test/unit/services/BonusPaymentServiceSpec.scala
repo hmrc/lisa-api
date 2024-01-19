@@ -17,14 +17,14 @@
 package unit.services
 
 import helpers.ServiceTestFixture
-import org.joda.time.DateTime
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesTransactionExistResponse, DesTransactionResponse, DesUnavailableResponse}
-import uk.gov.hmrc.lisaapi.models.{RequestBonusPaymentResponse, _}
+import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.BonusPaymentService
 
+import java.time.LocalDate
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
@@ -64,8 +64,8 @@ class BonusPaymentServiceSpec extends ServiceTestFixture {
           Some(
             RequestBonusPaymentRequest(
               lifeEventId = Some("1234567891"),
-              periodStartDate = new DateTime("2017-04-06"),
-              periodEndDate = new DateTime("2017-05-05"),
+              periodStartDate = LocalDate.parse("2017-04-06"),
+              periodEndDate = LocalDate.parse("2017-05-05"),
               htbTransfer = Some(HelpToBuyTransfer(0f, 0f)),
               inboundPayments = InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
               bonuses = Bonuses(1000f, 1000f, None, "Superseded Bonus")
@@ -244,8 +244,8 @@ class BonusPaymentServiceSpec extends ServiceTestFixture {
       case None      =>
         RequestBonusPaymentRequest(
           lifeEventId = Some("1234567891"),
-          periodStartDate = new DateTime("2017-04-06"),
-          periodEndDate = new DateTime("2017-05-05"),
+          periodStartDate = LocalDate.parse("2017-04-06"),
+          periodEndDate = LocalDate.parse("2017-05-05"),
           htbTransfer = Some(HelpToBuyTransfer(0f, 0f)),
           inboundPayments = InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
           bonuses = Bonuses(1000f, 1000f, None, "Life Event")

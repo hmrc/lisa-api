@@ -16,9 +16,10 @@
 
 package uk.gov.hmrc.lisaapi.models
 
-import org.joda.time.DateTime
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsPath, Reads, Writes}
+
+import java.time.LocalDate
 
 sealed trait WithdrawalSupersede extends Product
 
@@ -218,8 +219,8 @@ object WithdrawalSupersede {
 }
 
 sealed trait ReportWithdrawalChargeRequest extends Product {
-  val claimPeriodStartDate: DateTime
-  val claimPeriodEndDate: DateTime
+  val claimPeriodStartDate: LocalDate
+  val claimPeriodEndDate: LocalDate
   val automaticRecoveryAmount: Option[Amount]
   val withdrawalChargeAmount: Amount
   val fundsDeductedDuringWithdrawal: Boolean
@@ -229,8 +230,8 @@ sealed trait ReportWithdrawalChargeRequest extends Product {
 
 case class RegularWithdrawalChargeRequest(
   automaticRecoveryAmount: Option[Amount],
-  claimPeriodStartDate: DateTime,
-  claimPeriodEndDate: DateTime,
+  claimPeriodStartDate: LocalDate,
+  claimPeriodEndDate: LocalDate,
   withdrawalAmount: Amount,
   withdrawalChargeAmount: Amount,
   withdrawalChargeAmountYTD: Amount,
@@ -241,8 +242,8 @@ case class RegularWithdrawalChargeRequest(
 
 case class SupersededWithdrawalChargeRequest(
   automaticRecoveryAmount: Option[Amount],
-  claimPeriodStartDate: DateTime,
-  claimPeriodEndDate: DateTime,
+  claimPeriodStartDate: LocalDate,
+  claimPeriodEndDate: LocalDate,
   withdrawalAmount: Amount,
   withdrawalChargeAmount: Amount,
   withdrawalChargeAmountYTD: Amount,
@@ -256,8 +257,8 @@ object ReportWithdrawalChargeRequest {
 
   implicit val regularWithdrawalChargeReads: Reads[RegularWithdrawalChargeRequest] = (
     (JsPath \ "automaticRecoveryAmount").readNullable(JsonReads.nonNegativeAmount) and
-      (JsPath \ "claimPeriodStartDate").read(JsonReads.isoDate).map(new DateTime(_)) and
-      (JsPath \ "claimPeriodEndDate").read(JsonReads.isoDate).map(new DateTime(_)) and
+      (JsPath \ "claimPeriodStartDate").read(JsonReads.isoDate) and
+      (JsPath \ "claimPeriodEndDate").read(JsonReads.isoDate) and
       (JsPath \ "withdrawalAmount").read[Amount](JsonReads.nonNegativeAmount) and
       (JsPath \ "withdrawalChargeAmount").read[Amount](JsonReads.nonNegativeAmount) and
       (JsPath \ "withdrawalChargeAmountYTD").read[Amount](JsonReads.nonNegativeAmount) and
@@ -291,8 +292,8 @@ object ReportWithdrawalChargeRequest {
 
   implicit val supersededWithdrawalChargeReads: Reads[SupersededWithdrawalChargeRequest] = (
     (JsPath \ "automaticRecoveryAmount").readNullable(JsonReads.nonNegativeAmount) and
-      (JsPath \ "claimPeriodStartDate").read(JsonReads.isoDate).map(new DateTime(_)) and
-      (JsPath \ "claimPeriodEndDate").read(JsonReads.isoDate).map(new DateTime(_)) and
+      (JsPath \ "claimPeriodStartDate").read(JsonReads.isoDate) and
+      (JsPath \ "claimPeriodEndDate").read(JsonReads.isoDate) and
       (JsPath \ "withdrawalAmount").read[Amount](JsonReads.nonNegativeAmount) and
       (JsPath \ "withdrawalChargeAmount").read[Amount](JsonReads.nonNegativeAmount) and
       (JsPath \ "withdrawalChargeAmountYTD").read[Amount](JsonReads.nonNegativeAmount) and
@@ -336,8 +337,8 @@ object ReportWithdrawalChargeRequest {
 
   implicit val regularWithdrawalWrites: Writes[RegularWithdrawalChargeRequest] = (
     (JsPath \ "automaticRecoveryAmount").writeNullable[Amount] and
-      (JsPath \ "claimPeriodStartDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
-      (JsPath \ "claimPeriodEndDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
+      (JsPath \ "claimPeriodStartDate").write[LocalDate] and
+      (JsPath \ "claimPeriodEndDate").write[LocalDate] and
       (JsPath \ "withdrawalAmount").write[Amount] and
       (JsPath \ "withdrawalChargeAmount").write[Amount] and
       (JsPath \ "withdrawalChargeAmountYTD").write[Amount] and
@@ -358,8 +359,8 @@ object ReportWithdrawalChargeRequest {
 
   implicit val supersededWithdrawalWrites: Writes[SupersededWithdrawalChargeRequest] = (
     (JsPath \ "automaticRecoveryAmount").writeNullable[Amount] and
-      (JsPath \ "claimPeriodStartDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
-      (JsPath \ "claimPeriodEndDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
+      (JsPath \ "claimPeriodStartDate").write[LocalDate] and
+      (JsPath \ "claimPeriodEndDate").write[LocalDate] and
       (JsPath \ "withdrawalAmount").write[Amount] and
       (JsPath \ "withdrawalChargeAmount").write[Amount] and
       (JsPath \ "withdrawalChargeAmountYTD").write[Amount] and
@@ -388,8 +389,8 @@ object ReportWithdrawalChargeRequest {
 
   implicit val desRegularWithdrawalWrites: Writes[RegularWithdrawalChargeRequest] = (
     (JsPath \ "automaticRecoveryAmount").writeNullable[Amount] and
-      (JsPath \ "claimPeriodStartDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
-      (JsPath \ "claimPeriodEndDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
+      (JsPath \ "claimPeriodStartDate").write[LocalDate] and
+      (JsPath \ "claimPeriodEndDate").write[LocalDate] and
       (JsPath \ "withdrawalAmount").write[Amount] and
       (JsPath \ "withdrawalChargeAmount").write[Amount] and
       (JsPath \ "withdrawalChargeAmountYTD").write[Amount] and
@@ -410,8 +411,8 @@ object ReportWithdrawalChargeRequest {
 
   implicit val desSupersededWithdrawalWrites: Writes[SupersededWithdrawalChargeRequest] = (
     (JsPath \ "automaticRecoveryAmount").writeNullable[Amount] and
-      (JsPath \ "claimPeriodStartDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
-      (JsPath \ "claimPeriodEndDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
+      (JsPath \ "claimPeriodStartDate").write[LocalDate] and
+      (JsPath \ "claimPeriodEndDate").write[LocalDate] and
       (JsPath \ "withdrawalAmount").write[Amount] and
       (JsPath \ "withdrawalChargeAmount").write[Amount] and
       (JsPath \ "withdrawalChargeAmountYTD").write[Amount] and
