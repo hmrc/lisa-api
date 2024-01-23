@@ -128,7 +128,7 @@ class UpdateSubscriptionController @Inject() (
     val auditData = Map(
       "lisaManagerReferenceNumber" -> lisaManager,
       "accountID"                  -> accountId,
-      "firstSubscriptionDate"      -> updateSubsRequest.firstSubscriptionDate.toString("yyyy-MM-dd")
+      "firstSubscriptionDate"      -> updateSubsRequest.firstSubscriptionDate.toString
     )
 
     failureReason map { reason =>

@@ -17,7 +17,6 @@
 package unit.services
 
 import helpers.ServiceTestFixture
-import org.joda.time.DateTime
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import uk.gov.hmrc.http.HeaderCarrier
@@ -25,6 +24,7 @@ import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des.{DesAccountResponse, DesEmptySuccessResponse, DesFailureResponse, DesUnavailableResponse}
 import uk.gov.hmrc.lisaapi.services.AccountService
 
+import java.time.LocalDate
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
@@ -408,7 +408,7 @@ class AccountServiceSpec extends ServiceTestFixture {
           "123",
           "456",
           "All funds withdrawn",
-          new DateTime("201-04-06"),
+          LocalDate.parse("2017-04-06"),
           "OPEN",
           "AVAILABLE",
           None,
@@ -480,6 +480,6 @@ class AccountServiceSpec extends ServiceTestFixture {
     callback(response)
   }
 
-  val testDate = new DateTime("2000-01-01")
+  val testDate = LocalDate.parse("2000-01-01")
   val testLMRN = "Z019283"
 }

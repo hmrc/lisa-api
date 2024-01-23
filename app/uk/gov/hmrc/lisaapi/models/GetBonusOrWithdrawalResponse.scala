@@ -16,10 +16,11 @@
 
 package uk.gov.hmrc.lisaapi.models
 
-import org.joda.time.DateTime
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsPath, Reads, Writes}
 import uk.gov.hmrc.lisaapi.models.des.DesResponse
+
+import java.time.LocalDate
 
 trait GetBonusOrWithdrawalResponse extends DesResponse
 
@@ -36,22 +37,22 @@ trait GetBonusOrWithdrawalSuccessResponse extends GetBonusOrWithdrawalResponse {
 
 case class GetBonusResponse(
   lifeEventId: Option[LifeEventId],
-  periodStartDate: DateTime,
-  periodEndDate: DateTime,
+  periodStartDate: LocalDate,
+  periodEndDate: LocalDate,
   htbTransfer: Option[HelpToBuyTransfer],
   inboundPayments: InboundPayments,
   bonuses: Bonuses,
   supersededBy: Option[TransactionId] = None,
   supersede: Option[Supersede] = None,
   paymentStatus: String,
-  creationDate: DateTime
+  creationDate: LocalDate
 ) extends GetBonusOrWithdrawalSuccessResponse {
   override def getBonusDueForPeriod: Option[Amount] = Some(bonuses.bonusDueForPeriod)
 }
 
 case class GetWithdrawalResponse(
-  periodStartDate: DateTime,
-  periodEndDate: DateTime,
+  periodStartDate: LocalDate,
+  periodEndDate: LocalDate,
   automaticRecoveryAmount: Option[Amount],
   withdrawalAmount: Amount,
   withdrawalChargeAmount: Amount,
@@ -61,14 +62,14 @@ case class GetWithdrawalResponse(
   supersededBy: Option[TransactionId] = None,
   supersede: Option[WithdrawalSupersede] = None,
   paymentStatus: String,
-  creationDate: DateTime
+  creationDate: LocalDate
 ) extends GetBonusOrWithdrawalSuccessResponse
 
 object GetBonusOrWithdrawalResponse {
   implicit val bonusReads: Reads[GetBonusResponse] = (
     (JsPath \ "lifeEventId").readNullable(JsonReads.lifeEventId) and
-      (JsPath \ "claimPeriodStart").read(JsonReads.isoDate).map(new DateTime(_)) and
-      (JsPath \ "claimPeriodEnd").read(JsonReads.isoDate).map(new DateTime(_)) and
+      (JsPath \ "claimPeriodStart").read(JsonReads.isoDate) and
+      (JsPath \ "claimPeriodEnd").read(JsonReads.isoDate) and
       (JsPath \ "htbInAmountForPeriod").readNullable[Amount] and
       (JsPath \ "htbInAmountYtd").readNullable[Amount] and
       (JsPath \ "newSubsInPeriod").readNullable[Amount] and
@@ -86,7 +87,7 @@ object GetBonusOrWithdrawalResponse {
       (JsPath \ "supersededReason").readNullable[BonusClaimSupersedeReason] and
       (JsPath \ "automaticRecoveryAmount").readNullable[Amount] and
       (JsPath \ "paymentStatus").read[String] and
-      (JsPath \ "creationDate").read(JsonReads.isoDate).map(new DateTime(_))
+      (JsPath \ "creationDate").read(JsonReads.isoDate)
   )(
     (
       lifeEventId,
@@ -154,8 +155,8 @@ object GetBonusOrWithdrawalResponse {
   )
 
   implicit val withdrawalReads: Reads[GetWithdrawalResponse] = (
-    (JsPath \ "claimPeriodStart").read(JsonReads.isoDate).map(new DateTime(_)) and
-      (JsPath \ "claimPeriodEnd").read(JsonReads.isoDate).map(new DateTime(_)) and
+    (JsPath \ "claimPeriodStart").read(JsonReads.isoDate) and
+      (JsPath \ "claimPeriodEnd").read(JsonReads.isoDate) and
       (JsPath \ "automaticRecoveryAmount").readNullable[Amount] and
       (JsPath \ "withdrawalAmount").read[Amount] and
       (JsPath \ "withdrawalChargeAmount").read[Amount] and
@@ -168,7 +169,7 @@ object GetBonusOrWithdrawalResponse {
       (JsPath \ "supersededTransactionResult").readNullable[Amount] and
       (JsPath \ "supersededReason").readNullable[WithdrawalSupersedeReason] and
       (JsPath \ "paymentStatus").read[String] and
-      (JsPath \ "creationDate").read(JsonReads.isoDate).map(new DateTime(_))
+      (JsPath \ "creationDate").read(JsonReads.isoDate)
   )(
     (
       periodStartDate,
@@ -237,8 +238,8 @@ object GetBonusOrWithdrawalResponse {
 
   implicit val bonusWrites: Writes[GetBonusResponse] = (
     (JsPath \ "lifeEventId").writeNullable[String] and
-      (JsPath \ "periodStartDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
-      (JsPath \ "periodEndDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
+      (JsPath \ "periodStartDate").write[LocalDate] and
+      (JsPath \ "periodEndDate").write[LocalDate] and
       (JsPath \ "htbTransfer").writeNullable[HelpToBuyTransfer] and
       (JsPath \ "inboundPayments").write[InboundPayments] and
       (JsPath \ "bonuses").write[Bonuses] and
@@ -258,8 +259,8 @@ object GetBonusOrWithdrawalResponse {
   }
 
   implicit val withdrawalWrites: Writes[GetWithdrawalResponse] = (
-    (JsPath \ "claimPeriodStartDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
-      (JsPath \ "claimPeriodEndDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd")) and
+    (JsPath \ "claimPeriodStartDate").write[LocalDate] and
+      (JsPath \ "claimPeriodEndDate").write[LocalDate] and
       (JsPath \ "automaticRecoveryAmount").writeNullable[Amount] and
       (JsPath \ "withdrawalAmount").write[Amount] and
       (JsPath \ "withdrawalChargeAmount").write[Amount] and

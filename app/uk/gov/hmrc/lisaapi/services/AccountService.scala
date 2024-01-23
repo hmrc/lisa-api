@@ -100,7 +100,7 @@ class AccountService @Inject() (desConnector: DesConnector)(implicit ec: Executi
 
   def closeAccount(lisaManager: String, accountId: String, request: CloseLisaAccountRequest)(implicit
     hc: HeaderCarrier
-  ): Future[CloseLisaAccountResponse] =
+  ): Future[CloseLisaAccountResponse] = {
     desConnector.closeAccount(lisaManager, accountId, request) map {
       case DesEmptySuccessResponse             => CloseLisaAccountSuccessResponse(accountId)
       case DesUnavailableResponse              => CloseLisaAccountServiceUnavailable
@@ -117,5 +117,6 @@ class AccountService @Inject() (desConnector: DesConnector)(implicit ec: Executi
             CloseLisaAccountErrorResponse
         }
     }
+  }
 
 }

@@ -17,7 +17,6 @@
 package unit.controllers
 
 import helpers.ControllerTestFixture
-import org.joda.time.DateTime
 import org.mockito.ArgumentMatchers.{eq => MatcherEquals, _}
 import org.mockito.Mockito._
 import play.api.libs.json.{JsObject, Json}
@@ -28,6 +27,7 @@ import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.lisaapi.controllers.{BonusPaymentController, ErrorAccountNotFound, ErrorBadRequestLmrn, ErrorBonusPaymentTransactionNotFound, ErrorValidation}
 import uk.gov.hmrc.lisaapi.models._
 
+import java.time.LocalDate
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.io.Source
@@ -67,7 +67,7 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
     reset(mockBonusPaymentValidator)
 
     when(mockAuthConnector.authorise[Option[String]](any(), any())(any(), any())).thenReturn(Future(Some("1234")))
-    when(mockDateTimeService.now()).thenReturn(new DateTime("2018-01-01"))
+    when(mockDateTimeService.now()).thenReturn(LocalDate.parse("2018-01-01"))
     when(mockBonusPaymentValidator.validate(any())).thenReturn(Nil)
   }
 
@@ -188,7 +188,7 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
       }
 
       "the periodEndDate is more than 6 years and 14 days in the past" in {
-        val now = new DateTime("2050-01-20")
+        val now = LocalDate.parse("2050-01-20")
 
         when(mockDateTimeService.now()).thenReturn(now)
 
@@ -213,8 +213,8 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
       "help to buy is populated for a claim with a start date of 6 April 2018 or after" in {
         val validBonusPayment = Json.parse(validBonusPaymentJson).as[RequestBonusPaymentRequest]
         val request           = validBonusPayment.copy(
-          periodStartDate = new DateTime("2018-04-06"),
-          periodEndDate = new DateTime("2018-05-05")
+          periodStartDate = LocalDate.parse("2018-04-06"),
+          periodEndDate = LocalDate.parse("2018-05-05")
         )
 
         doRequest(Json.toJson(request).toString()) { res =>
@@ -844,15 +844,15 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
           Future.successful(
             GetBonusResponse(
               Some("1234567891"),
-              new DateTime("2017-04-06"),
-              new DateTime("2017-05-05"),
+              LocalDate.parse("2017-04-06"),
+              LocalDate.parse("2017-05-05"),
               Some(HelpToBuyTransfer(0f, 10f)),
               InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
               Bonuses(1000f, 1000f, Some(1000f), "Life Event"),
               Some("1234567892"),
               Some(BonusRecovery(100, "1234567890", 1100, -100)),
               "Paid",
-              new DateTime("2017-05-20")
+              LocalDate.parse("2017-05-20")
             )
           )
         )
@@ -898,15 +898,15 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
           Future.successful(
             GetBonusResponse(
               Some("1234567891"),
-              new DateTime("2017-04-06"),
-              new DateTime("2017-05-05"),
+              LocalDate.parse("2017-04-06"),
+              LocalDate.parse("2017-05-05"),
               Some(HelpToBuyTransfer(0f, 10f)),
               InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
               Bonuses(1000f, 1000f, Some(1000f), "Life Event"),
               Some("1234567892"),
               None,
               "Paid",
-              new DateTime("2017-05-20")
+              LocalDate.parse("2017-05-20")
             )
           )
         )
@@ -969,8 +969,8 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
         when(mockBonusOrWithdrawalService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetWithdrawalResponse(
-              new DateTime("2017-05-06"),
-              new DateTime("2017-06-05"),
+              LocalDate.parse("2017-05-06"),
+              LocalDate.parse("2017-06-05"),
               None,
               1000,
               250,
@@ -980,7 +980,7 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
               None,
               None,
               "Collected",
-              new DateTime("2017-06-19")
+              LocalDate.parse("2017-06-19")
             )
           )
         )
@@ -1005,15 +1005,15 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
           Future.successful(
             GetBonusResponse(
               Some("1234567891"),
-              new DateTime("2017-04-06"),
-              new DateTime("2017-05-05"),
+              LocalDate.parse("2017-04-06"),
+              LocalDate.parse("2017-05-05"),
               Some(HelpToBuyTransfer(0f, 10f)),
               InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
               Bonuses(1000f, 1000f, Some(1000f), "Superseded Bonus"),
               Some("1234567892"),
               Some(BonusRecovery(100, "1234567890", 1100, -100)),
               "Paid",
-              new DateTime("2017-05-20")
+              LocalDate.parse("2017-05-20")
             )
           )
         )
@@ -1047,15 +1047,15 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
           Future.successful(
             GetBonusResponse(
               Some("1234567891"),
-              new DateTime("2017-04-06"),
-              new DateTime("2017-05-05"),
+              LocalDate.parse("2017-04-06"),
+              LocalDate.parse("2017-05-05"),
               Some(HelpToBuyTransfer(0f, 10f)),
               InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
               Bonuses(1000f, 1000f, Some(1000f), "Life Event"),
               Some("1234567892"),
               Some(BonusRecovery(100, "1234567890", 1100, -100)),
               "Paid",
-              new DateTime("2017-05-20")
+              LocalDate.parse("2017-05-20")
             )
           )
         )
@@ -1080,15 +1080,15 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
           Future.successful(
             GetBonusResponse(
               Some("1234567891"),
-              new DateTime("2017-04-06"),
-              new DateTime("2017-05-05"),
+              LocalDate.parse("2017-04-06"),
+              LocalDate.parse("2017-05-05"),
               Some(HelpToBuyTransfer(0f, 10f)),
               InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
               Bonuses(1000f, 1000f, Some(1000f), "Life Event"),
               Some("1234567892"),
               None,
               "Paid",
-              new DateTime("2017-05-20")
+              LocalDate.parse("2017-05-20")
             )
           )
         )
@@ -1156,8 +1156,8 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
         when(mockBonusOrWithdrawalService.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetWithdrawalResponse(
-              new DateTime("2017-05-06"),
-              new DateTime("2017-06-05"),
+              LocalDate.parse("2017-05-06"),
+              LocalDate.parse("2017-06-05"),
               None,
               1000,
               250,
@@ -1167,7 +1167,7 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
               None,
               None,
               "Collected",
-              new DateTime("2017-06-19")
+              LocalDate.parse("2017-06-19")
             )
           )
         )
@@ -1211,15 +1211,15 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
           Future.successful(
             GetBonusResponse(
               Some("1234567891"),
-              new DateTime("2017-04-06"),
-              new DateTime("2017-05-05"),
+              LocalDate.parse("2017-04-06"),
+              LocalDate.parse("2017-05-05"),
               Some(HelpToBuyTransfer(0f, 10f)),
               InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
               Bonuses(1000f, 1000f, Some(1000f), "Superseded Bonus"),
               Some("1234567892"),
               Some(BonusRecovery(100, "1234567890", 1100, -100)),
               "Paid",
-              new DateTime("2017-05-20")
+              LocalDate.parse("2017-05-20")
             )
           )
         )

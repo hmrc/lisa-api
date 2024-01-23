@@ -16,10 +16,11 @@
 
 package unit.models
 
-import org.joda.time.DateTime
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.lisaapi.models._
+
+import java.time.LocalDate
 
 class GetBonusOrWithdrawalResponseSpec extends PlaySpec {
 
@@ -67,9 +68,9 @@ class GetBonusOrWithdrawalResponseSpec extends PlaySpec {
           errors => fail(errors.toString()),
           success =>
             success mustBe GetBonusResponse(
-              creationDate = new DateTime("2018-02-20"),
-              periodStartDate = new DateTime("2018-01-06"),
-              periodEndDate = new DateTime("2018-02-05"),
+              creationDate = LocalDate.parse("2018-02-20"),
+              periodStartDate = LocalDate.parse("2018-01-06"),
+              periodEndDate = LocalDate.parse("2018-02-05"),
               lifeEventId = Some("1234567890"),
               htbTransfer = Some(HelpToBuyTransfer(htbTransferInForPeriod = 100, htbTransferTotalYTD = 200)),
               paymentStatus = "Paid",
@@ -106,9 +107,9 @@ class GetBonusOrWithdrawalResponseSpec extends PlaySpec {
           errors => fail(errors.toString()),
           success =>
             success mustBe GetBonusResponse(
-              creationDate = new DateTime("2018-02-20"),
-              periodStartDate = new DateTime("2018-01-06"),
-              periodEndDate = new DateTime("2018-02-05"),
+              creationDate = LocalDate.parse("2018-02-20"),
+              periodStartDate = LocalDate.parse("2018-01-06"),
+              periodEndDate = LocalDate.parse("2018-02-05"),
               lifeEventId = Some("1234567890"),
               htbTransfer = Some(HelpToBuyTransfer(htbTransferInForPeriod = 100, htbTransferTotalYTD = 200)),
               paymentStatus = "Paid",
@@ -152,9 +153,9 @@ class GetBonusOrWithdrawalResponseSpec extends PlaySpec {
           errors => fail(errors.toString()),
           success =>
             success mustBe GetBonusResponse(
-              creationDate = new DateTime("2018-02-20"),
-              periodStartDate = new DateTime("2018-01-06"),
-              periodEndDate = new DateTime("2018-02-05"),
+              creationDate = LocalDate.parse("2018-02-20"),
+              periodStartDate = LocalDate.parse("2018-01-06"),
+              periodEndDate = LocalDate.parse("2018-02-05"),
               lifeEventId = Some("1234567890"),
               htbTransfer = Some(HelpToBuyTransfer(htbTransferInForPeriod = 100, htbTransferTotalYTD = 200)),
               paymentStatus = "Paid",
@@ -193,9 +194,9 @@ class GetBonusOrWithdrawalResponseSpec extends PlaySpec {
           errors => fail(errors.toString()),
           success =>
             success mustBe GetWithdrawalResponse(
-              creationDate = new DateTime("2018-02-20"),
-              periodStartDate = new DateTime("2018-01-06"),
-              periodEndDate = new DateTime("2018-02-05"),
+              creationDate = LocalDate.parse("2018-02-20"),
+              periodStartDate = LocalDate.parse("2018-01-06"),
+              periodEndDate = LocalDate.parse("2018-02-05"),
               automaticRecoveryAmount = Some(250),
               withdrawalAmount = 1000,
               withdrawalChargeAmount = 250,
@@ -223,9 +224,9 @@ class GetBonusOrWithdrawalResponseSpec extends PlaySpec {
           errors => fail(errors.toString()),
           success =>
             success mustBe GetWithdrawalResponse(
-              creationDate = new DateTime("2018-02-20"),
-              periodStartDate = new DateTime("2018-01-06"),
-              periodEndDate = new DateTime("2018-02-05"),
+              creationDate = LocalDate.parse("2018-02-20"),
+              periodStartDate = LocalDate.parse("2018-01-06"),
+              periodEndDate = LocalDate.parse("2018-02-05"),
               automaticRecoveryAmount = Some(250),
               withdrawalAmount = 1000,
               withdrawalChargeAmount = 250,
@@ -261,9 +262,9 @@ class GetBonusOrWithdrawalResponseSpec extends PlaySpec {
           errors => fail(errors.toString()),
           success =>
             success mustBe GetWithdrawalResponse(
-              creationDate = new DateTime("2018-02-20"),
-              periodStartDate = new DateTime("2018-01-06"),
-              periodEndDate = new DateTime("2018-02-05"),
+              creationDate = LocalDate.parse("2018-02-20"),
+              periodStartDate = LocalDate.parse("2018-01-06"),
+              periodEndDate = LocalDate.parse("2018-02-05"),
               automaticRecoveryAmount = Some(250),
               withdrawalAmount = 1000,
               withdrawalChargeAmount = 250,
@@ -303,9 +304,9 @@ class GetBonusOrWithdrawalResponseSpec extends PlaySpec {
           errors => fail(errors.toString()),
           success =>
             success mustBe GetWithdrawalResponse(
-              creationDate = new DateTime("2018-02-20"),
-              periodStartDate = new DateTime("2018-01-06"),
-              periodEndDate = new DateTime("2018-02-05"),
+              creationDate = LocalDate.parse("2018-02-20"),
+              periodStartDate = LocalDate.parse("2018-01-06"),
+              periodEndDate = LocalDate.parse("2018-02-05"),
               automaticRecoveryAmount = Some(0),
               withdrawalAmount = 0,
               withdrawalChargeAmount = 0,

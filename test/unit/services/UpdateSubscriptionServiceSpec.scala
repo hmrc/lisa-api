@@ -17,7 +17,6 @@
 package unit.services
 
 import helpers.ServiceTestFixture
-import org.joda.time.DateTime
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import uk.gov.hmrc.http.HeaderCarrier
@@ -25,6 +24,7 @@ import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des._
 import uk.gov.hmrc.lisaapi.services.UpdateSubscriptionService
 
+import java.time.LocalDate
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
@@ -126,7 +126,7 @@ class UpdateSubscriptionServiceSpec extends ServiceTestFixture {
   }
 
   private def doRequest(callback: UpdateSubscriptionResponse => Unit): Unit = {
-    val request  = UpdateSubscriptionRequest(new DateTime("2017-04-06"))
+    val request  = UpdateSubscriptionRequest(LocalDate.parse("2017-04-06"))
     val response = Await.result(
       updateSubscriptionService.updateSubscription("Z019283", "192837", request)(HeaderCarrier()),
       Duration.Inf

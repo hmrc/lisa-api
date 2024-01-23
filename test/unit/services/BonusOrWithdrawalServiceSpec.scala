@@ -17,7 +17,6 @@
 package unit.services
 
 import helpers.ServiceTestFixture
-import org.joda.time.DateTime
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import uk.gov.hmrc.http.HeaderCarrier
@@ -25,6 +24,7 @@ import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesUnavailableResponse}
 import uk.gov.hmrc.lisaapi.services.BonusOrWithdrawalService
 
+import java.time.LocalDate
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
@@ -38,8 +38,8 @@ class BonusOrWithdrawalServiceSpec extends ServiceTestFixture {
     "return a success response" when {
       "given a successful response from the DES connector" in {
         val desResponse = GetWithdrawalResponse(
-          periodStartDate = new DateTime("2018-01-06"),
-          periodEndDate = new DateTime("2018-02-05"),
+          periodStartDate = LocalDate.parse("2018-01-06"),
+          periodEndDate = LocalDate.parse("2018-02-05"),
           automaticRecoveryAmount = Some(0),
           withdrawalAmount = 100,
           withdrawalChargeAmount = 25,
@@ -49,7 +49,7 @@ class BonusOrWithdrawalServiceSpec extends ServiceTestFixture {
           supersededBy = None,
           supersede = None,
           paymentStatus = "Collected",
-          creationDate = new DateTime("2018-02-10")
+          creationDate = LocalDate.parse("2018-02-10")
         )
 
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any()))

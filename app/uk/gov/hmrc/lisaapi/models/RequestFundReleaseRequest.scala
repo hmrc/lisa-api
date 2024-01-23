@@ -16,9 +16,10 @@
 
 package uk.gov.hmrc.lisaapi.models
 
-import org.joda.time.DateTime
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
+
+import java.time.LocalDate
 
 case class FundReleasePropertyDetails(nameOrNumber: String, postalCode: String)
 
@@ -58,41 +59,38 @@ object FundReleasePropertyDetails {
   implicit val writes: Writes[FundReleasePropertyDetails] = Json.writes[FundReleasePropertyDetails]
 }
 
-case class FundReleaseSupersedeDetails(originalLifeEventId: LifeEventId, originalEventDate: DateTime)
+case class FundReleaseSupersedeDetails(originalLifeEventId: LifeEventId, originalEventDate: LocalDate)
 
 object FundReleaseSupersedeDetails {
-  implicit val dateReads: Reads[DateTime]                    = JodaReads.jodaDateReads("yyyy-MM-dd")
-  implicit val dateWrites: Writes[DateTime]                  = JodaWrites.jodaDateWrites("yyyy-MM-dd")
   implicit val formats: OFormat[FundReleaseSupersedeDetails] = Json.format[FundReleaseSupersedeDetails]
 }
 
 trait RequestFundReleaseRequest extends ReportLifeEventRequestBase {
-  val eventDate: DateTime
+  val eventDate: LocalDate
   val withdrawalAmount: Amount
 }
 
 case class InitialFundReleaseRequest(
-  eventDate: DateTime,
+  eventDate: LocalDate,
   withdrawalAmount: Amount,
   conveyancerReference: Option[String],
   propertyDetails: Option[FundReleasePropertyDetails]
 ) extends RequestFundReleaseRequest
 
 case class SupersedeFundReleaseRequest(
-  eventDate: DateTime,
+  eventDate: LocalDate,
   withdrawalAmount: Amount,
   supersede: FundReleaseSupersedeDetails
 ) extends RequestFundReleaseRequest
 
 object RequestFundReleaseRequest {
-  implicit val dateReads: Reads[DateTime]   = JsonReads.notFutureDate
-  implicit val dateWrites: Writes[DateTime] = JodaWrites.jodaDateWrites("yyyy-MM-dd")
+  implicit val dateReads: Reads[LocalDate]   = JsonReads.notFutureDate
 
   val initialReads: Reads[InitialFundReleaseRequest] = Json.reads[InitialFundReleaseRequest]
 
   implicit val initialWrites: Writes[InitialFundReleaseRequest] = (
     (JsPath \ "eventType").write[String] and
-      (JsPath \ "eventDate").write[DateTime] and
+      (JsPath \ "eventDate").write[LocalDate] and
       (JsPath \ "withdrawalAmount").write[Amount] and
       (JsPath \ "conveyancerReference").writeNullable[String] and
       (JsPath \ "propertyDetails").writeNullable[FundReleasePropertyDetails]
@@ -110,9 +108,9 @@ object RequestFundReleaseRequest {
 
   implicit val supersedeWrites: Writes[SupersedeFundReleaseRequest] = (
     (JsPath \ "eventType").write[String] and
-      (JsPath \ "eventDate").write[DateTime] and
+      (JsPath \ "eventDate").write[LocalDate] and
       (JsPath \ "withdrawalAmount").write[Amount] and
-      (JsPath \ "supersededLifeEventDate").write[DateTime] and
+      (JsPath \ "supersededLifeEventDate").write[LocalDate] and
       (JsPath \ "supersededLifeEventID").write[LifeEventId]
   ) { req: SupersedeFundReleaseRequest =>
     (

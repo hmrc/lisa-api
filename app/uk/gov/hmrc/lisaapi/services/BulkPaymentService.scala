@@ -17,20 +17,18 @@
 package uk.gov.hmrc.lisaapi.services
 
 import com.google.inject.Inject
-import org.joda.time.DateTime
 import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
 import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesUnavailableResponse}
 import uk.gov.hmrc.lisaapi.models._
 
+import java.time.LocalDate
 import scala.concurrent.{ExecutionContext, Future}
 
 class BulkPaymentService @Inject() (desConnector: DesConnector)(implicit ec: ExecutionContext) extends Logging {
 
-  def getBulkPayment(lisaManager: String, startDate: DateTime, endDate: DateTime)(implicit
-    hc: HeaderCarrier
-  ): Future[GetBulkPaymentResponse] =
+  def getBulkPayment(lisaManager: String, startDate: LocalDate, endDate: LocalDate)(implicit hc: HeaderCarrier): Future[GetBulkPaymentResponse] =
     desConnector.getBulkPayment(lisaManager, startDate, endDate) map {
       case GetBulkPaymentNotFoundResponse                         => GetBulkPaymentNotFoundResponse
       case s: GetBulkPaymentSuccessResponse if s.payments.isEmpty => GetBulkPaymentNotFoundResponse

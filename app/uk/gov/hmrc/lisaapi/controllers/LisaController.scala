@@ -95,7 +95,8 @@ abstract case class LisaController(
           Try(json.validate[T]) match {
             case Success(JsSuccess(payload, _)) =>
               Try(success(payload)) match {
-                case Success(result)        => result
+                case Success(result)        =>
+                  result
                 case Failure(ex: Exception) =>
                   logger.error(s"LisaController An error occurred in Json payload validation ${ex.getMessage}")
                   lisaMetrics.incrementMetrics(

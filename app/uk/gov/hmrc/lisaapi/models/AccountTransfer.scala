@@ -16,26 +16,27 @@
 
 package uk.gov.hmrc.lisaapi.models
 
-import org.joda.time.DateTime
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsPath, Reads, Writes}
+
+import java.time.LocalDate
 
 case class AccountTransfer(
   transferredFromAccountId: AccountId,
   transferredFromLMRN: LisaManagerReferenceNumber,
-  transferInDate: DateTime
+  transferInDate: LocalDate
 )
 
 object AccountTransfer {
   implicit val accountTransferReads: Reads[AccountTransfer] = (
     (JsPath \ "transferredFromAccountId").read(JsonReads.accountId) and
       (JsPath \ "transferredFromLMRN").read(JsonReads.lmrn) and
-      (JsPath \ "transferInDate").read(JsonReads.notFutureDate).map(new DateTime(_))
+      (JsPath \ "transferInDate").read(JsonReads.notFutureDate)
   )(AccountTransfer.apply _)
 
   implicit val accountTransferWrites: Writes[AccountTransfer] = (
     (JsPath \ "transferredFromAccountID").write[String] and
       (JsPath \ "transferredFromLMRN").write[String] and
-      (JsPath \ "transferInDate").write[String].contramap[DateTime](d => d.toString("yyyy-MM-dd"))
+      (JsPath \ "transferInDate").write[LocalDate]
   )(unlift(AccountTransfer.unapply))
 }

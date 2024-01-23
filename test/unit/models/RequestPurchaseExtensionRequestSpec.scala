@@ -16,10 +16,11 @@
 
 package unit.models
 
-import org.joda.time.DateTime
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsPath, Json, JsonValidationError}
 import uk.gov.hmrc.lisaapi.models._
+
+import java.time.LocalDate
 
 class RequestPurchaseExtensionRequestSpec extends PlaySpec {
 
@@ -30,7 +31,7 @@ class RequestPurchaseExtensionRequestSpec extends PlaySpec {
       val json = """{"fundReleaseId":"3456789001","eventDate":"2017-05-10","eventType":"Extension one"}"""
 
       Json.parse(json).as[RequestPurchaseExtension] mustBe RequestStandardPurchaseExtension(
-        eventDate = new DateTime("2017-05-10"),
+        eventDate = LocalDate.parse("2017-05-10"),
         eventType = "Extension one",
         fundReleaseId = "3456789001"
       )
@@ -40,7 +41,7 @@ class RequestPurchaseExtensionRequestSpec extends PlaySpec {
     "deserialize to json" in {
 
       val input = RequestStandardPurchaseExtension(
-        eventDate = new DateTime("2017-05-10"),
+        eventDate = LocalDate.parse("2017-05-10"),
         eventType = "Extension one",
         fundReleaseId = "3456789001"
       )
@@ -103,10 +104,10 @@ class RequestPurchaseExtensionRequestSpec extends PlaySpec {
         """{"eventDate":"2017-05-11","eventType":"Extension one","supersede":{"originalEventDate":"2017-05-10","originalLifeEventId":"6789000001"}}"""
 
       Json.parse(json).as[RequestPurchaseExtension] mustBe RequestSupersededPurchaseExtension(
-        eventDate = new DateTime("2017-05-11"),
+        eventDate = LocalDate.parse("2017-05-11"),
         eventType = "Extension one",
         supersede = RequestExtensionSupersedeDetails(
-          originalEventDate = new DateTime("2017-05-10"),
+          originalEventDate = LocalDate.parse("2017-05-10"),
           originalLifeEventId = "6789000001"
         )
       )
@@ -116,10 +117,10 @@ class RequestPurchaseExtensionRequestSpec extends PlaySpec {
     "deserialize to json" in {
 
       val input = RequestSupersededPurchaseExtension(
-        eventDate = new DateTime("2017-05-10"),
+        eventDate = LocalDate.parse("2017-05-10"),
         eventType = "Extension one",
         supersede = RequestExtensionSupersedeDetails(
-          originalEventDate = new DateTime("2017-05-10"),
+          originalEventDate = LocalDate.parse("2017-05-10"),
           originalLifeEventId = "6789000001"
         )
       )

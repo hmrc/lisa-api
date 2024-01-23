@@ -17,7 +17,6 @@
 package unit.services
 
 import helpers.ServiceTestFixture
-import org.joda.time.DateTime
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito.when
 import uk.gov.hmrc.http.HeaderCarrier
@@ -25,6 +24,7 @@ import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesUnavailableResponse}
 import uk.gov.hmrc.lisaapi.services.BulkPaymentService
 
+import java.time.LocalDate
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
@@ -126,5 +126,5 @@ class BulkPaymentServiceSpec extends ServiceTestFixture {
   }
 
   val lmrn = "Z123456"
-  val date = new DateTime("2018-01-01")
+  val date = LocalDate.parse("2018-01-01")
 }

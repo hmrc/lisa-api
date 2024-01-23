@@ -16,19 +16,18 @@
 
 package uk.gov.hmrc.lisaapi.connectors
 
-import java.util.UUID.randomUUID
-
 import com.google.inject.Inject
-import org.joda.time.DateTime
+import play.api.Logging
 import play.api.http.Status._
 import play.api.libs.json.{JsValue, Json, Reads}
-import play.api.Logging
 import play.utils.UriEncoding
 import uk.gov.hmrc.http.{HttpClient, _}
 import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des._
 
+import java.time.LocalDate
+import java.util.UUID.randomUUID
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 
@@ -377,12 +376,10 @@ class DesConnector @Inject() (
     }
   }
 
-  def getBulkPayment(lisaManager: String, startDate: DateTime, endDate: DateTime)(implicit
-    hc: HeaderCarrier
-  ): Future[DesResponse] = {
+  def getBulkPayment(lisaManager: String, startDate: LocalDate, endDate: LocalDate)(implicit hc: HeaderCarrier): Future[DesResponse] = {
     val uri = s"${appContext.desUrl}/enterprise/financial-data/ZISA/$lisaManager/LISA" +
-      s"?dateFrom=${startDate.toString("yyyy-MM-dd")}" +
-      s"&dateTo=${endDate.toString("yyyy-MM-dd")}" +
+      s"?dateFrom=${startDate.toString}" +
+      s"&dateTo=${endDate.toString}" +
       "&onlyOpenItems=false"
 
     logger.debug("Getting Bulk payment details from des: " + uri)

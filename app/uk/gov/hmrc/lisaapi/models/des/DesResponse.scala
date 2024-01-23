@@ -16,10 +16,11 @@
 
 package uk.gov.hmrc.lisaapi.models.des
 
-import org.joda.time.DateTime
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import uk.gov.hmrc.lisaapi.models._
+
+import java.time.LocalDate
 
 trait DesResponse
 
@@ -31,7 +32,7 @@ sealed abstract class DesFailure extends DesResponse {
 case class DesAccountResponse(accountID: String) extends DesResponse
 
 case class DesLifeEventResponse(lifeEventID: String) extends DesResponse
-case class DesLifeEventRetrievalResponse(lifeEventID: LifeEventId, eventType: LifeEventType, eventDate: DateTime)
+case class DesLifeEventRetrievalResponse(lifeEventID: LifeEventId, eventType: LifeEventType, eventDate: LocalDate)
     extends DesResponse
 case class DesCreateInvestorResponse(investorID: String) extends DesResponse
 case class DesTransactionResponse(transactionID: String, message: Option[String]) extends DesResponse
@@ -47,12 +48,12 @@ case class DesUpdateSubscriptionSuccessResponse(code: String, reason: String) ex
 case class DesReinstateAccountSuccessResponse(code: String, reason: String) extends DesResponse
 case class DesGetBonusPaymentResponse(
   lifeEventId: Option[LifeEventId],
-  periodStartDate: DateTime,
-  periodEndDate: DateTime,
+  periodStartDate: LocalDate,
+  periodEndDate: LocalDate,
   htbTransfer: Option[HelpToBuyTransfer],
   inboundPayments: InboundPayments,
   bonuses: Bonuses,
-  creationDate: DateTime,
+  creationDate: LocalDate,
   status: String,
   supersededBy: Option[TransactionId] = None,
   supersede: Option[Supersede] = None
@@ -93,7 +94,7 @@ object DesResponse {
   implicit val requestLifeEventResponseReads: Reads[DesLifeEventRetrievalResponse] = (
     (JsPath \ "lifeEventID").read(JsonReads.lifeEventId) and
       (JsPath \ "eventType").read(JsonReads.lifeEventType) and
-      (JsPath \ "eventDate").read(JsonReads.notFutureDate).map(new DateTime(_))
+      (JsPath \ "eventDate").read(JsonReads.notFutureDate)
   )(DesLifeEventRetrievalResponse.apply _)
 
   implicit val requestTransactionAlreadyExistResponseFormats: OFormat[DesTransactionExistResponse]                    =
@@ -105,8 +106,8 @@ object DesResponse {
 
   implicit val desGetBonusPaymentResponse: Reads[DesGetBonusPaymentResponse] = (
     (JsPath \ "lifeEventId").readNullable(JsonReads.lifeEventId) and
-      (JsPath \ "claimPeriodStart").read(JsonReads.isoDate).map(new DateTime(_)) and
-      (JsPath \ "claimPeriodEnd").read(JsonReads.isoDate).map(new DateTime(_)) and
+      (JsPath \ "claimPeriodStart").read(JsonReads.isoDate) and
+      (JsPath \ "claimPeriodEnd").read(JsonReads.isoDate) and
       (JsPath \ "htbInAmountForPeriod").readNullable[Amount] and
       (JsPath \ "htbInAmountYtd").readNullable[Amount] and
       (JsPath \ "newSubsInPeriod").readNullable[Amount] and
@@ -117,7 +118,7 @@ object DesResponse {
       (JsPath \ "bonusDueYtd").read[Amount] and
       (JsPath \ "bonusPaidYtd").readNullable[Amount] and
       (JsPath \ "claimReason").read[String] and
-      (JsPath \ "creationDate").read(JsonReads.isoDate).map(new DateTime(_)) and
+      (JsPath \ "creationDate").read(JsonReads.isoDate) and
       (JsPath \ "paymentStatus").read[String] and
       (JsPath \ "supersededBy").readNullable(JsonReads.transactionId) and
       (JsPath \ "automaticRecoveryAmount").readNullable[Amount] and

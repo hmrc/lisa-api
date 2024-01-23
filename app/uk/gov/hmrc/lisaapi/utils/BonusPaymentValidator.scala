@@ -172,7 +172,7 @@ class BonusPaymentValidator @Inject() (currentDateService: CurrentDateService) e
 
   private val periodStartDateIsNotInFuture
     : PartialFunction[BonusPaymentValidationRequest, BonusPaymentValidationRequest] = {
-    case req: BonusPaymentValidationRequest if req.data.periodStartDate.toDate.after(currentDateService.now().toDate) =>
+    case req: BonusPaymentValidationRequest if req.data.periodStartDate.isAfter(currentDateService.now()) =>
       req.copy(errors =
         req.errors :+ ErrorValidation(
           DATE_ERROR,
@@ -189,7 +189,7 @@ class BonusPaymentValidator @Inject() (currentDateService: CurrentDateService) e
       val monthBeforeEnd = req.data.periodEndDate.minusMonths(1)
       val endDateIsValid = req.data.periodEndDate.getDayOfMonth == 5 &&
         req.data.periodStartDate.getYear == monthBeforeEnd.getYear &&
-        req.data.periodStartDate.getMonthOfYear == monthBeforeEnd.getMonthOfYear
+        req.data.periodStartDate.getMonth == monthBeforeEnd.getMonth
 
       if (endDateIsValid) {
         req

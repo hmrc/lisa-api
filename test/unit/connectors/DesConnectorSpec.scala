@@ -16,9 +16,6 @@
 
 package unit.connectors
 
-import java.time.LocalDate
-
-import org.joda.time.DateTime
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
 import play.api.libs.json.JsValue
@@ -27,6 +24,7 @@ import uk.gov.hmrc.http._
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des._
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class DesConnectorSpec extends DesConnectorTestHelper {
@@ -1050,12 +1048,12 @@ class DesConnectorSpec extends DesConnectorTestHelper {
         doRetrieveBonusPaymentRequest { response =>
           response mustBe GetBonusResponse(
             lifeEventId = Some("1234567891"),
-            periodStartDate = new DateTime("2017-04-06"),
-            periodEndDate = new DateTime("2017-05-05"),
+            periodStartDate = LocalDate.parse("2017-04-06"),
+            periodEndDate = LocalDate.parse("2017-05-05"),
             htbTransfer = Some(HelpToBuyTransfer(0, 10)),
             inboundPayments = InboundPayments(Some(4000), 4000, 4000, 4000),
             bonuses = Bonuses(1000, 1000, Some(1000), "Life Event"),
-            creationDate = new DateTime("2017-05-05"),
+            creationDate = LocalDate.parse("2017-05-05"),
             paymentStatus = "Paid",
             supersededBy = None,
             supersede = None
@@ -1160,7 +1158,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
         doRetrieveTransactionRequest { response =>
           response mustBe DesGetTransactionPending(
-            paymentDueDate = new DateTime("2000-01-01"),
+            paymentDueDate = LocalDate.parse("2000-01-01"),
             paymentReference = Some("002630000994"),
             paymentAmount = Some(2.0)
           )
@@ -1182,7 +1180,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
         doRetrieveTransactionRequest { response =>
           response mustBe DesGetTransactionPending(
-            paymentDueDate = new DateTime("2000-01-01"),
+            paymentDueDate = LocalDate.parse("2000-01-01"),
             paymentReference = None,
             paymentAmount = None
           )
@@ -1206,7 +1204,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
         doRetrieveTransactionRequest { response =>
           response mustBe DesGetTransactionPaid(
-            paymentDate = new DateTime("2000-01-01"),
+            paymentDate = LocalDate.parse("2000-01-01"),
             paymentReference = "002630000993",
             paymentAmount = 1.0
           )
@@ -1331,11 +1329,11 @@ class DesConnectorSpec extends DesConnectorTestHelper {
             lisaManagerReferenceNumber = "Z5555",
             payments = List(
               BulkPaymentPaid(
-                paymentDate = Some(new DateTime("2017-06-01")),
+                paymentDate = Some(LocalDate.parse("2017-06-01")),
                 paymentReference = Some("ABC123456789"),
                 paymentAmount = 1000.00
               ),
-              BulkPaymentPending(dueDate = Some(new DateTime("2017-07-01")), paymentAmount = 1500.55)
+              BulkPaymentPending(dueDate = Some(LocalDate.parse("2017-07-01")), paymentAmount = 1500.55)
             )
           )
         }
@@ -1516,16 +1514,16 @@ class DesConnectorSpec extends DesConnectorTestHelper {
             accountId = "123456",
             investorId = "1234567890",
             creationReason = "Reinstated",
-            firstSubscriptionDate = new DateTime("2016-01-06"),
+            firstSubscriptionDate = LocalDate.parse("2016-01-06"),
             accountStatus = "OPEN",
             subscriptionStatus = "AVAILABLE",
             accountClosureReason = Some("Transferred out"),
-            closureDate = Some(new DateTime("2016-05-01")),
+            closureDate = Some(LocalDate.parse("2016-05-01")),
             transferAccount = Some(
               GetLisaAccountTransferAccount(
                 transferredFromAccountId = "123abc789ABC34567890",
                 transferredFromLMRN = "Z123453",
-                transferInDate = new DateTime("2016-03-01")
+                transferInDate = LocalDate.parse("2016-03-01")
               )
             )
           )
@@ -1565,16 +1563,16 @@ class DesConnectorSpec extends DesConnectorTestHelper {
             accountId = "123456",
             investorId = "1234567890",
             creationReason = "Reinstated",
-            firstSubscriptionDate = new DateTime("2016-01-06"),
+            firstSubscriptionDate = LocalDate.parse("2016-01-06"),
             accountStatus = "OPEN",
             subscriptionStatus = "AVAILABLE",
             accountClosureReason = Some("Transferred out"),
-            closureDate = Some(new DateTime("2016-05-01")),
+            closureDate = Some(LocalDate.parse("2016-05-01")),
             transferAccount = Some(
               GetLisaAccountTransferAccount(
                 transferredFromAccountId = "123abc789ABC34567890",
                 transferredFromLMRN = "Z123453",
-                transferInDate = new DateTime("2016-03-01")
+                transferInDate = LocalDate.parse("2016-03-01")
               )
             )
           )

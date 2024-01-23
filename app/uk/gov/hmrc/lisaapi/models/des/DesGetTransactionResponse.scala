@@ -16,30 +16,31 @@
 
 package uk.gov.hmrc.lisaapi.models.des
 
-import org.joda.time.DateTime
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsPath, Reads}
 import uk.gov.hmrc.lisaapi.models.{Amount, JsonReads}
 
+import java.time.LocalDate
+
 trait DesGetTransactionResponse extends DesResponse
 
 case class DesGetTransactionPending(
-  paymentDueDate: DateTime,
+  paymentDueDate: LocalDate,
   paymentReference: Option[String] = None,
   paymentAmount: Option[Amount] = None
 ) extends DesGetTransactionResponse
-case class DesGetTransactionPaid(paymentDate: DateTime, paymentReference: String, paymentAmount: Amount)
+case class DesGetTransactionPaid(paymentDate: LocalDate, paymentReference: String, paymentAmount: Amount)
     extends DesGetTransactionResponse
 
 object DesGetTransactionResponse {
   implicit val pendingReads: Reads[DesGetTransactionPending] = (
-    (JsPath \ "paymentDate").read(JsonReads.isoDate).map(new DateTime(_)) and
+    (JsPath \ "paymentDate").read(JsonReads.isoDate) and
       (JsPath \ "paymentReference").readNullable[String] and
       (JsPath \ "paymentAmount").readNullable[Amount]
   )(DesGetTransactionPending.apply _)
 
   implicit val paidReads: Reads[DesGetTransactionPaid] = (
-    (JsPath \ "paymentDate").read(JsonReads.isoDate).map(new DateTime(_)) and
+    (JsPath \ "paymentDate").read(JsonReads.isoDate) and
       (JsPath \ "paymentReference").read[String] and
       (JsPath \ "paymentAmount").read[Amount]
   )(DesGetTransactionPaid.apply _)

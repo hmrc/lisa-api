@@ -54,7 +54,7 @@ class WithdrawalChargeValidator @Inject() (currentDateService: CurrentDateServic
   private val periodStartDateIsNotInFuture
     : PartialFunction[WithdrawalChargeValidationRequest, WithdrawalChargeValidationRequest] = {
     case req: WithdrawalChargeValidationRequest
-        if req.data.claimPeriodStartDate.toDate.after(currentDateService.now().toDate) =>
+        if req.data.claimPeriodStartDate.isAfter(currentDateService.now()) =>
       req.copy(errors =
         req.errors :+ ErrorValidation(
           DATE_ERROR,
@@ -71,7 +71,7 @@ class WithdrawalChargeValidator @Inject() (currentDateService: CurrentDateServic
       val monthBeforeEnd = req.data.claimPeriodEndDate.minusMonths(1)
       val endDateIsValid = req.data.claimPeriodEndDate.getDayOfMonth == 5 &&
         req.data.claimPeriodStartDate.getYear == monthBeforeEnd.getYear &&
-        req.data.claimPeriodStartDate.getMonthOfYear == monthBeforeEnd.getMonthOfYear
+        req.data.claimPeriodStartDate.getMonth == monthBeforeEnd.getMonth
 
       if (endDateIsValid) {
         req

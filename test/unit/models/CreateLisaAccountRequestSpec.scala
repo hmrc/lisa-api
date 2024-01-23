@@ -16,10 +16,11 @@
 
 package unit.models
 
-import org.joda.time.DateTime
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json._
 import uk.gov.hmrc.lisaapi.models.{AccountTransfer, CreateLisaAccountCreationRequest, CreateLisaAccountRequest, CreateLisaAccountTransferRequest}
+
+import java.time.LocalDate
 
 class CreateLisaAccountRequestSpec extends PlaySpec {
 
@@ -60,9 +61,9 @@ class CreateLisaAccountRequestSpec extends PlaySpec {
               req.investorId mustBe "9876543210"
               req.accountId mustBe "8765432100"
               req.firstSubscriptionDate.getYear mustBe 2011
-              req.firstSubscriptionDate.getMonthOfYear mustBe 3
+              req.firstSubscriptionDate.getMonthValue mustBe 3
               req.firstSubscriptionDate.getDayOfMonth mustBe 23
-              req.transferAccount mustBe AccountTransfer("Z543210", "Z543333", new DateTime("2015-12-13"))
+              req.transferAccount mustBe AccountTransfer("Z543210", "Z543333", LocalDate.parse("2015-12-13"))
             case _                                     => fail()
           }
       }
@@ -82,9 +83,9 @@ class CreateLisaAccountRequestSpec extends PlaySpec {
               req.investorId mustBe "9876543210"
               req.accountId mustBe "8765432100"
               req.firstSubscriptionDate.getYear mustBe 2011
-              req.firstSubscriptionDate.getMonthOfYear mustBe 3
+              req.firstSubscriptionDate.getMonthValue mustBe 3
               req.firstSubscriptionDate.getDayOfMonth mustBe 23
-              req.transferAccount mustBe AccountTransfer("Z543210", "Z543333", new DateTime("2015-12-13"))
+              req.transferAccount mustBe AccountTransfer("Z543210", "Z543333", LocalDate.parse("2015-12-13"))
             case _                                     => fail()
           }
       }
@@ -104,9 +105,9 @@ class CreateLisaAccountRequestSpec extends PlaySpec {
               req.investorId mustBe "9876543210"
               req.accountId mustBe "8765432100"
               req.firstSubscriptionDate.getYear mustBe 2011
-              req.firstSubscriptionDate.getMonthOfYear mustBe 3
+              req.firstSubscriptionDate.getMonthValue mustBe 3
               req.firstSubscriptionDate.getDayOfMonth mustBe 23
-              req.transferAccount mustBe AccountTransfer("Z543210", "Z543333", new DateTime("2015-12-13"))
+              req.transferAccount mustBe AccountTransfer("Z543210", "Z543333", LocalDate.parse("2015-12-13"))
             case _                                     => fail()
           }
       }
@@ -123,7 +124,7 @@ class CreateLisaAccountRequestSpec extends PlaySpec {
               req.investorId mustBe "9876543210"
               req.accountId mustBe "8765432100"
               req.firstSubscriptionDate.getYear mustBe 2011
-              req.firstSubscriptionDate.getMonthOfYear mustBe 3
+              req.firstSubscriptionDate.getMonthValue mustBe 3
               req.firstSubscriptionDate.getDayOfMonth mustBe 23
             case _                                     => fail()
           }
@@ -135,8 +136,8 @@ class CreateLisaAccountRequestSpec extends PlaySpec {
         creationReason = "Transferred",
         investorId = "9876543210",
         accountId = "8765432100",
-        firstSubscriptionDate = new DateTime("2011-03-23"),
-        transferAccount = AccountTransfer("Z543210", "Z543333", new DateTime("2015-12-13"))
+        firstSubscriptionDate = LocalDate.parse("2011-03-23"),
+        transferAccount = AccountTransfer("Z543210", "Z543333", LocalDate.parse("2015-12-13"))
       )
 
       val json = Json.toJson[CreateLisaAccountRequest](request)
@@ -149,8 +150,8 @@ class CreateLisaAccountRequestSpec extends PlaySpec {
         creationReason = "Current year funds transferred",
         investorId = "9876543210",
         accountId = "8765432100",
-        firstSubscriptionDate = new DateTime("2011-03-23"),
-        transferAccount = AccountTransfer("Z543210", "Z543333", new DateTime("2015-12-13"))
+        firstSubscriptionDate = LocalDate.parse("2011-03-23"),
+        transferAccount = AccountTransfer("Z543210", "Z543333", LocalDate.parse("2015-12-13"))
       )
 
       val json = Json.toJson[CreateLisaAccountRequest](request)
@@ -165,8 +166,8 @@ class CreateLisaAccountRequestSpec extends PlaySpec {
         creationReason = "Previous year funds transferred",
         investorId = "9876543210",
         accountId = "8765432100",
-        firstSubscriptionDate = new DateTime("2011-03-23"),
-        transferAccount = AccountTransfer("Z543210", "Z543333", new DateTime("2015-12-13"))
+        firstSubscriptionDate = LocalDate.parse("2011-03-23"),
+        transferAccount = AccountTransfer("Z543210", "Z543333", LocalDate.parse("2015-12-13"))
       )
 
       val json = Json.toJson[CreateLisaAccountRequest](request)
@@ -180,7 +181,7 @@ class CreateLisaAccountRequestSpec extends PlaySpec {
       val request = CreateLisaAccountCreationRequest(
         investorId = "9876543210",
         accountId = "8765432100",
-        firstSubscriptionDate = new DateTime("2011-03-23")
+        firstSubscriptionDate = LocalDate.parse("2011-03-23")
       )
 
       val json = Json.toJson[CreateLisaAccountRequest](request)

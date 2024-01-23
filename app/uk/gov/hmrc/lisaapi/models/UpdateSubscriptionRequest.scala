@@ -16,21 +16,22 @@
 
 package uk.gov.hmrc.lisaapi.models
 
-import org.joda.time.DateTime
 import play.api.libs.json._
 
-case class UpdateSubscriptionRequest(firstSubscriptionDate: DateTime)
+import java.time.LocalDate
+
+case class UpdateSubscriptionRequest(firstSubscriptionDate: LocalDate)
 
 object UpdateSubscriptionRequest {
 
   implicit val updateSubscriptionRequestReads: Reads[UpdateSubscriptionRequest] =
     (__ \ "firstSubscriptionDate").read(JsonReads.notFutureDate).map { firstSubscriptionDate =>
-      UpdateSubscriptionRequest(new DateTime(firstSubscriptionDate))
+      UpdateSubscriptionRequest(firstSubscriptionDate)
     }
 
   implicit val updateSubscriptionRequestWrites: Writes[UpdateSubscriptionRequest] =
-    (__ \ "firstSubscriptionDate").write[String].contramap { (firstSubDate: UpdateSubscriptionRequest) =>
-      firstSubDate.firstSubscriptionDate.toString("yyyy-MM-dd")
+    (__ \ "firstSubscriptionDate").write[LocalDate].contramap { (firstSubDate: UpdateSubscriptionRequest) =>
+      firstSubDate.firstSubscriptionDate
     }
 
 }

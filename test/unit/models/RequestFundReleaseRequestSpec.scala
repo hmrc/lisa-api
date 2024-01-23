@@ -16,12 +16,13 @@
 
 package unit.models
 
-import org.joda.time.DateTime
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json._
 import uk.gov.hmrc.lisaapi.controllers.ErrorValidation
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.utils.ErrorConverter
+
+import java.time.LocalDate
 
 class RequestFundReleaseRequestSpec extends PlaySpec {
 
@@ -60,7 +61,7 @@ class RequestFundReleaseRequestSpec extends PlaySpec {
         """{"eventDate":"2017-05-10","withdrawalAmount":4000,"conveyancerReference":"CR12345-6789","propertyDetails":{"nameOrNumber":"1","postalCode":"AA11 1AA"}}"""
 
       Json.parse(json).as[RequestFundReleaseRequest] mustBe InitialFundReleaseRequest(
-        eventDate = new DateTime("2017-05-10"),
+        eventDate = LocalDate.parse("2017-05-10"),
         withdrawalAmount = 4000,
         conveyancerReference = Some("CR12345-6789"),
         propertyDetails = Some(
@@ -76,7 +77,7 @@ class RequestFundReleaseRequestSpec extends PlaySpec {
     "deserialize to json" in {
 
       val input    = InitialFundReleaseRequest(
-        eventDate = new DateTime("2017-05-10"),
+        eventDate = LocalDate.parse("2017-05-10"),
         withdrawalAmount = 4000,
         conveyancerReference = Some("CR12345-6789"),
         propertyDetails = Some(
@@ -96,7 +97,7 @@ class RequestFundReleaseRequestSpec extends PlaySpec {
     "deserialize to json without FundReleasePropertyDetails" in {
 
       val input    = InitialFundReleaseRequest(
-        eventDate = new DateTime("2017-05-10"),
+        eventDate = LocalDate.parse("2017-05-10"),
         withdrawalAmount = 4000,
         conveyancerReference = Some("CR12345-6789"),
         propertyDetails = None
@@ -111,7 +112,7 @@ class RequestFundReleaseRequestSpec extends PlaySpec {
     "deserialize to json without conveyancerReference" in {
 
       val input    = InitialFundReleaseRequest(
-        eventDate = new DateTime("2017-05-10"),
+        eventDate = LocalDate.parse("2017-05-10"),
         withdrawalAmount = 4000,
         conveyancerReference = None,
         propertyDetails = Some(
@@ -138,11 +139,11 @@ class RequestFundReleaseRequestSpec extends PlaySpec {
         """{"eventDate":"2017-05-05","withdrawalAmount":5000,"supersede":{"originalLifeEventId":"3456789000","originalEventDate":"2017-05-10"}}"""
 
       Json.parse(json).as[RequestFundReleaseRequest] mustBe SupersedeFundReleaseRequest(
-        eventDate = new DateTime("2017-05-05"),
+        eventDate = LocalDate.parse("2017-05-05"),
         withdrawalAmount = 5000,
         supersede = FundReleaseSupersedeDetails(
           originalLifeEventId = "3456789000",
-          originalEventDate = new DateTime("2017-05-10")
+          originalEventDate = LocalDate.parse("2017-05-10")
         )
       )
 
@@ -151,11 +152,11 @@ class RequestFundReleaseRequestSpec extends PlaySpec {
     "deserialize to json" in {
 
       val input    = SupersedeFundReleaseRequest(
-        eventDate = new DateTime("2017-05-05"),
+        eventDate = LocalDate.parse("2017-05-05"),
         withdrawalAmount = 5000,
         supersede = FundReleaseSupersedeDetails(
           originalLifeEventId = "3456789000",
-          originalEventDate = new DateTime("2017-05-10")
+          originalEventDate = LocalDate.parse("2017-05-10")
         )
       )
       val expected =

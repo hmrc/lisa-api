@@ -16,10 +16,11 @@
 
 package unit.models
 
-import org.joda.time.DateTime
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json._
 import uk.gov.hmrc.lisaapi.models.AccountTransfer
+
+import java.time.LocalDate
 
 class AccountTransferSpec extends PlaySpec {
 
@@ -37,13 +38,13 @@ class AccountTransferSpec extends PlaySpec {
           data.transferredFromAccountId mustBe "Z543210"
           data.transferredFromLMRN mustBe "Z543333"
           data.transferInDate.getYear mustBe 2015
-          data.transferInDate.getMonthOfYear mustBe 12
+          data.transferInDate.getMonthValue mustBe 12
           data.transferInDate.getDayOfMonth mustBe 13
       }
     }
 
     "deserialize to json" in {
-      val request = AccountTransfer("Z543210", "Z543333", new DateTime("2015-12-13"))
+      val request = AccountTransfer("Z543210", "Z543333", LocalDate.parse("2015-12-13"))
 
       val json = Json.toJson[AccountTransfer](request)
 

@@ -16,10 +16,11 @@
 
 package unit.models
 
-import org.joda.time.DateTime
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsSuccess, Json}
 import uk.gov.hmrc.lisaapi.models._
+
+import java.time.LocalDate
 
 class ReportLifeEventRequestSpec extends PlaySpec {
 
@@ -35,13 +36,13 @@ class ReportLifeEventRequestSpec extends PlaySpec {
         case JsSuccess(data, path) =>
           data.eventType mustBe "LISA Investor Terminal Ill Health"
           data.eventDate.getYear mustBe 2017
-          data.eventDate.getMonthOfYear mustBe 1
+          data.eventDate.getMonthValue mustBe 1
           data.eventDate.getDayOfMonth mustBe 1
       }
     }
 
     "deserialize to json" in {
-      val request = ReportLifeEventRequest("LISA Investor Terminal Ill Health", new DateTime("2017-01-01"))
+      val request = ReportLifeEventRequest("LISA Investor Terminal Ill Health", LocalDate.parse("2017-01-01"))
 
       val json = Json.toJson[ReportLifeEventRequestBase](request)
 
@@ -53,7 +54,7 @@ class ReportLifeEventRequestSpec extends PlaySpec {
   "ReportLifeEventRequestBase" must {
 
     "correctly serialise a standard life event" in {
-      val input  = ReportLifeEventRequest("LISA Investor Terminal Ill Health", new DateTime("2017-01-01"))
+      val input  = ReportLifeEventRequest("LISA Investor Terminal Ill Health", LocalDate.parse("2017-01-01"))
       val output = Json.toJson[ReportLifeEventRequestBase](input)
 
       output mustBe Json.obj(
@@ -64,7 +65,7 @@ class ReportLifeEventRequestSpec extends PlaySpec {
 
     "correctly serialise a standard fund release" in {
       val input  = InitialFundReleaseRequest(
-        eventDate = new DateTime("2017-05-10"),
+        eventDate = LocalDate.parse("2017-05-10"),
         withdrawalAmount = 4000,
         conveyancerReference = Some("CR12345-6789"),
         propertyDetails = Some(
@@ -90,7 +91,7 @@ class ReportLifeEventRequestSpec extends PlaySpec {
 
     "correctly serialise a standard fund release without conveyancerReference" in {
       val input  = InitialFundReleaseRequest(
-        eventDate = new DateTime("2017-05-10"),
+        eventDate = LocalDate.parse("2017-05-10"),
         withdrawalAmount = 4000,
         conveyancerReference = None,
         propertyDetails = Some(
@@ -115,7 +116,7 @@ class ReportLifeEventRequestSpec extends PlaySpec {
 
     "correctly serialise a standard fund release without propertyDetails" in {
       val input  = InitialFundReleaseRequest(
-        eventDate = new DateTime("2017-05-10"),
+        eventDate = LocalDate.parse("2017-05-10"),
         withdrawalAmount = 4000,
         conveyancerReference = Some("CR12345-6789"),
         propertyDetails = None
@@ -132,11 +133,11 @@ class ReportLifeEventRequestSpec extends PlaySpec {
 
     "correctly serialise a superseded fund release" in {
       val input  = SupersedeFundReleaseRequest(
-        eventDate = new DateTime("2017-05-05"),
+        eventDate = LocalDate.parse("2017-05-05"),
         withdrawalAmount = 5000,
         supersede = FundReleaseSupersedeDetails(
           originalLifeEventId = "3456789000",
-          originalEventDate = new DateTime("2017-05-10")
+          originalEventDate = LocalDate.parse("2017-05-10")
         )
       )
       val output = Json.toJson[ReportLifeEventRequestBase](input)
@@ -152,7 +153,7 @@ class ReportLifeEventRequestSpec extends PlaySpec {
 
     "correctly serialise a standard purchase extension" in {
       val input  = RequestStandardPurchaseExtension(
-        eventDate = new DateTime("2017-05-10"),
+        eventDate = LocalDate.parse("2017-05-10"),
         eventType = "Extension one",
         fundReleaseId = "3456789001"
       )
@@ -167,10 +168,10 @@ class ReportLifeEventRequestSpec extends PlaySpec {
 
     "correctly serialise a superseded purchase extension" in {
       val input  = RequestSupersededPurchaseExtension(
-        eventDate = new DateTime("2017-05-10"),
+        eventDate = LocalDate.parse("2017-05-10"),
         eventType = "Extension two",
         supersede = RequestExtensionSupersedeDetails(
-          originalEventDate = new DateTime("2017-05-10"),
+          originalEventDate = LocalDate.parse("2017-05-10"),
           originalLifeEventId = "6789000001"
         )
       )
@@ -187,7 +188,7 @@ class ReportLifeEventRequestSpec extends PlaySpec {
     "correctly serialise a standard purchase outcome" in {
       val input  = RequestPurchaseOutcomeCompletedRequest(
         fundReleaseId = "3456789000",
-        eventDate = new DateTime("2017-05-05"),
+        eventDate = LocalDate.parse("2017-05-05"),
         propertyPurchaseResult = "Purchase completed",
         propertyPurchaseValue = 250000
       )
@@ -206,12 +207,12 @@ class ReportLifeEventRequestSpec extends PlaySpec {
 
     "correctly serialise a superseded purchase outcome" in {
       val input  = RequestPurchaseOutcomeSupersededCompletedRequest(
-        eventDate = new DateTime("2017-06-10"),
+        eventDate = LocalDate.parse("2017-06-10"),
         propertyPurchaseResult = "Purchase completed",
         propertyPurchaseValue = 250000,
         supersede = PurchaseOutcomeSupersede(
           originalLifeEventId = "5678900001",
-          originalEventDate = new DateTime("2017-05-05")
+          originalEventDate = LocalDate.parse("2017-05-05")
         )
       )
       val output = Json.toJson[ReportLifeEventRequestBase](input)
@@ -230,7 +231,7 @@ class ReportLifeEventRequestSpec extends PlaySpec {
 
     "correctly serialise a standard annual return" in {
       val input = AnnualReturn(
-        eventDate = new DateTime("2018-04-05"),
+        eventDate = LocalDate.parse("2018-04-05"),
         lisaManagerName = "ISA Manager",
         taxYear = 2018,
         marketValueCash = 0,
@@ -253,7 +254,7 @@ class ReportLifeEventRequestSpec extends PlaySpec {
 
     "correctly serialise a superseded annual return" in {
       val input = AnnualReturn(
-        eventDate = new DateTime("2018-04-05"),
+        eventDate = LocalDate.parse("2018-04-05"),
         lisaManagerName = "ISA Manager",
         taxYear = 2018,
         marketValueCash = 0,
@@ -263,7 +264,7 @@ class ReportLifeEventRequestSpec extends PlaySpec {
         supersede = Some(
           AnnualReturnSupersede(
             originalLifeEventId = "1234567890",
-            originalEventDate = new DateTime("2017-04-01")
+            originalEventDate = LocalDate.parse("2017-04-01")
           )
         )
       )

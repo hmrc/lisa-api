@@ -17,7 +17,6 @@
 package unit.controllers
 
 import helpers.ControllerTestFixture
-import org.joda.time.DateTime
 import org.mockito.ArgumentMatchers.{eq => matchersEquals, _}
 import org.mockito.Mockito._
 import play.api.libs.json.{JsObject, Json}
@@ -28,6 +27,7 @@ import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.lisaapi.controllers.{ErrorBadRequestAccountId, ErrorBadRequestLmrn, PropertyPurchaseController}
 import uk.gov.hmrc.lisaapi.models._
 
+import java.time.LocalDate
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -250,7 +250,7 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
     "return with 400 bad request and a code of BAD_REQUEST" when {
 
       "given a future eventDate" in {
-        val invalidJson = fundReleaseJson.replace("2017-05-10", DateTime.now.plusDays(1).toString("yyyy-MM-dd"))
+        val invalidJson = fundReleaseJson.replace("2017-05-10", LocalDate.now.plusDays(1).toString)
 
         doFundReleaseRequest(invalidJson) { res =>
           status(res) mustBe BAD_REQUEST
@@ -556,7 +556,7 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
 
     "return with 400 bad request and a code of BAD_REQUEST" when {
       "given a future eventDate" in {
-        val invalidJson = extensionJson.replace("2017-05-10", DateTime.now.plusDays(1).toString("yyyy-MM-dd"))
+        val invalidJson = extensionJson.replace("2017-05-10", LocalDate.now.plusDays(1).toString)
 
         doExtensionRequest(invalidJson) { res =>
           status(res) mustBe BAD_REQUEST
@@ -887,7 +887,7 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
 
     "return with 400 bad request and a code of BAD_REQUEST" when {
       "given a future eventDate" in {
-        val invalidJson = outcomeJson.replace("2017-05-05", DateTime.now.plusDays(1).toString("yyyy-MM-dd"))
+        val invalidJson = outcomeJson.replace("2017-05-05", LocalDate.now.plusDays(1).toString)
 
         doOutcomeRequest(invalidJson) { res =>
           status(res) mustBe BAD_REQUEST

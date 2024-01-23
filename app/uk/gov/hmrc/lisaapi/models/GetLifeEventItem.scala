@@ -16,11 +16,10 @@
 
 package uk.gov.hmrc.lisaapi.models
 
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
+
+import java.time.LocalDate
 
 case class GetLifeEventItemPropertyDetails(nameOrNumber: String, postalCode: String)
 object GetLifeEventItemPropertyDetails {
@@ -28,11 +27,8 @@ object GetLifeEventItemPropertyDetails {
 }
 
 case class GetLifeEventItemSupersede(originalLifeEventId: LifeEventId, originalEventDate: LocalDate)
+
 object GetLifeEventItemSupersede {
-  implicit val dateReads: Reads[LocalDate]   = Reads.localDateReads(DateTimeFormatter.ISO_LOCAL_DATE)
-  implicit val dateWrites: Writes[LocalDate] = Writes { date =>
-    JsString(date.format(DateTimeFormatter.ISO_LOCAL_DATE))
-  }
   implicit val formats: OFormat[GetLifeEventItemSupersede] = Json.format[GetLifeEventItemSupersede]
 }
 
@@ -57,11 +53,6 @@ case class GetLifeEventItem(
 )
 
 object GetLifeEventItem {
-  implicit val dateReads: Reads[LocalDate]   = Reads.localDateReads(DateTimeFormatter.ISO_LOCAL_DATE)
-  implicit val dateWrites: Writes[LocalDate] = Writes { date =>
-    JsString(date.format(DateTimeFormatter.ISO_LOCAL_DATE))
-  }
-
   implicit val reads: Reads[GetLifeEventItem] = (
     (JsPath \ "lifeEventId").read(JsonReads.lifeEventId) and
       (JsPath \ "lifeEventType").read[String] and

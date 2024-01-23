@@ -17,7 +17,6 @@
 package unit.controllers
 
 import helpers.ControllerTestFixture
-import org.joda.time.DateTime
 import org.mockito.ArgumentMatchers.{any, eq => matchersEquals}
 import org.mockito.Mockito._
 import play.api.libs.json.Json
@@ -28,6 +27,7 @@ import uk.gov.hmrc.api.controllers.ErrorAcceptHeaderInvalid
 import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountNotFound, ErrorBadRequestAccountId, ErrorBadRequestLmrn, ErrorBadRequestTransactionId, ErrorBonusPaymentTransactionNotFound, ErrorInternalServerError, ErrorServiceUnavailable, ErrorTransactionNotFound, TransactionController}
 import uk.gov.hmrc.lisaapi.models._
 
+import java.time.LocalDate
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -66,7 +66,7 @@ class TransactionControllerSpec extends ControllerTestFixture {
               transactionId = transactionId,
               transactionType = Some("Payment"),
               paymentStatus = "Paid",
-              paymentDate = Some(new DateTime("2017-06-20")),
+              paymentDate = Some(LocalDate.parse("2017-06-20")),
               paymentAmount = Some(1.0),
               paymentReference = Some("ref"),
               supersededBy = Some("0000012345"),
@@ -100,7 +100,7 @@ class TransactionControllerSpec extends ControllerTestFixture {
               transactionId = transactionId,
               transactionType = Some("Payment"),
               paymentStatus = "Paid",
-              paymentDate = Some(new DateTime("2017-06-20")),
+              paymentDate = Some(LocalDate.parse("2017-06-20")),
               paymentAmount = Some(1.0),
               paymentReference = Some("ref"),
               supersededBy = Some("0000012345"),
@@ -276,7 +276,7 @@ class TransactionControllerSpec extends ControllerTestFixture {
               transactionId = transactionId,
               transactionType = Some("Payment"),
               paymentStatus = "Paid",
-              paymentDate = Some(new DateTime("2017-06-20")),
+              paymentDate = Some(LocalDate.parse("2017-06-20")),
               paymentAmount = Some(1.0),
               paymentReference = Some("ref"),
               supersededBy = Some("0000012345"),
@@ -307,7 +307,7 @@ class TransactionControllerSpec extends ControllerTestFixture {
               transactionId = transactionId,
               transactionType = Some("Payment"),
               paymentStatus = "Paid",
-              paymentDate = Some(new DateTime("2017-06-20")),
+              paymentDate = Some(LocalDate.parse("2017-06-20")),
               paymentAmount = Some(1.0),
               paymentReference = Some("ref"),
               supersededBy = Some("0000012345"),

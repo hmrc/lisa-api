@@ -17,7 +17,6 @@
 package unit.services
 
 import helpers.ServiceTestFixture
-import org.joda.time.DateTime
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import uk.gov.hmrc.http.HeaderCarrier
@@ -26,6 +25,7 @@ import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des._
 import uk.gov.hmrc.lisaapi.services.WithdrawalService
 
+import java.time.LocalDate
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
@@ -194,8 +194,8 @@ class WithdrawalServiceSpec extends ServiceTestFixture {
   private def doRequest(callback: ReportWithdrawalChargeResponse => Unit): Unit = {
     val request = models.RegularWithdrawalChargeRequest(
       Some(250.00),
-      new DateTime("2017-12-06"),
-      new DateTime("2018-01-05"),
+      LocalDate.parse("2017-12-06"),
+      LocalDate.parse("2018-01-05"),
       1000.00,
       250.00,
       500.00,
@@ -214,8 +214,8 @@ class WithdrawalServiceSpec extends ServiceTestFixture {
   private def doSupersededRequest(callback: ReportWithdrawalChargeResponse => Unit): Unit = {
     val request = models.SupersededWithdrawalChargeRequest(
       Some(250.00),
-      new DateTime("2017-12-06"),
-      new DateTime("2018-01-05"),
+      LocalDate.parse("2017-12-06"),
+      LocalDate.parse("2018-01-05"),
       1000.00,
       250.00,
       500.00,

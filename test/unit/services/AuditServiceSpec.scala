@@ -17,7 +17,6 @@
 package unit.services
 
 import helpers.ServiceTestFixture
-import org.joda.time.DateTime
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
@@ -28,6 +27,7 @@ import uk.gov.hmrc.lisaapi.services.AuditService
 import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
 import uk.gov.hmrc.play.audit.model.DataEvent
 
+import java.time.LocalDate
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class AuditServiceSpec extends ServiceTestFixture with BeforeAndAfter {
@@ -83,8 +83,8 @@ class AuditServiceSpec extends ServiceTestFixture with BeforeAndAfter {
     "build an audit event with the correct detail when passed a RequestBonusPaymentRequest" in {
       val data                              = RequestBonusPaymentRequest(
         lifeEventId = Some("1234567891"),
-        periodStartDate = new DateTime("2017-04-06"),
-        periodEndDate = new DateTime("2017-05-05"),
+        periodStartDate = LocalDate.parse("2017-04-06"),
+        periodEndDate = LocalDate.parse("2017-05-05"),
         htbTransfer = Some(HelpToBuyTransfer(1f, 0f)),
         inboundPayments = InboundPayments(Some(4000f), 4000f, 4000f, 4000f),
         bonuses = Bonuses(1000f, 1000f, Some(1000f), "Life Event")
