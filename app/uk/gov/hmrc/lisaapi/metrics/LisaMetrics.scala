@@ -19,15 +19,15 @@ package uk.gov.hmrc.lisaapi.metrics
 import java.util.concurrent.TimeUnit
 import com.google.inject.Inject
 import uk.gov.hmrc.play.bootstrap.metrics._
+import com.codahale.metrics.MetricRegistry
 
 import scala.util.Try
 
 class LisaMetrics @Inject() (metrics: Metrics) {
 
-  val registry: Metrics = metrics
+  private val registry: MetricRegistry = metrics.defaultRegistry
 
   def timer(diff: Long, unit: TimeUnit, metricType: String): Unit = registry.timer(s"$metricType").update(diff, unit)
-
   def incrementMetrics(startTime: Long, status: Int, api: String): Unit = {
     val diff = System.currentTimeMillis() - startTime
     val unit = TimeUnit.MILLISECONDS
