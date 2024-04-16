@@ -17,16 +17,14 @@
 package uk.gov.hmrc.lisaapi.metrics
 
 import java.util.concurrent.TimeUnit
-
-import com.codahale.metrics.MetricRegistry
 import com.google.inject.Inject
-import com.kenshoo.play.metrics.Metrics
+import uk.gov.hmrc.play.bootstrap.metrics._
 
 import scala.util.Try
 
 class LisaMetrics @Inject() (metrics: Metrics) {
 
-  val registry: MetricRegistry = metrics.defaultRegistry
+  val registry: Metrics = metrics
 
   def timer(diff: Long, unit: TimeUnit, metricType: String): Unit = registry.timer(s"$metricType").update(diff, unit)
 
