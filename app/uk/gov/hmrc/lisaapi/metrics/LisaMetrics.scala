@@ -18,7 +18,7 @@ package uk.gov.hmrc.lisaapi.metrics
 
 import java.util.concurrent.TimeUnit
 import com.google.inject.Inject
-import uk.gov.hmrc.play.bootstrap.metrics._
+import uk.gov.hmrc.play.bootstrap.metrics.Metrics
 import com.codahale.metrics.MetricRegistry
 
 import scala.util.Try
