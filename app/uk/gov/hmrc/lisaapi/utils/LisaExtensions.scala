@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.lisaapi.utils
 
-import org.joda.time.DateTime
+import java.time.ZonedDateTime
 
 object LisaExtensions {
 
@@ -53,10 +53,10 @@ object LisaExtensions {
 
   private def convertToString(value: Any): String =
     value match {
-      case x: String   => x
-      case x: DateTime => x.toString("yyyy-MM-dd")
-      case x: Float    => x.toString
-      case x: Int      => x.toString
-      case _           => value.toString
+      case x: String        => x
+      case x: ZonedDateTime => x.toString
+      case x: Float         => x.toString
+      case x: Int           => x.toString
+      case _                => value.toString
     }
 }

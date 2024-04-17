@@ -3,8 +3,6 @@
 ->        /                                                  definition.Routes
 ->        /                                                  health.Routes
 
-GET       /admin/metrics                                     com.kenshoo.play.metrics.MetricsController.metrics
-
 GET       /manager/:id                                                              uk.gov.hmrc.lisaapi.controllers.DiscoverController.discover(id: String)
 POST      /manager/:id/investors                                                    uk.gov.hmrc.lisaapi.controllers.InvestorController.createLisaInvestor(id: String)
 POST      /manager/:id/accounts                                                     uk.gov.hmrc.lisaapi.controllers.AccountController.createOrTransferLisaAccount(id: String)
