@@ -399,7 +399,7 @@ class DesConnector @Inject() (
   def parseDesResponse[A <: DesResponse](res: HttpResponse)(implicit reads: Reads[A]): DesResponse = {
     val contentTypeHeader = res.headers.get("Content-Type")
     contentTypeHeader match {
-      case Some(List("application/json")) =>
+      case Some(headerSeq) if headerSeq.contains("application/json") =>
         Try(res.json.as[A]) match {
           case Success(data) =>
             data
@@ -417,7 +417,7 @@ class DesConnector @Inject() (
                 DesFailureResponse()
             }
         }
-      case None =>
+      case _ =>
         logger.error(s"Error from DES (parsing as DesFailureResponse): Received non-JSON content from DES, status: ${res.status}")
         DesFailureResponse()
     }

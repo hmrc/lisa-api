@@ -48,6 +48,24 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           )
         }
       }
+
+      "The DES response has a correct JSON body and multiple types" in {
+        when(mockHttp.POST[CreateLisaInvestorRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                CREATED,
+                s"""{"investorID": "1234567890"}""",
+                Map("Content-Type" -> List("test", "application/json"))
+              )
+            )
+          )
+        doCreateInvestorRequest { response =>
+          response must be(
+            CreateLisaInvestorSuccessResponse("1234567890")
+          )
+        }
+      }
     }
 
     "return the default DesFailureResponse" when {
