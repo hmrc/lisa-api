@@ -35,6 +35,7 @@ trait DesConnectorTestHelper extends BaseTestFixture with GuiceOneAppPerSuite {
 
   val validBonusPaymentResponseJson: String =
     Source.fromInputStream(getClass.getResourceAsStream("/json/request.valid.bonus-payment-response.json")).mkString
+  val responseHeader: Map[String, List[String]] = Map("Content-Type" -> List("application/json"))
 
   val desConnector: DesConnector = new DesConnector(mockHttp, mockAppContext)
 

@@ -37,7 +37,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
             Future.successful(
               HttpResponse(
                 CREATED,
-                s"""{"investorID": "1234567890"}"""
+                s"""{"investorID": "1234567890"}""",
+                responseHeader
               )
             )
           )
@@ -89,7 +90,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
             Future.successful(
               HttpResponse(
                 CONFLICT,
-                s"""{"investorID": "$investorID"}"""
+                s"""{"investorID": "$investorID"}""",
+                responseHeader
               )
             )
           )
@@ -106,7 +108,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
             Future.successful(
               HttpResponse(
                 FORBIDDEN,
-                s"""{"code": "INVESTOR_NOT_FOUND","reason": "The investor details given do not match with HMRC’s records."}"""
+                s"""{"code": "INVESTOR_NOT_FOUND","reason": "The investor details given do not match with HMRC’s records."}""",
+                responseHeader
               )
             )
           )
@@ -194,7 +197,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
             Future.successful(
               HttpResponse(
                 GATEWAY_TIMEOUT,
-                s"""{"problem": "service unavailable"}"""
+                s"""{"problem": "service unavailable"}""",
+                responseHeader
               )
             )
           )
@@ -249,7 +253,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
             Future.successful(
               HttpResponse(
                 FORBIDDEN,
-                s"""{"code": "INVESTOR_NOT_FOUND", "reason": "The investorId given does not match with HMRC’s records."}"""
+                s"""{"code": "INVESTOR_NOT_FOUND", "reason": "The investorId given does not match with HMRC’s records."}""",
+                responseHeader
               )
             )
           )
@@ -304,7 +309,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
             Future.successful(
               HttpResponse(
                 GATEWAY_TIMEOUT,
-                s"""{"problem": "service unavailable"}"""
+                s"""{"problem": "service unavailable"}""",
+                responseHeader
               )
             )
           )
@@ -323,7 +329,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
             Future.successful(
               HttpResponse(
                 FORBIDDEN,
-                s"""{"code": "INVESTOR_NOT_FOUND", "reason": "The investorId given does not match with HMRC’s records."}"""
+                s"""{"code": "INVESTOR_NOT_FOUND", "reason": "The investorId given does not match with HMRC’s records."}""",
+                responseHeader
               )
             )
           )
@@ -429,7 +436,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
             Future.successful(
               HttpResponse(
                 OK,
-                s"""{"code": "SUCCESS", "reason": "Account successfully reinstated"}"""
+                s"""{"code": "SUCCESS", "reason": "Account successfully reinstated"}""",
+                responseHeader
               )
             )
           )
@@ -502,7 +510,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
             Future.successful(
               HttpResponse(
                 OK,
-                s"""{"code": "INVESTOR_ACCOUNT_NOW_VOID", "reason": "Date of first Subscription updated successfully, but as a result of the date change the account has subsequently been voided"}"""
+                s"""{"code": "INVESTOR_ACCOUNT_NOW_VOID", "reason": "Date of first Subscription updated successfully, but as a result of the date change the account has subsequently been voided"}""",
+                responseHeader
               )
             )
           )
@@ -541,7 +550,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           Future.successful(
             HttpResponse(
               CREATED,
-              s"""{"code": "UPDATED_AND_ACCOUNT_VOIDED", "message": "LISA Account firstSubscriptionDate has been updated successfully"}"""
+              s"""{"code": "UPDATED_AND_ACCOUNT_VOIDED", "message": "LISA Account firstSubscriptionDate has been updated successfully"}""",
+              responseHeader
             )
           )
         )
@@ -598,7 +608,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
             Future.successful(
               HttpResponse(
                 CREATED,
-                s"""{"lifeEventID": "87654321"}"""
+                s"""{"lifeEventID": "87654321"}""",
+                responseHeader
               )
             )
           )
@@ -637,7 +648,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
             Future.successful(
               HttpResponse(
                 CREATED,
-                s"""{"lifeEvent": "87654321"}"""
+                s"""{"lifeEvent": "87654321"}""",
+                responseHeader
               )
             )
           )
@@ -673,7 +685,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
             Future.successful(
               HttpResponse(
                 FORBIDDEN,
-                s"""{"code": "LIFE_EVENT_INAPPROPRIATE","reason": "The life event conflicts with previous life event reported."}"""
+                s"""{"code": "LIFE_EVENT_INAPPROPRIATE","reason": "The life event conflicts with previous life event reported."}""",
+                responseHeader
               )
             )
           )
@@ -755,7 +768,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
             Future.successful(
               HttpResponse(
                 INTERNAL_SERVER_ERROR,
-                """{"test": "test"}"""
+                """{"test": "test"}""",
+                responseHeader
               )
             )
           )
@@ -813,7 +827,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
             Future.successful(
               HttpResponse(
                 CREATED,
-                s"""{"transactionID": "87654321","message": "On Time"}"""
+                s"""{"transactionID": "87654321","message": "On Time"}""",
+                responseHeader
               )
             )
           )
@@ -831,7 +846,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
             Future.successful(
               HttpResponse(
                 CONFLICT,
-                s"""{"code": "x", "reason": "xx", "transactionID": "87654321"}"""
+                s"""{"code": "x", "reason": "xx", "transactionID": "87654321"}""",
+                responseHeader
               )
             )
           )
@@ -886,7 +902,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
             Future.successful(
               HttpResponse(
                 NOT_FOUND,
-                s"""{"code": "LIFE_EVENT_DOES_NOT_EXIST","reason": "The lifeEventId does not match with HMRC’s records."}"""
+                s"""{"code": "LIFE_EVENT_DOES_NOT_EXIST","reason": "The lifeEventId does not match with HMRC’s records."}""",
+                responseHeader
               )
             )
           )
@@ -1003,7 +1020,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
                 """{
                     | "code": "ERROR_CODE",
                     | "reason" : "ERROR MESSAGE"
-                  }""".stripMargin
+                  }""".stripMargin,
+                responseHeader
               )
             )
           )
@@ -1040,7 +1058,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
             Future.successful(
               HttpResponse(
                 OK,
-                validBonusPaymentResponseJson
+                validBonusPaymentResponseJson,
+                responseHeader
               )
             )
           )
@@ -1096,7 +1115,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
                 """{
                     | "code": "ERROR_CODE",
                     | "reason" : "ERROR MESSAGE"
-                  }""".stripMargin
+                  }""".stripMargin,
+                responseHeader
               )
             )
           )
@@ -1128,7 +1148,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
                 OK,
                 """{
                     | "status": "Due"
-                  }""".stripMargin
+                  }""".stripMargin,
+                responseHeader
               )
             )
           )
@@ -1151,7 +1172,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
                     |    "paymentDate": "2000-01-01",
                     |    "paymentReference": "002630000994",
                     |    "paymentAmount": 2.00
-                    |}""".stripMargin
+                    |}""".stripMargin,
+                responseHeader
               )
             )
           )
@@ -1173,7 +1195,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
                 """{
                     |    "paymentStatus": "PENDING",
                     |    "paymentDate": "2000-01-01"
-                    |}""".stripMargin
+                    |}""".stripMargin,
+                responseHeader
               )
             )
           )
@@ -1197,7 +1220,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
                     |    "paymentDate": "2000-01-01",
                     |    "paymentReference": "002630000993",
                     |    "paymentAmount": 1.00
-                    |}""".stripMargin
+                    |}""".stripMargin,
+                responseHeader
               )
             )
           )
@@ -1244,7 +1268,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
                 """{
                     | "code": "ERROR_CODE",
                     | "reason" : "ERROR MESSAGE"
-                  }""".stripMargin
+                  }""".stripMargin,
+                responseHeader
               )
             )
           )
@@ -1319,7 +1344,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
             Future.successful(
               HttpResponse(
                 OK,
-                responseString
+                responseString,
+                responseHeader
               )
             )
           )
@@ -1353,7 +1379,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
             Future.successful(
               HttpResponse(
                 OK,
-                responseString
+                responseString,
+                responseHeader
               )
             )
           )
@@ -1374,7 +1401,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
             Future.successful(
               HttpResponse(
                 OK,
-                responseString
+                responseString,
+                responseHeader
               )
             )
           )
@@ -1394,7 +1422,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
             Future.successful(
               HttpResponse(
                 OK,
-                responseString
+                responseString,
+                responseHeader
               )
             )
           )
@@ -1437,7 +1466,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
                 """{
                     | "code": "ERROR_CODE",
                     | "reason" : "ERROR MESSAGE"
-                  }""".stripMargin
+                  }""".stripMargin,
+                responseHeader
               )
             )
           )
@@ -1469,7 +1499,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
             Future.successful(
               HttpResponse(
                 OK,
-                responseString
+                responseString,
+                responseHeader
               )
             )
           )
@@ -1504,7 +1535,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
             Future.successful(
               HttpResponse(
                 OK,
-                responseString
+                responseString,
+                responseHeader
               )
             )
           )
@@ -1553,7 +1585,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
             Future.successful(
               HttpResponse(
                 OK,
-                responseString
+                responseString,
+                responseHeader
               )
             )
           )
@@ -1588,7 +1621,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           Future.successful(
             HttpResponse(
               CREATED,
-              s"""{"transactionID": "87654321","message": "On Time"}"""
+              s"""{"transactionID": "87654321","message": "On Time"}""",
+              responseHeader
             )
           )
         )
@@ -1611,7 +1645,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
             Future.successful(
               HttpResponse(
                 CREATED,
-                s"""{"transactionID": "87654321","message": "On Time"}"""
+                s"""{"transactionID": "87654321","message": "On Time"}""",
+                responseHeader
               )
             )
           )
@@ -1631,7 +1666,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
             Future.successful(
               HttpResponse(
                 CONFLICT,
-                s"""{"code": "WITHDRAWAL_CHARGE_ALREADY_EXISTS","reason": "A withdrawal charge with these details has already been requested for this investor","investorTransactionID":"2345678901"}"""
+                s"""{"code": "WITHDRAWAL_CHARGE_ALREADY_EXISTS","reason": "A withdrawal charge with these details has already been requested for this investor","investorTransactionID":"2345678901"}""",
+                responseHeader
               )
             )
           )
@@ -1652,7 +1688,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
             Future.successful(
               HttpResponse(
                 FORBIDDEN,
-                s"""{"code": "SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED","reason": "This withdrawal charge has already been superseded","supersededTransactionByID": "2345678901"}"""
+                s"""{"code": "SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED","reason": "This withdrawal charge has already been superseded","supersededTransactionByID": "2345678901"}""",
+                responseHeader
               )
             )
           )
@@ -1701,6 +1738,23 @@ class DesConnectorSpec extends DesConnectorTestHelper {
         }
       }
 
+      "the DES response has a html body instead of JSON format" in {
+        when(
+          mockHttp.POST[ReportWithdrawalChargeRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any())
+        )
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                CREATED,
+                """<!DOCTYPE html>"""
+              )
+            )
+          )
+        doReportWithdrawalRequest { response =>
+          response mustBe DesFailureResponse()
+        }
+      }
+
     }
 
     "return a specific DesFailureResponse" when {
@@ -1712,7 +1766,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
             Future.successful(
               HttpResponse(
                 NOT_FOUND,
-                s"""{"code": "LIFE_EVENT_DOES_NOT_EXIST","reason": "The lifeEventId does not match with HMRC’s records."}"""
+                s"""{"code": "LIFE_EVENT_DOES_NOT_EXIST","reason": "The lifeEventId does not match with HMRC’s records."}""",
+                responseHeader
               )
             )
           )
