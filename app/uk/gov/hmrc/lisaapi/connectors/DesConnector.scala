@@ -412,7 +412,7 @@ class DesConnector @Inject() (
               case Success(data) =>
                 logger.info(s"DesFailureResponse from DES: $data")
                 data
-              case Failure(ex)   =>
+              case Failure(ex)  =>
                 logger.error(s"Error from DES (parsing as DesFailureResponse): ${ex.getMessage}")
                 DesFailureResponse()
             }
