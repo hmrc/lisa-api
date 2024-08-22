@@ -17,7 +17,7 @@
 package uk.gov.hmrc.lisaapi.models.des
 
 import play.api.libs.functional.syntax._
-import play.api.libs.json.{JsPath, Reads}
+import play.api.libs.json.{JsError, JsPath, JsSuccess, Reads}
 import uk.gov.hmrc.lisaapi.models.{Amount, JsonReads}
 
 import java.time.LocalDate
@@ -46,11 +46,12 @@ object DesGetTransactionResponse {
   )(DesGetTransactionPaid.apply _)
 
   implicit val reads: Reads[DesGetTransactionResponse] = Reads[DesGetTransactionResponse] { json =>
-    val status: String = (json \ "paymentStatus").as[String]
-
-    status match {
-      case "PENDING" => pendingReads.reads(json)
-      case "PAID"    => paidReads.reads(json)
+    (json \ "paymentStatus").validate[String] match {
+      case JsSuccess(paymentStatus, _) => paymentStatus match {
+        case "PENDING" => pendingReads.reads(json)
+        case "PAID" => paidReads.reads(json)
+      }
+      case JsError(errors) => JsError(s"Unknown type: ${errors.mkString(", ")}")
     }
   }
 }
