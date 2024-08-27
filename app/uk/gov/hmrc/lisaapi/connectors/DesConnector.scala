@@ -19,7 +19,7 @@ package uk.gov.hmrc.lisaapi.connectors
 import com.google.inject.Inject
 import play.api.Logging
 import play.api.http.Status._
-import play.api.libs.json.{JsValue, Json, Reads}
+import play.api.libs.json.{JsError, JsSuccess, JsValue, Json, Reads}
 import play.utils.UriEncoding
 import uk.gov.hmrc.http.{HttpClient, _}
 import uk.gov.hmrc.lisaapi.config.AppContext
@@ -396,22 +396,29 @@ class DesConnector @Inject() (
   }
 
   // scalastyle:off magic.number
-  def parseDesResponse[A <: DesResponse](res: HttpResponse)(implicit reads: Reads[A]): DesResponse =
-    Try(res.json.as[A]) match {
-      case Success(data) =>
-        data
-      case Failure(er)   =>
-        if (res.status == 200 | res.status == 201) {
-          logger.error(s"Error from DES (parsing as DesResponse): ${er.getMessage}")
-        }
 
-        Try(res.json.as[DesFailureResponse]) match {
-          case Success(data) =>
-            logger.info(s"DesFailureResponse from DES: $data")
-            data
-          case Failure(ex)   =>
-            logger.error(s"Error from DES (parsing as DesFailureResponse): ${ex.getMessage}")
-            DesFailureResponse()
-        }
+  def parseDesResponse[A <: DesResponse](res: HttpResponse)(implicit reads: Reads[A]): DesResponse = {
+    val contentTypeHeader = res.headers.getOrElse("Content-Type", Seq.empty[String])
+    if (contentTypeHeader.contains("application/json")){
+      res.json.validate[A] match {
+        case JsSuccess(value, _) => value
+        case JsError(er) =>
+          if (res.status == 200 | res.status == 201) {
+            logger.error(s"Error from DES (parsing as DesResponse): ${er.mkString(", ")}")
+          }
+          Json.fromJson[DesFailureResponse](res.json) match {
+            case JsSuccess(data, _) =>
+              logger.info(s"DesFailureResponse from DES: $data")
+              data
+            case JsError(ex) =>
+              logger.error(s"Error from DES (parsing as DesFailureResponse): ${ex.mkString(", ")}")
+              DesFailureResponse()
+          }
+      }
     }
+    else{
+      logger.error(s"Error from DES (parsing as DesFailureResponse): Received non-JSON content from DES, status: ${res.status}")
+      DesFailureResponse()
+    }
+  }
 }
