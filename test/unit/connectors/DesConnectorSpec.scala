@@ -17,7 +17,8 @@
 package unit.connectors
 
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{verify, when}
+import org.mockito.Mockito.{reset, verify, when}
+import org.scalatest.BeforeAndAfterEach
 import play.api.test.Helpers._
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.http.client.RequestBuilder
@@ -27,15 +28,20 @@ import uk.gov.hmrc.lisaapi.models.des._
 import java.time.LocalDate
 import scala.concurrent.Future
 
-class DesConnectorSpec extends DesConnectorTestHelper {
+class DesConnectorSpec extends DesConnectorTestHelper with BeforeAndAfterEach {
   lazy val mockRequestBuilder: RequestBuilder = mock[RequestBuilder]
 
-  when(mockAppContext.desUrl).thenReturn("http://localhost:8883")
-  when(mockHttp.get(any())(any())).thenReturn(mockRequestBuilder)
-  when(mockHttp.post(any())(any())).thenReturn(mockRequestBuilder)
-  when(mockHttp.put(any())(any())).thenReturn(mockRequestBuilder)
-  when(mockRequestBuilder.withBody(any())(any(), any(), any())).thenReturn(mockRequestBuilder)
-  when(mockRequestBuilder.setHeader(any())).thenReturn(mockRequestBuilder)
+
+
+  override def beforeEach(): Unit = {
+    reset(mockHttp)
+    when(mockAppContext.desUrl).thenReturn("http://localhost:8883")
+    when(mockHttp.get(any())(any())).thenReturn(mockRequestBuilder)
+    when(mockHttp.post(any())(any())).thenReturn(mockRequestBuilder)
+    when(mockHttp.put(any())(any())).thenReturn(mockRequestBuilder)
+    when(mockRequestBuilder.withBody(any())(any(), any(), any())).thenReturn(mockRequestBuilder)
+    when(mockRequestBuilder.setHeader(any())).thenReturn(mockRequestBuilder)
+  }
 
   "Create Lisa Investor endpoint" must {
     "return a populated CreateLisaInvestorSuccessResponse" when {
@@ -1655,7 +1661,15 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           )
         )
       doReportWithdrawalRequest { response =>
-        mockRequestBuilder.execute[HttpResponse](any(),any())
+//        verify(mockHttp).post(any())(any())
+        verify(mockHttp).post(any())(any())
+
+//        verify(mockHttp).POST(any(), any(), any())(
+//          eqTo(ReportWithdrawalChargeRequest.desReportWithdrawalChargeWrites),
+//          any(),
+//          any(),
+//          any()
+//        )
       }
     }
 
