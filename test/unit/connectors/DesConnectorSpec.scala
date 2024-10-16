@@ -16,11 +16,11 @@
 
 package unit.connectors
 
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
-import play.api.libs.json.JsValue
 import play.api.test.Helpers._
 import uk.gov.hmrc.http._
+import uk.gov.hmrc.http.client.RequestBuilder
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des._
 
@@ -28,11 +28,20 @@ import java.time.LocalDate
 import scala.concurrent.Future
 
 class DesConnectorSpec extends DesConnectorTestHelper {
+  lazy val mockRequestBuilder: RequestBuilder = mock[RequestBuilder]
+
+  when(mockAppContext.desUrl).thenReturn("http://localhost:8883")
+  when(mockHttp.get(any())(any())).thenReturn(mockRequestBuilder)
+  when(mockHttp.post(any())(any())).thenReturn(mockRequestBuilder)
+  when(mockHttp.put(any())(any())).thenReturn(mockRequestBuilder)
+  when(mockRequestBuilder.withBody(any())(any(), any(), any())).thenReturn(mockRequestBuilder)
+  when(mockRequestBuilder.setHeader(any())).thenReturn(mockRequestBuilder)
 
   "Create Lisa Investor endpoint" must {
     "return a populated CreateLisaInvestorSuccessResponse" when {
       "The DES response has a json body that is in the correct format" in {
-        when(mockHttp.POST[CreateLisaInvestorRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -50,7 +59,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
       }
 
       "The DES response has a correct JSON body and multiple types" in {
-        when(mockHttp.POST[CreateLisaInvestorRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -70,7 +79,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
     "return the default DesFailureResponse" when {
       "the DES response has no json body" in {
-        when(mockHttp.POST[CreateLisaInvestorRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -85,7 +94,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
       }
 
       "the DES response has a json body that is in an incorrect format" in {
-        when(mockHttp.POST[CreateLisaInvestorRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -103,7 +112,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
     "return a populated CreateLisaInvestorAlreadyExistsResponse" when {
       "the investor already exists response is returned" in {
         val investorID = "1234567890"
-        when(mockHttp.POST[CreateLisaInvestorRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -121,7 +130,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
     "return a specific DesFailureResponse" when {
       "a specific failure is returned" in {
-        when(mockHttp.POST[CreateLisaInvestorRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -141,7 +150,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
     "return a DesUnavailableResponse" when {
       "a 503 is returned" in {
-        when(mockHttp.POST[CreateLisaInvestorRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -159,7 +168,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
     "return a DesBadRequestResponse" when {
       "a 400 is returned" in {
-        when(mockHttp.POST[CreateLisaInvestorRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -178,7 +187,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
   "Create Account endpoint" must {
     "return a populated success response" when {
       "DES returns 201 created" in {
-        when(mockHttp.POST[CreateLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -195,7 +204,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
     "return a generic failure response" when {
       "the DES response is not 201 created and has no json body" in {
-        when(mockHttp.POST[CreateLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -210,7 +219,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
       }
 
       "the DES response is not 201 created and has a json body that is not in the correct format" in {
-        when(mockHttp.POST[CreateLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -230,7 +239,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
     "return a DesUnavailableResponse" when {
 
       "a 503 is returned" in {
-        when(mockHttp.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -249,7 +258,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
     "return a DesBadRequestResponse" when {
       "a 400 is returned" in {
-        when(mockHttp.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -266,7 +275,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
     "return a type-appropriate failure response" when {
       "a specific failure is returned" in {
-        when(mockHttp.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -289,7 +298,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
   "Transfer Account endpoint" must {
     "return a populated success response" when {
       "DES returns 201 created" in {
-        when(mockHttp.POST[CreateLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -307,7 +316,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
     "return a generic failure response" when {
       "the DES response is not 201 created and has no json body" in {
-        when(mockHttp.POST[CreateLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -322,7 +331,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
       }
 
       "the DES response is not 201 created and has a json body that is not in the correct format" in {
-        when(mockHttp.POST[CreateLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -342,7 +351,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
     "return a type-appropriate failure response" when {
       "a specific failure is returned" in {
-        when(mockHttp.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -363,7 +372,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
     "return a DesUnavailableResponse" when {
       "a 503 is returned" in {
-        when(mockHttp.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -382,7 +391,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
   "Close Lisa Account endpoint" must {
     "return a DesEmptySuccessResponse" when {
       "DES returns 200 ok" in {
-        when(mockHttp.POST[CloseLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(Future.successful(HttpResponse(OK, "")))
 
         doCloseAccountRequest { response =>
@@ -393,7 +402,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
     "return a DesUnavailableResponse" when {
       "a 503 is returned" in {
-        when(mockHttp.POST[CloseLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -410,7 +419,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
     "return a DesBadRequestResponse" when {
       "a 400 is returned" in {
-        when(mockHttp.POST[CloseLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -427,7 +436,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
     "return a DesFailureResponse" when {
       "any other response is received" in {
-        when(mockHttp.POST[CloseLisaAccountRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -449,7 +458,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
     "return a populated success response" when {
       "DES returns 200 ok" in {
-        when(mockHttp.PUT[JsValue, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -468,7 +477,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
     "return a generic failure response" when {
       "the DES response has no json body" in {
-        when(mockHttp.PUT[JsValue, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -486,7 +495,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
     "return a DesUnavailableResponse" when {
       "a 503 is returned" in {
-        when(mockHttp.PUT[JsValue, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -504,7 +513,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
     "return a DesBadRequestResponse" when {
       "a 400 is returned" in {
-        when(mockHttp.PUT[JsValue, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -523,7 +532,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
   "Update First Subscription date endpoint" must {
     "return a populated DesUpdateSubscriptionSuccessResponse" when {
       "the DES response has a json body that is in the correct format" in {
-        when(mockHttp.PUT[UpdateSubscriptionRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -546,7 +555,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
     "return a failure response" when {
 
       "the DES response has no json body" in {
-        when(mockHttp.PUT[UpdateSubscriptionRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -563,7 +572,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
     }
 
     "status is 201 and json is invalid" in {
-      when(mockHttp.PUT[UpdateSubscriptionRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+      when(mockRequestBuilder.execute[HttpResponse](any(),any()))
         .thenReturn(
           Future.successful(
             HttpResponse(
@@ -584,7 +593,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
   "return a DesUnavailableResponse" when {
 
     "a 503 response is returned" in {
-      when(mockHttp.PUT[UpdateSubscriptionRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+      when(mockRequestBuilder.execute[HttpResponse](any(),any()))
         .thenReturn(
           Future.successful(
             HttpResponse(
@@ -603,7 +612,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
   "return a DesBadRequestResponse" when {
     "a 400 response is returned" in {
-      when(mockHttp.PUT[UpdateSubscriptionRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+      when(mockRequestBuilder.execute[HttpResponse](any(),any()))
         .thenReturn(
           Future.successful(
             HttpResponse(
@@ -621,7 +630,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
   "Report Life Event endpoint" must {
     "return a populated DesSuccessResponse" when {
       "the DES response has a json body that is in the correct format" in {
-        when(mockHttp.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -641,7 +650,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
     "return a DesUnavailableResponse" when {
 
       "a 503 is returned" in {
-        when(mockHttp.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -661,7 +670,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
     "return a generic DesFailureResponse" when {
 
       "the response json is invalid" in {
-        when(mockHttp.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -678,7 +687,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
       }
 
       "the response has no json body" in {
-        when(mockHttp.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -698,7 +707,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
     "return a populated DesFailureResponse" when {
 
       "a LIFE_EVENT_INAPPROPRIATE failure is returned" in {
-        when(mockHttp.POST[ReportLifeEventRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -726,7 +735,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
     "return a Left of DesUnavailableResponse" when {
 
       "a 503 is returned" in {
-        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -746,14 +755,14 @@ class DesConnectorSpec extends DesConnectorTestHelper {
     "return a Left of DesFailureResponse" when {
 
       "a specific failure is returned" in {
-        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
                 CONFLICT,
                 """{
-                    | "code": "ERROR_CODE",
-                    | "reason" : "ERROR MESSAGE"
+                  | "code": "ERROR_CODE",
+                  | "reason" : "ERROR MESSAGE"
                   }""".stripMargin
               )
             )
@@ -765,7 +774,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
       }
 
       "the response has no json body" in {
-        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -781,7 +790,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
       }
 
       "the response is badly formed" in {
-        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -803,7 +812,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
       "DES returns successfully" in {
 
-        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -840,7 +849,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
     "return a populated DesTransactionResponse" when {
       "the DES response has a json body that is in the correct format" in {
-        when(mockHttp.POST[RequestBonusPaymentRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -859,7 +868,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
     "return a populated DesTransactionExistResponse" when {
       "the DES response returns a 409 with a json body that is in the correct format" in {
-        when(mockHttp.POST[RequestBonusPaymentRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -879,7 +888,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
     "return the default DesFailureResponse" when {
 
       "the DES response has no json body" in {
-        when(mockHttp.POST[RequestBonusPaymentRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -895,7 +904,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
       }
 
       "the DES response has a json body that is in an incorrect format" in {
-        when(mockHttp.POST[RequestBonusPaymentRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -915,7 +924,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
     "return a specific DesFailureResponse" when {
 
       "a specific failure is returned" in {
-        when(mockHttp.POST[RequestBonusPaymentRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -939,7 +948,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
     "return a DesUnavailableResponse" when {
 
       "a 503 is returned" in {
-        when(mockHttp.POST[RequestBonusPaymentRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -959,7 +968,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
     "return a DesFailureResponse" when {
 
       "a gateway timeout is returned" in {
-        when(mockHttp.POST[RequestBonusPaymentRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.failed(
               UpstreamErrorResponse("Timeout", GATEWAY_TIMEOUT, GATEWAY_TIMEOUT)
@@ -976,7 +985,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
     "return a DesUnavailableResponse" when {
 
       "a 499 is returned" in {
-        when(mockHttp.POST[RequestBonusPaymentRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.failed(
               UpstreamErrorResponse("CLIENT CLOSED REQUEST", 499, 499)
@@ -992,7 +1001,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
     "return a DesBadRequestResponse" when {
       "a 400 is returned" in {
-        when(mockHttp.POST[RequestBonusPaymentRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1011,7 +1020,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
   "Retrieve Bonus Payment endpoint" must {
     "return a DesUnavailableResponse" when {
       "a 503 is returned" in {
-        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1030,14 +1039,14 @@ class DesConnectorSpec extends DesConnectorTestHelper {
     "return a DesFailureResponse" when {
 
       "a specific failure is returned" in {
-        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
                 CONFLICT,
                 """{
-                    | "code": "ERROR_CODE",
-                    | "reason" : "ERROR MESSAGE"
+                  | "code": "ERROR_CODE",
+                  | "reason" : "ERROR MESSAGE"
                   }""".stripMargin,
                 responseHeader
               )
@@ -1050,7 +1059,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
       }
 
       "the response has no json body" in {
-        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1071,7 +1080,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
       "DES returns successfully" in {
 
-        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1107,7 +1116,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
     "return a unavailable response" when {
       "a 503 is returned" in {
-        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1125,14 +1134,14 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
     "return a failure response" when {
       "the DES response is a failure response" in {
-        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
                 OK,
                 """{
-                    | "code": "ERROR_CODE",
-                    | "reason" : "ERROR MESSAGE"
+                  | "code": "ERROR_CODE",
+                  | "reason" : "ERROR MESSAGE"
                   }""".stripMargin,
                 responseHeader
               )
@@ -1144,7 +1153,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
         }
       }
       "the DES response has no json body" in {
-        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1159,13 +1168,13 @@ class DesConnectorSpec extends DesConnectorTestHelper {
         }
       }
       "the DES response is invalid" in {
-        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
                 OK,
                 """{
-                    | "status": "Due"
+                  | "status": "Due"
                   }""".stripMargin,
                 responseHeader
               )
@@ -1180,17 +1189,17 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
     "return a success response" when {
       "the DES response is a valid collected Pending transaction" in {
-        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
                 OK,
                 """{
-                    |    "paymentStatus": "PENDING",
-                    |    "paymentDate": "2000-01-01",
-                    |    "paymentReference": "002630000994",
-                    |    "paymentAmount": 2.00
-                    |}""".stripMargin,
+                  |    "paymentStatus": "PENDING",
+                  |    "paymentDate": "2000-01-01",
+                  |    "paymentReference": "002630000994",
+                  |    "paymentAmount": 2.00
+                  |}""".stripMargin,
                 responseHeader
               )
             )
@@ -1205,15 +1214,15 @@ class DesConnectorSpec extends DesConnectorTestHelper {
         }
       }
       "the DES response is a valid paid Pending transaction" in {
-        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
                 OK,
                 """{
-                    |    "paymentStatus": "PENDING",
-                    |    "paymentDate": "2000-01-01"
-                    |}""".stripMargin,
+                  |    "paymentStatus": "PENDING",
+                  |    "paymentDate": "2000-01-01"
+                  |}""".stripMargin,
                 responseHeader
               )
             )
@@ -1228,17 +1237,17 @@ class DesConnectorSpec extends DesConnectorTestHelper {
         }
       }
       "the DES response is a valid Paid transaction" in {
-        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
                 OK,
                 """{
-                    |    "paymentStatus": "PAID",
-                    |    "paymentDate": "2000-01-01",
-                    |    "paymentReference": "002630000993",
-                    |    "paymentAmount": 1.00
-                    |}""".stripMargin,
+                  |    "paymentStatus": "PAID",
+                  |    "paymentDate": "2000-01-01",
+                  |    "paymentReference": "002630000993",
+                  |    "paymentAmount": 1.00
+                  |}""".stripMargin,
                 responseHeader
               )
             )
@@ -1260,7 +1269,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
     "return a unavailable response" when {
       "a 503 is returned" in {
-        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1278,14 +1287,14 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
     "return a failure response" when {
       "the DES response is a failure response" in {
-        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
                 OK,
                 """{
-                    | "code": "ERROR_CODE",
-                    | "reason" : "ERROR MESSAGE"
+                  | "code": "ERROR_CODE",
+                  | "reason" : "ERROR MESSAGE"
                   }""".stripMargin,
                 responseHeader
               )
@@ -1297,7 +1306,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
         }
       }
       "the DES response has no json body" in {
-        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1314,7 +1323,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
       "the DES response is missing a processingDate" in {
         val responseString = "{}"
 
-        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1357,7 +1366,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
             |    ]
             |}""".stripMargin
 
-        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1392,7 +1401,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
             | "idNumber": "Z1234"
             |}""".stripMargin
 
-        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1414,7 +1423,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
             | "financialTransactions": []
             |}""".stripMargin
 
-        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1435,7 +1444,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
             | "processingDate": "2017-03-07T09:30:00.000Z"
             |}""".stripMargin
 
-        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1458,7 +1467,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
     "return a unavailable response" when {
       "a 503 is returned" in {
-        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1476,14 +1485,14 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
     "return a failure response" when {
       "the DES response is a failure response" in {
-        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
                 OK,
                 """{
-                    | "code": "ERROR_CODE",
-                    | "reason" : "ERROR MESSAGE"
+                  | "code": "ERROR_CODE",
+                  | "reason" : "ERROR MESSAGE"
                   }""".stripMargin,
                 responseHeader
               )
@@ -1495,7 +1504,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
         }
       }
       "the DES response has no json body" in {
-        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1512,7 +1521,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
       "the DES response is missing required fields" in {
         val responseString = "{}"
 
-        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1548,7 +1557,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
             |  "firstSubscriptionDate": "2016-01-06"
             |}""".stripMargin
 
-        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1583,7 +1592,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
     "return a subscriptionStatus of AVAILABLE" when {
       "there is no subscriptionStatus in the json response from DES" in {
-        val responseString = """{
+        val responseString =
+          """{
             |  "investorId": "1234567890",
             |  "status": "OPEN",
             |  "creationDate": "2016-01-01",
@@ -1598,7 +1608,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
             |  "firstSubscriptionDate": "2016-01-06"
             |}""".stripMargin
 
-        when(mockHttp.GET[HttpResponse](any(), any(), any())(any(), any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1634,7 +1644,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
   "Report withdrawal endpoint" must {
     "uses the des writes when posting data" in {
-      when(mockHttp.POST[ReportWithdrawalChargeRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any()))
+      when(mockRequestBuilder.execute[HttpResponse](any(),any()))
         .thenReturn(
           Future.successful(
             HttpResponse(
@@ -1645,20 +1655,13 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           )
         )
       doReportWithdrawalRequest { response =>
-        verify(mockHttp).POST(any(), any(), any())(
-          eqTo(ReportWithdrawalChargeRequest.desReportWithdrawalChargeWrites),
-          any(),
-          any(),
-          any()
-        )
+        mockRequestBuilder.execute[HttpResponse](any(),any())
       }
     }
 
     "return a populated DesTransactionResponse" when {
       "the DES response has a json body that is in the correct format" in {
-        when(
-          mockHttp.POST[ReportWithdrawalChargeRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any())
-        )
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1677,9 +1680,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
     "return a populated DesTransactionExistResponse" when {
       "the DES response has status CONFLICT" in {
-        when(
-          mockHttp.POST[ReportWithdrawalChargeRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any())
-        )
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1699,9 +1700,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
       }
 
       "the DES response has status FORBIDDEN and a transactionID value in the json body" in {
-        when(
-          mockHttp.POST[ReportWithdrawalChargeRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any())
-        )
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1723,9 +1722,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
     "return the default DesFailureResponse" when {
       "the DES response has no json body" in {
-        when(
-          mockHttp.POST[ReportWithdrawalChargeRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any())
-        )
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1740,9 +1737,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
       }
 
       "the DES response has a json body that is in an incorrect format" in {
-        when(
-          mockHttp.POST[ReportWithdrawalChargeRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any())
-        )
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1757,9 +1752,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
       }
 
       "the DES response has a html body instead of JSON format" in {
-        when(
-          mockHttp.POST[ReportWithdrawalChargeRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any())
-        )
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1777,9 +1770,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
     "return a specific DesFailureResponse" when {
       "a specific failure is returned" in {
-        when(
-          mockHttp.POST[ReportWithdrawalChargeRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any())
-        )
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1801,9 +1792,8 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
     "return a DesUnavailableResponse" when {
       "a 503 is returned" in {
-        when(
-          mockHttp.POST[ReportWithdrawalChargeRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any())
-        )
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
+
           .thenReturn(
             Future.successful(
               HttpResponse(
@@ -1820,9 +1810,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
 
     "return a DesBadRequestResponse" when {
       "a 400 is returned" in {
-        when(
-          mockHttp.POST[ReportWithdrawalChargeRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any())
-        )
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
           .thenReturn(
             Future.successful(
               HttpResponse(

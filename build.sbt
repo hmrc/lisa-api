@@ -6,7 +6,7 @@ defaultSettings()
 
 name := "lisa-api"
 majorVersion := 2
-scalaVersion := "2.13.13"
+scalaVersion := "2.13.15"
 PlayKeys.playDefaultPort := 9667
 
 lazy val lisaapi = project in file(".")

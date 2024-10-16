@@ -19,12 +19,12 @@ package helpers
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.Configuration
-import uk.gov.hmrc.http.HttpClient
+import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.lisaapi.config.AppContext
 
 trait BaseTestFixture extends PlaySpec with MockitoSugar {
 
   val mockConfiguration: Configuration = mock[Configuration]
   val mockAppContext: AppContext       = mock[AppContext]
-  val mockHttp: HttpClient             = mock[HttpClient]
+  val mockHttp: HttpClientV2             = mock[HttpClientV2]
 }
