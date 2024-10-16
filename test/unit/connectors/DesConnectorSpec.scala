@@ -1661,15 +1661,7 @@ class DesConnectorSpec extends DesConnectorTestHelper with BeforeAndAfterEach {
           )
         )
       doReportWithdrawalRequest { response =>
-//        verify(mockHttp).post(any())(any())
         verify(mockHttp).post(any())(any())
-
-//        verify(mockHttp).POST(any(), any(), any())(
-//          eqTo(ReportWithdrawalChargeRequest.desReportWithdrawalChargeWrites),
-//          any(),
-//          any(),
-//          any()
-//        )
       }
     }
 
