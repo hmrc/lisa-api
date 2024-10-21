@@ -21,7 +21,7 @@ import play.api.Logging
 import play.api.http.Status._
 import play.api.libs.json.{JsError, JsSuccess, Json, Reads}
 import play.utils.UriEncoding
-import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse, StringContextOps, UpstreamErrorResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps, UpstreamErrorResponse}
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.models._
@@ -41,7 +41,6 @@ class DesConnector @Inject() (
   val urlEncodingFormat: String   = "utf-8"
   lazy val lisaServiceUrl: String = s"${appContext.desUrl}/lifetime-isa/manager"
 
-  implicit val httpReads: HttpReads[HttpResponse] = (method: String, url: String, response: HttpResponse) => response
 
   private def desHeaders(implicit hc: HeaderCarrier): Seq[(String, String)] = Seq(
     "Environment"   -> appContext.desUrlHeaderEnv,
