@@ -73,7 +73,7 @@ class DesConnector @Inject() (
     logger.debug("Posting Create Investor request to des: " + fullUrl)
 
     val result = wsHttp.post(url"$fullUrl")
-      .withBody(Json.toJson(request.toString))
+      .withBody(Json.toJson(request))
       .setHeader(desHeaders:_*)
       .execute[HttpResponse]
     result.map { res =>
@@ -369,13 +369,6 @@ class DesConnector @Inject() (
       .setHeader(desHeaders:_*)
       .execute[HttpResponse]
 
-//    val result = wsHttp.POST[ReportWithdrawalChargeRequest, HttpResponse](uri, request, headers = desHeaders)(
-//
-//      ReportWithdrawalChargeRequest.desReportWithdrawalChargeWrites,
-//      httpReads,
-//      hc,
-//      implicitly
-//    )
 
     result.map { res =>
       logger.debug("Withdrawal request returned status: " + res.status)
