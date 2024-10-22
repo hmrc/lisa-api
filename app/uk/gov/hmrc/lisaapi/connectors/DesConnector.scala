@@ -270,7 +270,7 @@ class DesConnector @Inject() (
     val fullUrl    = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}"
     logger.debug("Posting update subscription request to des: " + fullUrl)
     val result = wsHttp.put(url"$fullUrl")
-      .withBody(Json.toJson(""))
+      .withBody(Json.toJson(request))
       .setHeader(desHeadersWithOriginator:_*)
       .execute[HttpResponse]
 
@@ -300,7 +300,7 @@ class DesConnector @Inject() (
       s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/bonus-claim"
     logger.debug("Posting Bonus Payment request to des: " + fullUrl)
     val result = wsHttp.post(url"$fullUrl")
-      .withBody(Json.toJson(""))
+      .withBody(Json.toJson(request))
       .setHeader(desHeaders:_*)
       .execute[HttpResponse]
     result
@@ -363,7 +363,7 @@ class DesConnector @Inject() (
     logger.debug("Posting withdrawal request to des: " + fullUrl)
 
     val result = wsHttp.post(url"$fullUrl")
-      .withBody(Json.toJson(""))
+      .withBody(Json.toJson(request))
       .setHeader(desHeaders:_*)
       .execute[HttpResponse]
 
