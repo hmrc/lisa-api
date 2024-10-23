@@ -139,6 +139,7 @@ class DesConnector @Inject() (
     logger.debug("Reinstate Account request returned status: " + fullUrl)
     val result = wsHttp.put(url"$fullUrl")
       .setHeader(desHeadersWithOriginator:_*)
+      .withBody(Json.toJson(""))
       .execute[HttpResponse]
     result.map { res =>
       logger.debug("Reinstate Account request returned status: " + res.status)
@@ -363,7 +364,7 @@ class DesConnector @Inject() (
     logger.debug("Posting withdrawal request to des: " + fullUrl)
 
     val result = wsHttp.post(url"$fullUrl")
-      .withBody(Json.toJson(request))
+      .withBody(Json.toJson(request)(ReportWithdrawalChargeRequest.desReportWithdrawalChargeWrites))
       .setHeader(desHeaders:_*)
       .execute[HttpResponse]
 
