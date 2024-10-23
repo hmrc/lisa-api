@@ -26,6 +26,7 @@ import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des._
+import uk.gov.hmrc.http.HttpReads.Implicits.readRaw
 
 import java.time.LocalDate
 import java.util.UUID.randomUUID
