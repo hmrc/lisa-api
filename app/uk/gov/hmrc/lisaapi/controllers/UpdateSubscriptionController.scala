@@ -85,7 +85,7 @@ class UpdateSubscriptionController @Inject() (
     hc: HeaderCarrier,
     startTime: Long
   ): Result = {
-    logger.debug("Matched an error")
+    logger.debug(s"[UpdateSubscriptionController][error] failed for lisaManager : $lisaManager , accountId : $accountId, error : ${e.message}")
     auditUpdateSubscription(lisaManager, accountId, req, Some(e.errorCode))
     lisaMetrics.incrementMetrics(startTime, e.httpStatusCode, LisaMetricKeys.UPDATE_SUBSCRIPTION)
     e.asResult

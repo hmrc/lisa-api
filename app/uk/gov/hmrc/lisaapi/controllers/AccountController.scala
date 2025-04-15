@@ -29,34 +29,39 @@ import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AccountController @Inject() (
-  authConnector: AuthConnector,
-  appContext: AppContext,
-  service: AccountService,
-  auditService: AuditService,
-  lisaMetrics: LisaMetrics,
-  cc: ControllerComponents,
-  parse: PlayBodyParsers
-)(implicit ec: ExecutionContext)
-    extends LisaController(
-      cc: ControllerComponents,
-      lisaMetrics: LisaMetrics,
-      appContext: AppContext,
-      authConnector: AuthConnector
-    ) {
+class AccountController @Inject()(
+                                   authConnector: AuthConnector,
+                                   appContext: AppContext,
+                                   service: AccountService,
+                                   auditService: AuditService,
+                                   lisaMetrics: LisaMetrics,
+                                   cc: ControllerComponents,
+                                   parse: PlayBodyParsers
+                                 )(implicit ec: ExecutionContext)
+  extends LisaController(
+    cc: ControllerComponents,
+    lisaMetrics: LisaMetrics,
+    appContext: AppContext,
+    authConnector: AuthConnector
+  ) {
 
   def createOrTransferLisaAccount(lisaManager: String): Action[AnyContent] =
     (validateHeader(parse) andThen validateLMRN(lisaManager)).async { implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
-
+      logger.info(s"[AccountController][createOrTransferLisaAccount]  started lisaManager : $lisaManager")
       withValidJson[CreateLisaAccountRequest](
         {
-          case createRequest: CreateLisaAccountCreationRequest   =>
+          case createRequest: CreateLisaAccountCreationRequest =>
             if (hasAccountTransferData(request.body.asJson.get.as[JsObject])) {
+              auditService.audit(
+                auditType = "transferAccount",
+                path = getCreateOrTransferEndpointUrl(lisaManager),
+                auditData = Map(ZREF -> lisaManager, "reasonNotCreated" -> "FORBIDDEN")
+              )
               lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.ACCOUNT)
-
               Future.successful(Forbidden(ErrorTransferAccountDataProvided.asJson))
             } else {
+              logger.info(s"[AccountController][createOrTransferLisaAccount]  in else block")
               processAccountCreation(lisaManager, createRequest)
             }
           case transferRequest: CreateLisaAccountTransferRequest => processAccountTransfer(lisaManager, transferRequest)
@@ -87,8 +92,8 @@ class AccountController @Inject() (
   private def hasAccountTransferData(js: JsObject): Boolean = js.keys.contains("transferAccount")
 
   private def processAccountCreation(lisaManager: String, creationRequest: CreateLisaAccountCreationRequest)(implicit
-    hc: HeaderCarrier,
-    startTime: Long
+                                                                                                             hc: HeaderCarrier,
+                                                                                                             startTime: Long
   ) = {
     val action = "Created"
 
@@ -100,21 +105,23 @@ class AccountController @Inject() (
             path = getCreateOrTransferEndpointUrl(lisaManager),
             auditData = creationRequest.toStringMap + (ZREF -> lisaManager)
           )
-
+          logger.info(s"[AccountController][processAccountCreation]  CreateLisaAccountSuccessResponse accountId : $accountId, lisaManager : $lisaManager")
           val data = ApiResponseData(message = "Account created", accountId = Some(accountId))
 
           lisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.ACCOUNT)
 
           Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
-        case CreateLisaAccountAlreadyExistsResponse      =>
+        case CreateLisaAccountAlreadyExistsResponse =>
+          logger.info(s"[AccountController][processAccountCreation] CreateLisaAccountAlreadyExistsResponse lisaManager : $lisaManager")
           handleCreateOrTransferFailure(
             lisaManager,
             creationRequest,
             ErrorAccountAlreadyExists(creationRequest.accountId),
             action
           )
-        case error: CreateLisaAccountResponse            =>
+        case error: CreateLisaAccountResponse =>
           val errorResponse = createLisaAccountErrorMap.getOrElse(error, ErrorInternalServerError)
+          logger.error(s"[AccountController][processAccountCreation] CreateLisaAccountResponse lisaManager : $lisaManager, errorResponse: $errorResponse")
           handleCreateOrTransferFailure(lisaManager, creationRequest, errorResponse, action)
       } recover { case e: Exception =>
         logger.error(s"AccountController: An error occurred due to ${e.getMessage} returning internal server error")
@@ -124,19 +131,19 @@ class AccountController @Inject() (
   }
 
   private val createLisaAccountErrorMap = Map[CreateLisaAccountResponse, ErrorResponse](
-    CreateLisaAccountInvestorNotEligibleResponse             -> ErrorInvestorNotEligible,
-    CreateLisaAccountInvestorNotFoundResponse                -> ErrorInvestorNotFound,
-    CreateLisaAccountInvestorComplianceCheckFailedResponse   -> ErrorInvestorComplianceCheckFailedCreateTransfer,
-    CreateLisaAccountInvestorAccountAlreadyClosedResponse    -> ErrorAccountAlreadyClosed,
+    CreateLisaAccountInvestorNotEligibleResponse -> ErrorInvestorNotEligible,
+    CreateLisaAccountInvestorNotFoundResponse -> ErrorInvestorNotFound,
+    CreateLisaAccountInvestorComplianceCheckFailedResponse -> ErrorInvestorComplianceCheckFailedCreateTransfer,
+    CreateLisaAccountInvestorAccountAlreadyClosedResponse -> ErrorAccountAlreadyClosed,
     CreateLisaAccountInvestorAccountAlreadyCancelledResponse -> ErrorAccountAlreadyCancelled,
-    CreateLisaAccountInvestorAccountAlreadyVoidResponse      -> ErrorAccountAlreadyVoided,
-    CreateLisaAccountErrorResponse                           -> ErrorInternalServerError,
-    CreateLisaAccountServiceUnavailableResponse              -> ErrorServiceUnavailable
+    CreateLisaAccountInvestorAccountAlreadyVoidResponse -> ErrorAccountAlreadyVoided,
+    CreateLisaAccountErrorResponse -> ErrorInternalServerError,
+    CreateLisaAccountServiceUnavailableResponse -> ErrorServiceUnavailable
   )
 
   private def processAccountTransfer(lisaManager: String, transferRequest: CreateLisaAccountTransferRequest)(implicit
-    hc: HeaderCarrier,
-    startTime: Long
+                                                                                                             hc: HeaderCarrier,
+                                                                                                             startTime: Long
   ) = {
     val action = "Transferred"
 
@@ -148,21 +155,24 @@ class AccountController @Inject() (
             path = getCreateOrTransferEndpointUrl(lisaManager),
             auditData = transferRequest.toStringMap + (ZREF -> lisaManager)
           )
-
+          logger.info(s"[AccountController][processAccountTransfer]  CreateLisaAccountSuccessResponse accountId : $accountId, lisaManager : $lisaManager")
           val data = ApiResponseData(message = "Account transferred", accountId = Some(accountId))
 
           lisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.ACCOUNT)
 
           Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
-        case CreateLisaAccountAlreadyExistsResponse      =>
+        case CreateLisaAccountAlreadyExistsResponse =>
+          logger.info(s"[AccountController][processAccountTransfer]  CreateLisaAccountAlreadyExistsResponse lisaManager : $lisaManager")
           handleCreateOrTransferFailure(
             lisaManager,
             transferRequest,
             ErrorAccountAlreadyExists(transferRequest.accountId),
             action
           )
-        case error: CreateLisaAccountResponse            =>
+        case error: CreateLisaAccountResponse =>
           val errorResponse = transferLisaAccountErrorMap.getOrElse(error, ErrorInternalServerError)
+          logger.error(s"[AccountController][processAccountTransfer]  CreateLisaAccountAlreadyExistsResponse " +
+            s"lisaManager : $lisaManager, errorResponse : $errorResponse")
           handleCreateOrTransferFailure(lisaManager, transferRequest, errorResponse, action)
       } recover { case e: Exception =>
         logger.error(s"AccountController: An error occurred in due to ${e.getMessage} returning internal server error")
@@ -172,14 +182,14 @@ class AccountController @Inject() (
   }
 
   private val transferLisaAccountErrorMap = Map[CreateLisaAccountResponse, ErrorResponse](
-    CreateLisaAccountInvestorNotFoundResponse                    -> ErrorInvestorNotFound,
-    CreateLisaAccountInvestorComplianceCheckFailedResponse       -> ErrorInvestorComplianceCheckFailedCreateTransfer,
+    CreateLisaAccountInvestorNotFoundResponse -> ErrorInvestorNotFound,
+    CreateLisaAccountInvestorComplianceCheckFailedResponse -> ErrorInvestorComplianceCheckFailedCreateTransfer,
     CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse -> ErrorPreviousAccountDoesNotExist,
-    CreateLisaAccountInvestorAccountAlreadyClosedResponse        -> ErrorAccountAlreadyClosed,
-    CreateLisaAccountInvestorAccountAlreadyCancelledResponse     -> ErrorAccountAlreadyCancelled,
-    CreateLisaAccountInvestorAccountAlreadyVoidResponse          -> ErrorAccountAlreadyVoided,
-    CreateLisaAccountErrorResponse                               -> ErrorInternalServerError,
-    CreateLisaAccountServiceUnavailableResponse                  -> ErrorServiceUnavailable
+    CreateLisaAccountInvestorAccountAlreadyClosedResponse -> ErrorAccountAlreadyClosed,
+    CreateLisaAccountInvestorAccountAlreadyCancelledResponse -> ErrorAccountAlreadyCancelled,
+    CreateLisaAccountInvestorAccountAlreadyVoidResponse -> ErrorAccountAlreadyVoided,
+    CreateLisaAccountErrorResponse -> ErrorInternalServerError,
+    CreateLisaAccountServiceUnavailableResponse -> ErrorServiceUnavailable
   )
 
   private def hasValidDatesForCreation(lisaManager: String, creationRequest: CreateLisaAccountCreationRequest)(
@@ -222,7 +232,7 @@ class AccountController @Inject() (
           Some("/firstSubscriptionDate")
         )
       }
-    val transferInDateError        = Option(transferRequest.transferAccount.transferInDate.isBefore(LISA_START_DATE))
+    val transferInDateError = Option(transferRequest.transferAccount.transferInDate.isBefore(LISA_START_DATE))
       .collect { case true =>
         ErrorValidation(
           DATE_ERROR,
@@ -230,7 +240,7 @@ class AccountController @Inject() (
           Some("/transferAccount/transferInDate")
         )
       }
-    val errors                     = List(firstSubscriptionDateError, transferInDateError).flatten
+    val errors = List(firstSubscriptionDateError, transferInDateError).flatten
 
     if (errors.nonEmpty) {
       auditService.audit(
@@ -248,22 +258,21 @@ class AccountController @Inject() (
   }
 
   private def handleCreateOrTransferFailure(
-    lisaManager: String,
-    requestData: Product,
-    e: ErrorResponse,
-    action: String
-  )(implicit hc: HeaderCarrier, startTime: Long) = {
+                                             lisaManager: String,
+                                             requestData: Product,
+                                             e: ErrorResponse,
+                                             action: String
+                                           )(implicit hc: HeaderCarrier, startTime: Long) = {
     auditService.audit(
       auditType = s"accountNot$action",
       path = getCreateOrTransferEndpointUrl(lisaManager),
       auditData = requestData.toStringMap ++ Map(
-        ZREF                -> lisaManager,
+        ZREF -> lisaManager,
         s"reasonNotCreated" -> e.errorCode
       )
     )
-
+    logger.error(s"[AccountController][handleCreateOrTransferFailure] lisaManager : $lisaManager , action : $action")
     lisaMetrics.incrementMetrics(startTime, e.httpStatusCode, LisaMetricKeys.ACCOUNT)
-
     Status(e.httpStatusCode).apply(Json.toJson(e))
   }
 
