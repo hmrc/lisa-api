@@ -31,40 +31,40 @@ import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
 import java.time.LocalDate
 import scala.concurrent.{ExecutionContext, Future}
 
-class BonusPaymentController @Inject() (
-  authConnector: AuthConnector,
-  appContext: AppContext,
-  getService: BonusOrWithdrawalService,
-  postService: BonusPaymentService,
-  auditService: AuditService,
-  validator: BonusPaymentValidator,
-  dateTimeService: CurrentDateService,
-  lisaMetrics: LisaMetrics,
-  cc: ControllerComponents,
-  parse: PlayBodyParsers
-)(implicit ec: ExecutionContext)
-    extends LisaController(
-      cc: ControllerComponents,
-      lisaMetrics: LisaMetrics,
-      appContext: AppContext,
-      authConnector: AuthConnector
-    ) {
+class BonusPaymentController @Inject()(
+                                        authConnector: AuthConnector,
+                                        appContext: AppContext,
+                                        getService: BonusOrWithdrawalService,
+                                        postService: BonusPaymentService,
+                                        auditService: AuditService,
+                                        validator: BonusPaymentValidator,
+                                        dateTimeService: CurrentDateService,
+                                        lisaMetrics: LisaMetrics,
+                                        cc: ControllerComponents,
+                                        parse: PlayBodyParsers
+                                      )(implicit ec: ExecutionContext)
+  extends LisaController(
+    cc: ControllerComponents,
+    lisaMetrics: LisaMetrics,
+    appContext: AppContext,
+    authConnector: AuthConnector
+  ) {
 
-  private val requestBonusErrors   = Map[RequestBonusPaymentErrorResponse, ErrorResponse](
-    RequestBonusPaymentBonusClaimError   -> ErrorBonusClaimError,
-    RequestBonusPaymentNoSubscriptions   -> ErrorNoSubscriptions,
-    RequestBonusPaymentAccountNotFound   -> ErrorAccountNotFound,
+  private val requestBonusErrors = Map[RequestBonusPaymentErrorResponse, ErrorResponse](
+    RequestBonusPaymentBonusClaimError -> ErrorBonusClaimError,
+    RequestBonusPaymentNoSubscriptions -> ErrorNoSubscriptions,
+    RequestBonusPaymentAccountNotFound -> ErrorAccountNotFound,
     RequestBonusPaymentLifeEventNotFound -> ErrorLifeEventIdNotFound
   )
   private val requestBonusErrorsV1 = requestBonusErrors ++ Map[RequestBonusPaymentErrorResponse, ErrorResponse](
     RequestBonusPaymentAccountClosedOrVoid -> ErrorAccountAlreadyClosedOrVoid
   )
   private val requestBonusErrorsV2 = requestBonusErrors ++ Map[RequestBonusPaymentErrorResponse, ErrorResponse](
-    RequestBonusPaymentAccountClosed            -> ErrorAccountAlreadyClosed,
-    RequestBonusPaymentAccountCancelled         -> ErrorAccountAlreadyCancelled,
-    RequestBonusPaymentAccountVoid              -> ErrorAccountAlreadyVoided,
+    RequestBonusPaymentAccountClosed -> ErrorAccountAlreadyClosed,
+    RequestBonusPaymentAccountCancelled -> ErrorAccountAlreadyCancelled,
+    RequestBonusPaymentAccountVoid -> ErrorAccountAlreadyVoided,
     RequestBonusPaymentSupersededAmountMismatch -> ErrorBonusSupersededAmountMismatch,
-    RequestBonusPaymentSupersededOutcomeError   -> ErrorBonusSupersededOutcomeError
+    RequestBonusPaymentSupersededOutcomeError -> ErrorBonusSupersededOutcomeError
   )
 
   def requestBonusPayment(lisaManager: String, accountId: String): Action[AnyContent] = {
@@ -99,9 +99,9 @@ class BonusPaymentController @Inject() (
     }
 
   private def processGetBonusPayment(lisaManager: String, accountId: String, transactionId: String)(implicit
-    hc: HeaderCarrier,
-    startTime: Long,
-    request: Request[AnyContent]
+                                                                                                    hc: HeaderCarrier,
+                                                                                                    startTime: Long,
+                                                                                                    request: Request[AnyContent]
   ): Future[Result] =
     getService.getBonusOrWithdrawal(lisaManager, accountId, transactionId).flatMap {
       case response: GetBonusResponse =>
@@ -148,15 +148,15 @@ class BonusPaymentController @Inject() (
     }
 
   private def getBonusPaymentAudit(
-    lisaManager: String,
-    accountId: String,
-    transactionId: String,
-    failureReason: Option[String] = None
-  )(implicit hc: HeaderCarrier) = {
-    val path      = getBonusPaymentEndpointUrl(lisaManager, accountId, transactionId)
+                                    lisaManager: String,
+                                    accountId: String,
+                                    transactionId: String,
+                                    failureReason: Option[String] = None
+                                  )(implicit hc: HeaderCarrier) = {
+    val path = getBonusPaymentEndpointUrl(lisaManager, accountId, transactionId)
     val auditData = Map(
-      ZREF            -> lisaManager,
-      "accountId"     -> accountId,
+      ZREF -> lisaManager,
+      "accountId" -> accountId,
       "transactionId" -> transactionId
     )
 
@@ -174,16 +174,16 @@ class BonusPaymentController @Inject() (
   }
 
   private def processRequestBonusPayment(
-    lisaManager: String,
-    accountId: String,
-    reads: Reads[RequestBonusPaymentRequest]
-  )(implicit request: Request[AnyContent], startTime: Long, hc: HeaderCarrier, ec: ExecutionContext) =
+                                          lisaManager: String,
+                                          accountId: String,
+                                          reads: Reads[RequestBonusPaymentRequest]
+                                        )(implicit request: Request[AnyContent], startTime: Long, hc: HeaderCarrier, ec: ExecutionContext) =
     withValidJson[RequestBonusPaymentRequest](
       req =>
         withValidData(req)(lisaManager, accountId) { () =>
           postService.requestBonusPayment(lisaManager, accountId, req) map {
             case success: RequestBonusPaymentSuccessResponse => handleSuccess(lisaManager, accountId, req, success)
-            case failure: RequestBonusPaymentErrorResponse   => handleFailure(lisaManager, accountId, req, failure)
+            case failure: RequestBonusPaymentErrorResponse => handleFailure(lisaManager, accountId, req, failure)
           } recover { case e: Exception =>
             handleError(e, lisaManager, accountId, req)
           }
@@ -197,7 +197,7 @@ class BonusPaymentController @Inject() (
     (data.bonuses.claimReason, data.lifeEventId) match {
       case ("Life Event", None) =>
         handleLifeEventNotProvided(lisaManager, accountId, data)
-      case _                    =>
+      case _ =>
         val errors = validator.validate(data)
 
         if (errors.isEmpty) {
@@ -240,10 +240,10 @@ class BonusPaymentController @Inject() (
     val lastValidHtbStartDate = LocalDate.parse("2018-03-06")
 
     val htbResponse = for {
-      htb                 <- data.htbTransfer
+      htb <- data.htbTransfer
       htbFiguresSubmitted <- Some(htb.htbTransferInForPeriod > 0 || htb.htbTransferTotalYTD > 0)
-      error               <- Option(htbFiguresSubmitted && data.periodStartDate.isAfter(lastValidHtbStartDate))
-                               .collect { case true => ErrorBonusHelpToBuyNotApplicable }
+      error <- Option(htbFiguresSubmitted && data.periodStartDate.isAfter(lastValidHtbStartDate))
+        .collect { case true => ErrorBonusHelpToBuyNotApplicable }
     } yield {
       requestBonusPaymentFailureAudit(lisaManager, accountId, data, error.errorCode)
       lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.BONUS_PAYMENT)
@@ -254,18 +254,18 @@ class BonusPaymentController @Inject() (
   }
 
   private def handleSuccess(
-    lisaManager: String,
-    accountId: String,
-    req: RequestBonusPaymentRequest,
-    resp: RequestBonusPaymentSuccessResponse
-  )(implicit hc: HeaderCarrier, startTime: Long) = {
+                             lisaManager: String,
+                             accountId: String,
+                             req: RequestBonusPaymentRequest,
+                             resp: RequestBonusPaymentSuccessResponse
+                           )(implicit hc: HeaderCarrier, startTime: Long) = {
     logger.debug("Matched success response")
 
     val (responseData, notification) = resp match {
-      case _: RequestBonusPaymentOnTimeResponse     =>
+      case _: RequestBonusPaymentOnTimeResponse =>
         val data = ApiResponseData(message = "Bonus transaction created", transactionId = Some(resp.transactionId))
         (data, Some("no"))
-      case _: RequestBonusPaymentLateResponse       =>
+      case _: RequestBonusPaymentLateResponse =>
         val data = ApiResponseData(
           message = "Bonus transaction created - late notification",
           transactionId = Some(resp.transactionId)
@@ -292,20 +292,20 @@ class BonusPaymentController @Inject() (
   }
 
   private def handleFailure(
-    lisaManager: String,
-    accountId: String,
-    req: RequestBonusPaymentRequest,
-    errorResponse: RequestBonusPaymentErrorResponse
-  )(implicit hc: HeaderCarrier, request: Request[AnyContent], startTime: Long) = {
+                             lisaManager: String,
+                             accountId: String,
+                             req: RequestBonusPaymentRequest,
+                             errorResponse: RequestBonusPaymentErrorResponse
+                           )(implicit hc: HeaderCarrier, request: Request[AnyContent], startTime: Long) = {
     logger.debug("Matched failure response")
 
     val response: ErrorResponse = (errorResponse, getAPIVersionFromRequest(request)) match {
       case (e: RequestBonusPaymentClaimAlreadyExists, Some(VERSION_2)) => ErrorBonusClaimAlreadyExists(e.transactionId)
-      case (e: RequestBonusPaymentAlreadySuperseded, Some(VERSION_2))  =>
+      case (e: RequestBonusPaymentAlreadySuperseded, Some(VERSION_2)) =>
         ErrorBonusClaimAlreadySuperseded(e.transactionId)
-      case (RequestBonusPaymentServiceUnavailable, _)                  => ErrorServiceUnavailable
-      case (_, Some(VERSION_1))                                        => requestBonusErrorsV1.getOrElse(errorResponse, ErrorInternalServerError)
-      case (_, Some(VERSION_2))                                        => requestBonusErrorsV2.getOrElse(errorResponse, ErrorInternalServerError)
+      case (RequestBonusPaymentServiceUnavailable, _) => ErrorServiceUnavailable
+      case (_, Some(VERSION_1)) => requestBonusErrorsV1.getOrElse(errorResponse, ErrorInternalServerError)
+      case (_, Some(VERSION_2)) => requestBonusErrorsV2.getOrElse(errorResponse, ErrorInternalServerError)
     }
     requestBonusPaymentFailureAudit(lisaManager, accountId, req, response.errorCode)
     lisaMetrics.incrementMetrics(startTime, response.httpStatusCode, LisaMetricKeys.BONUS_PAYMENT)
@@ -326,10 +326,10 @@ class BonusPaymentController @Inject() (
   }
 
   private def handleLifeEventNotProvided(
-    lisaManager: String,
-    accountId: String,
-    req: RequestBonusPaymentRequest
-  )(implicit hc: HeaderCarrier, startTime: Long) = {
+                                          lisaManager: String,
+                                          accountId: String,
+                                          req: RequestBonusPaymentRequest
+                                        )(implicit hc: HeaderCarrier, startTime: Long) = {
     logger.debug("Life event not provided")
 
     requestBonusPaymentFailureAudit(lisaManager, accountId, req, ErrorLifeEventNotProvided.errorCode)
@@ -339,11 +339,11 @@ class BonusPaymentController @Inject() (
   }
 
   private def requestBonusPaymentFailureAudit(
-    lisaManager: String,
-    accountId: String,
-    req: RequestBonusPaymentRequest,
-    failureReason: String
-  )(implicit hc: HeaderCarrier) =
+                                               lisaManager: String,
+                                               accountId: String,
+                                               req: RequestBonusPaymentRequest,
+                                               failureReason: String
+                                             )(implicit hc: HeaderCarrier) =
     auditService.audit(
       auditType = "bonusPaymentNotRequested",
       path = requestBonusPaymentEndpointUrl(lisaManager, accountId),
@@ -351,15 +351,15 @@ class BonusPaymentController @Inject() (
     )
 
   private def createAuditData(
-    lisaManager: String,
-    accountId: String,
-    req: RequestBonusPaymentRequest
-  ): Map[String, String] = {
+                               lisaManager: String,
+                               accountId: String,
+                               req: RequestBonusPaymentRequest
+                             ): Map[String, String] = {
     val result = req.toStringMap ++ Map(ZREF -> lisaManager, "accountId" -> accountId)
 
     req.supersede.fold(result) {
       case _: AdditionalBonus => result ++ Map("reason" -> "Additional bonus")
-      case _: BonusRecovery   => result ++ Map("reason" -> "Bonus recovery")
+      case _: BonusRecovery => result ++ Map("reason" -> "Bonus recovery")
     }
   }
 

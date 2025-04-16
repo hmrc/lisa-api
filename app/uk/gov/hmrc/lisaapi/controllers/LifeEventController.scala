@@ -29,26 +29,27 @@ import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class LifeEventController @Inject() (
-  authConnector: AuthConnector,
-  appContext: AppContext,
-  service: LifeEventService,
-  auditService: AuditService,
-  lisaMetrics: LisaMetrics,
-  cc: ControllerComponents,
-  parse: PlayBodyParsers
-)(implicit ec: ExecutionContext)
-    extends LisaController(
-      cc: ControllerComponents,
-      lisaMetrics: LisaMetrics,
-      appContext: AppContext,
-      authConnector: AuthConnector
-    ) {
+class LifeEventController @Inject()(
+                                     authConnector: AuthConnector,
+                                     appContext: AppContext,
+                                     service: LifeEventService,
+                                     auditService: AuditService,
+                                     lisaMetrics: LisaMetrics,
+                                     cc: ControllerComponents,
+                                     parse: PlayBodyParsers
+                                   )(implicit ec: ExecutionContext)
+  extends LisaController(
+    cc: ControllerComponents,
+    lisaMetrics: LisaMetrics,
+    appContext: AppContext,
+    authConnector: AuthConnector
+  ) {
 
   def reportLisaLifeEvent(lisaManager: String, accountId: String): Action[AnyContent] =
     (validateHeader(parse) andThen validateLMRN(lisaManager) andThen validateAccountId(accountId)).async {
       implicit request =>
         implicit val startTime: Long = System.currentTimeMillis()
+        logger.info(s"[LifeEventController][reportLisaLifeEvent]  accountId : $accountId, lisaManager : $lisaManager")
         withValidJson[ReportLifeEventRequest](
           req =>
             withValidDates(lisaManager, accountId, req) { () =>
@@ -63,7 +64,7 @@ class LifeEventController @Inject() (
                     Future.successful(
                       Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
                     )
-                  case res: ReportLifeEventResponse                =>
+                  case res: ReportLifeEventResponse =>
                     withApiVersion {
                       case Some(VERSION_1) =>
                         val errorResponse = v1errors.applyOrElse(
@@ -73,6 +74,7 @@ class LifeEventController @Inject() (
                             ErrorInternalServerError
                           }
                         )
+                        logger.error(s"[LifeEventController][reportLisaLifeEvent] ReportLifeEventResponse lisaManager : $lisaManager, errorResponse: $errorResponse")
                         Future.successful(error(errorResponse, lisaManager, accountId, req))
                       case Some(VERSION_2) =>
                         val errorResponse = v2errors.applyOrElse(
@@ -82,6 +84,7 @@ class LifeEventController @Inject() (
                             ErrorInternalServerError
                           }
                         )
+                        logger.error(s"[LifeEventController][reportLisaLifeEvent] internal server error for lisaManager : $lisaManager, errorResponse: $errorResponse")
                         Future.successful(error(errorResponse, lisaManager, accountId, req))
                     }
                 }
@@ -92,10 +95,10 @@ class LifeEventController @Inject() (
     }
 
   private val commonErrors: PartialFunction[ReportLifeEventResponse, ErrorResponse] = {
-    case ReportLifeEventInappropriateResponse              => ErrorLifeEventInappropriate
+    case ReportLifeEventInappropriateResponse => ErrorLifeEventInappropriate
     case ReportLifeEventAlreadyExistsResponse(lifeEventId) => ErrorLifeEventAlreadyExists(lifeEventId)
-    case ReportLifeEventAccountNotFoundResponse            => ErrorAccountNotFound
-    case ReportLifeEventServiceUnavailableResponse         => ErrorServiceUnavailable
+    case ReportLifeEventAccountNotFoundResponse => ErrorAccountNotFound
+    case ReportLifeEventServiceUnavailableResponse => ErrorServiceUnavailable
   }
 
   private val v1errors: PartialFunction[ReportLifeEventResponse, ErrorResponse] = commonErrors.orElse {
@@ -103,14 +106,14 @@ class LifeEventController @Inject() (
   }
 
   private val v2errors: PartialFunction[ReportLifeEventResponse, ErrorResponse] = commonErrors.orElse {
-    case ReportLifeEventAccountClosedResponse    => ErrorAccountAlreadyClosed
+    case ReportLifeEventAccountClosedResponse => ErrorAccountAlreadyClosed
     case ReportLifeEventAccountCancelledResponse => ErrorAccountAlreadyCancelled
-    case ReportLifeEventAccountVoidResponse      => ErrorAccountAlreadyVoided
+    case ReportLifeEventAccountVoidResponse => ErrorAccountAlreadyVoided
   }
 
   private def error(e: ErrorResponse, lisaManager: String, accountId: String, req: ReportLifeEventRequest)(implicit
-    hc: HeaderCarrier,
-    startTime: Long
+                                                                                                           hc: HeaderCarrier,
+                                                                                                           startTime: Long
   ): Result = {
     logger.debug("Matched an error response")
     auditReportLifeEvent(lisaManager, accountId, req, success = false, Map("reasonNotReported" -> e.errorCode))
@@ -119,18 +122,18 @@ class LifeEventController @Inject() (
   }
 
   private def auditReportLifeEvent(
-    lisaManager: String,
-    accountId: String,
-    req: ReportLifeEventRequest,
-    success: Boolean,
-    extraData: Map[String, String] = Map()
-  )(implicit hc: HeaderCarrier) =
+                                    lisaManager: String,
+                                    accountId: String,
+                                    req: ReportLifeEventRequest,
+                                    success: Boolean,
+                                    extraData: Map[String, String] = Map()
+                                  )(implicit hc: HeaderCarrier) =
     auditService.audit(
       auditType = if (success) "lifeEventReported" else "lifeEventNotReported",
       path = reportLifeEventEndpointUrl(lisaManager, accountId),
       auditData = req.toStringMap ++ Map(
         "lisaManagerReferenceNumber" -> lisaManager,
-        "accountID"                  -> accountId
+        "accountID" -> accountId
       ) ++ extraData
     )
 

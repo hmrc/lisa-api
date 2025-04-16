@@ -50,7 +50,7 @@ class PropertyPurchaseController @Inject() (
   def requestFundRelease(lisaManager: String, accountId: String): Action[AnyContent] = validateHeader(parse).async {
     implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
-
+      logger.info(s"[PropertyPurchaseController][requestFundRelease]  accountId : $accountId, lisaManager : $lisaManager")
       withValidLMRN(lisaManager) { () =>
         withValidAccountId(accountId) { () =>
           withValidJson[RequestFundReleaseRequest](

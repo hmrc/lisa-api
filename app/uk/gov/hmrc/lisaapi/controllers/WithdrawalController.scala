@@ -55,7 +55,7 @@ class WithdrawalController @Inject() (
     (validateHeader(parse) andThen validateLMRN(lisaManager) andThen validateAccountId(accountId)).async {
       implicit request =>
         implicit val startTime: Long = System.currentTimeMillis()
-
+        logger.info(s"[WithdrawalController][reportWithdrawalCharge]  accountId : $accountId, lisaManager : $lisaManager")
         withValidJson[ReportWithdrawalChargeRequest](
           req =>
             withValidData(req)(lisaManager, accountId) { () =>
@@ -67,6 +67,7 @@ class WithdrawalController @Inject() (
                     case successResponse: ReportWithdrawalChargeSuccessResponse =>
                       handleSuccess(lisaManager, accountId, req, successResponse)
                     case errorResponse: ReportWithdrawalChargeErrorResponse     =>
+                      logger.error(s"[WithdrawalController][reportWithdrawalCharge]  in errorResponse accountId : $accountId, lisaManager : $lisaManager")
                       handleFailure(lisaManager, accountId, req, errorResponse)
                   }
                 } recover { case e: Exception =>
