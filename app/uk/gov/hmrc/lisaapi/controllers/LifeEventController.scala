@@ -49,15 +49,15 @@ class LifeEventController @Inject()(
     (validateHeader(parse) andThen validateLMRN(lisaManager) andThen validateAccountId(accountId)).async {
       implicit request =>
         implicit val startTime: Long = System.currentTimeMillis()
-        logger.info(s"[LifeEventController][reportLisaLifeEvent]  accountId : $accountId, lisaManager : $lisaManager")
+        logger.info(s"""[LifeEventController][reportLisaLifeEvent]  accountId : $accountId, lisaManager : $lisaManager""")
         withValidJson[ReportLifeEventRequest](
           req =>
             withValidDates(lisaManager, accountId, req) { () =>
               service.reportLifeEvent(lisaManager, accountId, req) flatMap { res =>
-                logger.debug("Entering LifeEvent Controller and the response is " + res.toString)
+                logger.info(s"""[LifeEventController][reportLisaLifeEvent] lisaManager : $lisaManager , response : ${res.toString}""")
                 res match {
                   case ReportLifeEventSuccessResponse(lifeEventId) =>
-                    logger.debug("Matched Valid Response ")
+                    logger.info(s"""[LifeEventController][reportLisaLifeEvent] Matched Valid Response lisaManager : $lisaManager""")
                     auditReportLifeEvent(lisaManager, accountId, req, success = true)
                     lisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.EVENT)
                     val data = ApiResponseData(message = "Life event created", lifeEventId = Some(lifeEventId))
@@ -74,7 +74,9 @@ class LifeEventController @Inject()(
                             ErrorInternalServerError
                           }
                         )
-                        logger.error(s"[LifeEventController][reportLisaLifeEvent] ReportLifeEventResponse lisaManager : $lisaManager, errorResponse: $errorResponse")
+                        logger.error(
+                          s"""[LifeEventController][reportLisaLifeEvent] ReportLifeEventResponse
+                             | lisaManager : $lisaManager, errorResponse: $errorResponse""".stripMargin)
                         Future.successful(error(errorResponse, lisaManager, accountId, req))
                       case Some(VERSION_2) =>
                         val errorResponse = v2errors.applyOrElse(
@@ -84,7 +86,8 @@ class LifeEventController @Inject()(
                             ErrorInternalServerError
                           }
                         )
-                        logger.error(s"[LifeEventController][reportLisaLifeEvent] internal server error for lisaManager : $lisaManager, errorResponse: $errorResponse")
+                        logger.error(s"[LifeEventController][reportLisaLifeEvent] internal server error for" +
+                          s" lisaManager : $lisaManager, errorResponse: $errorResponse")
                         Future.successful(error(errorResponse, lisaManager, accountId, req))
                     }
                 }

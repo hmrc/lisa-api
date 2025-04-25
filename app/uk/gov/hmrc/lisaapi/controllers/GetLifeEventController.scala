@@ -48,7 +48,7 @@ class GetLifeEventController @Inject()(
   def getLifeEvent(lisaManager: String, accountId: String, lifeEventId: String): Action[AnyContent] =
     validateHeader(parse).async { implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
-      logger.info(s"[GetLifeEventController][getLifeEvent]  accountId : $accountId, lisaManager : $lisaManager")
+      logger.info(s"""[GetLifeEventController][getLifeEvent]  accountId : $accountId, lisaManager : $lisaManager""")
 
       withValidLMRN(lisaManager) { () =>
         withValidAccountId(accountId) { () =>
@@ -57,12 +57,12 @@ class GetLifeEventController @Inject()(
               case Left(error) =>
                 auditGetLifeEvent(lisaManager, accountId, lifeEventId, Some(error.errorCode))
                 lisaMetrics.incrementMetrics(startTime, error.httpStatusCode, LisaMetricKeys.EVENT)
-                logger.error(s"[GetLifeEventController][getLifeEvent]  accountId : $accountId, lisaManager : $lisaManager error :${error.asResult}")
+                logger.error(s"""[GetLifeEventController][getLifeEvent]  accountId : $accountId, lisaManager : $lisaManager error :${error.asResult}""")
                 error.asResult
               case Right(success) =>
                 auditGetLifeEvent(lisaManager, accountId, lifeEventId)
                 lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.EVENT)
-                logger.info(s"[GetLifeEventController][getLifeEvent] came to success response accountId : $accountId, lisaManager : $lisaManager")
+                logger.info(s"""[GetLifeEventController][getLifeEvent] came to success response accountId : $accountId, lisaManager : $lisaManager""")
                 Ok(Json.toJson(success))
             }
           }

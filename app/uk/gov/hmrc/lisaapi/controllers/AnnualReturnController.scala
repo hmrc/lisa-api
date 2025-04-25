@@ -58,29 +58,29 @@ class AnnualReturnController @Inject()(
             req =>
               withValidData(req)(lisaManager, accountId) { () =>
                 service.reportLifeEvent(lisaManager, accountId, req) map { res =>
-                  logger.debug(s"submitAnnualReturn: The response is ${res.toString} accountId : $accountId, lisaManager : $lisaManager")
+                  logger.info(s"[AnnualReturnController][submitReturn] The response is ${res.toString} accountId : $accountId, lisaManager : $lisaManager")
 
                   res match {
                     case success: ReportLifeEventSuccessResponse =>
                       val message = if (req.supersede.isEmpty) "Life event created" else "Life event superseded"
                       val data = ApiResponseData(message = message, lifeEventId = Some(success.lifeEventId))
-                      logger.info(s"[AnnualReturnController][submitReturn]  ReportLifeEventSuccessResponse accountId : $accountId, lisaManager : $lisaManager message : $message")
-
+                      logger.info(s"[AnnualReturnController][submitReturn]  ReportLifeEventSuccessResponse accountId : $accountId," +
+                        s" lisaManager : $lisaManager message : $message")
                       audit(lisaManager, accountId, req)
                       lisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.EVENT)
                       Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
                     case error: ReportLifeEventResponse =>
                       val response = getErrorResponse(error)
-                      logger.error(s"[AnnualReturnController][submitReturn]  ReportLifeEventSuccessResponse accountId : $accountId, lisaManager : $lisaManager error response : $response")
+                      logger.error(s"[AnnualReturnController][submitReturn]  ReportLifeEventSuccessResponse accountId : $accountId," +
+                        s" lisaManager : $lisaManager error response : $response")
                       audit(lisaManager, accountId, req, Some(response.errorCode))
                       lisaMetrics.incrementMetrics(startTime, response.httpStatusCode, LisaMetricKeys.EVENT)
                       response.asResult
                   }
                 } recover { case e: Exception =>
                   logger.error(
-                    s"submitAnnualReturn: An error occurred due to ${e.getMessage}, returning internal server error"
+                    s"[AnnualReturnController][submitReturn] An error occurred due to ${e.getMessage}, returning internal server error"
                   )
-
                   audit(lisaManager, accountId, req, Some("INTERNAL_SERVER_ERROR"))
                   lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.EVENT)
                   InternalServerError(ErrorInternalServerError.asJson)

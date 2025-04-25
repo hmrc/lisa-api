@@ -50,14 +50,15 @@ class PropertyPurchaseController @Inject() (
   def requestFundRelease(lisaManager: String, accountId: String): Action[AnyContent] = validateHeader(parse).async {
     implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
-      logger.info(s"[PropertyPurchaseController][requestFundRelease]  accountId : $accountId, lisaManager : $lisaManager")
+      logger.info(s"""[PropertyPurchaseController][requestFundRelease]  accountId : $accountId, lisaManager : $lisaManager""")
       withValidLMRN(lisaManager) { () =>
         withValidAccountId(accountId) { () =>
           withValidJson[RequestFundReleaseRequest](
             req =>
               if (conveyancerOrPropertyDetailsIncludedOnASupersedeRequest(request.body.asJson)) {
-                logger.debug(
-                  "Fund release not reported - conveyancer and/or property details included on a supersede request"
+                logger.info(
+                  s"[PropertyPurchaseController][requestFundRelease] Fund release not reported - conveyancer and/or property details" +
+                    s" included on a supersede request lisaManager : $lisaManager"
                 )
                 auditFundRelease(
                   lisaManager,
@@ -69,7 +70,7 @@ class PropertyPurchaseController @Inject() (
                 lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
                 Future.successful(Forbidden(ErrorInvalidDataProvided.asJson))
               } else if (req.eventDate.isBefore(LISA_START_DATE)) {
-                logger.debug("Fund release not reported - invalid event date")
+                logger.info(s"[PropertyPurchaseController][requestFundRelease] Fund release not reported - invalid event date lisaManager : $lisaManager")
                 auditFundRelease(lisaManager, accountId, req, success = false, Map("reasonNotReported" -> "FORBIDDEN"))
                 lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
                 Future.successful(
@@ -84,7 +85,7 @@ class PropertyPurchaseController @Inject() (
               } else {
                 service.reportLifeEvent(lisaManager, accountId, req).map {
                   case res: ReportLifeEventSuccessResponse =>
-                    logger.debug("Fund release successful")
+                    logger.debug("[PropertyPurchaseController][requestFundRelease] Fund release successful")
                     auditFundRelease(lisaManager, accountId, req, success = true)
                     lisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.PROPERTY_PURCHASE)
                     val data = req match {
@@ -97,7 +98,7 @@ class PropertyPurchaseController @Inject() (
                   case res: ReportLifeEventResponse        =>
                     val response =
                       fundReleaseErrors.applyOrElse(res, { _: ReportLifeEventResponse => ErrorInternalServerError })
-                    logger.debug(s"Fund Release received $res, responding with $response")
+                    logger.debug(s"[PropertyPurchaseController][requestFundRelease] Fund Release received $res, responding with $response")
                     auditFundRelease(
                       lisaManager,
                       accountId,
@@ -124,7 +125,7 @@ class PropertyPurchaseController @Inject() (
           withValidJson[RequestPurchaseExtension](
             req =>
               if (req.eventDate.isBefore(LISA_START_DATE)) {
-                logger.debug("Extension not reported - invalid event date")
+                logger.info("[PropertyPurchaseController][requestExtension] Extension not reported - invalid event date")
 
                 auditExtension(lisaManager, accountId, req, success = false, Map("reasonNotReported" -> "FORBIDDEN"))
                 lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
@@ -141,7 +142,7 @@ class PropertyPurchaseController @Inject() (
               } else {
                 service.reportLifeEvent(lisaManager, accountId, req).map {
                   case res: ReportLifeEventSuccessResponse =>
-                    logger.debug("Extension successful")
+                    logger.info("[PropertyPurchaseController][requestExtension] Extension successful")
                     auditExtension(lisaManager, accountId, req, success = true)
                     lisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.PROPERTY_PURCHASE)
                     val data = req match {
@@ -154,7 +155,7 @@ class PropertyPurchaseController @Inject() (
                   case res: ReportLifeEventResponse        =>
                     val response =
                       extensionErrors.applyOrElse(res, { _: ReportLifeEventResponse => ErrorInternalServerError })
-                    logger.debug(s"Extension received $res, responding with $response")
+                    logger.warn(s"[PropertyPurchaseController][requestExtension] Extension received $res, responding with $response")
                     auditExtension(
                       lisaManager,
                       accountId,
@@ -181,7 +182,7 @@ class PropertyPurchaseController @Inject() (
           withValidJson[RequestPurchaseOutcomeRequest](
             req =>
               if (req.eventDate.isBefore(LISA_START_DATE)) {
-                logger.debug("Purchase outcome not reported - invalid event date")
+                logger.info("[PropertyPurchaseController][reportPurchaseOutcome] Purchase outcome not reported - invalid event date")
 
                 auditOutcome(lisaManager, accountId, req, success = false, Map("reasonNotReported" -> "FORBIDDEN"))
                 lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
@@ -198,7 +199,7 @@ class PropertyPurchaseController @Inject() (
               } else {
                 service.reportLifeEvent(lisaManager, accountId, req) map {
                   case res: ReportLifeEventSuccessResponse =>
-                    logger.debug("Purchase outcome successful")
+                    logger.info("[PropertyPurchaseController][reportPurchaseOutcome] Purchase outcome successful")
                     auditOutcome(lisaManager, accountId, req, success = true)
                     lisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.PROPERTY_PURCHASE)
                     val data = req match {
@@ -212,7 +213,7 @@ class PropertyPurchaseController @Inject() (
                   case res: ReportLifeEventResponse        =>
                     val response: ErrorResponse =
                       outcomeErrors.applyOrElse(res, { _: ReportLifeEventResponse => ErrorInternalServerError })
-                    logger.debug(s"Purchase outcome received $res, responding with $response")
+                    logger.warn(s"[PropertyPurchaseController][reportPurchaseOutcome] Purchase outcome received $res, responding with $response")
                     auditOutcome(
                       lisaManager,
                       accountId,

@@ -47,19 +47,22 @@ class InvestorController @Inject() (
   def createLisaInvestor(lisaManager: String): Action[AnyContent] =
     (validateHeader(parse) andThen validateLMRN(lisaManager)).async { implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
-      logger.debug(s"LISA HTTP Request: ${request.uri} and method: ${request.method}")
+      logger.info(s"[InvestorController][createLisaInvestor] LISA HTTP Request: ${request.uri} and method: ${request.method} lisaManager :$lisaManager")
       withValidJson[CreateLisaInvestorRequest](
         createRequest =>
           service.createInvestor(lisaManager, createRequest).map {
             case CreateLisaInvestorSuccessResponse(investorId)       =>
+              logger.info(s"[InvestorController][CreateLisaInvestorSuccessResponse]  lisaManager :$lisaManager")
               success(lisaManager, createRequest, investorId)
             case CreateLisaInvestorAlreadyExistsResponse(investorId) =>
+              logger.warn(s"[InvestorController][CreateLisaInvestorAlreadyExistsResponse]  lisaManager :$lisaManager")
               error(lisaManager, createRequest, ErrorInvestorAlreadyExists(investorId))
             case r: CreateLisaInvestorResponse                       =>
+              logger.warn(s"[InvestorController][CreateLisaInvestorResponse]  lisaManager :$lisaManager")
               error(lisaManager, createRequest, errorMap.getOrElse(r, ErrorInternalServerError))
           } recover { case e: Exception =>
             logger.error(
-              s"createLisaInvestor: An error occurred due to ${e.getMessage} returning internal server error"
+              s"[InvestorController][createLisaInvestor] An error occurred due to ${e.getMessage} returning internal server error"
             )
             error(lisaManager, createRequest, ErrorInternalServerError)
           },

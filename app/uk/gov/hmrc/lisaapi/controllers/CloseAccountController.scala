@@ -49,7 +49,7 @@ class CloseAccountController @Inject()(
     (validateHeader(parse) andThen validateLMRN(lisaManager) andThen validateAccountId(accountId)).async {
       implicit request =>
         implicit val startTime: Long = System.currentTimeMillis()
-        logger.info(s"[CloseAccountController][closeLisaAccount]  started lisaManager : $lisaManager , accountId : $accountId")
+        logger.info(s"""[CloseAccountController][closeLisaAccount]  started lisaManager : $lisaManager , accountId : $accountId""")
         withValidJson[CloseLisaAccountRequest](
           requestData =>
             hasValidDatesForClosure(lisaManager, accountId, requestData) { () =>
@@ -67,9 +67,14 @@ class CloseAccountController @Inject()(
                   lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.CLOSE)
 
                   val data = ApiResponseData(message = "LISA account closed", accountId = Some(accountId))
-                  logger.info(s"[CloseAccountController][closeLisaAccount]  close lisa account success for  lisaManager : $lisaManager , accountId : $accountId")
+                  logger.info(
+                    s"""[CloseAccountController][closeLisaAccount] close lisa account success for
+                       | lisaManager : $lisaManager , accountId : $accountId""".stripMargin)
                   Ok(Json.toJson(ApiResponse(data = Some(data), success = true, status = OK)))
                 case failure: CloseLisaAccountResponse =>
+                  logger.warn(
+                    s"[CloseAccountController][closeLisaAccount]: An error occurred:$failure"
+                  )
                   handleFailure(lisaManager, accountId, requestData, failure)
               } recover { case e: Exception =>
                 logger.error(

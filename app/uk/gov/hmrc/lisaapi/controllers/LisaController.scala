@@ -98,7 +98,7 @@ abstract case class LisaController(
                 case Success(result)        =>
                   result
                 case Failure(ex: Exception) =>
-                  logger.error(s"LisaController An error occurred in Json payload validation ${ex.getMessage}")
+                  logger.error(s"""[LisaController][withValidJson] An error occurred in Json payload validation ${ex.getMessage}""")
                   lisaMetrics.incrementMetrics(
                     startTime,
                     INTERNAL_SERVER_ERROR,
@@ -109,7 +109,7 @@ abstract case class LisaController(
             case Success(JsError(errors))       =>
               invalid map { _(errors) } getOrElse {
                 lisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.getMetricKey(request.uri))
-                logger.warn(s"[LisaController][withValidJson] The errors are ${errorConverter.convert(errors)}")
+                logger.warn(s"""[LisaController][withValidJson] The errors are ${errorConverter.convert(errors)}""")
                 Future.successful(BadRequest(ErrorBadRequest(errorConverter.convert(errors)).asJson))
               }
             case Failure(e)                     =>
@@ -121,6 +121,7 @@ abstract case class LisaController(
           }
 
         case None =>
+          logger.warn("[LisaController][withValidJson] Bad request")
           lisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.getMetricKey(request.uri))
           Future.successful(BadRequest(EmptyJson.asJson))
       }
@@ -128,11 +129,11 @@ abstract case class LisaController(
 
   def handleFailure(implicit request: Request[_], startTime: Long): PartialFunction[Throwable, Future[Result]] = {
     case _: InsufficientEnrolments =>
-      logger.warn(s"Unauthorised access for ${request.uri}")
+      logger.warn(s"[LisaController][handleFailure] Unauthorised access for ${request.uri}")
       lisaMetrics.incrementMetrics(startTime, UNAUTHORIZED, LisaMetricKeys.getMetricKey(request.uri))
       Future.successful(Unauthorized(ErrorInvalidLisaManager.asJson))
     case _: AuthorisationException =>
-      logger.warn(s"Unauthorised Exception for ${request.uri}")
+      logger.warn(s"[LisaController][handleFailure] Unauthorised Exception for ${request.uri}")
       lisaMetrics.incrementMetrics(startTime, UNAUTHORIZED, LisaMetricKeys.getMetricKey(request.uri))
       Future.successful(Unauthorized(ErrorUnauthorized.asJson))
     case _                         =>

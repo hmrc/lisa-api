@@ -72,6 +72,7 @@ class BonusPaymentController @Inject()(
     validateHeader(parse).async { implicit request =>
       withValidLMRN(lisaManager) { () =>
         withValidAccountId(accountId) { () =>
+          logger.info(s"""[BonusPaymentController][requestBonusPayment] lisaManager: $lisaManager, accountId : $accountId""")
           withApiVersion {
             case Some(VERSION_1) =>
               processRequestBonusPayment(lisaManager, accountId, RequestBonusPaymentRequest.requestBonusPaymentReadsV1)
@@ -86,7 +87,7 @@ class BonusPaymentController @Inject()(
   def getBonusPayment(lisaManager: String, accountId: String, transactionId: String): Action[AnyContent] =
     validateHeader(parse).async { implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
-
+      logger.info(s"""[BonusPaymentController][getBonusPayment] lisaManager: $lisaManager, accountId : $accountId, transactionId : $transactionId""")
       withValidLMRN(lisaManager) { () =>
         withEnrolment(lisaManager) { _ =>
           withValidAccountId(accountId) { () =>
@@ -110,13 +111,19 @@ class BonusPaymentController @Inject()(
           case Some(VERSION_1) =>
             if (response.bonuses.claimReason == "Superseded Bonus") {
               getBonusPaymentAudit(lisaManager, accountId, transactionId, Some(ErrorInternalServerError.errorCode))
-              logger.warn(s"API v1 received a superseded bonus claim. ID was $transactionId")
+              logger.warn(s"""[BonusPaymentController][processGetBonusPayment] API v1 received a superseded bonus claim. ID was $transactionId""")
               Future.successful(InternalServerError(ErrorInternalServerError.asJson))
             } else {
+              logger.info(
+                s"""[BonusPaymentController][processGetBonusPayment] In Version1, lisaManager: $lisaManager,
+                   | accountId : $accountId, transactionId : $transactionId""".stripMargin)
               getBonusPaymentAudit(lisaManager, accountId, transactionId)
               Future.successful(Ok(Json.toJson(response.copy(supersededBy = None))))
             }
           case Some(VERSION_2) =>
+            logger.info(
+              s"""[BonusPaymentController][processGetBonusPayment] In Version2, lisaManager: $lisaManager,
+                 | accountId : $accountId, transactionId : $transactionId""".stripMargin)
             getBonusPaymentAudit(lisaManager, accountId, transactionId)
             Future.successful(Ok(Json.toJson(response)))
         }
@@ -153,6 +160,11 @@ class BonusPaymentController @Inject()(
                                     transactionId: String,
                                     failureReason: Option[String] = None
                                   )(implicit hc: HeaderCarrier) = {
+
+    logger.info(
+      s"""[BonusPaymentController][getBonusPaymentAudit] calling audit lisaManager: $lisaManager,
+         | accountId : $accountId, transactionId : $transactionId""".stripMargin)
+
     val path = getBonusPaymentEndpointUrl(lisaManager, accountId, transactionId)
     val auditData = Map(
       ZREF -> lisaManager,
@@ -259,7 +271,7 @@ class BonusPaymentController @Inject()(
                              req: RequestBonusPaymentRequest,
                              resp: RequestBonusPaymentSuccessResponse
                            )(implicit hc: HeaderCarrier, startTime: Long) = {
-    logger.debug("Matched success response")
+    logger.info(s"[BonusPaymentController][handleSuccess] Matched success response for lisaManager : $lisaManager, account : $accountId")
 
     val (responseData, notification) = resp match {
       case _: RequestBonusPaymentOnTimeResponse =>
@@ -297,7 +309,7 @@ class BonusPaymentController @Inject()(
                              req: RequestBonusPaymentRequest,
                              errorResponse: RequestBonusPaymentErrorResponse
                            )(implicit hc: HeaderCarrier, request: Request[AnyContent], startTime: Long) = {
-    logger.debug("Matched failure response")
+    logger.info(s"[BonusPaymentController][handleFailure] Matched failure response for lisaManager : $lisaManager, account : $accountId")
 
     val response: ErrorResponse = (errorResponse, getAPIVersionFromRequest(request)) match {
       case (e: RequestBonusPaymentClaimAlreadyExists, Some(VERSION_2)) => ErrorBonusClaimAlreadyExists(e.transactionId)
@@ -330,8 +342,7 @@ class BonusPaymentController @Inject()(
                                           accountId: String,
                                           req: RequestBonusPaymentRequest
                                         )(implicit hc: HeaderCarrier, startTime: Long) = {
-    logger.debug("Life event not provided")
-
+    logger.info(s"[BonusPaymentController][handleLifeEventNotProvided] Life event not provided for lisaManager : $lisaManager, account : $accountId")
     requestBonusPaymentFailureAudit(lisaManager, accountId, req, ErrorLifeEventNotProvided.errorCode)
     lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.BONUS_PAYMENT)
 

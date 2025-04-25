@@ -89,7 +89,7 @@ class ReinstateAccountController @Inject()(
       case ReinstateLisaAccountErrorResponse =>
         processReinstateFailure(lisaManager, accountId, ErrorInternalServerError)
     } recover { case _: Exception =>
-      logger.error(s"ReinstateAccountController: reinstateAccount: An error occurred returning internal server error")
+      logger.error(s"[ReinstateAccountController][processReinstateAccount] An error occurred returning internal server error")
       lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.REINSTATE)
       ErrorInternalServerError.asResult
     }

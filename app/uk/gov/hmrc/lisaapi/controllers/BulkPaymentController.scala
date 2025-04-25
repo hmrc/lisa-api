@@ -52,7 +52,7 @@ class BulkPaymentController @Inject()(
   def getBulkPayment(lisaManager: String, startDate: String, endDate: String): Action[AnyContent] =
     validateHeader(parse).async { implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
-      logger.info(s"[BulkPaymentController][getBulkPayment] lisaManager : $lisaManager")
+      logger.info(s"""[BulkPaymentController][getBulkPayment] lisaManager : $lisaManager""")
 
       withValidLMRN(lisaManager) { () =>
         withEnrolment(lisaManager) { _ =>
@@ -61,7 +61,7 @@ class BulkPaymentController @Inject()(
 
             response flatMap {
               case s: GetBulkPaymentSuccessResponse =>
-                logger.info(s"[BulkPaymentController][getBulkPayment] GetBulkPaymentSuccessResponse lisaManager : $lisaManager")
+                logger.info(s"""[BulkPaymentController][getBulkPayment] GetBulkPaymentSuccessResponse lisaManager : $lisaManager""")
                 getBulkPaymentAudit(lisaManager)
                 lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.TRANSACTION)
                 withApiVersion {
@@ -69,7 +69,7 @@ class BulkPaymentController @Inject()(
                   case Some(VERSION_2) => Future.successful(Ok(Json.toJson(s)))
                 }
               case GetBulkPaymentNotFoundResponse =>
-                logger.info(s"[BulkPaymentController][getBulkPayment] GetBulkPaymentNotFoundResponse lisaManager : $lisaManager")
+                logger.info(s"""[BulkPaymentController][getBulkPayment] GetBulkPaymentNotFoundResponse lisaManager : $lisaManager""")
                 lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.TRANSACTION)
                 withApiVersion {
                   case Some(VERSION_1) =>

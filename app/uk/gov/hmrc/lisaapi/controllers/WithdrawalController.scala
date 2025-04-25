@@ -61,8 +61,7 @@ class WithdrawalController @Inject() (
             withValidData(req)(lisaManager, accountId) { () =>
               withValidClaimPeriod(req)(lisaManager, accountId) { () =>
                 postService.reportWithdrawalCharge(lisaManager, accountId, req) map { res =>
-                  logger.debug("reportWithdrawalCharge: The response is " + res.toString)
-
+                  logger.info(s"[WithdrawalController][reportWithdrawalCharge]  response : ${res.toString} accountId : $accountId, lisaManager : $lisaManager")
                   res match {
                     case successResponse: ReportWithdrawalChargeSuccessResponse =>
                       handleSuccess(lisaManager, accountId, req, successResponse)
@@ -72,7 +71,7 @@ class WithdrawalController @Inject() (
                   }
                 } recover { case e: Exception =>
                   logger.error(
-                    s"reportWithdrawalCharge: An error occurred due to ${e.getMessage}, returning internal server error"
+                    s"[WithdrawalController][reportWithdrawalCharge] An error occurred due to ${e.getMessage}, returning internal server error"
                   )
                   handleFailure(lisaManager, accountId, req, ReportWithdrawalChargeError)
                 }
