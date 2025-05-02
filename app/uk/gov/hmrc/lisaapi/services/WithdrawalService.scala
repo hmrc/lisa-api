@@ -32,7 +32,7 @@ class WithdrawalService @Inject() (desConnector: DesConnector)(implicit ec: Exec
   ): Future[ReportWithdrawalChargeResponse] =
     desConnector.reportWithdrawalCharge(lisaManager, accountId, request) map {
       case successResponse: DesTransactionResponse                                 =>
-        logger.debug("Matched ReportWithdrawalChargeSuccessResponse and the message is " + successResponse.message)
+        logger.info("Matched ReportWithdrawalChargeSuccessResponse and the message is " + successResponse.message)
         request match {
           case _: RegularWithdrawalChargeRequest    =>
             if (successResponse.message.contains("Late")) {
@@ -44,21 +44,21 @@ class WithdrawalService @Inject() (desConnector: DesConnector)(implicit ec: Exec
             ReportWithdrawalChargeSupersededResponse(successResponse.transactionID)
         }
       case DesUnavailableResponse                                                  =>
-        logger.debug("Matched DesUnavailableResponse")
+        logger.warn("Matched DesUnavailableResponse")
         ReportWithdrawalChargeServiceUnavailable
       case alreadyExistsResponse: DesWithdrawalChargeAlreadyExistsResponse         =>
-        logger.debug("Matched DesWithdrawalChargeAlreadyExistsResponse and the code is " + alreadyExistsResponse.code)
+        logger.info("Matched DesWithdrawalChargeAlreadyExistsResponse and the code is " + alreadyExistsResponse.code)
         ReportWithdrawalChargeAlreadyExists(alreadyExistsResponse.investorTransactionID)
       case alreadySupersededResponse: DesWithdrawalChargeAlreadySupersededResponse =>
-        logger.debug(
+        logger.info(
           "Matched DesWithdrawalChargeAlreadySupersededResponse and the code is " + alreadySupersededResponse.code
         )
         ReportWithdrawalChargeAlreadySuperseded(alreadySupersededResponse.supersededTransactionByID)
       case failureResponse: DesFailureResponse                                     =>
-        logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
+        logger.error("Matched DesFailureResponse and the code is " + failureResponse.code)
         desFailures.getOrElse(
           failureResponse.code, {
-            logger.warn(s"Request bonus payment returned error: ${failureResponse.code}")
+            logger.error(s"Request bonus payment returned error: ${failureResponse.code}")
             ReportWithdrawalChargeError
           }
         )

@@ -87,7 +87,7 @@ class UpdateSubscriptionController @Inject()(
                                                                                                               hc: HeaderCarrier,
                                                                                                               startTime: Long
   ): Result = {
-    logger.debug(s"[UpdateSubscriptionController][error] failed for lisaManager : $lisaManager , accountId : $accountId, error : ${e.message}")
+    logger.info(s"[UpdateSubscriptionController][error] failed for lisaManager : $lisaManager , accountId : $accountId, error : ${e.message}")
     auditUpdateSubscription(lisaManager, accountId, req, Some(e.errorCode))
     lisaMetrics.incrementMetrics(startTime, e.httpStatusCode, LisaMetricKeys.UPDATE_SUBSCRIPTION)
     e.asResult
@@ -97,7 +97,7 @@ class UpdateSubscriptionController @Inject()(
     success: () => Future[Result]
   )(implicit hc: HeaderCarrier, startTime: Long): Future[Result] =
     if (updateSubsRequest.firstSubscriptionDate.isBefore(LISA_START_DATE)) {
-      logger.debug("First Subscription date not updated - failed business rule validation")
+      logger.info("First Subscription date not updated - failed business rule validation")
 
       auditUpdateSubscription(lisaManager, accountId, updateSubsRequest, Some("FORBIDDEN"))
 

@@ -32,27 +32,27 @@ class BonusPaymentService @Inject() (desConnector: DesConnector)(implicit ec: Ex
   ): Future[RequestBonusPaymentResponse] =
     desConnector.requestBonusPayment(lisaManager, accountId, request) map {
       case successResponse: DesTransactionResponse       =>
-        logger.debug("Matched RequestBonusPaymentSuccessResponse and the message is " + successResponse.message)
+        logger.info("Matched RequestBonusPaymentSuccessResponse and the message is " + successResponse.message)
         (request.bonuses.claimReason, successResponse.message) match {
           case ("Superseded Bonus", _) => RequestBonusPaymentSupersededResponse(successResponse.transactionID)
           case (_, Some("Late"))       => RequestBonusPaymentLateResponse(successResponse.transactionID)
           case (_, _)                  => RequestBonusPaymentOnTimeResponse(successResponse.transactionID)
         }
       case conflictResponse: DesTransactionExistResponse =>
-        logger.debug("Matched DesTransactionExistResponse and the code is " + conflictResponse.code)
+        logger.info("Matched DesTransactionExistResponse and the code is " + conflictResponse.code)
         conflictResponse.code match {
           case "BONUS_CLAIM_ALREADY_EXISTS"                   => RequestBonusPaymentClaimAlreadyExists(conflictResponse.transactionID)
           case "SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED" =>
             RequestBonusPaymentAlreadySuperseded(conflictResponse.transactionID)
         }
       case DesUnavailableResponse                        =>
-        logger.debug("Matched DesUnavailableResponse")
+        logger.info("Matched DesUnavailableResponse")
         RequestBonusPaymentServiceUnavailable
       case failureResponse: DesFailureResponse           =>
-        logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
+        logger.warn("Matched DesFailureResponse and the code is " + failureResponse.code)
         desFailures.getOrElse(
           failureResponse.code, {
-            logger.warn(s"Request bonus payment returned error: ${failureResponse.code}")
+            logger.error(s"Request bonus payment returned error: ${failureResponse.code}")
             RequestBonusPaymentError
           }
         )

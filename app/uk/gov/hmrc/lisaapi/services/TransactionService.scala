@@ -34,16 +34,16 @@ class TransactionService @Inject() (desConnector: DesConnector)(implicit ec: Exe
       case success: GetBonusOrWithdrawalSuccessResponse =>
         handleITMPResponse(lisaManager, accountId, transactionId, success)
       case DesUnavailableResponse                       =>
-        logger.debug("503 from ITMP")
+        logger.warn("503 from ITMP")
         Future.successful(GetTransactionServiceUnavailableResponse)
       case error: DesFailureResponse                    =>
-        logger.debug(s"Error from ITMP: ${error.code}")
+        logger.error(s"Error from ITMP: ${error.code}")
         Future.successful(
           error.code match {
             case "TRANSACTION_ID_NOT_FOUND"     => GetTransactionTransactionNotFoundResponse
             case "INVESTOR_ACCOUNTID_NOT_FOUND" => GetTransactionAccountNotFoundResponse
             case _                              =>
-              logger.warn(s"Get transaction returned error: ${error.code} from ITMP")
+              logger.error(s"Get transaction returned error: ${error.code} from ITMP")
               GetTransactionErrorResponse
           }
         )
@@ -55,7 +55,7 @@ class TransactionService @Inject() (desConnector: DesConnector)(implicit ec: Exe
     transactionId: String,
     itmpResponse: GetBonusOrWithdrawalSuccessResponse
   )(implicit hc: HeaderCarrier): Future[GetTransactionResponse] = {
-    logger.debug(s"Matched a ${itmpResponse.paymentStatus} transaction from ITMP")
+    logger.info(s"Matched a ${itmpResponse.paymentStatus} transaction from ITMP")
     itmpResponse.paymentStatus match {
       case TransactionPaymentStatus.PENDING | TransactionPaymentStatus.DUE | TransactionPaymentStatus.VOID |
           TransactionPaymentStatus.CANCELLED =>

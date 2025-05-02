@@ -70,7 +70,7 @@ class LifeEventController @Inject()(
                         val errorResponse = v1errors.applyOrElse(
                           res,
                           { _: ReportLifeEventResponse =>
-                            logger.debug(s"Matched an unexpected response: $res, returning a 500 error")
+                            logger.error(s"Matched an unexpected response: $res, returning a 500 error")
                             ErrorInternalServerError
                           }
                         )
@@ -82,7 +82,7 @@ class LifeEventController @Inject()(
                         val errorResponse = v2errors.applyOrElse(
                           res,
                           { _: ReportLifeEventResponse =>
-                            logger.debug(s"Matched an unexpected response: $res, returning a 500 error")
+                            logger.error(s"Matched an unexpected response: $res, returning a 500 error")
                             ErrorInternalServerError
                           }
                         )
@@ -118,7 +118,7 @@ class LifeEventController @Inject()(
                                                                                                            hc: HeaderCarrier,
                                                                                                            startTime: Long
   ): Result = {
-    logger.debug("Matched an error response")
+    logger.info("Matched an error response")
     auditReportLifeEvent(lisaManager, accountId, req, success = false, Map("reasonNotReported" -> e.errorCode))
     lisaMetrics.incrementMetrics(startTime, e.httpStatusCode, LisaMetricKeys.EVENT)
     e.asResult
@@ -144,7 +144,7 @@ class LifeEventController @Inject()(
     success: () => Future[Result]
   )(implicit hc: HeaderCarrier, startTime: Long) =
     if (req.eventDate.isBefore(LISA_START_DATE)) {
-      logger.debug("Life event not reported - invalid event date")
+      logger.info("Life event not reported - invalid event date")
 
       auditReportLifeEvent(lisaManager, accountId, req, success = false, Map("reasonNotReported" -> "FORBIDDEN"))
       lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.EVENT)

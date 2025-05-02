@@ -35,17 +35,17 @@ class LifeEventService @Inject() (desConnector: DesConnector)(implicit ec: Execu
   ): Future[ReportLifeEventResponse] =
     desConnector.reportLifeEvent(lisaManager, accountId, request) map {
       case successResponse: DesLifeEventResponse =>
-        logger.debug("Matched DesLifeEventResponse")
+        logger.info("Matched DesLifeEventResponse")
         ReportLifeEventSuccessResponse(successResponse.lifeEventID)
       case DesUnavailableResponse                =>
-        logger.debug("Matched DesUnavailableResponse")
+        logger.info("Matched DesUnavailableResponse")
         ReportLifeEventServiceUnavailableResponse
       case failureResponse: DesFailureResponse   =>
-        logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
+        logger.warn("Matched DesFailureResponse and the code is " + failureResponse.code)
         postErrors.applyOrElse(
           (failureResponse.code, failureResponse),
           { _: (String, DesFailureResponse) =>
-            logger.warn(s"Report life event returned error: ${failureResponse.code}")
+            logger.error(s"Report life event returned error: ${failureResponse.code}")
             ReportLifeEventErrorResponse
           }
         )
@@ -56,13 +56,13 @@ class LifeEventService @Inject() (desConnector: DesConnector)(implicit ec: Execu
   ): Future[Either[ErrorResponse, Seq[GetLifeEventItem]]] =
     desConnector.getLifeEvent(lisaManager, accountId, lifeEventId) map {
       case Right(successResponse) =>
-        logger.debug("Matched ReportLifeEventRequestBase")
+        logger.info("Matched ReportLifeEventRequestBase")
         Right(successResponse)
       case Left(failureResponse)  =>
-        logger.debug("Matched DesFailureResponse and the code is " + failureResponse.code)
+        logger.warn("Matched DesFailureResponse and the code is " + failureResponse.code)
         val error = getErrors.getOrElse(
           failureResponse.code, {
-            logger.warn(s"Report life event returned error: ${failureResponse.code}")
+            logger.error(s"Report life event returned error: ${failureResponse.code}")
             ErrorInternalServerError
           }
         )
