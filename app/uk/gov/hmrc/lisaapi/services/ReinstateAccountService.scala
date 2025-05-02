@@ -32,10 +32,10 @@ class ReinstateAccountService @Inject() (desConnector: DesConnector)(implicit ec
   ): Future[ReinstateLisaAccountResponse] =
     desConnector.reinstateAccount(lisaManager, accountId) map {
       case successResponse: DesReinstateAccountSuccessResponse =>
-        logger.debug("Reinstate account success response")
+        logger.info("Reinstate account success response")
         ReinstateLisaAccountSuccessResponse(successResponse.code, successResponse.reason)
       case DesUnavailableResponse                              =>
-        logger.debug("Reinstate account returned service unavailable")
+        logger.warn("Reinstate account returned service unavailable")
         ReinstateLisaAccountServiceUnavailableResponse
       case failureResponse: DesFailureResponse                 =>
         failureResponse.code match {
@@ -45,7 +45,7 @@ class ReinstateAccountService @Inject() (desConnector: DesConnector)(implicit ec
           case "INVESTOR_ACCOUNT_ALREADY_OPEN"      => ReinstateLisaAccountAlreadyOpenResponse
           case "INVESTOR_COMPLIANCE_CHECK_FAILED"   => ReinstateLisaAccountInvestorComplianceCheckFailedResponse
           case _                                    =>
-            logger.warn(s"Reinstate account returned error ${failureResponse.code}")
+            logger.error(s"Reinstate account returned error ${failureResponse.code}")
             ReinstateLisaAccountErrorResponse
         }
     }

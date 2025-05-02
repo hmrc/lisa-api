@@ -85,7 +85,7 @@ class PropertyPurchaseController @Inject() (
               } else {
                 service.reportLifeEvent(lisaManager, accountId, req).map {
                   case res: ReportLifeEventSuccessResponse =>
-                    logger.debug("[PropertyPurchaseController][requestFundRelease] Fund release successful")
+                    logger.info("[PropertyPurchaseController][requestFundRelease] Fund release successful")
                     auditFundRelease(lisaManager, accountId, req, success = true)
                     lisaMetrics.incrementMetrics(startTime, CREATED, LisaMetricKeys.PROPERTY_PURCHASE)
                     val data = req match {
@@ -98,7 +98,7 @@ class PropertyPurchaseController @Inject() (
                   case res: ReportLifeEventResponse        =>
                     val response =
                       fundReleaseErrors.applyOrElse(res, { _: ReportLifeEventResponse => ErrorInternalServerError })
-                    logger.debug(s"[PropertyPurchaseController][requestFundRelease] Fund Release received $res, responding with $response")
+                    logger.info(s"[PropertyPurchaseController][requestFundRelease] Fund Release received $res, responding with $response")
                     auditFundRelease(
                       lisaManager,
                       accountId,

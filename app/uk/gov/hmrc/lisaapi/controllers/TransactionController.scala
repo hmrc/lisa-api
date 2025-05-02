@@ -55,7 +55,7 @@ class TransactionController @Inject()(
             withValidTransactionId(transactionId) { () =>
               service.getTransaction(lisaManager, accountId, transactionId) flatMap {
                 case success: GetTransactionSuccessResponse =>
-                  logger.debug("Matched Valid Response")
+                  logger.info("Matched Valid Response")
                   lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.TRANSACTION)
 
                   withApiVersion {
@@ -77,7 +77,7 @@ class TransactionController @Inject()(
                       Future.successful(Ok(Json.toJson(success.copy(bonusDueForPeriod = None))))
                   }
                 case GetTransactionTransactionNotFoundResponse =>
-                  logger.debug("Matched Not Found Response")
+                  logger.info("Matched Not Found Response")
                   lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.TRANSACTION)
 
                   withApiVersion {
@@ -99,7 +99,7 @@ class TransactionController @Inject()(
                       Future.successful(ErrorTransactionNotFound.asResult)
                   }
                 case res: GetTransactionResponse =>
-                  logger.debug("Matched an error")
+                  logger.warn("Matched an error")
                   val errorResponse = errors.applyOrElse(
                     res,
                     { _: GetTransactionResponse =>
