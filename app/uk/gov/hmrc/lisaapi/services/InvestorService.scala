@@ -31,9 +31,15 @@ class InvestorService @Inject() (desConnector: DesConnector)(implicit ec: Execut
     hc: HeaderCarrier
   ): Future[CreateLisaInvestorResponse] =
     desConnector.createInvestor(lisaManager, request) map {
-      case successResponse: CreateLisaInvestorSuccessResponse      => successResponse
-      case existsResponse: CreateLisaInvestorAlreadyExistsResponse => existsResponse
-      case DesUnavailableResponse                                  => CreateLisaInvestorServiceUnavailableResponse
+      case successResponse: CreateLisaInvestorSuccessResponse      =>
+        logger.info(s"Matched CreateLisaInvestorSuccessResponse for lisaManager : $lisaManager")
+        successResponse
+      case existsResponse: CreateLisaInvestorAlreadyExistsResponse =>
+        logger.info(s"Matched CreateLisaInvestorAlreadyExistsResponse for lisaManager : $lisaManager")
+        existsResponse
+      case DesUnavailableResponse                                  =>
+        logger.warn(s"Matched DesUnavailableResponse for lisaManager : $lisaManager")
+        CreateLisaInvestorServiceUnavailableResponse
       case error: DesFailureResponse                               =>
         error.code match {
           case "INVESTOR_NOT_FOUND" => CreateLisaInvestorInvestorNotFoundResponse

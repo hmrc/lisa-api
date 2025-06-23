@@ -17,8 +17,6 @@
 package uk.gov.hmrc.lisaapi.controllers
 
 import com.google.inject.Inject
-import jdk.internal.net.http.common.Log.errors
-import org.checkerframework.checker.units.qual.s
 import play.api.libs.json.{JsObject, JsPath, Json, JsonValidationError}
 import play.api.mvc._
 import uk.gov.hmrc.auth.core.AuthConnector

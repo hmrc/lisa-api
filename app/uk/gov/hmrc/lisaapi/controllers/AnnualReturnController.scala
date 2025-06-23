@@ -58,7 +58,7 @@ class AnnualReturnController @Inject()(
             req =>
               withValidData(req)(lisaManager, accountId) { () =>
                 service.reportLifeEvent(lisaManager, accountId, req) map { res =>
-                  logger.info(s"[AnnualReturnController][submitReturn] The response is ${res.toString} accountId : $accountId, lisaManager : $lisaManager")
+                  logger.info(s"[AnnualReturnController][submitReturn] accountId : $accountId, lisaManager : $lisaManager")
 
                   res match {
                     case success: ReportLifeEventSuccessResponse =>
