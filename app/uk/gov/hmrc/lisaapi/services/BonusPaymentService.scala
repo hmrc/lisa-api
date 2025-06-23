@@ -39,7 +39,7 @@ class BonusPaymentService @Inject() (desConnector: DesConnector)(implicit ec: Ex
           case (_, _)                  => RequestBonusPaymentOnTimeResponse(successResponse.transactionID)
         }
       case conflictResponse: DesTransactionExistResponse =>
-        logger.info("Matched DesTransactionExistResponse and the code is " + conflictResponse.code)
+        logger.info(s"Matched DesTransactionExistResponse and the code is : ${conflictResponse.code} for lisaManager : $lisaManager")
         conflictResponse.code match {
           case "BONUS_CLAIM_ALREADY_EXISTS"                   => RequestBonusPaymentClaimAlreadyExists(conflictResponse.transactionID)
           case "SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED" =>
