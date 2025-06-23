@@ -109,7 +109,7 @@ abstract case class LisaController(
             case Success(JsError(errors))       =>
               invalid map { _(errors) } getOrElse {
                 lisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.getMetricKey(request.uri))
-                logger.warn(s"""[LisaController][withValidJson] The errors are ${errorConverter.convert(errors)}""")
+                logger.warn(s"""[LisaController][withValidJson] Validation errors for lisa Manager : $lisaManager The errors are ${errorConverter.convert(errors)}""")
                 Future.successful(BadRequest(ErrorBadRequest(errorConverter.convert(errors)).asJson))
               }
             case Failure(e)                     =>
@@ -121,7 +121,7 @@ abstract case class LisaController(
           }
 
         case None =>
-          logger.warn("[LisaController][withValidJson] Bad request")
+          logger.warn(s"[LisaController][withValidJson] Bad request for lisa manager : $lisaManager")
           lisaMetrics.incrementMetrics(startTime, BAD_REQUEST, LisaMetricKeys.getMetricKey(request.uri))
           Future.successful(BadRequest(EmptyJson.asJson))
       }
