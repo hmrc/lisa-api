@@ -46,13 +46,13 @@ class BonusPaymentService @Inject() (desConnector: DesConnector)(implicit ec: Ex
             RequestBonusPaymentAlreadySuperseded(conflictResponse.transactionID)
         }
       case DesUnavailableResponse                        =>
-        logger.info("Matched DesUnavailableResponse")
+        logger.info(s"Matched DesUnavailableResponse for lisaManager : $lisaManager")
         RequestBonusPaymentServiceUnavailable
       case failureResponse: DesFailureResponse           =>
-        logger.warn("Matched DesFailureResponse and the code is " + failureResponse.code)
+        logger.warn(s"Matched DesFailureResponse for lisaManager : $lisaManager and the code is : ${failureResponse.code}")
         desFailures.getOrElse(
           failureResponse.code, {
-            logger.error(s"Request bonus payment returned error: ${failureResponse.code}")
+            logger.error(s"Request bonus payment returned error: ${failureResponse.code} for lisaManager : $lisaManager")
             RequestBonusPaymentError
           }
         )

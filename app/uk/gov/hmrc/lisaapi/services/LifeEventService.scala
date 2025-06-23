@@ -35,17 +35,17 @@ class LifeEventService @Inject() (desConnector: DesConnector)(implicit ec: Execu
   ): Future[ReportLifeEventResponse] =
     desConnector.reportLifeEvent(lisaManager, accountId, request) map {
       case successResponse: DesLifeEventResponse =>
-        logger.info("Matched DesLifeEventResponse")
+        logger.info(s"Matched DesLifeEventResponse for lisaManager : $lisaManager")
         ReportLifeEventSuccessResponse(successResponse.lifeEventID)
       case DesUnavailableResponse                =>
-        logger.info("Matched DesUnavailableResponse")
+        logger.info(s"Matched DesUnavailableResponse for lisaManager : $lisaManager")
         ReportLifeEventServiceUnavailableResponse
       case failureResponse: DesFailureResponse   =>
-        logger.warn("Matched DesFailureResponse and the code is " + failureResponse.code)
+        logger.warn(s"Matched DesFailureResponse for lisaManager : $lisaManager and the code is " + failureResponse.code)
         postErrors.applyOrElse(
           (failureResponse.code, failureResponse),
           { _: (String, DesFailureResponse) =>
-            logger.error(s"Report life event returned error: ${failureResponse.code}")
+            logger.error(s"Report life event returned error: ${failureResponse.code} for lisaManager : $lisaManager")
             ReportLifeEventErrorResponse
           }
         )
@@ -56,13 +56,13 @@ class LifeEventService @Inject() (desConnector: DesConnector)(implicit ec: Execu
   ): Future[Either[ErrorResponse, Seq[GetLifeEventItem]]] =
     desConnector.getLifeEvent(lisaManager, accountId, lifeEventId) map {
       case Right(successResponse) =>
-        logger.info("Matched ReportLifeEventRequestBase")
+        logger.info(s"Matched ReportLifeEventRequestBase for lisaManager : $lisaManager")
         Right(successResponse)
       case Left(failureResponse)  =>
-        logger.warn("Matched DesFailureResponse and the code is " + failureResponse.code)
+        logger.warn(s"Matched DesFailureResponse for lisaManager : $lisaManager and the code is : $failureResponse.code")
         val error = getErrors.getOrElse(
           failureResponse.code, {
-            logger.error(s"Report life event returned error: ${failureResponse.code}")
+            logger.error(s"Report life event returned error: ${failureResponse.code} for lisaManager : $lisaManager")
             ErrorInternalServerError
           }
         )

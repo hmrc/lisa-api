@@ -34,16 +34,16 @@ class TransactionService @Inject() (desConnector: DesConnector)(implicit ec: Exe
       case success: GetBonusOrWithdrawalSuccessResponse =>
         handleITMPResponse(lisaManager, accountId, transactionId, success)
       case DesUnavailableResponse                       =>
-        logger.warn("503 from ITMP")
+        logger.warn(s"ITMP returned with 503 for getTransaction, lisaManager is $lisaManager")
         Future.successful(GetTransactionServiceUnavailableResponse)
       case error: DesFailureResponse                    =>
-        logger.error(s"Error from ITMP: ${error.code}")
+        logger.error(s"Error from ITMP: ${error.code} for getTransaction, lisaManager is $lisaManager")
         Future.successful(
           error.code match {
             case "TRANSACTION_ID_NOT_FOUND"     => GetTransactionTransactionNotFoundResponse
             case "INVESTOR_ACCOUNTID_NOT_FOUND" => GetTransactionAccountNotFoundResponse
             case _                              =>
-              logger.error(s"Get transaction returned error: ${error.code} from ITMP")
+              logger.error(s"Get transaction returned error: ${error.code} from ITMP for lisaManager $lisaManager")
               GetTransactionErrorResponse
           }
         )
@@ -59,6 +59,7 @@ class TransactionService @Inject() (desConnector: DesConnector)(implicit ec: Exe
     itmpResponse.paymentStatus match {
       case TransactionPaymentStatus.PENDING | TransactionPaymentStatus.DUE | TransactionPaymentStatus.VOID |
           TransactionPaymentStatus.CANCELLED =>
+        logger.info(s"Received transaction payment status as cancelled from ITMP for lisaManager : $lisaManager")
         Future.successful(
           GetTransactionSuccessResponse(
             transactionId = transactionId,
@@ -67,6 +68,7 @@ class TransactionService @Inject() (desConnector: DesConnector)(implicit ec: Exe
           )
         )
       case TransactionPaymentStatus.SUPERSEDED =>
+        logger.info(s"Received transaction payment status as superseded from ITMP for lisaManager : $lisaManager")
         Future.successful(
           GetTransactionSuccessResponse(
             transactionId = transactionId,
@@ -75,11 +77,13 @@ class TransactionService @Inject() (desConnector: DesConnector)(implicit ec: Exe
           )
         )
       case TransactionPaymentStatus.PAID       =>
+        logger.info(s"Received transaction payment status as paid from ITMP for lisaManager : $lisaManager")
         handlePaidTransaction(lisaManager, accountId, transactionId, itmpResponse.getBonusDueForPeriod)
       case TransactionPaymentStatus.COLLECTED  =>
+        logger.info(s"Received transaction payment status as collected from ITMP for lisaManager : $lisaManager")
         handleCollectedTransaction(lisaManager, accountId, transactionId)
       case _                                   =>
-        logger.warn(s"Unexpected status: ${itmpResponse.paymentStatus}, returning an error")
+        logger.warn(s"Unexpected status: ${itmpResponse.paymentStatus}, returning an error from ITMP for lisaManager : $lisaManager")
         Future.successful(GetTransactionErrorResponse)
     }
   }
@@ -88,7 +92,9 @@ class TransactionService @Inject() (desConnector: DesConnector)(implicit ec: Exe
     hc: HeaderCarrier
   ): Future[GetTransactionResponse] =
     desConnector.getTransaction(lisaManager, accountId, transactionId) map {
-      case DesUnavailableResponse           => GetTransactionServiceUnavailableResponse
+      case DesUnavailableResponse           =>
+        logger.warn(s"Matched DesUnavailableResponse for lisaManager : $lisaManager")
+        GetTransactionServiceUnavailableResponse
       case collected: DesGetTransactionPaid =>
         GetTransactionSuccessResponse(
           transactionId = transactionId,
@@ -115,7 +121,7 @@ class TransactionService @Inject() (desConnector: DesConnector)(implicit ec: Exe
               paymentStatus = TransactionPaymentStatus.DUE
             )
           case _           =>
-            logger.warn(s"Get collected transaction returned error: ${error.code} from ETMP")
+            logger.warn(s"Get collected transaction returned error: ${error.code} from ETMP for lisaManager : $lisaManager")
             GetTransactionErrorResponse
         }
     }
@@ -127,7 +133,9 @@ class TransactionService @Inject() (desConnector: DesConnector)(implicit ec: Exe
     bonusDueForPeriod: Option[Amount]
   )(implicit hc: HeaderCarrier): Future[GetTransactionResponse] =
     desConnector.getTransaction(lisaManager, accountId, transactionId) map {
-      case DesUnavailableResponse            => GetTransactionServiceUnavailableResponse
+      case DesUnavailableResponse            =>
+        logger.warn(s"Matched DesUnavailableResponse for lisaManager : $lisaManager")
+        GetTransactionServiceUnavailableResponse
       case paid: DesGetTransactionPaid       =>
         GetTransactionSuccessResponse(
           transactionId = transactionId,
@@ -162,7 +170,7 @@ class TransactionService @Inject() (desConnector: DesConnector)(implicit ec: Exe
               bonusDueForPeriod = bonusDueForPeriod
             )
           case _                   =>
-            logger.warn(s"Get paid transaction returned error: ${error.code} from ETMP")
+            logger.warn(s"Get paid transaction returned error: ${error.code} from ETMP for lisaManager : $lisaManager")
             GetTransactionErrorResponse
         }
     }

@@ -39,7 +39,7 @@ class BulkPaymentService @Inject() (desConnector: DesConnector)(implicit ec: Exe
           case "NOT_FOUND" | "INVALID_CALCULATEACCRUEDINTEREST" | "INVALID_CUSTOMERPAYMENTINFORMATION" =>
             GetBulkPaymentNotFoundResponse
           case _                                                                                       =>
-            logger.warn(s"Get bulk payment returned error: ${f.code}")
+            logger.warn(s"Get bulk payment returned error: ${f.code} for lisaManager : $lisaManager")
             GetBulkPaymentErrorResponse
         }
     }
