@@ -17,6 +17,8 @@
 package uk.gov.hmrc.lisaapi.controllers
 
 import com.google.inject.Inject
+import jdk.internal.net.http.common.Log.errors
+import org.checkerframework.checker.units.qual.s
 import play.api.libs.json.{JsObject, JsPath, Json, JsonValidationError}
 import play.api.mvc._
 import uk.gov.hmrc.auth.core.AuthConnector
@@ -68,7 +70,7 @@ class AccountController @Inject()(
         },
         Some { errors =>
           logger.warn(
-            "[AccountController][createOrTransferLisaAccount] The errors are " + errorConverter.convert(errors)
+            s"[AccountController][createOrTransferLisaAccount] Lisa Manager : $lisaManager The errors are " + errorConverter.convert(errors)
           )
 
           val transferAccountDataNotProvided = errors.exists { case (path: JsPath, errors: Seq[JsonValidationError]) =>
@@ -124,7 +126,7 @@ class AccountController @Inject()(
           logger.error(s"[AccountController][processAccountCreation] CreateLisaAccountResponse lisaManager : $lisaManager, errorResponse: $errorResponse")
           handleCreateOrTransferFailure(lisaManager, creationRequest, errorResponse, action)
       } recover { case e: Exception =>
-        logger.error(s"AccountController: An error occurred due to ${e.getMessage} returning internal server error")
+        logger.error(s"AccountController: An error occurred due to ${e.getMessage} returning internal server error for lisaManager : $lisaManager")
         handleCreateOrTransferFailure(lisaManager, creationRequest, ErrorInternalServerError, action)
       }
     }
@@ -175,7 +177,7 @@ class AccountController @Inject()(
             s"lisaManager : $lisaManager, errorResponse : $errorResponse")
           handleCreateOrTransferFailure(lisaManager, transferRequest, errorResponse, action)
       } recover { case e: Exception =>
-        logger.error(s"AccountController: An error occurred in due to ${e.getMessage} returning internal server error")
+        logger.error(s"AccountController: An error occurred in due to ${e.getMessage} returning internal server error for lisaManager : $lisaManager")
         handleCreateOrTransferFailure(lisaManager, transferRequest, ErrorInternalServerError, action)
       }
     }
