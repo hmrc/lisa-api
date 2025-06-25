@@ -124,7 +124,7 @@ class AccountController @Inject()(
           logger.error(s"[AccountController][processAccountCreation] CreateLisaAccountResponse lisaManager : $lisaManager, errorResponse: $errorResponse")
           handleCreateOrTransferFailure(lisaManager, creationRequest, errorResponse, action)
       } recover { case e: Exception =>
-        logger.error(s"AccountController: An error occurred due to ${e.getMessage} returning internal server error for lisaManager : $lisaManager")
+        logger.error(s"[AccountController][processAccountCreation]: An error occurred due to ${e.getMessage} returning internal server error for lisaManager : $lisaManager")
         handleCreateOrTransferFailure(lisaManager, creationRequest, ErrorInternalServerError, action)
       }
     }
@@ -175,7 +175,7 @@ class AccountController @Inject()(
             s"lisaManager : $lisaManager, errorResponse : $errorResponse")
           handleCreateOrTransferFailure(lisaManager, transferRequest, errorResponse, action)
       } recover { case e: Exception =>
-        logger.error(s"AccountController: An error occurred in due to ${e.getMessage} returning internal server error for lisaManager : $lisaManager")
+        logger.error(s"[AccountController][processAccountTransfer]: An error occurred in due to ${e.getMessage} returning internal server error for lisaManager : $lisaManager")
         handleCreateOrTransferFailure(lisaManager, transferRequest, ErrorInternalServerError, action)
       }
     }

@@ -44,13 +44,13 @@ class UpdateSubscriptionService @Inject() (desConnector: DesConnector)(implicit 
           UpdateSubscriptionSuccessResponse("UPDATED_AND_ACCOUNT_VOID", voidMsg)
         }
       case DesUnavailableResponse                                =>
-        logger.info(s"Update subscription des unavailable response for lisaManager: $lisaManager")
+        logger.warn(s"Update subscription des unavailable response for lisaManager: $lisaManager")
         UpdateSubscriptionServiceUnavailableResponse
       case failureResponse: DesFailureResponse                   =>
-        logger.info(s"Matched DesFailureResponse and the code is : ${failureResponse.code} for lisaManager: $lisaManager")
+        logger.warn(s"Matched DesFailureResponse and the code is : ${failureResponse.code} for lisaManager: $lisaManager")
         desFailures.getOrElse(
           failureResponse.code, {
-            logger.warn(s"Update date of first subscription returned error: ${failureResponse.code} for lisaManager: $lisaManager")
+            logger.error(s"Update date of first subscription returned error: ${failureResponse.code} for lisaManager: $lisaManager")
             UpdateSubscriptionErrorResponse
           }
         )

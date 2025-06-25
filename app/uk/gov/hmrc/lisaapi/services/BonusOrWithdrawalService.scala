@@ -32,18 +32,18 @@ class BonusOrWithdrawalService @Inject() (desConnector: DesConnector)(implicit e
   ): Future[GetBonusOrWithdrawalResponse] =
     desConnector.getBonusOrWithdrawal(lisaManager, accountId, transactionId) map {
       case successResponse: GetBonusOrWithdrawalResponse =>
-        logger.info(s"Matched GetBonusOrWithdrawalResponse for lisaManager : $lisaManager")
+        logger.info(s"[BonusOrWithdrawalService][getBonusOrWithdrawal] Matched GetBonusOrWithdrawalResponse for lisaManager : $lisaManager")
         successResponse
       case DesUnavailableResponse                        =>
-        logger.warn(s"Matched DesUnavailableResponse for lisaManager : $lisaManager")
+        logger.warn(s"[BonusOrWithdrawalService][getBonusOrWithdrawal] Matched DesUnavailableResponse for lisaManager : $lisaManager")
         GetBonusOrWithdrawalServiceUnavailableResponse
       case failureResponse: DesFailureResponse           =>
-        logger.error(s"Matched DesFailureResponse for lisaManager : $lisaManager and the code is : ${failureResponse.code}")
+        logger.error(s"[BonusOrWithdrawalService][getBonusOrWithdrawal] Matched DesFailureResponse for lisaManager : $lisaManager and the code is : ${failureResponse.code}")
         failureResponse.code match {
           case "TRANSACTION_ID_NOT_FOUND"     => GetBonusOrWithdrawalTransactionNotFoundResponse
           case "INVESTOR_ACCOUNTID_NOT_FOUND" => GetBonusOrWithdrawalInvestorNotFoundResponse
           case _                              =>
-            logger.error(s"Get bonus payment or withdrawal returned error: ${failureResponse.code} for lisaManager : $lisaManager")
+            logger.error(s"[BonusOrWithdrawalService][getBonusOrWithdrawal] Get bonus payment or withdrawal returned error: ${failureResponse.code} for lisaManager : $lisaManager")
             GetBonusOrWithdrawalErrorResponse
         }
     }

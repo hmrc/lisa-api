@@ -53,7 +53,7 @@ class WithdrawalService @Inject() (desConnector: DesConnector)(implicit ec: Exec
         logger.info(s"Matched DesWithdrawalChargeAlreadySupersededResponse and the code is: ${alreadySupersededResponse.code} for lisaManager: $lisaManager")
         ReportWithdrawalChargeAlreadySuperseded(alreadySupersededResponse.supersededTransactionByID)
       case failureResponse: DesFailureResponse                                     =>
-        logger.error(s"Matched DesFailureResponse and the code is :${failureResponse.code} for lisaManager: $lisaManager")
+        logger.warn(s"Matched DesFailureResponse and the code is :${failureResponse.code} for lisaManager: $lisaManager")
         desFailures.getOrElse(
           failureResponse.code, {
             logger.error(s"Request bonus payment returned error: ${failureResponse.code} for lisaManager: $lisaManager")

@@ -44,7 +44,7 @@ class InvestorService @Inject() (desConnector: DesConnector)(implicit ec: Execut
         error.code match {
           case "INVESTOR_NOT_FOUND" => CreateLisaInvestorInvestorNotFoundResponse
           case _                    =>
-            logger.warn(s"Create investor returned error code ${error.code} for lisaManager : $lisaManager")
+            logger.error(s"Create investor returned error code ${error.code} for lisaManager : $lisaManager")
             CreateLisaInvestorErrorResponse
         }
     }
