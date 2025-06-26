@@ -83,7 +83,7 @@ class TransactionService @Inject() (desConnector: DesConnector)(implicit ec: Exe
         logger.info(s"[TransactionService][handleITMPResponse] Received transaction payment status as collected from ITMP for lisaManager : $lisaManager")
         handleCollectedTransaction(lisaManager, accountId, transactionId)
       case _                                   =>
-        logger.warn(s"[TransactionService][handleITMPResponse] Unexpected status: ${itmpResponse.paymentStatus}, returning an error from ITMP for lisaManager : $lisaManager")
+        logger.error(s"[TransactionService][handleITMPResponse] Unexpected status: ${itmpResponse.paymentStatus}, returning an error from ITMP for lisaManager : $lisaManager")
         Future.successful(GetTransactionErrorResponse)
     }
   }
@@ -121,7 +121,7 @@ class TransactionService @Inject() (desConnector: DesConnector)(implicit ec: Exe
               paymentStatus = TransactionPaymentStatus.DUE
             )
           case _           =>
-            logger.warn(s"[TransactionService][handleCollectedTransaction] Get collected transaction returned error: ${error.code} from ETMP for lisaManager : $lisaManager")
+            logger.error(s"[TransactionService][handleCollectedTransaction] Get collected transaction returned error: ${error.code} from ETMP for lisaManager : $lisaManager")
             GetTransactionErrorResponse
         }
     }

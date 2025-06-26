@@ -47,10 +47,10 @@ class WithdrawalService @Inject() (desConnector: DesConnector)(implicit ec: Exec
         logger.warn(s"[WithdrawalService][reportWithdrawalCharge] Matched DesUnavailableResponse for lisaManager: $lisaManager")
         ReportWithdrawalChargeServiceUnavailable
       case alreadyExistsResponse: DesWithdrawalChargeAlreadyExistsResponse         =>
-        logger.info(s"[WithdrawalService][reportWithdrawalCharge] Matched DesWithdrawalChargeAlreadyExistsResponse and the code is : ${alreadyExistsResponse.code} for lisaManager: $lisaManager")
+        logger.warn(s"[WithdrawalService][reportWithdrawalCharge] Matched DesWithdrawalChargeAlreadyExistsResponse and the code is : ${alreadyExistsResponse.code} for lisaManager: $lisaManager")
         ReportWithdrawalChargeAlreadyExists(alreadyExistsResponse.investorTransactionID)
       case alreadySupersededResponse: DesWithdrawalChargeAlreadySupersededResponse =>
-        logger.info(s"[WithdrawalService][reportWithdrawalCharge] Matched DesWithdrawalChargeAlreadySupersededResponse and the code is: ${alreadySupersededResponse.code} for lisaManager: $lisaManager")
+        logger.warn(s"[WithdrawalService][reportWithdrawalCharge] Matched DesWithdrawalChargeAlreadySupersededResponse and the code is: ${alreadySupersededResponse.code} for lisaManager: $lisaManager")
         ReportWithdrawalChargeAlreadySuperseded(alreadySupersededResponse.supersededTransactionByID)
       case failureResponse: DesFailureResponse                                     =>
         logger.warn(s"[WithdrawalService][reportWithdrawalCharge] Matched DesFailureResponse and the code is :${failureResponse.code} for lisaManager: $lisaManager")
