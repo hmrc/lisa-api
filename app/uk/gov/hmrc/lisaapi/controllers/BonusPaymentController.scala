@@ -135,20 +135,28 @@ class BonusPaymentController @Inject()(
           transactionId,
           Some(ErrorBonusPaymentTransactionNotFound.errorCode)
         )
+        logger.info(
+          s"""[BonusPaymentController][processGetBonusPayment] Received GetWithdrawalResponse | GetBonusOrWithdrawalTransactionNotFoundResponse for lisaManager: $lisaManager,
+             | accountId : $accountId, transactionId : $transactionId""".stripMargin)
         lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.BONUS_PAYMENT)
         Future.successful(NotFound(ErrorBonusPaymentTransactionNotFound.asJson))
 
       case GetBonusOrWithdrawalInvestorNotFoundResponse =>
+        logger.info(s"""[BonusPaymentController][processGetBonusPayment] Received GetBonusOrWithdrawalInvestorNotFoundResponse for lisaManager : $lisaManager | accountId : $accountId, transactionId : $transactionId""".stripMargin)
         getBonusPaymentAudit(lisaManager, accountId, transactionId, Some(ErrorAccountNotFound.errorCode))
         lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.BONUS_PAYMENT)
         Future.successful(NotFound(ErrorAccountNotFound.asJson))
 
       case GetBonusOrWithdrawalServiceUnavailableResponse =>
+        logger.info(s"""[BonusPaymentController][processGetBonusPayment] Received GetBonusOrWithdrawalServiceUnavailableResponse for lisaManager : $lisaManager | accountId : $accountId, transactionId : $transactionId""".stripMargin)
         getBonusPaymentAudit(lisaManager, accountId, transactionId, Some(ErrorServiceUnavailable.errorCode))
         lisaMetrics.incrementMetrics(startTime, SERVICE_UNAVAILABLE, LisaMetricKeys.BONUS_PAYMENT)
         Future.successful(ServiceUnavailable(ErrorServiceUnavailable.asJson))
 
       case _ =>
+        logger.error(
+          s"""[BonusPaymentController][processGetBonusPayment] ErrorInternalServerError lisaManager : $lisaManager ,
+             | accountId : $accountId , error : ${ErrorInternalServerError.asJson}""".stripMargin)
         getBonusPaymentAudit(lisaManager, accountId, transactionId, Some(ErrorInternalServerError.errorCode))
         lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.BONUS_PAYMENT)
         Future.successful(InternalServerError(ErrorInternalServerError.asJson))

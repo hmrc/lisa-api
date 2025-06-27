@@ -32,31 +32,31 @@ class BonusPaymentService @Inject() (desConnector: DesConnector)(implicit ec: Ex
   ): Future[RequestBonusPaymentResponse] =
     desConnector.requestBonusPayment(lisaManager, accountId, request) map {
       case successResponse: DesTransactionResponse       =>
-        logger.info("Matched RequestBonusPaymentSuccessResponse and the message is " + successResponse.message)
+        logger.info("[BonusPaymentService][requestBonusPayment] Matched RequestBonusPaymentSuccessResponse and the message is " + successResponse.message)
         (request.bonuses.claimReason, successResponse.message) match {
           case ("Superseded Bonus", _) => RequestBonusPaymentSupersededResponse(successResponse.transactionID)
           case (_, Some("Late"))       => RequestBonusPaymentLateResponse(successResponse.transactionID)
           case (_, _)                  => RequestBonusPaymentOnTimeResponse(successResponse.transactionID)
         }
       case conflictResponse: DesTransactionExistResponse =>
-        logger.info("Matched DesTransactionExistResponse and the code is " + conflictResponse.code)
+        logger.info(s"[BonusPaymentService][requestBonusPayment] Matched DesTransactionExistResponse and the code is : ${conflictResponse.code} for lisaManager : $lisaManager")
         conflictResponse.code match {
           case "BONUS_CLAIM_ALREADY_EXISTS"                   => RequestBonusPaymentClaimAlreadyExists(conflictResponse.transactionID)
           case "SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED" =>
             RequestBonusPaymentAlreadySuperseded(conflictResponse.transactionID)
         }
       case DesUnavailableResponse                        =>
-        logger.info("Matched DesUnavailableResponse")
+        logger.warn(s"[BonusPaymentService][requestBonusPayment] Matched DesUnavailableResponse for lisaManager : $lisaManager")
         RequestBonusPaymentServiceUnavailable
       case failureResponse: DesFailureResponse           =>
-        logger.warn("Matched DesFailureResponse and the code is " + failureResponse.code)
+        logger.warn(s"[BonusPaymentService][requestBonusPayment] Matched DesFailureResponse for lisaManager : $lisaManager and the code is : ${failureResponse.code}")
         desFailures.getOrElse(
           failureResponse.code, {
-            logger.error(s"Request bonus payment returned error: ${failureResponse.code}")
+            logger.error(s"[BonusPaymentService][requestBonusPayment] Request bonus payment returned error: ${failureResponse.code} for lisaManager : $lisaManager")
             RequestBonusPaymentError
           }
         )
-    }
+     }
 
   private val desFailures = Map[String, RequestBonusPaymentErrorResponse](
     "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID"      -> RequestBonusPaymentAccountClosedOrVoid,

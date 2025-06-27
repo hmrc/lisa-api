@@ -78,7 +78,8 @@ class CloseAccountController @Inject()(
                   handleFailure(lisaManager, accountId, requestData, failure)
               } recover { case e: Exception =>
                 logger.error(
-                  s"AccountController: closeLisaAccount: An error occurred due to ${e.getMessage} returning internal server error"
+                  s"AccountController: closeLisaAccount: An error occurred due to ${e.getMessage} returning internal " +
+                    s"server error for lisaManager : $lisaManager"
                 )
                 handleFailure(lisaManager, accountId, requestData, CloseLisaAccountErrorResponse)
               }

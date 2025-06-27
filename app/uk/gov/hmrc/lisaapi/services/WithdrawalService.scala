@@ -32,7 +32,7 @@ class WithdrawalService @Inject() (desConnector: DesConnector)(implicit ec: Exec
   ): Future[ReportWithdrawalChargeResponse] =
     desConnector.reportWithdrawalCharge(lisaManager, accountId, request) map {
       case successResponse: DesTransactionResponse                                 =>
-        logger.info("Matched ReportWithdrawalChargeSuccessResponse and the message is " + successResponse.message)
+        logger.info(s"[WithdrawalService][reportWithdrawalCharge] Matched ReportWithdrawalChargeSuccessResponse and the message is : ${successResponse.message} for lisaManager: $lisaManager")
         request match {
           case _: RegularWithdrawalChargeRequest    =>
             if (successResponse.message.contains("Late")) {
@@ -44,21 +44,19 @@ class WithdrawalService @Inject() (desConnector: DesConnector)(implicit ec: Exec
             ReportWithdrawalChargeSupersededResponse(successResponse.transactionID)
         }
       case DesUnavailableResponse                                                  =>
-        logger.warn("Matched DesUnavailableResponse")
+        logger.warn(s"[WithdrawalService][reportWithdrawalCharge] Matched DesUnavailableResponse for lisaManager: $lisaManager")
         ReportWithdrawalChargeServiceUnavailable
       case alreadyExistsResponse: DesWithdrawalChargeAlreadyExistsResponse         =>
-        logger.info("Matched DesWithdrawalChargeAlreadyExistsResponse and the code is " + alreadyExistsResponse.code)
+        logger.warn(s"[WithdrawalService][reportWithdrawalCharge] Matched DesWithdrawalChargeAlreadyExistsResponse and the code is : ${alreadyExistsResponse.code} for lisaManager: $lisaManager")
         ReportWithdrawalChargeAlreadyExists(alreadyExistsResponse.investorTransactionID)
       case alreadySupersededResponse: DesWithdrawalChargeAlreadySupersededResponse =>
-        logger.info(
-          "Matched DesWithdrawalChargeAlreadySupersededResponse and the code is " + alreadySupersededResponse.code
-        )
+        logger.warn(s"[WithdrawalService][reportWithdrawalCharge] Matched DesWithdrawalChargeAlreadySupersededResponse and the code is: ${alreadySupersededResponse.code} for lisaManager: $lisaManager")
         ReportWithdrawalChargeAlreadySuperseded(alreadySupersededResponse.supersededTransactionByID)
       case failureResponse: DesFailureResponse                                     =>
-        logger.error("Matched DesFailureResponse and the code is " + failureResponse.code)
+        logger.warn(s"[WithdrawalService][reportWithdrawalCharge] Matched DesFailureResponse and the code is :${failureResponse.code} for lisaManager: $lisaManager")
         desFailures.getOrElse(
           failureResponse.code, {
-            logger.error(s"Request bonus payment returned error: ${failureResponse.code}")
+            logger.error(s"[WithdrawalService][reportWithdrawalCharge] Request bonus payment returned error: ${failureResponse.code} for lisaManager: $lisaManager")
             ReportWithdrawalChargeError
           }
         )
