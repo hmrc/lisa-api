@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.lisaapi.connectors
 
+import com.fasterxml.jackson.core.JsonParseException
 import com.google.inject.Inject
 import play.api.Logging
 import play.api.http.Status._
@@ -428,20 +429,26 @@ class DesConnector @Inject() (
   def parseDesResponse[A <: DesResponse](res: HttpResponse)(implicit reads: Reads[A]): DesResponse = {
     val contentTypeHeader = res.headers.getOrElse("Content-Type", Seq.empty[String])
     if (contentTypeHeader.contains("application/json")){
-      res.json.validate[A] match {
-        case JsSuccess(value, _) => value
-        case JsError(er) =>
-          if (res.status == 200 | res.status == 201) {
-            logger.error(s"Error from DES (parsing as DesResponse): ${er.mkString(", ")}")
-          }
-          Json.fromJson[DesFailureResponse](res.json) match {
-            case JsSuccess(data, _) =>
-              logger.info(s"DesFailureResponse from DES: $data")
-              data
-            case JsError(ex) =>
-              logger.error(s"Error from DES (parsing as DesFailureResponse): ${ex.mkString(", ")}")
-              DesFailureResponse()
-          }
+      try {
+        res.json.validate[A] match {
+          case JsSuccess(value, _) => value
+          case JsError(er) =>
+            if (res.status == 200 | res.status == 201) {
+              logger.error(s"Error from DES (parsing as DesResponse): ${er.mkString(", ")}")
+            }
+            Json.fromJson[DesFailureResponse](res.json) match {
+              case JsSuccess(data, _) =>
+                logger.info(s"DesFailureResponse from DES: $data")
+                data
+              case JsError(ex) =>
+                logger.error(s"Error from DES (parsing as DesFailureResponse): ${ex.mkString(", ")}")
+                DesFailureResponse()
+            }
+        }
+      } catch {
+        case _: JsonParseException =>
+          logger.error(s"Invalid JSON received from DES. Status: ${res.status}, Body: ${res.body}")
+          DesFailureResponse()
       }
     }
     else{

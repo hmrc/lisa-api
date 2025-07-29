@@ -113,6 +113,38 @@ class DesConnectorSpec extends DesConnectorTestHelper with BeforeAndAfterEach {
           response must be(DesFailureResponse())
         }
       }
+
+      "a 409 is returned with invalid JSON" in {
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                CONFLICT,
+                """{"invalid": json""",
+                responseHeader
+              )
+            )
+          )
+        doCreateInvestorRequest { response =>
+          response must be(DesFailureResponse())
+        }
+      }
+
+      "a 200 is returned with invalid JSON" in {
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                OK,
+                """{"invalid": json""",
+                responseHeader
+              )
+            )
+          )
+        doCreateInvestorRequest { response =>
+          response must be(DesFailureResponse())
+        }
+      }
     }
 
     "return a populated CreateLisaInvestorAlreadyExistsResponse" when {
