@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.lisaapi.connectors
 
-import com.fasterxml.jackson.core.JsonParseException
 import com.google.inject.Inject
 import play.api.Logging
 import play.api.http.Status
