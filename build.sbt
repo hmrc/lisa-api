@@ -31,5 +31,3 @@ scalacOptions ++= Seq(
   "-Wconf:cat=unused-imports&src=views/.*:s",
   "-Wconf:msg=match may not be exhaustive:s"
 )
-
-addCommandAlias("scalastyleAll", "all scalastyle Test/scalastyle")

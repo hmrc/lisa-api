@@ -113,6 +113,22 @@ class DesConnectorSpec extends DesConnectorTestHelper with BeforeAndAfterEach {
           response must be(DesFailureResponse())
         }
       }
+
+      "a 409 is returned with JSON that cannot be parsed as expected response" in {
+        when(mockRequestBuilder.execute[HttpResponse](any(),any()))
+          .thenReturn(
+            Future.successful(
+              HttpResponse(
+                CONFLICT,
+                """{"unexpectedField": "value", "notInvestorID": "123"}""",
+                responseHeader
+              )
+            )
+          )
+        doCreateInvestorRequest { response =>
+          response must be(DesFailureResponse())
+        }
+      }
     }
 
     "return a populated CreateLisaInvestorAlreadyExistsResponse" when {

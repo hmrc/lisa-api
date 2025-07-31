@@ -18,8 +18,10 @@ package uk.gov.hmrc.lisaapi.connectors
 
 import com.google.inject.Inject
 import play.api.Logging
+import play.api.http.Status
 import play.api.http.Status._
 import play.api.libs.json.{JsError, JsSuccess, Json, Reads}
+import play.mvc.Http.{HeaderNames, MimeTypes}
 import play.utils.UriEncoding
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps, UpstreamErrorResponse}
 import uk.gov.hmrc.http.client.HttpClientV2
@@ -426,15 +428,15 @@ class DesConnector @Inject() (
   // scalastyle:off magic.number
 
   def parseDesResponse[A <: DesResponse](res: HttpResponse)(implicit reads: Reads[A]): DesResponse = {
-    val contentTypeHeader = res.headers.getOrElse("Content-Type", Seq.empty[String])
-    if (contentTypeHeader.contains("application/json")){
+    val isJson = res.headers.getOrElse(HeaderNames.CONTENT_TYPE, Seq.empty[String]).map(_.toLowerCase).exists(_.contains(MimeTypes.JSON.toLowerCase))
+    if (isJson) {
       res.json.validate[A] match {
         case JsSuccess(value, _) => value
         case JsError(er) =>
-          if (res.status == 200 | res.status == 201) {
+          if (res.status == Status.OK || res.status == Status.CREATED) {
             logger.error(s"Error from DES (parsing as DesResponse): ${er.mkString(", ")}")
           }
-          Json.fromJson[DesFailureResponse](res.json) match {
+          res.json.validate[DesFailureResponse] match {
             case JsSuccess(data, _) =>
               logger.info(s"DesFailureResponse from DES: $data")
               data
@@ -444,7 +446,7 @@ class DesConnector @Inject() (
           }
       }
     }
-    else{
+    else {
       logger.error(s"Error from DES (parsing as DesFailureResponse): Received non-JSON content from DES, status: ${res.status}")
       DesFailureResponse()
     }
