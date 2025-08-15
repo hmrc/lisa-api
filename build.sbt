@@ -1,4 +1,3 @@
-import scoverage.ScoverageKeys
 import uk.gov.hmrc.DefaultBuildSettings.{defaultSettings, scalaSettings}
 
 scalaSettings
@@ -21,11 +20,7 @@ retrieveManaged := true
 Compile / unmanagedResourceDirectories += baseDirectory.value / "resources"
 Test / fork := true
 
-ScoverageKeys.coverageExcludedPackages := "<empty>;testOnlyDoNotUseInAppConf.*;uk.gov.hmrc.lisaapi.views.txt;uk.gov.hmrc;definition;uk.gov.hmrc.lisaapi.config.*;uk.gov.hmrc.lisaapi.models.*;uk.gov.hmrc.lisaapi.metrics.*;prod"
-ScoverageKeys.coverageMinimumStmtTotal := 91
-ScoverageKeys.coverageFailOnMinimum := true
-ScoverageKeys.coverageHighlighting := true
-
+CodeCoverageSettings()
 scalacOptions ++= Seq(
   "-Wconf:src=routes/.*:s",
   "-Wconf:cat=unused-imports&src=views/.*:s",
