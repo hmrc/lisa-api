@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.lisaapi.controllers
+package uk.gov.hmrc.lisaapi.controllers.doc
 
 import com.google.inject.Inject
 import controllers.Assets

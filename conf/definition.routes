@@ -1,5 +1,5 @@
-GET        /api/definition                                  uk.gov.hmrc.lisaapi.controllers.Documentation.definition()
+GET        /api/definition                                  uk.gov.hmrc.lisaapi.controllers.doc.Documentation.definition()
 
-GET        /api/documentation/:version/:endpointName        uk.gov.hmrc.lisaapi.controllers.Documentation.documentation(version,endpointName)
+GET        /api/documentation/:version/:endpointName        uk.gov.hmrc.lisaapi.controllers.doc.Documentation.documentation(version,endpointName)
 
-GET        /api/conf/:version/*file                         uk.gov.hmrc.lisaapi.controllers.Documentation.specification(version, file)
+GET        /api/conf/:version/*file                         uk.gov.hmrc.lisaapi.controllers.doc.Documentation.specification(version, file)
