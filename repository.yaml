@@ -1,5 +1,9 @@
-digital-service: Lifetime ISA
+digital-service: LISA / Lifetime Individual Saving's Account
+description: This is the API repository for Lifetime ISA service.
 repoVisibility: public_0C3F0CE3E6E6448FAD341E7BFA50FCD333E06A20CFF05FCACE61154DDBBADF71
+type: Service
+service-type: Backend
+tags: [ 'api' ]
 test-repositories:
   - lisa-performance-tests
   - lisa-api-tests
