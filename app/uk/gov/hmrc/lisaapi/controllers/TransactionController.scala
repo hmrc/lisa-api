@@ -55,7 +55,7 @@ class TransactionController @Inject()(
             withValidTransactionId(transactionId) { () =>
               service.getTransaction(lisaManager, accountId, transactionId) flatMap {
                 case success: GetTransactionSuccessResponse =>
-                  logger.info("Matched Valid Response")
+                  logger.info(s"[TransactionController][getTransaction] Matched Valid Response for accountId : $accountId, lisaManager : $lisaManager")
                   lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.TRANSACTION)
 
                   withApiVersion {
@@ -77,7 +77,7 @@ class TransactionController @Inject()(
                       Future.successful(Ok(Json.toJson(success.copy(bonusDueForPeriod = None))))
                   }
                 case GetTransactionTransactionNotFoundResponse =>
-                  logger.info("Matched Not Found Response")
+                  logger.info(s"[TransactionController][getTransaction] Matched Not Found Response for accountId : $accountId, lisaManager : $lisaManager")
                   lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.TRANSACTION)
 
                   withApiVersion {
@@ -99,11 +99,11 @@ class TransactionController @Inject()(
                       Future.successful(ErrorTransactionNotFound.asResult)
                   }
                 case res: GetTransactionResponse =>
-                  logger.warn("Matched an error")
+                  logger.warn("[LifeEventController][reportLisaLifeEvent] Matched an error")
                   val errorResponse = errors.applyOrElse(
                     res,
                     { _: GetTransactionResponse =>
-                      logger.error(s"Matched an unexpected response: $res, returning a 500 error")
+                      logger.error(s"[LifeEventController][reportLisaLifeEvent] Matched an unexpected response: $res, returning a 500 error")
                       ErrorInternalServerError
                     }
                   )

@@ -56,7 +56,6 @@ class UpdateSubscriptionController @Inject()(
                 logger.info(s"[UpdateSubscriptionController][updateSubscription] response : ${request.toString()} lisaManager: $lisaManager, accountId: $accountId")
                 result match {
                   case success: UpdateSubscriptionSuccessResponse =>
-                    logger.info("First Subscription date updated")
                     logger.info(s"[UpdateSubscriptionController][updateSubscription] First Subscription date updated lisaManager: $lisaManager, accountId: $accountId")
                     auditUpdateSubscription(lisaManager, accountId, updateSubsRequest)
                     val data =
@@ -97,7 +96,7 @@ class UpdateSubscriptionController @Inject()(
     success: () => Future[Result]
   )(implicit hc: HeaderCarrier, startTime: Long): Future[Result] =
     if (updateSubsRequest.firstSubscriptionDate.isBefore(LISA_START_DATE)) {
-      logger.info("First Subscription date not updated - failed business rule validation")
+      logger.info("[UpdateSubscriptionController][withValidDates] First Subscription date not updated - failed business rule validation")
 
       auditUpdateSubscription(lisaManager, accountId, updateSubsRequest, Some("FORBIDDEN"))
 

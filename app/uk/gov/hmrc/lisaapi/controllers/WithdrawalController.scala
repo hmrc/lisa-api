@@ -191,7 +191,7 @@ class WithdrawalController @Inject() (
     req: ReportWithdrawalChargeRequest,
     resp: ReportWithdrawalChargeSuccessResponse
   )(implicit hc: HeaderCarrier, startTime: Long) = {
-    logger.info("Matched success response")
+    logger.info(s"[WithdrawalController][handleSuccess] Matched success response for accountId : $accountId, lisaManager : $lisaManager")
 
     val (responseData, notification) = resp match {
       case _: ReportWithdrawalChargeOnTimeResponse     =>
