@@ -87,7 +87,7 @@ class BonusPaymentController @Inject()(
   def getBonusPayment(lisaManager: String, accountId: String, transactionId: String): Action[AnyContent] =
     validateHeader(parse).async { implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
-      logger.info(s"""[BonusPaymentController][getBonusPayment] lisaManager: $lisaManager, accountId : $accountId, transactionId : $transactionId""")
+      logger.info(s"[BonusPaymentController][getBonusPayment] lisaManager: $lisaManager, accountId : $accountId, transactionId : $transactionId")
       withValidLMRN(lisaManager) { () =>
         withEnrolment(lisaManager) { _ =>
           withValidAccountId(accountId) { () =>
@@ -111,7 +111,7 @@ class BonusPaymentController @Inject()(
           case Some(VERSION_1) =>
             if (response.bonuses.claimReason == "Superseded Bonus") {
               getBonusPaymentAudit(lisaManager, accountId, transactionId, Some(ErrorInternalServerError.errorCode))
-              logger.warn(s"""[BonusPaymentController][processGetBonusPayment] API v1 received a superseded bonus claim. ID was $transactionId""")
+              logger.warn(s"[BonusPaymentController][processGetBonusPayment] API v1 received a superseded bonus claim. ID was $transactionId")
               Future.successful(InternalServerError(ErrorInternalServerError.asJson))
             } else {
               logger.info(

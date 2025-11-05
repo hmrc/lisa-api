@@ -70,7 +70,7 @@ class LifeEventController @Inject()(
                         val errorResponse = v1errors.applyOrElse(
                           res,
                           { _: ReportLifeEventResponse =>
-                            logger.error(s"Matched an unexpected response: $res, returning a 500 error")
+                            logger.error(s"[LifeEventController][reportLisaLifeEvent] Matched an unexpected response: $res, returning a 500 error")
                             ErrorInternalServerError
                           }
                         )
@@ -82,7 +82,7 @@ class LifeEventController @Inject()(
                         val errorResponse = v2errors.applyOrElse(
                           res,
                           { _: ReportLifeEventResponse =>
-                            logger.error(s"Matched an unexpected response: $res, returning a 500 error")
+                            logger.error(s"[LifeEventController][reportLisaLifeEvent] Matched an unexpected response: $res, returning a 500 error")
                             ErrorInternalServerError
                           }
                         )
@@ -118,7 +118,7 @@ class LifeEventController @Inject()(
                                                                                                            hc: HeaderCarrier,
                                                                                                            startTime: Long
   ): Result = {
-    logger.info("Matched an error response")
+    logger.info("[LifeEventController][reportLisaLifeEvent] Matched an error response")
     auditReportLifeEvent(lisaManager, accountId, req, success = false, Map("reasonNotReported" -> e.errorCode))
     lisaMetrics.incrementMetrics(startTime, e.httpStatusCode, LisaMetricKeys.EVENT)
     e.asResult
