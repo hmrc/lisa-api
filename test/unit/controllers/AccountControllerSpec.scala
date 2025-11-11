@@ -108,7 +108,7 @@ class AccountControllerSpec extends ControllerTestFixture {
 
   "The Create / Transfer Account endpoint" must {
 
-    when(mockAuthConnector.authorise[Option[String]](any(), any())(any(), any())).thenReturn(Future(Some("1234")))
+    mockAuthorize(lisaManager)
 
     "audit an accountCreated event" when {
       "submitted a valid create account request" in {

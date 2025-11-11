@@ -52,7 +52,7 @@ class GetLifeEventController @Inject()(
 
       withValidLMRN(lisaManager) { () =>
         withValidAccountId(accountId) { () =>
-          withEnrolment(lisaManager) { _ =>
+          withEnrolment(lisaManager) { () =>
             service.getLifeEvent(lisaManager, accountId, lifeEventId) map {
               case Left(error) =>
                 auditGetLifeEvent(lisaManager, accountId, lifeEventId, Some(error.errorCode))

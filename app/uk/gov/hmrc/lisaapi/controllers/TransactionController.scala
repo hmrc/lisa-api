@@ -50,7 +50,7 @@ class TransactionController @Inject()(
       logger.info(s"[TransactionController][getTransaction]  accountId : $accountId, lisaManager : $lisaManager")
 
       withValidLMRN(lisaManager) { () =>
-        withEnrolment(lisaManager) { _ =>
+        withEnrolment(lisaManager) { () =>
           withValidAccountId(accountId) { () =>
             withValidTransactionId(transactionId) { () =>
               service.getTransaction(lisaManager, accountId, transactionId) flatMap {

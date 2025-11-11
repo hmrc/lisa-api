@@ -50,7 +50,7 @@ class AnnualReturnControllerSpec extends ControllerTestFixture {
     reset(mockAnnualReturnValidator)
     reset(mockLifeEventService)
 
-    when(mockAuthConnector.authorise[Option[String]](any(), any())(any(), any())).thenReturn(Future(Some("1234")))
+    mockAuthorize(lisaManager)
     when(mockAnnualReturnValidator.validate(any())).thenReturn(Nil)
     when(mockAppContext.endpointIsDisabled(any())).thenReturn(false)
   }

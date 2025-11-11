@@ -56,7 +56,7 @@ class ReinstateAccountControllerSpec extends ControllerTestFixture {
 
   "The Reinstate Account endpoint" must {
 
-    when(mockAuthConnector.authorise[Option[String]](any(), any())(any(), any())).thenReturn(Future(Some("1234")))
+    mockAuthorize(lisaManager)
 
     "audit an account reinstated event" when {
       "return with status 200 ok" when {

@@ -50,7 +50,7 @@ class UpdateFirstSubscriptionDateSpec extends ControllerTestFixture {
 
   override def beforeEach(): Unit = {
     reset(mockAuditService)
-    when(mockAuthConnector.authorise[Option[String]](any(), any())(any(), any())).thenReturn(Future(Some("1234")))
+    mockAuthorize(lisaManager)
   }
 
   val updateFirstSubscriptionDate: String =

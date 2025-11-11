@@ -89,7 +89,7 @@ class BonusPaymentController @Inject()(
       implicit val startTime: Long = System.currentTimeMillis()
       logger.info(s"""[BonusPaymentController][getBonusPayment] lisaManager: $lisaManager, accountId : $accountId, transactionId : $transactionId""")
       withValidLMRN(lisaManager) { () =>
-        withEnrolment(lisaManager) { _ =>
+        withEnrolment(lisaManager) { () =>
           withValidAccountId(accountId) { () =>
             withValidTransactionId(transactionId) { () =>
               processGetBonusPayment(lisaManager, accountId, transactionId)

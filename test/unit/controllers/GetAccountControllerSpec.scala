@@ -57,7 +57,7 @@ class GetAccountControllerSpec extends ControllerTestFixture {
 
   "The Get Account Details endpoint" must {
 
-    when(mockAuthConnector.authorise[Option[String]](any(), any())(any(), any())).thenReturn(Future(Some("1234")))
+    mockAuthorize(lisaManager)
 
     "return the correct json" when {
       "returning a valid open account response" in {

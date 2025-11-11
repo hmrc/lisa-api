@@ -60,7 +60,7 @@ class CloseAccountControllerSpec extends ControllerTestFixture {
 
   "The Close Account endpoint" must {
 
-    when(mockAuthConnector.authorise[Option[String]](any(), any())(any(), any())).thenReturn(Future(Some("1234")))
+    mockAuthorize(lisaManager)
 
     "audit an accountClosed event" when {
       "return with status 200 ok" when {

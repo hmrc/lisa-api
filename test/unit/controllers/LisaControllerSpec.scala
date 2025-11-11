@@ -17,8 +17,6 @@
 package unit.controllers
 
 import helpers.ControllerTestFixture
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsPath, Json, Reads}
 import play.api.mvc._
@@ -45,20 +43,23 @@ class LisaControllerSpec extends ControllerTestFixture {
     mockControllerComponents,
     mockParser
   ) {
-    def testJsonValidator(): Action[AnyContent]
+    def testJsonValidator(lisaMangerRef: String): Action[AnyContent]
+
     def testLMRNValidator(lmrn: String): Action[AnyContent]
+
     def testAccountIdValidator(accountId: String): Action[AnyContent]
+
     def testTransactionIdValidator(transactionId: String): Action[AnyContent]
   }
 
   val accountController: AccountControllerTestHelper = new AccountControllerTestHelper {
 
-    def testJsonValidator(): Action[AnyContent] = validateHeader(mockParser).async { implicit request =>
+    def testJsonValidator(lisaMangerRef: String): Action[AnyContent] = validateHeader(mockParser).async { implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
       withValidJson[TestType](
         _ => Future.successful(PreconditionFailed) // we don't ever want this to return
         ,
-        lisaManager = ""
+        lisaManager = lisaMangerRef
       )
     }
 
@@ -80,7 +81,8 @@ class LisaControllerSpec extends ControllerTestFixture {
     }
   }
 
-  val fundReleaseJsonForInvalidAddress = """
+  val fundReleaseJsonForInvalidAddress =
+    """
 {
   "propertyDetails": {
     "nameOrNumber": "Flat~1!!",
@@ -89,7 +91,8 @@ class LisaControllerSpec extends ControllerTestFixture {
 }
 """
 
-  val fundReleaseJsonForNotValidAddress = """
+  val fundReleaseJsonForNotValidAddress =
+    """
 {
   "propertyDetails": {
     "nameOrNumber": "Flat A Wiiliams Park Benton Road Newcastle Upon Tyne",
@@ -98,7 +101,8 @@ class LisaControllerSpec extends ControllerTestFixture {
 }
 """
 
-  val fundReleaseJsonForValidAddress = """
+  val fundReleaseJsonForValidAddress =
+    """
 {
   "propertyDetails": {
     "nameOrNumber": "Flat A",
@@ -107,7 +111,8 @@ class LisaControllerSpec extends ControllerTestFixture {
 }
 """
 
-  val fundReleaseJsonForNoAddress = """
+  val fundReleaseJsonForNoAddress =
+    """
 {
   "eventDate": "2017-05-10"
 }
@@ -116,17 +121,19 @@ class LisaControllerSpec extends ControllerTestFixture {
   implicit val testTypeReads: Reads[TestType] = (
     (JsPath \ "prop1").read[Int].map[String](i => throw new RuntimeException("Deliberate Test Exception")) and
       (JsPath \ "prop2").read[String]
-  )(TestType.apply _)
+    )(TestType.apply _)
 
   "The withValidJson method" must {
 
     "return with an Internal Server Error" when {
 
       "an exception is thrown by one of our Json reads" in {
-        when(mockAuthConnector.authorise[Option[String]](any(), any())(any(), any())).thenReturn(Future(Some("1234")))
+        val lisaManagerReferenceNumber = "Z123456"
+        mockAuthorize(lisaManagerReferenceNumber)
+
         val jsonString = """{"prop1": 123, "prop2": "123"}"""
-        val res        = accountController
-          .testJsonValidator()
+        val res = accountController
+          .testJsonValidator(lisaManagerReferenceNumber)
           .apply(
             FakeRequest(Helpers.PUT, "/")
               .withHeaders(acceptHeader)
@@ -144,7 +151,7 @@ class LisaControllerSpec extends ControllerTestFixture {
 
       "an invalid lmrn is passed in" in {
         val jsonString = """{"prop1": 123, "prop2": "123"}"""
-        val res        = accountController
+        val res = accountController
           .testLMRNValidator("Z")
           .apply(
             FakeRequest(Helpers.PUT, "/")
@@ -166,7 +173,7 @@ class LisaControllerSpec extends ControllerTestFixture {
 
       "a valid lmrn is passed in" in {
         val jsonString = """{"prop1": 123, "prop2": "123"}"""
-        val res        = accountController
+        val res = accountController
           .testLMRNValidator("Z123456")
           .apply(
             FakeRequest(Helpers.PUT, "/")
@@ -187,7 +194,7 @@ class LisaControllerSpec extends ControllerTestFixture {
 
       "an invalid account is passed in" in {
         val jsonString = """{"prop1": 123, "prop2": "123"}"""
-        val res        = accountController
+        val res = accountController
           .testAccountIdValidator("Z" * 21)
           .apply(
             FakeRequest(Helpers.PUT, "/")
@@ -209,7 +216,7 @@ class LisaControllerSpec extends ControllerTestFixture {
 
       "a valid accountId is passed in" in {
         val jsonString = """{"prop1": 123, "prop2": "123"}"""
-        val res        = accountController
+        val res = accountController
           .testAccountIdValidator("ABC12345")
           .apply(
             FakeRequest(Helpers.PUT, "/")
@@ -230,7 +237,7 @@ class LisaControllerSpec extends ControllerTestFixture {
 
       "an invalid transaction Id is passed in" in {
         val jsonString = """{"prop1": 123, "prop2": "123"}"""
-        val res        = accountController
+        val res = accountController
           .testTransactionIdValidator("123.345")
           .apply(
             FakeRequest(Helpers.PUT, "/")
@@ -252,7 +259,7 @@ class LisaControllerSpec extends ControllerTestFixture {
 
       "a valid accountId is passed in" in {
         val jsonString = """{"prop1": 123, "prop2": "123"}"""
-        val res        = accountController
+        val res = accountController
           .testTransactionIdValidator("1234567890")
           .apply(
             FakeRequest(Helpers.PUT, "/")

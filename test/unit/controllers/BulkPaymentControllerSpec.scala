@@ -53,8 +53,9 @@ class BulkPaymentControllerSpec extends ControllerTestFixture {
 
   override def beforeEach(): Unit = {
     reset(mockAuditService)
-    when(mockAuthConnector.authorise[Option[String]](any(), any())(any(), any()))
-      .thenReturn(Future(Some("1234")))
+    reset(mockAuthConnector)
+
+    mockAuthorize(lmrn)
 
     when(mockDateTimeService.now())
       .thenReturn(currentDate)

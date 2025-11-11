@@ -44,7 +44,7 @@ class DiscoverController @Inject() (
       validateLMRN(lisaManagerReferenceNumber)).async { implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
 
-      withEnrolment(lisaManagerReferenceNumber) { _ =>
+      withEnrolment(lisaManagerReferenceNumber) { () =>
         val result = withApiVersion {
           case Some(VERSION_1) => Future.successful(Ok(Json.parse(v1(lisaManagerReferenceNumber))))
           case Some(VERSION_2) => Future.successful(Ok(Json.parse(v2(lisaManagerReferenceNumber))))

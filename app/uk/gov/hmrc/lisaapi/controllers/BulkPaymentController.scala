@@ -55,7 +55,7 @@ class BulkPaymentController @Inject()(
       logger.info(s"""[BulkPaymentController][getBulkPayment] lisaManager : $lisaManager""")
 
       withValidLMRN(lisaManager) { () =>
-        withEnrolment(lisaManager) { _ =>
+        withEnrolment(lisaManager) { () =>
           withValidDates(startDate, endDate, lisaManager) { (start, end) =>
             val response = service.getBulkPayment(lisaManager, start, end)
 
