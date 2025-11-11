@@ -68,7 +68,7 @@ This service is written in [Scala](http://www.scala-lang.org/) and [Play](http:/
 
 Install [Service Manager](https://github.com/hmrc/sm2), then start dependencies:
 
-    sm2 --start GG_AUTH_SERVICES LISA_STUB
+    sm2 --start LISA_API_ALL --wait 30 && sm2 --stop LISA_API
 
 Start the app:
 
