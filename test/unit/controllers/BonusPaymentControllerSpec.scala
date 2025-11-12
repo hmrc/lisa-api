@@ -66,7 +66,7 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
     reset(mockDateTimeService)
     reset(mockBonusPaymentValidator)
 
-    when(mockAuthConnector.authorise[Option[String]](any(), any())(any(), any())).thenReturn(Future(Some("1234")))
+    mockAuthorize(lisaManager)
     when(mockDateTimeService.now()).thenReturn(LocalDate.parse("2018-01-01"))
     when(mockBonusPaymentValidator.validate(any())).thenReturn(Nil)
   }

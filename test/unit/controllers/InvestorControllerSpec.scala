@@ -66,7 +66,7 @@ class InvestorControllerSpec extends ControllerTestFixture {
   override def beforeEach(): Unit = {
     reset(mockAuditService)
     reset(mockInvestorService)
-    when(mockAuthConnector.authorise[Option[String]](any(), any())(any(), any())).thenReturn(Future(Some("1234")))
+    mockAuthorize(lisaManager)
   }
 
   "The Investor Controller" should {

@@ -85,7 +85,7 @@ class WithdrawalController @Inject() (
     validateHeader(parse).async { implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
       withValidLMRN(lisaManager) { () =>
-        withEnrolment(lisaManager) { _ =>
+        withEnrolment(lisaManager) { () =>
           withValidAccountId(accountId) { () =>
             processGetWithdrawalCharge(lisaManager, accountId, transactionId)
           }

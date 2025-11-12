@@ -16,16 +16,20 @@
 
 package helpers
 
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.inject.Injector
 import play.api.mvc.{ControllerComponents, PlayBodyParsers}
-import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.auth.core.{AuthConnector, Enrolment, EnrolmentIdentifier, Enrolments}
 import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.metrics.LisaMetrics
 import uk.gov.hmrc.lisaapi.models.AnnualReturnValidator
 import uk.gov.hmrc.lisaapi.services._
 import uk.gov.hmrc.lisaapi.utils.{BonusPaymentValidator, ErrorConverter, WithdrawalChargeValidator}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 trait ControllerTestFixture
     extends BaseTestFixture
@@ -51,6 +55,13 @@ trait ControllerTestFixture
   val mockWithdrawalService: WithdrawalService                = mock[WithdrawalService]
 
   val mockAuthConnector: AuthConnector = mock[AuthConnector]
+
+  def mockAuthorize(lisaManager: String = "Z019283")(implicit ec: ExecutionContext): Unit =
+    when(mockAuthConnector.authorise[Enrolments](any(), any())(any(), any())).thenReturn(Future(Enrolments(Set(Enrolment(
+    key = "HMRC-LISA-ORG",
+    identifiers = Seq(EnrolmentIdentifier("ZREF", lisaManager)),
+    state = "Activated"
+  )))))
 
   val mockErrorConverter: ErrorConverter = mock[ErrorConverter]
 

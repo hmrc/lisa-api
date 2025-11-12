@@ -61,7 +61,7 @@ class WithdrawalControllerSpec extends ControllerTestFixture {
     reset(mockDateTimeService)
     reset(mockWithdrawalChargeValidator)
 
-    when(mockAuthConnector.authorise[Option[String]](any(), any())(any(), any())).thenReturn(Future(Some("1234")))
+    mockAuthorize(lisaManager)
     when(mockDateTimeService.now()).thenReturn(LocalDate.parse("2018-01-01"))
     when(mockWithdrawalChargeValidator.validate(any())).thenReturn(Nil)
   }

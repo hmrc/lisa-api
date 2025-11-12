@@ -51,7 +51,7 @@ class GetAccountController @Inject() (
         logger.info(
           s"""[GetAccountController][getAccountDetails] started lisaManager : $lisaManager ,
              | accountId : $accountId""".stripMargin)
-        withEnrolment(lisaManager) { _ =>
+        withEnrolment(lisaManager) { () =>
           service.getAccount(lisaManager, accountId).map {
             case response: GetLisaAccountSuccessResponse =>
               auditGetAccount(lisaManager, accountId)
