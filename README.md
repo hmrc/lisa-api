@@ -78,7 +78,7 @@ Start the app:
 
 This service uses [sbt-scoverage](https://github.com/scoverage/sbt-scoverage) to provide test coverage reports.
 
-Run this script before raising a PR to ensure your code changes pass the Jenkins pipeline. This runs all the unit tests with scalastyle and checks for dependency updates:
+Run this script before raising a PR to ensure your code changes pass the Jenkins pipeline. This runs all the unit tests and checks for dependency updates:
 
 ```
 ./run_all_tests.sh

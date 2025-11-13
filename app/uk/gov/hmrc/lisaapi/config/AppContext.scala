@@ -23,11 +23,8 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 @Singleton
 class AppContext @Inject() (config: Configuration, serviceConfig: ServicesConfig) {
   lazy val appName: String               = serviceConfig.getString("appName")
-  lazy val serviceLocatorUrl: String     = serviceConfig.baseUrl("service-locator")
-  lazy val registrationEnabled: Boolean  =
-    serviceConfig.getConfBool(s"microservice.services.service-locator.enabled", defBool = false)
   lazy val apiContext: String            = serviceConfig.getString("api.context")
-  lazy val baseUrl: String               = serviceConfig.getString(s"baseUrl")
+  lazy val baseUrl: String               = serviceConfig.getString("baseUrl")
   lazy val v1apiStatus: String           = serviceConfig.getString("api.status")
   lazy val v2apiStatus: String           = serviceConfig.getString("api.statusv2")
   lazy val desAuthToken: String          = serviceConfig.getString("desauthtoken")
