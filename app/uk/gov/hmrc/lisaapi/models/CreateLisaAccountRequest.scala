@@ -37,7 +37,6 @@ case class CreateLisaAccountTransferRequest(
   transferAccount: AccountTransfer
 ) extends CreateLisaAccountRequest
 
-//scalastyle:off multiple.string.literals
 object CreateLisaAccountRequest {
   implicit val createLisaAccountCreationRequestReads: Reads[CreateLisaAccountCreationRequest] = (
     (JsPath \ "investorId").read(JsonReads.investorId) and

@@ -425,8 +425,6 @@ class DesConnector @Inject() (
     }
   }
 
-  // scalastyle:off magic.number
-
   def parseDesResponse[A <: DesResponse](res: HttpResponse)(implicit reads: Reads[A]): DesResponse = {
     val isJson = res.headers.getOrElse(HeaderNames.CONTENT_TYPE, Seq.empty[String]).map(_.toLowerCase).exists(_.contains(MimeTypes.JSON.toLowerCase))
     if (isJson) {
