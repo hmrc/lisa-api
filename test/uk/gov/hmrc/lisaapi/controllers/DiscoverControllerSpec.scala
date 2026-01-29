@@ -43,7 +43,7 @@ class DiscoverControllerSpec extends ControllerTestFixture {
       status(res) mustBe OK
       val json = contentAsJson(res)
       (json \ "_links" \ "close account" \ "href")
-        .as[String] mustBe "/lifetime-isa/manager/Z019283/accounts/{accountId}/close-account"
+        .as[String]                                                               mustBe "/lifetime-isa/manager/Z019283/accounts/{accountId}/close-account"
       (json \ "_links" \ "property purchase fund release" \ "href").asOpt[String] mustBe None
     }
 
@@ -53,7 +53,7 @@ class DiscoverControllerSpec extends ControllerTestFixture {
       status(res) mustBe OK
       val json = contentAsJson(res)
       (json \ "_links" \ "close account" \ "href")
-        .as[String] mustBe "/lifetime-isa/manager/Z019283/accounts/{accountId}/close-account"
+        .as[String]                                                               mustBe "/lifetime-isa/manager/Z019283/accounts/{accountId}/close-account"
       (json \ "_links" \ "property purchase fund release" \ "href").asOpt[String] mustBe Some(
         "/lifetime-isa/manager/Z019283/accounts/{accountId}/events/fund-releases"
       )
@@ -62,7 +62,7 @@ class DiscoverControllerSpec extends ControllerTestFixture {
     "return the lisa manager reference number provided" in {
       val res = discoverController.discover("Z019283").apply(FakeRequest(Helpers.GET, "/").withHeaders(v1))
 
-      status(res) mustBe OK
+      status(res)   mustBe OK
       (contentAsJson(res) \ "_links" \ "close account" \ "href")
         .as[String] mustBe "/lifetime-isa/manager/Z019283/accounts/{accountId}/close-account"
     }
@@ -76,7 +76,7 @@ class DiscoverControllerSpec extends ControllerTestFixture {
 
         val json = contentAsJson(res)
 
-        (json \ "code").as[String] mustBe ErrorBadRequestLmrn.errorCode
+        (json \ "code").as[String]    mustBe ErrorBadRequestLmrn.errorCode
         (json \ "message").as[String] mustBe ErrorBadRequestLmrn.message
       }
 
@@ -92,10 +92,11 @@ class DiscoverControllerSpec extends ControllerTestFixture {
 
         val json = contentAsJson(res)
 
-        (json \ "code").as[String] mustBe ErrorAcceptHeaderInvalid.errorCode
+        (json \ "code").as[String]    mustBe ErrorAcceptHeaderInvalid.errorCode
         (json \ "message").as[String] mustBe ErrorAcceptHeaderInvalid.message
       }
 
     }
   }
+
 }

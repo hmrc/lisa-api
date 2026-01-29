@@ -55,18 +55,24 @@ class WithdrawalController @Inject() (
     (validateHeader(parse) andThen validateLMRN(lisaManager) andThen validateAccountId(accountId)).async {
       implicit request =>
         implicit val startTime: Long = System.currentTimeMillis()
-        logger.info(s"[WithdrawalController][reportWithdrawalCharge]  accountId : $accountId, lisaManager : $lisaManager")
+        logger.info(
+          s"[WithdrawalController][reportWithdrawalCharge]  accountId : $accountId, lisaManager : $lisaManager"
+        )
         withValidJson[ReportWithdrawalChargeRequest](
           req =>
             withValidData(req)(lisaManager, accountId) { () =>
               withValidClaimPeriod(req)(lisaManager, accountId) { () =>
                 postService.reportWithdrawalCharge(lisaManager, accountId, req) map { res =>
-                  logger.info(s"[WithdrawalController][reportWithdrawalCharge]  response : ${res.toString} accountId : $accountId, lisaManager : $lisaManager")
+                  logger.info(
+                    s"[WithdrawalController][reportWithdrawalCharge]  response : ${res.toString} accountId : $accountId, lisaManager : $lisaManager"
+                  )
                   res match {
                     case successResponse: ReportWithdrawalChargeSuccessResponse =>
                       handleSuccess(lisaManager, accountId, req, successResponse)
                     case errorResponse: ReportWithdrawalChargeErrorResponse     =>
-                      logger.error(s"[WithdrawalController][reportWithdrawalCharge]  in errorResponse accountId : $accountId, lisaManager : $lisaManager")
+                      logger.error(
+                        s"[WithdrawalController][reportWithdrawalCharge]  in errorResponse accountId : $accountId, lisaManager : $lisaManager"
+                      )
                       handleFailure(lisaManager, accountId, req, errorResponse)
                   }
                 } recover { case e: Exception =>
@@ -155,8 +161,8 @@ class WithdrawalController @Inject() (
     callback: () => Future[Result]
   )(implicit hc: HeaderCarrier, startTime: Long) = {
 
-    //the deadline for making a monthly bonus claim to HMRC is the 20th day of the month following the end of the claim period - therefore 14 days
-    //LISA Bonus claims can be made to HMRC or corrected by an ISA manager within 6 years after the end of the original bonus claim period - therefore 6 years
+    // the deadline for making a monthly bonus claim to HMRC is the 20th day of the month following the end of the claim period - therefore 14 days
+    // LISA Bonus claims can be made to HMRC or corrected by an ISA manager within 6 years after the end of the original bonus claim period - therefore 6 years
     val lastClaimDate       = dateTimeService.now().minusYears(6).minusDays(14)
     val claimCanStillBeMade = data.claimPeriodEndDate.isAfter(lastClaimDate.minusDays(1))
     if (claimCanStillBeMade) {
@@ -191,7 +197,9 @@ class WithdrawalController @Inject() (
     req: ReportWithdrawalChargeRequest,
     resp: ReportWithdrawalChargeSuccessResponse
   )(implicit hc: HeaderCarrier, startTime: Long) = {
-    logger.info(s"[WithdrawalController][handleSuccess] Matched success response for accountId : $accountId, lisaManager : $lisaManager")
+    logger.info(
+      s"[WithdrawalController][handleSuccess] Matched success response for accountId : $accountId, lisaManager : $lisaManager"
+    )
 
     val (responseData, notification) = resp match {
       case _: ReportWithdrawalChargeOnTimeResponse     =>
@@ -283,4 +291,5 @@ class WithdrawalController @Inject() (
 
   private def getWithdrawalChargeEndpointUrl(lisaManager: String, accountId: String, transactionId: String): String =
     s"/manager/$lisaManager/accounts/$accountId/withdrawal-charges/$transactionId"
+
 }

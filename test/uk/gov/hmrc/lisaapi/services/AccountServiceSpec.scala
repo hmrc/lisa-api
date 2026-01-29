@@ -21,7 +21,9 @@ import org.mockito.Mockito.when
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.helpers.ServiceTestFixture
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.models.des.{DesAccountResponse, DesEmptySuccessResponse, DesFailureResponse, DesUnavailableResponse}
+import uk.gov.hmrc.lisaapi.models.des.{
+  DesAccountResponse, DesEmptySuccessResponse, DesFailureResponse, DesUnavailableResponse
+}
 import uk.gov.hmrc.lisaapi.services.AccountService
 
 import java.time.LocalDate

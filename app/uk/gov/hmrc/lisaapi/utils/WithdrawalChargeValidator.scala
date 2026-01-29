@@ -28,12 +28,12 @@ class WithdrawalChargeValidator @Inject() (currentDateService: CurrentDateServic
 
   def validate(data: ReportWithdrawalChargeRequest): Seq[ErrorValidation] =
     (
-      periodStartDateIsSixth andThen
-        periodEndDateIsFifthOfMonthAfterPeriodStartDate andThen
-        periodStartDateIsNotInFuture andThen
-        periodStartDateIsNotBeforeFirstValidDate andThen
-        periodEndDateIsNotBeforeFirstValidDate andThen
-        regularWithdrawalIsNotSupersede andThen
+      periodStartDateIsSixth                                                     andThen
+        periodEndDateIsFifthOfMonthAfterPeriodStartDate                          andThen
+        periodStartDateIsNotInFuture                                             andThen
+        periodStartDateIsNotBeforeFirstValidDate                                 andThen
+        periodEndDateIsNotBeforeFirstValidDate                                   andThen
+        regularWithdrawalIsNotSupersede                                          andThen
         automaticRecoveryAmountNotEqualToWithdrawalChargeAmountWhenFundsDeducted andThen
         automaticRecoveryAmountLteWithdrawalChargeAmount
     ).apply(WithdrawalChargeValidationRequest(data)).errors
@@ -48,13 +48,12 @@ class WithdrawalChargeValidator @Inject() (currentDateService: CurrentDateServic
           Some(s"/claimPeriodStartDate")
         )
       )
-    case req: WithdrawalChargeValidationRequest                                                       => req
+    case req: WithdrawalChargeValidationRequest                                                     => req
   }
 
   private val periodStartDateIsNotInFuture
     : PartialFunction[WithdrawalChargeValidationRequest, WithdrawalChargeValidationRequest] = {
-    case req: WithdrawalChargeValidationRequest
-        if req.data.claimPeriodStartDate.isAfter(currentDateService.now()) =>
+    case req: WithdrawalChargeValidationRequest if req.data.claimPeriodStartDate.isAfter(currentDateService.now()) =>
       req.copy(errors =
         req.errors :+ ErrorValidation(
           DATE_ERROR,
@@ -62,7 +61,7 @@ class WithdrawalChargeValidator @Inject() (currentDateService: CurrentDateServic
           Some(s"/claimPeriodStartDate")
         )
       )
-    case req: WithdrawalChargeValidationRequest => req
+    case req: WithdrawalChargeValidationRequest                                                                    => req
   }
 
   private val periodEndDateIsFifthOfMonthAfterPeriodStartDate
@@ -117,8 +116,7 @@ class WithdrawalChargeValidator @Inject() (currentDateService: CurrentDateServic
         req
       }
 
-  private val regularWithdrawalIsNotSupersede
-    : WithdrawalChargeValidationRequest => WithdrawalChargeValidationRequest =
+  private val regularWithdrawalIsNotSupersede: WithdrawalChargeValidationRequest => WithdrawalChargeValidationRequest =
     (req: WithdrawalChargeValidationRequest) =>
       if (req.data.supersede.isDefined && req.data.withdrawalReason == "Regular withdrawal") {
         req.copy(errors =

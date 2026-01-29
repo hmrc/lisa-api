@@ -28,15 +28,17 @@ abstract class RequestPurchaseExtension extends ReportLifeEventRequestBase {
 
 case class RequestStandardPurchaseExtension(fundReleaseId: LifeEventId, eventDate: LocalDate, eventType: LifeEventType)
     extends RequestPurchaseExtension
+
 case class RequestSupersededPurchaseExtension(
   eventDate: LocalDate,
   eventType: LifeEventType,
   supersede: RequestExtensionSupersedeDetails
 ) extends RequestPurchaseExtension
+
 case class RequestExtensionSupersedeDetails(originalEventDate: LocalDate, originalLifeEventId: LifeEventId)
 
 object RequestPurchaseExtension {
-  implicit val dateReads: Reads[LocalDate]   = JsonReads.notFutureDate
+  implicit val dateReads: Reads[LocalDate] = JsonReads.notFutureDate
 
   implicit val supersedeDetailReads: Reads[RequestExtensionSupersedeDetails] = (
     (JsPath \ "originalEventDate").read(JsonReads.notFutureDate) and

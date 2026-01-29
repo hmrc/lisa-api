@@ -41,6 +41,7 @@ class BonusPaymentValidatorSpec extends BaseTestFixture with BeforeAndAfter {
   val validBonusPaymentJson: String                 = Source
     .fromInputStream(getClass.getResourceAsStream("/json/request.valid.bonus-payment.additional-bonus.json"))
     .mkString
+
   val validBonusPayment: RequestBonusPaymentRequest = Json.parse(validBonusPaymentJson).as[RequestBonusPaymentRequest]
 
   "newSubsForPeriod and htbTransferForPeriod" should {
@@ -54,9 +55,9 @@ class BonusPaymentValidatorSpec extends BaseTestFixture with BeforeAndAfter {
 
         val errors = bonusPaymentValidator.validate(request)
 
-        errors.size mustBe 2
+        errors.size      mustBe 2
         errors.head.path mustBe Some("/inboundPayments/newSubsForPeriod")
-        errors(1).path mustBe Some("/htbTransfer/htbTransferInForPeriod")
+        errors(1).path   mustBe Some("/htbTransfer/htbTransferInForPeriod")
       }
 
       "they are both none" in {
@@ -65,9 +66,9 @@ class BonusPaymentValidatorSpec extends BaseTestFixture with BeforeAndAfter {
 
         val errors = bonusPaymentValidator.validate(request)
 
-        errors.size mustBe 2
+        errors.size      mustBe 2
         errors.head.path mustBe Some("/inboundPayments/newSubsForPeriod")
-        errors(1).path mustBe Some("/htbTransfer/htbTransferInForPeriod")
+        errors(1).path   mustBe Some("/htbTransfer/htbTransferInForPeriod")
       }
 
     }
@@ -80,7 +81,7 @@ class BonusPaymentValidatorSpec extends BaseTestFixture with BeforeAndAfter {
 
         val errors = bonusPaymentValidator.validate(request)
 
-        errors.size mustBe 1
+        errors.size      mustBe 1
         errors.head.path mustBe Some("/inboundPayments/newSubsForPeriod")
       }
 
@@ -91,7 +92,7 @@ class BonusPaymentValidatorSpec extends BaseTestFixture with BeforeAndAfter {
 
         val errors = bonusPaymentValidator.validate(request)
 
-        errors.size mustBe 1
+        errors.size      mustBe 1
         errors.head.path mustBe Some("/htbTransfer/htbTransferInForPeriod")
       }
 
@@ -109,7 +110,7 @@ class BonusPaymentValidatorSpec extends BaseTestFixture with BeforeAndAfter {
 
         val errors = bonusPaymentValidator.validate(request)
 
-        errors.size mustBe 1
+        errors.size      mustBe 1
         errors.head.path mustBe Some("/inboundPayments/newSubsYTD")
       }
 
@@ -127,7 +128,7 @@ class BonusPaymentValidatorSpec extends BaseTestFixture with BeforeAndAfter {
 
         val errors = bonusPaymentValidator.validate(request)
 
-        errors.size mustBe 1
+        errors.size      mustBe 1
         errors.head.path mustBe Some("/htbTransfer/htbTransferTotalYTD")
       }
 
@@ -145,7 +146,7 @@ class BonusPaymentValidatorSpec extends BaseTestFixture with BeforeAndAfter {
 
         val errors = bonusPaymentValidator.validate(request)
 
-        errors.size mustBe 1
+        errors.size      mustBe 1
         errors.head.path mustBe Some("/inboundPayments/totalSubsForPeriod")
       }
 
@@ -163,7 +164,7 @@ class BonusPaymentValidatorSpec extends BaseTestFixture with BeforeAndAfter {
 
         val errors = bonusPaymentValidator.validate(request)
 
-        errors.size mustBe 1
+        errors.size      mustBe 1
         errors.head.path mustBe Some("/inboundPayments/totalSubsYTD")
       }
 
@@ -181,7 +182,7 @@ class BonusPaymentValidatorSpec extends BaseTestFixture with BeforeAndAfter {
 
         val errors = bonusPaymentValidator.validate(request)
 
-        errors.size mustBe 1
+        errors.size      mustBe 1
         errors.head.path mustBe Some("/bonuses/bonusDueForPeriod")
       }
 
@@ -199,7 +200,7 @@ class BonusPaymentValidatorSpec extends BaseTestFixture with BeforeAndAfter {
 
         val errors = bonusPaymentValidator.validate(request)
 
-        errors.size mustBe 1
+        errors.size      mustBe 1
         errors.head.path mustBe Some("/bonuses/totalBonusDueYTD")
       }
 
@@ -444,13 +445,14 @@ class BonusPaymentValidatorSpec extends BaseTestFixture with BeforeAndAfter {
 
         val errors = bonusPaymentValidator.validate(request)
 
-        errors.size mustBe 3
+        errors.size      mustBe 3
         errors.head.path mustBe Some("/htbTransfer/htbTransferTotalYTD")
-        errors(1).path mustBe Some("/inboundPayments/newSubsYTD")
-        errors(2).path mustBe Some("/inboundPayments/totalSubsForPeriod")
+        errors(1).path   mustBe Some("/inboundPayments/newSubsYTD")
+        errors(2).path   mustBe Some("/inboundPayments/totalSubsForPeriod")
       }
 
     }
 
   }
+
 }

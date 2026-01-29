@@ -26,16 +26,17 @@ package object controllers {
     (e: ErrorValidation) => Json.obj("code" -> e.errorCode, "message" -> e.message, "path" -> e.path)
 
   implicit val errorResponseWrites: Writes[ErrorResponse] = {
-    case e: ErrorResponseWithAccountId =>
+    case e: ErrorResponseWithAccountId     =>
       Json.obj("code" -> e.errorCode, "message" -> e.message, "accountId" -> e.accountId)
-    case e: ErrorResponseWithErrors => Json.obj("code" -> e.errorCode, "message" -> e.message, "errors" -> e.errors)
-    case e: ErrorResponseWithId => Json.obj("code" -> e.errorCode, "message" -> e.message, "id" -> e.id)
-    case e: ErrorResponseWithLifeEventId =>
+    case e: ErrorResponseWithErrors        => Json.obj("code" -> e.errorCode, "message" -> e.message, "errors" -> e.errors)
+    case e: ErrorResponseWithId            => Json.obj("code" -> e.errorCode, "message" -> e.message, "id" -> e.id)
+    case e: ErrorResponseWithLifeEventId   =>
       Json.obj("code" -> e.errorCode, "message" -> e.message, "lifeEventId" -> e.lifeEventID)
     case e: ErrorResponseWithTransactionId =>
       Json.obj("code" -> e.errorCode, "message" -> e.message, "transactionId" -> e.transactionId)
-    case e => Json.obj("code" -> e.errorCode, "message" -> e.message)
+    case e                                 => Json.obj("code" -> e.errorCode, "message" -> e.message)
   }
+
 }
 
 trait LisaConstants {

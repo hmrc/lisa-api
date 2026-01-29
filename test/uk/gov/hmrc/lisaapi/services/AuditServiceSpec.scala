@@ -52,7 +52,7 @@ class AuditServiceSpec extends ServiceTestFixture with BeforeAndAfter {
       val event = captor.getValue
 
       event.auditSource mustBe "lisa-api"
-      event.auditType mustBe "investorCreated"
+      event.auditType   mustBe "investorCreated"
     }
 
     "build an audit event with the correct tags" in {
@@ -117,4 +117,5 @@ class AuditServiceSpec extends ServiceTestFixture with BeforeAndAfter {
       verify(mockAuditConnector).sendEvent(any())(any(), any())
     }
   }
+
 }

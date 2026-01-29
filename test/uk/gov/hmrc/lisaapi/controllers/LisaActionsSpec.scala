@@ -20,7 +20,9 @@ import play.api.mvc.Results.BadRequest
 import play.api.mvc._
 import play.api.test.FakeRequest
 import play.test.Helpers
-import uk.gov.hmrc.lisaapi.controllers.{ErrorBadRequestAccountId, ErrorBadRequestLmrn, LMRNRequest, LMRNWithAccountRequest, LisaActions}
+import uk.gov.hmrc.lisaapi.controllers.{
+  ErrorBadRequestAccountId, ErrorBadRequestLmrn, LMRNRequest, LMRNWithAccountRequest, LisaActions
+}
 import uk.gov.hmrc.lisaapi.helpers.ControllerTestFixture
 
 import scala.concurrent.ExecutionContext.Implicits.global

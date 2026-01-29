@@ -36,14 +36,13 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 
 class DesConnector @Inject() (
-                               wsHttp: HttpClientV2,
-                               appContext: AppContext
+  wsHttp: HttpClientV2,
+  appContext: AppContext
 )(implicit ec: ExecutionContext)
     extends Logging {
 
   val urlEncodingFormat: String   = "utf-8"
   lazy val lisaServiceUrl: String = s"${appContext.desUrl}/lifetime-isa/manager"
-
 
   private def desHeaders(implicit hc: HeaderCarrier): Seq[(String, String)] = Seq(
     "Environment"   -> appContext.desUrlHeaderEnv,
@@ -74,9 +73,10 @@ class DesConnector @Inject() (
     val fullUrl: String = s"$lisaServiceUrl/$lisaManager/investors"
     logger.info("[DesConnector][createInvestor] Posting Create Investor request to des: " + fullUrl)
 
-    val result = wsHttp.post(url"$fullUrl")
+    val result = wsHttp
+      .post(url"$fullUrl")
       .withBody(Json.toJson(request))
-      .setHeader(desHeaders:_*)
+      .setHeader(desHeaders: _*)
       .execute[HttpResponse]
     result.map { res =>
       logger.info("[DesConnector][createInvestor] Create Investor request returned status: " + res.status)
@@ -94,11 +94,12 @@ class DesConnector @Inject() (
   def createAccount(lisaManager: String, request: CreateLisaAccountCreationRequest)(implicit
     hc: HeaderCarrier
   ): Future[DesResponse] = {
-    val fullUrl    = s"$lisaServiceUrl/$lisaManager/accounts"
+    val fullUrl = s"$lisaServiceUrl/$lisaManager/accounts"
     logger.info("[DesConnector][createAccount] Posting Create Account request to des: " + fullUrl)
-    val result = wsHttp.post(url"$fullUrl")
+    val result  = wsHttp
+      .post(url"$fullUrl")
       .withBody(Json.toJson(request))
-      .setHeader(desHeaders:_*)
+      .setHeader(desHeaders: _*)
       .execute[HttpResponse]
 
     result.map { res =>
@@ -115,10 +116,12 @@ class DesConnector @Inject() (
   /** Attempts to get the details for LISA account
     */
   def getAccountInformation(lisaManager: String, accountId: String)(implicit hc: HeaderCarrier): Future[DesResponse] = {
-    val fullUrl = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}"
+    val fullUrl =
+      s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}"
     logger.info("[DesConnector][getAccountInformation] Getting the Account details from des: " + fullUrl)
-    val result = wsHttp.get(url"$fullUrl")
-      .setHeader(desHeadersWithOriginator:_*)
+    val result  = wsHttp
+      .get(url"$fullUrl")
+      .setHeader(desHeadersWithOriginator: _*)
       .execute[HttpResponse]
 
     result.map { res =>
@@ -140,8 +143,9 @@ class DesConnector @Inject() (
     val fullUrl =
       s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/reinstate"
     logger.info("[DesConnector][reinstateAccount] Reinstate Account request returned status: " + fullUrl)
-    val result = wsHttp.put(url"$fullUrl")
-      .setHeader(desHeadersWithOriginator:_*)
+    val result  = wsHttp
+      .put(url"$fullUrl")
+      .setHeader(desHeadersWithOriginator: _*)
       .withBody(Json.toJson(""))
       .execute[HttpResponse]
     result.map { res =>
@@ -160,11 +164,12 @@ class DesConnector @Inject() (
   def transferAccount(lisaManager: String, request: CreateLisaAccountTransferRequest)(implicit
     hc: HeaderCarrier
   ): Future[DesResponse] = {
-    val fullUrl    = s"$lisaServiceUrl/$lisaManager/accounts"
+    val fullUrl = s"$lisaServiceUrl/$lisaManager/accounts"
     logger.info("[DesConnector][transferAccount] Posting Create Transfer request to des: " + fullUrl)
-    val result = wsHttp.post(url"$fullUrl")
+    val result  = wsHttp
+      .post(url"$fullUrl")
       .withBody(Json.toJson(request))
-      .setHeader(desHeaders:_*)
+      .setHeader(desHeaders: _*)
       .execute[HttpResponse]
 
     result.map { res =>
@@ -183,12 +188,13 @@ class DesConnector @Inject() (
   def closeAccount(lisaManager: String, accountId: String, request: CloseLisaAccountRequest)(implicit
     hc: HeaderCarrier
   ): Future[DesResponse] = {
-    val fullUrl    =
+    val fullUrl =
       s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/close-account"
     logger.info("[DesConnector][closeAccount] Posting Close Account request to des: " + fullUrl)
-    val result = wsHttp.post(url"$fullUrl")
+    val result  = wsHttp
+      .post(url"$fullUrl")
       .withBody(Json.toJson(request))
-      .setHeader(desHeaders:_*)
+      .setHeader(desHeaders: _*)
       .execute[HttpResponse]
     result.map { res =>
       logger.info("[DesConnector][closeAccount] Close Account request returned status: " + res.status)
@@ -207,12 +213,13 @@ class DesConnector @Inject() (
     hc: HeaderCarrier
   ): Future[DesResponse] = {
 
-    val fullUrl    =
+    val fullUrl =
       s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/life-event"
     logger.info("[DesConnector][reportLifeEvent] Posting Life Event request to des: " + fullUrl)
-    val result = wsHttp.post(url"$fullUrl")
+    val result  = wsHttp
+      .post(url"$fullUrl")
       .withBody(Json.toJson(request))
-      .setHeader(desHeaders:_*)
+      .setHeader(desHeaders: _*)
       .execute[HttpResponse]
     result.map { res =>
       logger.info("[DesConnector][reportLifeEvent] Life Event request returned status: " + res.status)
@@ -234,9 +241,9 @@ class DesConnector @Inject() (
       s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/life-events/$lifeEventId"
     logger.info("[DesConnector][getLifeEvent] Getting life event from des: " + fullUrl)
 
-
-    val result = wsHttp.get(url"$fullUrl")
-      .setHeader(desHeadersWithOriginator:_*)
+    val result = wsHttp
+      .get(url"$fullUrl")
+      .setHeader(desHeadersWithOriginator: _*)
       .execute[HttpResponse]
 
     result.map { res =>
@@ -257,7 +264,9 @@ class DesConnector @Inject() (
                   logger.info(s"[DesConnector][getLifeEvent] DesFailureResponse from DES: $data")
                   Left(data)
                 case Failure(ex)   =>
-                  logger.error(s"[DesConnector][getLifeEvent] Error from DES (parsing as DesFailureResponse): ${ex.getMessage}")
+                  logger.error(
+                    s"[DesConnector][getLifeEvent] Error from DES (parsing as DesFailureResponse): ${ex.getMessage}"
+                  )
                   Left(DesFailureResponse())
               }
           }
@@ -271,15 +280,19 @@ class DesConnector @Inject() (
     hc: HeaderCarrier
   ): Future[DesResponse] = {
 
-    val fullUrl    = s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}"
+    val fullUrl =
+      s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}"
     logger.info("[DesConnector][updateFirstSubDate] Posting update subscription request to des: " + fullUrl)
-    val result = wsHttp.put(url"$fullUrl")
+    val result  = wsHttp
+      .put(url"$fullUrl")
       .withBody(Json.toJson(request))
-      .setHeader(desHeadersWithOriginator:_*)
+      .setHeader(desHeadersWithOriginator: _*)
       .execute[HttpResponse]
 
     result.map { res =>
-      logger.info("[DesConnector][updateFirstSubDate] Update first subscription date request returned status: " + res.status)
+      logger.info(
+        "[DesConnector][updateFirstSubDate] Update first subscription date request returned status: " + res.status
+      )
       res.status match {
         case OK                  => parseDesResponse[DesUpdateSubscriptionSuccessResponse](res)
         case BAD_REQUEST         => DesBadRequestResponse
@@ -300,12 +313,13 @@ class DesConnector @Inject() (
     hc: HeaderCarrier
   ): Future[DesResponse] = {
 
-    val fullUrl    =
+    val fullUrl =
       s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/bonus-claim"
     logger.info("[DesConnector][requestBonusPayment] Posting Bonus Payment request to des: " + fullUrl)
-    val result = wsHttp.post(url"$fullUrl")
+    val result  = wsHttp
+      .post(url"$fullUrl")
       .withBody(Json.toJson(request))
-      .setHeader(desHeaders:_*)
+      .setHeader(desHeaders: _*)
       .execute[HttpResponse]
     result
       .map { res =>
@@ -339,13 +353,18 @@ class DesConnector @Inject() (
   ): Future[DesResponse] = {
     val fullUrl =
       s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/transaction/$transactionId"
-    logger.info("[DesConnector][getBonusOrWithdrawal] Getting the Bonus Payment transaction details from des: " + fullUrl)
+    logger.info(
+      "[DesConnector][getBonusOrWithdrawal] Getting the Bonus Payment transaction details from des: " + fullUrl
+    )
 
-    val result = wsHttp.get(url"$fullUrl")
-      .setHeader(desHeadersWithOriginator:_*)
+    val result = wsHttp
+      .get(url"$fullUrl")
+      .setHeader(desHeadersWithOriginator: _*)
       .execute[HttpResponse]
     result.map { res =>
-      logger.info("[DesConnector][getBonusOrWithdrawal] Get Bonus Payment transaction details returned status: " + res.status)
+      logger.info(
+        "[DesConnector][getBonusOrWithdrawal] Get Bonus Payment transaction details returned status: " + res.status
+      )
       res.status match {
         case SERVICE_UNAVAILABLE => DesUnavailableResponse
         case _                   => parseDesResponse[GetBonusOrWithdrawalResponse](res)
@@ -366,11 +385,11 @@ class DesConnector @Inject() (
       s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/withdrawal"
     logger.info("[DesConnector][reportWithdrawalCharge] Posting withdrawal request to des: " + fullUrl)
 
-    val result = wsHttp.post(url"$fullUrl")
+    val result = wsHttp
+      .post(url"$fullUrl")
       .withBody(Json.toJson(request)(ReportWithdrawalChargeRequest.desReportWithdrawalChargeWrites))
-      .setHeader(desHeaders:_*)
+      .setHeader(desHeaders: _*)
       .execute[HttpResponse]
-
 
     result.map { res =>
       logger.info("[DesConnector][reportWithdrawalCharge] Withdrawal request returned status: " + res.status)
@@ -393,8 +412,9 @@ class DesConnector @Inject() (
       s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/transaction/$transactionId/bonusChargeDetails"
     logger.info("[DesConnector][getTransaction] Getting the Transaction details from des: " + fullUrl)
 
-    val result = wsHttp.get(url"$fullUrl")
-      .setHeader(desHeadersWithOriginator:_*)
+    val result = wsHttp
+      .get(url"$fullUrl")
+      .setHeader(desHeadersWithOriginator: _*)
       .execute[HttpResponse]
     result.map { res =>
       logger.info("[DesConnector][getTransaction] Get Transaction details returned status: " + res.status)
@@ -405,7 +425,9 @@ class DesConnector @Inject() (
     }
   }
 
-  def getBulkPayment(lisaManager: String, startDate: LocalDate, endDate: LocalDate)(implicit hc: HeaderCarrier): Future[DesResponse] = {
+  def getBulkPayment(lisaManager: String, startDate: LocalDate, endDate: LocalDate)(implicit
+    hc: HeaderCarrier
+  ): Future[DesResponse] = {
     val fullUrl = s"${appContext.desUrl}/enterprise/financial-data/ZISA/$lisaManager/LISA" +
       s"?dateFrom=${startDate.toString}" +
       s"&dateTo=${endDate.toString}" +
@@ -413,8 +435,9 @@ class DesConnector @Inject() (
 
     logger.info("[DesConnector][getBulkPayment] Getting Bulk payment details from des: " + fullUrl)
 
-    val result = wsHttp.get(url"$fullUrl")
-      .setHeader(desHeadersWithOriginator:_*)
+    val result = wsHttp
+      .get(url"$fullUrl")
+      .setHeader(desHeadersWithOriginator: _*)
       .execute[HttpResponse]
     result.map { res =>
       logger.info("[DesConnector][getBulkPayment] Get Bulk payment details returned status: " + res.status)
@@ -426,27 +449,36 @@ class DesConnector @Inject() (
   }
 
   def parseDesResponse[A <: DesResponse](res: HttpResponse)(implicit reads: Reads[A]): DesResponse = {
-    val isJson = res.headers.getOrElse(HeaderNames.CONTENT_TYPE, Seq.empty[String]).map(_.toLowerCase).exists(_.contains(MimeTypes.JSON.toLowerCase))
+    val isJson = res.headers
+      .getOrElse(HeaderNames.CONTENT_TYPE, Seq.empty[String])
+      .map(_.toLowerCase)
+      .exists(_.contains(MimeTypes.JSON.toLowerCase))
     if (isJson) {
       res.json.validate[A] match {
         case JsSuccess(value, _) => value
-        case JsError(er) =>
+        case JsError(er)         =>
           if (res.status == Status.OK || res.status == Status.CREATED) {
-            logger.error(s"[DesConnector][parseDesResponse] Error from DES (parsing as DesResponse): ${er.mkString(", ")}")
+            logger.error(
+              s"[DesConnector][parseDesResponse] Error from DES (parsing as DesResponse): ${er.mkString(", ")}"
+            )
           }
           res.json.validate[DesFailureResponse] match {
             case JsSuccess(data, _) =>
               logger.info(s"[DesConnector][parseDesResponse] DesFailureResponse from DES: $data")
               data
-            case JsError(ex) =>
-              logger.error(s"[DesConnector][parseDesResponse] Error from DES (parsing as DesFailureResponse): ${ex.mkString(", ")}")
+            case JsError(ex)        =>
+              logger.error(
+                s"[DesConnector][parseDesResponse] Error from DES (parsing as DesFailureResponse): ${ex.mkString(", ")}"
+              )
               DesFailureResponse()
           }
       }
-    }
-    else {
-      logger.error(s"[DesConnector][parseDesResponse] Error from DES (parsing as DesFailureResponse): Received non-JSON content from DES, status: ${res.status}")
+    } else {
+      logger.error(
+        s"[DesConnector][parseDesResponse] Error from DES (parsing as DesFailureResponse): Received non-JSON content from DES, status: ${res.status}"
+      )
       DesFailureResponse()
     }
   }
+
 }

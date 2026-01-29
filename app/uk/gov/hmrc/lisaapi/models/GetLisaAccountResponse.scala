@@ -34,8 +34,7 @@ case class GetLisaAccountSuccessResponse(
   accountClosureReason: Option[String],
   closureDate: Option[LocalDate],
   transferAccount: Option[GetLisaAccountTransferAccount]
-) extends GetLisaAccountResponse
-    with DesResponse
+) extends GetLisaAccountResponse with DesResponse
 
 case class GetLisaAccountTransferAccount(
   transferredFromAccountId: String,
@@ -48,14 +47,17 @@ case object GetLisaAccountErrorResponse extends GetLisaAccountResponse
 case object GetLisaAccountServiceUnavailable extends GetLisaAccountResponse
 
 object GetLisaAccountTransferAccount {
+
   implicit val writes: Writes[GetLisaAccountTransferAccount] = (
     (JsPath \ "transferredFromAccountId").write[String] and
       (JsPath \ "transferredFromLMRN").write[String] and
       (JsPath \ "transferInDate").write[LocalDate]
   )(unlift(GetLisaAccountTransferAccount.unapply))
+
 }
 
 object GetLisaAccountSuccessResponse {
+
   implicit val getAccountSuccessReads: Reads[GetLisaAccountSuccessResponse] = (
     (JsPath \ "investorId").read(JsonReads.investorId) and
       (JsPath \ "status").read[String] and
@@ -127,4 +129,5 @@ object GetLisaAccountSuccessResponse {
       (JsPath \ "closureDate").writeNullable[LocalDate] and
       (JsPath \ "transferAccount").writeNullable[GetLisaAccountTransferAccount]
   )(unlift(GetLisaAccountSuccessResponse.unapply))
+
 }

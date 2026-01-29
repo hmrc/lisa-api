@@ -29,10 +29,12 @@ case class DesGetTransactionPending(
   paymentReference: Option[String] = None,
   paymentAmount: Option[Amount] = None
 ) extends DesGetTransactionResponse
+
 case class DesGetTransactionPaid(paymentDate: LocalDate, paymentReference: String, paymentAmount: Amount)
     extends DesGetTransactionResponse
 
 object DesGetTransactionResponse {
+
   implicit val pendingReads: Reads[DesGetTransactionPending] = (
     (JsPath \ "paymentDate").read(JsonReads.isoDate) and
       (JsPath \ "paymentReference").readNullable[String] and
@@ -47,11 +49,13 @@ object DesGetTransactionResponse {
 
   implicit val reads: Reads[DesGetTransactionResponse] = Reads[DesGetTransactionResponse] { json =>
     (json \ "paymentStatus").validate[String] match {
-      case JsSuccess(paymentStatus, _) => paymentStatus match {
-        case "PENDING" => pendingReads.reads(json)
-        case "PAID" => paidReads.reads(json)
-      }
-      case JsError(errors) => JsError(s"Unknown type: ${errors.mkString(", ")}")
+      case JsSuccess(paymentStatus, _) =>
+        paymentStatus match {
+          case "PENDING" => pendingReads.reads(json)
+          case "PAID"    => paidReads.reads(json)
+        }
+      case JsError(errors)             => JsError(s"Unknown type: ${errors.mkString(", ")}")
     }
   }
+
 }

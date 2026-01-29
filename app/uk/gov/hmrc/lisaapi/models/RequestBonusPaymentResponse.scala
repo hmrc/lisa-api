@@ -21,6 +21,7 @@ trait RequestBonusPaymentResponse
 trait RequestBonusPaymentSuccessResponse extends RequestBonusPaymentResponse {
   val transactionId: String
 }
+
 case class RequestBonusPaymentLateResponse(transactionId: String) extends RequestBonusPaymentSuccessResponse
 case class RequestBonusPaymentOnTimeResponse(transactionId: String) extends RequestBonusPaymentSuccessResponse
 case class RequestBonusPaymentSupersededResponse(transactionId: String) extends RequestBonusPaymentSuccessResponse

@@ -23,7 +23,10 @@ import play.api.mvc.{AnyContentAsJson, Result}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
-import uk.gov.hmrc.lisaapi.controllers.{BonusPaymentController, ErrorAccountNotFound, ErrorBadRequestLmrn, ErrorBonusPaymentTransactionNotFound, ErrorValidation}
+import uk.gov.hmrc.lisaapi.controllers.{
+  BonusPaymentController, ErrorAccountNotFound, ErrorBadRequestLmrn, ErrorBonusPaymentTransactionNotFound,
+  ErrorValidation
+}
 import uk.gov.hmrc.lisaapi.helpers.ControllerTestFixture
 import uk.gov.hmrc.lisaapi.models._
 
@@ -56,8 +59,10 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
   val lisaManager                                = "Z019283"
   val accountId                                  = "ABC/12345"
   val transactionId                              = "1234567890"
+
   val validBonusPaymentJson: String              =
     Source.fromInputStream(getClass.getResourceAsStream("/json/request.valid.bonus-payment.json")).mkString
+
   val validBonusPaymentMinimumFieldsJson: String =
     Source.fromInputStream(getClass.getResourceAsStream("/json/request.valid.bonus-payment.min.json")).mkString
 
@@ -80,9 +85,9 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(RequestBonusPaymentOnTimeResponse("1928374")))
 
         doRequest(validBonusPaymentJson) { res =>
-          status(res) mustBe CREATED
+          status(res)                                                mustBe CREATED
           (contentAsJson(res) \ "data" \ "transactionId").as[String] mustBe "1928374"
-          (contentAsJson(res) \ "data" \ "message").as[String] mustBe "Bonus transaction created"
+          (contentAsJson(res) \ "data" \ "message").as[String]       mustBe "Bonus transaction created"
         }
       }
 
@@ -91,9 +96,9 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(RequestBonusPaymentLateResponse("1928374")))
 
         doRequest(validBonusPaymentJson) { res =>
-          status(res) mustBe CREATED
+          status(res)                                                mustBe CREATED
           (contentAsJson(res) \ "data" \ "transactionId").as[String] mustBe "1928374"
-          (contentAsJson(res) \ "data" \ "message").as[String] mustBe "Bonus transaction created - late notification"
+          (contentAsJson(res) \ "data" \ "message").as[String]       mustBe "Bonus transaction created - late notification"
         }
       }
 
@@ -102,9 +107,9 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(RequestBonusPaymentSupersededResponse("1928374")))
 
         doRequest(validBonusPaymentJson) { res =>
-          status(res) mustBe CREATED
+          status(res)                                                mustBe CREATED
           (contentAsJson(res) \ "data" \ "transactionId").as[String] mustBe "1928374"
-          (contentAsJson(res) \ "data" \ "message").as[String] mustBe "Bonus transaction superseded"
+          (contentAsJson(res) \ "data" \ "message").as[String]       mustBe "Bonus transaction superseded"
         }
       }
 
@@ -112,50 +117,46 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
 
     "return with status 400 bad request" when {
 
-      "provided an invalid json object" in {
+      "provided an invalid json object" in
         doRequest(validBonusPaymentJson.replace("1234567891", "X")) { res =>
-          status(res) mustBe BAD_REQUEST
-          (contentAsJson(res) \ "code").as[String] mustBe "BAD_REQUEST"
+          status(res)                                 mustBe BAD_REQUEST
+          (contentAsJson(res) \ "code").as[String]    mustBe "BAD_REQUEST"
           (contentAsJson(res) \ "message").as[String] mustBe "Bad Request"
         }
-      }
 
-      "provided an invalid lmrn" in {
+      "provided an invalid lmrn" in
         doRequest(validBonusPaymentJson, "Z1234567") { res =>
           status(res) mustBe BAD_REQUEST
           val json = contentAsJson(res)
-          (json \ "code").as[String] mustBe ErrorBadRequestLmrn.errorCode
+          (json \ "code").as[String]    mustBe ErrorBadRequestLmrn.errorCode
           (json \ "message").as[String] mustBe ErrorBadRequestLmrn.message
         }
-      }
 
-      "attempting a superseded claim on v1 of the api" in {
+      "attempting a superseded claim on v1 of the api" in
         doRequest(validBonusPaymentJson.replace("Life Event", "Superseded Bonus"))(
           res => {
             status(res) mustBe BAD_REQUEST
             val json = contentAsJson(res)
-            (json \ "code").as[String] mustBe "BAD_REQUEST"
-            (json \ "message").as[String] mustBe "Bad Request"
-            (json \ "errors" \ 0 \ "code").as[String] mustBe "INVALID_FORMAT"
+            (json \ "code").as[String]                   mustBe "BAD_REQUEST"
+            (json \ "message").as[String]                mustBe "Bad Request"
+            (json \ "errors" \ 0 \ "code").as[String]    mustBe "INVALID_FORMAT"
             (json \ "errors" \ 0 \ "message").as[String] mustBe "Invalid format has been used"
-            (json \ "errors" \ 0 \ "path").as[String] mustBe "/bonuses/claimReason"
+            (json \ "errors" \ 0 \ "path").as[String]    mustBe "/bonuses/claimReason"
           },
           acceptHeaderV1
         )
-      }
 
     }
 
     "return with status 403 forbidden" when {
 
-      "the bonus claim reason is life event and no life event id is provided" in {
+      "the bonus claim reason is life event and no life event id is provided" in
         doRequest(validBonusPaymentJson.replace(""""lifeEventId": "1234567891",""", "")) { res =>
-          status(res) mustBe FORBIDDEN
+          status(res)                              mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "LIFE_EVENT_NOT_PROVIDED"
           (contentAsJson(res) \ "message")
-            .as[String] mustBe "lifeEventId is required when the claimReason is a life event"
+            .as[String]                            mustBe "lifeEventId is required when the claimReason is a life event"
         }
-      }
 
       "the json request fails business validation" in {
         val errors = List(
@@ -206,7 +207,7 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
           (json \ "code").as[String] mustBe "BONUS_CLAIM_TIMESCALES_EXCEEDED"
           (json \ "message").as[
             String
-          ] mustBe "The timescale for claiming a bonus has passed. The claim period lasts for 6 years and 14 days"
+          ]                          mustBe "The timescale for claiming a bonus has passed. The claim period lasts for 6 years and 14 days"
         }
       }
 
@@ -222,7 +223,7 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
 
           val json = contentAsJson(res)
 
-          (json \ "code").as[String] mustBe "HELP_TO_BUY_NOT_APPLICABLE"
+          (json \ "code").as[String]    mustBe "HELP_TO_BUY_NOT_APPLICABLE"
           (json \ "message").as[String] mustBe "Help to buy is only applicable for claims within the 2017-18 tax year"
         }
       }
@@ -232,10 +233,10 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(RequestBonusPaymentBonusClaimError))
 
         doRequest(validBonusPaymentJson) { res =>
-          status(res) mustBe FORBIDDEN
+          status(res)                              mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "BONUS_CLAIM_ERROR"
           (contentAsJson(res) \ "message")
-            .as[String] mustBe "The bonus amount given is above the maximum annual amount, " +
+            .as[String]                            mustBe "The bonus amount given is above the maximum annual amount, " +
             "or the qualifying deposits are above the maximum annual amount or the bonus claim does not equal the correct " +
             "percentage of qualifying funds"
         }
@@ -247,10 +248,10 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
 
         doRequest(validBonusPaymentJson)(
           res => {
-            status(res) mustBe FORBIDDEN
+            status(res)                              mustBe FORBIDDEN
             (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID"
             (contentAsJson(res) \ "message")
-              .as[String] mustBe "This LISA account has already been closed or been made void by HMRC"
+              .as[String]                            mustBe "This LISA account has already been closed or been made void by HMRC"
           },
           acceptHeaderV1
         )
@@ -261,8 +262,8 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(RequestBonusPaymentAccountClosed))
 
         doRequest(validBonusPaymentJson) { res =>
-          status(res) mustBe FORBIDDEN
-          (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CLOSED"
+          status(res)                                 mustBe FORBIDDEN
+          (contentAsJson(res) \ "code").as[String]    mustBe "INVESTOR_ACCOUNT_ALREADY_CLOSED"
           (contentAsJson(res) \ "message").as[String] mustBe "The LISA account is already closed"
         }
       }
@@ -272,8 +273,8 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(RequestBonusPaymentAccountCancelled))
 
         doRequest(validBonusPaymentJson) { res =>
-          status(res) mustBe FORBIDDEN
-          (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CANCELLED"
+          status(res)                                 mustBe FORBIDDEN
+          (contentAsJson(res) \ "code").as[String]    mustBe "INVESTOR_ACCOUNT_ALREADY_CANCELLED"
           (contentAsJson(res) \ "message").as[String] mustBe "The LISA account is already cancelled"
         }
       }
@@ -283,8 +284,8 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(RequestBonusPaymentAccountVoid))
 
         doRequest(validBonusPaymentJson) { res =>
-          status(res) mustBe FORBIDDEN
-          (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_VOID"
+          status(res)                                 mustBe FORBIDDEN
+          (contentAsJson(res) \ "code").as[String]    mustBe "INVESTOR_ACCOUNT_ALREADY_VOID"
           (contentAsJson(res) \ "message").as[String] mustBe "The LISA account is already void"
         }
       }
@@ -294,10 +295,10 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(RequestBonusPaymentSupersededAmountMismatch))
 
         doRequest(validBonusPaymentJson) { res =>
-          status(res) mustBe FORBIDDEN
+          status(res)                              mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "SUPERSEDED_BONUS_CLAIM_AMOUNT_MISMATCH"
           (contentAsJson(res) \ "message")
-            .as[String] mustBe "originalTransactionId and the originalBonusDueForPeriod amount do not match the information in the original bonus request"
+            .as[String]                            mustBe "originalTransactionId and the originalBonusDueForPeriod amount do not match the information in the original bonus request"
         }
 
       }
@@ -307,10 +308,10 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(RequestBonusPaymentSupersededOutcomeError))
 
         doRequest(validBonusPaymentJson) { res =>
-          status(res) mustBe FORBIDDEN
+          status(res)                              mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "SUPERSEDED_BONUS_REQUEST_OUTCOME_ERROR"
           (contentAsJson(res) \ "message")
-            .as[String] mustBe "The calculation from your superseded bonus claim is incorrect"
+            .as[String]                            mustBe "The calculation from your superseded bonus claim is incorrect"
         }
 
       }
@@ -320,10 +321,10 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(RequestBonusPaymentNoSubscriptions))
 
         doRequest(validBonusPaymentJson) { res =>
-          status(res) mustBe FORBIDDEN
+          status(res)                              mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "ACCOUNT_ERROR_NO_SUBSCRIPTIONS_THIS_TAX_YEAR"
           (contentAsJson(res) \ "message")
-            .as[String] mustBe "This account is not eligible for a bonus payment because the investor already has another LISA account"
+            .as[String]                            mustBe "This account is not eligible for a bonus payment because the investor already has another LISA account"
         }
 
       }
@@ -337,8 +338,8 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(RequestBonusPaymentAccountNotFound))
 
         doRequest(validBonusPaymentJson) { res =>
-          status(res) mustBe NOT_FOUND
-          (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNTID_NOT_FOUND"
+          status(res)                                 mustBe NOT_FOUND
+          (contentAsJson(res) \ "code").as[String]    mustBe "INVESTOR_ACCOUNTID_NOT_FOUND"
           (contentAsJson(res) \ "message").as[String] mustBe "Enter a real accountId"
         }
       }
@@ -348,8 +349,8 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(RequestBonusPaymentLifeEventNotFound))
 
         doRequest(validBonusPaymentJson) { res =>
-          status(res) mustBe NOT_FOUND
-          (contentAsJson(res) \ "code").as[String] mustBe "LIFE_EVENT_NOT_FOUND"
+          status(res)                                 mustBe NOT_FOUND
+          (contentAsJson(res) \ "code").as[String]    mustBe "LIFE_EVENT_NOT_FOUND"
           (contentAsJson(res) \ "message").as[String] mustBe "The lifeEventId does not match with HMRC’s records"
         }
       }
@@ -365,8 +366,8 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
         doRequest(validBonusPaymentJson) { res =>
           status(res) mustBe CONFLICT
           val json = contentAsJson(res)
-          (json \ "code").as[String] mustBe "BONUS_CLAIM_ALREADY_EXISTS"
-          (json \ "message").as[String] mustBe "The investor’s bonus payment has already been requested"
+          (json \ "code").as[String]          mustBe "BONUS_CLAIM_ALREADY_EXISTS"
+          (json \ "message").as[String]       mustBe "The investor’s bonus payment has already been requested"
           (json \ "transactionId").as[String] mustBe transactionId
         }
       }
@@ -378,8 +379,8 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
         doRequest(validBonusPaymentJson) { res =>
           status(res) mustBe CONFLICT
           val json = contentAsJson(res)
-          (json \ "code").as[String] mustBe "BONUS_CLAIM_ALREADY_SUPERSEDED"
-          (json \ "message").as[String] mustBe "This bonus claim has already been superseded"
+          (json \ "code").as[String]          mustBe "BONUS_CLAIM_ALREADY_SUPERSEDED"
+          (json \ "message").as[String]       mustBe "This bonus claim has already been superseded"
           (json \ "transactionId").as[String] mustBe transactionId
         }
       }
@@ -394,7 +395,7 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
 
         doRequest(validBonusPaymentJson) { res =>
           reset(mockBonusPaymentService) // removes the thenThrow
-          status(res) mustBe INTERNAL_SERVER_ERROR
+          status(res)        mustBe INTERNAL_SERVER_ERROR
           contentAsJson(res) mustBe internalServerError
         }
       }
@@ -404,7 +405,7 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(TestBonusPaymentResponse))
 
         doRequest(validBonusPaymentJson) { res =>
-          status(res) mustBe INTERNAL_SERVER_ERROR
+          status(res)        mustBe INTERNAL_SERVER_ERROR
           contentAsJson(res) mustBe internalServerError
         }
       }
@@ -414,7 +415,7 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(RequestBonusPaymentError))
 
         doRequest(validBonusPaymentJson) { res =>
-          status(res) mustBe INTERNAL_SERVER_ERROR
+          status(res)        mustBe INTERNAL_SERVER_ERROR
           contentAsJson(res) mustBe internalServerError
         }
       }
@@ -425,7 +426,7 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
 
         doRequest(validBonusPaymentJson)(
           res => {
-            status(res) mustBe INTERNAL_SERVER_ERROR
+            status(res)        mustBe INTERNAL_SERVER_ERROR
             contentAsJson(res) mustBe internalServerError
           },
           acceptHeaderV1
@@ -438,7 +439,7 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
 
         doRequest(validBonusPaymentJson)(
           res => {
-            status(res) mustBe INTERNAL_SERVER_ERROR
+            status(res)        mustBe INTERNAL_SERVER_ERROR
             contentAsJson(res) mustBe internalServerError
           },
           acceptHeaderV1
@@ -451,7 +452,7 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
 
         doRequest(validBonusPaymentJson)(
           res => {
-            status(res) mustBe INTERNAL_SERVER_ERROR
+            status(res)        mustBe INTERNAL_SERVER_ERROR
             contentAsJson(res) mustBe internalServerError
           },
           acceptHeaderV1
@@ -464,7 +465,7 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
 
         doRequest(validBonusPaymentJson)(
           res => {
-            status(res) mustBe INTERNAL_SERVER_ERROR
+            status(res)        mustBe INTERNAL_SERVER_ERROR
             contentAsJson(res) mustBe internalServerError
           },
           acceptHeaderV1
@@ -477,7 +478,7 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
 
         doRequest(validBonusPaymentJson)(
           res => {
-            status(res) mustBe INTERNAL_SERVER_ERROR
+            status(res)        mustBe INTERNAL_SERVER_ERROR
             contentAsJson(res) mustBe internalServerError
           },
           acceptHeaderV1
@@ -490,7 +491,7 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
 
         doRequest(validBonusPaymentJson)(
           res => {
-            status(res) mustBe INTERNAL_SERVER_ERROR
+            status(res)        mustBe INTERNAL_SERVER_ERROR
             contentAsJson(res) mustBe internalServerError
           },
           acceptHeaderV1
@@ -503,7 +504,7 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
 
         doRequest(validBonusPaymentJson)(
           res => {
-            status(res) mustBe INTERNAL_SERVER_ERROR
+            status(res)        mustBe INTERNAL_SERVER_ERROR
             contentAsJson(res) mustBe internalServerError
           },
           acceptHeaderV1
@@ -516,7 +517,7 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
 
         doRequest(validBonusPaymentJson)(
           res => {
-            status(res) mustBe INTERNAL_SERVER_ERROR
+            status(res)        mustBe INTERNAL_SERVER_ERROR
             contentAsJson(res) mustBe internalServerError
           },
           acceptHeaderV2
@@ -532,7 +533,7 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(RequestBonusPaymentServiceUnavailable))
 
         doRequest(validBonusPaymentJson) { res =>
-          status(res) mustBe SERVICE_UNAVAILABLE
+          status(res)                              mustBe SERVICE_UNAVAILABLE
           (contentAsJson(res) \ "code").as[String] mustBe "SERVER_ERROR"
         }
       }
@@ -858,7 +859,7 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
         )
 
         doGetBonusPaymentTransactionRequest { res =>
-          status(res) mustBe OK
+          status(res)        mustBe OK
           contentAsJson(res) mustBe Json.obj(
             "lifeEventId"     -> "1234567891",
             "periodStartDate" -> "2017-04-06",
@@ -913,7 +914,7 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
 
         doGetBonusPaymentTransactionRequest(
           res => {
-            status(res) mustBe OK
+            status(res)        mustBe OK
             contentAsJson(res) mustBe Json.obj(
               "lifeEventId"     -> "1234567891",
               "periodStartDate" -> "2017-04-06",
@@ -947,7 +948,7 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
       doGetBonusPaymentTransactionRequest { res =>
         status(res) mustBe NOT_FOUND
         val json = contentAsJson(res)
-        (json \ "code").as[String] mustBe ErrorAccountNotFound.errorCode
+        (json \ "code").as[String]    mustBe ErrorAccountNotFound.errorCode
         (json \ "message").as[String] mustBe ErrorAccountNotFound.message
       }
     }
@@ -960,7 +961,7 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
         doGetBonusPaymentTransactionRequest { res =>
           status(res) mustBe NOT_FOUND
           val json = contentAsJson(res)
-          (json \ "code").as[String] mustBe ErrorBonusPaymentTransactionNotFound.errorCode
+          (json \ "code").as[String]    mustBe ErrorBonusPaymentTransactionNotFound.errorCode
           (json \ "message").as[String] mustBe ErrorBonusPaymentTransactionNotFound.message
         }
       }
@@ -987,7 +988,7 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
         doGetBonusPaymentTransactionRequest { res =>
           status(res) mustBe NOT_FOUND
           val json = contentAsJson(res)
-          (json \ "code").as[String] mustBe ErrorBonusPaymentTransactionNotFound.errorCode
+          (json \ "code").as[String]    mustBe ErrorBonusPaymentTransactionNotFound.errorCode
           (json \ "message").as[String] mustBe ErrorBonusPaymentTransactionNotFound.message
         }
       }
@@ -1020,7 +1021,7 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
 
         doGetBonusPaymentTransactionRequest(
           res => {
-            status(res) mustBe INTERNAL_SERVER_ERROR
+            status(res)        mustBe INTERNAL_SERVER_ERROR
             contentAsJson(res) mustBe internalServerError
           },
           acceptHeaderV1
@@ -1035,7 +1036,7 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(GetBonusOrWithdrawalServiceUnavailableResponse))
 
         doGetBonusPaymentTransactionRequest { res =>
-          status(res) mustBe SERVICE_UNAVAILABLE
+          status(res)                              mustBe SERVICE_UNAVAILABLE
           (contentAsJson(res) \ "code").as[String] mustBe "SERVER_ERROR"
         }
       }
@@ -1298,4 +1299,5 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
       .apply(FakeRequest(Helpers.GET, "/").withHeaders(header))
     callback(res)
   }
+
 }

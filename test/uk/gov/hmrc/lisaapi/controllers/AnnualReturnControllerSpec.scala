@@ -23,7 +23,10 @@ import play.api.mvc.{AnyContentAsJson, Result}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
-import uk.gov.hmrc.lisaapi.controllers.{AnnualReturnController, ErrorBadRequest, ErrorBadRequestAccountId, ErrorBadRequestLmrn, ErrorForbidden, ErrorInternalServerError, ErrorServiceUnavailable, ErrorValidation}
+import uk.gov.hmrc.lisaapi.controllers.{
+  AnnualReturnController, ErrorBadRequest, ErrorBadRequestAccountId, ErrorBadRequestLmrn, ErrorForbidden,
+  ErrorInternalServerError, ErrorServiceUnavailable, ErrorValidation
+}
 import uk.gov.hmrc.lisaapi.helpers.ControllerTestFixture
 import uk.gov.hmrc.lisaapi.models._
 
@@ -32,11 +35,11 @@ import scala.concurrent.Future
 
 class AnnualReturnControllerSpec extends ControllerTestFixture {
 
-
   private val acceptHeaderV1 = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
   private val acceptHeaderV2 = (HeaderNames.ACCEPT, "application/vnd.hmrc.2.0+json")
   private val lisaManager    = "Z123456"
   private val accountId      = "1234567890"
+
   private val json           = Json.obj(
     "eventDate"                  -> "2018-04-05",
     "lisaManagerName"            -> "ISA Manager 1",
@@ -46,6 +49,7 @@ class AnnualReturnControllerSpec extends ControllerTestFixture {
     "annualSubsCash"             -> 0,
     "annualSubsStocksAndShares"  -> 55
   )
+
   private val supersedeJson  = json ++ Json.obj(
     "supersede" -> Json.obj(
       "originalLifeEventId" -> "1234567890",
@@ -54,11 +58,11 @@ class AnnualReturnControllerSpec extends ControllerTestFixture {
   )
 
   private def doRequest(
-                         lmrn: String = lisaManager,
-                         accountId: String = accountId,
-                         acceptHeader: (String, String) = acceptHeaderV2,
-                         payload: JsValue = json
-                       )(callback: Future[Result] => Unit): Unit = {
+    lmrn: String = lisaManager,
+    accountId: String = accountId,
+    acceptHeader: (String, String) = acceptHeaderV2,
+    payload: JsValue = json
+  )(callback: Future[Result] => Unit): Unit = {
     val req = FakeRequest(Helpers.POST, "/")
     val res = annualReturnController
       .submitReturn(lmrn, accountId)
@@ -98,7 +102,7 @@ class AnnualReturnControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
 
         doRequest() { res =>
-          status(res) mustBe CREATED
+          status(res)        mustBe CREATED
           contentAsJson(res) mustBe Json.obj(
             "data"    -> Json.obj(
               "lifeEventId" -> "1928374",
@@ -114,7 +118,7 @@ class AnnualReturnControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
 
         doRequest(payload = supersedeJson) { res =>
-          status(res) mustBe CREATED
+          status(res)        mustBe CREATED
           contentAsJson(res) mustBe Json.obj(
             "data"    -> Json.obj(
               "lifeEventId" -> "1928374",
@@ -128,37 +132,34 @@ class AnnualReturnControllerSpec extends ControllerTestFixture {
     }
 
     "return 400 bad request" when {
-      "given a invalid lmrn in the url" in {
+      "given a invalid lmrn in the url" in
         doRequest(lmrn = "123456") { res =>
           status(res) mustBe BAD_REQUEST
 
           val json = contentAsJson(res)
 
-          (json \ "code").as[String] mustBe ErrorBadRequestLmrn.errorCode
+          (json \ "code").as[String]    mustBe ErrorBadRequestLmrn.errorCode
           (json \ "message").as[String] mustBe ErrorBadRequestLmrn.message
         }
-      }
-      "given a invalid accountId in the url" in {
+      "given a invalid accountId in the url" in
         doRequest(accountId = "1234567890!") { res =>
           status(res) mustBe BAD_REQUEST
 
           val json = contentAsJson(res)
 
-          (json \ "code").as[String] mustBe ErrorBadRequestAccountId.errorCode
+          (json \ "code").as[String]    mustBe ErrorBadRequestAccountId.errorCode
           (json \ "message").as[String] mustBe ErrorBadRequestAccountId.message
         }
-      }
-      "given a invalid json payload" in {
+      "given a invalid json payload" in
         doRequest(payload = Json.obj()) { res =>
           status(res) mustBe BAD_REQUEST
 
           val json       = contentAsJson(res)
           val badRequest = ErrorBadRequest(Nil)
 
-          (json \ "code").as[String] mustBe badRequest.errorCode
+          (json \ "code").as[String]    mustBe badRequest.errorCode
           (json \ "message").as[String] mustBe badRequest.message
         }
-      }
     }
 
     "return 403 forbidden" when {
@@ -191,7 +192,7 @@ class AnnualReturnControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(ReportLifeEventAccountClosedResponse))
 
         doRequest() { res =>
-          status(res) mustBe FORBIDDEN
+          status(res)        mustBe FORBIDDEN
           contentAsJson(res) mustBe Json.obj(
             "code"    -> "INVESTOR_ACCOUNT_ALREADY_CLOSED",
             "message" -> "The LISA account is already closed"
@@ -204,7 +205,7 @@ class AnnualReturnControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(ReportLifeEventAccountVoidResponse))
 
         doRequest() { res =>
-          status(res) mustBe FORBIDDEN
+          status(res)        mustBe FORBIDDEN
           contentAsJson(res) mustBe Json.obj(
             "code"    -> "INVESTOR_ACCOUNT_ALREADY_VOID",
             "message" -> "The LISA account is already void"
@@ -216,7 +217,7 @@ class AnnualReturnControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(ReportLifeEventAccountCancelledResponse))
 
         doRequest() { res =>
-          status(res) mustBe FORBIDDEN
+          status(res)        mustBe FORBIDDEN
           contentAsJson(res) mustBe Json.obj(
             "code"    -> "INVESTOR_ACCOUNT_ALREADY_CANCELLED",
             "message" -> "The LISA account is already cancelled"
@@ -228,7 +229,7 @@ class AnnualReturnControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(ReportLifeEventMismatchResponse))
 
         doRequest() { res =>
-          status(res) mustBe FORBIDDEN
+          status(res)        mustBe FORBIDDEN
           contentAsJson(res) mustBe Json.obj(
             "code"    -> "SUPERSEDED_LIFE_EVENT_MISMATCH_ERROR",
             "message" -> "originalLifeEventId and the originalEventDate do not match the information in the original request"
@@ -243,7 +244,7 @@ class AnnualReturnControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(ReportLifeEventAccountNotFoundResponse))
 
         doRequest() { res =>
-          status(res) mustBe NOT_FOUND
+          status(res)        mustBe NOT_FOUND
           contentAsJson(res) mustBe Json.obj(
             "code"    -> "INVESTOR_ACCOUNTID_NOT_FOUND",
             "message" -> "Enter a real accountId"
@@ -253,11 +254,10 @@ class AnnualReturnControllerSpec extends ControllerTestFixture {
     }
 
     "return 406 not acceptable" when {
-      "the accept header is for v1.0 of the api" in {
+      "the accept header is for v1.0 of the api" in
         doRequest(acceptHeader = acceptHeaderV1) { res =>
           status(res) mustBe NOT_ACCEPTABLE
         }
-      }
     }
 
     "return 409 conflict" when {
@@ -266,7 +266,7 @@ class AnnualReturnControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(ReportLifeEventAlreadyExistsResponse("123")))
 
         doRequest() { res =>
-          status(res) mustBe CONFLICT
+          status(res)        mustBe CONFLICT
           contentAsJson(res) mustBe Json.obj(
             "code"        -> "LIFE_EVENT_ALREADY_EXISTS",
             "message"     -> "The investor’s life event has already been reported",
@@ -279,7 +279,7 @@ class AnnualReturnControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(ReportLifeEventAlreadySupersededResponse("123")))
 
         doRequest() { res =>
-          status(res) mustBe CONFLICT
+          status(res)        mustBe CONFLICT
           contentAsJson(res) mustBe Json.obj(
             "code"        -> "SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED",
             "message"     -> "This life event has already been superseded",
@@ -295,8 +295,8 @@ class AnnualReturnControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.failed(new RuntimeException("Test")))
 
         doRequest() { res =>
-          status(res) mustBe INTERNAL_SERVER_ERROR
-          (contentAsJson(res) \ "code").as[String] mustBe ErrorInternalServerError.errorCode
+          status(res)                                 mustBe INTERNAL_SERVER_ERROR
+          (contentAsJson(res) \ "code").as[String]    mustBe ErrorInternalServerError.errorCode
           (contentAsJson(res) \ "message").as[String] mustBe ErrorInternalServerError.message
         }
       }
@@ -305,7 +305,7 @@ class AnnualReturnControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(ReportLifeEventFundReleaseNotFoundResponse))
 
         doRequest() { res =>
-          status(res) mustBe INTERNAL_SERVER_ERROR
+          status(res)        mustBe INTERNAL_SERVER_ERROR
           contentAsJson(res) mustBe ErrorInternalServerError.asJson
         }
       }
@@ -317,7 +317,7 @@ class AnnualReturnControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(ReportLifeEventServiceUnavailableResponse))
 
         doRequest() { res =>
-          status(res) mustBe SERVICE_UNAVAILABLE
+          status(res)        mustBe SERVICE_UNAVAILABLE
           contentAsJson(res) mustBe ErrorServiceUnavailable.asJson
         }
       }

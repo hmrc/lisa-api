@@ -32,7 +32,9 @@ class UpdateSubscriptionService @Inject() (desConnector: DesConnector)(implicit 
   ): Future[UpdateSubscriptionResponse] =
     desConnector.updateFirstSubDate(lisaManager, accountId, request) map {
       case successResponse: DesUpdateSubscriptionSuccessResponse =>
-        logger.info(s"[UpdateSubscriptionService][updateSubscription] Update subscription success response for lisaManager: $lisaManager")
+        logger.info(
+          s"[UpdateSubscriptionService][updateSubscription] Update subscription success response for lisaManager: $lisaManager"
+        )
         if (successResponse.code == "SUCCESS") {
           UpdateSubscriptionSuccessResponse(
             "UPDATED",
@@ -44,13 +46,19 @@ class UpdateSubscriptionService @Inject() (desConnector: DesConnector)(implicit 
           UpdateSubscriptionSuccessResponse("UPDATED_AND_ACCOUNT_VOID", voidMsg)
         }
       case DesUnavailableResponse                                =>
-        logger.warn(s"[UpdateSubscriptionService][updateSubscription] Update subscription des unavailable response for lisaManager: $lisaManager")
+        logger.warn(
+          s"[UpdateSubscriptionService][updateSubscription] Update subscription des unavailable response for lisaManager: $lisaManager"
+        )
         UpdateSubscriptionServiceUnavailableResponse
       case failureResponse: DesFailureResponse                   =>
-        logger.warn(s"[UpdateSubscriptionService][updateSubscription] Matched DesFailureResponse and the code is : ${failureResponse.code} for lisaManager: $lisaManager")
+        logger.warn(
+          s"[UpdateSubscriptionService][updateSubscription] Matched DesFailureResponse and the code is : ${failureResponse.code} for lisaManager: $lisaManager"
+        )
         desFailures.getOrElse(
           failureResponse.code, {
-            logger.error(s"[UpdateSubscriptionService][updateSubscription] Update date of first subscription returned error: ${failureResponse.code} for lisaManager: $lisaManager")
+            logger.error(
+              s"[UpdateSubscriptionService][updateSubscription] Update date of first subscription returned error: ${failureResponse.code} for lisaManager: $lisaManager"
+            )
             UpdateSubscriptionErrorResponse
           }
         )
@@ -62,4 +70,5 @@ class UpdateSubscriptionService @Inject() (desConnector: DesConnector)(implicit 
     "INVESTOR_ACCOUNT_ALREADY_CANCELLED" -> UpdateSubscriptionAccountCancelledResponse,
     "INVESTOR_ACCOUNT_ALREADY_VOID"      -> UpdateSubscriptionAccountVoidedResponse
   )
+
 }

@@ -140,8 +140,8 @@ class GetBulkPaymentResponseSpec extends PlaySpec {
       res match {
         case errors: JsError    => fail(s"Json validation failed: ${JsError.toFlatForm(errors)}")
         case JsSuccess(data, _) =>
-          data.paymentAmount mustBe 1000.0
-          data.paymentDate mustBe Some(LocalDate.parse("2017-06-01"))
+          data.paymentAmount    mustBe 1000.0
+          data.paymentDate      mustBe Some(LocalDate.parse("2017-06-01"))
           data.paymentReference mustBe Some("ABC123456789")
       }
     }
@@ -150,10 +150,10 @@ class GetBulkPaymentResponseSpec extends PlaySpec {
       val data = BulkPaymentPaid(1000.0, Some(LocalDate.parse("2017-06-01")), Some("ABC123"))
       val json = Json.toJson(data)
       (json \ "paymentAmount").as[BigDecimal] mustBe 1000.0
-      (json \ "paymentDate").as[String] mustBe "2017-06-01"
-      (json \ "paymentReference").as[String] mustBe "ABC123"
-      (json \ "transactionType").as[String] mustBe "Payment"
-      (json \ "status").as[String] mustBe "Paid"
+      (json \ "paymentDate").as[String]       mustBe "2017-06-01"
+      (json \ "paymentReference").as[String]  mustBe "ABC123"
+      (json \ "transactionType").as[String]   mustBe "Payment"
+      (json \ "status").as[String]            mustBe "Paid"
     }
 
     "serialize from json when optional fields are missing" in {
@@ -162,8 +162,8 @@ class GetBulkPaymentResponseSpec extends PlaySpec {
       res match {
         case errors: JsError    => fail(s"Json validation failed: ${JsError.toFlatForm(errors)}")
         case JsSuccess(data, _) =>
-          data.paymentAmount mustBe 1000.0
-          data.paymentDate mustBe None
+          data.paymentAmount    mustBe 1000.0
+          data.paymentDate      mustBe None
           data.paymentReference mustBe None
       }
     }
@@ -172,10 +172,10 @@ class GetBulkPaymentResponseSpec extends PlaySpec {
       val data = BulkPaymentPaid(1000.0, None, None)
       val json = Json.toJson(data)
       (json \ "paymentAmount").as[BigDecimal] mustBe 1000.0
-      (json \ "paymentDate").isDefined mustBe false
-      (json \ "paymentReference").isDefined mustBe false
-      (json \ "transactionType").as[String] mustBe "Payment"
-      (json \ "status").as[String] mustBe "Paid"
+      (json \ "paymentDate").isDefined        mustBe false
+      (json \ "paymentReference").isDefined   mustBe false
+      (json \ "transactionType").as[String]   mustBe "Payment"
+      (json \ "status").as[String]            mustBe "Paid"
     }
 
   }
@@ -189,7 +189,7 @@ class GetBulkPaymentResponseSpec extends PlaySpec {
         case errors: JsError    => fail(s"Json validation failed: ${JsError.toFlatForm(errors)}")
         case JsSuccess(data, _) =>
           data.paymentAmount mustBe 1000.0
-          data.dueDate mustBe Some(LocalDate.parse("2017-06-01"))
+          data.dueDate       mustBe Some(LocalDate.parse("2017-06-01"))
       }
     }
 
@@ -197,9 +197,9 @@ class GetBulkPaymentResponseSpec extends PlaySpec {
       val data = BulkPaymentPending(1000.0, Some(LocalDate.parse("2017-06-01")))
       val json = Json.toJson(data)
       (json \ "paymentAmount").as[BigDecimal] mustBe 1000.0
-      (json \ "dueDate").as[String] mustBe "2017-06-01"
-      (json \ "transactionType").as[String] mustBe "Payment"
-      (json \ "status").as[String] mustBe "Pending"
+      (json \ "dueDate").as[String]           mustBe "2017-06-01"
+      (json \ "transactionType").as[String]   mustBe "Payment"
+      (json \ "status").as[String]            mustBe "Pending"
     }
 
     "serialize from json missing due date" in {
@@ -209,7 +209,7 @@ class GetBulkPaymentResponseSpec extends PlaySpec {
         case errors: JsError    => fail(s"Json validation failed: ${JsError.toFlatForm(errors)}")
         case JsSuccess(data, _) =>
           data.paymentAmount mustBe 1000.0
-          data.dueDate mustBe None
+          data.dueDate       mustBe None
       }
     }
 
@@ -217,9 +217,9 @@ class GetBulkPaymentResponseSpec extends PlaySpec {
       val data = BulkPaymentPending(1000.0, None)
       val json = Json.toJson(data)
       (json \ "paymentAmount").as[BigDecimal] mustBe 1000.0
-      (json \ "dueDate").isDefined mustBe false
-      (json \ "transactionType").as[String] mustBe "Payment"
-      (json \ "status").as[String] mustBe "Pending"
+      (json \ "dueDate").isDefined            mustBe false
+      (json \ "transactionType").as[String]   mustBe "Payment"
+      (json \ "status").as[String]            mustBe "Pending"
     }
   }
 
@@ -231,8 +231,8 @@ class GetBulkPaymentResponseSpec extends PlaySpec {
       res match {
         case errors: JsError    => fail(s"Json validation failed: ${JsError.toFlatForm(errors)}")
         case JsSuccess(data, _) =>
-          data.paymentAmount mustBe 1000.0
-          data.paymentDate mustBe Some(LocalDate.parse("2017-06-01"))
+          data.paymentAmount    mustBe 1000.0
+          data.paymentDate      mustBe Some(LocalDate.parse("2017-06-01"))
           data.paymentReference mustBe Some("ABC123456789")
       }
     }
@@ -241,10 +241,10 @@ class GetBulkPaymentResponseSpec extends PlaySpec {
       val data = BulkPaymentCollected(1000.0, Some(LocalDate.parse("2017-06-01")), Some("ABC123"))
       val json = Json.toJson(data)
       (json \ "paymentAmount").as[BigDecimal] mustBe 1000.0
-      (json \ "paymentDate").as[String] mustBe "2017-06-01"
-      (json \ "paymentReference").as[String] mustBe "ABC123"
-      (json \ "transactionType").as[String] mustBe "Debt"
-      (json \ "status").as[String] mustBe "Collected"
+      (json \ "paymentDate").as[String]       mustBe "2017-06-01"
+      (json \ "paymentReference").as[String]  mustBe "ABC123"
+      (json \ "transactionType").as[String]   mustBe "Debt"
+      (json \ "status").as[String]            mustBe "Collected"
     }
 
     "serialize from json missing reference" in {
@@ -253,8 +253,8 @@ class GetBulkPaymentResponseSpec extends PlaySpec {
       res match {
         case errors: JsError    => fail(s"Json validation failed: ${JsError.toFlatForm(errors)}")
         case JsSuccess(data, _) =>
-          data.paymentAmount mustBe 1000.0
-          data.paymentDate mustBe Some(LocalDate.parse("2017-06-01"))
+          data.paymentAmount    mustBe 1000.0
+          data.paymentDate      mustBe Some(LocalDate.parse("2017-06-01"))
           data.paymentReference mustBe None
       }
     }
@@ -263,10 +263,10 @@ class GetBulkPaymentResponseSpec extends PlaySpec {
       val data = BulkPaymentCollected(1000.0, Some(LocalDate.parse("2017-06-01")), None)
       val json = Json.toJson(data)
       (json \ "paymentAmount").as[BigDecimal] mustBe 1000.0
-      (json \ "paymentDate").as[String] mustBe "2017-06-01"
-      (json \ "paymentReference").isDefined mustBe false
-      (json \ "transactionType").as[String] mustBe "Debt"
-      (json \ "status").as[String] mustBe "Collected"
+      (json \ "paymentDate").as[String]       mustBe "2017-06-01"
+      (json \ "paymentReference").isDefined   mustBe false
+      (json \ "transactionType").as[String]   mustBe "Debt"
+      (json \ "status").as[String]            mustBe "Collected"
     }
   }
 
@@ -279,7 +279,7 @@ class GetBulkPaymentResponseSpec extends PlaySpec {
         case errors: JsError    => fail(s"Json validation failed: ${JsError.toFlatForm(errors)}")
         case JsSuccess(data, _) =>
           data.paymentAmount mustBe 1000.0
-          data.dueDate mustBe Some(LocalDate.parse("2017-06-01"))
+          data.dueDate       mustBe Some(LocalDate.parse("2017-06-01"))
       }
     }
 
@@ -287,9 +287,9 @@ class GetBulkPaymentResponseSpec extends PlaySpec {
       val data = BulkPaymentDue(1000.0, Some(LocalDate.parse("2017-06-01")))
       val json = Json.toJson(data)
       (json \ "paymentAmount").as[BigDecimal] mustBe 1000.0
-      (json \ "dueDate").as[String] mustBe "2017-06-01"
-      (json \ "transactionType").as[String] mustBe "Debt"
-      (json \ "status").as[String] mustBe "Due"
+      (json \ "dueDate").as[String]           mustBe "2017-06-01"
+      (json \ "transactionType").as[String]   mustBe "Debt"
+      (json \ "status").as[String]            mustBe "Due"
     }
 
     "serialize from json no dueDate" in {
@@ -299,7 +299,7 @@ class GetBulkPaymentResponseSpec extends PlaySpec {
         case errors: JsError    => fail(s"Json validation failed: ${JsError.toFlatForm(errors)}")
         case JsSuccess(data, _) =>
           data.paymentAmount mustBe 1000.0
-          data.dueDate mustBe None
+          data.dueDate       mustBe None
       }
     }
 
@@ -307,9 +307,10 @@ class GetBulkPaymentResponseSpec extends PlaySpec {
       val data = BulkPaymentDue(1000.0, None)
       val json = Json.toJson(data)
       (json \ "paymentAmount").as[BigDecimal] mustBe 1000.0
-      (json \ "dueDate").isDefined mustBe false
-      (json \ "transactionType").as[String] mustBe "Debt"
-      (json \ "status").as[String] mustBe "Due"
+      (json \ "dueDate").isDefined            mustBe false
+      (json \ "transactionType").as[String]   mustBe "Debt"
+      (json \ "status").as[String]            mustBe "Due"
     }
   }
+
 }

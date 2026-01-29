@@ -114,4 +114,5 @@ class BonusOrWithdrawalServiceSpec extends ServiceTestFixture {
 
     callback(response)
   }
+
 }

@@ -35,8 +35,8 @@ class CloseLisaAccountSpec extends PlaySpec {
       res match {
         case JsError(_)         => fail()
         case JsSuccess(data, _) =>
-          data.accountClosureReason mustBe "All funds withdrawn"
-          data.closureDate.getYear mustBe 2000
+          data.accountClosureReason      mustBe "All funds withdrawn"
+          data.closureDate.getYear       mustBe 2000
           data.closureDate.getMonthValue mustBe 1
           data.closureDate.getDayOfMonth mustBe 1
       }
@@ -48,8 +48,8 @@ class CloseLisaAccountSpec extends PlaySpec {
       res match {
         case JsError(_)         => fail()
         case JsSuccess(data, _) =>
-          data.accountClosureReason mustBe "Cancellation"
-          data.closureDate.getYear mustBe 2000
+          data.accountClosureReason      mustBe "Cancellation"
+          data.closureDate.getYear       mustBe 2000
           data.closureDate.getMonthValue mustBe 1
           data.closureDate.getDayOfMonth mustBe 1
       }

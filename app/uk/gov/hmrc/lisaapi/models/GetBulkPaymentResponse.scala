@@ -29,17 +29,21 @@ case object GetBulkPaymentErrorResponse extends GetBulkPaymentResponse
 case object GetBulkPaymentServiceUnavailableResponse extends GetBulkPaymentResponse
 
 trait BulkPayment
+
 case class BulkPaymentPaid(
   paymentAmount: Amount,
   paymentDate: Option[LocalDate] = None,
   paymentReference: Option[String] = None
 ) extends BulkPayment
+
 case class BulkPaymentPending(paymentAmount: Amount, dueDate: Option[LocalDate] = None) extends BulkPayment
+
 case class BulkPaymentCollected(
   paymentAmount: Amount,
   paymentDate: Option[LocalDate] = None,
   paymentReference: Option[String] = None
 ) extends BulkPayment
+
 case class BulkPaymentDue(paymentAmount: Amount, dueDate: Option[LocalDate] = None) extends BulkPayment
 
 object BulkPayment {
@@ -48,7 +52,7 @@ object BulkPayment {
     (JsPath \ "clearedAmount").read[Amount].map(_.abs) and
       (JsPath \ "items" \ 0 \ "clearingDate").readNullable(JsonReads.isoDate) and
       (JsPath \ "items" \ 0 \ "clearingSAPDocument").readNullable[String]
-    )(BulkPaymentPaid.apply _)
+  )(BulkPaymentPaid.apply _)
 
   implicit val bpPaidWrites: Writes[BulkPaymentPaid] = (
     (JsPath \ "transactionType").write[String] and
@@ -70,7 +74,7 @@ object BulkPayment {
     (JsPath \ "clearedAmount").read[Amount].map(_.abs) and
       (JsPath \ "items" \ 0 \ "clearingDate").readNullable(JsonReads.isoDate) and
       (JsPath \ "items" \ 0 \ "clearingSAPDocument").readNullable[String]
-    )(BulkPaymentCollected.apply _)
+  )(BulkPaymentCollected.apply _)
 
   implicit val bpCollectedWrites: Writes[BulkPaymentCollected] = (
     (JsPath \ "transactionType").write[String] and
@@ -91,7 +95,7 @@ object BulkPayment {
   implicit val bpPendingReads: Reads[BulkPaymentPending] = (
     (JsPath \ "outstandingAmount").read[Amount].map(_.abs) and
       (JsPath \ "items" \ 0 \ "dueDate").readNullable(JsonReads.isoDate)
-    )(BulkPaymentPending.apply _)
+  )(BulkPaymentPending.apply _)
 
   implicit val bpPendingWrites: Writes[BulkPaymentPending] = (
     (JsPath \ "transactionType").write[String] and
@@ -145,6 +149,7 @@ object BulkPayment {
     case collected: BulkPaymentCollected => bpCollectedWrites.writes(collected)
     case due: BulkPaymentDue             => bpDueWrites.writes(due)
   }
+
 }
 
 case class GetBulkPaymentSuccessResponse(

@@ -51,4 +51,5 @@ class AppContextSpec extends PlaySpec with MockitoSugar {
       appContext.endpointIsDisabled("test3") mustBe true
     }
   }
+
 }

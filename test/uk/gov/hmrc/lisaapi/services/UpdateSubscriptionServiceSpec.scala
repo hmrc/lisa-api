@@ -134,4 +134,5 @@ class UpdateSubscriptionServiceSpec extends ServiceTestFixture {
 
     callback(response)
   }
+
 }

@@ -81,7 +81,7 @@ class UpdateFirstSubscriptionDateSpec extends ControllerTestFixture {
       }
     }
     "audit a firstSubscriptionDateNotUpdated event" when {
-      "the json fails date validation" in {
+      "the json fails date validation" in
         doUpdateSubsDate(updateFirstSubscriptionDate.replace("2017-04-06", "2017-04-05")) { result =>
           await(result)
           verify(mockAuditService).audit(
@@ -97,7 +97,6 @@ class UpdateFirstSubscriptionDateSpec extends ControllerTestFixture {
             )
           )(any())
         }
-      }
       "the data service returns a UpdateFirstSubscriptionDateAccountAlreadyVoidedResponse" in {
         when(mockUpdateSubscritionService.updateSubscription(any(), any(), any())(any()))
           .thenReturn(Future.successful(UpdateSubscriptionAccountVoidedResponse))
@@ -204,7 +203,7 @@ class UpdateFirstSubscriptionDateSpec extends ControllerTestFixture {
         when(mockUpdateSubscritionService.updateSubscription(any(), any(), any())(any()))
           .thenReturn(Future.successful(UpdateSubscriptionSuccessResponse("UPDATED", "message")))
         doUpdateSubsDate(updateFirstSubscriptionDate) { res =>
-          status(res) mustBe OK
+          status(res)                                            mustBe OK
           (contentAsJson(res) \ "data" \ "accountId").as[String] mustBe accountId
         }
       }
@@ -216,7 +215,7 @@ class UpdateFirstSubscriptionDateSpec extends ControllerTestFixture {
         doUpdateSubsDate(invalidJson) { res =>
           status(res) mustBe BAD_REQUEST
           val json = contentAsJson(res)
-          (json \ "code").as[String] mustBe "BAD_REQUEST"
+          (json \ "code").as[String]                mustBe "BAD_REQUEST"
           (json \ "errors" \ 0 \ "code").as[String] mustBe "INVALID_DATE"
           (json \ "errors" \ 0 \ "path").as[String] mustBe "/firstSubscriptionDate"
         }
@@ -228,7 +227,7 @@ class UpdateFirstSubscriptionDateSpec extends ControllerTestFixture {
         doUpdateSubsDate(updateFirstSubscriptionDate, lmrn = "123") { res =>
           status(res) mustBe BAD_REQUEST
           val json = contentAsJson(res)
-          (json \ "code").as[String] mustBe ErrorBadRequestLmrn.errorCode
+          (json \ "code").as[String]    mustBe ErrorBadRequestLmrn.errorCode
           (json \ "message").as[String] mustBe ErrorBadRequestLmrn.message
         }
       }
@@ -239,7 +238,7 @@ class UpdateFirstSubscriptionDateSpec extends ControllerTestFixture {
         doUpdateSubsDate(updateFirstSubscriptionDate, accId = "1=2!") { res =>
           status(res) mustBe BAD_REQUEST
           val json = contentAsJson(res)
-          (json \ "code").as[String] mustBe ErrorBadRequestAccountId.errorCode
+          (json \ "code").as[String]    mustBe ErrorBadRequestAccountId.errorCode
           (json \ "message").as[String] mustBe ErrorBadRequestAccountId.message
         }
       }
@@ -251,7 +250,7 @@ class UpdateFirstSubscriptionDateSpec extends ControllerTestFixture {
         doUpdateSubsDate(invalidJson) { res =>
           status(res) mustBe FORBIDDEN
           val json = contentAsJson(res)
-          (json \ "code").as[String] mustBe "FORBIDDEN"
+          (json \ "code").as[String]                mustBe "FORBIDDEN"
           (json \ "errors" \ 0 \ "code").as[String] mustBe "INVALID_DATE"
           (json \ "errors" \ 0 \ "path").as[String] mustBe "/firstSubscriptionDate"
         }
@@ -263,7 +262,7 @@ class UpdateFirstSubscriptionDateSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(UpdateSubscriptionAccountClosedResponse))
 
         doUpdateSubsDate(updateFirstSubscriptionDate) { res =>
-          status(res) mustBe FORBIDDEN
+          status(res)                              mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CLOSED"
         }
       }
@@ -274,7 +273,7 @@ class UpdateFirstSubscriptionDateSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(UpdateSubscriptionAccountCancelledResponse))
 
         doUpdateSubsDate(updateFirstSubscriptionDate) { res =>
-          status(res) mustBe FORBIDDEN
+          status(res)                              mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CANCELLED"
         }
       }
@@ -285,7 +284,7 @@ class UpdateFirstSubscriptionDateSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(UpdateSubscriptionAccountVoidedResponse))
 
         doUpdateSubsDate(updateFirstSubscriptionDate) { res =>
-          status(res) mustBe FORBIDDEN
+          status(res)                              mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_VOID"
         }
       }
@@ -296,7 +295,7 @@ class UpdateFirstSubscriptionDateSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(UpdateSubscriptionAccountNotFoundResponse))
 
         doUpdateSubsDate(updateFirstSubscriptionDate) { res =>
-          status(res) mustBe NOT_FOUND
+          status(res)                              mustBe NOT_FOUND
           (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNTID_NOT_FOUND"
         }
       }
@@ -317,7 +316,7 @@ class UpdateFirstSubscriptionDateSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(UpdateSubscriptionServiceUnavailableResponse))
 
         doUpdateSubsDate(updateFirstSubscriptionDate) { res =>
-          status(res) mustBe SERVICE_UNAVAILABLE
+          status(res)                              mustBe SERVICE_UNAVAILABLE
           (contentAsJson(res) \ "code").as[String] mustBe "SERVER_ERROR"
         }
       }
@@ -333,4 +332,5 @@ class UpdateFirstSubscriptionDateSpec extends ControllerTestFixture {
 
     callback(res)
   }
+
 }

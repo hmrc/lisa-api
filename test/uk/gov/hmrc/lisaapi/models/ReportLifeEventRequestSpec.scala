@@ -34,8 +34,8 @@ class ReportLifeEventRequestSpec extends PlaySpec {
       res match {
         case JsError(errors)       => fail()
         case JsSuccess(data, path) =>
-          data.eventType mustBe "LISA Investor Terminal Ill Health"
-          data.eventDate.getYear mustBe 2017
+          data.eventType               mustBe "LISA Investor Terminal Ill Health"
+          data.eventDate.getYear       mustBe 2017
           data.eventDate.getMonthValue mustBe 1
           data.eventDate.getDayOfMonth mustBe 1
       }

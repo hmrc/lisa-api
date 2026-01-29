@@ -76,7 +76,7 @@ class GetLifeEventControllerSpec extends ControllerTestFixture {
           .getLifeEvent(lisaManager, accountId, eventId)
           .apply(FakeRequest().withHeaders(acceptHeaderV2))
 
-        status(res) mustBe OK
+        status(res)        mustBe OK
         contentAsJson(res) mustBe Json.toJson[Seq[GetLifeEventItem]](List(annualReturn))
       }
     }
@@ -90,7 +90,7 @@ class GetLifeEventControllerSpec extends ControllerTestFixture {
           .getLifeEvent(lisaManager, accountId, eventId)
           .apply(FakeRequest().withHeaders(acceptHeaderV2))
 
-        status(res) mustBe NOT_FOUND
+        status(res)        mustBe NOT_FOUND
         contentAsJson(res) mustBe Json.obj(
           "code"    -> ErrorAccountNotFound.errorCode,
           "message" -> ErrorAccountNotFound.message
@@ -148,4 +148,5 @@ class GetLifeEventControllerSpec extends ControllerTestFixture {
     }
 
   }
+
 }

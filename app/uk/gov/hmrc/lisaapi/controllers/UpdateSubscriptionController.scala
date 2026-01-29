@@ -28,52 +28,60 @@ import uk.gov.hmrc.lisaapi.services.{AuditService, UpdateSubscriptionService}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class UpdateSubscriptionController @Inject()(
-                                              authConnector: AuthConnector,
-                                              appContext: AppContext,
-                                              service: UpdateSubscriptionService,
-                                              auditService: AuditService,
-                                              lisaMetrics: LisaMetrics,
-                                              cc: ControllerComponents,
-                                              parse: PlayBodyParsers
-                                            )(implicit ec: ExecutionContext)
-  extends LisaController(
-    cc: ControllerComponents,
-    lisaMetrics: LisaMetrics,
-    appContext: AppContext,
-    authConnector: AuthConnector
-  ) {
+class UpdateSubscriptionController @Inject() (
+  authConnector: AuthConnector,
+  appContext: AppContext,
+  service: UpdateSubscriptionService,
+  auditService: AuditService,
+  lisaMetrics: LisaMetrics,
+  cc: ControllerComponents,
+  parse: PlayBodyParsers
+)(implicit ec: ExecutionContext)
+    extends LisaController(
+      cc: ControllerComponents,
+      lisaMetrics: LisaMetrics,
+      appContext: AppContext,
+      authConnector: AuthConnector
+    ) {
 
   def updateSubscription(lisaManager: String, accountId: String): Action[AnyContent] =
     (validateHeader(parse) andThen validateLMRN(lisaManager) andThen validateAccountId(accountId)).async {
       implicit request =>
         implicit val startTime: Long = System.currentTimeMillis()
-        logger.info(s"[UpdateSubscriptionController][updateSubscription] lisaManager: $lisaManager, accountId: $accountId")
+        logger.info(
+          s"[UpdateSubscriptionController][updateSubscription] lisaManager: $lisaManager, accountId: $accountId"
+        )
         withValidJson[UpdateSubscriptionRequest](
           updateSubsRequest =>
             withValidDates(lisaManager, accountId, updateSubsRequest) { () =>
               service.updateSubscription(lisaManager, accountId, updateSubsRequest) map { result =>
-                logger.info(s"[UpdateSubscriptionController][updateSubscription] response : ${request.toString()} lisaManager: $lisaManager, accountId: $accountId")
+                logger.info(
+                  s"[UpdateSubscriptionController][updateSubscription] response : ${request.toString()} lisaManager: $lisaManager, accountId: $accountId"
+                )
                 result match {
-                  case success: UpdateSubscriptionSuccessResponse =>
-                    logger.info(s"[UpdateSubscriptionController][updateSubscription] First Subscription date updated lisaManager: $lisaManager, accountId: $accountId")
+                  case success: UpdateSubscriptionSuccessResponse   =>
+                    logger.info(
+                      s"[UpdateSubscriptionController][updateSubscription] First Subscription date updated lisaManager: $lisaManager, accountId: $accountId"
+                    )
                     auditUpdateSubscription(lisaManager, accountId, updateSubsRequest)
                     val data =
                       ApiResponseData(message = success.message, code = Some(success.code), accountId = Some(accountId))
                     lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.UPDATE_SUBSCRIPTION)
                     Ok(Json.toJson(ApiResponse(data = Some(data), success = true, status = OK)))
-                  case UpdateSubscriptionAccountNotFoundResponse =>
+                  case UpdateSubscriptionAccountNotFoundResponse    =>
                     error(ErrorAccountNotFound, lisaManager, accountId, updateSubsRequest)
-                  case UpdateSubscriptionAccountClosedResponse =>
+                  case UpdateSubscriptionAccountClosedResponse      =>
                     error(ErrorAccountAlreadyClosed, lisaManager, accountId, updateSubsRequest)
-                  case UpdateSubscriptionAccountCancelledResponse =>
+                  case UpdateSubscriptionAccountCancelledResponse   =>
                     error(ErrorAccountAlreadyCancelled, lisaManager, accountId, updateSubsRequest)
-                  case UpdateSubscriptionAccountVoidedResponse =>
+                  case UpdateSubscriptionAccountVoidedResponse      =>
                     error(ErrorAccountAlreadyVoided, lisaManager, accountId, updateSubsRequest)
                   case UpdateSubscriptionServiceUnavailableResponse =>
                     error(ErrorServiceUnavailable, lisaManager, accountId, updateSubsRequest)
-                  case _ =>
-                    logger.error(s"[UpdateSubscriptionController][updateSubscription]  in errorResponse accountId : $accountId, lisaManager : $lisaManager")
+                  case _                                            =>
+                    logger.error(
+                      s"[UpdateSubscriptionController][updateSubscription]  in errorResponse accountId : $accountId, lisaManager : $lisaManager"
+                    )
                     error(ErrorInternalServerError, lisaManager, accountId, updateSubsRequest)
                 }
               }
@@ -83,10 +91,12 @@ class UpdateSubscriptionController @Inject()(
     }
 
   private def error(e: ErrorResponse, lisaManager: String, accountId: String, req: UpdateSubscriptionRequest)(implicit
-                                                                                                              hc: HeaderCarrier,
-                                                                                                              startTime: Long
+    hc: HeaderCarrier,
+    startTime: Long
   ): Result = {
-    logger.info(s"[UpdateSubscriptionController][error] failed for lisaManager : $lisaManager , accountId : $accountId, error : ${e.message}")
+    logger.info(
+      s"[UpdateSubscriptionController][error] failed for lisaManager : $lisaManager , accountId : $accountId, error : ${e.message}"
+    )
     auditUpdateSubscription(lisaManager, accountId, req, Some(e.errorCode))
     lisaMetrics.incrementMetrics(startTime, e.httpStatusCode, LisaMetricKeys.UPDATE_SUBSCRIPTION)
     e.asResult
@@ -96,7 +106,9 @@ class UpdateSubscriptionController @Inject()(
     success: () => Future[Result]
   )(implicit hc: HeaderCarrier, startTime: Long): Future[Result] =
     if (updateSubsRequest.firstSubscriptionDate.isBefore(LISA_START_DATE)) {
-      logger.info("[UpdateSubscriptionController][withValidDates] First Subscription date not updated - failed business rule validation")
+      logger.info(
+        "[UpdateSubscriptionController][withValidDates] First Subscription date not updated - failed business rule validation"
+      )
 
       auditUpdateSubscription(lisaManager, accountId, updateSubsRequest, Some("FORBIDDEN"))
 
@@ -120,16 +132,16 @@ class UpdateSubscriptionController @Inject()(
     }
 
   private def auditUpdateSubscription(
-                                       lisaManager: String,
-                                       accountId: String,
-                                       updateSubsRequest: UpdateSubscriptionRequest,
-                                       failureReason: Option[String] = None
-                                     )(implicit hc: HeaderCarrier) = {
-    val path = s"/manager/$lisaManager/accounts/$accountId/update-subscription"
+    lisaManager: String,
+    accountId: String,
+    updateSubsRequest: UpdateSubscriptionRequest,
+    failureReason: Option[String] = None
+  )(implicit hc: HeaderCarrier) = {
+    val path      = s"/manager/$lisaManager/accounts/$accountId/update-subscription"
     val auditData = Map(
       "lisaManagerReferenceNumber" -> lisaManager,
-      "accountID" -> accountId,
-      "firstSubscriptionDate" -> updateSubsRequest.firstSubscriptionDate.toString
+      "accountID"                  -> accountId,
+      "firstSubscriptionDate"      -> updateSubsRequest.firstSubscriptionDate.toString
     )
 
     failureReason map { reason =>

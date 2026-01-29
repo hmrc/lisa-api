@@ -106,6 +106,7 @@ case class Bonuses(
 )
 
 object Bonuses {
+
   implicit val bonusesReadsV2: Reads[Bonuses] = (
     (JsPath \ "bonusDueForPeriod").read[Amount](JsonReads.nonNegativeAmount) and
       (JsPath \ "totalBonusDueYTD").read[Amount](JsonReads.nonNegativeAmount) and
@@ -126,11 +127,13 @@ object Bonuses {
       (JsPath \ "bonusPaidYTD").writeNullable[Amount] and
       (JsPath \ "claimReason").write[String]
   )(unlift(Bonuses.unapply))
+
 }
 
 case class HelpToBuyTransfer(htbTransferInForPeriod: Amount, htbTransferTotalYTD: Amount)
 
 object HelpToBuyTransfer {
+
   implicit val htbReads: Reads[HelpToBuyTransfer] = (
     (JsPath \ "htbTransferInForPeriod").read[Amount](JsonReads.nonNegativeAmount) and
       (JsPath \ "htbTransferTotalYTD").read[Amount](JsonReads.nonNegativeAmount)
@@ -140,6 +143,7 @@ object HelpToBuyTransfer {
     (JsPath \ "htbTransferInForPeriod").write[Amount] and
       (JsPath \ "htbTransferTotalYTD").write[Amount]
   )(unlift(HelpToBuyTransfer.unapply))
+
 }
 
 case class InboundPayments(
@@ -150,6 +154,7 @@ case class InboundPayments(
 )
 
 object InboundPayments {
+
   implicit val ibpReads: Reads[InboundPayments] = (
     (JsPath \ "newSubsForPeriod").readNullable[Amount](JsonReads.nonNegativeAmount) and
       (JsPath \ "newSubsYTD").read[Amount](JsonReads.nonNegativeAmount) and
@@ -163,6 +168,7 @@ object InboundPayments {
       (JsPath \ "totalSubsForPeriod").write[Amount] and
       (JsPath \ "totalSubsYTD").write[Amount]
   )(unlift(InboundPayments.unapply))
+
 }
 
 sealed trait Supersede extends Product

@@ -19,7 +19,9 @@ package uk.gov.hmrc.lisaapi.services
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountNotFound, ErrorInternalServerError, ErrorLifeEventIdNotFound, ErrorResponse, ErrorServiceUnavailable}
+import uk.gov.hmrc.lisaapi.controllers.{
+  ErrorAccountNotFound, ErrorInternalServerError, ErrorLifeEventIdNotFound, ErrorResponse, ErrorServiceUnavailable
+}
 import uk.gov.hmrc.lisaapi.helpers.ServiceTestFixture
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.models.des._
@@ -292,4 +294,5 @@ class LifeEventServiceSpec extends ServiceTestFixture {
 
     callback(response)
   }
+
 }

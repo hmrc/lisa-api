@@ -24,6 +24,7 @@ import java.time.LocalDate
 case class CloseLisaAccountRequest(accountClosureReason: AccountClosureReason, closureDate: LocalDate)
 
 object CloseLisaAccountRequest {
+
   implicit val closeLisaAccountRequestReads: Reads[CloseLisaAccountRequest] = (
     (JsPath \ "accountClosureReason").read(JsonReads.accountClosureReason) and
       (JsPath \ "closureDate").read(JsonReads.notFutureDate)
@@ -33,4 +34,5 @@ object CloseLisaAccountRequest {
     (JsPath \ "accountClosureReason").write[String] and
       (JsPath \ "closureDate").write[LocalDate]
   )(unlift(CloseLisaAccountRequest.unapply))
+
 }

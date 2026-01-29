@@ -48,9 +48,8 @@ class ReinstateAccountControllerSpec extends ControllerTestFixture {
   val lisaManager                    = "Z019283"
   val accountId                      = "ABC/12345"
 
-  override def beforeEach(): Unit = {
+  override def beforeEach(): Unit =
     reset(mockAuditService)
-  }
 
   val reinstateAccountValidJson = s"""{"accountId" :"$accountId"}"""
 
@@ -228,7 +227,7 @@ class ReinstateAccountControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(ReinstateLisaAccountAlreadyClosedResponse))
 
         doReinstateRequest(reinstateAccountValidJson, lisaManager) { res =>
-          status(res) mustBe FORBIDDEN
+          status(res)                              mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CLOSED"
         }
       }
@@ -240,7 +239,7 @@ class ReinstateAccountControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(ReinstateLisaAccountAlreadyCancelledResponse))
 
         doReinstateRequest(reinstateAccountValidJson, lisaManager) { res =>
-          status(res) mustBe FORBIDDEN
+          status(res)                              mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CANCELLED"
         }
       }
@@ -252,7 +251,7 @@ class ReinstateAccountControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(ReinstateLisaAccountAlreadyOpenResponse))
 
         doReinstateRequest(reinstateAccountValidJson, lisaManager) { res =>
-          status(res) mustBe FORBIDDEN
+          status(res)                              mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_OPEN"
         }
       }
@@ -264,7 +263,7 @@ class ReinstateAccountControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(ReinstateLisaAccountInvestorComplianceCheckFailedResponse))
 
         doReinstateRequest(reinstateAccountValidJson, lisaManager) { res =>
-          status(res) mustBe FORBIDDEN
+          status(res)                              mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_COMPLIANCE_CHECK_FAILED"
         }
       }
@@ -276,31 +275,29 @@ class ReinstateAccountControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(ReinstateLisaAccountNotFoundResponse))
 
         doReinstateRequest(reinstateAccountValidJson, lisaManager) { res =>
-          status(res) mustBe NOT_FOUND
+          status(res)                              mustBe NOT_FOUND
           (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNTID_NOT_FOUND"
         }
       }
     }
 
     "return with status 400 bad request" when {
-      "submitted an invalid lmrn" in {
+      "submitted an invalid lmrn" in
         doReinstateRequest(reinstateAccountValidJson, "Z12345") { res =>
           status(res) mustBe BAD_REQUEST
           val json = contentAsJson(res)
-          (json \ "code").as[String] mustBe ErrorBadRequestLmrn.errorCode
+          (json \ "code").as[String]    mustBe ErrorBadRequestLmrn.errorCode
           (json \ "message").as[String] mustBe ErrorBadRequestLmrn.message
         }
-      }
-      "submitted an invalid accountId" in {
+      "submitted an invalid accountId" in
         doReinstateRequest(reinstateAccountValidJson.replace(accountId, "1=2!"), lisaManager) { res =>
           status(res) mustBe BAD_REQUEST
           val json = contentAsJson(res)
-          (json \ "code").as[String] mustBe ErrorGenericBadRequest.errorCode
-          (json \ "message").as[String] mustBe ErrorGenericBadRequest.message
+          (json \ "code").as[String]                mustBe ErrorGenericBadRequest.errorCode
+          (json \ "message").as[String]             mustBe ErrorGenericBadRequest.message
           (json \ "errors" \ 0 \ "code").as[String] mustBe "INVALID_FORMAT"
           (json \ "errors" \ 0 \ "path").as[String] mustBe "/accountId"
         }
-      }
     }
 
     "return with status 500 internal server error" when {
@@ -319,7 +316,7 @@ class ReinstateAccountControllerSpec extends ControllerTestFixture {
         doReinstateRequest(reinstateAccountValidJson) { res =>
           reset(mockReinstateAccountService) // removes the thenThrow
 
-          status(res) mustBe INTERNAL_SERVER_ERROR
+          status(res)        mustBe INTERNAL_SERVER_ERROR
           contentAsJson(res) mustBe ErrorInternalServerError.asJson
         }
       }
@@ -331,7 +328,7 @@ class ReinstateAccountControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(ReinstateLisaAccountServiceUnavailableResponse))
 
         doReinstateRequest(reinstateAccountValidJson) { res =>
-          status(res) mustBe SERVICE_UNAVAILABLE
+          status(res)        mustBe SERVICE_UNAVAILABLE
           contentAsJson(res) mustBe ErrorServiceUnavailable.asJson
         }
       }
@@ -358,4 +355,5 @@ class ReinstateAccountControllerSpec extends ControllerTestFixture {
 
     callback(res)
   }
+
 }

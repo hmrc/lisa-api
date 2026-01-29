@@ -21,6 +21,7 @@ trait ReportWithdrawalChargeResponse
 trait ReportWithdrawalChargeSuccessResponse extends ReportWithdrawalChargeResponse {
   val transactionId: String
 }
+
 case class ReportWithdrawalChargeLateResponse(transactionId: String) extends ReportWithdrawalChargeSuccessResponse
 case class ReportWithdrawalChargeOnTimeResponse(transactionId: String) extends ReportWithdrawalChargeSuccessResponse
 case class ReportWithdrawalChargeSupersededResponse(transactionId: String) extends ReportWithdrawalChargeSuccessResponse

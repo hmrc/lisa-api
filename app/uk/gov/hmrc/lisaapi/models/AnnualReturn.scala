@@ -42,12 +42,13 @@ case class AnnualReturn(
 ) extends ReportLifeEventRequestBase
 
 object AnnualReturnSupersede {
-  implicit val dateReads: Reads[LocalDate] = JsonReads.notFutureDate
-  implicit val lifeEventReads: Reads[LifeEventId] = JsonReads.lifeEventId
+  implicit val dateReads: Reads[LocalDate]             = JsonReads.notFutureDate
+  implicit val lifeEventReads: Reads[LifeEventId]      = JsonReads.lifeEventId
   implicit val formats: OFormat[AnnualReturnSupersede] = Json.format[AnnualReturnSupersede]
 }
 
 object AnnualReturn {
+
   implicit val reads: Reads[AnnualReturn] = (
     (JsPath \ "eventDate").read(JsonReads.notFutureDate) and
       (JsPath \ "lisaManagerName").read(JsonReads.lisaManagerName) and
@@ -95,6 +96,7 @@ object AnnualReturn {
       supersededLifeEventID
     )
   }
+
 }
 
 trait AnnualReturnValidator extends LisaConstants {
@@ -104,8 +106,8 @@ trait AnnualReturnValidator extends LisaConstants {
 
   def validate(req: AnnualReturn): Seq[ErrorValidation] =
     (
-      taxYearIsAfter2016 andThen
-        taxYearIsNotCurrent andThen
+      taxYearIsAfter2016     andThen
+        taxYearIsNotCurrent  andThen
         taxYearIsNotInFuture andThen
         onlyCashOrStocksHaveBeenSpecified
     ).apply(ValidationRequest(req)).errors
@@ -120,10 +122,10 @@ trait AnnualReturnValidator extends LisaConstants {
 
   private val taxYearIsNotCurrent: PartialFunction[ValidationRequest, ValidationRequest] = {
     case req: ValidationRequest =>
-      val now = currentDateService.now()
-      val currentYear = now.getYear
+      val now                 = currentDateService.now()
+      val currentYear         = now.getYear
       val currentTaxYearStart = LocalDate.of(currentYear, TAX_YEAR_START_MONTH, TAX_YEAR_START_DAY)
-      val currentTaxYear = if (now.isBefore(currentTaxYearStart)) currentYear else currentYear + 1
+      val currentTaxYear      = if (now.isBefore(currentTaxYearStart)) currentYear else currentYear + 1
 
       if (req.data.taxYear == currentTaxYear) {
         req.copy(errors =
@@ -142,57 +144,56 @@ trait AnnualReturnValidator extends LisaConstants {
     case req: ValidationRequest                                                        => req
   }
 
-  private val onlyCashOrStocksHaveBeenSpecified: ValidationRequest => ValidationRequest = (req: ValidationRequest) =>
-    {
-      val cashValue  = req.data.marketValueCash
-      val cashSubs   = req.data.annualSubsCash
-      val stockValue = req.data.marketValueStocksAndShares
-      val stockSubs  = req.data.annualSubsStocksAndShares
+  private val onlyCashOrStocksHaveBeenSpecified: ValidationRequest => ValidationRequest = (req: ValidationRequest) => {
+    val cashValue  = req.data.marketValueCash
+    val cashSubs   = req.data.annualSubsCash
+    val stockValue = req.data.marketValueStocksAndShares
+    val stockSubs  = req.data.annualSubsStocksAndShares
 
-      val cashHasBeenSpecified    = cashValue > 0 || cashSubs > 0
-      val stocksHaveBeenSpecified = stockValue > 0 || stockSubs > 0
+    val cashHasBeenSpecified    = cashValue > 0 || cashSubs > 0
+    val stocksHaveBeenSpecified = stockValue > 0 || stockSubs > 0
 
-      if (cashHasBeenSpecified && stocksHaveBeenSpecified) {
-        val newErrs      = new ListBuffer[ErrorValidation]()
-        val errorMessage = "You can only give cash or stocks and shares values"
+    if (cashHasBeenSpecified && stocksHaveBeenSpecified) {
+      val newErrs      = new ListBuffer[ErrorValidation]()
+      val errorMessage = "You can only give cash or stocks and shares values"
 
-        if (cashValue > 0) {
-          newErrs += ErrorValidation(
-            errorCode = MONETARY_ERROR,
-            message = errorMessage,
-            path = Some("/marketValueCash")
-          )
-        }
-
-        if (cashSubs > 0) {
-          newErrs += ErrorValidation(
-            errorCode = MONETARY_ERROR,
-            message = errorMessage,
-            path = Some("/annualSubsCash")
-          )
-        }
-
-        if (stockValue > 0) {
-          newErrs += ErrorValidation(
-            errorCode = MONETARY_ERROR,
-            message = errorMessage,
-            path = Some("/marketValueStocksAndShares")
-          )
-        }
-
-        if (stockSubs > 0) {
-          newErrs += ErrorValidation(
-            errorCode = MONETARY_ERROR,
-            message = errorMessage,
-            path = Some("/annualSubsStocksAndShares")
-          )
-        }
-
-        req.copy(errors = req.errors ++ newErrs)
-      } else {
-        req
+      if (cashValue > 0) {
+        newErrs += ErrorValidation(
+          errorCode = MONETARY_ERROR,
+          message = errorMessage,
+          path = Some("/marketValueCash")
+        )
       }
+
+      if (cashSubs > 0) {
+        newErrs += ErrorValidation(
+          errorCode = MONETARY_ERROR,
+          message = errorMessage,
+          path = Some("/annualSubsCash")
+        )
+      }
+
+      if (stockValue > 0) {
+        newErrs += ErrorValidation(
+          errorCode = MONETARY_ERROR,
+          message = errorMessage,
+          path = Some("/marketValueStocksAndShares")
+        )
+      }
+
+      if (stockSubs > 0) {
+        newErrs += ErrorValidation(
+          errorCode = MONETARY_ERROR,
+          message = errorMessage,
+          path = Some("/annualSubsStocksAndShares")
+        )
+      }
+
+      req.copy(errors = req.errors ++ newErrs)
+    } else {
+      req
     }
+  }
 
 }
 

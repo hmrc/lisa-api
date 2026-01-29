@@ -36,9 +36,9 @@ class BonusesSpec extends PlaySpec {
           case JsError(errors)       => fail()
           case JsSuccess(data, path) =>
             data.bonusDueForPeriod mustBe 1000.5f
-            data.totalBonusDueYTD mustBe 1000.5f
-            data.bonusPaidYTD mustBe Some(500.5f)
-            data.claimReason mustBe "Life Event"
+            data.totalBonusDueYTD  mustBe 1000.5f
+            data.bonusPaidYTD      mustBe Some(500.5f)
+            data.claimReason       mustBe "Life Event"
         }
       }
 
@@ -49,9 +49,9 @@ class BonusesSpec extends PlaySpec {
           case JsError(errors)       => fail()
           case JsSuccess(data, path) =>
             data.bonusDueForPeriod mustBe 1000.5f
-            data.totalBonusDueYTD mustBe 1000.5f
-            data.bonusPaidYTD mustBe None
-            data.claimReason mustBe "Life Event"
+            data.totalBonusDueYTD  mustBe 1000.5f
+            data.bonusPaidYTD      mustBe None
+            data.claimReason       mustBe "Life Event"
         }
       }
 

@@ -40,6 +40,7 @@ class WithdrawalChargeValidatorSpec extends BaseTestFixture with BeforeAndAfter 
 
   val validWithdrawalJson: String                        =
     Source.fromInputStream(getClass.getResourceAsStream("/json/request.valid.withdrawal-charge.json")).mkString
+
   val validWithdrawal: SupersededWithdrawalChargeRequest =
     Json.parse(validWithdrawalJson).as[SupersededWithdrawalChargeRequest]
 
@@ -355,11 +356,12 @@ class WithdrawalChargeValidatorSpec extends BaseTestFixture with BeforeAndAfter 
 
         val errors = withdrawalChargeValidator.validate(request)
 
-        errors.size mustBe 2
+        errors.size      mustBe 2
         errors.head.path mustBe Some("/claimPeriodStartDate")
-        errors(1).path mustBe Some("/claimPeriodEndDate")
+        errors(1).path   mustBe Some("/claimPeriodEndDate")
       }
     }
 
   }
+
 }

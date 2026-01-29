@@ -25,6 +25,7 @@ import java.time.LocalDate
 class CreateLisaInvestorRequestSpec extends PlaySpec {
 
   val validRequestJson           = """{"investorNINO":"AB123456A", "firstName":"A", "lastName":"B", "dateOfBirth":"2000-02-29"}"""
+
   val validRequestJsonWithSpaces =
     """{"investorNINO":"AB123456B", "firstName":"  A      ", "lastName":" C    ", "dateOfBirth":"2000-02-29"}"""
 
@@ -36,10 +37,10 @@ class CreateLisaInvestorRequestSpec extends PlaySpec {
       res match {
         case JsError(errors)       => fail()
         case JsSuccess(data, path) =>
-          data.investorNINO mustBe "AB123456A"
-          data.firstName mustBe "A"
-          data.lastName mustBe "B"
-          data.dateOfBirth.getYear mustBe 2000
+          data.investorNINO              mustBe "AB123456A"
+          data.firstName                 mustBe "A"
+          data.lastName                  mustBe "B"
+          data.dateOfBirth.getYear       mustBe 2000
           data.dateOfBirth.getMonthValue mustBe 2
           data.dateOfBirth.getDayOfMonth mustBe 29
       }
@@ -51,10 +52,10 @@ class CreateLisaInvestorRequestSpec extends PlaySpec {
       res match {
         case JsError(errors)       => fail()
         case JsSuccess(data, path) =>
-          data.investorNINO mustBe "AB123456B"
-          data.firstName mustBe "A"
-          data.lastName mustBe "C"
-          data.dateOfBirth.getYear mustBe 2000
+          data.investorNINO              mustBe "AB123456B"
+          data.firstName                 mustBe "A"
+          data.lastName                  mustBe "C"
+          data.dateOfBirth.getYear       mustBe 2000
           data.dateOfBirth.getMonthValue mustBe 2
           data.dateOfBirth.getDayOfMonth mustBe 29
       }
@@ -68,59 +69,51 @@ class CreateLisaInvestorRequestSpec extends PlaySpec {
       json mustBe Json.parse(validRequestJson)
     }
 
-    "catch an invalid NINO" in {
+    "catch an invalid NINO" in
       hasCorrectValidationError(validRequestJson.replace("AB123456A", "123"), "/investorNINO", "error.formatting.nino")
-    }
 
-    "catch an invalid firstName" in {
+    "catch an invalid firstName" in
       hasCorrectValidationError(validRequestJson.replace("A", ""), "/firstName", "error.formatting.name")
-    }
 
-    "catch an invalid lastName" in {
+    "catch an invalid lastName" in
       hasCorrectValidationError(validRequestJson.replace("B", ""), "/lastName", "error.formatting.name")
-    }
 
     "catch an invalid dateOfBirth" when {
 
-      "the data type is incorrect" in {
+      "the data type is incorrect" in
         hasCorrectValidationError(
           validRequestJson.replace("\"2000-02-29\"", "123456789"),
           "/dateOfBirth",
           "error.expected.jsstring"
         )
-      }
 
-      "the format is incorrect" in {
+      "the format is incorrect" in
         hasCorrectValidationError(
           validRequestJson.replace("2000-02-29", "01/01/2000"),
           "/dateOfBirth",
           "error.formatting.date"
         )
-      }
 
-      "day and month are in the wrong order" in {
+      "day and month are in the wrong order" in
         hasCorrectValidationError(
           validRequestJson.replace("2000-02-29", "2000-31-01"),
           "/dateOfBirth",
           "error.formatting.date"
         )
-      }
 
-      "an invalid date is supplied" in {
+      "an invalid date is supplied" in
         hasCorrectValidationError(
           validRequestJson.replace("2000-02-29", "2000-09-31"),
           "/dateOfBirth",
           "error.formatting.date"
         )
-      }
 
-      "feb 29th is supplied for a non-leap year" in {
+      "feb 29th is supplied for a non-leap year" in
         hasCorrectValidationError(
           validRequestJson.replace("2000-02-29", "2017-02-29"),
           "/dateOfBirth",
           "error.formatting.date"
         )
-      }
 
       "the date is in the future" in {
         val futureDate = LocalDate.now().plusDays(1).toString

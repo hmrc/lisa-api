@@ -27,21 +27,21 @@ import uk.gov.hmrc.lisaapi.services.{AuditService, LifeEventService}
 
 import scala.concurrent.ExecutionContext
 
-class GetLifeEventController @Inject()(
-                                        authConnector: AuthConnector,
-                                        appContext: AppContext,
-                                        lisaMetrics: LisaMetrics,
-                                        val service: LifeEventService,
-                                        auditService: AuditService,
-                                        cc: ControllerComponents,
-                                        parse: PlayBodyParsers
-                                      )(implicit ec: ExecutionContext)
-  extends LisaController(
-    cc: ControllerComponents,
-    lisaMetrics: LisaMetrics,
-    appContext: AppContext,
-    authConnector: AuthConnector
-  ) {
+class GetLifeEventController @Inject() (
+  authConnector: AuthConnector,
+  appContext: AppContext,
+  lisaMetrics: LisaMetrics,
+  val service: LifeEventService,
+  auditService: AuditService,
+  cc: ControllerComponents,
+  parse: PlayBodyParsers
+)(implicit ec: ExecutionContext)
+    extends LisaController(
+      cc: ControllerComponents,
+      lisaMetrics: LisaMetrics,
+      appContext: AppContext,
+      authConnector: AuthConnector
+    ) {
 
   override val validateVersion: String => Boolean = _ == "2.0"
 
@@ -54,15 +54,19 @@ class GetLifeEventController @Inject()(
         withValidAccountId(accountId) { () =>
           withEnrolment(lisaManager) { () =>
             service.getLifeEvent(lisaManager, accountId, lifeEventId) map {
-              case Left(error) =>
+              case Left(error)    =>
                 auditGetLifeEvent(lisaManager, accountId, lifeEventId, Some(error.errorCode))
                 lisaMetrics.incrementMetrics(startTime, error.httpStatusCode, LisaMetricKeys.EVENT)
-                logger.error(s"""[GetLifeEventController][getLifeEvent]  accountId : $accountId, lisaManager : $lisaManager error :${error.asResult}""")
+                logger.error(
+                  s"""[GetLifeEventController][getLifeEvent]  accountId : $accountId, lisaManager : $lisaManager error :${error.asResult}"""
+                )
                 error.asResult
               case Right(success) =>
                 auditGetLifeEvent(lisaManager, accountId, lifeEventId)
                 lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.EVENT)
-                logger.info(s"""[GetLifeEventController][getLifeEvent] came to success response accountId : $accountId, lisaManager : $lisaManager""")
+                logger.info(
+                  s"""[GetLifeEventController][getLifeEvent] came to success response accountId : $accountId, lisaManager : $lisaManager"""
+                )
                 Ok(Json.toJson(success))
             }
           }
@@ -71,15 +75,15 @@ class GetLifeEventController @Inject()(
     }
 
   private def auditGetLifeEvent(
-                                 lisaManager: String,
-                                 accountId: String,
-                                 lifeEventId: String,
-                                 failureReason: Option[String] = None
-                               )(implicit hc: HeaderCarrier) = {
-    val path = getLifeEventEndpointUrl(lisaManager, accountId, lifeEventId)
+    lisaManager: String,
+    accountId: String,
+    lifeEventId: String,
+    failureReason: Option[String] = None
+  )(implicit hc: HeaderCarrier) = {
+    val path      = getLifeEventEndpointUrl(lisaManager, accountId, lifeEventId)
     val auditData = Map(
-      ZREF -> lisaManager,
-      "accountId" -> accountId,
+      ZREF          -> lisaManager,
+      "accountId"   -> accountId,
       "lifeEventId" -> lifeEventId
     )
 
@@ -97,10 +101,10 @@ class GetLifeEventController @Inject()(
   }
 
   private def getLifeEventEndpointUrl(
-                                       lisaManagerReferenceNumber: String,
-                                       accountId: String,
-                                       lifeEventId: String
-                                     ): String =
+    lisaManagerReferenceNumber: String,
+    accountId: String,
+    lifeEventId: String
+  ): String =
     s"/manager/$lisaManagerReferenceNumber/accounts/$accountId/events/$lifeEventId"
 
 }

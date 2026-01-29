@@ -18,7 +18,9 @@ package uk.gov.hmrc.lisaapi.models
 
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json._
-import uk.gov.hmrc.lisaapi.models.{AccountTransfer, CreateLisaAccountCreationRequest, CreateLisaAccountRequest, CreateLisaAccountTransferRequest}
+import uk.gov.hmrc.lisaapi.models.{
+  AccountTransfer, CreateLisaAccountCreationRequest, CreateLisaAccountRequest, CreateLisaAccountTransferRequest
+}
 
 import java.time.LocalDate
 
@@ -57,13 +59,13 @@ class CreateLisaAccountRequestSpec extends PlaySpec {
         case JsSuccess(data, path) =>
           data match {
             case req: CreateLisaAccountTransferRequest =>
-              req.creationReason mustBe "Transferred"
-              req.investorId mustBe "9876543210"
-              req.accountId mustBe "8765432100"
-              req.firstSubscriptionDate.getYear mustBe 2011
+              req.creationReason                      mustBe "Transferred"
+              req.investorId                          mustBe "9876543210"
+              req.accountId                           mustBe "8765432100"
+              req.firstSubscriptionDate.getYear       mustBe 2011
               req.firstSubscriptionDate.getMonthValue mustBe 3
               req.firstSubscriptionDate.getDayOfMonth mustBe 23
-              req.transferAccount mustBe AccountTransfer("Z543210", "Z543333", LocalDate.parse("2015-12-13"))
+              req.transferAccount                     mustBe AccountTransfer("Z543210", "Z543333", LocalDate.parse("2015-12-13"))
             case _                                     => fail()
           }
       }
@@ -79,13 +81,13 @@ class CreateLisaAccountRequestSpec extends PlaySpec {
         case JsSuccess(data, path) =>
           data match {
             case req: CreateLisaAccountTransferRequest =>
-              req.creationReason mustBe "Current year funds transferred"
-              req.investorId mustBe "9876543210"
-              req.accountId mustBe "8765432100"
-              req.firstSubscriptionDate.getYear mustBe 2011
+              req.creationReason                      mustBe "Current year funds transferred"
+              req.investorId                          mustBe "9876543210"
+              req.accountId                           mustBe "8765432100"
+              req.firstSubscriptionDate.getYear       mustBe 2011
               req.firstSubscriptionDate.getMonthValue mustBe 3
               req.firstSubscriptionDate.getDayOfMonth mustBe 23
-              req.transferAccount mustBe AccountTransfer("Z543210", "Z543333", LocalDate.parse("2015-12-13"))
+              req.transferAccount                     mustBe AccountTransfer("Z543210", "Z543333", LocalDate.parse("2015-12-13"))
             case _                                     => fail()
           }
       }
@@ -101,13 +103,13 @@ class CreateLisaAccountRequestSpec extends PlaySpec {
         case JsSuccess(data, path) =>
           data match {
             case req: CreateLisaAccountTransferRequest =>
-              req.creationReason mustBe "Previous year funds transferred"
-              req.investorId mustBe "9876543210"
-              req.accountId mustBe "8765432100"
-              req.firstSubscriptionDate.getYear mustBe 2011
+              req.creationReason                      mustBe "Previous year funds transferred"
+              req.investorId                          mustBe "9876543210"
+              req.accountId                           mustBe "8765432100"
+              req.firstSubscriptionDate.getYear       mustBe 2011
               req.firstSubscriptionDate.getMonthValue mustBe 3
               req.firstSubscriptionDate.getDayOfMonth mustBe 23
-              req.transferAccount mustBe AccountTransfer("Z543210", "Z543333", LocalDate.parse("2015-12-13"))
+              req.transferAccount                     mustBe AccountTransfer("Z543210", "Z543333", LocalDate.parse("2015-12-13"))
             case _                                     => fail()
           }
       }
@@ -121,9 +123,9 @@ class CreateLisaAccountRequestSpec extends PlaySpec {
         case JsSuccess(data, path) =>
           data match {
             case req: CreateLisaAccountCreationRequest =>
-              req.investorId mustBe "9876543210"
-              req.accountId mustBe "8765432100"
-              req.firstSubscriptionDate.getYear mustBe 2011
+              req.investorId                          mustBe "9876543210"
+              req.accountId                           mustBe "8765432100"
+              req.firstSubscriptionDate.getYear       mustBe 2011
               req.firstSubscriptionDate.getMonthValue mustBe 3
               req.firstSubscriptionDate.getDayOfMonth mustBe 23
             case _                                     => fail()

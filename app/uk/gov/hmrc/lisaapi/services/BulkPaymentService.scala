@@ -28,7 +28,9 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class BulkPaymentService @Inject() (desConnector: DesConnector)(implicit ec: ExecutionContext) extends Logging {
 
-  def getBulkPayment(lisaManager: String, startDate: LocalDate, endDate: LocalDate)(implicit hc: HeaderCarrier): Future[GetBulkPaymentResponse] =
+  def getBulkPayment(lisaManager: String, startDate: LocalDate, endDate: LocalDate)(implicit
+    hc: HeaderCarrier
+  ): Future[GetBulkPaymentResponse] =
     desConnector.getBulkPayment(lisaManager, startDate, endDate) map {
       case GetBulkPaymentNotFoundResponse                         => GetBulkPaymentNotFoundResponse
       case s: GetBulkPaymentSuccessResponse if s.payments.isEmpty => GetBulkPaymentNotFoundResponse
@@ -37,10 +39,14 @@ class BulkPaymentService @Inject() (desConnector: DesConnector)(implicit ec: Exe
       case f: DesFailureResponse                                  =>
         f.code match {
           case "NOT_FOUND" | "INVALID_CALCULATEACCRUEDINTEREST" | "INVALID_CUSTOMERPAYMENTINFORMATION" =>
-            logger.warn(s"[BulkPaymentService][getBulkPayment] Get bulk payment returned error matched with ${f.code} for lisaManager : $lisaManager")
+            logger.warn(
+              s"[BulkPaymentService][getBulkPayment] Get bulk payment returned error matched with ${f.code} for lisaManager : $lisaManager"
+            )
             GetBulkPaymentNotFoundResponse
           case _                                                                                       =>
-            logger.error(s"[BulkPaymentService][getBulkPayment]Get bulk payment returned error: ${f.code} for lisaManager : $lisaManager")
+            logger.error(
+              s"[BulkPaymentService][getBulkPayment]Get bulk payment returned error: ${f.code} for lisaManager : $lisaManager"
+            )
             GetBulkPaymentErrorResponse
         }
     }

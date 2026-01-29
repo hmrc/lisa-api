@@ -120,13 +120,13 @@ class GetLifeEventItemSpec extends PlaySpec {
       val eventOfType: String => GetLifeEventItem =
         (eventType: String) => (validInputJson ++ Json.obj(fields = "lifeEventType" -> eventType)).as[GetLifeEventItem]
 
-      eventOfType("TERMINAL_ILLNESS").eventType mustBe "LISA Investor Terminal Ill Health"
-      eventOfType("DEATH").eventType mustBe "LISA Investor Death"
+      eventOfType("TERMINAL_ILLNESS").eventType       mustBe "LISA Investor Terminal Ill Health"
+      eventOfType("DEATH").eventType                  mustBe "LISA Investor Death"
       eventOfType("PURCHASE_FUNDS_RELEASE").eventType mustBe "Funds release"
-      eventOfType("EXTENSION_ONE").eventType mustBe "Extension one"
-      eventOfType("EXTENSION_TWO").eventType mustBe "Extension two"
-      eventOfType("PURCHASE_RESULT").eventType mustBe "Purchase outcome"
-      eventOfType("STATUTORY_SUBMISSION").eventType mustBe "Statutory Submission"
+      eventOfType("EXTENSION_ONE").eventType          mustBe "Extension one"
+      eventOfType("EXTENSION_TWO").eventType          mustBe "Extension two"
+      eventOfType("PURCHASE_RESULT").eventType        mustBe "Purchase outcome"
+      eventOfType("STATUTORY_SUBMISSION").eventType   mustBe "Statutory Submission"
     }
 
     "map purchase results correctly" in {
@@ -136,7 +136,7 @@ class GetLifeEventItemSpec extends PlaySpec {
         )).as[GetLifeEventItem]
 
       eventOfResult("PURCHASE_COMPLETE").propertyPurchaseResult mustBe Some("Purchase completed")
-      eventOfResult("PURCHASE_FAILED").propertyPurchaseResult mustBe Some("Purchase failed")
+      eventOfResult("PURCHASE_FAILED").propertyPurchaseResult   mustBe Some("Purchase failed")
     }
 
     "serialize with the minimum fields required" in {

@@ -27,7 +27,8 @@ class LisaMetrics @Inject() (metrics: Metrics) {
 
   private val registry: MetricRegistry = metrics.defaultRegistry
 
-  def timer(diff: Long, unit: TimeUnit, metricType: String): Unit = registry.timer(s"$metricType").update(diff, unit)
+  def timer(diff: Long, unit: TimeUnit, metricType: String): Unit       = registry.timer(s"$metricType").update(diff, unit)
+
   def incrementMetrics(startTime: Long, status: Int, api: String): Unit = {
     val diff = System.currentTimeMillis() - startTime
     val unit = TimeUnit.MILLISECONDS
@@ -69,4 +70,5 @@ trait LisaMetricKeys {
   def getMetricKey(url: String): String = keys.getOrElse(Try(url.split("/").last).getOrElse("discover"), "UNKNOWN")
 
 }
+
 object LisaMetricKeys extends LisaMetricKeys

@@ -222,18 +222,18 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
         when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
           .thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
         doFundReleaseRequest(fundReleaseJson) { res =>
-          status(res) mustBe CREATED
+          status(res)                                              mustBe CREATED
           (contentAsJson(res) \ "data" \ "lifeEventId").as[String] mustBe "1928374"
-          (contentAsJson(res) \ "data" \ "message").as[String] mustBe "Fund release created"
+          (contentAsJson(res) \ "data" \ "message").as[String]     mustBe "Fund release created"
         }
       }
       "a superseded fund release is successful" in {
         when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
           .thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
         doFundReleaseRequest(supersededFundReleaseJson) { res =>
-          status(res) mustBe CREATED
+          status(res)                                              mustBe CREATED
           (contentAsJson(res) \ "data" \ "lifeEventId").as[String] mustBe "1928374"
-          (contentAsJson(res) \ "data" \ "message").as[String] mustBe "Fund release superseded"
+          (contentAsJson(res) \ "data" \ "message").as[String]     mustBe "Fund release superseded"
         }
       }
     }
@@ -242,7 +242,7 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
       when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
         .thenReturn(Future.successful(ReportLifeEventInvalidPayload))
       doFundReleaseRequest(fundReleaseJson) { res =>
-        status(res) mustBe BAD_REQUEST
+        status(res)                              mustBe BAD_REQUEST
         (contentAsJson(res) \ "code").as[String] mustBe "INVALID_PAYLOAD"
       }
     }
@@ -253,30 +253,28 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
         val invalidJson = fundReleaseJson.replace("2017-05-10", LocalDate.now.plusDays(1).toString)
 
         doFundReleaseRequest(invalidJson) { res =>
-          status(res) mustBe BAD_REQUEST
+          status(res)                              mustBe BAD_REQUEST
           (contentAsJson(res) \ "code").as[String] mustBe "BAD_REQUEST"
         }
       }
-      "given an invalid lmrn in the url" in {
+      "given an invalid lmrn in the url" in
         doFundReleaseRequest(fundReleaseJson, "Z111") { res =>
           status(res) mustBe BAD_REQUEST
 
           val json = contentAsJson(res)
 
-          (json \ "code").as[String] mustBe ErrorBadRequestLmrn.errorCode
+          (json \ "code").as[String]    mustBe ErrorBadRequestLmrn.errorCode
           (json \ "message").as[String] mustBe ErrorBadRequestLmrn.message
         }
-      }
-      "given an invalid accountId in the url" in {
+      "given an invalid accountId in the url" in
         doFundReleaseRequest(fundReleaseJson, accId = "1=2!") { res =>
           status(res) mustBe BAD_REQUEST
 
           val json = contentAsJson(res)
 
-          (json \ "code").as[String] mustBe ErrorBadRequestAccountId.errorCode
+          (json \ "code").as[String]    mustBe ErrorBadRequestAccountId.errorCode
           (json \ "message").as[String] mustBe ErrorBadRequestAccountId.message
         }
-      }
     }
 
     "return with 403 forbidden and a code of FORBIDDEN" when {
@@ -287,10 +285,10 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
         doFundReleaseRequest(fundReleaseJson.replace("2017-05-10", "2017-04-05")) { res =>
           status(res) mustBe FORBIDDEN
           val json = contentAsJson(res)
-          (json \ "code").as[String] mustBe "FORBIDDEN"
-          (json \ "errors" \ 0 \ "code").as[String] mustBe "INVALID_DATE"
+          (json \ "code").as[String]                   mustBe "FORBIDDEN"
+          (json \ "errors" \ 0 \ "code").as[String]    mustBe "INVALID_DATE"
           (json \ "errors" \ 0 \ "message").as[String] mustBe "The eventDate cannot be before 6 April 2017"
-          (json \ "errors" \ 0 \ "path").as[String] mustBe "/eventDate"
+          (json \ "errors" \ 0 \ "path").as[String]    mustBe "/eventDate"
         }
       }
     }
@@ -299,8 +297,8 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
       when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
         .thenReturn(Future.successful(ReportLifeEventAccountClosedResponse))
       doFundReleaseRequest(fundReleaseJson) { res =>
-        status(res) mustBe FORBIDDEN
-        (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CLOSED"
+        status(res)                                 mustBe FORBIDDEN
+        (contentAsJson(res) \ "code").as[String]    mustBe "INVESTOR_ACCOUNT_ALREADY_CLOSED"
         (contentAsJson(res) \ "message").as[String] mustBe "The LISA account is already closed"
       }
     }
@@ -309,8 +307,8 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
       when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
         .thenReturn(Future.successful(ReportLifeEventAccountCancelledResponse))
       doFundReleaseRequest(fundReleaseJson) { res =>
-        status(res) mustBe FORBIDDEN
-        (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CANCELLED"
+        status(res)                                 mustBe FORBIDDEN
+        (contentAsJson(res) \ "code").as[String]    mustBe "INVESTOR_ACCOUNT_ALREADY_CANCELLED"
         (contentAsJson(res) \ "message").as[String] mustBe "The LISA account is already cancelled"
       }
     }
@@ -319,8 +317,8 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
       when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
         .thenReturn(Future.successful(ReportLifeEventAccountVoidResponse))
       doFundReleaseRequest(fundReleaseJson) { res =>
-        status(res) mustBe FORBIDDEN
-        (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_VOID"
+        status(res)                                 mustBe FORBIDDEN
+        (contentAsJson(res) \ "code").as[String]    mustBe "INVESTOR_ACCOUNT_ALREADY_VOID"
         (contentAsJson(res) \ "message").as[String] mustBe "The LISA account is already void"
       }
     }
@@ -329,11 +327,11 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
       when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
         .thenReturn(Future.successful(ReportLifeEventMismatchResponse))
       doFundReleaseRequest(fundReleaseJson) { res =>
-        status(res) mustBe FORBIDDEN
+        status(res)                              mustBe FORBIDDEN
         (contentAsJson(res) \ "code").as[String] mustBe "SUPERSEDED_LIFE_EVENT_MISMATCH_ERROR"
         (contentAsJson(res) \ "message").as[
           String
-        ] mustBe "originalLifeEventId and the originalEventDate do not match the information in the original request"
+        ]                                        mustBe "originalLifeEventId and the originalEventDate do not match the information in the original request"
       }
     }
 
@@ -341,8 +339,8 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
       when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
         .thenReturn(Future.successful(ReportLifeEventAccountNotOpenLongEnoughResponse))
       doFundReleaseRequest(fundReleaseJson) { res =>
-        status(res) mustBe FORBIDDEN
-        (contentAsJson(res) \ "code").as[String] mustBe "COMPLIANCE_ERROR_ACCOUNT_NOT_OPEN_LONG_ENOUGH"
+        status(res)                                 mustBe FORBIDDEN
+        (contentAsJson(res) \ "code").as[String]    mustBe "COMPLIANCE_ERROR_ACCOUNT_NOT_OPEN_LONG_ENOUGH"
         (contentAsJson(res) \ "message").as[String] mustBe "The account has not been open for long enough"
       }
     }
@@ -351,8 +349,8 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
       when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
         .thenReturn(Future.successful(ReportLifeEventOtherPurchaseOnRecordResponse))
       doFundReleaseRequest(fundReleaseJson) { res =>
-        status(res) mustBe FORBIDDEN
-        (contentAsJson(res) \ "code").as[String] mustBe "COMPLIANCE_ERROR_OTHER_PURCHASE_ON_RECORD"
+        status(res)                                 mustBe FORBIDDEN
+        (contentAsJson(res) \ "code").as[String]    mustBe "COMPLIANCE_ERROR_OTHER_PURCHASE_ON_RECORD"
         (contentAsJson(res) \ "message").as[String] mustBe "Another property purchase is already recorded"
       }
     }
@@ -366,11 +364,11 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
       )
 
       doFundReleaseRequest(json.toString()) { res =>
-        status(res) mustBe FORBIDDEN
+        status(res)                              mustBe FORBIDDEN
         (contentAsJson(res) \ "code").as[String] mustBe "INVALID_DATA_PROVIDED"
         (contentAsJson(res) \ "message").as[
           String
-        ] mustBe "You can only change eventDate or withdrawalAmount when superseding a property purchase fund release"
+        ]                                        mustBe "You can only change eventDate or withdrawalAmount when superseding a property purchase fund release"
       }
     }
 
@@ -378,30 +376,29 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
       when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
         .thenReturn(Future.successful(ReportLifeEventAccountNotFoundResponse))
       doFundReleaseRequest(fundReleaseJson) { res =>
-        status(res) mustBe NOT_FOUND
-        (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNTID_NOT_FOUND"
+        status(res)                                 mustBe NOT_FOUND
+        (contentAsJson(res) \ "code").as[String]    mustBe "INVESTOR_ACCOUNTID_NOT_FOUND"
         (contentAsJson(res) \ "message").as[String] mustBe "Enter a real accountId"
       }
     }
 
     "return with 406 not acceptable and a code of ACCEPT_HEADER_INVALID" when {
-      "attempting to use the v1 of the api" in {
+      "attempting to use the v1 of the api" in
         doFundReleaseRequest(fundReleaseJson, header = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")) { res =>
-          status(res) mustBe NOT_ACCEPTABLE
+          status(res)                              mustBe NOT_ACCEPTABLE
           (contentAsJson(res) \ "code").as[String] mustBe "ACCEPT_HEADER_INVALID"
           (contentAsJson(res) \ "message")
-            .as[String] mustBe "The accept header has an invalid version for this endpoint"
+            .as[String]                            mustBe "The accept header has an invalid version for this endpoint"
         }
-      }
     }
 
     "return with 409 conflict and a code of LIFE_EVENT_ALREADY_EXISTS" in {
       when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
         .thenReturn(Future.successful(ReportLifeEventAlreadyExistsResponse("123")))
       doFundReleaseRequest(fundReleaseJson) { res =>
-        status(res) mustBe CONFLICT
-        (contentAsJson(res) \ "code").as[String] mustBe "LIFE_EVENT_ALREADY_EXISTS"
-        (contentAsJson(res) \ "message").as[String] mustBe "The investor’s life event has already been reported"
+        status(res)                                     mustBe CONFLICT
+        (contentAsJson(res) \ "code").as[String]        mustBe "LIFE_EVENT_ALREADY_EXISTS"
+        (contentAsJson(res) \ "message").as[String]     mustBe "The investor’s life event has already been reported"
         (contentAsJson(res) \ "lifeEventId").as[String] mustBe "123"
       }
     }
@@ -410,9 +407,9 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
       when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
         .thenReturn(Future.successful(ReportLifeEventAlreadySupersededResponse("123")))
       doFundReleaseRequest(fundReleaseJson) { res =>
-        status(res) mustBe CONFLICT
-        (contentAsJson(res) \ "code").as[String] mustBe "SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED"
-        (contentAsJson(res) \ "message").as[String] mustBe "This life event has already been superseded"
+        status(res)                                     mustBe CONFLICT
+        (contentAsJson(res) \ "code").as[String]        mustBe "SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED"
+        (contentAsJson(res) \ "message").as[String]     mustBe "This life event has already been superseded"
         (contentAsJson(res) \ "lifeEventId").as[String] mustBe "123"
       }
     }
@@ -421,8 +418,8 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
       when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
         .thenReturn(Future.successful(ReportLifeEventErrorResponse))
       doFundReleaseRequest(fundReleaseJson) { res =>
-        status(res) mustBe INTERNAL_SERVER_ERROR
-        (contentAsJson(res) \ "code").as[String] mustBe "INTERNAL_SERVER_ERROR"
+        status(res)                                 mustBe INTERNAL_SERVER_ERROR
+        (contentAsJson(res) \ "code").as[String]    mustBe "INTERNAL_SERVER_ERROR"
         (contentAsJson(res) \ "message").as[String] mustBe "Internal server error"
       }
     }
@@ -432,8 +429,8 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
         .thenReturn(Future.successful(ReportLifeEventServiceUnavailableResponse))
 
       doFundReleaseRequest(fundReleaseJson) { res =>
-        status(res) mustBe SERVICE_UNAVAILABLE
-        (contentAsJson(res) \ "code").as[String] mustBe "SERVER_ERROR"
+        status(res)                                 mustBe SERVICE_UNAVAILABLE
+        (contentAsJson(res) \ "code").as[String]    mustBe "SERVER_ERROR"
         (contentAsJson(res) \ "message").as[String] mustBe "Service unavailable"
       }
     }
@@ -538,18 +535,18 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
         when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
           .thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
         doExtensionRequest(extensionJson) { res =>
-          status(res) mustBe CREATED
+          status(res)                                              mustBe CREATED
           (contentAsJson(res) \ "data" \ "lifeEventId").as[String] mustBe "1928374"
-          (contentAsJson(res) \ "data" \ "message").as[String] mustBe "Extension created"
+          (contentAsJson(res) \ "data" \ "message").as[String]     mustBe "Extension created"
         }
       }
       "a superseded extension is successful" in {
         when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
           .thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
         doExtensionRequest(supersededExtensionJson) { res =>
-          status(res) mustBe CREATED
+          status(res)                                              mustBe CREATED
           (contentAsJson(res) \ "data" \ "lifeEventId").as[String] mustBe "1928374"
-          (contentAsJson(res) \ "data" \ "message").as[String] mustBe "Extension superseded"
+          (contentAsJson(res) \ "data" \ "message").as[String]     mustBe "Extension superseded"
         }
       }
     }
@@ -563,31 +560,29 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
 
           val json = contentAsJson(res)
 
-          (json \ "code").as[String] mustBe "BAD_REQUEST"
+          (json \ "code").as[String]                mustBe "BAD_REQUEST"
           (json \ "errors" \ 0 \ "code").as[String] mustBe "INVALID_DATE"
           (json \ "errors" \ 0 \ "path").as[String] mustBe "/eventDate"
         }
       }
-      "given an invalid lmrn in the url" in {
+      "given an invalid lmrn in the url" in
         doExtensionRequest(extensionJson, "Z111") { res =>
           status(res) mustBe BAD_REQUEST
 
           val json = contentAsJson(res)
 
-          (json \ "code").as[String] mustBe ErrorBadRequestLmrn.errorCode
+          (json \ "code").as[String]    mustBe ErrorBadRequestLmrn.errorCode
           (json \ "message").as[String] mustBe ErrorBadRequestLmrn.message
         }
-      }
-      "given an invalid accountId in the url" in {
+      "given an invalid accountId in the url" in
         doExtensionRequest(extensionJson, accId = "1=2!") { res =>
           status(res) mustBe BAD_REQUEST
 
           val json = contentAsJson(res)
 
-          (json \ "code").as[String] mustBe ErrorBadRequestAccountId.errorCode
+          (json \ "code").as[String]    mustBe ErrorBadRequestAccountId.errorCode
           (json \ "message").as[String] mustBe ErrorBadRequestAccountId.message
         }
-      }
     }
 
     "return with 403 forbidden and a code of FORBIDDEN" when {
@@ -598,10 +593,10 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
         doExtensionRequest(extensionJson.replace("2017-05-10", "2017-04-05")) { res =>
           status(res) mustBe FORBIDDEN
           val json = contentAsJson(res)
-          (json \ "code").as[String] mustBe "FORBIDDEN"
-          (json \ "errors" \ 0 \ "code").as[String] mustBe "INVALID_DATE"
+          (json \ "code").as[String]                   mustBe "FORBIDDEN"
+          (json \ "errors" \ 0 \ "code").as[String]    mustBe "INVALID_DATE"
           (json \ "errors" \ 0 \ "message").as[String] mustBe "The eventDate cannot be before 6 April 2017"
-          (json \ "errors" \ 0 \ "path").as[String] mustBe "/eventDate"
+          (json \ "errors" \ 0 \ "path").as[String]    mustBe "/eventDate"
         }
       }
     }
@@ -610,8 +605,8 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
       when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
         .thenReturn(Future.successful(ReportLifeEventAccountClosedResponse))
       doExtensionRequest(extensionJson) { res =>
-        status(res) mustBe FORBIDDEN
-        (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CLOSED"
+        status(res)                                 mustBe FORBIDDEN
+        (contentAsJson(res) \ "code").as[String]    mustBe "INVESTOR_ACCOUNT_ALREADY_CLOSED"
         (contentAsJson(res) \ "message").as[String] mustBe "The LISA account is already closed"
       }
     }
@@ -620,8 +615,8 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
       when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
         .thenReturn(Future.successful(ReportLifeEventAccountVoidResponse))
       doExtensionRequest(extensionJson) { res =>
-        status(res) mustBe FORBIDDEN
-        (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_VOID"
+        status(res)                                 mustBe FORBIDDEN
+        (contentAsJson(res) \ "code").as[String]    mustBe "INVESTOR_ACCOUNT_ALREADY_VOID"
         (contentAsJson(res) \ "message").as[String] mustBe "The LISA account is already void"
       }
     }
@@ -630,8 +625,8 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
       when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
         .thenReturn(Future.successful(ReportLifeEventAccountCancelledResponse))
       doExtensionRequest(extensionJson) { res =>
-        status(res) mustBe FORBIDDEN
-        (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CANCELLED"
+        status(res)                                 mustBe FORBIDDEN
+        (contentAsJson(res) \ "code").as[String]    mustBe "INVESTOR_ACCOUNT_ALREADY_CANCELLED"
         (contentAsJson(res) \ "message").as[String] mustBe "The LISA account is already cancelled"
       }
     }
@@ -640,8 +635,8 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
       when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
         .thenReturn(Future.successful(ReportLifeEventExtensionOneNotYetApprovedResponse))
       doExtensionRequest(extensionJson) { res =>
-        status(res) mustBe FORBIDDEN
-        (contentAsJson(res) \ "code").as[String] mustBe "FIRST_EXTENSION_NOT_APPROVED"
+        status(res)                                 mustBe FORBIDDEN
+        (contentAsJson(res) \ "code").as[String]    mustBe "FIRST_EXTENSION_NOT_APPROVED"
         (contentAsJson(res) \ "message").as[String] mustBe "A first extension has not yet been approved"
       }
     }
@@ -650,9 +645,9 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
       when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
         .thenReturn(Future.successful(ReportLifeEventExtensionOneAlreadyApprovedResponse("123")))
       doExtensionRequest(extensionJson) { res =>
-        status(res) mustBe FORBIDDEN
-        (contentAsJson(res) \ "code").as[String] mustBe "FIRST_EXTENSION_ALREADY_APPROVED"
-        (contentAsJson(res) \ "message").as[String] mustBe "A first extension has already been approved"
+        status(res)                                     mustBe FORBIDDEN
+        (contentAsJson(res) \ "code").as[String]        mustBe "FIRST_EXTENSION_ALREADY_APPROVED"
+        (contentAsJson(res) \ "message").as[String]     mustBe "A first extension has already been approved"
         (contentAsJson(res) \ "lifeEventId").as[String] mustBe "123"
       }
     }
@@ -661,9 +656,9 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
       when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
         .thenReturn(Future.successful(ReportLifeEventExtensionTwoAlreadyApprovedResponse("321")))
       doExtensionRequest(extensionJson) { res =>
-        status(res) mustBe FORBIDDEN
-        (contentAsJson(res) \ "code").as[String] mustBe "SECOND_EXTENSION_ALREADY_APPROVED"
-        (contentAsJson(res) \ "message").as[String] mustBe "A second extension has already been approved"
+        status(res)                                     mustBe FORBIDDEN
+        (contentAsJson(res) \ "code").as[String]        mustBe "SECOND_EXTENSION_ALREADY_APPROVED"
+        (contentAsJson(res) \ "message").as[String]     mustBe "A second extension has already been approved"
         (contentAsJson(res) \ "lifeEventId").as[String] mustBe "321"
       }
     }
@@ -672,11 +667,11 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
       when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
         .thenReturn(Future.successful(ReportLifeEventMismatchResponse))
       doExtensionRequest(extensionJson) { res =>
-        status(res) mustBe FORBIDDEN
+        status(res)                              mustBe FORBIDDEN
         (contentAsJson(res) \ "code").as[String] mustBe "SUPERSEDED_LIFE_EVENT_MISMATCH_ERROR"
         (contentAsJson(res) \ "message").as[
           String
-        ] mustBe "originalLifeEventId and the originalEventDate do not match the information in the original request"
+        ]                                        mustBe "originalLifeEventId and the originalEventDate do not match the information in the original request"
       }
     }
 
@@ -684,8 +679,8 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
       when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
         .thenReturn(Future.successful(ReportLifeEventAccountNotFoundResponse))
       doExtensionRequest(extensionJson) { res =>
-        status(res) mustBe NOT_FOUND
-        (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNTID_NOT_FOUND"
+        status(res)                                 mustBe NOT_FOUND
+        (contentAsJson(res) \ "code").as[String]    mustBe "INVESTOR_ACCOUNTID_NOT_FOUND"
         (contentAsJson(res) \ "message").as[String] mustBe "Enter a real accountId"
       }
     }
@@ -694,30 +689,29 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
       when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
         .thenReturn(Future.successful(ReportLifeEventFundReleaseNotFoundResponse))
       doExtensionRequest(extensionJson) { res =>
-        status(res) mustBe NOT_FOUND
-        (contentAsJson(res) \ "code").as[String] mustBe "FUND_RELEASE_NOT_FOUND"
+        status(res)                                 mustBe NOT_FOUND
+        (contentAsJson(res) \ "code").as[String]    mustBe "FUND_RELEASE_NOT_FOUND"
         (contentAsJson(res) \ "message").as[String] mustBe "The fundReleaseId does not match HMRC’s records"
       }
     }
 
     "return with 406 not acceptable and a code of ACCEPT_HEADER_INVALID" when {
-      "attempting to use the v1 of the api" in {
+      "attempting to use the v1 of the api" in
         doExtensionRequest(extensionJson, header = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")) { res =>
-          status(res) mustBe NOT_ACCEPTABLE
+          status(res)                              mustBe NOT_ACCEPTABLE
           (contentAsJson(res) \ "code").as[String] mustBe "ACCEPT_HEADER_INVALID"
           (contentAsJson(res) \ "message")
-            .as[String] mustBe "The accept header has an invalid version for this endpoint"
+            .as[String]                            mustBe "The accept header has an invalid version for this endpoint"
         }
-      }
     }
 
     "return with 409 conflict and a code of LIFE_EVENT_ALREADY_EXISTS" in {
       when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
         .thenReturn(Future.successful(ReportLifeEventAlreadyExistsResponse("123")))
       doExtensionRequest(extensionJson) { res =>
-        status(res) mustBe CONFLICT
-        (contentAsJson(res) \ "code").as[String] mustBe "LIFE_EVENT_ALREADY_EXISTS"
-        (contentAsJson(res) \ "message").as[String] mustBe "The investor’s life event has already been reported"
+        status(res)                                     mustBe CONFLICT
+        (contentAsJson(res) \ "code").as[String]        mustBe "LIFE_EVENT_ALREADY_EXISTS"
+        (contentAsJson(res) \ "message").as[String]     mustBe "The investor’s life event has already been reported"
         (contentAsJson(res) \ "lifeEventId").as[String] mustBe "123"
       }
     }
@@ -726,9 +720,9 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
       when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
         .thenReturn(Future.successful(ReportLifeEventFundReleaseSupersededResponse("666")))
       doExtensionRequest(extensionJson) { res =>
-        status(res) mustBe CONFLICT
-        (contentAsJson(res) \ "code").as[String] mustBe "FUND_RELEASE_SUPERSEDED"
-        (contentAsJson(res) \ "message").as[String] mustBe "This fund release has already been superseded"
+        status(res)                                     mustBe CONFLICT
+        (contentAsJson(res) \ "code").as[String]        mustBe "FUND_RELEASE_SUPERSEDED"
+        (contentAsJson(res) \ "message").as[String]     mustBe "This fund release has already been superseded"
         (contentAsJson(res) \ "lifeEventId").as[String] mustBe "666"
       }
     }
@@ -737,9 +731,9 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
       when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
         .thenReturn(Future.successful(ReportLifeEventAlreadySupersededResponse("321")))
       doExtensionRequest(extensionJson) { res =>
-        status(res) mustBe CONFLICT
-        (contentAsJson(res) \ "code").as[String] mustBe "SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED"
-        (contentAsJson(res) \ "message").as[String] mustBe "This life event has already been superseded"
+        status(res)                                     mustBe CONFLICT
+        (contentAsJson(res) \ "code").as[String]        mustBe "SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED"
+        (contentAsJson(res) \ "message").as[String]     mustBe "This life event has already been superseded"
         (contentAsJson(res) \ "lifeEventId").as[String] mustBe "321"
       }
     }
@@ -748,8 +742,8 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
       when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
         .thenReturn(Future.successful(ReportLifeEventErrorResponse))
       doExtensionRequest(extensionJson) { res =>
-        status(res) mustBe INTERNAL_SERVER_ERROR
-        (contentAsJson(res) \ "code").as[String] mustBe "INTERNAL_SERVER_ERROR"
+        status(res)                                 mustBe INTERNAL_SERVER_ERROR
+        (contentAsJson(res) \ "code").as[String]    mustBe "INTERNAL_SERVER_ERROR"
         (contentAsJson(res) \ "message").as[String] mustBe "Internal server error"
       }
     }
@@ -759,8 +753,8 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
         .thenReturn(Future.successful(ReportLifeEventServiceUnavailableResponse))
 
       doExtensionRequest(extensionJson) { res =>
-        status(res) mustBe SERVICE_UNAVAILABLE
-        (contentAsJson(res) \ "code").as[String] mustBe "SERVER_ERROR"
+        status(res)                                 mustBe SERVICE_UNAVAILABLE
+        (contentAsJson(res) \ "code").as[String]    mustBe "SERVER_ERROR"
         (contentAsJson(res) \ "message").as[String] mustBe "Service unavailable"
       }
     }
@@ -869,18 +863,18 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
         when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
           .thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
         doOutcomeRequest(outcomeJson) { res =>
-          status(res) mustBe CREATED
+          status(res)                                              mustBe CREATED
           (contentAsJson(res) \ "data" \ "lifeEventId").as[String] mustBe "1928374"
-          (contentAsJson(res) \ "data" \ "message").as[String] mustBe "Purchase outcome created"
+          (contentAsJson(res) \ "data" \ "message").as[String]     mustBe "Purchase outcome created"
         }
       }
       "a superseded extension is successful" in {
         when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
           .thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
         doOutcomeRequest(supersededOutcomeJson) { res =>
-          status(res) mustBe CREATED
+          status(res)                                              mustBe CREATED
           (contentAsJson(res) \ "data" \ "lifeEventId").as[String] mustBe "1928374"
-          (contentAsJson(res) \ "data" \ "message").as[String] mustBe "Purchase outcome superseded"
+          (contentAsJson(res) \ "data" \ "message").as[String]     mustBe "Purchase outcome superseded"
         }
       }
     }
@@ -894,42 +888,40 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
 
           val json = contentAsJson(res)
 
-          (json \ "code").as[String] mustBe "BAD_REQUEST"
+          (json \ "code").as[String]                mustBe "BAD_REQUEST"
           (json \ "errors" \ 0 \ "code").as[String] mustBe "INVALID_DATE"
           (json \ "errors" \ 0 \ "path").as[String] mustBe "/eventDate"
         }
       }
-      "given an invalid lmrn in the url" in {
+      "given an invalid lmrn in the url" in
         doOutcomeRequest(outcomeJson, "Z111") { res =>
           status(res) mustBe BAD_REQUEST
 
           val json = contentAsJson(res)
 
-          (json \ "code").as[String] mustBe ErrorBadRequestLmrn.errorCode
+          (json \ "code").as[String]    mustBe ErrorBadRequestLmrn.errorCode
           (json \ "message").as[String] mustBe ErrorBadRequestLmrn.message
         }
-      }
-      "given an invalid accountId in the url" in {
+      "given an invalid accountId in the url" in
         doOutcomeRequest(outcomeJson, accId = "1=2!") { res =>
           status(res) mustBe BAD_REQUEST
 
           val json = contentAsJson(res)
 
-          (json \ "code").as[String] mustBe ErrorBadRequestAccountId.errorCode
+          (json \ "code").as[String]    mustBe ErrorBadRequestAccountId.errorCode
           (json \ "message").as[String] mustBe ErrorBadRequestAccountId.message
         }
-      }
     }
 
     "return with 403 forbidden and a code of SUPERSEDED_LIFE_EVENT_MISMATCH_ERROR" in {
       when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
         .thenReturn(Future.successful(ReportLifeEventMismatchResponse))
       doOutcomeRequest(outcomeJson) { res =>
-        status(res) mustBe FORBIDDEN
+        status(res)                              mustBe FORBIDDEN
         (contentAsJson(res) \ "code").as[String] mustBe "SUPERSEDED_LIFE_EVENT_MISMATCH_ERROR"
         (contentAsJson(res) \ "message").as[
           String
-        ] mustBe "originalLifeEventId and the originalEventDate do not match the information in the original request"
+        ]                                        mustBe "originalLifeEventId and the originalEventDate do not match the information in the original request"
       }
     }
 
@@ -937,29 +929,28 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
       when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
         .thenReturn(Future.successful(ReportLifeEventFundReleaseNotFoundResponse))
       doOutcomeRequest(outcomeJson) { res =>
-        status(res) mustBe NOT_FOUND
-        (contentAsJson(res) \ "code").as[String] mustBe "FUND_RELEASE_NOT_FOUND"
+        status(res)                                 mustBe NOT_FOUND
+        (contentAsJson(res) \ "code").as[String]    mustBe "FUND_RELEASE_NOT_FOUND"
         (contentAsJson(res) \ "message").as[String] mustBe "The fundReleaseId does not match HMRC’s records"
       }
     }
 
     "return with 406 not acceptable and a code of ACCEPT_HEADER_INVALID" when {
-      "attempting to use the v1 of the api" in {
+      "attempting to use the v1 of the api" in
         doOutcomeRequest(outcomeJson, header = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")) { res =>
-          status(res) mustBe NOT_ACCEPTABLE
+          status(res)                              mustBe NOT_ACCEPTABLE
           (contentAsJson(res) \ "code").as[String] mustBe "ACCEPT_HEADER_INVALID"
           (contentAsJson(res) \ "message")
-            .as[String] mustBe "The accept header has an invalid version for this endpoint"
+            .as[String]                            mustBe "The accept header has an invalid version for this endpoint"
         }
-      }
     }
 
     "return with 404 not found and a code of INVESTOR_ACCOUNTID_NOT_FOUND" in {
       when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
         .thenReturn(Future.successful(ReportLifeEventAccountNotFoundResponse))
       doOutcomeRequest(outcomeJson) { res =>
-        status(res) mustBe NOT_FOUND
-        (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNTID_NOT_FOUND"
+        status(res)                                 mustBe NOT_FOUND
+        (contentAsJson(res) \ "code").as[String]    mustBe "INVESTOR_ACCOUNTID_NOT_FOUND"
         (contentAsJson(res) \ "message").as[String] mustBe "Enter a real accountId"
       }
     }
@@ -968,9 +959,9 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
       when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
         .thenReturn(Future.successful(ReportLifeEventFundReleaseSupersededResponse("555")))
       doOutcomeRequest(outcomeJson) { res =>
-        status(res) mustBe CONFLICT
-        (contentAsJson(res) \ "code").as[String] mustBe "FUND_RELEASE_SUPERSEDED"
-        (contentAsJson(res) \ "message").as[String] mustBe "This fund release has already been superseded"
+        status(res)                                     mustBe CONFLICT
+        (contentAsJson(res) \ "code").as[String]        mustBe "FUND_RELEASE_SUPERSEDED"
+        (contentAsJson(res) \ "message").as[String]     mustBe "This fund release has already been superseded"
         (contentAsJson(res) \ "lifeEventId").as[String] mustBe "555"
       }
     }
@@ -979,9 +970,9 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
       when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
         .thenReturn(Future.successful(ReportLifeEventAlreadySupersededResponse("789")))
       doOutcomeRequest(outcomeJson) { res =>
-        status(res) mustBe CONFLICT
-        (contentAsJson(res) \ "code").as[String] mustBe "SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED"
-        (contentAsJson(res) \ "message").as[String] mustBe "This life event has already been superseded"
+        status(res)                                     mustBe CONFLICT
+        (contentAsJson(res) \ "code").as[String]        mustBe "SUPERSEDED_LIFE_EVENT_ALREADY_SUPERSEDED"
+        (contentAsJson(res) \ "message").as[String]     mustBe "This life event has already been superseded"
         (contentAsJson(res) \ "lifeEventId").as[String] mustBe "789"
       }
     }
@@ -990,9 +981,9 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
       when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
         .thenReturn(Future.successful(ReportLifeEventAlreadyExistsResponse("123")))
       doOutcomeRequest(outcomeJson) { res =>
-        status(res) mustBe CONFLICT
-        (contentAsJson(res) \ "code").as[String] mustBe "LIFE_EVENT_ALREADY_EXISTS"
-        (contentAsJson(res) \ "message").as[String] mustBe "The investor’s life event has already been reported"
+        status(res)                                     mustBe CONFLICT
+        (contentAsJson(res) \ "code").as[String]        mustBe "LIFE_EVENT_ALREADY_EXISTS"
+        (contentAsJson(res) \ "message").as[String]     mustBe "The investor’s life event has already been reported"
         (contentAsJson(res) \ "lifeEventId").as[String] mustBe "123"
       }
     }
@@ -1002,8 +993,8 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
         when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
           .thenReturn(Future.successful(ReportLifeEventErrorResponse))
         doOutcomeRequest(outcomeJson) { res =>
-          status(res) mustBe INTERNAL_SERVER_ERROR
-          (contentAsJson(res) \ "code").as[String] mustBe "INTERNAL_SERVER_ERROR"
+          status(res)                                 mustBe INTERNAL_SERVER_ERROR
+          (contentAsJson(res) \ "code").as[String]    mustBe "INTERNAL_SERVER_ERROR"
           (contentAsJson(res) \ "message").as[String] mustBe "Internal server error"
         }
       }
@@ -1012,8 +1003,8 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
         when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
           .thenReturn(Future.successful(ReportLifeEventAccountClosedResponse))
         doOutcomeRequest(outcomeJson) { res =>
-          status(res) mustBe INTERNAL_SERVER_ERROR
-          (contentAsJson(res) \ "code").as[String] mustBe "INTERNAL_SERVER_ERROR"
+          status(res)                                 mustBe INTERNAL_SERVER_ERROR
+          (contentAsJson(res) \ "code").as[String]    mustBe "INTERNAL_SERVER_ERROR"
           (contentAsJson(res) \ "message").as[String] mustBe "Internal server error"
         }
       }
@@ -1024,8 +1015,8 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
         .thenReturn(Future.successful(ReportLifeEventServiceUnavailableResponse))
 
       doOutcomeRequest(outcomeJson) { res =>
-        status(res) mustBe SERVICE_UNAVAILABLE
-        (contentAsJson(res) \ "code").as[String] mustBe "SERVER_ERROR"
+        status(res)                                 mustBe SERVICE_UNAVAILABLE
+        (contentAsJson(res) \ "code").as[String]    mustBe "SERVER_ERROR"
         (contentAsJson(res) \ "message").as[String] mustBe "Service unavailable"
       }
     }
@@ -1073,4 +1064,5 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
 
     callback(res)
   }
+
 }

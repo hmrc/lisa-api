@@ -35,17 +35,17 @@ class BonusPaymentValidator @Inject() (currentDateService: CurrentDateService) e
   def validate(data: RequestBonusPaymentRequest): Seq[ErrorValidation] =
     (
       htbTransferTotalYTDGtZeroIfHtbTransferInForPeriodGtZero andThen
-        totalSubsYTDGteTotalSubsForPeriod andThen
-        newSubsYTDGtZeroIfNewSubsForPeriodGtZero andThen
-        newSubsOrHtbTransferGtZero andThen
-        totalSubsForPeriodGtZero andThen
-        bonusDueForPeriodGtZero andThen
-        totalBonusDueYTDGtZero andThen
-        periodStartDateIsSixth andThen
-        periodEndDateIsFifthOfMonthAfterPeriodStartDate andThen
-        periodStartDateIsNotInFuture andThen
-        periodStartDateIsNotBeforeFirstValidDate andThen
-        periodEndDateIsNotBeforeFirstValidDate andThen
+        totalSubsYTDGteTotalSubsForPeriod                     andThen
+        newSubsYTDGtZeroIfNewSubsForPeriodGtZero              andThen
+        newSubsOrHtbTransferGtZero                            andThen
+        totalSubsForPeriodGtZero                              andThen
+        bonusDueForPeriodGtZero                               andThen
+        totalBonusDueYTDGtZero                                andThen
+        periodStartDateIsSixth                                andThen
+        periodEndDateIsFifthOfMonthAfterPeriodStartDate       andThen
+        periodStartDateIsNotInFuture                          andThen
+        periodStartDateIsNotBeforeFirstValidDate              andThen
+        periodEndDateIsNotBeforeFirstValidDate                andThen
         supersedeExistsIfSupersedingClaimReason
     ).apply(BonusPaymentValidationRequest(data)).errors
 
@@ -167,7 +167,7 @@ class BonusPaymentValidator @Inject() (currentDateService: CurrentDateService) e
           Some(s"/periodStartDate")
         )
       )
-    case req: BonusPaymentValidationRequest                                                  => req
+    case req: BonusPaymentValidationRequest                                                => req
   }
 
   private val periodStartDateIsNotInFuture
@@ -180,7 +180,7 @@ class BonusPaymentValidator @Inject() (currentDateService: CurrentDateService) e
           Some(s"/periodStartDate")
         )
       )
-    case req: BonusPaymentValidationRequest                                                                           => req
+    case req: BonusPaymentValidationRequest                                                               => req
   }
 
   private val periodEndDateIsFifthOfMonthAfterPeriodStartDate
@@ -204,8 +204,7 @@ class BonusPaymentValidator @Inject() (currentDateService: CurrentDateService) e
       }
     }
 
-  private val periodStartDateIsNotBeforeFirstValidDate
-    : BonusPaymentValidationRequest => BonusPaymentValidationRequest =
+  private val periodStartDateIsNotBeforeFirstValidDate: BonusPaymentValidationRequest => BonusPaymentValidationRequest =
     (req: BonusPaymentValidationRequest) =>
       if (req.data.periodStartDate.isBefore(LISA_START_DATE)) {
         req.copy(errors =
@@ -233,8 +232,7 @@ class BonusPaymentValidator @Inject() (currentDateService: CurrentDateService) e
         req
       }
 
-  private val supersedeExistsIfSupersedingClaimReason
-    : BonusPaymentValidationRequest => BonusPaymentValidationRequest =
+  private val supersedeExistsIfSupersedingClaimReason: BonusPaymentValidationRequest => BonusPaymentValidationRequest =
     (req: BonusPaymentValidationRequest) =>
       (req.data.bonuses.claimReason, req.data.supersede) match {
         case ("Superseded Bonus", None) =>

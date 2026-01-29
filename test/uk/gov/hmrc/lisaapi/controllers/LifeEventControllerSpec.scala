@@ -23,7 +23,10 @@ import play.api.mvc.{AnyContentAsJson, Result}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
-import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountAlreadyCancelled, ErrorAccountAlreadyClosed, ErrorAccountAlreadyVoided, ErrorBadRequestAccountId, ErrorBadRequestLmrn, LifeEventController}
+import uk.gov.hmrc.lisaapi.controllers.{
+  ErrorAccountAlreadyCancelled, ErrorAccountAlreadyClosed, ErrorAccountAlreadyVoided, ErrorBadRequestAccountId,
+  ErrorBadRequestLmrn, LifeEventController
+}
 import uk.gov.hmrc.lisaapi.helpers.ControllerTestFixture
 import uk.gov.hmrc.lisaapi.models._
 
@@ -90,7 +93,7 @@ class LifeEventControllerSpec extends ControllerTestFixture {
     }
 
     "audit lifeEventNotReported" when {
-      "the json fails date validation" in {
+      "the json fails date validation" in
         doReportLifeEventRequest(reportLifeEventJson.replace(validDate, invalidDate)) { res =>
           await(res)
           verify(mockAuditService).audit(
@@ -107,7 +110,6 @@ class LifeEventControllerSpec extends ControllerTestFixture {
             )
           )(any())
         }
-      }
       "the request results in a ReportLifeEventInappropriateResponse" in {
         when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
           .thenReturn(Future.successful(ReportLifeEventInappropriateResponse))
@@ -195,7 +197,7 @@ class LifeEventControllerSpec extends ControllerTestFixture {
       when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
         .thenReturn(Future.successful(ReportLifeEventSuccessResponse("1928374")))
       doReportLifeEventRequest(reportLifeEventJson) { res =>
-        status(res) mustBe CREATED
+        status(res)                                              mustBe CREATED
         (contentAsJson(res) \ "data" \ "lifeEventId").as[String] mustBe "1928374"
       }
     }
@@ -205,7 +207,7 @@ class LifeEventControllerSpec extends ControllerTestFixture {
         val invalidJson = reportLifeEventJson.replace("LISA Investor Terminal Ill Health", "Invalid Event Type")
 
         doReportLifeEventRequest(invalidJson) { res =>
-          status(res) mustBe BAD_REQUEST
+          status(res)                              mustBe BAD_REQUEST
           (contentAsJson(res) \ "code").as[String] mustBe "BAD_REQUEST"
         }
       }
@@ -213,30 +215,28 @@ class LifeEventControllerSpec extends ControllerTestFixture {
         val invalidJson = reportLifeEventJson.replace(s"$validDate", LocalDate.now.plusDays(1).toString)
 
         doReportLifeEventRequest(invalidJson) { res =>
-          status(res) mustBe BAD_REQUEST
+          status(res)                              mustBe BAD_REQUEST
           (contentAsJson(res) \ "code").as[String] mustBe "BAD_REQUEST"
         }
       }
-      "given an invalid lmrn in the url" in {
+      "given an invalid lmrn in the url" in
         doReportLifeEventRequest(reportLifeEventJson, "Z111") { res =>
           status(res) mustBe BAD_REQUEST
 
           val json = contentAsJson(res)
 
-          (json \ "code").as[String] mustBe ErrorBadRequestLmrn.errorCode
+          (json \ "code").as[String]    mustBe ErrorBadRequestLmrn.errorCode
           (json \ "message").as[String] mustBe ErrorBadRequestLmrn.message
         }
-      }
-      "given an invalid accountId in the url" in {
+      "given an invalid accountId in the url" in
         doReportLifeEventRequest(reportLifeEventJson, accId = "1=2!") { res =>
           status(res) mustBe BAD_REQUEST
 
           val json = contentAsJson(res)
 
-          (json \ "code").as[String] mustBe ErrorBadRequestAccountId.errorCode
+          (json \ "code").as[String]    mustBe ErrorBadRequestAccountId.errorCode
           (json \ "message").as[String] mustBe ErrorBadRequestAccountId.message
         }
-      }
     }
 
     "return with 403 forbidden and a code of FORBIDDEN" when {
@@ -247,10 +247,10 @@ class LifeEventControllerSpec extends ControllerTestFixture {
         doReportLifeEventRequest(reportLifeEventJson.replace(validDate, "2017-04-05")) { res =>
           status(res) mustBe FORBIDDEN
           val json = contentAsJson(res)
-          (json \ "code").as[String] mustBe "FORBIDDEN"
-          (json \ "errors" \ 0 \ "code").as[String] mustBe "INVALID_DATE"
+          (json \ "code").as[String]                   mustBe "FORBIDDEN"
+          (json \ "errors" \ 0 \ "code").as[String]    mustBe "INVALID_DATE"
           (json \ "errors" \ 0 \ "message").as[String] mustBe "The eventDate cannot be before 6 April 2017"
-          (json \ "errors" \ 0 \ "path").as[String] mustBe "/eventDate"
+          (json \ "errors" \ 0 \ "path").as[String]    mustBe "/eventDate"
         }
       }
     }
@@ -259,7 +259,7 @@ class LifeEventControllerSpec extends ControllerTestFixture {
       when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
         .thenReturn(Future.successful(ReportLifeEventInappropriateResponse))
       doReportLifeEventRequest(reportLifeEventJson) { res =>
-        status(res) mustBe FORBIDDEN
+        status(res)                              mustBe FORBIDDEN
         (contentAsJson(res) \ "code").as[String] mustBe "LIFE_EVENT_INAPPROPRIATE"
       }
     }
@@ -268,10 +268,10 @@ class LifeEventControllerSpec extends ControllerTestFixture {
       when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
         .thenReturn(Future.successful(ReportLifeEventAccountClosedOrVoidResponse))
       doReportLifeEventRequest(reportLifeEventJson) { res =>
-        status(res) mustBe FORBIDDEN
+        status(res)                              mustBe FORBIDDEN
         (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID"
         (contentAsJson(res) \ "message")
-          .as[String] mustBe "This LISA account has already been closed or been made void by HMRC"
+          .as[String]                            mustBe "This LISA account has already been closed or been made void by HMRC"
       }
     }
 
@@ -279,8 +279,8 @@ class LifeEventControllerSpec extends ControllerTestFixture {
       when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
         .thenReturn(Future.successful(ReportLifeEventAccountClosedResponse))
       doReportLifeEventRequest(reportLifeEventJson, acceptHeader = acceptHeaderV2) { res =>
-        status(res) mustBe FORBIDDEN
-        (contentAsJson(res) \ "code").as[String] mustBe ErrorAccountAlreadyClosed.errorCode
+        status(res)                                 mustBe FORBIDDEN
+        (contentAsJson(res) \ "code").as[String]    mustBe ErrorAccountAlreadyClosed.errorCode
         (contentAsJson(res) \ "message").as[String] mustBe ErrorAccountAlreadyClosed.message
       }
     }
@@ -289,8 +289,8 @@ class LifeEventControllerSpec extends ControllerTestFixture {
       when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
         .thenReturn(Future.successful(ReportLifeEventAccountCancelledResponse))
       doReportLifeEventRequest(reportLifeEventJson, acceptHeader = acceptHeaderV2) { res =>
-        status(res) mustBe FORBIDDEN
-        (contentAsJson(res) \ "code").as[String] mustBe ErrorAccountAlreadyCancelled.errorCode
+        status(res)                                 mustBe FORBIDDEN
+        (contentAsJson(res) \ "code").as[String]    mustBe ErrorAccountAlreadyCancelled.errorCode
         (contentAsJson(res) \ "message").as[String] mustBe ErrorAccountAlreadyCancelled.message
       }
     }
@@ -299,8 +299,8 @@ class LifeEventControllerSpec extends ControllerTestFixture {
       when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
         .thenReturn(Future.successful(ReportLifeEventAccountVoidResponse))
       doReportLifeEventRequest(reportLifeEventJson, acceptHeader = acceptHeaderV2) { res =>
-        status(res) mustBe FORBIDDEN
-        (contentAsJson(res) \ "code").as[String] mustBe ErrorAccountAlreadyVoided.errorCode
+        status(res)                                 mustBe FORBIDDEN
+        (contentAsJson(res) \ "code").as[String]    mustBe ErrorAccountAlreadyVoided.errorCode
         (contentAsJson(res) \ "message").as[String] mustBe ErrorAccountAlreadyVoided.message
       }
     }
@@ -309,7 +309,7 @@ class LifeEventControllerSpec extends ControllerTestFixture {
       when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
         .thenReturn(Future.successful(ReportLifeEventAccountNotFoundResponse))
       doReportLifeEventRequest(reportLifeEventJson) { res =>
-        status(res) mustBe NOT_FOUND
+        status(res)                              mustBe NOT_FOUND
         (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNTID_NOT_FOUND"
       }
     }
@@ -320,7 +320,7 @@ class LifeEventControllerSpec extends ControllerTestFixture {
       doReportLifeEventRequest(reportLifeEventJson) { res =>
         status(res) mustBe CONFLICT
         val json = contentAsJson(res)
-        (json \ "code").as[String] mustBe "LIFE_EVENT_ALREADY_EXISTS"
+        (json \ "code").as[String]        mustBe "LIFE_EVENT_ALREADY_EXISTS"
         (json \ "lifeEventId").as[String] mustBe "123"
       }
     }
@@ -329,7 +329,7 @@ class LifeEventControllerSpec extends ControllerTestFixture {
       when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
         .thenReturn(Future.successful(ReportLifeEventFundReleaseNotFoundResponse))
       doReportLifeEventRequest(reportLifeEventJson) { res =>
-        status(res) mustBe INTERNAL_SERVER_ERROR
+        status(res)                              mustBe INTERNAL_SERVER_ERROR
         (contentAsJson(res) \ "code").as[String] mustBe "INTERNAL_SERVER_ERROR"
       }
     }
@@ -339,7 +339,7 @@ class LifeEventControllerSpec extends ControllerTestFixture {
         .thenReturn(Future.successful(ReportLifeEventServiceUnavailableResponse))
 
       doReportLifeEventRequest(reportLifeEventJson) { res =>
-        status(res) mustBe SERVICE_UNAVAILABLE
+        status(res)                              mustBe SERVICE_UNAVAILABLE
         (contentAsJson(res) \ "code").as[String] mustBe "SERVER_ERROR"
       }
     }
@@ -359,4 +359,5 @@ class LifeEventControllerSpec extends ControllerTestFixture {
 
     callback(res)
   }
+
 }

@@ -48,4 +48,5 @@ class LisaExtensionsSpec extends BaseTestFixture with GuiceOneAppPerSuite {
 
     }
   }
+
 }
