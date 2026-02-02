@@ -27,8 +27,10 @@ class RequestBonusPaymentRequestSpec extends PlaySpec {
 
   val validBonusPaymentJson: String =
     Source.fromInputStream(getClass.getResourceAsStream("/json/request.valid.bonus-payment.json")).mkString
+
   val validBonusPaymentDesJson: String =
     Source.fromInputStream(getClass.getResourceAsStream("/json/request.valid.bonus-payment.des.json")).mkString
+
   val validBonusPayment: RequestBonusPaymentRequest = RequestBonusPaymentRequest(
     lifeEventId = Some("1234567891"),
     periodStartDate = LocalDate.parse("2017-04-06"),

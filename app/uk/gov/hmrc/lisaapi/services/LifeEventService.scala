@@ -24,7 +24,9 @@ import uk.gov.hmrc.lisaapi.models.des._
 
 import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountNotFound, ErrorInternalServerError, ErrorLifeEventIdNotFound, ErrorResponse, ErrorServiceUnavailable}
+import uk.gov.hmrc.lisaapi.controllers.{
+  ErrorAccountNotFound, ErrorInternalServerError, ErrorLifeEventIdNotFound, ErrorResponse, ErrorServiceUnavailable
+}
 
 import scala.util.matching.Regex
 
@@ -38,14 +40,20 @@ class LifeEventService @Inject() (desConnector: DesConnector)(implicit ec: Execu
         logger.info(s"[LifeEventService][reportLifeEvent] Matched DesLifeEventResponse for lisaManager : $lisaManager")
         ReportLifeEventSuccessResponse(successResponse.lifeEventID)
       case DesUnavailableResponse                =>
-        logger.info(s"[LifeEventService][reportLifeEvent] Matched DesUnavailableResponse for lisaManager : $lisaManager")
+        logger.info(
+          s"[LifeEventService][reportLifeEvent] Matched DesUnavailableResponse for lisaManager : $lisaManager"
+        )
         ReportLifeEventServiceUnavailableResponse
       case failureResponse: DesFailureResponse   =>
-        logger.warn(s"[LifeEventService][reportLifeEvent] Matched DesFailureResponse for lisaManager : $lisaManager and the code is " + failureResponse.code)
+        logger.warn(
+          s"[LifeEventService][reportLifeEvent] Matched DesFailureResponse for lisaManager : $lisaManager and the code is " + failureResponse.code
+        )
         postErrors.applyOrElse(
           (failureResponse.code, failureResponse),
           { _: (String, DesFailureResponse) =>
-            logger.error(s"[LifeEventService][reportLifeEvent] Report life event returned error: ${failureResponse.code} for lisaManager : $lisaManager")
+            logger.error(
+              s"[LifeEventService][reportLifeEvent] Report life event returned error: ${failureResponse.code} for lisaManager : $lisaManager"
+            )
             ReportLifeEventErrorResponse
           }
         )
@@ -56,13 +64,19 @@ class LifeEventService @Inject() (desConnector: DesConnector)(implicit ec: Execu
   ): Future[Either[ErrorResponse, Seq[GetLifeEventItem]]] =
     desConnector.getLifeEvent(lisaManager, accountId, lifeEventId) map {
       case Right(successResponse) =>
-        logger.info(s"[LifeEventService][getLifeEvent] Matched ReportLifeEventRequestBase for lisaManager : $lisaManager")
+        logger.info(
+          s"[LifeEventService][getLifeEvent] Matched ReportLifeEventRequestBase for lisaManager : $lisaManager"
+        )
         Right(successResponse)
       case Left(failureResponse)  =>
-        logger.warn(s"[LifeEventService][getLifeEvent] Matched DesFailureResponse for lisaManager : $lisaManager and the code is : $failureResponse.code")
+        logger.warn(
+          s"[LifeEventService][getLifeEvent] Matched DesFailureResponse for lisaManager : $lisaManager and the code is : $failureResponse.code"
+        )
         val error = getErrors.getOrElse(
           failureResponse.code, {
-            logger.error(s"[LifeEventService][getLifeEvent] Report life event returned error: ${failureResponse.code} for lisaManager : $lisaManager")
+            logger.error(
+              s"[LifeEventService][getLifeEvent] Report life event returned error: ${failureResponse.code} for lisaManager : $lisaManager"
+            )
             ErrorInternalServerError
           }
         )

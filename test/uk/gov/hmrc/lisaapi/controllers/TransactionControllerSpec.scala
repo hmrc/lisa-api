@@ -23,7 +23,11 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.api.controllers.ErrorAcceptHeaderInvalid
-import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountNotFound, ErrorBadRequestAccountId, ErrorBadRequestLmrn, ErrorBadRequestTransactionId, ErrorBonusPaymentTransactionNotFound, ErrorInternalServerError, ErrorServiceUnavailable, ErrorTransactionNotFound, TransactionController}
+import uk.gov.hmrc.lisaapi.controllers.{
+  ErrorAccountNotFound, ErrorBadRequestAccountId, ErrorBadRequestLmrn, ErrorBadRequestTransactionId,
+  ErrorBonusPaymentTransactionNotFound, ErrorInternalServerError, ErrorServiceUnavailable, ErrorTransactionNotFound,
+  TransactionController
+}
 import uk.gov.hmrc.lisaapi.helpers.ControllerTestFixture
 import uk.gov.hmrc.lisaapi.models._
 
@@ -470,4 +474,5 @@ class TransactionControllerSpec extends ControllerTestFixture {
     }
 
   }
+
 }

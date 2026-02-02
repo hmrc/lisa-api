@@ -22,7 +22,10 @@ import play.api.mvc._
 import play.api.test.FakeRequest
 import play.test.Helpers
 import uk.gov.hmrc.lisaapi.config.AppContext
-import uk.gov.hmrc.lisaapi.controllers.{APIVersioning, ErrorAcceptHeaderContentInvalid, ErrorAcceptHeaderInvalid, ErrorAcceptHeaderVersionInvalid, ErrorApiNotAvailable}
+import uk.gov.hmrc.lisaapi.controllers.{
+  APIVersioning, ErrorAcceptHeaderContentInvalid, ErrorAcceptHeaderInvalid, ErrorAcceptHeaderVersionInvalid,
+  ErrorApiNotAvailable
+}
 import uk.gov.hmrc.lisaapi.helpers.ControllerTestFixture
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -133,4 +136,5 @@ class APIVersioningSpec extends ControllerTestFixture {
     val response = builder.invokeBlock[A](request, _ => Future.successful(Results.Ok))
     Await.result(response, 100 millis)
   }
+
 }

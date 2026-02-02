@@ -40,7 +40,7 @@ class BulkPaymentServiceSpec extends ServiceTestFixture {
   }
 
   val lmrn: String = "Z123456"
-  val date = LocalDate.parse("2018-01-01")
+  val date         = LocalDate.parse("2018-01-01")
 
   "Get Bulk Payment" must {
 

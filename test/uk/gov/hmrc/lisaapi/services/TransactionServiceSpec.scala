@@ -143,7 +143,9 @@ class TransactionServiceSpec extends ServiceTestFixture {
         )
 
         when(mockDesConnector.getTransaction(any(), any(), any())(any()))
-          .thenReturn(Future.successful(DesGetTransactionPending(LocalDate.parse("2000-01-01"), Some("YREF"), Some(30))))
+          .thenReturn(
+            Future.successful(DesGetTransactionPending(LocalDate.parse("2000-01-01"), Some("YREF"), Some(30)))
+          )
 
         val result =
           Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
@@ -471,4 +473,5 @@ class TransactionServiceSpec extends ServiceTestFixture {
     }
 
   }
+
 }

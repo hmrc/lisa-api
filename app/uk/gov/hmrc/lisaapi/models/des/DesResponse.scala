@@ -32,20 +32,28 @@ sealed abstract class DesFailure extends DesResponse {
 case class DesAccountResponse(accountID: String) extends DesResponse
 
 case class DesLifeEventResponse(lifeEventID: String) extends DesResponse
+
 case class DesLifeEventRetrievalResponse(lifeEventID: LifeEventId, eventType: LifeEventType, eventDate: LocalDate)
     extends DesResponse
+
 case class DesCreateInvestorResponse(investorID: String) extends DesResponse
 case class DesTransactionResponse(transactionID: String, message: Option[String]) extends DesResponse
+
 case class DesFailureResponse(code: String = "INTERNAL_SERVER_ERROR", reason: String = "Internal Server Error")
     extends DesFailure
+
 case class DesTransactionExistResponse(code: String, reason: String, transactionID: String) extends DesResponse
+
 case class DesWithdrawalChargeAlreadyExistsResponse(code: String, reason: String, investorTransactionID: String)
     extends DesResponse
+
 case class DesWithdrawalChargeAlreadySupersededResponse(code: String, reason: String, supersededTransactionByID: String)
     extends DesResponse
+
 case object DesEmptySuccessResponse extends DesResponse
 case class DesUpdateSubscriptionSuccessResponse(code: String, reason: String) extends DesResponse
 case class DesReinstateAccountSuccessResponse(code: String, reason: String) extends DesResponse
+
 case class DesGetBonusPaymentResponse(
   lifeEventId: Option[LifeEventId],
   periodStartDate: LocalDate,
@@ -72,13 +80,16 @@ case object DesBadRequestResponse extends DesFailure {
 object DesResponse {
   implicit val desCreateAccountResponseFormats: OFormat[DesAccountResponse] = Json.format[DesAccountResponse]
 
-  implicit val desCreateInvestorResponseFormats: OFormat[DesCreateInvestorResponse]                =
+  implicit val desCreateInvestorResponseFormats: OFormat[DesCreateInvestorResponse] =
     Json.format[DesCreateInvestorResponse]
-  implicit val desLifeEventResponseFormats: OFormat[DesLifeEventResponse]                          = Json.format[DesLifeEventResponse]
-  implicit val desTransactionResponseFormats: OFormat[DesTransactionResponse]                      = Json.format[DesTransactionResponse]
+
+  implicit val desLifeEventResponseFormats: OFormat[DesLifeEventResponse]     = Json.format[DesLifeEventResponse]
+  implicit val desTransactionResponseFormats: OFormat[DesTransactionResponse] = Json.format[DesTransactionResponse]
+
   implicit val desUpdateSubscriptionResponseFormats: OFormat[DesUpdateSubscriptionSuccessResponse] =
     Json.format[DesUpdateSubscriptionSuccessResponse]
-  implicit val desReinstateAccountResponseFormats: OFormat[DesReinstateAccountSuccessResponse]     =
+
+  implicit val desReinstateAccountResponseFormats: OFormat[DesReinstateAccountSuccessResponse] =
     Json.format[DesReinstateAccountSuccessResponse]
 
   implicit val desFailureReads: Reads[DesFailureResponse] = (
@@ -97,10 +108,12 @@ object DesResponse {
       (JsPath \ "eventDate").read(JsonReads.notFutureDate)
   )(DesLifeEventRetrievalResponse.apply _)
 
-  implicit val requestTransactionAlreadyExistResponseFormats: OFormat[DesTransactionExistResponse]                    =
+  implicit val requestTransactionAlreadyExistResponseFormats: OFormat[DesTransactionExistResponse] =
     Json.format[DesTransactionExistResponse]
+
   implicit val requestWithdrawalChargeAlreadyExistsResponseFormats: OFormat[DesWithdrawalChargeAlreadyExistsResponse] =
     Json.format[DesWithdrawalChargeAlreadyExistsResponse]
+
   implicit val requestWithdrawalChargeAlreadySupersededResponseFormats
     : OFormat[DesWithdrawalChargeAlreadySupersededResponse] = Json.format[DesWithdrawalChargeAlreadySupersededResponse]
 

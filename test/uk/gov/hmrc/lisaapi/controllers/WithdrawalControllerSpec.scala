@@ -23,7 +23,11 @@ import play.api.mvc.{AnyContentAsJson, Result}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
-import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountAlreadyCancelled, ErrorAccountAlreadyVoided, ErrorAccountNotFound, ErrorInternalServerError, ErrorServiceUnavailable, ErrorValidation, ErrorWithdrawalNotFound, ErrorWithdrawalTimescalesExceeded, WithdrawalController}
+import uk.gov.hmrc.lisaapi.controllers.{
+  ErrorAccountAlreadyCancelled, ErrorAccountAlreadyVoided, ErrorAccountNotFound, ErrorInternalServerError,
+  ErrorServiceUnavailable, ErrorValidation, ErrorWithdrawalNotFound, ErrorWithdrawalTimescalesExceeded,
+  WithdrawalController
+}
 import uk.gov.hmrc.lisaapi.helpers.ControllerTestFixture
 import uk.gov.hmrc.lisaapi.models._
 
@@ -53,7 +57,8 @@ class WithdrawalControllerSpec extends ControllerTestFixture {
   val lisaManager                    = "Z019283"
   val accountId                      = "ABC/12345"
   val transactionId                  = "1234567890"
-  val validWithdrawalJson: String    =
+
+  val validWithdrawalJson: String =
     Source.fromInputStream(getClass.getResourceAsStream("/json/request.valid.withdrawal-charge.json")).mkString
 
   override def beforeEach(): Unit = {
@@ -75,9 +80,9 @@ class WithdrawalControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(ReportWithdrawalChargeOnTimeResponse("1928374")))
 
         doRequest(validWithdrawalJson) { res =>
-          status(res) mustBe CREATED
+          status(res)                                                mustBe CREATED
           (contentAsJson(res) \ "data" \ "transactionId").as[String] mustBe "1928374"
-          (contentAsJson(res) \ "data" \ "message").as[String] mustBe "Unauthorised withdrawal transaction created"
+          (contentAsJson(res) \ "data" \ "message").as[String]       mustBe "Unauthorised withdrawal transaction created"
         }
       }
 
@@ -86,10 +91,10 @@ class WithdrawalControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(ReportWithdrawalChargeLateResponse("1928374")))
 
         doRequest(validWithdrawalJson) { res =>
-          status(res) mustBe CREATED
+          status(res)                                                mustBe CREATED
           (contentAsJson(res) \ "data" \ "transactionId").as[String] mustBe "1928374"
           (contentAsJson(res) \ "data" \ "message")
-            .as[String] mustBe "Unauthorised withdrawal transaction created - late notification"
+            .as[String]                                              mustBe "Unauthorised withdrawal transaction created - late notification"
         }
       }
 
@@ -98,9 +103,9 @@ class WithdrawalControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(ReportWithdrawalChargeSupersededResponse("1928374")))
 
         doRequest(validWithdrawalJson) { res =>
-          status(res) mustBe CREATED
+          status(res)                                                mustBe CREATED
           (contentAsJson(res) \ "data" \ "transactionId").as[String] mustBe "1928374"
-          (contentAsJson(res) \ "data" \ "message").as[String] mustBe "Unauthorised withdrawal transaction superseded"
+          (contentAsJson(res) \ "data" \ "message").as[String]       mustBe "Unauthorised withdrawal transaction superseded"
         }
       }
 
@@ -113,8 +118,8 @@ class WithdrawalControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(ReportWithdrawalChargeAccountCancelled))
 
         doRequest(validWithdrawalJson) { res =>
-          status(res) mustBe FORBIDDEN
-          (contentAsJson(res) \ "code").as[String] mustBe ErrorAccountAlreadyCancelled.errorCode
+          status(res)                                 mustBe FORBIDDEN
+          (contentAsJson(res) \ "code").as[String]    mustBe ErrorAccountAlreadyCancelled.errorCode
           (contentAsJson(res) \ "message").as[String] mustBe ErrorAccountAlreadyCancelled.message
         }
       }
@@ -124,8 +129,8 @@ class WithdrawalControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(ReportWithdrawalChargeAccountVoid))
 
         doRequest(validWithdrawalJson) { res =>
-          status(res) mustBe FORBIDDEN
-          (contentAsJson(res) \ "code").as[String] mustBe ErrorAccountAlreadyVoided.errorCode
+          status(res)                                 mustBe FORBIDDEN
+          (contentAsJson(res) \ "code").as[String]    mustBe ErrorAccountAlreadyVoided.errorCode
           (contentAsJson(res) \ "message").as[String] mustBe ErrorAccountAlreadyVoided.message
         }
       }
@@ -135,8 +140,8 @@ class WithdrawalControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(ReportWithdrawalChargeAccountCancelled))
 
         doRequest(validWithdrawalJson) { res =>
-          status(res) mustBe FORBIDDEN
-          (contentAsJson(res) \ "code").as[String] mustBe ErrorAccountAlreadyCancelled.errorCode
+          status(res)                                 mustBe FORBIDDEN
+          (contentAsJson(res) \ "code").as[String]    mustBe ErrorAccountAlreadyCancelled.errorCode
           (contentAsJson(res) \ "message").as[String] mustBe ErrorAccountAlreadyCancelled.message
         }
       }
@@ -146,10 +151,10 @@ class WithdrawalControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(ReportWithdrawalChargeReportingError))
 
         doRequest(validWithdrawalJson) { res =>
-          status(res) mustBe FORBIDDEN
+          status(res)                              mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "WITHDRAWAL_REPORTING_ERROR"
           (contentAsJson(res) \ "message")
-            .as[String] mustBe "The withdrawal charge as a percentage of the withdrawal amount is incorrect. " +
+            .as[String]                            mustBe "The withdrawal charge as a percentage of the withdrawal amount is incorrect. " +
             "For withdrawals made between 06/03/2020 and 05/04/2021 the withdrawal charge is 20%. For all other withdrawals it is 25%."
         }
       }
@@ -159,9 +164,9 @@ class WithdrawalControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(ReportWithdrawalChargeAlreadySuperseded(transactionId)))
 
         doRequest(validWithdrawalJson) { res =>
-          status(res) mustBe FORBIDDEN
-          (contentAsJson(res) \ "code").as[String] mustBe "WITHDRAWAL_CHARGE_ALREADY_SUPERSEDED"
-          (contentAsJson(res) \ "message").as[String] mustBe "This withdrawal charge has already been superseded"
+          status(res)                                       mustBe FORBIDDEN
+          (contentAsJson(res) \ "code").as[String]          mustBe "WITHDRAWAL_CHARGE_ALREADY_SUPERSEDED"
+          (contentAsJson(res) \ "message").as[String]       mustBe "This withdrawal charge has already been superseded"
           (contentAsJson(res) \ "transactionId").as[String] mustBe transactionId
         }
       }
@@ -171,10 +176,10 @@ class WithdrawalControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(ReportWithdrawalChargeSupersedeAmountMismatch))
 
         doRequest(validWithdrawalJson) { res =>
-          status(res) mustBe FORBIDDEN
+          status(res)                              mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "SUPERSEDED_WITHDRAWAL_CHARGE_ID_AMOUNT_MISMATCH"
           (contentAsJson(res) \ "message")
-            .as[String] mustBe "originalTransactionId and the originalWithdrawalChargeAmount do not match the information in the original request"
+            .as[String]                            mustBe "originalTransactionId and the originalWithdrawalChargeAmount do not match the information in the original request"
         }
       }
 
@@ -183,10 +188,10 @@ class WithdrawalControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(ReportWithdrawalChargeSupersedeOutcomeError))
 
         doRequest(validWithdrawalJson) { res =>
-          status(res) mustBe FORBIDDEN
+          status(res)                              mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "SUPERSEDED_WITHDRAWAL_CHARGE_OUTCOME_ERROR"
           (contentAsJson(res) \ "message")
-            .as[String] mustBe "The calculation from your superseded withdrawal charge is incorrect"
+            .as[String]                            mustBe "The calculation from your superseded withdrawal charge is incorrect"
         }
       }
 
@@ -207,7 +212,7 @@ class WithdrawalControllerSpec extends ControllerTestFixture {
 
           val json = contentAsJson(res)
 
-          (json \ "code").as[String] mustBe ErrorWithdrawalTimescalesExceeded.errorCode
+          (json \ "code").as[String]    mustBe ErrorWithdrawalTimescalesExceeded.errorCode
           (json \ "message").as[String] mustBe ErrorWithdrawalTimescalesExceeded.message
         }
       }
@@ -253,8 +258,8 @@ class WithdrawalControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(ReportWithdrawalChargeAccountNotFound))
 
         doRequest(validWithdrawalJson) { res =>
-          status(res) mustBe NOT_FOUND
-          (contentAsJson(res) \ "code").as[String] mustBe ErrorAccountNotFound.errorCode
+          status(res)                                 mustBe NOT_FOUND
+          (contentAsJson(res) \ "code").as[String]    mustBe ErrorAccountNotFound.errorCode
           (contentAsJson(res) \ "message").as[String] mustBe ErrorAccountNotFound.message
         }
       }
@@ -263,14 +268,13 @@ class WithdrawalControllerSpec extends ControllerTestFixture {
 
     "return with status 406 not acceptable" when {
 
-      "attempting to use the v1 of the api" in {
+      "attempting to use the v1 of the api" in
         doRequest(validWithdrawalJson, header = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")) { res =>
-          status(res) mustBe NOT_ACCEPTABLE
+          status(res)                              mustBe NOT_ACCEPTABLE
           (contentAsJson(res) \ "code").as[String] mustBe "ACCEPT_HEADER_INVALID"
           (contentAsJson(res) \ "message")
-            .as[String] mustBe "The accept header has an invalid version for this endpoint"
+            .as[String]                            mustBe "The accept header has an invalid version for this endpoint"
         }
-      }
 
     }
 
@@ -281,10 +285,10 @@ class WithdrawalControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(ReportWithdrawalChargeAlreadyExists(transactionId)))
 
         doRequest(validWithdrawalJson) { res =>
-          status(res) mustBe CONFLICT
-          (contentAsJson(res) \ "code").as[String] mustBe "WITHDRAWAL_CHARGE_ALREADY_EXISTS"
+          status(res)                                       mustBe CONFLICT
+          (contentAsJson(res) \ "code").as[String]          mustBe "WITHDRAWAL_CHARGE_ALREADY_EXISTS"
           (contentAsJson(res) \ "message")
-            .as[String] mustBe "A withdrawal charge with these details has already been requested for this investor"
+            .as[String]                                     mustBe "A withdrawal charge with these details has already been requested for this investor"
           (contentAsJson(res) \ "transactionId").as[String] mustBe transactionId
         }
       }
@@ -300,8 +304,8 @@ class WithdrawalControllerSpec extends ControllerTestFixture {
         doRequest(validWithdrawalJson) { res =>
           reset(mockWithdrawalService) // removes the thenThrow
 
-          status(res) mustBe INTERNAL_SERVER_ERROR
-          (contentAsJson(res) \ "code").as[String] mustBe ErrorInternalServerError.errorCode
+          status(res)                                 mustBe INTERNAL_SERVER_ERROR
+          (contentAsJson(res) \ "code").as[String]    mustBe ErrorInternalServerError.errorCode
           (contentAsJson(res) \ "message").as[String] mustBe ErrorInternalServerError.message
         }
       }
@@ -311,8 +315,8 @@ class WithdrawalControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(ReportWithdrawalChargeError))
 
         doRequest(validWithdrawalJson) { res =>
-          status(res) mustBe INTERNAL_SERVER_ERROR
-          (contentAsJson(res) \ "code").as[String] mustBe ErrorInternalServerError.errorCode
+          status(res)                                 mustBe INTERNAL_SERVER_ERROR
+          (contentAsJson(res) \ "code").as[String]    mustBe ErrorInternalServerError.errorCode
           (contentAsJson(res) \ "message").as[String] mustBe ErrorInternalServerError.message
         }
       }
@@ -326,7 +330,7 @@ class WithdrawalControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(ReportWithdrawalChargeServiceUnavailable))
 
         doRequest(validWithdrawalJson) { res =>
-          status(res) mustBe SERVICE_UNAVAILABLE
+          status(res)        mustBe SERVICE_UNAVAILABLE
           contentAsJson(res) mustBe ErrorServiceUnavailable.asJson
         }
       }
@@ -852,7 +856,7 @@ class WithdrawalControllerSpec extends ControllerTestFixture {
       )
 
       doGetRequest { res =>
-        status(res) mustBe OK
+        status(res)        mustBe OK
         contentAsJson(res) mustBe Json.obj(
           "claimPeriodStartDate"          -> "2017-05-06",
           "claimPeriodEndDate"            -> "2017-06-05",
@@ -879,7 +883,7 @@ class WithdrawalControllerSpec extends ControllerTestFixture {
       doGetRequest { res =>
         status(res) mustBe NOT_FOUND
         val json = contentAsJson(res)
-        (json \ "code").as[String] mustBe ErrorAccountNotFound.errorCode
+        (json \ "code").as[String]    mustBe ErrorAccountNotFound.errorCode
         (json \ "message").as[String] mustBe ErrorAccountNotFound.message
       }
     }
@@ -892,7 +896,7 @@ class WithdrawalControllerSpec extends ControllerTestFixture {
         doGetRequest { res =>
           status(res) mustBe NOT_FOUND
           val json = contentAsJson(res)
-          (json \ "code").as[String] mustBe ErrorWithdrawalNotFound.errorCode
+          (json \ "code").as[String]    mustBe ErrorWithdrawalNotFound.errorCode
           (json \ "message").as[String] mustBe ErrorWithdrawalNotFound.message
         }
       }
@@ -918,7 +922,7 @@ class WithdrawalControllerSpec extends ControllerTestFixture {
         doGetRequest { res =>
           status(res) mustBe NOT_FOUND
           val json = contentAsJson(res)
-          (json \ "code").as[String] mustBe ErrorWithdrawalNotFound.errorCode
+          (json \ "code").as[String]    mustBe ErrorWithdrawalNotFound.errorCode
           (json \ "message").as[String] mustBe ErrorWithdrawalNotFound.message
         }
       }
@@ -927,17 +931,16 @@ class WithdrawalControllerSpec extends ControllerTestFixture {
 
     "return with status 406 not acceptable" when {
 
-      "attempting to use the v1 of the api" in {
+      "attempting to use the v1 of the api" in
         doGetRequest(
           res => {
-            status(res) mustBe NOT_ACCEPTABLE
+            status(res)                              mustBe NOT_ACCEPTABLE
             (contentAsJson(res) \ "code").as[String] mustBe "ACCEPT_HEADER_INVALID"
             (contentAsJson(res) \ "message")
-              .as[String] mustBe "The accept header has an invalid version for this endpoint"
+              .as[String]                            mustBe "The accept header has an invalid version for this endpoint"
           },
           header = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
         )
-      }
 
     }
 
@@ -953,7 +956,7 @@ class WithdrawalControllerSpec extends ControllerTestFixture {
         .thenReturn(Future.successful(GetBonusOrWithdrawalServiceUnavailableResponse))
 
       doGetRequest { res =>
-        status(res) mustBe SERVICE_UNAVAILABLE
+        status(res)                              mustBe SERVICE_UNAVAILABLE
         (contentAsJson(res) \ "code").as[String] mustBe "SERVER_ERROR"
       }
     }
@@ -1132,4 +1135,5 @@ class WithdrawalControllerSpec extends ControllerTestFixture {
 
     callback(res)
   }
+
 }

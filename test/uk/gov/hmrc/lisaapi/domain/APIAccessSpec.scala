@@ -30,4 +30,5 @@ class APIAccessSpec extends PlaySpec {
       Json.toJson[APIAccess](access) must be(expectedJson)
     }
   }
+
 }

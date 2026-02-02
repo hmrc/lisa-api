@@ -20,7 +20,9 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.helpers.ServiceTestFixture
-import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesTransactionExistResponse, DesTransactionResponse, DesUnavailableResponse}
+import uk.gov.hmrc.lisaapi.models.des.{
+  DesFailureResponse, DesTransactionExistResponse, DesTransactionResponse, DesUnavailableResponse
+}
 import uk.gov.hmrc.lisaapi.models._
 import uk.gov.hmrc.lisaapi.services.BonusPaymentService
 
@@ -257,4 +259,5 @@ class BonusPaymentServiceSpec extends ServiceTestFixture {
 
     callback(response)
   }
+
 }

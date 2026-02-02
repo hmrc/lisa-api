@@ -50,7 +50,9 @@ class PropertyPurchaseController @Inject() (
   def requestFundRelease(lisaManager: String, accountId: String): Action[AnyContent] = validateHeader(parse).async {
     implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
-      logger.info(s"""[PropertyPurchaseController][requestFundRelease]  accountId : $accountId, lisaManager : $lisaManager""")
+      logger.info(
+        s"""[PropertyPurchaseController][requestFundRelease]  accountId : $accountId, lisaManager : $lisaManager"""
+      )
       withValidLMRN(lisaManager) { () =>
         withValidAccountId(accountId) { () =>
           withValidJson[RequestFundReleaseRequest](
@@ -70,7 +72,9 @@ class PropertyPurchaseController @Inject() (
                 lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
                 Future.successful(Forbidden(ErrorInvalidDataProvided.asJson))
               } else if (req.eventDate.isBefore(LISA_START_DATE)) {
-                logger.info(s"[PropertyPurchaseController][requestFundRelease] Fund release not reported - invalid event date lisaManager : $lisaManager")
+                logger.info(
+                  s"[PropertyPurchaseController][requestFundRelease] Fund release not reported - invalid event date lisaManager : $lisaManager"
+                )
                 auditFundRelease(lisaManager, accountId, req, success = false, Map("reasonNotReported" -> "FORBIDDEN"))
                 lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
                 Future.successful(
@@ -98,7 +102,9 @@ class PropertyPurchaseController @Inject() (
                   case res: ReportLifeEventResponse        =>
                     val response =
                       fundReleaseErrors.applyOrElse(res, { _: ReportLifeEventResponse => ErrorInternalServerError })
-                    logger.info(s"[PropertyPurchaseController][requestFundRelease] Fund Release received $res, responding with $response")
+                    logger.info(
+                      s"[PropertyPurchaseController][requestFundRelease] Fund Release received $res, responding with $response"
+                    )
                     auditFundRelease(
                       lisaManager,
                       accountId,
@@ -125,7 +131,9 @@ class PropertyPurchaseController @Inject() (
           withValidJson[RequestPurchaseExtension](
             req =>
               if (req.eventDate.isBefore(LISA_START_DATE)) {
-                logger.info("[PropertyPurchaseController][requestExtension] Extension not reported - invalid event date")
+                logger.info(
+                  "[PropertyPurchaseController][requestExtension] Extension not reported - invalid event date"
+                )
 
                 auditExtension(lisaManager, accountId, req, success = false, Map("reasonNotReported" -> "FORBIDDEN"))
                 lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
@@ -155,7 +163,9 @@ class PropertyPurchaseController @Inject() (
                   case res: ReportLifeEventResponse        =>
                     val response =
                       extensionErrors.applyOrElse(res, { _: ReportLifeEventResponse => ErrorInternalServerError })
-                    logger.warn(s"[PropertyPurchaseController][requestExtension] Extension received $res, responding with $response")
+                    logger.warn(
+                      s"[PropertyPurchaseController][requestExtension] Extension received $res, responding with $response"
+                    )
                     auditExtension(
                       lisaManager,
                       accountId,
@@ -182,7 +192,9 @@ class PropertyPurchaseController @Inject() (
           withValidJson[RequestPurchaseOutcomeRequest](
             req =>
               if (req.eventDate.isBefore(LISA_START_DATE)) {
-                logger.info("[PropertyPurchaseController][reportPurchaseOutcome] Purchase outcome not reported - invalid event date")
+                logger.info(
+                  "[PropertyPurchaseController][reportPurchaseOutcome] Purchase outcome not reported - invalid event date"
+                )
 
                 auditOutcome(lisaManager, accountId, req, success = false, Map("reasonNotReported" -> "FORBIDDEN"))
                 lisaMetrics.incrementMetrics(startTime, FORBIDDEN, LisaMetricKeys.PROPERTY_PURCHASE)
@@ -213,7 +225,9 @@ class PropertyPurchaseController @Inject() (
                   case res: ReportLifeEventResponse        =>
                     val response: ErrorResponse =
                       outcomeErrors.applyOrElse(res, { _: ReportLifeEventResponse => ErrorInternalServerError })
-                    logger.warn(s"[PropertyPurchaseController][reportPurchaseOutcome] Purchase outcome received $res, responding with $response")
+                    logger.warn(
+                      s"[PropertyPurchaseController][reportPurchaseOutcome] Purchase outcome received $res, responding with $response"
+                    )
                     auditOutcome(
                       lisaManager,
                       accountId,

@@ -231,4 +231,5 @@ class WithdrawalServiceSpec extends ServiceTestFixture {
 
     callback(response)
   }
+
 }

@@ -48,9 +48,8 @@ class AccountControllerSpec extends ControllerTestFixture {
   val lisaManager                    = "Z019283"
   val accountId                      = "ABC/12345"
 
-  override def beforeEach(): Unit = {
+  override def beforeEach(): Unit =
     reset(mockAuditService)
-  }
 
   val validDate   = "2017-04-06"
   val invalidDate = "2015-04-05"
@@ -132,7 +131,7 @@ class AccountControllerSpec extends ControllerTestFixture {
     }
 
     "audit an accountNotCreated event" when {
-      "the json fails date validation" in {
+      "the json fails date validation" in
         doSyncCreateOrTransferRequest(createAccountJson.replace(validDate, invalidDate)) { _ =>
           verify(mockAuditService).audit(
             auditType = matchersEquals("accountNotCreated"),
@@ -148,7 +147,6 @@ class AccountControllerSpec extends ControllerTestFixture {
             )
           )(any())
         }
-      }
       "the data service returns a CreateLisaAccountInvestorNotFoundResponse for a create request" in {
         when(mockAccountService.createAccount(any(), any())(any()))
           .thenReturn(Future.successful(CreateLisaAccountInvestorNotFoundResponse))
@@ -301,7 +299,7 @@ class AccountControllerSpec extends ControllerTestFixture {
     }
 
     "audit an accountNotTransferred event" when {
-      "the json fails date validation" in {
+      "the json fails date validation" in
         doSyncCreateOrTransferRequest(transferAccountJson.replace(validDate, invalidDate)) { _ =>
           verify(mockAuditService).audit(
             auditType = matchersEquals("accountNotTransferred"),
@@ -321,7 +319,6 @@ class AccountControllerSpec extends ControllerTestFixture {
             )
           )(any())
         }
-      }
       "the data service returns a CreateLisaAccountInvestorNotFoundResponse for a transfer request" in {
         when(mockAccountService.transferAccount(any(), any())(any()))
           .thenReturn(Future.successful(CreateLisaAccountInvestorNotFoundResponse))
@@ -497,7 +494,7 @@ class AccountControllerSpec extends ControllerTestFixture {
         when(mockAccountService.createAccount(any(), any())(any()))
           .thenReturn(Future.successful(CreateLisaAccountSuccessResponse(accountId)))
         doCreateOrTransferRequest(createAccountJson) { res =>
-          status(res) mustBe CREATED
+          status(res)                                            mustBe CREATED
           (contentAsJson(res) \ "data" \ "accountId").as[String] mustBe accountId
         }
       }
@@ -506,7 +503,7 @@ class AccountControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(CreateLisaAccountSuccessResponse(accountId)))
 
         doCreateOrTransferRequest(transferAccountJson) { res =>
-          status(res) mustBe CREATED
+          status(res)                                            mustBe CREATED
           (contentAsJson(res) \ "data" \ "accountId").as[String] mustBe accountId
         }
       }
@@ -517,7 +514,7 @@ class AccountControllerSpec extends ControllerTestFixture {
         val invalidJson = createAccountJson.replace("9876543210", "")
 
         doCreateOrTransferRequest(invalidJson) { res =>
-          status(res) mustBe BAD_REQUEST
+          status(res)                              mustBe BAD_REQUEST
           (contentAsJson(res) \ "code").as[String] mustBe "BAD_REQUEST"
         }
       }
@@ -528,7 +525,7 @@ class AccountControllerSpec extends ControllerTestFixture {
         doCreateOrTransferRequest(createAccountJson, "ZZ1234") { res =>
           status(res) mustBe BAD_REQUEST
           val json = contentAsJson(res)
-          (json \ "code").as[String] mustBe ErrorBadRequestLmrn.errorCode
+          (json \ "code").as[String]    mustBe ErrorBadRequestLmrn.errorCode
           (json \ "message").as[String] mustBe ErrorBadRequestLmrn.message
         }
       }
@@ -540,7 +537,7 @@ class AccountControllerSpec extends ControllerTestFixture {
           status(res) mustBe BAD_REQUEST
 
           val json = contentAsJson(res)
-          (json \ "code").as[String] mustBe "BAD_REQUEST"
+          (json \ "code").as[String]    mustBe "BAD_REQUEST"
           (json \ "message").as[String] mustBe "Bad Request"
 
           val errors = (json \ "errors").as[List[JsObject]]
@@ -571,10 +568,10 @@ class AccountControllerSpec extends ControllerTestFixture {
 
           val json = contentAsJson(res)
 
-          (json \ "code").as[String] mustBe "FORBIDDEN"
-          (json \ "errors" \ 0 \ "code").as[String] mustBe "INVALID_DATE"
+          (json \ "code").as[String]                   mustBe "FORBIDDEN"
+          (json \ "errors" \ 0 \ "code").as[String]    mustBe "INVALID_DATE"
           (json \ "errors" \ 0 \ "message").as[String] mustBe "The firstSubscriptionDate cannot be before 6 April 2017"
-          (json \ "errors" \ 0 \ "path").as[String] mustBe "/firstSubscriptionDate"
+          (json \ "errors" \ 0 \ "path").as[String]    mustBe "/firstSubscriptionDate"
         }
       }
       "given a firstSubscriptionDate and transferInDate prior to 6 April 2017" in {
@@ -588,13 +585,13 @@ class AccountControllerSpec extends ControllerTestFixture {
 
           val json = contentAsJson(res)
 
-          (json \ "code").as[String] mustBe "FORBIDDEN"
-          (json \ "errors" \ 0 \ "code").as[String] mustBe "INVALID_DATE"
+          (json \ "code").as[String]                   mustBe "FORBIDDEN"
+          (json \ "errors" \ 0 \ "code").as[String]    mustBe "INVALID_DATE"
           (json \ "errors" \ 0 \ "message").as[String] mustBe "The firstSubscriptionDate cannot be before 6 April 2017"
-          (json \ "errors" \ 0 \ "path").as[String] mustBe "/firstSubscriptionDate"
-          (json \ "errors" \ 1 \ "code").as[String] mustBe "INVALID_DATE"
+          (json \ "errors" \ 0 \ "path").as[String]    mustBe "/firstSubscriptionDate"
+          (json \ "errors" \ 1 \ "code").as[String]    mustBe "INVALID_DATE"
           (json \ "errors" \ 1 \ "message").as[String] mustBe "The transferInDate cannot be before 6 April 2017"
-          (json \ "errors" \ 1 \ "path").as[String] mustBe "/transferAccount/transferInDate"
+          (json \ "errors" \ 1 \ "path").as[String]    mustBe "/transferAccount/transferInDate"
         }
       }
     }
@@ -605,7 +602,7 @@ class AccountControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(CreateLisaAccountInvestorNotFoundResponse))
 
         doCreateOrTransferRequest(createAccountJson) { res =>
-          status(res) mustBe FORBIDDEN
+          status(res)                              mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_NOT_FOUND"
         }
       }
@@ -614,7 +611,7 @@ class AccountControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(CreateLisaAccountInvestorNotFoundResponse))
 
         doCreateOrTransferRequest(transferAccountJson) { res =>
-          status(res) mustBe FORBIDDEN
+          status(res)                              mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_NOT_FOUND"
         }
       }
@@ -626,7 +623,7 @@ class AccountControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(CreateLisaAccountInvestorNotEligibleResponse))
 
         doCreateOrTransferRequest(createAccountJson) { res =>
-          status(res) mustBe FORBIDDEN
+          status(res)                              mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ELIGIBILITY_CHECK_FAILED"
         }
       }
@@ -638,7 +635,7 @@ class AccountControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(CreateLisaAccountInvestorComplianceCheckFailedResponse))
 
         doCreateOrTransferRequest(createAccountJson) { res =>
-          status(res) mustBe FORBIDDEN
+          status(res)                              mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_COMPLIANCE_CHECK_FAILED"
         }
       }
@@ -647,7 +644,7 @@ class AccountControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(CreateLisaAccountInvestorComplianceCheckFailedResponse))
 
         doCreateOrTransferRequest(transferAccountJson) { res =>
-          status(res) mustBe FORBIDDEN
+          status(res)                              mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_COMPLIANCE_CHECK_FAILED"
         }
       }
@@ -659,42 +656,38 @@ class AccountControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse))
 
         doCreateOrTransferRequest(transferAccountJson) { res =>
-          status(res) mustBe FORBIDDEN
+          status(res)                              mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "PREVIOUS_INVESTOR_ACCOUNT_DOES_NOT_EXIST"
         }
       }
     }
 
     "return with status 403 forbidden and a code of TRANSFER_ACCOUNT_DATA_NOT_PROVIDED" when {
-      "sent a transfer request json with no transferAccount data" in {
+      "sent a transfer request json with no transferAccount data" in
         doCreateOrTransferRequest(transferAccountJsonIncomplete) { res =>
-          status(res) mustBe FORBIDDEN
+          status(res)                              mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "TRANSFER_ACCOUNT_DATA_NOT_PROVIDED"
         }
-      }
     }
 
     "return with status 403 forbidden and a code of TRANSFER_ACCOUNT_DATA_PROVIDED" when {
-      "sent a create request json with full transferAccount data" in {
+      "sent a create request json with full transferAccount data" in
         doCreateOrTransferRequest(createAccountJsonWithTransfer) { res =>
-          status(res) mustBe FORBIDDEN
+          status(res)                              mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "TRANSFER_ACCOUNT_DATA_PROVIDED"
         }
-      }
-      "sent a create request json with partial transferAccount data" in {
+      "sent a create request json with partial transferAccount data" in
         doCreateOrTransferRequest(
           createAccountJsonWithTransfer.replace("\"transferredFromAccountID\": \"Z543210\",", "")
         ) { res =>
-          status(res) mustBe FORBIDDEN
+          status(res)                              mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "TRANSFER_ACCOUNT_DATA_PROVIDED"
         }
-      }
-      "sent a create request json with invalid transferAccount data" in {
+      "sent a create request json with invalid transferAccount data" in
         doCreateOrTransferRequest(createAccountJsonWithInvalidTransfer) { res =>
-          status(res) mustBe FORBIDDEN
+          status(res)                              mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "TRANSFER_ACCOUNT_DATA_PROVIDED"
         }
-      }
     }
 
     "return with status 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_CLOSED" when {
@@ -703,7 +696,7 @@ class AccountControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(CreateLisaAccountInvestorAccountAlreadyClosedResponse))
 
         doCreateOrTransferRequest(createAccountJson) { res =>
-          status(res) mustBe FORBIDDEN
+          status(res)                              mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CLOSED"
         }
       }
@@ -712,7 +705,7 @@ class AccountControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(CreateLisaAccountInvestorAccountAlreadyClosedResponse))
 
         doCreateOrTransferRequest(transferAccountJson) { res =>
-          status(res) mustBe FORBIDDEN
+          status(res)                              mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CLOSED"
         }
       }
@@ -724,7 +717,7 @@ class AccountControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(CreateLisaAccountInvestorAccountAlreadyCancelledResponse))
 
         doCreateOrTransferRequest(createAccountJson) { res =>
-          status(res) mustBe FORBIDDEN
+          status(res)                              mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CANCELLED"
         }
       }
@@ -733,7 +726,7 @@ class AccountControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(CreateLisaAccountInvestorAccountAlreadyCancelledResponse))
 
         doCreateOrTransferRequest(transferAccountJson) { res =>
-          status(res) mustBe FORBIDDEN
+          status(res)                              mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CANCELLED"
         }
       }
@@ -745,7 +738,7 @@ class AccountControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(CreateLisaAccountInvestorAccountAlreadyVoidResponse))
 
         doCreateOrTransferRequest(createAccountJson) { res =>
-          status(res) mustBe FORBIDDEN
+          status(res)                              mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_VOID"
         }
       }
@@ -754,7 +747,7 @@ class AccountControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(CreateLisaAccountInvestorAccountAlreadyVoidResponse))
 
         doCreateOrTransferRequest(transferAccountJson) { res =>
-          status(res) mustBe FORBIDDEN
+          status(res)                              mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_VOID"
         }
       }
@@ -768,7 +761,7 @@ class AccountControllerSpec extends ControllerTestFixture {
         doCreateOrTransferRequest(createAccountJson) { res =>
           status(res) mustBe CONFLICT
           val json = contentAsJson(res)
-          (json \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_EXISTS"
+          (json \ "code").as[String]      mustBe "INVESTOR_ACCOUNT_ALREADY_EXISTS"
           (json \ "accountId").as[String] mustBe "8765/432100"
         }
       }
@@ -779,7 +772,7 @@ class AccountControllerSpec extends ControllerTestFixture {
         doCreateOrTransferRequest(transferAccountJson) { res =>
           status(res) mustBe CONFLICT
           val json = contentAsJson(res)
-          (json \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_EXISTS"
+          (json \ "code").as[String]      mustBe "INVESTOR_ACCOUNT_ALREADY_EXISTS"
           (json \ "accountId").as[String] mustBe "8765/432100"
         }
       }
@@ -856,7 +849,9 @@ class AccountControllerSpec extends ControllerTestFixture {
     }
   }
 
-  def doCreateOrTransferRequest(jsonString: String, lmrn: String = lisaManager)(callback: Future[Result] => Unit): Unit = {
+  def doCreateOrTransferRequest(jsonString: String, lmrn: String = lisaManager)(
+    callback: Future[Result] => Unit
+  ): Unit = {
     val res = accountConnector
       .createOrTransferLisaAccount(lmrn)
       .apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).withBody(AnyContentAsJson(Json.parse(jsonString))))
@@ -875,4 +870,5 @@ class AccountControllerSpec extends ControllerTestFixture {
 
     callback(res)
   }
+
 }

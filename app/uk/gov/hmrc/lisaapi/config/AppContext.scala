@@ -36,4 +36,5 @@ class AppContext @Inject() (config: Configuration, serviceConfig: ServicesConfig
 
   def endpointIsDisabled(endpoint: String): Boolean =
     config.getOptional[Seq[String]]("api.disabledEndpoints").fold(false)(list => list.contains(endpoint))
+
 }

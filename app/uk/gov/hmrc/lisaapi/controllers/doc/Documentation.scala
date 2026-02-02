@@ -55,4 +55,5 @@ class Documentation @Inject() (
     val access = APIAccessConfig(appContext.access)
     APIAccess(access.accessType)
   }
+
 }

@@ -66,8 +66,9 @@ class ErrorConverterSpec extends BaseTestFixture with GuiceOneAppPerSuite {
       val e   = validate.asInstanceOf[JsError]
       val res = errorConverter.convert(e.errors)
       res.size mustBe 1
-      res must contain(ErrorValidation("INVALID_DATE", "Date is invalid", Some("/dateOfBirth")))
+      res        must contain(ErrorValidation("INVALID_DATE", "Date is invalid", Some("/dateOfBirth")))
 
     }
   }
+
 }

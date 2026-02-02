@@ -28,6 +28,7 @@ case class AccountTransfer(
 )
 
 object AccountTransfer {
+
   implicit val accountTransferReads: Reads[AccountTransfer] = (
     (JsPath \ "transferredFromAccountId").read(JsonReads.accountId) and
       (JsPath \ "transferredFromLMRN").read(JsonReads.lmrn) and
@@ -39,4 +40,5 @@ object AccountTransfer {
       (JsPath \ "transferredFromLMRN").write[String] and
       (JsPath \ "transferInDate").write[LocalDate]
   )(unlift(AccountTransfer.unapply))
+
 }

@@ -38,4 +38,5 @@ class APIAccessConfigSpec extends BaseTestFixture {
       apiAccessConfigMocked.accessType must be("PRIVATE")
     }
   }
+
 }

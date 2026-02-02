@@ -51,9 +51,8 @@ class GetAccountControllerSpec extends ControllerTestFixture {
   val validDate                      = "2017-04-06"
   val invalidDate                    = "2015-04-05"
 
-  override def beforeEach(): Unit = {
+  override def beforeEach(): Unit =
     reset(mockAuditService)
-  }
 
   "The Get Account Details endpoint" must {
 
@@ -81,15 +80,15 @@ class GetAccountControllerSpec extends ControllerTestFixture {
           status(res) mustBe OK
           val json = contentAsJson(res)
 
-          (json \ "investorId").as[String] mustBe "9876543210"
-          (json \ "accountId").as[String] mustBe "8765432100"
-          (json \ "creationReason").as[String] mustBe "New"
-          (json \ "firstSubscriptionDate").as[String] mustBe validDate
-          (json \ "accountStatus").as[String] mustBe "OPEN"
-          (json \ "subscriptionStatus").as[String] mustBe "AVAILABLE"
+          (json \ "investorId").as[String]              mustBe "9876543210"
+          (json \ "accountId").as[String]               mustBe "8765432100"
+          (json \ "creationReason").as[String]          mustBe "New"
+          (json \ "firstSubscriptionDate").as[String]   mustBe validDate
+          (json \ "accountStatus").as[String]           mustBe "OPEN"
+          (json \ "subscriptionStatus").as[String]      mustBe "AVAILABLE"
           (json \ "accountClosureReason").asOpt[String] mustBe None
-          (json \ "closureDate").asOpt[String] mustBe None
-          (json \ "transferAccount").asOpt[JsObject] mustBe None
+          (json \ "closureDate").asOpt[String]          mustBe None
+          (json \ "transferAccount").asOpt[JsObject]    mustBe None
         }
       }
       "returning a valid close account response" in {
@@ -114,15 +113,15 @@ class GetAccountControllerSpec extends ControllerTestFixture {
 
           val json = contentAsJson(res)
 
-          (json \ "investorId").as[String] mustBe "9876543210"
-          (json \ "accountId").as[String] mustBe "8765432100"
-          (json \ "creationReason").as[String] mustBe "New"
-          (json \ "firstSubscriptionDate").as[String] mustBe validDate
-          (json \ "accountStatus").as[String] mustBe "CLOSED"
-          (json \ "subscriptionStatus").as[String] mustBe "ACTIVE"
+          (json \ "investorId").as[String]              mustBe "9876543210"
+          (json \ "accountId").as[String]               mustBe "8765432100"
+          (json \ "creationReason").as[String]          mustBe "New"
+          (json \ "firstSubscriptionDate").as[String]   mustBe validDate
+          (json \ "accountStatus").as[String]           mustBe "CLOSED"
+          (json \ "subscriptionStatus").as[String]      mustBe "ACTIVE"
           (json \ "accountClosureReason").asOpt[String] mustBe Some("All funds withdrawn")
-          (json \ "closureDate").asOpt[String] mustBe Some(validDate)
-          (json \ "transferAccount").asOpt[JsObject] mustBe None
+          (json \ "closureDate").asOpt[String]          mustBe Some(validDate)
+          (json \ "transferAccount").asOpt[JsObject]    mustBe None
         }
       }
       "returning a valid transfer account response" in {
@@ -153,17 +152,17 @@ class GetAccountControllerSpec extends ControllerTestFixture {
 
           val json = contentAsJson(res)
 
-          (json \ "investorId").as[String] mustBe "9876543210"
-          (json \ "accountId").as[String] mustBe "8765432100"
-          (json \ "creationReason").as[String] mustBe "Transferred"
-          (json \ "firstSubscriptionDate").as[String] mustBe validDate
-          (json \ "accountStatus").as[String] mustBe "OPEN"
-          (json \ "subscriptionStatus").as[String] mustBe "ACTIVE"
-          (json \ "accountClosureReason").asOpt[String] mustBe None
-          (json \ "closureDate").asOpt[String] mustBe None
+          (json \ "investorId").as[String]                                   mustBe "9876543210"
+          (json \ "accountId").as[String]                                    mustBe "8765432100"
+          (json \ "creationReason").as[String]                               mustBe "Transferred"
+          (json \ "firstSubscriptionDate").as[String]                        mustBe validDate
+          (json \ "accountStatus").as[String]                                mustBe "OPEN"
+          (json \ "subscriptionStatus").as[String]                           mustBe "ACTIVE"
+          (json \ "accountClosureReason").asOpt[String]                      mustBe None
+          (json \ "closureDate").asOpt[String]                               mustBe None
           (json \ "transferAccount" \ "transferredFromAccountId").as[String] mustBe "8765432102"
-          (json \ "transferAccount" \ "transferredFromLMRN").as[String] mustBe "Z543333"
-          (json \ "transferAccount" \ "transferInDate").as[String] mustBe validDate
+          (json \ "transferAccount" \ "transferredFromLMRN").as[String]      mustBe "Z543333"
+          (json \ "transferAccount" \ "transferInDate").as[String]           mustBe validDate
         }
       }
       "returning a valid void account response" in {
@@ -188,22 +187,22 @@ class GetAccountControllerSpec extends ControllerTestFixture {
 
           val json = contentAsJson(res)
 
-          (json \ "investorId").as[String] mustBe "9876543210"
-          (json \ "accountId").as[String] mustBe "8765432100"
-          (json \ "creationReason").as[String] mustBe "New"
-          (json \ "firstSubscriptionDate").as[String] mustBe validDate
-          (json \ "accountStatus").as[String] mustBe "VOID"
-          (json \ "subscriptionStatus").as[String] mustBe "ACTIVE"
+          (json \ "investorId").as[String]              mustBe "9876543210"
+          (json \ "accountId").as[String]               mustBe "8765432100"
+          (json \ "creationReason").as[String]          mustBe "New"
+          (json \ "firstSubscriptionDate").as[String]   mustBe validDate
+          (json \ "accountStatus").as[String]           mustBe "VOID"
+          (json \ "subscriptionStatus").as[String]      mustBe "ACTIVE"
           (json \ "accountClosureReason").asOpt[String] mustBe None
-          (json \ "closureDate").asOpt[String] mustBe None
-          (json \ "transferAccount").asOpt[JsObject] mustBe None
+          (json \ "closureDate").asOpt[String]          mustBe None
+          (json \ "transferAccount").asOpt[JsObject]    mustBe None
         }
       }
       "returning a service unavailable response" in {
         when(mockAccountService.getAccount(any(), any())(any()))
           .thenReturn(Future.successful(GetLisaAccountServiceUnavailable))
         doSyncGetAccountDetailsRequest { res =>
-          status(res) mustBe SERVICE_UNAVAILABLE
+          status(res)                              mustBe SERVICE_UNAVAILABLE
           (contentAsJson(res) \ "code").as[String] mustBe "SERVER_ERROR"
         }
       }
@@ -320,4 +319,5 @@ class GetAccountControllerSpec extends ControllerTestFixture {
       .apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
     callback(res)
   }
+
 }

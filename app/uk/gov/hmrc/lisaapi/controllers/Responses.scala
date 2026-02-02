@@ -24,10 +24,13 @@ sealed abstract class ErrorResponse(
   val errorCode: String,
   val message: String
 ) {
+
   def asResult: Result =
     Results.Status(httpStatusCode)(Json.toJson(this))
-  def asJson: JsValue  =
+
+  def asJson: JsValue =
     Json.toJson(this)
+
 }
 
 sealed abstract class ErrorResponseWithErrors(
@@ -79,22 +82,29 @@ case class ErrorForbidden(errs: List[ErrorValidation])
 
 case object ErrorBadRequestInvalidPayload
     extends ErrorResponse(400, "INVALID_PAYLOAD", "Submission has not passed validation")
+
 case object ErrorBadRequestLmrn
     extends ErrorResponse(400, "BAD_REQUEST", "Enter lisaManagerReferenceNumber in the correct format, like Z1234")
+
 case object ErrorBadRequestAccountId
     extends ErrorResponse(400, "BAD_REQUEST", "Enter accountId in the correct format, like ABC12345")
+
 case object ErrorBadRequestTransactionId
     extends ErrorResponse(400, "BAD_REQUEST", "transactionId in the URL is in the wrong format")
 
 // specific errors for bulk payment url validation
 case object ErrorBadRequestStart extends ErrorResponse(400, "BAD_REQUEST", "startDate is in the wrong format")
 case object ErrorBadRequestEnd extends ErrorResponse(400, "BAD_REQUEST", "endDate is in the wrong format")
+
 case object ErrorBadRequestStartEnd
     extends ErrorResponse(400, "BAD_REQUEST", "startDate and endDate are in the wrong format")
+
 case object ErrorBadRequestEndInFuture extends ErrorResponse(403, "FORBIDDEN", "endDate cannot be in the future")
 case object ErrorBadRequestEndBeforeStart extends ErrorResponse(403, "FORBIDDEN", "endDate cannot be before startDate")
+
 case object ErrorBadRequestStartBefore6April2017
     extends ErrorResponse(403, "FORBIDDEN", "startDate cannot be before 6 April 2017")
+
 case object ErrorBadRequestOverYearBetweenStartAndEnd
     extends ErrorResponse(403, "FORBIDDEN", "endDate cannot be more than a year after startDate")
 // end
@@ -135,6 +145,7 @@ case object ErrorInvestorComplianceCheckFailedCreateTransfer
       "INVESTOR_COMPLIANCE_CHECK_FAILED",
       "You cannot create or transfer a LISA account because the investor has failed a compliance check"
     )
+
 case object ErrorInvestorComplianceCheckFailedReinstate
     extends ErrorResponse(
       403,
@@ -307,12 +318,14 @@ case class ErrorLifeEventAlreadyExists(lifeEventId: String)
       "The investor’s life event has already been reported",
       lifeEventId
     )
+
 case object ErrorLifeEventMismatch
     extends ErrorResponse(
       403,
       "SUPERSEDED_LIFE_EVENT_MISMATCH_ERROR",
       "originalLifeEventId and the originalEventDate do not match the information in the original request"
     )
+
 case class ErrorLifeEventAlreadySuperseded(lifeEventId: String)
     extends ErrorResponseWithLifeEventId(
       409,
@@ -327,22 +340,27 @@ case object ErrorAccountNotOpenLongEnough
       "COMPLIANCE_ERROR_ACCOUNT_NOT_OPEN_LONG_ENOUGH",
       "The account has not been open for long enough"
     )
+
 case object ErrorFundReleaseOtherPropertyOnRecord
     extends ErrorResponse(
       403,
       "COMPLIANCE_ERROR_OTHER_PURCHASE_ON_RECORD",
       "Another property purchase is already recorded"
     )
+
 case object ErrorInvalidDataProvided
     extends ErrorResponse(
       403,
       "INVALID_DATA_PROVIDED",
       "You can only change eventDate or withdrawalAmount when superseding a property purchase fund release"
     )
+
 case object ErrorExtensionOneNotApproved
     extends ErrorResponse(403, "FIRST_EXTENSION_NOT_APPROVED", "A first extension has not yet been approved")
+
 case object ErrorFundReleaseNotFound
     extends ErrorResponse(404, "FUND_RELEASE_NOT_FOUND", "The fundReleaseId does not match HMRC’s records")
+
 case class ErrorFundReleaseSuperseded(lifeEventId: String)
     extends ErrorResponseWithLifeEventId(
       409,
@@ -350,6 +368,7 @@ case class ErrorFundReleaseSuperseded(lifeEventId: String)
       "This fund release has already been superseded",
       lifeEventId
     )
+
 case class ErrorExtensionOneAlreadyApproved(lifeEventId: String)
     extends ErrorResponseWithLifeEventId(
       403,
@@ -357,6 +376,7 @@ case class ErrorExtensionOneAlreadyApproved(lifeEventId: String)
       "A first extension has already been approved",
       lifeEventId
     )
+
 case class ErrorExtensionTwoAlreadyApproved(lifeEventId: String)
     extends ErrorResponseWithLifeEventId(
       403,
@@ -386,6 +406,7 @@ object ErrorWithdrawalExists {
       "A withdrawal charge with these details has already been requested for this investor",
       transactionId
     )
+
 }
 
 object ErrorInvestorAlreadyExists {

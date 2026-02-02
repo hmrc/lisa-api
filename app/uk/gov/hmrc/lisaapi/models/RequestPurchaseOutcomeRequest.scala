@@ -63,6 +63,7 @@ object PurchaseOutcomeSupersede {
     (JsPath \ "originalLifeEventId").read(JsonReads.lifeEventId) and
       (JsPath \ "originalEventDate").read(JsonReads.notFutureDate)
   )(PurchaseOutcomeSupersede.apply _)
+
 }
 
 object RequestPurchaseOutcomeRequest {
@@ -189,4 +190,5 @@ object RequestPurchaseOutcomeRequest {
     case i: RequestPurchaseOutcomeCompletedRequest           => initialCompletedWrites.writes(i)
     case i: RequestPurchaseOutcomeFailedRequest              => initialFailedWrites.writes(i)
   }
+
 }

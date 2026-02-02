@@ -22,6 +22,7 @@ import play.api.libs.json._
 import java.time.LocalDate
 
 case class GetLifeEventItemPropertyDetails(nameOrNumber: String, postalCode: String)
+
 object GetLifeEventItemPropertyDetails {
   implicit val formats: OFormat[GetLifeEventItemPropertyDetails] = Json.format[GetLifeEventItemPropertyDetails]
 }
@@ -53,6 +54,7 @@ case class GetLifeEventItem(
 )
 
 object GetLifeEventItem {
+
   implicit val reads: Reads[GetLifeEventItem] = (
     (JsPath \ "lifeEventId").read(JsonReads.lifeEventId) and
       (JsPath \ "lifeEventType").read[String] and
@@ -173,4 +175,5 @@ object GetLifeEventItem {
       event.supersededBy
     )
   }
+
 }

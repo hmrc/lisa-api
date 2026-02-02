@@ -66,6 +66,7 @@ case class GetWithdrawalResponse(
 ) extends GetBonusOrWithdrawalSuccessResponse
 
 object GetBonusOrWithdrawalResponse {
+
   implicit val bonusReads: Reads[GetBonusResponse] = (
     (JsPath \ "lifeEventId").readNullable(JsonReads.lifeEventId) and
       (JsPath \ "claimPeriodStart").read(JsonReads.isoDate) and
@@ -298,6 +299,7 @@ object GetBonusOrWithdrawalResponse {
       case "CANCELLED"         => TransactionPaymentStatus.CANCELLED
       case "SUPERSEDED"        => TransactionPaymentStatus.SUPERSEDED
     }
+
 }
 
 object TransactionPaymentType {

@@ -47,7 +47,9 @@ class InvestorController @Inject() (
   def createLisaInvestor(lisaManager: String): Action[AnyContent] =
     (validateHeader(parse) andThen validateLMRN(lisaManager)).async { implicit request =>
       implicit val startTime: Long = System.currentTimeMillis()
-      logger.info(s"[InvestorController][createLisaInvestor] LISA HTTP Request: ${request.uri} and method: ${request.method} lisaManager :$lisaManager")
+      logger.info(
+        s"[InvestorController][createLisaInvestor] LISA HTTP Request: ${request.uri} and method: ${request.method} lisaManager :$lisaManager"
+      )
       withValidJson[CreateLisaInvestorRequest](
         createRequest =>
           service.createInvestor(lisaManager, createRequest).map {

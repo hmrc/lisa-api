@@ -32,10 +32,14 @@ class InvestorService @Inject() (desConnector: DesConnector)(implicit ec: Execut
   ): Future[CreateLisaInvestorResponse] =
     desConnector.createInvestor(lisaManager, request) map {
       case successResponse: CreateLisaInvestorSuccessResponse      =>
-        logger.info(s"[InvestorService][createInvestor] Matched CreateLisaInvestorSuccessResponse for lisaManager : $lisaManager")
+        logger.info(
+          s"[InvestorService][createInvestor] Matched CreateLisaInvestorSuccessResponse for lisaManager : $lisaManager"
+        )
         successResponse
       case existsResponse: CreateLisaInvestorAlreadyExistsResponse =>
-        logger.info(s"[InvestorService][createInvestor] Matched CreateLisaInvestorAlreadyExistsResponse for lisaManager : $lisaManager")
+        logger.info(
+          s"[InvestorService][createInvestor] Matched CreateLisaInvestorAlreadyExistsResponse for lisaManager : $lisaManager"
+        )
         existsResponse
       case DesUnavailableResponse                                  =>
         logger.warn(s"[InvestorService][createInvestor] Matched DesUnavailableResponse for lisaManager : $lisaManager")
@@ -43,10 +47,14 @@ class InvestorService @Inject() (desConnector: DesConnector)(implicit ec: Execut
       case error: DesFailureResponse                               =>
         error.code match {
           case "INVESTOR_NOT_FOUND" =>
-            logger.error(s"[InvestorService][createInvestor] Matched error code as ${error.code} for lisaManager : $lisaManager")
+            logger.error(
+              s"[InvestorService][createInvestor] Matched error code as ${error.code} for lisaManager : $lisaManager"
+            )
             CreateLisaInvestorInvestorNotFoundResponse
           case _                    =>
-            logger.error(s"[InvestorService][createInvestor] Create investor returned error code ${error.code} for lisaManager : $lisaManager")
+            logger.error(
+              s"[InvestorService][createInvestor] Create investor returned error code ${error.code} for lisaManager : $lisaManager"
+            )
             CreateLisaInvestorErrorResponse
         }
     }

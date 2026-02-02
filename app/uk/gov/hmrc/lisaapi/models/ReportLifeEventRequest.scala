@@ -26,6 +26,7 @@ trait ReportLifeEventRequestBase extends Product
 case class ReportLifeEventRequest(eventType: LifeEventType, eventDate: LocalDate) extends ReportLifeEventRequestBase
 
 object ReportLifeEventRequestBase {
+
   implicit val writes: Writes[ReportLifeEventRequestBase] = Writes[ReportLifeEventRequestBase] {
     case deathTerminalIllness: ReportLifeEventRequest   => ReportLifeEventRequest.desWrites.writes(deathTerminalIllness)
     case fundRelease: RequestFundReleaseRequest         => RequestFundReleaseRequest.desWrites.writes(fundRelease)
@@ -34,9 +35,11 @@ object ReportLifeEventRequestBase {
       RequestPurchaseOutcomeRequest.desWrites.writes(purchaseOutcome)
     case annualReturn: AnnualReturn                     => AnnualReturn.desWrites.writes(annualReturn)
   }
+
 }
 
 object ReportLifeEventRequest {
+
   implicit val userReads: Reads[ReportLifeEventRequest] = (
     (JsPath \ "eventType").read(JsonReads.lifeEventType) and
       (JsPath \ "eventDate").read(JsonReads.notFutureDate)
@@ -46,4 +49,5 @@ object ReportLifeEventRequest {
     (JsPath \ "eventType").write[String] and
       (JsPath \ "eventDate").write[LocalDate]
   )(unlift(ReportLifeEventRequest.unapply))
+
 }

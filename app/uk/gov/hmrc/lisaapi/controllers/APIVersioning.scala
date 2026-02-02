@@ -38,7 +38,9 @@ trait APIVersioning extends Logging {
     override protected def executionContext: ExecutionContext                                             = ec
     override def invokeBlock[A](request: Request[A], block: Request[A] => Future[Result]): Future[Result] =
       if (appContext.endpointIsDisabled(endpoint)) {
-        logger.info(s"[APIVersioning][isEndpointEnabled] User attempted to use an endpoint which is not available ($endpoint)")
+        logger.info(
+          s"[APIVersioning][isEndpointEnabled] User attempted to use an endpoint which is not available ($endpoint)"
+        )
         Future.successful(ErrorApiNotAvailable.asResult)
       } else {
         block(request)
@@ -47,8 +49,8 @@ trait APIVersioning extends Logging {
 
   def validateHeader(parse: PlayBodyParsers)(implicit ec: ExecutionContext): ActionBuilder[Request, AnyContent] =
     new ActionBuilder[Request, AnyContent] {
-      override def parser: BodyParser[AnyContent]                                           = parse.defaultBodyParser
-      override protected def executionContext: ExecutionContext                             = ec
+      override def parser: BodyParser[AnyContent]                                                           = parse.defaultBodyParser
+      override protected def executionContext: ExecutionContext                                             = ec
       override def invokeBlock[A](request: Request[A], block: Request[A] => Future[Result]): Future[Result] =
         extractAcceptHeader(request) match {
           case Some(AcceptHeader(version, content)) =>
@@ -63,7 +65,9 @@ trait APIVersioning extends Logging {
                   logger.info(s"[APIVersioning][validateHeader] Request accept header has invalid version: $version")
                   Future.successful(ErrorAcceptHeaderVersionInvalid.asResult)
                 case (_, false)   =>
-                  logger.info(s"[APIVersioning][validateHeader] Request accept header has invalid content type: $content")
+                  logger.info(
+                    s"[APIVersioning][validateHeader] Request accept header has invalid content type: $content"
+                  )
                   Future.successful(ErrorAcceptHeaderContentInvalid.asResult)
               }
             }

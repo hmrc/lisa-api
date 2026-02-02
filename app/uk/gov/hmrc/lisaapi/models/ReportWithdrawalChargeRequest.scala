@@ -437,4 +437,5 @@ object ReportWithdrawalChargeRequest {
     case regular: RegularWithdrawalChargeRequest       => desRegularWithdrawalWrites.writes(regular)
     case superseded: SupersededWithdrawalChargeRequest => desSupersededWithdrawalWrites.writes(superseded)
   }
+
 }

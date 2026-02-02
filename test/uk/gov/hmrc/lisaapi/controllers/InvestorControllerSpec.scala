@@ -109,7 +109,7 @@ class InvestorControllerSpec extends ControllerTestFixture {
 
         val json = contentAsJson(res)
 
-        (json \ "code").as[String] mustBe ErrorBadRequestLmrn.errorCode
+        (json \ "code").as[String]    mustBe ErrorBadRequestLmrn.errorCode
         (json \ "message").as[String] mustBe ErrorBadRequestLmrn.message
       }
 
@@ -155,9 +155,9 @@ class InvestorControllerSpec extends ControllerTestFixture {
 
         val json = contentAsJson(res)
 
-        (json \ "code").as[String] mustBe "INVESTOR_ALREADY_EXISTS"
+        (json \ "code").as[String]    mustBe "INVESTOR_ALREADY_EXISTS"
         (json \ "message").as[String] mustBe "The investor already has a record with HMRC"
-        (json \ "id").as[String] mustBe "1234567890"
+        (json \ "id").as[String]      mustBe "1234567890"
 
       }
     }
@@ -172,7 +172,7 @@ class InvestorControllerSpec extends ControllerTestFixture {
             FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).withBody(AnyContentAsJson(Json.parse(investorJson)))
           )
 
-        status(res) mustBe INTERNAL_SERVER_ERROR
+        status(res)                              mustBe INTERNAL_SERVER_ERROR
         (contentAsJson(res) \ "code").as[String] mustBe "INTERNAL_SERVER_ERROR"
       }
     }
@@ -188,7 +188,7 @@ class InvestorControllerSpec extends ControllerTestFixture {
             FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).withBody(AnyContentAsJson(Json.parse(investorJson)))
           )
 
-        status(res) mustBe SERVICE_UNAVAILABLE
+        status(res)                              mustBe SERVICE_UNAVAILABLE
         (contentAsJson(res) \ "code").as[String] mustBe "SERVER_ERROR"
       }
     }
@@ -328,4 +328,5 @@ class InvestorControllerSpec extends ControllerTestFixture {
       }
     }
   }
+
 }

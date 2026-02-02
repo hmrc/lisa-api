@@ -14,3 +14,5 @@ lazy val microservice = Project("lisa-api", file("."))
     PlayKeys.playDefaultPort := 9667
   )
   .settings(CodeCoverageSettings())
+
+addCommandAlias("scalafmtAll", "all scalafmtSbt scalafmt Test/scalafmt")

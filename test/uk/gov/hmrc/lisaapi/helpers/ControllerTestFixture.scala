@@ -32,10 +32,7 @@ import uk.gov.hmrc.lisaapi.utils.{BonusPaymentValidator, ErrorConverter, Withdra
 import scala.concurrent.{ExecutionContext, Future}
 
 trait ControllerTestFixture
-    extends BaseTestFixture
-    with GuiceOneAppPerSuite
-    with BeforeAndAfterEach
-    with LisaConstants {
+    extends BaseTestFixture with GuiceOneAppPerSuite with BeforeAndAfterEach with LisaConstants {
 
   val injector: Injector                             = app.injector
   val mockControllerComponents: ControllerComponents = injector.instanceOf[ControllerComponents]
@@ -57,11 +54,19 @@ trait ControllerTestFixture
   val mockAuthConnector: AuthConnector = mock[AuthConnector]
 
   def mockAuthorize(lisaManager: String = "Z019283")(implicit ec: ExecutionContext): Unit =
-    when(mockAuthConnector.authorise[Enrolments](any(), any())(any(), any())).thenReturn(Future(Enrolments(Set(Enrolment(
-    key = "HMRC-LISA-ORG",
-    identifiers = Seq(EnrolmentIdentifier("ZREF", lisaManager)),
-    state = "Activated"
-  )))))
+    when(mockAuthConnector.authorise[Enrolments](any(), any())(any(), any())).thenReturn(
+      Future(
+        Enrolments(
+          Set(
+            Enrolment(
+              key = "HMRC-LISA-ORG",
+              identifiers = Seq(EnrolmentIdentifier("ZREF", lisaManager)),
+              state = "Activated"
+            )
+          )
+        )
+      )
+    )
 
   val mockErrorConverter: ErrorConverter = mock[ErrorConverter]
 

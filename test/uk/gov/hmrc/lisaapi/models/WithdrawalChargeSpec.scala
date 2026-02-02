@@ -164,7 +164,7 @@ class WithdrawalChargeSpec extends PlaySpec {
       }
     }
 
-    "error for an empty object" in {
+    "error for an empty object" in
       Json
         .parse("""{}""")
         .validate[ReportWithdrawalChargeRequest]
@@ -182,7 +182,6 @@ class WithdrawalChargeSpec extends PlaySpec {
           },
           _ => fail("invalid json passed validation")
         )
-    }
 
     "error for invalid data formats" in {
       val json = Json

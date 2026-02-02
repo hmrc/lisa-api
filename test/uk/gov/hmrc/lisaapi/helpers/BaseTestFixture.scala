@@ -26,5 +26,5 @@ trait BaseTestFixture extends PlaySpec with MockitoSugar {
 
   val mockConfiguration: Configuration = mock[Configuration]
   val mockAppContext: AppContext       = mock[AppContext]
-  val mockHttp: HttpClientV2             = mock[HttpClientV2]
+  val mockHttp: HttpClientV2           = mock[HttpClientV2]
 }

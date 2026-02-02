@@ -24,6 +24,7 @@ import java.time.LocalDate
 case class CreateLisaInvestorRequest(investorNINO: Nino, firstName: Name, lastName: Name, dateOfBirth: LocalDate)
 
 object CreateLisaInvestorRequest {
+
   implicit val createLisaInvestorRequestReads: Reads[CreateLisaInvestorRequest] = (
     (JsPath \ "investorNINO").read[Nino](JsonReads.nino) and
       (JsPath \ "firstName").read(JsonReads.name).map[String](_.toUpperCase.trim) and
@@ -37,4 +38,5 @@ object CreateLisaInvestorRequest {
       (JsPath \ "lastName").write[String] and
       (JsPath \ "dateOfBirth").write[LocalDate]
   )(unlift(CreateLisaInvestorRequest.unapply))
+
 }

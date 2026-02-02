@@ -46,10 +46,10 @@ class BulkPaymentControllerSpec extends ControllerTestFixture {
   }
 
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.2.0+json")
-  val currentDate: LocalDate = LocalDate.parse("2020-01-01")
-  val validDate: String = "2018-01-01"
-  val invalidDate: String = "01-01-2018"
-  val lmrn: String = "Z123456"
+  val currentDate: LocalDate         = LocalDate.parse("2020-01-01")
+  val validDate: String              = "2018-01-01"
+  val invalidDate: String            = "01-01-2018"
+  val lmrn: String                   = "Z123456"
 
   val successResponse: GetBulkPaymentSuccessResponse = GetBulkPaymentSuccessResponse(
     lmrn,
@@ -85,17 +85,16 @@ class BulkPaymentControllerSpec extends ControllerTestFixture {
 
         val json = contentAsJson(result)
 
-        (json \ "lisaManagerReferenceNumber").as[String] mustBe lmrn
+        (json \ "lisaManagerReferenceNumber").as[String]   mustBe lmrn
         (json \ "payments" \ 0 \ "paymentAmount")
-          .as[Amount] mustBe successResponse.payments.head.asInstanceOf[BulkPaymentPaid].paymentAmount
-        (json \ "payments" \ 0 \ "paymentDate").as[String] mustBe successResponse
-          .payments.head
+          .as[Amount]                                      mustBe successResponse.payments.head.asInstanceOf[BulkPaymentPaid].paymentAmount
+        (json \ "payments" \ 0 \ "paymentDate").as[String] mustBe successResponse.payments.head
           .asInstanceOf[BulkPaymentPaid]
           .paymentDate
           .get
           .toString
         (json \ "payments" \ 0 \ "paymentReference")
-          .as[String] mustBe successResponse.payments.head.asInstanceOf[BulkPaymentPaid].paymentReference.get
+          .as[String]                                      mustBe successResponse.payments.head.asInstanceOf[BulkPaymentPaid].paymentReference.get
       }
     }
 
@@ -109,7 +108,7 @@ class BulkPaymentControllerSpec extends ControllerTestFixture {
 
         val json = contentAsJson(result)
 
-        (json \ "code").as[String] mustBe "BAD_REQUEST"
+        (json \ "code").as[String]    mustBe "BAD_REQUEST"
         (json \ "message").as[String] mustBe "Enter lisaManagerReferenceNumber in the correct format, like Z1234"
       }
       "the startDate parameter is in the wrong format" in {
@@ -121,7 +120,7 @@ class BulkPaymentControllerSpec extends ControllerTestFixture {
 
         val json = contentAsJson(result)
 
-        (json \ "code").as[String] mustBe ErrorBadRequestStart.errorCode
+        (json \ "code").as[String]    mustBe ErrorBadRequestStart.errorCode
         (json \ "message").as[String] mustBe ErrorBadRequestStart.message
       }
       "the endDate parameter is in the wrong format" in {
@@ -133,7 +132,7 @@ class BulkPaymentControllerSpec extends ControllerTestFixture {
 
         val json = contentAsJson(result)
 
-        (json \ "code").as[String] mustBe ErrorBadRequestEnd.errorCode
+        (json \ "code").as[String]    mustBe ErrorBadRequestEnd.errorCode
         (json \ "message").as[String] mustBe ErrorBadRequestEnd.message
       }
       "the startDate and endDate parameters are invalid" in {
@@ -145,7 +144,7 @@ class BulkPaymentControllerSpec extends ControllerTestFixture {
 
         val json = contentAsJson(result)
 
-        (json \ "code").as[String] mustBe ErrorBadRequestStartEnd.errorCode
+        (json \ "code").as[String]    mustBe ErrorBadRequestStartEnd.errorCode
         (json \ "message").as[String] mustBe ErrorBadRequestStartEnd.message
       }
     }
@@ -161,7 +160,7 @@ class BulkPaymentControllerSpec extends ControllerTestFixture {
 
         val json = contentAsJson(result)
 
-        (json \ "code").as[String] mustBe ErrorBadRequestEndInFuture.errorCode
+        (json \ "code").as[String]    mustBe ErrorBadRequestEndInFuture.errorCode
         (json \ "message").as[String] mustBe ErrorBadRequestEndInFuture.message
       }
       "the endDate is before the startDate" in {
@@ -174,7 +173,7 @@ class BulkPaymentControllerSpec extends ControllerTestFixture {
 
         val json = contentAsJson(result)
 
-        (json \ "code").as[String] mustBe ErrorBadRequestEndBeforeStart.errorCode
+        (json \ "code").as[String]    mustBe ErrorBadRequestEndBeforeStart.errorCode
         (json \ "message").as[String] mustBe ErrorBadRequestEndBeforeStart.message
       }
       "the startDate is before 6 April 2017" in {
@@ -186,7 +185,7 @@ class BulkPaymentControllerSpec extends ControllerTestFixture {
 
         val json = contentAsJson(result)
 
-        (json \ "code").as[String] mustBe ErrorBadRequestStartBefore6April2017.errorCode
+        (json \ "code").as[String]    mustBe ErrorBadRequestStartBefore6April2017.errorCode
         (json \ "message").as[String] mustBe ErrorBadRequestStartBefore6April2017.message
       }
       "there's more than a year between startDate and endDate" in {
@@ -199,7 +198,7 @@ class BulkPaymentControllerSpec extends ControllerTestFixture {
 
         val json = contentAsJson(result)
 
-        (json \ "code").as[String] mustBe ErrorBadRequestOverYearBetweenStartAndEnd.errorCode
+        (json \ "code").as[String]    mustBe ErrorBadRequestOverYearBetweenStartAndEnd.errorCode
         (json \ "message").as[String] mustBe ErrorBadRequestOverYearBetweenStartAndEnd.message
       }
     }
@@ -217,7 +216,7 @@ class BulkPaymentControllerSpec extends ControllerTestFixture {
 
         val json = contentAsJson(result)
 
-        (json \ "code").as[String] mustBe "TRANSACTION_NOT_FOUND"
+        (json \ "code").as[String]    mustBe "TRANSACTION_NOT_FOUND"
         (json \ "message").as[String] mustBe "No payments or debts exist for this date range"
       }
     }
@@ -235,7 +234,7 @@ class BulkPaymentControllerSpec extends ControllerTestFixture {
 
         val json = contentAsJson(result)
 
-        (json \ "code").as[String] mustBe "INTERNAL_SERVER_ERROR"
+        (json \ "code").as[String]    mustBe "INTERNAL_SERVER_ERROR"
         (json \ "message").as[String] mustBe "Internal server error"
       }
     }
@@ -253,7 +252,7 @@ class BulkPaymentControllerSpec extends ControllerTestFixture {
 
         val json = contentAsJson(result)
 
-        (json \ "code").as[String] mustBe "SERVER_ERROR"
+        (json \ "code").as[String]    mustBe "SERVER_ERROR"
         (json \ "message").as[String] mustBe "Service unavailable"
       }
     }
@@ -293,7 +292,7 @@ class BulkPaymentControllerSpec extends ControllerTestFixture {
 
       val result = Future.successful(mockBulkPaymentController.transformV1Response(input))
 
-      status(result) mustBe OK
+      status(result)        mustBe OK
       contentAsJson(result) mustBe expected
     }
 
@@ -307,7 +306,7 @@ class BulkPaymentControllerSpec extends ControllerTestFixture {
 
       val result = Future.successful(mockBulkPaymentController.transformV1Response(input))
 
-      status(result) mustBe INTERNAL_SERVER_ERROR
+      status(result)        mustBe INTERNAL_SERVER_ERROR
       contentAsJson(result) mustBe expected
     }
 

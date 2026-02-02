@@ -38,6 +38,7 @@ case class CreateLisaAccountTransferRequest(
 ) extends CreateLisaAccountRequest
 
 object CreateLisaAccountRequest {
+
   implicit val createLisaAccountCreationRequestReads: Reads[CreateLisaAccountCreationRequest] = (
     (JsPath \ "investorId").read(JsonReads.investorId) and
       (JsPath \ "accountId").read(JsonReads.accountId) and
@@ -105,4 +106,5 @@ object CreateLisaAccountRequest {
     case r: CreateLisaAccountCreationRequest => createLisaAccountCreationRequestWrites.writes(r)
     case r: CreateLisaAccountTransferRequest => createLisaAccountTransferRequestWrites.writes(r)
   }
+
 }

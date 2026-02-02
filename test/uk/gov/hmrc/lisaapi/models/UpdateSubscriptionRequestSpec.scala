@@ -34,7 +34,7 @@ class UpdateSubscriptionRequestSpec extends PlaySpec {
       res match {
         case JsError(errors)       => fail()
         case JsSuccess(data, path) =>
-          data.firstSubscriptionDate.getYear mustBe 2017
+          data.firstSubscriptionDate.getYear       mustBe 2017
           data.firstSubscriptionDate.getMonthValue mustBe 1
           data.firstSubscriptionDate.getDayOfMonth mustBe 1
       }

@@ -84,7 +84,7 @@ case class SupersedeFundReleaseRequest(
 ) extends RequestFundReleaseRequest
 
 object RequestFundReleaseRequest {
-  implicit val dateReads: Reads[LocalDate]   = JsonReads.notFutureDate
+  implicit val dateReads: Reads[LocalDate] = JsonReads.notFutureDate
 
   val initialReads: Reads[InitialFundReleaseRequest] = Json.reads[InitialFundReleaseRequest]
 
@@ -135,4 +135,5 @@ object RequestFundReleaseRequest {
     case s: SupersedeFundReleaseRequest => supersedeWrites.writes(s)
     case i: InitialFundReleaseRequest   => initialWrites.writes(i)
   }
+
 }

@@ -23,7 +23,9 @@ import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
-import uk.gov.hmrc.lisaapi.models.{GetLisaAccountDoesNotExistResponse, GetLisaAccountServiceUnavailable, GetLisaAccountSuccessResponse}
+import uk.gov.hmrc.lisaapi.models.{
+  GetLisaAccountDoesNotExistResponse, GetLisaAccountServiceUnavailable, GetLisaAccountSuccessResponse
+}
 import uk.gov.hmrc.lisaapi.services.{AccountService, AuditService}
 
 import scala.concurrent.ExecutionContext
@@ -48,14 +50,15 @@ class GetAccountController @Inject() (
     (validateHeader(parse) andThen validateLMRN(lisaManager) andThen validateAccountId(accountId)).async {
       implicit request =>
         implicit val startTime: Long = System.currentTimeMillis()
-        logger.info(
-          s"""[GetAccountController][getAccountDetails] started lisaManager : $lisaManager ,
+        logger.info(s"""[GetAccountController][getAccountDetails] started lisaManager : $lisaManager ,
              | accountId : $accountId""".stripMargin)
         withEnrolment(lisaManager) { () =>
           service.getAccount(lisaManager, accountId).map {
             case response: GetLisaAccountSuccessResponse =>
               auditGetAccount(lisaManager, accountId)
-              logger.info(s"""[GetAccountController][getAccountDetails] GetLisaAccountSuccessResponse lisaManager : $lisaManager , accountId : $accountId""")
+              logger.info(
+                s"""[GetAccountController][getAccountDetails] GetLisaAccountSuccessResponse lisaManager : $lisaManager , accountId : $accountId"""
+              )
               lisaMetrics.incrementMetrics(startTime, OK, LisaMetricKeys.ACCOUNT)
               Ok(Json.toJson(response))
             case GetLisaAccountDoesNotExistResponse      =>
@@ -63,21 +66,24 @@ class GetAccountController @Inject() (
               lisaMetrics.incrementMetrics(startTime, NOT_FOUND, LisaMetricKeys.ACCOUNT)
               logger.error(
                 s"""[GetAccountController][getAccountDetails] GetLisaAccountDoesNotExistResponse lisaManager : $lisaManager ,
-                   | accountId : $accountId , error : ${ErrorAccountNotFound.asJson}""".stripMargin)
+                   | accountId : $accountId , error : ${ErrorAccountNotFound.asJson}""".stripMargin
+              )
               NotFound(ErrorAccountNotFound.asJson)
             case GetLisaAccountServiceUnavailable        =>
               auditGetAccount(lisaManager, accountId, Some(ErrorServiceUnavailable.errorCode))
               lisaMetrics.incrementMetrics(startTime, SERVICE_UNAVAILABLE, LisaMetricKeys.ACCOUNT)
               logger.error(
                 s"""[GetAccountController][getAccountDetails] GetLisaAccountServiceUnavailable lisaManager : $lisaManager ,
-                   | accountId : $accountId , error : ${ErrorServiceUnavailable.asJson}""".stripMargin)
+                   | accountId : $accountId , error : ${ErrorServiceUnavailable.asJson}""".stripMargin
+              )
               ServiceUnavailable(ErrorServiceUnavailable.asJson)
             case _                                       =>
               auditGetAccount(lisaManager, accountId, Some(ErrorInternalServerError.errorCode))
               lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.ACCOUNT)
               logger.error(
                 s"""[GetAccountController][getAccountDetails] ErrorInternalServerError lisaManager : $lisaManager ,
-                   | accountId : $accountId , error : ${ErrorInternalServerError.asJson}""".stripMargin)
+                   | accountId : $accountId , error : ${ErrorInternalServerError.asJson}""".stripMargin
+              )
               InternalServerError(ErrorInternalServerError.asJson)
           }
         }

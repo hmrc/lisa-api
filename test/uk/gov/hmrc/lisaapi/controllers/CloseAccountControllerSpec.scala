@@ -87,7 +87,7 @@ class CloseAccountControllerSpec extends ControllerTestFixture {
     }
 
     "audit an accountNotClosed event" when {
-      "the json fails date validation" in {
+      "the json fails date validation" in
         doSyncCloseRequest(closeAccountJson.replace(validDate, invalidDate)) { res =>
           verify(mockAuditService).audit(
             auditType = matchersEquals("accountNotClosed"),
@@ -103,7 +103,6 @@ class CloseAccountControllerSpec extends ControllerTestFixture {
             )
           )(any())
         }
-      }
       "the data service returns a CloseLisaAccountAlreadyVoidResponse" in {
         when(mockAccountService.closeAccount(any(), any(), any())(any()))
           .thenReturn(Future.successful(CloseLisaAccountAlreadyVoidResponse))
@@ -251,10 +250,10 @@ class CloseAccountControllerSpec extends ControllerTestFixture {
 
           val json = contentAsJson(res)
 
-          (json \ "code").as[String] mustBe "FORBIDDEN"
-          (json \ "errors" \ 0 \ "code").as[String] mustBe "INVALID_DATE"
+          (json \ "code").as[String]                   mustBe "FORBIDDEN"
+          (json \ "errors" \ 0 \ "code").as[String]    mustBe "INVALID_DATE"
           (json \ "errors" \ 0 \ "message").as[String] mustBe "The closureDate cannot be before 6 April 2017"
-          (json \ "errors" \ 0 \ "path").as[String] mustBe "/closureDate"
+          (json \ "errors" \ 0 \ "path").as[String]    mustBe "/closureDate"
         }
       }
     }
@@ -265,7 +264,7 @@ class CloseAccountControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(CloseLisaAccountAlreadyVoidResponse))
 
         doCloseRequest(closeAccountJson) { res =>
-          status(res) mustBe FORBIDDEN
+          status(res)                              mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_VOID"
         }
       }
@@ -277,7 +276,7 @@ class CloseAccountControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(CloseLisaAccountAlreadyClosedResponse))
 
         doCloseRequest(closeAccountJson) { res =>
-          status(res) mustBe FORBIDDEN
+          status(res)                              mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CLOSED"
         }
       }
@@ -289,7 +288,7 @@ class CloseAccountControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(CloseLisaAccountCancellationPeriodExceeded))
 
         doCloseRequest(closeAccountJson) { res =>
-          status(res) mustBe FORBIDDEN
+          status(res)                              mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "CANCELLATION_PERIOD_EXCEEDED"
         }
       }
@@ -301,7 +300,7 @@ class CloseAccountControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(CloseLisaAccountWithinCancellationPeriod))
 
         doCloseRequest(closeAccountJson) { res =>
-          status(res) mustBe FORBIDDEN
+          status(res)                              mustBe FORBIDDEN
           (contentAsJson(res) \ "code").as[String] mustBe "ACCOUNT_WITHIN_CANCELLATION_PERIOD"
         }
       }
@@ -313,34 +312,31 @@ class CloseAccountControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(CloseLisaAccountNotFoundResponse))
 
         doCloseRequest(closeAccountJson) { res =>
-          status(res) mustBe NOT_FOUND
+          status(res)                              mustBe NOT_FOUND
           (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNTID_NOT_FOUND"
         }
       }
     }
 
     "return with status 400 bad request" when {
-      "submitted an invalid close account request" in {
+      "submitted an invalid close account request" in
         doCloseRequest(closeAccountJson.replace("All funds withdrawn", "X")) { res =>
           status(res) mustBe BAD_REQUEST
         }
-      }
-      "submitted an invalid lmrn" in {
+      "submitted an invalid lmrn" in
         doCloseRequest(closeAccountJson, "Z12345") { res =>
           status(res) mustBe BAD_REQUEST
           val json = contentAsJson(res)
-          (json \ "code").as[String] mustBe ErrorBadRequestLmrn.errorCode
+          (json \ "code").as[String]    mustBe ErrorBadRequestLmrn.errorCode
           (json \ "message").as[String] mustBe ErrorBadRequestLmrn.message
         }
-      }
-      "submitted an invalid accountId" in {
+      "submitted an invalid accountId" in
         doCloseRequest(closeAccountJson, accId = "1=2!") { res =>
           status(res) mustBe BAD_REQUEST
           val json = contentAsJson(res)
-          (json \ "code").as[String] mustBe ErrorBadRequestAccountId.errorCode
+          (json \ "code").as[String]    mustBe ErrorBadRequestAccountId.errorCode
           (json \ "message").as[String] mustBe ErrorBadRequestAccountId.message
         }
-      }
     }
 
     "return with status 500 internal server error" when {
@@ -367,7 +363,7 @@ class CloseAccountControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(CloseLisaAccountServiceUnavailable))
 
         doCloseRequest(closeAccountJson) { res =>
-          status(res) mustBe SERVICE_UNAVAILABLE
+          status(res)                              mustBe SERVICE_UNAVAILABLE
           (contentAsJson(res) \ "code").as[String] mustBe "SERVER_ERROR"
         }
       }
@@ -396,4 +392,5 @@ class CloseAccountControllerSpec extends ControllerTestFixture {
 
     callback(res)
   }
+
 }

@@ -35,9 +35,9 @@ class AccountTransferSpec extends PlaySpec {
       res match {
         case JsError(errors)       => fail()
         case JsSuccess(data, path) =>
-          data.transferredFromAccountId mustBe "Z543210"
-          data.transferredFromLMRN mustBe "Z543333"
-          data.transferInDate.getYear mustBe 2015
+          data.transferredFromAccountId     mustBe "Z543210"
+          data.transferredFromLMRN          mustBe "Z543333"
+          data.transferInDate.getYear       mustBe 2015
           data.transferInDate.getMonthValue mustBe 12
           data.transferInDate.getDayOfMonth mustBe 13
       }
