@@ -50,7 +50,7 @@ class BonusPaymentController @Inject() (
       authConnector: AuthConnector
     ) {
 
-  private val requestBonusErrors   = Map[RequestBonusPaymentErrorResponse, ErrorResponse](
+  private val requestBonusErrors = Map[RequestBonusPaymentErrorResponse, ErrorResponse](
     RequestBonusPaymentBonusClaimError   -> ErrorBonusClaimError,
     RequestBonusPaymentNoSubscriptions   -> ErrorNoSubscriptions,
     RequestBonusPaymentAccountNotFound   -> ErrorAccountNotFound,

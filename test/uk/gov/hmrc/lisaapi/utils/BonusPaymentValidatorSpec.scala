@@ -38,7 +38,7 @@ class BonusPaymentValidatorSpec extends BaseTestFixture with BeforeAndAfter {
     when(mockDateService.now()).thenReturn(LocalDate.now)
   }
 
-  val validBonusPaymentJson: String                 = Source
+  val validBonusPaymentJson: String = Source
     .fromInputStream(getClass.getResourceAsStream("/json/request.valid.bonus-payment.additional-bonus.json"))
     .mkString
 

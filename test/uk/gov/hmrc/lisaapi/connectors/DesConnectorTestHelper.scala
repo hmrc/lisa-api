@@ -33,7 +33,7 @@ trait DesConnectorTestHelper extends BaseTestFixture with GuiceOneAppPerSuite {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  val validBonusPaymentResponseJson: String     =
+  val validBonusPaymentResponseJson: String =
     Source.fromInputStream(getClass.getResourceAsStream("/json/request.valid.bonus-payment-response.json")).mkString
 
   val responseHeader: Map[String, List[String]] = Map("Content-Type" -> List("application/json"))

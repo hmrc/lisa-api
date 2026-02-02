@@ -58,7 +58,7 @@ class WithdrawalControllerSpec extends ControllerTestFixture {
   val accountId                      = "ABC/12345"
   val transactionId                  = "1234567890"
 
-  val validWithdrawalJson: String    =
+  val validWithdrawalJson: String =
     Source.fromInputStream(getClass.getResourceAsStream("/json/request.valid.withdrawal-charge.json")).mkString
 
   override def beforeEach(): Unit = {

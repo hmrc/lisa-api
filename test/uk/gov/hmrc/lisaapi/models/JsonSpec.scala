@@ -27,7 +27,7 @@ class JsonSpec extends PlaySpec {
   val property            = "property"
   val currencyFormatError = "error.formatting.currencyNegativeDisallowed"
 
-  implicit val testMonetaryReads: Reads[TestMonetaryClass]   =
+  implicit val testMonetaryReads: Reads[TestMonetaryClass] =
     (JsPath \ property).read[Amount](JsonReads.nonNegativeAmount).map(TestMonetaryClass.apply)
 
   implicit val testMonetaryWrites: Writes[TestMonetaryClass] =

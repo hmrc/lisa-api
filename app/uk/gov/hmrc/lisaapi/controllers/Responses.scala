@@ -28,7 +28,7 @@ sealed abstract class ErrorResponse(
   def asResult: Result =
     Results.Status(httpStatusCode)(Json.toJson(this))
 
-  def asJson: JsValue  =
+  def asJson: JsValue =
     Json.toJson(this)
 
 }

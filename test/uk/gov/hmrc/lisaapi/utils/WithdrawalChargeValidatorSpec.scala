@@ -38,7 +38,7 @@ class WithdrawalChargeValidatorSpec extends BaseTestFixture with BeforeAndAfter 
     when(mockDateService.now()).thenReturn(LocalDate.now)
   }
 
-  val validWithdrawalJson: String                        =
+  val validWithdrawalJson: String =
     Source.fromInputStream(getClass.getResourceAsStream("/json/request.valid.withdrawal-charge.json")).mkString
 
   val validWithdrawal: SupersededWithdrawalChargeRequest =

@@ -54,13 +54,13 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
 
   case object TestBonusPaymentResponse extends RequestBonusPaymentResponse
 
-  val acceptHeaderV1: (String, String)           = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
-  val acceptHeaderV2: (String, String)           = (HeaderNames.ACCEPT, "application/vnd.hmrc.2.0+json")
-  val lisaManager                                = "Z019283"
-  val accountId                                  = "ABC/12345"
-  val transactionId                              = "1234567890"
+  val acceptHeaderV1: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
+  val acceptHeaderV2: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.2.0+json")
+  val lisaManager                      = "Z019283"
+  val accountId                        = "ABC/12345"
+  val transactionId                    = "1234567890"
 
-  val validBonusPaymentJson: String              =
+  val validBonusPaymentJson: String =
     Source.fromInputStream(getClass.getResourceAsStream("/json/request.valid.bonus-payment.json")).mkString
 
   val validBonusPaymentMinimumFieldsJson: String =

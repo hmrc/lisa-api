@@ -24,7 +24,7 @@ import java.time.LocalDate
 
 class CreateLisaInvestorRequestSpec extends PlaySpec {
 
-  val validRequestJson           = """{"investorNINO":"AB123456A", "firstName":"A", "lastName":"B", "dateOfBirth":"2000-02-29"}"""
+  val validRequestJson = """{"investorNINO":"AB123456A", "firstName":"A", "lastName":"B", "dateOfBirth":"2000-02-29"}"""
 
   val validRequestJsonWithSpaces =
     """{"investorNINO":"AB123456B", "firstName":"  A      ", "lastName":" C    ", "dateOfBirth":"2000-02-29"}"""

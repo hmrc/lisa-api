@@ -40,7 +40,7 @@ class AnnualReturnControllerSpec extends ControllerTestFixture {
   private val lisaManager    = "Z123456"
   private val accountId      = "1234567890"
 
-  private val json           = Json.obj(
+  private val json = Json.obj(
     "eventDate"                  -> "2018-04-05",
     "lisaManagerName"            -> "ISA Manager 1",
     "taxYear"                    -> 2018,
@@ -50,7 +50,7 @@ class AnnualReturnControllerSpec extends ControllerTestFixture {
     "annualSubsStocksAndShares"  -> 55
   )
 
-  private val supersedeJson  = json ++ Json.obj(
+  private val supersedeJson = json ++ Json.obj(
     "supersede" -> Json.obj(
       "originalLifeEventId" -> "1234567890",
       "originalEventDate"   -> "2018-01-01"
