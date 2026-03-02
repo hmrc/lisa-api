@@ -94,7 +94,7 @@ object RequestFundReleaseRequest {
       (JsPath \ "withdrawalAmount").write[Amount] and
       (JsPath \ "conveyancerReference").writeNullable[String] and
       (JsPath \ "propertyDetails").writeNullable[FundReleasePropertyDetails]
-  ) { req: InitialFundReleaseRequest =>
+  ) { (req: InitialFundReleaseRequest) =>
     (
       "Funds Release",
       req.eventDate,
@@ -112,7 +112,7 @@ object RequestFundReleaseRequest {
       (JsPath \ "withdrawalAmount").write[Amount] and
       (JsPath \ "supersededLifeEventDate").write[LocalDate] and
       (JsPath \ "supersededLifeEventID").write[LifeEventId]
-  ) { req: SupersedeFundReleaseRequest =>
+  ) { (req: SupersedeFundReleaseRequest) =>
     (
       "Funds Release",
       req.eventDate,

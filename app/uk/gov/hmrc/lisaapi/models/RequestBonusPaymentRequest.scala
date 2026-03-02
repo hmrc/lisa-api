@@ -71,7 +71,7 @@ object RequestBonusPaymentRequest {
       (JsPath \ "inboundPayments").write[InboundPayments] and
       (JsPath \ "bonuses").write[Bonuses] and
       (JsPath \ "supersededDetail").writeNullable[Supersede]
-  ) { req: RequestBonusPaymentRequest =>
+  ) { (req: RequestBonusPaymentRequest) =>
     (
       req.lifeEventId,
       req.periodStartDate,

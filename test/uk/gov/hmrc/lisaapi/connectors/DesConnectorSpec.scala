@@ -1674,7 +1674,7 @@ class DesConnectorSpec extends DesConnectorTestHelper with BeforeAndAfterEach {
             )
           )
         )
-      doReportWithdrawalRequest { response =>
+      doReportWithdrawalRequest { _ =>
         verify(mockHttp).post(any())(any())
       }
     }

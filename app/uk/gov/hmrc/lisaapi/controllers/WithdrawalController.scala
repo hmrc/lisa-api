@@ -246,7 +246,7 @@ class WithdrawalController @Inject() (
     errorResponse: ReportWithdrawalChargeErrorResponse
   )(implicit hc: HeaderCarrier, startTime: Long) = {
     val error =
-      errorOutcomes.applyOrElse(errorResponse, { _: ReportWithdrawalChargeErrorResponse => ErrorInternalServerError })
+      errorOutcomes.applyOrElse(errorResponse, (_: ReportWithdrawalChargeErrorResponse) => ErrorInternalServerError)
 
     auditReportWithdrawalChargeFailure(lisaManager, accountId, req, error.errorCode)
     lisaMetrics.incrementMetrics(startTime, error.httpStatusCode, LisaMetricKeys.WITHDRAWAL_CHARGE)

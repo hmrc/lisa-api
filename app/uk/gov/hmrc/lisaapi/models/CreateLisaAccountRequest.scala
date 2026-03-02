@@ -80,7 +80,7 @@ object CreateLisaAccountRequest {
       (JsPath \ "accountID").write[AccountId] and
       (JsPath \ "firstSubscriptionDate").write[LocalDate] and
       (JsPath \ "creationReason").write[String]
-  ) { req: CreateLisaAccountCreationRequest => (req.investorId, req.accountId, req.firstSubscriptionDate, "New") }
+  )((req: CreateLisaAccountCreationRequest) => (req.investorId, req.accountId, req.firstSubscriptionDate, "New"))
 
   implicit val createLisaAccountTransferRequestWrites: Writes[CreateLisaAccountTransferRequest] = (
     (JsPath \ "investorID").write[InvestorId] and
@@ -88,7 +88,7 @@ object CreateLisaAccountRequest {
       (JsPath \ "firstSubscriptionDate").write[LocalDate] and
       (JsPath \ "transferAccount").write[AccountTransfer] and
       (JsPath \ "creationReason").write[String]
-  ) { req: CreateLisaAccountTransferRequest =>
+  ) { (req: CreateLisaAccountTransferRequest) =>
     (
       req.investorId,
       req.accountId,

@@ -321,6 +321,17 @@ class WithdrawalControllerSpec extends ControllerTestFixture {
         }
       }
 
+      "the service future fails with an exception" in {
+        when(mockWithdrawalService.reportWithdrawalCharge(any(), any(), any())(any()))
+          .thenReturn(Future.failed(new RuntimeException("Service error")))
+
+        doRequest(validWithdrawalJson) { res =>
+          status(res)                                 mustBe INTERNAL_SERVER_ERROR
+          (contentAsJson(res) \ "code").as[String]    mustBe ErrorInternalServerError.errorCode
+          (contentAsJson(res) \ "message").as[String] mustBe ErrorInternalServerError.message
+        }
+      }
+
     }
 
     "return with status 503 service unavailable" when {

@@ -110,7 +110,7 @@ object WithdrawalSupersede {
       (JsPath \ "originalWithdrawalChargeAmount").write[Amount] and
       (JsPath \ "transactionResult").write[Amount] and
       (JsPath \ "reason").write[String]
-  ) { b: WithdrawalIncrease =>
+  ) { (b: WithdrawalIncrease) =>
     (
       b.originalTransactionId,
       b.originalWithdrawalChargeAmount,
@@ -124,7 +124,7 @@ object WithdrawalSupersede {
       (JsPath \ "originalWithdrawalChargeAmount").write[Amount] and
       (JsPath \ "transactionResult").write[Amount] and
       (JsPath \ "reason").write[String]
-  ) { b: WithdrawalDecrease =>
+  ) { (b: WithdrawalDecrease) =>
     (
       b.originalTransactionId,
       b.originalWithdrawalChargeAmount,
@@ -138,7 +138,7 @@ object WithdrawalSupersede {
       (JsPath \ "originalWithdrawalChargeAmount").write[Amount] and
       (JsPath \ "transactionResult").write[Amount] and
       (JsPath \ "reason").write[String]
-  ) { b: WithdrawalRefund =>
+  ) { (b: WithdrawalRefund) =>
     (
       b.originalTransactionId,
       b.originalWithdrawalChargeAmount,
@@ -152,7 +152,7 @@ object WithdrawalSupersede {
       (JsPath \ "originalWithdrawalChargeAmount").write[Amount] and
       (JsPath \ "transactionResult").write[Amount] and
       (JsPath \ "reason").write[String]
-  ) { b: WithdrawalSuperseded =>
+  ) { (b: WithdrawalSuperseded) =>
     (
       b.originalTransactionId,
       b.originalWithdrawalChargeAmount,
@@ -166,7 +166,7 @@ object WithdrawalSupersede {
       (JsPath \ "transactionAmount").write[Amount] and
       (JsPath \ "transactionResult").write[Amount] and
       (JsPath \ "reason").write[String]
-  ) { b: WithdrawalIncrease =>
+  ) { (b: WithdrawalIncrease) =>
     (
       b.originalTransactionId,
       b.originalWithdrawalChargeAmount,
@@ -180,7 +180,7 @@ object WithdrawalSupersede {
       (JsPath \ "transactionAmount").write[Amount] and
       (JsPath \ "transactionResult").write[Amount] and
       (JsPath \ "reason").write[String]
-  ) { b: WithdrawalDecrease =>
+  ) { (b: WithdrawalDecrease) =>
     (
       b.originalTransactionId,
       b.originalWithdrawalChargeAmount,
@@ -194,7 +194,7 @@ object WithdrawalSupersede {
       (JsPath \ "transactionAmount").write[Amount] and
       (JsPath \ "transactionResult").write[Amount] and
       (JsPath \ "reason").write[String]
-  ) { b: WithdrawalRefund =>
+  ) { (b: WithdrawalRefund) =>
     (
       b.originalTransactionId,
       b.originalWithdrawalChargeAmount,
@@ -344,7 +344,7 @@ object ReportWithdrawalChargeRequest {
       (JsPath \ "withdrawalChargeAmountYTD").write[Amount] and
       (JsPath \ "fundsDeductedDuringWithdrawal").write[Boolean] and
       (JsPath \ "withdrawalReason").write[String]
-  ) { req: RegularWithdrawalChargeRequest =>
+  ) { (req: RegularWithdrawalChargeRequest) =>
     (
       req.automaticRecoveryAmount,
       req.claimPeriodStartDate,
@@ -367,7 +367,7 @@ object ReportWithdrawalChargeRequest {
       (JsPath \ "fundsDeductedDuringWithdrawal").write[Boolean] and
       (JsPath \ "withdrawalReason").write[String] and
       (JsPath \ "supersede").writeNullable[WithdrawalSupersede]
-  ) { req: SupersededWithdrawalChargeRequest =>
+  ) { (req: SupersededWithdrawalChargeRequest) =>
     (
       req.automaticRecoveryAmount,
       req.claimPeriodStartDate,
@@ -396,7 +396,7 @@ object ReportWithdrawalChargeRequest {
       (JsPath \ "withdrawalChargeAmountYTD").write[Amount] and
       (JsPath \ "fundsDeductedDuringWithdrawal").write[Boolean] and
       (JsPath \ "withdrawalReason").write[String]
-  ) { req: RegularWithdrawalChargeRequest =>
+  ) { (req: RegularWithdrawalChargeRequest) =>
     (
       req.automaticRecoveryAmount,
       req.claimPeriodStartDate,
@@ -419,7 +419,7 @@ object ReportWithdrawalChargeRequest {
       (JsPath \ "fundsDeductedDuringWithdrawal").write[Boolean] and
       (JsPath \ "withdrawalReason").write[String] and
       (JsPath \ "supersededDetail").writeNullable[WithdrawalSupersede](WithdrawalSupersede.desSupersedeWrites)
-  ) { req: SupersededWithdrawalChargeRequest =>
+  ) { (req: SupersededWithdrawalChargeRequest) =>
     (
       req.automaticRecoveryAmount,
       req.claimPeriodStartDate,

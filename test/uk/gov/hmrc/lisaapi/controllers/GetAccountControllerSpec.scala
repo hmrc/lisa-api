@@ -242,9 +242,9 @@ class GetAccountControllerSpec extends ControllerTestFixture {
         doSyncGetAccountDetailsRequest { res =>
           await(res)
           verify(mockAuditService).audit(
-            auditType = matchersEquals("getAccountReported"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId"),
-            auditData = matchersEquals(
+            matchersEquals("getAccountReported"),
+            matchersEquals(s"/manager/$lisaManager/accounts/$accountId"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountId"                  -> accountId
@@ -262,9 +262,9 @@ class GetAccountControllerSpec extends ControllerTestFixture {
         doSyncGetAccountDetailsRequest { res =>
           await(res)
           verify(mockAuditService).audit(
-            auditType = matchersEquals("getAccountNotReported"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId"),
-            auditData = matchersEquals(
+            matchersEquals("getAccountNotReported"),
+            matchersEquals(s"/manager/$lisaManager/accounts/$accountId"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountId"                  -> accountId,
@@ -280,9 +280,9 @@ class GetAccountControllerSpec extends ControllerTestFixture {
         doSyncGetAccountDetailsRequest { res =>
           await(res)
           verify(mockAuditService).audit(
-            auditType = matchersEquals("getAccountNotReported"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId"),
-            auditData = matchersEquals(
+            matchersEquals("getAccountNotReported"),
+            matchersEquals(s"/manager/$lisaManager/accounts/$accountId"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountId"                  -> accountId,
@@ -298,9 +298,9 @@ class GetAccountControllerSpec extends ControllerTestFixture {
         doSyncGetAccountDetailsRequest { res =>
           await(res)
           verify(mockAuditService).audit(
-            auditType = matchersEquals("getAccountNotReported"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId"),
-            auditData = matchersEquals(
+            matchersEquals("getAccountNotReported"),
+            matchersEquals(s"/manager/$lisaManager/accounts/$accountId"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountId"                  -> accountId,

@@ -115,9 +115,9 @@ class AccountControllerSpec extends ControllerTestFixture {
           .thenReturn(Future.successful(CreateLisaAccountSuccessResponse(accountId)))
         doSyncCreateOrTransferRequest(createAccountJson) { _ =>
           verify(mockAuditService).audit(
-            auditType = matchersEquals("accountCreated"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts"),
-            auditData = matchersEquals(
+            matchersEquals("accountCreated"),
+            matchersEquals(s"/manager/$lisaManager/accounts"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "investorId"                 -> "9876543210",
@@ -134,9 +134,9 @@ class AccountControllerSpec extends ControllerTestFixture {
       "the json fails date validation" in
         doSyncCreateOrTransferRequest(createAccountJson.replace(validDate, invalidDate)) { _ =>
           verify(mockAuditService).audit(
-            auditType = matchersEquals("accountNotCreated"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts"),
-            auditData = matchersEquals(
+            matchersEquals("accountNotCreated"),
+            matchersEquals(s"/manager/$lisaManager/accounts"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "investorId"                 -> "9876543210",
@@ -153,9 +153,9 @@ class AccountControllerSpec extends ControllerTestFixture {
 
         doSyncCreateOrTransferRequest(createAccountJson) { _ =>
           verify(mockAuditService).audit(
-            auditType = matchersEquals("accountNotCreated"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts"),
-            auditData = matchersEquals(
+            matchersEquals("accountNotCreated"),
+            matchersEquals(s"/manager/$lisaManager/accounts"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "investorId"                 -> "9876543210",
@@ -173,9 +173,9 @@ class AccountControllerSpec extends ControllerTestFixture {
 
         doSyncCreateOrTransferRequest(createAccountJson) { _ =>
           verify(mockAuditService).audit(
-            auditType = matchersEquals("accountNotCreated"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts"),
-            auditData = matchersEquals(
+            matchersEquals("accountNotCreated"),
+            matchersEquals(s"/manager/$lisaManager/accounts"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "investorId"                 -> "9876543210",
@@ -193,9 +193,9 @@ class AccountControllerSpec extends ControllerTestFixture {
 
         doSyncCreateOrTransferRequest(createAccountJson) { _ =>
           verify(mockAuditService).audit(
-            auditType = matchersEquals("accountNotCreated"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts"),
-            auditData = matchersEquals(
+            matchersEquals("accountNotCreated"),
+            matchersEquals(s"/manager/$lisaManager/accounts"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "investorId"                 -> "9876543210",
@@ -213,9 +213,9 @@ class AccountControllerSpec extends ControllerTestFixture {
 
         doSyncCreateOrTransferRequest(transferAccountJson) { _ =>
           verify(mockAuditService).audit(
-            auditType = matchersEquals("accountNotTransferred"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts"),
-            auditData = matchersEquals(
+            matchersEquals("accountNotTransferred"),
+            matchersEquals(s"/manager/$lisaManager/accounts"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "investorId"                 -> "9876543210",
@@ -237,9 +237,9 @@ class AccountControllerSpec extends ControllerTestFixture {
 
         doSyncCreateOrTransferRequest(createAccountJson) { _ =>
           verify(mockAuditService).audit(
-            auditType = matchersEquals("accountNotCreated"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts"),
-            auditData = matchersEquals(
+            matchersEquals("accountNotCreated"),
+            matchersEquals(s"/manager/$lisaManager/accounts"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "investorId"                 -> "9876543210",
@@ -257,9 +257,9 @@ class AccountControllerSpec extends ControllerTestFixture {
 
         doSyncCreateOrTransferRequest(createAccountJson) { _ =>
           verify(mockAuditService).audit(
-            auditType = matchersEquals("accountNotCreated"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts"),
-            auditData = matchersEquals(
+            matchersEquals("accountNotCreated"),
+            matchersEquals(s"/manager/$lisaManager/accounts"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "investorId"                 -> "9876543210",
@@ -277,11 +277,11 @@ class AccountControllerSpec extends ControllerTestFixture {
       "submitted a valid transfer account request" in {
         when(mockAccountService.transferAccount(any(), any())(any()))
           .thenReturn(Future.successful(CreateLisaAccountSuccessResponse(accountId)))
-        doSyncCreateOrTransferRequest(transferAccountJson) { res =>
+        doSyncCreateOrTransferRequest(transferAccountJson) { _ =>
           verify(mockAuditService).audit(
-            auditType = matchersEquals("accountTransferred"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts"),
-            auditData = matchersEquals(
+            matchersEquals("accountTransferred"),
+            matchersEquals(s"/manager/$lisaManager/accounts"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "investorId"                 -> "9876543210",
@@ -302,9 +302,9 @@ class AccountControllerSpec extends ControllerTestFixture {
       "the json fails date validation" in
         doSyncCreateOrTransferRequest(transferAccountJson.replace(validDate, invalidDate)) { _ =>
           verify(mockAuditService).audit(
-            auditType = matchersEquals("accountNotTransferred"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts"),
-            auditData = matchersEquals(
+            matchersEquals("accountNotTransferred"),
+            matchersEquals(s"/manager/$lisaManager/accounts"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "investorId"                 -> "9876543210",
@@ -323,11 +323,11 @@ class AccountControllerSpec extends ControllerTestFixture {
         when(mockAccountService.transferAccount(any(), any())(any()))
           .thenReturn(Future.successful(CreateLisaAccountInvestorNotFoundResponse))
 
-        doSyncCreateOrTransferRequest(transferAccountJson) { res =>
+        doSyncCreateOrTransferRequest(transferAccountJson) { _ =>
           verify(mockAuditService).audit(
-            auditType = matchersEquals("accountNotTransferred"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts"),
-            auditData = matchersEquals(
+            matchersEquals("accountNotTransferred"),
+            matchersEquals(s"/manager/$lisaManager/accounts"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "investorId"                 -> "9876543210",
@@ -347,11 +347,11 @@ class AccountControllerSpec extends ControllerTestFixture {
         when(mockAccountService.transferAccount(any(), any())(any()))
           .thenReturn(Future.successful(CreateLisaAccountInvestorComplianceCheckFailedResponse))
 
-        doSyncCreateOrTransferRequest(transferAccountJson) { res =>
+        doSyncCreateOrTransferRequest(transferAccountJson) { _ =>
           verify(mockAuditService).audit(
-            auditType = matchersEquals("accountNotTransferred"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts"),
-            auditData = matchersEquals(
+            matchersEquals("accountNotTransferred"),
+            matchersEquals(s"/manager/$lisaManager/accounts"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "investorId"                 -> "9876543210",
@@ -371,11 +371,11 @@ class AccountControllerSpec extends ControllerTestFixture {
         when(mockAccountService.transferAccount(any(), any())(any()))
           .thenReturn(Future.successful(CreateLisaAccountInvestorPreviousAccountDoesNotExistResponse))
 
-        doSyncCreateOrTransferRequest(transferAccountJson) { res =>
+        doSyncCreateOrTransferRequest(transferAccountJson) { _ =>
           verify(mockAuditService).audit(
-            auditType = matchersEquals("accountNotTransferred"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts"),
-            auditData = matchersEquals(
+            matchersEquals("accountNotTransferred"),
+            matchersEquals(s"/manager/$lisaManager/accounts"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "investorId"                 -> "9876543210",
@@ -395,11 +395,11 @@ class AccountControllerSpec extends ControllerTestFixture {
         when(mockAccountService.transferAccount(any(), any())(any()))
           .thenReturn(Future.successful(CreateLisaAccountInvestorAccountAlreadyClosedResponse))
 
-        doSyncCreateOrTransferRequest(transferAccountJson) { res =>
+        doSyncCreateOrTransferRequest(transferAccountJson) { _ =>
           verify(mockAuditService).audit(
-            auditType = matchersEquals("accountNotTransferred"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts"),
-            auditData = matchersEquals(
+            matchersEquals("accountNotTransferred"),
+            matchersEquals(s"/manager/$lisaManager/accounts"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "investorId"                 -> "9876543210",
@@ -419,11 +419,11 @@ class AccountControllerSpec extends ControllerTestFixture {
         when(mockAccountService.transferAccount(any(), any())(any()))
           .thenReturn(Future.successful(CreateLisaAccountInvestorAccountAlreadyVoidResponse))
 
-        doSyncCreateOrTransferRequest(transferAccountJson) { res =>
+        doSyncCreateOrTransferRequest(transferAccountJson) { _ =>
           verify(mockAuditService).audit(
-            auditType = matchersEquals("accountNotTransferred"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts"),
-            auditData = matchersEquals(
+            matchersEquals("accountNotTransferred"),
+            matchersEquals(s"/manager/$lisaManager/accounts"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "investorId"                 -> "9876543210",
@@ -443,11 +443,11 @@ class AccountControllerSpec extends ControllerTestFixture {
         when(mockAccountService.transferAccount(any(), any())(any()))
           .thenReturn(Future.successful(CreateLisaAccountAlreadyExistsResponse))
 
-        doSyncCreateOrTransferRequest(transferAccountJson) { res =>
+        doSyncCreateOrTransferRequest(transferAccountJson) { _ =>
           verify(mockAuditService).audit(
-            auditType = matchersEquals("accountNotTransferred"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts"),
-            auditData = matchersEquals(
+            matchersEquals("accountNotTransferred"),
+            matchersEquals(s"/manager/$lisaManager/accounts"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "investorId"                 -> "9876543210",
@@ -467,11 +467,11 @@ class AccountControllerSpec extends ControllerTestFixture {
         when(mockAccountService.transferAccount(any(), any())(any()))
           .thenReturn(Future.successful(CreateLisaAccountErrorResponse))
 
-        doSyncCreateOrTransferRequest(transferAccountJson) { res =>
+        doSyncCreateOrTransferRequest(transferAccountJson) { _ =>
           verify(mockAuditService).audit(
-            auditType = matchersEquals("accountNotTransferred"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts"),
-            auditData = matchersEquals(
+            matchersEquals("accountNotTransferred"),
+            matchersEquals(s"/manager/$lisaManager/accounts"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "investorId"                 -> "9876543210",

@@ -60,8 +60,11 @@ class RequestBonusPaymentRequestSpec extends PlaySpec {
 
       res match {
         case JsError(errors) =>
-          errors.count { case (path: JsPath, errors: Seq[JsonValidationError]) =>
-            path.toString() == "/lifeEventId" && errors.contains(JsonValidationError("error.formatting.lifeEventId"))
+          errors.count {
+            case (path: JsPath, errs: Seq[_]) if errs.headOption.exists(_.isInstanceOf[JsonValidationError]) =>
+              val errors = errs.asInstanceOf[Seq[JsonValidationError]]
+              path.toString() == "/lifeEventId" && errors.contains(JsonValidationError("error.formatting.lifeEventId"))
+            case _                                                                                           => false
           } mustBe 1
         case _               => fail()
       }

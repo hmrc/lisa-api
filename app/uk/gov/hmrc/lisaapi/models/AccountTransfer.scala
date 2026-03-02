@@ -39,6 +39,6 @@ object AccountTransfer {
     (JsPath \ "transferredFromAccountID").write[String] and
       (JsPath \ "transferredFromLMRN").write[String] and
       (JsPath \ "transferInDate").write[LocalDate]
-  )(unlift(AccountTransfer.unapply))
+  )((a: AccountTransfer) => (a.transferredFromAccountId, a.transferredFromLMRN, a.transferInDate))
 
 }

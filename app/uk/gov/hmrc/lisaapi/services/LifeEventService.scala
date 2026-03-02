@@ -50,7 +50,7 @@ class LifeEventService @Inject() (desConnector: DesConnector)(implicit ec: Execu
         )
         postErrors.applyOrElse(
           (failureResponse.code, failureResponse),
-          { _: (String, DesFailureResponse) =>
+          { (_: (String, DesFailureResponse)) =>
             logger.error(
               s"[LifeEventService][reportLifeEvent] Report life event returned error: ${failureResponse.code} for lisaManager : $lisaManager"
             )

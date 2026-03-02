@@ -37,6 +37,6 @@ object CreateLisaInvestorRequest {
       (JsPath \ "firstName").write[String] and
       (JsPath \ "lastName").write[String] and
       (JsPath \ "dateOfBirth").write[LocalDate]
-  )(unlift(CreateLisaInvestorRequest.unapply))
+  )((c: CreateLisaInvestorRequest) => (c.investorNINO, c.firstName, c.lastName, c.dateOfBirth))
 
 }

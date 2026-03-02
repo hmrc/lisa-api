@@ -48,6 +48,6 @@ object ReportLifeEventRequest {
   val desWrites: Writes[ReportLifeEventRequest] = (
     (JsPath \ "eventType").write[String] and
       (JsPath \ "eventDate").write[LocalDate]
-  )(unlift(ReportLifeEventRequest.unapply))
+  )((r: ReportLifeEventRequest) => (r.eventType, r.eventDate))
 
 }

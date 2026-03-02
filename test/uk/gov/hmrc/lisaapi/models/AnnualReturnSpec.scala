@@ -77,11 +77,11 @@ class AnnualReturnSpec extends PlaySpec with LisaConstants with MockitoSugar wit
       )
     }
     "require all fields" in {
-      Json.obj().validate[AnnualReturnSupersede] mustBe JsError(errors =
-        List(
-          (JsPath \ "originalLifeEventId", List(JsonValidationError("error.path.missing"))),
-          (JsPath \ "originalEventDate", List(JsonValidationError("error.path.missing")))
-        )
+      val result = Json.obj().validate[AnnualReturnSupersede]
+      result.isError         mustBe true
+      result.asEither.left.get must contain allOf (
+        (JsPath \ "originalLifeEventId", List(JsonValidationError("error.path.missing"))),
+        (JsPath \ "originalEventDate", List(JsonValidationError("error.path.missing")))
       )
     }
 

@@ -246,7 +246,7 @@ object GetBonusOrWithdrawalResponse {
       (JsPath \ "bonuses").write[Bonuses] and
       (JsPath \ "supersededBy").writeNullable[String] and
       (JsPath \ "supersede").writeNullable[Supersede](Supersede.getSupersedeWrites)
-  ) { req: GetBonusResponse =>
+  ) { (req: GetBonusResponse) =>
     (
       req.lifeEventId,
       req.periodStartDate,
@@ -270,7 +270,7 @@ object GetBonusOrWithdrawalResponse {
       (JsPath \ "withdrawalReason").write[WithdrawalReason] and
       (JsPath \ "supersededBy").writeNullable[TransactionId] and
       (JsPath \ "supersede").writeNullable[WithdrawalSupersede]
-  ) { req: GetWithdrawalResponse =>
+  ) { (req: GetWithdrawalResponse) =>
     (
       req.periodStartDate,
       req.periodEndDate,

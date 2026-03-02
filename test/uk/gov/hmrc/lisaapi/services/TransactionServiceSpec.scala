@@ -472,6 +472,90 @@ class TransactionServiceSpec extends ServiceTestFixture {
       }
     }
 
+    "return an Error response" when {
+      "ITMP returns an unknown error code" in {
+        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesFailureResponse("UNKNOWN_ERROR", "Unknown error")))
+
+        val result =
+          Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
+
+        result mustBe GetTransactionErrorResponse
+      }
+
+      "ITMP returns an unexpected payment status" in {
+        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+          Future.successful(
+            GetBonusResponse(
+              lifeEventId = None,
+              periodStartDate = LocalDate.parse("2001-01-01"),
+              periodEndDate = LocalDate.parse("2002-01-01"),
+              htbTransfer = None,
+              inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
+              bonuses = Bonuses(1.0, 1.0, None, "X"),
+              creationDate = LocalDate.parse("2000-01-01"),
+              paymentStatus = "UnknownStatus"
+            )
+          )
+        )
+
+        val result =
+          Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
+
+        result mustBe GetTransactionErrorResponse
+      }
+
+      "ETMP returns an unknown error for a Paid transaction" in {
+        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+          Future.successful(
+            GetBonusResponse(
+              lifeEventId = None,
+              periodStartDate = LocalDate.parse("2001-01-01"),
+              periodEndDate = LocalDate.parse("2002-01-01"),
+              htbTransfer = None,
+              inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
+              bonuses = Bonuses(1.0, 1.0, None, "X"),
+              creationDate = LocalDate.parse("2000-01-01"),
+              paymentStatus = "Paid"
+            )
+          )
+        )
+
+        when(mockDesConnector.getTransaction(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesFailureResponse("UNKNOWN_ERROR", "Unknown error")))
+
+        val result =
+          Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
+
+        result mustBe GetTransactionErrorResponse
+      }
+
+      "ETMP returns an unknown error for a Collected transaction" in {
+        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+          Future.successful(
+            GetBonusResponse(
+              lifeEventId = None,
+              periodStartDate = LocalDate.parse("2001-01-01"),
+              periodEndDate = LocalDate.parse("2002-01-01"),
+              htbTransfer = None,
+              inboundPayments = InboundPayments(None, 1.0, 1.0, 1.0),
+              bonuses = Bonuses(1.0, 1.0, None, "X"),
+              creationDate = LocalDate.parse("2000-01-01"),
+              paymentStatus = "Collected"
+            )
+          )
+        )
+
+        when(mockDesConnector.getTransaction(any(), any(), any())(any()))
+          .thenReturn(Future.successful(DesFailureResponse("UNKNOWN_ERROR", "Unknown error")))
+
+        val result =
+          Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
+
+        result mustBe GetTransactionErrorResponse
+      }
+    }
+
   }
 
 }

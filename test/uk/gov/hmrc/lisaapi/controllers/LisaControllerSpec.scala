@@ -16,12 +16,15 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsPath, Json, Reads}
 import play.api.mvc._
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
+import uk.gov.hmrc.auth.core.{Enrolment, EnrolmentIdentifier, Enrolments}
 import uk.gov.hmrc.lisaapi.controllers.AccountController
 import uk.gov.hmrc.lisaapi.helpers.ControllerTestFixture
 
@@ -121,7 +124,7 @@ class LisaControllerSpec extends ControllerTestFixture {
 """
 
   implicit val testTypeReads: Reads[TestType] = (
-    (JsPath \ "prop1").read[Int].map[String](i => throw new RuntimeException("Deliberate Test Exception")) and
+    (JsPath \ "prop1").read[Int].map[String](_ => throw new RuntimeException("Deliberate Test Exception")) and
       (JsPath \ "prop2").read[String]
   )(TestType.apply _)
 
@@ -227,6 +230,98 @@ class LisaControllerSpec extends ControllerTestFixture {
           )
 
         status(res) mustBe OK
+      }
+
+    }
+
+  }
+
+  "The withEnrolment method" must {
+
+    val lisaManagerReferenceNumber = "Z123456"
+    val jsonString                 = """{"prop1": 1, "prop2": "val"}"""
+
+    def doEnrolmentRequest(lmrn: String = lisaManagerReferenceNumber): Future[Result] =
+      accountController
+        .testJsonValidator(lmrn)
+        .apply(
+          FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).withBody(AnyContentAsJson(Json.parse(jsonString)))
+        )
+
+    "return 401 with ErrorInvalidLisaManager" when {
+
+      "the authorise call returns an empty enrolment set (no HMRC-LISA-ORG enrolment)" in {
+        when(mockAuthConnector.authorise[Enrolments](any(), any())(any(), any()))
+          .thenReturn(Future.successful(Enrolments(Set.empty)))
+
+        val res = doEnrolmentRequest()
+        status(res)                              mustBe UNAUTHORIZED
+        (contentAsJson(res) \ "code").as[String] mustBe ErrorInvalidLisaManager.errorCode
+      }
+
+      "the authorise call returns an enrolment with a ZREF that does not match the lisaManager" in {
+        when(mockAuthConnector.authorise[Enrolments](any(), any())(any(), any()))
+          .thenReturn(
+            Future.successful(
+              Enrolments(Set(Enrolment("HMRC-LISA-ORG", Seq(EnrolmentIdentifier("ZREF", "Z999999")), "Activated")))
+            )
+          )
+
+        val res = doEnrolmentRequest()
+        status(res)                              mustBe UNAUTHORIZED
+        (contentAsJson(res) \ "code").as[String] mustBe ErrorInvalidLisaManager.errorCode
+      }
+
+      "the authorise call returns an enrolment with no ZREF identifier" in {
+        when(mockAuthConnector.authorise[Enrolments](any(), any())(any(), any()))
+          .thenReturn(
+            Future.successful(Enrolments(Set(Enrolment("HMRC-LISA-ORG", Seq.empty, "Activated"))))
+          )
+
+        val res = doEnrolmentRequest()
+        status(res)                              mustBe UNAUTHORIZED
+        (contentAsJson(res) \ "code").as[String] mustBe ErrorInvalidLisaManager.errorCode
+      }
+
+    }
+
+    "return 401 with ErrorUnauthorized" when {
+
+      "the authorise call throws an AuthorisationException" in {
+        when(mockAuthConnector.authorise[Enrolments](any(), any())(any(), any()))
+          .thenReturn(
+            Future.failed(new uk.gov.hmrc.auth.core.InsufficientConfidenceLevel("Insufficient confidence level"))
+          )
+
+        val res = doEnrolmentRequest()
+        status(res)                              mustBe UNAUTHORIZED
+        (contentAsJson(res) \ "code").as[String] mustBe ErrorUnauthorized.errorCode
+      }
+
+    }
+
+    "return 500 with ErrorInternalServerError" when {
+
+      "the authorise call throws an unexpected exception" in {
+        when(mockAuthConnector.authorise[Enrolments](any(), any())(any(), any()))
+          .thenReturn(Future.failed(new RuntimeException("Unexpected error")))
+
+        val res = doEnrolmentRequest()
+        status(res) mustBe INTERNAL_SERVER_ERROR
+      }
+
+    }
+
+    "return 400 Bad Request with empty JSON error" when {
+
+      "the request has no JSON body" in {
+        mockAuthorize(lisaManagerReferenceNumber)
+
+        val res = accountController
+          .testJsonValidator(lisaManagerReferenceNumber)
+          .apply(FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader))
+
+        status(res) mustBe BAD_REQUEST
       }
 
     }

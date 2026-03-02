@@ -52,7 +52,7 @@ object GetLisaAccountTransferAccount {
     (JsPath \ "transferredFromAccountId").write[String] and
       (JsPath \ "transferredFromLMRN").write[String] and
       (JsPath \ "transferInDate").write[LocalDate]
-  )(unlift(GetLisaAccountTransferAccount.unapply))
+  )((t: GetLisaAccountTransferAccount) => (t.transferredFromAccountId, t.transferredFromLMRN, t.transferInDate))
 
 }
 
@@ -128,6 +128,18 @@ object GetLisaAccountSuccessResponse {
       (JsPath \ "accountClosureReason").writeNullable[String] and
       (JsPath \ "closureDate").writeNullable[LocalDate] and
       (JsPath \ "transferAccount").writeNullable[GetLisaAccountTransferAccount]
-  )(unlift(GetLisaAccountSuccessResponse.unapply))
+  )((g: GetLisaAccountSuccessResponse) =>
+    (
+      g.accountId,
+      g.investorId,
+      g.creationReason,
+      g.firstSubscriptionDate,
+      g.accountStatus,
+      g.subscriptionStatus,
+      g.accountClosureReason,
+      g.closureDate,
+      g.transferAccount
+    )
+  )
 
 }

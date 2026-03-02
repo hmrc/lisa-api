@@ -58,8 +58,11 @@ class AccountTransferSpec extends PlaySpec {
 
       res match {
         case JsError(errors) =>
-          errors.count { case (path: JsPath, errors: Seq[JsonValidationError]) =>
-            path.toString() == "/transferredFromLMRN" && errors.contains(JsonValidationError("error.formatting.lmrn"))
+          errors.count {
+            case (path: JsPath, errs: Seq[_]) if errs.headOption.exists(_.isInstanceOf[JsonValidationError]) =>
+              val errors = errs.asInstanceOf[Seq[JsonValidationError]]
+              path.toString() == "/transferredFromLMRN" && errors.contains(JsonValidationError("error.formatting.lmrn"))
+            case _                                                                                           => false
           } mustBe 1
         case _               => fail()
       }
@@ -72,8 +75,11 @@ class AccountTransferSpec extends PlaySpec {
 
       res match {
         case JsError(errors) =>
-          errors.count { case (path: JsPath, errors: Seq[JsonValidationError]) =>
-            path.toString() == "/transferInDate" && errors.contains(JsonValidationError("error.formatting.date"))
+          errors.count {
+            case (path: JsPath, errs: Seq[_]) if errs.headOption.exists(_.isInstanceOf[JsonValidationError]) =>
+              val errors = errs.asInstanceOf[Seq[JsonValidationError]]
+              path.toString() == "/transferInDate" && errors.contains(JsonValidationError("error.formatting.date"))
+            case _                                                                                           => false
           } mustBe 1
         case _               => fail()
       }

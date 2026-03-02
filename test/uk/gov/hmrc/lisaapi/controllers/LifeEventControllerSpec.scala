@@ -77,9 +77,9 @@ class LifeEventControllerSpec extends ControllerTestFixture {
         doReportLifeEventRequest(reportLifeEventJson) { res =>
           await(res)
           verify(mockAuditService).audit(
-            auditType = matchersEquals("lifeEventReported"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events"),
-            auditData = matchersEquals(
+            matchersEquals("lifeEventReported"),
+            matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountID"                  -> accountId,
@@ -97,9 +97,9 @@ class LifeEventControllerSpec extends ControllerTestFixture {
         doReportLifeEventRequest(reportLifeEventJson.replace(validDate, invalidDate)) { res =>
           await(res)
           verify(mockAuditService).audit(
-            auditType = matchersEquals("lifeEventNotReported"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events"),
-            auditData = matchersEquals(
+            matchersEquals("lifeEventNotReported"),
+            matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountID"                  -> accountId,
@@ -116,9 +116,9 @@ class LifeEventControllerSpec extends ControllerTestFixture {
         doReportLifeEventRequest(reportLifeEventJson) { res =>
           await(res)
           verify(mockAuditService).audit(
-            auditType = matchersEquals("lifeEventNotReported"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events"),
-            auditData = matchersEquals(
+            matchersEquals("lifeEventNotReported"),
+            matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountID"                  -> accountId,
@@ -136,9 +136,9 @@ class LifeEventControllerSpec extends ControllerTestFixture {
         doReportLifeEventRequest(reportLifeEventJson) { res =>
           await(res)
           verify(mockAuditService).audit(
-            auditType = matchersEquals("lifeEventNotReported"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events"),
-            auditData = matchersEquals(
+            matchersEquals("lifeEventNotReported"),
+            matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountID"                  -> accountId,
@@ -156,9 +156,9 @@ class LifeEventControllerSpec extends ControllerTestFixture {
         doReportLifeEventRequest(reportLifeEventJson) { res =>
           await(res)
           verify(mockAuditService).audit(
-            auditType = matchersEquals("lifeEventNotReported"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events"),
-            auditData = matchersEquals(
+            matchersEquals("lifeEventNotReported"),
+            matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountID"                  -> accountId,
@@ -177,9 +177,9 @@ class LifeEventControllerSpec extends ControllerTestFixture {
         doReportLifeEventRequest(reportLifeEventJson) { res =>
           await(res)
           verify(mockAuditService).audit(
-            auditType = matchersEquals("lifeEventNotReported"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events"),
-            auditData = matchersEquals(
+            matchersEquals("lifeEventNotReported"),
+            matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountID"                  -> accountId,
@@ -265,8 +265,10 @@ class LifeEventControllerSpec extends ControllerTestFixture {
     }
 
     "return with 403 forbidden and a code of INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID in version 1" in {
+      @annotation.nowarn("msg=deprecated")
+      val deprecatedResponse: ReportLifeEventResponse = ReportLifeEventAccountClosedOrVoidResponse
       when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
-        .thenReturn(Future.successful(ReportLifeEventAccountClosedOrVoidResponse))
+        .thenReturn(Future.successful(deprecatedResponse))
       doReportLifeEventRequest(reportLifeEventJson) { res =>
         status(res)                              mustBe FORBIDDEN
         (contentAsJson(res) \ "code").as[String] mustBe "INVESTOR_ACCOUNT_ALREADY_CLOSED_OR_VOID"
@@ -329,6 +331,17 @@ class LifeEventControllerSpec extends ControllerTestFixture {
       when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
         .thenReturn(Future.successful(ReportLifeEventFundReleaseNotFoundResponse))
       doReportLifeEventRequest(reportLifeEventJson) { res =>
+        status(res)                              mustBe INTERNAL_SERVER_ERROR
+        (contentAsJson(res) \ "code").as[String] mustBe "INTERNAL_SERVER_ERROR"
+      }
+    }
+
+    "return with 500 internal server error on API v2 when an unhandled v2 response is returned" in {
+      @annotation.nowarn("msg=deprecated")
+      val deprecatedResponse: ReportLifeEventResponse = ReportLifeEventAccountClosedOrVoidResponse
+      when(mockLifeEventService.reportLifeEvent(any(), any(), any())(any()))
+        .thenReturn(Future.successful(deprecatedResponse))
+      doReportLifeEventRequest(reportLifeEventJson, acceptHeader = acceptHeaderV2) { res =>
         status(res)                              mustBe INTERNAL_SERVER_ERROR
         (contentAsJson(res) \ "code").as[String] mustBe "INTERNAL_SERVER_ERROR"
       }
