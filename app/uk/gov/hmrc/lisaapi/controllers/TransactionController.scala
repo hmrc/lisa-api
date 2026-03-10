@@ -106,7 +106,7 @@ class TransactionController @Inject() (
                   logger.warn("[LifeEventController][reportLisaLifeEvent] Matched an error")
                   val errorResponse = errors.applyOrElse(
                     res,
-                    { _: GetTransactionResponse =>
+                    { (_: GetTransactionResponse) =>
                       logger.error(
                         s"[LifeEventController][reportLisaLifeEvent] Matched an unexpected response: $res, returning a 500 error"
                       )

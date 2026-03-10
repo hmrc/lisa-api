@@ -55,7 +55,7 @@ object RequestPurchaseExtension {
     (JsPath \ "eventType").write[String] and
       (JsPath \ "eventDate").write[LocalDate] and
       (JsPath \ "fundsReleaseLifeEventID").write[String]
-  ) { req: RequestStandardPurchaseExtension =>
+  ) { (req: RequestStandardPurchaseExtension) =>
     (
       req.eventType,
       req.eventDate,
@@ -76,7 +76,7 @@ object RequestPurchaseExtension {
       (JsPath \ "eventDate").write[LocalDate] and
       (JsPath \ "supersededLifeEventDate").write[LocalDate] and
       (JsPath \ "supersededLifeEventID").write[String]
-  ) { req: RequestSupersededPurchaseExtension =>
+  ) { (req: RequestSupersededPurchaseExtension) =>
     (
       req.eventType,
       req.eventDate,

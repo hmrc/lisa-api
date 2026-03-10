@@ -37,7 +37,7 @@ sealed abstract class ErrorResponseWithErrors(
   override val httpStatusCode: Int,
   override val errorCode: String,
   override val message: String,
-  val errors: Option[List[ErrorValidation]] = None
+  val errors: Option[List[ErrorValidation]]
 ) extends ErrorResponse(httpStatusCode, errorCode, message)
 
 case class ErrorResponseWithId(

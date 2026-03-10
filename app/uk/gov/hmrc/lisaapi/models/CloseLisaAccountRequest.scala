@@ -33,6 +33,6 @@ object CloseLisaAccountRequest {
   implicit val closeLisaAccountRequestWrites: Writes[CloseLisaAccountRequest] = (
     (JsPath \ "accountClosureReason").write[String] and
       (JsPath \ "closureDate").write[LocalDate]
-  )(unlift(CloseLisaAccountRequest.unapply))
+  )((c: CloseLisaAccountRequest) => (c.accountClosureReason, c.closureDate))
 
 }

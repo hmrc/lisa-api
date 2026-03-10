@@ -17,7 +17,7 @@
 package uk.gov.hmrc.lisaapi.models
 
 import org.scalatestplus.play.PlaySpec
-import play.api.libs.json._
+import play.api.libs.json.{JsonValidationError, *}
 import uk.gov.hmrc.lisaapi.models.CreateLisaInvestorRequest
 
 import java.time.LocalDate
@@ -129,13 +129,16 @@ class CreateLisaInvestorRequestSpec extends PlaySpec {
 
   }
 
-  private def hasCorrectValidationError(req: String, path: String, errorMessage: String): Unit = {
-    val res = Json.parse(req).validate[CreateLisaInvestorRequest]
+  private def hasCorrectValidationError(req: String, expectedPath: String, errorMessage: String): Unit = {
+    val res               = Json.parse(req).validate[CreateLisaInvestorRequest]
+    val expectedJsonError = JsonValidationError(errorMessage)
 
     res match {
       case JsError(errors) =>
-        errors.count { case (path: JsPath, errors: Seq[JsonValidationError]) =>
-          path.eq(path) && errors.contains(JsonValidationError(errorMessage))
+        errors.count {
+          case (path: JsPath, errs: Seq[_]) if errs.headOption.exists(_.isInstanceOf[JsonValidationError]) =>
+            path.toString == expectedPath && errs.asInstanceOf[Seq[JsonValidationError]].contains(expectedJsonError)
+          case _                                                                                           => false
         } mustBe 1
       case _               => fail()
     }

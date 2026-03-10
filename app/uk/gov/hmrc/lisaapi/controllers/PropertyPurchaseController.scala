@@ -101,7 +101,7 @@ class PropertyPurchaseController @Inject() (
                     Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
                   case res: ReportLifeEventResponse        =>
                     val response =
-                      fundReleaseErrors.applyOrElse(res, { _: ReportLifeEventResponse => ErrorInternalServerError })
+                      fundReleaseErrors.applyOrElse(res, (_: ReportLifeEventResponse) => ErrorInternalServerError)
                     logger.info(
                       s"[PropertyPurchaseController][requestFundRelease] Fund Release received $res, responding with $response"
                     )
@@ -162,7 +162,7 @@ class PropertyPurchaseController @Inject() (
                     Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
                   case res: ReportLifeEventResponse        =>
                     val response =
-                      extensionErrors.applyOrElse(res, { _: ReportLifeEventResponse => ErrorInternalServerError })
+                      extensionErrors.applyOrElse(res, (_: ReportLifeEventResponse) => ErrorInternalServerError)
                     logger.warn(
                       s"[PropertyPurchaseController][requestExtension] Extension received $res, responding with $response"
                     )
@@ -224,7 +224,7 @@ class PropertyPurchaseController @Inject() (
                     Created(Json.toJson(ApiResponse(data = Some(data), success = true, status = CREATED)))
                   case res: ReportLifeEventResponse        =>
                     val response: ErrorResponse =
-                      outcomeErrors.applyOrElse(res, { _: ReportLifeEventResponse => ErrorInternalServerError })
+                      outcomeErrors.applyOrElse(res, (_: ReportLifeEventResponse) => ErrorInternalServerError)
                     logger.warn(
                       s"[PropertyPurchaseController][reportPurchaseOutcome] Purchase outcome received $res, responding with $response"
                     )

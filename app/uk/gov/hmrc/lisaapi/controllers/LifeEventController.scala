@@ -75,7 +75,7 @@ class LifeEventController @Inject() (
                       case Some(VERSION_1) =>
                         val errorResponse = v1errors.applyOrElse(
                           res,
-                          { _: ReportLifeEventResponse =>
+                          { (_: ReportLifeEventResponse) =>
                             logger.error(
                               s"[LifeEventController][reportLisaLifeEvent] Matched an unexpected response: $res, returning a 500 error"
                             )
@@ -88,7 +88,7 @@ class LifeEventController @Inject() (
                       case Some(VERSION_2) =>
                         val errorResponse = v2errors.applyOrElse(
                           res,
-                          { _: ReportLifeEventResponse =>
+                          { (_: ReportLifeEventResponse) =>
                             logger.error(
                               s"[LifeEventController][reportLisaLifeEvent] Matched an unexpected response: $res, returning a 500 error"
                             )

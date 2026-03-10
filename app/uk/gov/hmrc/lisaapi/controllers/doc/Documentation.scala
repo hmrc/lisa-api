@@ -18,24 +18,22 @@ package uk.gov.hmrc.lisaapi.controllers.doc
 
 import com.google.inject.Inject
 import controllers.Assets
-import play.api.http.HttpErrorHandler
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import uk.gov.hmrc.api.controllers.DocumentationController
 import uk.gov.hmrc.lisaapi.config.{APIAccessConfig, AppContext}
 import uk.gov.hmrc.lisaapi.domain.APIAccess
-import uk.gov.hmrc.lisaapi.views._
+import uk.gov.hmrc.lisaapi.views.*
+import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 class Documentation @Inject() (
   appContext: AppContext,
   assets: Assets,
-  errorHandler: HttpErrorHandler,
   cc: ControllerComponents
-) extends DocumentationController(cc, assets, errorHandler) {
+) extends BackendController(cc) {
 
-  override def documentation(version: String, endpointName: String): Action[AnyContent] =
+  def documentation(version: String, endpointName: String): Action[AnyContent] =
     assets.at(s"/public/api/documentation/$version", s"${endpointName.replaceAll(" ", "-")}.xml")
 
-  override def definition(): Action[AnyContent] = Action {
+  def definition(): Action[AnyContent] = Action {
     Ok(
       txt.definition(
         appContext.apiContext,

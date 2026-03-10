@@ -73,7 +73,7 @@ object AnnualReturn {
       (JsPath \ "lisaAnnualStocksAndSharesSubs").write[Int] and
       (JsPath \ "supersededLifeEventDate").writeNullable[LocalDate] and
       (JsPath \ "supersededLifeEventID").writeNullable[LifeEventId]
-  ) { req: AnnualReturn =>
+  ) { (req: AnnualReturn) =>
     val supersededLifeEventDate = req.supersede match {
       case None      => None
       case Some(sup) => Some(sup.originalEventDate)

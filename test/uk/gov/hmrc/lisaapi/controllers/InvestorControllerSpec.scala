@@ -175,6 +175,19 @@ class InvestorControllerSpec extends ControllerTestFixture {
         status(res)                              mustBe INTERNAL_SERVER_ERROR
         (contentAsJson(res) \ "code").as[String] mustBe "INTERNAL_SERVER_ERROR"
       }
+      "the service future fails with an exception" in {
+        when(mockInvestorService.createInvestor(any(), any())(any()))
+          .thenReturn(Future.failed(new RuntimeException("Service error")))
+
+        val res = investorController
+          .createLisaInvestor(lisaManager)
+          .apply(
+            FakeRequest(Helpers.PUT, "/").withHeaders(acceptHeader).withBody(AnyContentAsJson(Json.parse(investorJson)))
+          )
+
+        status(res)                              mustBe INTERNAL_SERVER_ERROR
+        (contentAsJson(res) \ "code").as[String] mustBe "INTERNAL_SERVER_ERROR"
+      }
     }
 
     "return with status 503 service unavailable" when {
@@ -253,9 +266,9 @@ class InvestorControllerSpec extends ControllerTestFixture {
         )
 
         verify(mockAuditService).audit(
-          auditType = matchersEquals("investorNotCreated"),
-          path = matchersEquals(s"/manager/$lisaManager/investors"),
-          auditData = matchersEquals(
+          matchersEquals("investorNotCreated"),
+          matchersEquals(s"/manager/$lisaManager/investors"),
+          matchersEquals(
             Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorNINO"               -> "AB123456D",
@@ -283,9 +296,9 @@ class InvestorControllerSpec extends ControllerTestFixture {
         )
 
         verify(mockAuditService).audit(
-          auditType = matchersEquals("investorNotCreated"),
-          path = matchersEquals(s"/manager/$lisaManager/investors"),
-          auditData = matchersEquals(
+          matchersEquals("investorNotCreated"),
+          matchersEquals(s"/manager/$lisaManager/investors"),
+          matchersEquals(
             Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorNINO"               -> "AB123456D",
@@ -314,9 +327,9 @@ class InvestorControllerSpec extends ControllerTestFixture {
         )
 
         verify(mockAuditService).audit(
-          auditType = matchersEquals("investorCreated"),
-          path = matchersEquals(s"/manager/$lisaManager/investors"),
-          auditData = matchersEquals(
+          matchersEquals("investorCreated"),
+          matchersEquals(s"/manager/$lisaManager/investors"),
+          matchersEquals(
             Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "investorNINO"               -> "AB123456D",

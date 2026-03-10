@@ -87,6 +87,12 @@ class APIVersioningSpec extends ControllerTestFixture {
       Await.result(response, 100 millis) mustBe ErrorAcceptHeaderVersionInvalid.asResult
     }
 
+    "expose its parser and executionContext" in {
+      val builder = APIVersioningImpl.validateHeader(mockParser)
+      val action  = builder.async(_ => Future.successful(Results.Ok))
+      action.executionContext mustBe global
+    }
+
   }
 
   "The isEndpointEnabled function" must {
@@ -99,6 +105,23 @@ class APIVersioningSpec extends ControllerTestFixture {
       when(mockAppContext.endpointIsDisabled("test")).thenReturn(true)
       val request = FakeRequest(Helpers.GET, "/").withHeaders((ACCEPT, "application/vnd.hmrc.2.0+json"))
       isEndpointEnabledTest(request) mustBe ErrorApiNotAvailable.asResult
+    }
+    "expose its parser and executionContext" in {
+      val builder = APIVersioningImpl.isEndpointEnabled("test", mockParser)
+      val action  = builder.async(_ => Future.successful(Results.Ok))
+      action.executionContext mustBe global
+    }
+  }
+
+  "The v2endpointsEnabled lazy val" must {
+    "delegate to appContext when not overridden" in {
+      when(mockAppContext.v2endpointsEnabled).thenReturn(true)
+      val impl = new APIVersioning {
+        override val validateVersion: String => Boolean     = List("1.0", "2.0") contains _
+        override val validateContentType: String => Boolean = _ == "json"
+        override protected def appContext: AppContext       = mockAppContext
+      }
+      impl.v2endpointsEnabled mustBe true
     }
   }
 

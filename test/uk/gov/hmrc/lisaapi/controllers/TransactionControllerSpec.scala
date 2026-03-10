@@ -22,11 +22,10 @@ import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.mvc.Http.HeaderNames
-import uk.gov.hmrc.api.controllers.ErrorAcceptHeaderInvalid
 import uk.gov.hmrc.lisaapi.controllers.{
-  ErrorAccountNotFound, ErrorBadRequestAccountId, ErrorBadRequestLmrn, ErrorBadRequestTransactionId,
-  ErrorBonusPaymentTransactionNotFound, ErrorInternalServerError, ErrorServiceUnavailable, ErrorTransactionNotFound,
-  TransactionController
+  ErrorAcceptHeaderInvalid, ErrorAccountNotFound, ErrorBadRequestAccountId, ErrorBadRequestLmrn,
+  ErrorBadRequestTransactionId, ErrorBonusPaymentTransactionNotFound, ErrorInternalServerError, ErrorServiceUnavailable,
+  ErrorTransactionNotFound, TransactionController
 }
 import uk.gov.hmrc.lisaapi.helpers.ControllerTestFixture
 import uk.gov.hmrc.lisaapi.models._
@@ -293,9 +292,9 @@ class TransactionControllerSpec extends ControllerTestFixture {
           .apply(FakeRequest().withHeaders(acceptHeaderV1))
         await(res)
         verify(mockAuditService).audit(
-          auditType = matchersEquals("getTransactionReported"),
-          path = matchersEquals(s"/manager/$lmrn/accounts/$accountId/transactions/$transactionId/payments"),
-          auditData = matchersEquals(
+          matchersEquals("getTransactionReported"),
+          matchersEquals(s"/manager/$lmrn/accounts/$accountId/transactions/$transactionId/payments"),
+          matchersEquals(
             Map(
               "lisaManagerReferenceNumber" -> lmrn,
               "accountId"                  -> accountId,
@@ -325,9 +324,9 @@ class TransactionControllerSpec extends ControllerTestFixture {
           .apply(FakeRequest().withHeaders(acceptHeaderV2))
         await(res)
         verify(mockAuditService).audit(
-          auditType = matchersEquals("getTransactionReported"),
-          path = matchersEquals(s"/manager/$lmrn/accounts/$accountId/transactions/$transactionId/payments"),
-          auditData = matchersEquals(
+          matchersEquals("getTransactionReported"),
+          matchersEquals(s"/manager/$lmrn/accounts/$accountId/transactions/$transactionId/payments"),
+          matchersEquals(
             Map(
               "lisaManagerReferenceNumber" -> lmrn,
               "accountId"                  -> accountId,
@@ -348,9 +347,9 @@ class TransactionControllerSpec extends ControllerTestFixture {
           .apply(FakeRequest().withHeaders(acceptHeaderV2))
         await(res)
         verify(mockAuditService).audit(
-          auditType = matchersEquals("getTransactionNotReported"),
-          path = matchersEquals(s"/manager/$lmrn/accounts/$accountId/transactions/$transactionId/payments"),
-          auditData = matchersEquals(
+          matchersEquals("getTransactionNotReported"),
+          matchersEquals(s"/manager/$lmrn/accounts/$accountId/transactions/$transactionId/payments"),
+          matchersEquals(
             Map(
               "lisaManagerReferenceNumber" -> lmrn,
               "accountId"                  -> accountId,
@@ -369,9 +368,9 @@ class TransactionControllerSpec extends ControllerTestFixture {
           .apply(FakeRequest().withHeaders(acceptHeaderV1))
         await(res)
         verify(mockAuditService).audit(
-          auditType = matchersEquals("getTransactionNotReported"),
-          path = matchersEquals(s"/manager/$lmrn/accounts/$accountId/transactions/$transactionId/payments"),
-          auditData = matchersEquals(
+          matchersEquals("getTransactionNotReported"),
+          matchersEquals(s"/manager/$lmrn/accounts/$accountId/transactions/$transactionId/payments"),
+          matchersEquals(
             Map(
               "lisaManagerReferenceNumber" -> lmrn,
               "accountId"                  -> accountId,
@@ -390,9 +389,9 @@ class TransactionControllerSpec extends ControllerTestFixture {
           .apply(FakeRequest().withHeaders(acceptHeaderV2))
         await(res)
         verify(mockAuditService).audit(
-          auditType = matchersEquals("getTransactionNotReported"),
-          path = matchersEquals(s"/manager/$lmrn/accounts/$accountId/transactions/$transactionId/payments"),
-          auditData = matchersEquals(
+          matchersEquals("getTransactionNotReported"),
+          matchersEquals(s"/manager/$lmrn/accounts/$accountId/transactions/$transactionId/payments"),
+          matchersEquals(
             Map(
               "lisaManagerReferenceNumber" -> lmrn,
               "accountId"                  -> accountId,
@@ -411,9 +410,9 @@ class TransactionControllerSpec extends ControllerTestFixture {
           .apply(FakeRequest().withHeaders(acceptHeaderV2))
         await(res)
         verify(mockAuditService).audit(
-          auditType = matchersEquals("getTransactionNotReported"),
-          path = matchersEquals(s"/manager/$lmrn/accounts/$accountId/transactions/$transactionId/payments"),
-          auditData = matchersEquals(
+          matchersEquals("getTransactionNotReported"),
+          matchersEquals(s"/manager/$lmrn/accounts/$accountId/transactions/$transactionId/payments"),
+          matchersEquals(
             Map(
               "lisaManagerReferenceNumber" -> lmrn,
               "accountId"                  -> accountId,
@@ -438,9 +437,9 @@ class TransactionControllerSpec extends ControllerTestFixture {
           .apply(FakeRequest().withHeaders(acceptHeaderV1))
         await(res)
         verify(mockAuditService).audit(
-          auditType = matchersEquals("getTransactionNotReported"),
-          path = matchersEquals(s"/manager/$lmrn/accounts/$accountId/transactions/$transactionId/payments"),
-          auditData = matchersEquals(
+          matchersEquals("getTransactionNotReported"),
+          matchersEquals(s"/manager/$lmrn/accounts/$accountId/transactions/$transactionId/payments"),
+          matchersEquals(
             Map(
               "lisaManagerReferenceNumber" -> lmrn,
               "accountId"                  -> accountId,
@@ -459,9 +458,9 @@ class TransactionControllerSpec extends ControllerTestFixture {
           .apply(FakeRequest().withHeaders(acceptHeaderV2))
         await(res)
         verify(mockAuditService).audit(
-          auditType = matchersEquals("getTransactionNotReported"),
-          path = matchersEquals(s"/manager/$lmrn/accounts/$accountId/transactions/$transactionId/payments"),
-          auditData = matchersEquals(
+          matchersEquals("getTransactionNotReported"),
+          matchersEquals(s"/manager/$lmrn/accounts/$accountId/transactions/$transactionId/payments"),
+          matchersEquals(
             Map(
               "lisaManagerReferenceNumber" -> lmrn,
               "accountId"                  -> accountId,

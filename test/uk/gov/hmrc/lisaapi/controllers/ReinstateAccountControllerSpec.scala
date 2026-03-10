@@ -38,8 +38,7 @@ class ReinstateAccountControllerSpec extends ControllerTestFixture {
     mockReinstateAccountService,
     mockAuditService,
     mockLisaMetrics,
-    mockControllerComponents,
-    mockParser
+    mockControllerComponents
   ) {
     override lazy val v2endpointsEnabled = true
   }
@@ -63,11 +62,11 @@ class ReinstateAccountControllerSpec extends ControllerTestFixture {
           when(mockReinstateAccountService.reinstateAccountService(any(), any())(any()))
             .thenReturn(Future.successful(ReinstateLisaAccountSuccessResponse("code", "reason")))
 
-          doSyncReinstateAccount(reinstateAccountValidJson) { res =>
+          doSyncReinstateAccount(reinstateAccountValidJson) { _ =>
             verify(mockAuditService).audit(
-              auditType = matchersEquals("accountReinstated"),
-              path = matchersEquals(s"/manager/$lisaManager/reinstate-account"),
-              auditData = matchersEquals(
+              matchersEquals("accountReinstated"),
+              matchersEquals(s"/manager/$lisaManager/reinstate-account"),
+              matchersEquals(
                 Map(
                   "lisaManagerReferenceNumber" -> lisaManager,
                   "accountId"                  -> accountId
@@ -84,11 +83,11 @@ class ReinstateAccountControllerSpec extends ControllerTestFixture {
         when(mockReinstateAccountService.reinstateAccountService(any(), any())(any()))
           .thenReturn(Future.successful(ReinstateLisaAccountAlreadyClosedResponse))
 
-        doSyncReinstateAccount(reinstateAccountValidJson) { res =>
+        doSyncReinstateAccount(reinstateAccountValidJson) { _ =>
           verify(mockAuditService).audit(
-            auditType = matchersEquals("accountNotReinstated"),
-            path = matchersEquals(s"/manager/$lisaManager/reinstate-account"),
-            auditData = matchersEquals(
+            matchersEquals("accountNotReinstated"),
+            matchersEquals(s"/manager/$lisaManager/reinstate-account"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountId"                  -> accountId,
@@ -102,11 +101,11 @@ class ReinstateAccountControllerSpec extends ControllerTestFixture {
         when(mockReinstateAccountService.reinstateAccountService(any(), any())(any()))
           .thenReturn(Future.successful(ReinstateLisaAccountAlreadyCancelledResponse))
 
-        doSyncReinstateAccount(reinstateAccountValidJson) { res =>
+        doSyncReinstateAccount(reinstateAccountValidJson) { _ =>
           verify(mockAuditService).audit(
-            auditType = matchersEquals("accountNotReinstated"),
-            path = matchersEquals(s"/manager/$lisaManager/reinstate-account"),
-            auditData = matchersEquals(
+            matchersEquals("accountNotReinstated"),
+            matchersEquals(s"/manager/$lisaManager/reinstate-account"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountId"                  -> accountId,
@@ -120,11 +119,11 @@ class ReinstateAccountControllerSpec extends ControllerTestFixture {
         when(mockReinstateAccountService.reinstateAccountService(any(), any())(any()))
           .thenReturn(Future.successful(ReinstateLisaAccountAlreadyOpenResponse))
 
-        doSyncReinstateAccount(reinstateAccountValidJson) { res =>
+        doSyncReinstateAccount(reinstateAccountValidJson) { _ =>
           verify(mockAuditService).audit(
-            auditType = matchersEquals("accountNotReinstated"),
-            path = matchersEquals(s"/manager/$lisaManager/reinstate-account"),
-            auditData = matchersEquals(
+            matchersEquals("accountNotReinstated"),
+            matchersEquals(s"/manager/$lisaManager/reinstate-account"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountId"                  -> accountId,
@@ -138,11 +137,11 @@ class ReinstateAccountControllerSpec extends ControllerTestFixture {
         when(mockReinstateAccountService.reinstateAccountService(any(), any())(any()))
           .thenReturn(Future.successful(ReinstateLisaAccountInvestorComplianceCheckFailedResponse))
 
-        doSyncReinstateAccount(reinstateAccountValidJson) { res =>
+        doSyncReinstateAccount(reinstateAccountValidJson) { _ =>
           verify(mockAuditService).audit(
-            auditType = matchersEquals("accountNotReinstated"),
-            path = matchersEquals(s"/manager/$lisaManager/reinstate-account"),
-            auditData = matchersEquals(
+            matchersEquals("accountNotReinstated"),
+            matchersEquals(s"/manager/$lisaManager/reinstate-account"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountId"                  -> accountId,
@@ -156,11 +155,11 @@ class ReinstateAccountControllerSpec extends ControllerTestFixture {
         when(mockReinstateAccountService.reinstateAccountService(any(), any())(any()))
           .thenReturn(Future.successful(ReinstateLisaAccountNotFoundResponse))
 
-        doSyncReinstateAccount(reinstateAccountValidJson) { res =>
+        doSyncReinstateAccount(reinstateAccountValidJson) { _ =>
           verify(mockAuditService).audit(
-            auditType = matchersEquals("accountNotReinstated"),
-            path = matchersEquals(s"/manager/$lisaManager/reinstate-account"),
-            auditData = matchersEquals(
+            matchersEquals("accountNotReinstated"),
+            matchersEquals(s"/manager/$lisaManager/reinstate-account"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountId"                  -> accountId,
@@ -175,11 +174,11 @@ class ReinstateAccountControllerSpec extends ControllerTestFixture {
         when(mockReinstateAccountService.reinstateAccountService(any(), any())(any()))
           .thenReturn(Future.successful(ReinstateLisaAccountServiceUnavailableResponse))
 
-        doSyncReinstateAccount(reinstateAccountValidJson) { res =>
+        doSyncReinstateAccount(reinstateAccountValidJson) { _ =>
           verify(mockAuditService).audit(
-            auditType = matchersEquals("accountNotReinstated"),
-            path = matchersEquals(s"/manager/$lisaManager/reinstate-account"),
-            auditData = matchersEquals(
+            matchersEquals("accountNotReinstated"),
+            matchersEquals(s"/manager/$lisaManager/reinstate-account"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountId"                  -> accountId,
@@ -194,11 +193,11 @@ class ReinstateAccountControllerSpec extends ControllerTestFixture {
         when(mockReinstateAccountService.reinstateAccountService(any(), any())(any()))
           .thenReturn(Future.successful(ReinstateLisaAccountErrorResponse))
 
-        doSyncReinstateAccount(reinstateAccountValidJson) { res =>
+        doSyncReinstateAccount(reinstateAccountValidJson) { _ =>
           verify(mockAuditService).audit(
-            auditType = matchersEquals("accountNotReinstated"),
-            path = matchersEquals(s"/manager/$lisaManager/reinstate-account"),
-            auditData = matchersEquals(
+            matchersEquals("accountNotReinstated"),
+            matchersEquals(s"/manager/$lisaManager/reinstate-account"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountId"                  -> accountId,
@@ -316,6 +315,15 @@ class ReinstateAccountControllerSpec extends ControllerTestFixture {
         doReinstateRequest(reinstateAccountValidJson) { res =>
           reset(mockReinstateAccountService) // removes the thenThrow
 
+          status(res)        mustBe INTERNAL_SERVER_ERROR
+          contentAsJson(res) mustBe ErrorInternalServerError.asJson
+        }
+      }
+      "the service future fails with an exception" in {
+        when(mockReinstateAccountService.reinstateAccountService(any(), any())(any()))
+          .thenReturn(Future.failed(new RuntimeException("Service error")))
+
+        doReinstateRequest(reinstateAccountValidJson) { res =>
           status(res)        mustBe INTERNAL_SERVER_ERROR
           contentAsJson(res) mustBe ErrorInternalServerError.asJson
         }

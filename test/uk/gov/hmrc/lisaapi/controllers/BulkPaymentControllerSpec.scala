@@ -123,6 +123,17 @@ class BulkPaymentControllerSpec extends ControllerTestFixture {
         (json \ "code").as[String]    mustBe ErrorBadRequestStart.errorCode
         (json \ "message").as[String] mustBe ErrorBadRequestStart.message
       }
+      "the startDate parameter has the right format but is an invalid date" in {
+        val result = mockBulkPaymentController
+          .getBulkPayment(lmrn, "2023-13-01", validDate)
+          .apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeader))
+
+        status(result) mustBe BAD_REQUEST
+
+        val json = contentAsJson(result)
+
+        (json \ "code").as[String] mustBe ErrorBadRequestStart.errorCode
+      }
       "the endDate parameter is in the wrong format" in {
         val result = mockBulkPaymentController
           .getBulkPayment(lmrn, validDate, invalidDate)
@@ -259,6 +270,46 @@ class BulkPaymentControllerSpec extends ControllerTestFixture {
 
   }
 
+  "Get Bulk Payment with API v1 accept header" must {
+
+    val acceptHeaderV1: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
+
+    "return 200 success with transformed response (no transactionType or status)" when {
+      "the service returns a GetBulkPaymentSuccessResponse" in {
+        when(mockBulkPaymentService.getBulkPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(successResponse))
+
+        val oneYearInFuture = LocalDate.parse(validDate).plusYears(1).toString
+        val result          = mockBulkPaymentController
+          .getBulkPayment(lmrn, validDate, oneYearInFuture)
+          .apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeaderV1))
+
+        status(result) mustBe OK
+
+        val json = contentAsJson(result)
+        (json \ "payments" \ 0 \ "transactionType").asOpt[String] mustBe None
+        (json \ "payments" \ 0 \ "status").asOpt[String]          mustBe None
+      }
+    }
+
+    "return 404 TRANSACTION_NOT_FOUND" when {
+      "the service returns a GetBulkPaymentNotFoundResponse" in {
+        when(mockBulkPaymentService.getBulkPayment(any(), any(), any())(any()))
+          .thenReturn(Future.successful(GetBulkPaymentNotFoundResponse))
+
+        val result = mockBulkPaymentController
+          .getBulkPayment(lmrn, validDate, validDate)
+          .apply(FakeRequest(Helpers.GET, "/").withHeaders(acceptHeaderV1))
+
+        status(result) mustBe NOT_FOUND
+
+        val json = contentAsJson(result)
+        (json \ "code").as[String] mustBe ErrorBulkTransactionNotFoundV1.errorCode
+      }
+    }
+
+  }
+
   "transformV1Response" must {
 
     "remove transactionType and status" in {
@@ -325,9 +376,9 @@ class BulkPaymentControllerSpec extends ControllerTestFixture {
       await(result)
 
       verify(mockAuditService).audit(
-        auditType = matchersEquals("getBulkPaymentReported"),
-        path = matchersEquals(s"/manager/$lmrn/payments"),
-        auditData = matchersEquals(
+        matchersEquals("getBulkPaymentReported"),
+        matchersEquals(s"/manager/$lmrn/payments"),
+        matchersEquals(
           Map(
             "lisaManagerReferenceNumber" -> lmrn
           )
@@ -344,9 +395,9 @@ class BulkPaymentControllerSpec extends ControllerTestFixture {
       await(result)
 
       verify(mockAuditService).audit(
-        auditType = matchersEquals("getBulkPaymentNotReported"),
-        path = matchersEquals(s"/manager/$lmrn/payments"),
-        auditData = matchersEquals(
+        matchersEquals("getBulkPaymentNotReported"),
+        matchersEquals(s"/manager/$lmrn/payments"),
+        matchersEquals(
           Map(
             "lisaManagerReferenceNumber" -> lmrn,
             "reasonNotReported"          -> ErrorBadRequestStart.errorCode
@@ -361,9 +412,9 @@ class BulkPaymentControllerSpec extends ControllerTestFixture {
       await(result)
 
       verify(mockAuditService).audit(
-        auditType = matchersEquals("getBulkPaymentNotReported"),
-        path = matchersEquals(s"/manager/$lmrn/payments"),
-        auditData = matchersEquals(
+        matchersEquals("getBulkPaymentNotReported"),
+        matchersEquals(s"/manager/$lmrn/payments"),
+        matchersEquals(
           Map(
             "lisaManagerReferenceNumber" -> lmrn,
             "reasonNotReported"          -> ErrorBadRequestEnd.errorCode
@@ -378,9 +429,9 @@ class BulkPaymentControllerSpec extends ControllerTestFixture {
       await(result)
 
       verify(mockAuditService).audit(
-        auditType = matchersEquals("getBulkPaymentNotReported"),
-        path = matchersEquals(s"/manager/$lmrn/payments"),
-        auditData = matchersEquals(
+        matchersEquals("getBulkPaymentNotReported"),
+        matchersEquals(s"/manager/$lmrn/payments"),
+        matchersEquals(
           Map(
             "lisaManagerReferenceNumber" -> lmrn,
             "reasonNotReported"          -> ErrorBadRequestStartEnd.errorCode
@@ -396,9 +447,9 @@ class BulkPaymentControllerSpec extends ControllerTestFixture {
       await(result)
 
       verify(mockAuditService).audit(
-        auditType = matchersEquals("getBulkPaymentNotReported"),
-        path = matchersEquals(s"/manager/$lmrn/payments"),
-        auditData = matchersEquals(
+        matchersEquals("getBulkPaymentNotReported"),
+        matchersEquals(s"/manager/$lmrn/payments"),
+        matchersEquals(
           Map(
             "lisaManagerReferenceNumber" -> lmrn,
             "reasonNotReported"          -> ErrorBadRequestEndInFuture.errorCode
@@ -414,9 +465,9 @@ class BulkPaymentControllerSpec extends ControllerTestFixture {
       await(result)
 
       verify(mockAuditService).audit(
-        auditType = matchersEquals("getBulkPaymentNotReported"),
-        path = matchersEquals(s"/manager/$lmrn/payments"),
-        auditData = matchersEquals(
+        matchersEquals("getBulkPaymentNotReported"),
+        matchersEquals(s"/manager/$lmrn/payments"),
+        matchersEquals(
           Map(
             "lisaManagerReferenceNumber" -> lmrn,
             "reasonNotReported"          -> ErrorBadRequestEndBeforeStart.errorCode
@@ -431,9 +482,9 @@ class BulkPaymentControllerSpec extends ControllerTestFixture {
       await(result)
 
       verify(mockAuditService).audit(
-        auditType = matchersEquals("getBulkPaymentNotReported"),
-        path = matchersEquals(s"/manager/$lmrn/payments"),
-        auditData = matchersEquals(
+        matchersEquals("getBulkPaymentNotReported"),
+        matchersEquals(s"/manager/$lmrn/payments"),
+        matchersEquals(
           Map(
             "lisaManagerReferenceNumber" -> lmrn,
             "reasonNotReported"          -> ErrorBadRequestStartBefore6April2017.errorCode
@@ -449,9 +500,9 @@ class BulkPaymentControllerSpec extends ControllerTestFixture {
       await(result)
 
       verify(mockAuditService).audit(
-        auditType = matchersEquals("getBulkPaymentNotReported"),
-        path = matchersEquals(s"/manager/$lmrn/payments"),
-        auditData = matchersEquals(
+        matchersEquals("getBulkPaymentNotReported"),
+        matchersEquals(s"/manager/$lmrn/payments"),
+        matchersEquals(
           Map(
             "lisaManagerReferenceNumber" -> lmrn,
             "reasonNotReported"          -> ErrorBadRequestOverYearBetweenStartAndEnd.errorCode
@@ -469,9 +520,9 @@ class BulkPaymentControllerSpec extends ControllerTestFixture {
       await(result)
 
       verify(mockAuditService).audit(
-        auditType = matchersEquals("getBulkPaymentNotReported"),
-        path = matchersEquals(s"/manager/$lmrn/payments"),
-        auditData = matchersEquals(
+        matchersEquals("getBulkPaymentNotReported"),
+        matchersEquals(s"/manager/$lmrn/payments"),
+        matchersEquals(
           Map(
             "lisaManagerReferenceNumber" -> lmrn,
             "reasonNotReported"          -> "TRANSACTION_NOT_FOUND"
@@ -489,9 +540,9 @@ class BulkPaymentControllerSpec extends ControllerTestFixture {
       await(result)
 
       verify(mockAuditService).audit(
-        auditType = matchersEquals("getBulkPaymentNotReported"),
-        path = matchersEquals(s"/manager/$lmrn/payments"),
-        auditData = matchersEquals(
+        matchersEquals("getBulkPaymentNotReported"),
+        matchersEquals(s"/manager/$lmrn/payments"),
+        matchersEquals(
           Map(
             "lisaManagerReferenceNumber" -> lmrn,
             "reasonNotReported"          -> "INTERNAL_SERVER_ERROR"
@@ -509,9 +560,9 @@ class BulkPaymentControllerSpec extends ControllerTestFixture {
       await(result)
 
       verify(mockAuditService).audit(
-        auditType = matchersEquals("getBulkPaymentNotReported"),
-        path = matchersEquals(s"/manager/$lmrn/payments"),
-        auditData = matchersEquals(
+        matchersEquals("getBulkPaymentNotReported"),
+        matchersEquals(s"/manager/$lmrn/payments"),
+        matchersEquals(
           Map(
             "lisaManagerReferenceNumber" -> lmrn,
             "reasonNotReported"          -> "SERVER_ERROR"

@@ -66,6 +66,11 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
   val validBonusPaymentMinimumFieldsJson: String =
     Source.fromInputStream(getClass.getResourceAsStream("/json/request.valid.bonus-payment.min.json")).mkString
 
+  val validBonusPaymentAdditionalBonusJson: String =
+    Source
+      .fromInputStream(getClass.getResourceAsStream("/json/request.valid.bonus-payment.additional-bonus.json"))
+      .mkString
+
   override def beforeEach(): Unit = {
     reset(mockAuditService)
     reset(mockDateTimeService)
@@ -225,6 +230,19 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
 
           (json \ "code").as[String]    mustBe "HELP_TO_BUY_NOT_APPLICABLE"
           (json \ "message").as[String] mustBe "Help to buy is only applicable for claims within the 2017-18 tax year"
+        }
+      }
+
+      "help to buy total YTD is non-zero but in-period amount is zero for a claim with a start date of 6 April 2018 or after" in {
+        val htbJson =
+          s"""{"lifeEventId":"1234567891","periodStartDate":"2018-04-06","periodEndDate":"2018-05-05",
+             |"htbTransfer":{"htbTransferInForPeriod":0,"htbTransferTotalYTD":10},
+             |"inboundPayments":{"newSubsForPeriod":4000,"newSubsYTD":4000,"totalSubsForPeriod":4000,"totalSubsYTD":4000},
+             |"bonuses":{"bonusDueForPeriod":1000,"totalBonusDueYTD":1000,"bonusPaidYTD":1000,"claimReason":"Life Event"}}""".stripMargin
+
+        doRequest(htbJson) { res =>
+          status(res)                              mustBe FORBIDDEN
+          (contentAsJson(res) \ "code").as[String] mustBe "HELP_TO_BUY_NOT_APPLICABLE"
         }
       }
 
@@ -627,6 +645,49 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
             acceptHeaderV2
           )
         }
+        "using v2 of the API with an additional bonus supersede" in {
+          when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any()))
+            .thenReturn(Future.successful(RequestBonusPaymentOnTimeResponse("1928374")))
+
+          doSyncRequest(validBonusPaymentAdditionalBonusJson)(
+            _ => {
+              val json            = Json.parse(validBonusPaymentAdditionalBonusJson)
+              val inboundPayments = json \ "inboundPayments"
+              val bonuses         = json \ "bonuses"
+              val supersede       = json \ "supersede"
+
+              verify(mockAuditService).audit(
+                auditType = MatcherEquals("bonusPaymentRequested"),
+                path = MatcherEquals(s"/manager/$lisaManager/accounts/$accountId/transactions"),
+                auditData = MatcherEquals(
+                  Map(
+                    "lisaManagerReferenceNumber" -> lisaManager,
+                    "accountId"                  -> accountId,
+                    "lateNotification"           -> "no",
+                    "lifeEventId"                -> (json \ "lifeEventId").as[String],
+                    "periodStartDate"            -> (json \ "periodStartDate").as[String],
+                    "periodEndDate"              -> (json \ "periodEndDate").as[String],
+                    "htbTransferInForPeriod"     -> (json \ "htbTransfer" \ "htbTransferInForPeriod").as[Amount].toString,
+                    "htbTransferTotalYTD"        -> (json \ "htbTransfer" \ "htbTransferTotalYTD").as[Amount].toString,
+                    "newSubsForPeriod"           -> (inboundPayments \ "newSubsForPeriod").as[Amount].toString,
+                    "newSubsYTD"                 -> (inboundPayments \ "newSubsYTD").as[Amount].toString,
+                    "totalSubsForPeriod"         -> (inboundPayments \ "totalSubsForPeriod").as[Amount].toString,
+                    "totalSubsYTD"               -> (inboundPayments \ "totalSubsYTD").as[Amount].toString,
+                    "bonusDueForPeriod"          -> (bonuses \ "bonusDueForPeriod").as[Amount].toString,
+                    "bonusPaidYTD"               -> (bonuses \ "bonusPaidYTD").as[Amount].toString,
+                    "totalBonusDueYTD"           -> (bonuses \ "totalBonusDueYTD").as[Amount].toString,
+                    "claimReason"                -> (bonuses \ "claimReason").as[String],
+                    "originalTransactionId"      -> (supersede \ "originalTransactionId").as[String],
+                    "originalBonusDueForPeriod"  -> (supersede \ "originalBonusDueForPeriod").as[Amount].toString,
+                    "transactionResult"          -> (supersede \ "transactionResult").as[Amount].toString,
+                    "reason"                     -> "Additional bonus"
+                  )
+                )
+              )(any())
+            },
+            acceptHeaderV2
+          )
+        }
       }
 
       "given a success response from the service layer and no optional fields" in {
@@ -672,7 +733,7 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
         when(mockBonusPaymentService.requestBonusPayment(any(), any(), any())(any()))
           .thenReturn(Future.successful(RequestBonusPaymentLifeEventNotFound))
 
-        doSyncRequest(validBonusPaymentMinimumFieldsJson) { res =>
+        doSyncRequest(validBonusPaymentMinimumFieldsJson) { _ =>
           val json            = Json.parse(validBonusPaymentMinimumFieldsJson)
           val inboundPayments = json \ "inboundPayments"
           val bonuses         = json \ "bonuses"
@@ -706,7 +767,7 @@ class BonusPaymentControllerSpec extends ControllerTestFixture {
 
         val invalidJson = validBonusPaymentJson.replace("\"lifeEventId\": \"1234567891\",", "")
 
-        doSyncRequest(invalidJson) { res =>
+        doSyncRequest(invalidJson) { _ =>
           reset(mockBonusPaymentService) // removes the thenThrow
 
           val json            = Json.parse(invalidJson)

@@ -52,6 +52,18 @@ object GetTransactionResponse {
       (JsPath \ "paymentReference").writeNullable[String] and
       (JsPath \ "supersededBy").writeNullable[TransactionId] and
       (JsPath \ "bonusDueForPeriod").writeNullable[Amount]
-  )(unlift(GetTransactionSuccessResponse.unapply))
+  )((g: GetTransactionSuccessResponse) =>
+    (
+      g.transactionId,
+      g.transactionType,
+      g.paymentStatus,
+      g.paymentDate,
+      g.paymentDueDate,
+      g.paymentAmount,
+      g.paymentReference,
+      g.supersededBy,
+      g.bonusDueForPeriod
+    )
+  )
 
 }

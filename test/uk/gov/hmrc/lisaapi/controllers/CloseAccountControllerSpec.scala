@@ -68,11 +68,11 @@ class CloseAccountControllerSpec extends ControllerTestFixture {
           when(mockAccountService.closeAccount(any(), any(), any())(any()))
             .thenReturn(Future.successful(CloseLisaAccountSuccessResponse(accountId)))
 
-          doSyncCloseRequest(closeAccountJson) { res =>
+          doSyncCloseRequest(closeAccountJson) { _ =>
             verify(mockAuditService).audit(
-              auditType = matchersEquals("accountClosed"),
-              path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/close-account"),
-              auditData = matchersEquals(
+              matchersEquals("accountClosed"),
+              matchersEquals(s"/manager/$lisaManager/accounts/$accountId/close-account"),
+              matchersEquals(
                 Map(
                   "lisaManagerReferenceNumber" -> lisaManager,
                   "accountClosureReason"       -> "All funds withdrawn",
@@ -88,11 +88,11 @@ class CloseAccountControllerSpec extends ControllerTestFixture {
 
     "audit an accountNotClosed event" when {
       "the json fails date validation" in
-        doSyncCloseRequest(closeAccountJson.replace(validDate, invalidDate)) { res =>
+        doSyncCloseRequest(closeAccountJson.replace(validDate, invalidDate)) { _ =>
           verify(mockAuditService).audit(
-            auditType = matchersEquals("accountNotClosed"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/close-account"),
-            auditData = matchersEquals(
+            matchersEquals("accountNotClosed"),
+            matchersEquals(s"/manager/$lisaManager/accounts/$accountId/close-account"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountClosureReason"       -> "All funds withdrawn",
@@ -107,11 +107,11 @@ class CloseAccountControllerSpec extends ControllerTestFixture {
         when(mockAccountService.closeAccount(any(), any(), any())(any()))
           .thenReturn(Future.successful(CloseLisaAccountAlreadyVoidResponse))
 
-        doSyncCloseRequest(closeAccountJson) { res =>
+        doSyncCloseRequest(closeAccountJson) { _ =>
           verify(mockAuditService).audit(
-            auditType = matchersEquals("accountNotClosed"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/close-account"),
-            auditData = matchersEquals(
+            matchersEquals("accountNotClosed"),
+            matchersEquals(s"/manager/$lisaManager/accounts/$accountId/close-account"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountClosureReason"       -> "All funds withdrawn",
@@ -127,11 +127,11 @@ class CloseAccountControllerSpec extends ControllerTestFixture {
         when(mockAccountService.closeAccount(any(), any(), any())(any()))
           .thenReturn(Future.successful(CloseLisaAccountAlreadyClosedResponse))
 
-        doSyncCloseRequest(closeAccountJson) { res =>
+        doSyncCloseRequest(closeAccountJson) { _ =>
           verify(mockAuditService).audit(
-            auditType = matchersEquals("accountNotClosed"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/close-account"),
-            auditData = matchersEquals(
+            matchersEquals("accountNotClosed"),
+            matchersEquals(s"/manager/$lisaManager/accounts/$accountId/close-account"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountClosureReason"       -> "All funds withdrawn",
@@ -147,11 +147,11 @@ class CloseAccountControllerSpec extends ControllerTestFixture {
         when(mockAccountService.closeAccount(any(), any(), any())(any()))
           .thenReturn(Future.successful(CloseLisaAccountCancellationPeriodExceeded))
 
-        doSyncCloseRequest(closeAccountJson) { res =>
+        doSyncCloseRequest(closeAccountJson) { _ =>
           verify(mockAuditService).audit(
-            auditType = matchersEquals("accountNotClosed"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/close-account"),
-            auditData = matchersEquals(
+            matchersEquals("accountNotClosed"),
+            matchersEquals(s"/manager/$lisaManager/accounts/$accountId/close-account"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountClosureReason"       -> "All funds withdrawn",
@@ -167,11 +167,11 @@ class CloseAccountControllerSpec extends ControllerTestFixture {
         when(mockAccountService.closeAccount(any(), any(), any())(any()))
           .thenReturn(Future.successful(CloseLisaAccountWithinCancellationPeriod))
 
-        doSyncCloseRequest(closeAccountJson) { res =>
+        doSyncCloseRequest(closeAccountJson) { _ =>
           verify(mockAuditService).audit(
-            auditType = matchersEquals("accountNotClosed"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/close-account"),
-            auditData = matchersEquals(
+            matchersEquals("accountNotClosed"),
+            matchersEquals(s"/manager/$lisaManager/accounts/$accountId/close-account"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountClosureReason"       -> "All funds withdrawn",
@@ -187,11 +187,11 @@ class CloseAccountControllerSpec extends ControllerTestFixture {
         when(mockAccountService.closeAccount(any(), any(), any())(any()))
           .thenReturn(Future.successful(CloseLisaAccountNotFoundResponse))
 
-        doSyncCloseRequest(closeAccountJson) { res =>
+        doSyncCloseRequest(closeAccountJson) { _ =>
           verify(mockAuditService).audit(
-            auditType = matchersEquals("accountNotClosed"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/close-account"),
-            auditData = matchersEquals(
+            matchersEquals("accountNotClosed"),
+            matchersEquals(s"/manager/$lisaManager/accounts/$accountId/close-account"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountClosureReason"       -> "All funds withdrawn",
@@ -208,11 +208,11 @@ class CloseAccountControllerSpec extends ControllerTestFixture {
         when(mockAccountService.closeAccount(any(), any(), any())(any()))
           .thenReturn(Future.successful(CloseLisaAccountErrorResponse))
 
-        doSyncCloseRequest(closeAccountJson) { res =>
+        doSyncCloseRequest(closeAccountJson) { _ =>
           verify(mockAuditService).audit(
-            auditType = matchersEquals("accountNotClosed"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/close-account"),
-            auditData = matchersEquals(
+            matchersEquals("accountNotClosed"),
+            matchersEquals(s"/manager/$lisaManager/accounts/$accountId/close-account"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountClosureReason"       -> "All funds withdrawn",
@@ -353,6 +353,15 @@ class CloseAccountControllerSpec extends ControllerTestFixture {
 
         doCloseRequest(closeAccountJson) { res =>
           status(res) mustBe INTERNAL_SERVER_ERROR
+        }
+      }
+      "the service future fails with an exception" in {
+        when(mockAccountService.closeAccount(any(), any(), any())(any()))
+          .thenReturn(Future.failed(new RuntimeException("Service error")))
+
+        doCloseRequest(closeAccountJson) { res =>
+          status(res)        mustBe INTERNAL_SERVER_ERROR
+          contentAsJson(res) mustBe ErrorInternalServerError.asJson
         }
       }
     }

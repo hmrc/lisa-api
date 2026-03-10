@@ -127,9 +127,9 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
         doFundReleaseRequest(fundReleaseJson) { res =>
           await(res)
           verify(mockAuditService).audit(
-            auditType = matchersEquals("fundReleaseReported"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/fund-releases"),
-            auditData = matchersEquals(
+            matchersEquals("fundReleaseReported"),
+            matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/fund-releases"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountID"                  -> accountId,
@@ -149,9 +149,9 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
         doFundReleaseRequest(supersededFundReleaseJson) { res =>
           await(res)
           verify(mockAuditService).audit(
-            auditType = matchersEquals("fundReleaseReported"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/fund-releases"),
-            auditData = matchersEquals(
+            matchersEquals("fundReleaseReported"),
+            matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/fund-releases"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountID"                  -> accountId,
@@ -174,9 +174,9 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
         doFundReleaseRequest(fundReleaseJson) { res =>
           await(res)
           verify(mockAuditService).audit(
-            auditType = matchersEquals("fundReleaseNotReported"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/fund-releases"),
-            auditData = matchersEquals(
+            matchersEquals("fundReleaseNotReported"),
+            matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/fund-releases"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountID"                  -> accountId,
@@ -198,9 +198,9 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
         doFundReleaseRequest(fundReleaseJson.replace("2017-05-10", "2017-04-05")) { res =>
           await(res)
           verify(mockAuditService).audit(
-            auditType = matchersEquals("fundReleaseNotReported"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/fund-releases"),
-            auditData = matchersEquals(
+            matchersEquals("fundReleaseNotReported"),
+            matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/fund-releases"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountID"                  -> accountId,
@@ -446,9 +446,9 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
         doExtensionRequest(extensionJson) { res =>
           await(res)
           verify(mockAuditService).audit(
-            auditType = matchersEquals("extensionReported"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/purchase-extensions"),
-            auditData = matchersEquals(
+            matchersEquals("extensionReported"),
+            matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/purchase-extensions"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountID"                  -> accountId,
@@ -466,9 +466,9 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
         doExtensionRequest(supersededExtensionJson) { res =>
           await(res)
           verify(mockAuditService).audit(
-            auditType = matchersEquals("extensionReported"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/purchase-extensions"),
-            auditData = matchersEquals(
+            matchersEquals("extensionReported"),
+            matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/purchase-extensions"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountID"                  -> accountId,
@@ -491,9 +491,9 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
         doExtensionRequest(extensionJson) { res =>
           await(res)
           verify(mockAuditService).audit(
-            auditType = matchersEquals("extensionNotReported"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/purchase-extensions"),
-            auditData = matchersEquals(
+            matchersEquals("extensionNotReported"),
+            matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/purchase-extensions"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountID"                  -> accountId,
@@ -513,9 +513,9 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
         doExtensionRequest(extensionJson.replace("2017-05-10", "2017-04-05")) { res =>
           await(res)
           verify(mockAuditService).audit(
-            auditType = matchersEquals("extensionNotReported"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/purchase-extensions"),
-            auditData = matchersEquals(
+            matchersEquals("extensionNotReported"),
+            matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/purchase-extensions"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountID"                  -> accountId,
@@ -770,9 +770,9 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
         doOutcomeRequest(outcomeJson) { res =>
           await(res)
           verify(mockAuditService).audit(
-            auditType = matchersEquals("purchaseOutcomeReported"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/purchase-outcomes"),
-            auditData = matchersEquals(
+            matchersEquals("purchaseOutcomeReported"),
+            matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/purchase-outcomes"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountID"                  -> accountId,
@@ -791,9 +791,9 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
         doOutcomeRequest(supersededOutcomeJson) { res =>
           await(res)
           verify(mockAuditService).audit(
-            auditType = matchersEquals("purchaseOutcomeReported"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/purchase-outcomes"),
-            auditData = matchersEquals(
+            matchersEquals("purchaseOutcomeReported"),
+            matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/purchase-outcomes"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountID"                  -> accountId,
@@ -817,9 +817,9 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
         doOutcomeRequest(outcomeJson) { res =>
           await(res)
           verify(mockAuditService).audit(
-            auditType = matchersEquals("purchaseOutcomeNotReported"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/purchase-outcomes"),
-            auditData = matchersEquals(
+            matchersEquals("purchaseOutcomeNotReported"),
+            matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/purchase-outcomes"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountID"                  -> accountId,
@@ -840,9 +840,9 @@ class PropertyPurchaseControllerSpec extends ControllerTestFixture {
         doOutcomeRequest(outcomeJson.replace("2017-05-05", "2017-04-05")) { res =>
           await(res)
           verify(mockAuditService).audit(
-            auditType = matchersEquals("purchaseOutcomeNotReported"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/purchase-outcomes"),
-            auditData = matchersEquals(
+            matchersEquals("purchaseOutcomeNotReported"),
+            matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/purchase-outcomes"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountID"                  -> accountId,

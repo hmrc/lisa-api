@@ -2,7 +2,7 @@
 
 ## Requirements
 
-This service is written in [Scala 2.13](http://www.scala-lang.org/) and [Play](http://playframework.com/), needs at least a Java 11 to run.
+This service is written in [Scala 3](http://www.scala-lang.org/) and [Play](http://playframework.com/), needs at least a Java 11(recommended 21) to run.
 
 ## Description
 
@@ -63,8 +63,6 @@ For more information, visit the [API Developer Hub](https://developer.service.hm
 Test data for each LISA API is available on the [HMRC Developer Hub](https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/lisa-api/2.0).
 
 ## Running locally
-
-This service is written in [Scala](http://www.scala-lang.org/) and [Play](http://playframework.com/), so needs a [JRE](http://www.oracle.com/technetwork/java/javase/overview/index.html) to run.
 
 Install [Service Manager](https://github.com/hmrc/sm2), then start dependencies:
 

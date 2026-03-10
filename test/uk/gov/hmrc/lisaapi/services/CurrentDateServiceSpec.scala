@@ -14,12 +14,23 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.lisaapi.domain
+package uk.gov.hmrc.lisaapi.services
 
-import play.api.libs.json.{Json, OFormat}
+import org.scalatestplus.play.PlaySpec
+import uk.gov.hmrc.lisaapi.helpers.BaseTestFixture
 
-case class Registration(serviceName: String, serviceUrl: String, metadata: Option[Map[String, String]] = None)
+import java.time.LocalDate
 
-object Registration {
-  implicit val format: OFormat[Registration] = Json.format[Registration]
+class CurrentDateServiceSpec extends BaseTestFixture {
+
+  "CurrentDateService" must {
+    "return the current date" in {
+      val result = CurrentDateService.now()
+      result mustBe a[LocalDate]
+
+      val today = LocalDate.now()
+      result mustBe today
+    }
+  }
+
 }

@@ -126,7 +126,7 @@ object Bonuses {
       (JsPath \ "totalBonusDueYTD").write[Amount] and
       (JsPath \ "bonusPaidYTD").writeNullable[Amount] and
       (JsPath \ "claimReason").write[String]
-  )(unlift(Bonuses.unapply))
+  )((b: Bonuses) => (b.bonusDueForPeriod, b.totalBonusDueYTD, b.bonusPaidYTD, b.claimReason))
 
 }
 
@@ -142,7 +142,7 @@ object HelpToBuyTransfer {
   implicit val htbWrites: Writes[HelpToBuyTransfer] = (
     (JsPath \ "htbTransferInForPeriod").write[Amount] and
       (JsPath \ "htbTransferTotalYTD").write[Amount]
-  )(unlift(HelpToBuyTransfer.unapply))
+  )((h: HelpToBuyTransfer) => (h.htbTransferInForPeriod, h.htbTransferTotalYTD))
 
 }
 
@@ -167,7 +167,7 @@ object InboundPayments {
       (JsPath \ "newSubsYTD").write[Amount] and
       (JsPath \ "totalSubsForPeriod").write[Amount] and
       (JsPath \ "totalSubsYTD").write[Amount]
-  )(unlift(InboundPayments.unapply))
+  )((i: InboundPayments) => (i.newSubsForPeriod, i.newSubsYTD, i.totalSubsForPeriod, i.totalSubsYTD))
 
 }
 
@@ -231,7 +231,7 @@ object Supersede {
       (JsPath \ "transactionAmount").write[Amount] and
       (JsPath \ "transactionResult").write[Amount] and
       (JsPath \ "reason").write[String]
-  ) { b: BonusRecovery =>
+  ) { (b: BonusRecovery) =>
     (
       b.automaticRecoveryAmount,
       b.originalTransactionId,
@@ -246,7 +246,7 @@ object Supersede {
       (JsPath \ "transactionAmount").write[Amount] and
       (JsPath \ "transactionResult").write[Amount] and
       (JsPath \ "reason").write[String]
-  ) { b: AdditionalBonus =>
+  ) { (b: AdditionalBonus) =>
     (
       b.originalTransactionId,
       b.originalBonusDueForPeriod,
@@ -266,7 +266,7 @@ object Supersede {
       (JsPath \ "originalBonusDueForPeriod").write[Amount] and
       (JsPath \ "transactionResult").write[Amount] and
       (JsPath \ "reason").write[String]
-  ) { b: BonusRecovery =>
+  ) { (b: BonusRecovery) =>
     (
       b.automaticRecoveryAmount,
       b.originalTransactionId,
@@ -281,7 +281,7 @@ object Supersede {
       (JsPath \ "originalBonusDueForPeriod").write[Amount] and
       (JsPath \ "transactionResult").write[Amount] and
       (JsPath \ "reason").write[String]
-  ) { b: AdditionalBonus =>
+  ) { (b: AdditionalBonus) =>
     (
       b.originalTransactionId,
       b.originalBonusDueForPeriod,

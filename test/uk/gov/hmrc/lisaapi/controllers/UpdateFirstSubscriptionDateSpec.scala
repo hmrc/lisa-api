@@ -67,9 +67,9 @@ class UpdateFirstSubscriptionDateSpec extends ControllerTestFixture {
           await(result)
 
           verify(mockAuditService).audit(
-            auditType = matchersEquals("firstSubscriptionDateUpdated"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/update-subscription"),
-            auditData = matchersEquals(
+            matchersEquals("firstSubscriptionDateUpdated"),
+            matchersEquals(s"/manager/$lisaManager/accounts/$accountId/update-subscription"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountID"                  -> accountId,
@@ -85,9 +85,9 @@ class UpdateFirstSubscriptionDateSpec extends ControllerTestFixture {
         doUpdateSubsDate(updateFirstSubscriptionDate.replace("2017-04-06", "2017-04-05")) { result =>
           await(result)
           verify(mockAuditService).audit(
-            auditType = matchersEquals("firstSubscriptionDateNotUpdated"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/update-subscription"),
-            auditData = matchersEquals(
+            matchersEquals("firstSubscriptionDateNotUpdated"),
+            matchersEquals(s"/manager/$lisaManager/accounts/$accountId/update-subscription"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountID"                  -> accountId,
@@ -104,9 +104,9 @@ class UpdateFirstSubscriptionDateSpec extends ControllerTestFixture {
         doUpdateSubsDate(updateFirstSubscriptionDate) { result =>
           await(result)
           verify(mockAuditService).audit(
-            auditType = matchersEquals("firstSubscriptionDateNotUpdated"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/update-subscription"),
-            auditData = matchersEquals(
+            matchersEquals("firstSubscriptionDateNotUpdated"),
+            matchersEquals(s"/manager/$lisaManager/accounts/$accountId/update-subscription"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountID"                  -> accountId,
@@ -124,9 +124,9 @@ class UpdateFirstSubscriptionDateSpec extends ControllerTestFixture {
         doUpdateSubsDate(updateFirstSubscriptionDate) { result =>
           await(result)
           verify(mockAuditService).audit(
-            auditType = matchersEquals("firstSubscriptionDateNotUpdated"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/update-subscription"),
-            auditData = matchersEquals(
+            matchersEquals("firstSubscriptionDateNotUpdated"),
+            matchersEquals(s"/manager/$lisaManager/accounts/$accountId/update-subscription"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountID"                  -> accountId,
@@ -144,9 +144,9 @@ class UpdateFirstSubscriptionDateSpec extends ControllerTestFixture {
         doUpdateSubsDate(updateFirstSubscriptionDate) { result =>
           await(result)
           verify(mockAuditService).audit(
-            auditType = matchersEquals("firstSubscriptionDateNotUpdated"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/update-subscription"),
-            auditData = matchersEquals(
+            matchersEquals("firstSubscriptionDateNotUpdated"),
+            matchersEquals(s"/manager/$lisaManager/accounts/$accountId/update-subscription"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountID"                  -> accountId,
@@ -164,9 +164,9 @@ class UpdateFirstSubscriptionDateSpec extends ControllerTestFixture {
         doUpdateSubsDate(updateFirstSubscriptionDate) { result =>
           await(result)
           verify(mockAuditService).audit(
-            auditType = matchersEquals("firstSubscriptionDateNotUpdated"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/update-subscription"),
-            auditData = matchersEquals(
+            matchersEquals("firstSubscriptionDateNotUpdated"),
+            matchersEquals(s"/manager/$lisaManager/accounts/$accountId/update-subscription"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountID"                  -> accountId,
@@ -184,9 +184,9 @@ class UpdateFirstSubscriptionDateSpec extends ControllerTestFixture {
         doUpdateSubsDate(updateFirstSubscriptionDate) { result =>
           await(result)
           verify(mockAuditService).audit(
-            auditType = matchersEquals("firstSubscriptionDateNotUpdated"),
-            path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/update-subscription"),
-            auditData = matchersEquals(
+            matchersEquals("firstSubscriptionDateNotUpdated"),
+            matchersEquals(s"/manager/$lisaManager/accounts/$accountId/update-subscription"),
+            matchersEquals(
               Map(
                 "lisaManagerReferenceNumber" -> lisaManager,
                 "accountID"                  -> accountId,

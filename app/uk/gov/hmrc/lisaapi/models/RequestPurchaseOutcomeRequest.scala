@@ -90,7 +90,7 @@ object RequestPurchaseOutcomeRequest {
       (JsPath \ "eventDate").write[LocalDate] and
       (JsPath \ "fundsReleaseLifeEventID").write[String] and
       (JsPath \ "propertyDetails").write[JsObject]
-  ) { req: RequestPurchaseOutcomeCompletedRequest =>
+  ) { (req: RequestPurchaseOutcomeCompletedRequest) =>
     (
       "Purchase Result",
       req.eventDate,
@@ -107,7 +107,7 @@ object RequestPurchaseOutcomeRequest {
       (JsPath \ "eventDate").write[LocalDate] and
       (JsPath \ "fundsReleaseLifeEventID").write[String] and
       (JsPath \ "propertyDetails").write[JsObject]
-  ) { req: RequestPurchaseOutcomeFailedRequest =>
+  ) { (req: RequestPurchaseOutcomeFailedRequest) =>
     (
       "Purchase Result",
       req.eventDate,
@@ -141,7 +141,7 @@ object RequestPurchaseOutcomeRequest {
       (JsPath \ "propertyDetails").write[JsObject] and
       (JsPath \ "supersededLifeEventID").write[String] and
       (JsPath \ "supersededLifeEventDate").write[LocalDate]
-  ) { req: RequestPurchaseOutcomeSupersededCompletedRequest =>
+  ) { (req: RequestPurchaseOutcomeSupersededCompletedRequest) =>
     (
       "Purchase Result",
       req.eventDate,
@@ -160,7 +160,7 @@ object RequestPurchaseOutcomeRequest {
       (JsPath \ "propertyDetails").write[JsObject] and
       (JsPath \ "supersededLifeEventID").write[String] and
       (JsPath \ "supersededLifeEventDate").write[LocalDate]
-  ) { req: RequestPurchaseOutcomeSupersededFailedRequest =>
+  ) { (req: RequestPurchaseOutcomeSupersededFailedRequest) =>
     (
       "Purchase Result",
       req.eventDate,

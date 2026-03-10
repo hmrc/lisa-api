@@ -100,7 +100,7 @@ object DesResponse {
   implicit val desFailureWrites: Writes[DesFailureResponse] = (
     (JsPath \ "code").write[String] and
       (JsPath \ "message").write[String]
-  )(unlift(DesFailureResponse.unapply))
+  )((d: DesFailureResponse) => (d.code, d.reason))
 
   implicit val requestLifeEventResponseReads: Reads[DesLifeEventRetrievalResponse] = (
     (JsPath \ "lifeEventID").read(JsonReads.lifeEventId) and

@@ -27,6 +27,10 @@ class LisaExtensionsSpec extends BaseTestFixture with GuiceOneAppPerSuite {
     case class OneOption(first: Option[String])
     case class TestInts(anInt: Int, anOpInt: Option[Int])
     case class TestDouble(aDouble: Double, anOpDouble: Option[Double])
+    case class TestFloat(aFloat: Float, anOpFloat: Option[Float])
+    case class TestNested(value: String, inner: TestInts)
+    case class TestNestedOption(value: String, inner: Option[TestInts])
+
     "Return empty for case class containing one None" in {
       val one = OneOption(None)
       one.toStringMap mustBe Map()
@@ -45,7 +49,40 @@ class LisaExtensionsSpec extends BaseTestFixture with GuiceOneAppPerSuite {
     "Return Map with Doubles and Option Doubles converted to strings" in {
       val testdoubles = TestDouble(1.2d, Some(1.2d))
       testdoubles.toStringMap mustBe Map("aDouble" -> "1.2", "anOpDouble" -> "1.2")
+    }
 
+    "Return Map with Floats and Option Floats converted to strings" in {
+      val testfloats = TestFloat(1.5f, Some(2.5f))
+      testfloats.toStringMap mustBe Map("aFloat" -> "1.5", "anOpFloat" -> "2.5")
+    }
+
+    "Return Map with nested Product" in {
+      val nested = TestNested("outer", TestInts(42, Some(100)))
+      val result = nested.toStringMap
+      result("value")            mustBe "outer"
+      result.contains("anInt")   mustBe true
+      result.contains("anOpInt") mustBe true
+    }
+
+    "Return Map with nested Option[Product]" in {
+      val nested = TestNestedOption("outer", Some(TestInts(42, None)))
+      val result = nested.toStringMap
+      result("value")          mustBe "outer"
+      result.contains("anInt") mustBe true
+    }
+
+    "Return Map with nested Option[Product] as None" in {
+      val nested = TestNestedOption("outer", None)
+      val result = nested.toStringMap
+      result mustBe Map("value" -> "outer")
+    }
+
+    "Handle ZonedDateTime conversion" in {
+      import java.time.ZonedDateTime
+      case class TestDateTime(date: ZonedDateTime)
+      val now      = ZonedDateTime.now()
+      val testDate = TestDateTime(now)
+      testDate.toStringMap("date") mustBe now.toString
     }
   }
 

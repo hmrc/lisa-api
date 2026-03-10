@@ -110,9 +110,9 @@ class GetLifeEventControllerSpec extends ControllerTestFixture {
           .apply(FakeRequest().withHeaders(acceptHeaderV2))
         await(res)
         verify(mockAuditService).audit(
-          auditType = matchersEquals("getLifeEventReported"),
-          path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/$eventId"),
-          auditData = matchersEquals(
+          matchersEquals("getLifeEventReported"),
+          matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/$eventId"),
+          matchersEquals(
             Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountId"                  -> accountId,
@@ -133,9 +133,9 @@ class GetLifeEventControllerSpec extends ControllerTestFixture {
           .apply(FakeRequest().withHeaders(acceptHeaderV2))
         await(res)
         verify(mockAuditService).audit(
-          auditType = matchersEquals("getLifeEventNotReported"),
-          path = matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/$eventId"),
-          auditData = matchersEquals(
+          matchersEquals("getLifeEventNotReported"),
+          matchersEquals(s"/manager/$lisaManager/accounts/$accountId/events/$eventId"),
+          matchersEquals(
             Map(
               "lisaManagerReferenceNumber" -> lisaManager,
               "accountId"                  -> accountId,

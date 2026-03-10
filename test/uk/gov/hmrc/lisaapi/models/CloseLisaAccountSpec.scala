@@ -69,13 +69,16 @@ class CloseLisaAccountSpec extends PlaySpec {
         val req = "{}"
 
         validateRequest(req) { errors =>
-          errors.count { case (path: JsPath, errors: Seq[JsonValidationError]) =>
-            val accountClosureReasonMissing =
-              path.toString() == "/accountClosureReason" && errors.contains(JsonValidationError("error.path.missing"))
-            val closureDateMissing          =
-              path.toString() == "/closureDate" && errors.contains(JsonValidationError("error.path.missing"))
+          errors.count {
+            case (path: JsPath, errs: Seq[_]) if errs.headOption.exists(_.isInstanceOf[JsonValidationError]) =>
+              val errors                      = errs.asInstanceOf[Seq[JsonValidationError]]
+              val accountClosureReasonMissing =
+                path.toString() == "/accountClosureReason" && errors.contains(JsonValidationError("error.path.missing"))
+              val closureDateMissing          =
+                path.toString() == "/closureDate" && errors.contains(JsonValidationError("error.path.missing"))
 
-            accountClosureReasonMissing || closureDateMissing
+              accountClosureReasonMissing || closureDateMissing
+            case _                                                                                           => false
           } mustBe 2
         }
       }
@@ -84,10 +87,13 @@ class CloseLisaAccountSpec extends PlaySpec {
         val req = validClosedRequestJson.replace("All funds withdrawn", "X")
 
         validateRequest(req) { errors =>
-          errors.count { case (path: JsPath, errors: Seq[JsonValidationError]) =>
-            path.toString() == "/accountClosureReason" && errors.contains(
-              JsonValidationError("error.formatting.accountClosureReason")
-            )
+          errors.count {
+            case (path: JsPath, errs: Seq[_]) if errs.headOption.exists(_.isInstanceOf[JsonValidationError]) =>
+              val errors = errs.asInstanceOf[Seq[JsonValidationError]]
+              path.toString() == "/accountClosureReason" && errors.contains(
+                JsonValidationError("error.formatting.accountClosureReason")
+              )
+            case _                                                                                           => false
           } mustBe 1
         }
       }
@@ -96,8 +102,11 @@ class CloseLisaAccountSpec extends PlaySpec {
         val req = validClosedRequestJson.replace("2000-01-01", "01/01/2000")
 
         validateRequest(req) { errors =>
-          errors.count { case (path: JsPath, errors: Seq[JsonValidationError]) =>
-            path.toString() == "/closureDate" && errors.contains(JsonValidationError("error.formatting.date"))
+          errors.count {
+            case (path: JsPath, errs: Seq[_]) if errs.headOption.exists(_.isInstanceOf[JsonValidationError]) =>
+              val errors = errs.asInstanceOf[Seq[JsonValidationError]]
+              path.toString() == "/closureDate" && errors.contains(JsonValidationError("error.formatting.date"))
+            case _                                                                                           => false
           } mustBe 1
         }
       }
@@ -107,8 +116,11 @@ class CloseLisaAccountSpec extends PlaySpec {
         val req        = validClosedRequestJson.replace("2000-01-01", futureDate)
 
         validateRequest(req) { errors =>
-          errors.count { case (path: JsPath, errors: Seq[JsonValidationError]) =>
-            path.toString() == "/closureDate" && errors.contains(JsonValidationError("error.formatting.date"))
+          errors.count {
+            case (path: JsPath, errs: Seq[_]) if errs.headOption.exists(_.isInstanceOf[JsonValidationError]) =>
+              val errors = errs.asInstanceOf[Seq[JsonValidationError]]
+              path.toString() == "/closureDate" && errors.contains(JsonValidationError("error.formatting.date"))
+            case _                                                                                           => false
           } mustBe 1
         }
       }

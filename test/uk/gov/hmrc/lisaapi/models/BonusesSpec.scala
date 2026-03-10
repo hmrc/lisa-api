@@ -71,8 +71,11 @@ class BonusesSpec extends PlaySpec {
 
       res match {
         case JsError(errors) =>
-          errors.count { case (path: JsPath, errors: Seq[JsonValidationError]) =>
-            path.toString() == "/claimReason" && errors.contains(JsonValidationError("error.formatting.claimReason"))
+          errors.count {
+            case (path: JsPath, errs: Seq[_]) if errs.headOption.exists(_.isInstanceOf[JsonValidationError]) =>
+              val errors = errs.asInstanceOf[Seq[JsonValidationError]]
+              path.toString() == "/claimReason" && errors.contains(JsonValidationError("error.formatting.claimReason"))
+            case _                                                                                           => false
           } mustBe 1
         case _               => fail()
       }

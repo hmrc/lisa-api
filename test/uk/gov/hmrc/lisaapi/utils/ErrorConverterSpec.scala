@@ -17,7 +17,7 @@
 package uk.gov.hmrc.lisaapi.utils
 
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.libs.json.{JsError, Json, OFormat}
+import play.api.libs.json.*
 import uk.gov.hmrc.lisaapi.controllers.ErrorValidation
 import uk.gov.hmrc.lisaapi.helpers.BaseTestFixture
 import uk.gov.hmrc.lisaapi.models.CreateLisaInvestorRequest
@@ -68,6 +68,104 @@ class ErrorConverterSpec extends BaseTestFixture with GuiceOneAppPerSuite {
       res.size mustBe 1
       res        must contain(ErrorValidation("INVALID_DATE", "Date is invalid", Some("/dateOfBirth")))
 
+    }
+
+    "handle error.formatting.currencyNegativeDisallowed" in {
+      val errors = List((JsPath \ "amount", Seq(JsonValidationError("error.formatting.currencyNegativeDisallowed"))))
+      val result = errorConverter.convert(errors)
+
+      result.size           mustBe 1
+      result.head.errorCode mustBe "INVALID_MONETARY_AMOUNT"
+      result.head.message   mustBe "Amount cannot be negative, and can only have up to 2 decimal places"
+    }
+
+    "handle error.formatting.currencyNegativeAllowed" in {
+      val errors = List((JsPath \ "amount", Seq(JsonValidationError("error.formatting.currencyNegativeAllowed"))))
+      val result = errorConverter.convert(errors)
+
+      result.size           mustBe 1
+      result.head.errorCode mustBe "INVALID_MONETARY_AMOUNT"
+      result.head.message   mustBe "Amount can only have up to 2 decimal places"
+    }
+
+    "handle error.formatting.annualFigures" in {
+      val errors = List((JsPath \ "amount", Seq(JsonValidationError("error.formatting.annualFigures"))))
+      val result = errorConverter.convert(errors)
+
+      result.size           mustBe 1
+      result.head.errorCode mustBe "INVALID_MONETARY_AMOUNT"
+      result.head.message   mustBe "Amount cannot be negative"
+    }
+
+    "handle error.formatting.* generic" in {
+      val errors = List((JsPath \ "field", Seq(JsonValidationError("error.formatting.something"))))
+      val result = errorConverter.convert(errors)
+
+      result.size           mustBe 1
+      result.head.errorCode mustBe "INVALID_FORMAT"
+      result.head.message   mustBe "Invalid format has been used"
+    }
+
+    "handle emptyNameOrNumber" in {
+      val errors = List((JsPath \ "nameOrNumber", Seq(JsonValidationError("emptyNameOrNumber"))))
+      val result = errorConverter.convert(errors)
+
+      result.size           mustBe 1
+      result.head.errorCode mustBe "INVALID_NAME_OR_NUMBER"
+      result.head.message   mustBe "Enter nameOrNumber"
+    }
+
+    "handle tooLongNameOrNumber" in {
+      val errors = List((JsPath \ "nameOrNumber", Seq(JsonValidationError("tooLongNameOrNumber"))))
+      val result = errorConverter.convert(errors)
+
+      result.size           mustBe 1
+      result.head.errorCode mustBe "INVALID_NAME_OR_NUMBER"
+      result.head.message   mustBe "nameOrNumber must be 35 characters or less"
+    }
+
+    "handle invalidNameOrNumber" in {
+      val errors = List((JsPath \ "nameOrNumber", Seq(JsonValidationError("invalidNameOrNumber"))))
+      val result = errorConverter.convert(errors)
+
+      result.size           mustBe 1
+      result.head.errorCode mustBe "INVALID_NAME_OR_NUMBER"
+      result.head.message   mustBe "nameOrNumber must only include letters a to z, numbers 0 to 9, colons, forward slashes, hyphen and spaces"
+    }
+
+    "handle emptyPostalCode" in {
+      val errors = List((JsPath \ "postalCode", Seq(JsonValidationError("emptyPostalCode"))))
+      val result = errorConverter.convert(errors)
+
+      result.size           mustBe 1
+      result.head.errorCode mustBe "INVALID_POSTAL_CODE"
+      result.head.message   mustBe "Enter a postcode"
+    }
+
+    "handle invalidPostalCode" in {
+      val errors = List((JsPath \ "postalCode", Seq(JsonValidationError("invalidPostalCode"))))
+      val result = errorConverter.convert(errors)
+
+      result.size           mustBe 1
+      result.head.errorCode mustBe "INVALID_POSTAL_CODE"
+      result.head.message   mustBe "Postcode must only include letters a to z and numbers 0 to 9, like AA1 1AA"
+    }
+
+    "handle error.path.missing" in {
+      val errors = List((JsPath \ "field", Seq(JsonValidationError("error.path.missing"))))
+      val result = errorConverter.convert(errors)
+
+      result.size           mustBe 1
+      result.head.errorCode mustBe "MISSING_FIELD"
+      result.head.message   mustBe "This field is required"
+    }
+
+    "throw MatchError for unknown error type" in {
+      val errors = List((JsPath \ "field", Seq(JsonValidationError("unknown.error.type"))))
+
+      assertThrows[MatchError] {
+        errorConverter.convert(errors)
+      }
     }
   }
 
