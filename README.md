@@ -84,7 +84,7 @@ Run this script before raising a PR to ensure your code changes pass the Jenkins
 
 ## Support
 
-If you have any business-related questions, submit the requests at SDST Deskpro support form : <https://developer.service.hmrc.gov.uk/devhub-support/start>
+If you have any business-related questions, submit requests via the SDST Deskpro support form : <https://developer.service.hmrc.gov.uk/devhub-support/start>
 
 ## License
 
