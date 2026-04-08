@@ -84,7 +84,7 @@ Run this script before raising a PR to ensure your code changes pass the Jenkins
 
 ## Support
 
-If you have any business-related questions, email the Software Developer Support Team (SDST) at <sdsteam@hmrc.gov.uk>
+If you have any business-related questions, email the Software Developer Support Team (SDST) at <https://developer.service.hmrc.gov.uk/devhub-support/start>
 
 ## License
 
