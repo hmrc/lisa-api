@@ -16,114 +16,68 @@
 
 package uk.gov.hmrc.lisaapi.connectors
 
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{reset, verify, when}
-import org.scalatest.BeforeAndAfterEach
-import play.api.test.Helpers._
-import uk.gov.hmrc.http._
-import uk.gov.hmrc.http.client.RequestBuilder
-import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.models.des._
+import com.github.tomakehurst.wiremock.client.WireMock.*
+import com.github.tomakehurst.wiremock.http.Fault
+import play.api.test.Helpers.*
+import uk.gov.hmrc.lisaapi.models.*
+import uk.gov.hmrc.lisaapi.models.des.*
 
 import java.time.LocalDate
-import scala.concurrent.Future
 
-class DesConnectorSpec extends DesConnectorTestHelper with BeforeAndAfterEach {
-  lazy val mockRequestBuilder: RequestBuilder = mock[RequestBuilder]
+class DesConnectorSpec extends DesConnectorTestHelper {
 
-  override def beforeEach(): Unit = {
-    reset(mockHttp)
-    when(mockAppContext.desUrl).thenReturn("http://localhost:8883")
-    when(mockHttp.get(any())(any())).thenReturn(mockRequestBuilder)
-    when(mockHttp.post(any())(any())).thenReturn(mockRequestBuilder)
-    when(mockHttp.put(any())(any())).thenReturn(mockRequestBuilder)
-    when(mockRequestBuilder.withBody(any())(any(), any(), any())).thenReturn(mockRequestBuilder)
-    when(mockRequestBuilder.setHeader(any())).thenReturn(mockRequestBuilder)
-  }
+  val managerPath = "/lifetime-isa/manager"
+
+  private val createInvestorUrl  = s"$managerPath/Z019283/investors"
+  private val createAccountUrl   = s"$managerPath/Z019283/accounts"
+  private val transferAccountUrl = s"$managerPath/Z019283/accounts"
+  private val updateFirstSubUrl  = s"$managerPath/Z019283/accounts/123456789"
+
+  private val closeAccountUrl      = s"$managerPath/Z123456/accounts/ABC12345/close-account"
+  private val reinstateAccountUrl  = s"$managerPath/Z123456/accounts/ABC12345/reinstate"
+  private val reportLifeEventUrl   = s"$managerPath/Z123456/accounts/ABC12345/life-event"
+  private val getLifeEventUrl      = s"$managerPath/Z123456/accounts/ABC12345/life-events/1234567890"
+  private val requestBonusUrl      = s"$managerPath/Z123456/accounts/ABC12345/bonus-claim"
+  private val getBonusOrWithdrawal = s"$managerPath/Z123456/accounts/ABC12345/transaction/123456"
+
+  private val getTransactionUrl =
+    s"$managerPath/Z123456/accounts/ABC12345/transaction/123456/bonusChargeDetails"
+
+  private val withdrawalUrl = s"$managerPath/Z123456/accounts/ABC12345/withdrawal"
+  private val getAccountUrl = s"$managerPath/Z123456/accounts/123456"
+
+  private val bulkPaymentUrl =
+    "/enterprise/financial-data/ZISA/Z123456/LISA?dateFrom=2018-01-01&dateTo=2018-01-01&onlyOpenItems=false"
 
   "Create Lisa Investor endpoint" must {
     "return a populated CreateLisaInvestorSuccessResponse" when {
+
       "The DES response has a json body that is in the correct format" in {
-
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                CREATED,
-                s"""{"investorID": "1234567890"}""",
-                responseHeader
-              )
-            )
-          )
-        doCreateInvestorRequest { response =>
-          response must be(
-            CreateLisaInvestorSuccessResponse("1234567890")
-          )
-        }
-      }
-
-      "The DES response has a correct JSON body and multiple types" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                CREATED,
-                s"""{"investorID": "1234567890"}""",
-                Map("Content-Type" -> List("test", "application/json"))
-              )
-            )
-          )
-        doCreateInvestorRequest { response =>
-          response must be(
-            CreateLisaInvestorSuccessResponse("1234567890")
-          )
+        stubForPost(createInvestorUrl, CREATED, """{"investorID": "1234567890"}""")
+        createInvestorRequest { response =>
+          response must be(CreateLisaInvestorSuccessResponse("1234567890"))
         }
       }
     }
 
     "return the default DesFailureResponse" when {
       "the DES response has no json body" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                GATEWAY_TIMEOUT,
-                ""
-              )
-            )
-          )
-        doCreateInvestorRequest { response =>
+        stubForPost(createInvestorUrl, OK, "")
+        createInvestorRequest { response =>
           response must be(DesFailureResponse())
         }
       }
 
       "the DES response has a json body that is in an incorrect format" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                OK,
-                """[1,2,3]"""
-              )
-            )
-          )
-        doCreateInvestorRequest { response =>
+        stubForPost(createInvestorUrl, OK, """[1,2,3]""")
+        createInvestorRequest { response =>
           response must be(DesFailureResponse())
         }
       }
 
       "a 409 is returned with JSON that cannot be parsed as expected response" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                CONFLICT,
-                """{"unexpectedField": "value", "notInvestorID": "123"}""",
-                responseHeader
-              )
-            )
-          )
-        doCreateInvestorRequest { response =>
+        stubForPost(createInvestorUrl, CONFLICT, """{"unexpectedField": "value", "notInvestorID": "123"}""")
+        createInvestorRequest { response =>
           response must be(DesFailureResponse())
         }
       }
@@ -132,17 +86,8 @@ class DesConnectorSpec extends DesConnectorTestHelper with BeforeAndAfterEach {
     "return a populated CreateLisaInvestorAlreadyExistsResponse" when {
       "the investor already exists response is returned" in {
         val investorID = "1234567890"
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                CONFLICT,
-                s"""{"investorID": "$investorID"}""",
-                responseHeader
-              )
-            )
-          )
-        doCreateInvestorRequest { response =>
+        stubForPost(createInvestorUrl, CONFLICT, s"""{"investorID": "$investorID"}""")
+        createInvestorRequest { response =>
           response must be(CreateLisaInvestorAlreadyExistsResponse(investorID))
         }
       }
@@ -150,17 +95,12 @@ class DesConnectorSpec extends DesConnectorTestHelper with BeforeAndAfterEach {
 
     "return a specific DesFailureResponse" when {
       "a specific failure is returned" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                FORBIDDEN,
-                s"""{"code": "INVESTOR_NOT_FOUND","reason": "The investor details given do not match with HMRC’s records."}""",
-                responseHeader
-              )
-            )
-          )
-        doCreateInvestorRequest { response =>
+        stubForPost(
+          createInvestorUrl,
+          FORBIDDEN,
+          """{"code": "INVESTOR_NOT_FOUND","reason": "The investor details given do not match with HMRC’s records."}"""
+        )
+        createInvestorRequest { response =>
           response must be(
             DesFailureResponse("INVESTOR_NOT_FOUND", "The investor details given do not match with HMRC’s records.")
           )
@@ -170,34 +110,17 @@ class DesConnectorSpec extends DesConnectorTestHelper with BeforeAndAfterEach {
 
     "return a DesUnavailableResponse" when {
       "a 503 is returned" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                SERVICE_UNAVAILABLE,
-                ""
-              )
-            )
-          )
-        doCreateInvestorRequest { response =>
+        stubForPost(createInvestorUrl, SERVICE_UNAVAILABLE, "")
+        createInvestorRequest { response =>
           response mustBe DesUnavailableResponse
         }
       }
-
     }
 
     "return a DesBadRequestResponse" when {
       "a 400 is returned" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                BAD_REQUEST,
-                ""
-              )
-            )
-          )
-        doCreateInvestorRequest { response =>
+        stubForPost(createInvestorUrl, BAD_REQUEST, "")
+        createInvestorRequest { response =>
           response mustBe DesBadRequestResponse
         }
       }
@@ -207,16 +130,8 @@ class DesConnectorSpec extends DesConnectorTestHelper with BeforeAndAfterEach {
   "Create Account endpoint" must {
     "return a populated success response" when {
       "DES returns 201 created" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                CREATED,
-                ""
-              )
-            )
-          )
-        doCreateAccountRequest { response =>
+        stubForPost(createAccountUrl, CREATED, "")
+        createAccountRequest { response =>
           response mustBe DesAccountResponse("9876543210")
         }
       }
@@ -224,70 +139,33 @@ class DesConnectorSpec extends DesConnectorTestHelper with BeforeAndAfterEach {
 
     "return a generic failure response" when {
       "the DES response is not 201 created and has no json body" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                GATEWAY_TIMEOUT,
-                ""
-              )
-            )
-          )
-        doCreateAccountRequest { response =>
+        stubForPost(createAccountUrl, OK, "")
+        createAccountRequest { response =>
           response mustBe DesFailureResponse()
         }
       }
 
       "the DES response is not 201 created and has a json body that is not in the correct format" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                GATEWAY_TIMEOUT,
-                s"""{"problem": "service unavailable"}""",
-                responseHeader
-              )
-            )
-          )
-        doCreateAccountRequest { response =>
+        stubForPost(createAccountUrl, GATEWAY_TIMEOUT, """{"problem": "service unavailable"}""")
+        createAccountRequest { response =>
           response mustBe DesFailureResponse()
         }
       }
-
     }
 
     "return a DesUnavailableResponse" when {
-
       "a 503 is returned" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                SERVICE_UNAVAILABLE,
-                ""
-              )
-            )
-          )
-
-        doCreateAccountRequest { response =>
+        stubForPost(createAccountUrl, SERVICE_UNAVAILABLE, "")
+        createAccountRequest { response =>
           response mustBe DesUnavailableResponse
         }
       }
-
     }
 
     "return a DesBadRequestResponse" when {
       "a 400 is returned" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                BAD_REQUEST,
-                ""
-              )
-            )
-          )
-        doCreateAccountRequest { response =>
+        stubForPost(createAccountUrl, BAD_REQUEST, "")
+        createAccountRequest { response =>
           response mustBe DesBadRequestResponse
         }
       }
@@ -295,17 +173,12 @@ class DesConnectorSpec extends DesConnectorTestHelper with BeforeAndAfterEach {
 
     "return a type-appropriate failure response" when {
       "a specific failure is returned" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                FORBIDDEN,
-                s"""{"code": "INVESTOR_NOT_FOUND", "reason": "The investorId given does not match with HMRC’s records."}""",
-                responseHeader
-              )
-            )
-          )
-        doCreateAccountRequest { response =>
+        stubForPost(
+          createAccountUrl,
+          FORBIDDEN,
+          """{"code": "INVESTOR_NOT_FOUND", "reason": "The investorId given does not match with HMRC’s records."}"""
+        )
+        createAccountRequest { response =>
           response mustBe DesFailureResponse(
             "INVESTOR_NOT_FOUND",
             "The investorId given does not match with HMRC’s records."
@@ -318,70 +191,37 @@ class DesConnectorSpec extends DesConnectorTestHelper with BeforeAndAfterEach {
   "Transfer Account endpoint" must {
     "return a populated success response" when {
       "DES returns 201 created" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                CREATED,
-                ""
-              )
-            )
-          )
-        doTransferAccountRequest { response =>
+        stubForPost(transferAccountUrl, CREATED, "")
+        transferAccountRequest { response =>
           response mustBe DesAccountResponse("9876543210")
         }
       }
-
     }
 
     "return a generic failure response" when {
       "the DES response is not 201 created and has no json body" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                GATEWAY_TIMEOUT,
-                ""
-              )
-            )
-          )
-        doTransferAccountRequest { response =>
+        stubForPost(transferAccountUrl, OK, "")
+        transferAccountRequest { response =>
           response mustBe DesFailureResponse()
         }
       }
 
       "the DES response is not 201 created and has a json body that is not in the correct format" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                GATEWAY_TIMEOUT,
-                s"""{"problem": "service unavailable"}""",
-                responseHeader
-              )
-            )
-          )
-
-        doTransferAccountRequest { response =>
+        stubForPost(transferAccountUrl, GATEWAY_TIMEOUT, """{"problem": "service unavailable"}""")
+        transferAccountRequest { response =>
           response mustBe DesFailureResponse()
         }
       }
-
     }
 
     "return a type-appropriate failure response" when {
       "a specific failure is returned" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                FORBIDDEN,
-                s"""{"code": "INVESTOR_NOT_FOUND", "reason": "The investorId given does not match with HMRC’s records."}""",
-                responseHeader
-              )
-            )
-          )
-        doTransferAccountRequest { response =>
+        stubForPost(
+          transferAccountUrl,
+          FORBIDDEN,
+          """{"code": "INVESTOR_NOT_FOUND", "reason": "The investorId given does not match with HMRC’s records."}"""
+        )
+        transferAccountRequest { response =>
           response mustBe DesFailureResponse(
             "INVESTOR_NOT_FOUND",
             "The investorId given does not match with HMRC’s records."
@@ -392,16 +232,8 @@ class DesConnectorSpec extends DesConnectorTestHelper with BeforeAndAfterEach {
 
     "return a DesUnavailableResponse" when {
       "a 503 is returned" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                SERVICE_UNAVAILABLE,
-                ""
-              )
-            )
-          )
-        doTransferAccountRequest { response =>
+        stubForPost(transferAccountUrl, SERVICE_UNAVAILABLE, "")
+        transferAccountRequest { response =>
           response mustBe DesUnavailableResponse
         }
       }
@@ -411,10 +243,8 @@ class DesConnectorSpec extends DesConnectorTestHelper with BeforeAndAfterEach {
   "Close Lisa Account endpoint" must {
     "return a DesEmptySuccessResponse" when {
       "DES returns 200 ok" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(Future.successful(HttpResponse(OK, "")))
-
-        doCloseAccountRequest { response =>
+        stubForPost(closeAccountUrl, OK, "")
+        closeAccountRequest { response =>
           response mustBe DesEmptySuccessResponse
         }
       }
@@ -422,16 +252,8 @@ class DesConnectorSpec extends DesConnectorTestHelper with BeforeAndAfterEach {
 
     "return a DesUnavailableResponse" when {
       "a 503 is returned" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                SERVICE_UNAVAILABLE,
-                ""
-              )
-            )
-          )
-        doCloseAccountRequest { response =>
+        stubForPost(closeAccountUrl, SERVICE_UNAVAILABLE, "")
+        closeAccountRequest { response =>
           response mustBe DesUnavailableResponse
         }
       }
@@ -439,16 +261,8 @@ class DesConnectorSpec extends DesConnectorTestHelper with BeforeAndAfterEach {
 
     "return a DesBadRequestResponse" when {
       "a 400 is returned" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                BAD_REQUEST,
-                ""
-              )
-            )
-          )
-        doCloseAccountRequest { response =>
+        stubForPost(closeAccountUrl, BAD_REQUEST, "")
+        closeAccountRequest { response =>
           response mustBe DesBadRequestResponse
         }
       }
@@ -456,40 +270,19 @@ class DesConnectorSpec extends DesConnectorTestHelper with BeforeAndAfterEach {
 
     "return a DesFailureResponse" when {
       "any other response is received" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                GATEWAY_TIMEOUT,
-                ""
-              )
-            )
-          )
-        doCloseAccountRequest { response =>
+        stubForPost(closeAccountUrl, GATEWAY_TIMEOUT, "")
+        closeAccountRequest { response =>
           response mustBe DesFailureResponse()
         }
       }
-
     }
-
   }
 
   "Reinstate Lisa Account endpoint" must {
-
     "return a populated success response" when {
       "DES returns 200 ok" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                OK,
-                s"""{"code": "SUCCESS", "reason": "Account successfully reinstated"}""",
-                responseHeader
-              )
-            )
-          )
-
-        doReinstateAccountRequest { response =>
+        stubForPut(reinstateAccountUrl, OK, """{"code": "SUCCESS", "reason": "Account successfully reinstated"}""")
+        reinstateAccountRequest { response =>
           response mustBe DesReinstateAccountSuccessResponse("SUCCESS", "Account successfully reinstated")
         }
       }
@@ -497,17 +290,8 @@ class DesConnectorSpec extends DesConnectorTestHelper with BeforeAndAfterEach {
 
     "return a generic failure response" when {
       "the DES response has no json body" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                GATEWAY_TIMEOUT,
-                ""
-              )
-            )
-          )
-
-        doReinstateAccountRequest { response =>
+        stubForPut(reinstateAccountUrl, OK, "")
+        reinstateAccountRequest { response =>
           response mustBe DesFailureResponse()
         }
       }
@@ -515,17 +299,8 @@ class DesConnectorSpec extends DesConnectorTestHelper with BeforeAndAfterEach {
 
     "return a DesUnavailableResponse" when {
       "a 503 is returned" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                SERVICE_UNAVAILABLE,
-                ""
-              )
-            )
-          )
-
-        doReinstateAccountRequest { response =>
+        stubForPut(reinstateAccountUrl, SERVICE_UNAVAILABLE, "")
+        reinstateAccountRequest { response =>
           response mustBe DesUnavailableResponse
         }
       }
@@ -533,16 +308,8 @@ class DesConnectorSpec extends DesConnectorTestHelper with BeforeAndAfterEach {
 
     "return a DesBadRequestResponse" when {
       "a 400 is returned" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                BAD_REQUEST,
-                ""
-              )
-            )
-          )
-        doReinstateAccountRequest { response =>
+        stubForPut(reinstateAccountUrl, BAD_REQUEST, "")
+        reinstateAccountRequest { response =>
           response mustBe DesBadRequestResponse
         }
       }
@@ -552,17 +319,11 @@ class DesConnectorSpec extends DesConnectorTestHelper with BeforeAndAfterEach {
   "Update First Subscription date endpoint" must {
     "return a populated DesUpdateSubscriptionSuccessResponse" when {
       "the DES response has a json body that is in the correct format" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                OK,
-                s"""{"code": "INVESTOR_ACCOUNT_NOW_VOID", "reason": "Date of first Subscription updated successfully, but as a result of the date change the account has subsequently been voided"}""",
-                responseHeader
-              )
-            )
-          )
-
+        stubForPut(
+          updateFirstSubUrl,
+          OK,
+          """{"code": "INVESTOR_ACCOUNT_NOW_VOID", "reason": "Date of first Subscription updated successfully, but as a result of the date change the account has subsequently been voided"}"""
+        )
         updateFirstSubscriptionDateRequest { response =>
           response mustBe DesUpdateSubscriptionSuccessResponse(
             "INVESTOR_ACCOUNT_NOW_VOID",
@@ -573,76 +334,40 @@ class DesConnectorSpec extends DesConnectorTestHelper with BeforeAndAfterEach {
     }
 
     "return a failure response" when {
-
       "the DES response has no json body" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                GATEWAY_TIMEOUT,
-                ""
-              )
-            )
-          )
+        stubForPut(updateFirstSubUrl, OK, "")
+        updateFirstSubscriptionDateRequest { response =>
+          response mustBe DesFailureResponse()
+        }
+      }
 
+      "status is 201 and json is invalid" in {
+        stubForPut(
+          updateFirstSubUrl,
+          CREATED,
+          """{"code": "UPDATED_AND_ACCOUNT_VOIDED", "message": "LISA Account firstSubscriptionDate has been updated successfully"}"""
+        )
         updateFirstSubscriptionDateRequest { response =>
           response mustBe DesFailureResponse()
         }
       }
     }
 
-    "status is 201 and json is invalid" in {
-      when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-        .thenReturn(
-          Future.successful(
-            HttpResponse(
-              CREATED,
-              s"""{"code": "UPDATED_AND_ACCOUNT_VOIDED", "message": "LISA Account firstSubscriptionDate has been updated successfully"}""",
-              responseHeader
-            )
-          )
-        )
-
-      updateFirstSubscriptionDateRequest { response =>
-        response mustBe DesFailureResponse()
+    "return a DesUnavailableResponse" when {
+      "a 503 response is returned" in {
+        stubForPut(updateFirstSubUrl, SERVICE_UNAVAILABLE, "")
+        updateFirstSubscriptionDateRequest { response =>
+          response mustBe DesUnavailableResponse
+        }
       }
     }
 
-  }
-
-  "return a DesUnavailableResponse" when {
-
-    "a 503 response is returned" in {
-      when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-        .thenReturn(
-          Future.successful(
-            HttpResponse(
-              SERVICE_UNAVAILABLE,
-              ""
-            )
-          )
-        )
-
-      updateFirstSubscriptionDateRequest { response =>
-        response mustBe DesUnavailableResponse
-      }
-    }
-
-  }
-
-  "return a DesBadRequestResponse" when {
-    "a 400 response is returned" in {
-      when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-        .thenReturn(
-          Future.successful(
-            HttpResponse(
-              BAD_REQUEST,
-              ""
-            )
-          )
-        )
-      updateFirstSubscriptionDateRequest { response =>
-        response mustBe DesBadRequestResponse
+    "return a DesBadRequestResponse" when {
+      "a 400 response is returned" in {
+        stubForPut(updateFirstSubUrl, BAD_REQUEST, "")
+        updateFirstSubscriptionDateRequest { response =>
+          response mustBe DesBadRequestResponse
+        }
       }
     }
   }
@@ -650,204 +375,102 @@ class DesConnectorSpec extends DesConnectorTestHelper with BeforeAndAfterEach {
   "Report Life Event endpoint" must {
     "return a populated DesSuccessResponse" when {
       "the DES response has a json body that is in the correct format" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                CREATED,
-                s"""{"lifeEventID": "87654321"}""",
-                responseHeader
-              )
-            )
-          )
-        doReportLifeEventRequest { response =>
+        stubForPost(reportLifeEventUrl, CREATED, """{"lifeEventID": "87654321"}""")
+        reportLifeEventRequest { response =>
           response mustBe DesLifeEventResponse("87654321")
         }
       }
-
     }
 
     "return a DesUnavailableResponse" when {
-
       "a 503 is returned" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                SERVICE_UNAVAILABLE,
-                ""
-              )
-            )
-          )
-
-        doReportLifeEventRequest { response =>
+        stubForPost(reportLifeEventUrl, SERVICE_UNAVAILABLE, "")
+        reportLifeEventRequest { response =>
           response mustBe DesUnavailableResponse
         }
       }
-
     }
 
     "return a generic DesFailureResponse" when {
-
       "the response json is invalid" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                CREATED,
-                s"""{"lifeEvent": "87654321"}""",
-                responseHeader
-              )
-            )
-          )
-
-        doReportLifeEventRequest { response =>
+        stubForPost(reportLifeEventUrl, CREATED, """{"lifeEvent": "87654321"}""")
+        reportLifeEventRequest { response =>
           response mustBe DesFailureResponse()
         }
       }
 
       "the response has no json body" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                CREATED,
-                ""
-              )
-            )
-          )
-
-        doReportLifeEventRequest { response =>
+        stubForPost(reportLifeEventUrl, CREATED, "")
+        reportLifeEventRequest { response =>
           response mustBe DesFailureResponse()
         }
       }
-
     }
 
     "return a populated DesFailureResponse" when {
-
       "a LIFE_EVENT_INAPPROPRIATE failure is returned" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                FORBIDDEN,
-                s"""{"code": "LIFE_EVENT_INAPPROPRIATE","reason": "The life event conflicts with previous life event reported."}""",
-                responseHeader
-              )
-            )
-          )
-
-        doReportLifeEventRequest { response =>
+        stubForPost(
+          reportLifeEventUrl,
+          FORBIDDEN,
+          """{"code": "LIFE_EVENT_INAPPROPRIATE","reason": "The life event conflicts with previous life event reported."}"""
+        )
+        reportLifeEventRequest { response =>
           response mustBe DesFailureResponse(
             "LIFE_EVENT_INAPPROPRIATE",
             "The life event conflicts with previous life event reported."
           )
         }
       }
-
     }
-
   }
 
   "Retrieve Life Event endpoint" must {
-
     "return a Left of DesUnavailableResponse" when {
-
       "a 503 is returned" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                SERVICE_UNAVAILABLE,
-                ""
-              )
-            )
-          )
-
-        doRetrieveLifeEventRequest { response =>
+        stubForGet(getLifeEventUrl, SERVICE_UNAVAILABLE, "")
+        retrieveLifeEventRequest { response =>
           response mustBe Left(DesUnavailableResponse)
         }
       }
-
     }
 
     "return a Left of DesFailureResponse" when {
-
       "a specific failure is returned" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                CONFLICT,
-                """{
-                  | "code": "ERROR_CODE",
-                  | "reason" : "ERROR MESSAGE"
-                  }""".stripMargin
-              )
-            )
-          )
+        stubForGet(
+          getLifeEventUrl,
+          CONFLICT,
+          """{ "code": "ERROR_CODE", "reason" : "ERROR MESSAGE" }""".stripMargin
+        )
 
-        doRetrieveLifeEventRequest { response =>
+        retrieveLifeEventRequest { response =>
           response mustBe Left(DesFailureResponse("ERROR_CODE", "ERROR MESSAGE"))
         }
       }
 
       "the response has no json body" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                INTERNAL_SERVER_ERROR,
-                ""
-              )
-            )
-          )
-
-        doRetrieveLifeEventRequest { response =>
+        stubForGet(getLifeEventUrl, OK, "")
+        retrieveLifeEventRequest { response =>
           response mustBe Left(DesFailureResponse())
         }
       }
 
       "the response is badly formed" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                INTERNAL_SERVER_ERROR,
-                """{"test": "test"}""",
-                responseHeader
-              )
-            )
-          )
-
-        doRetrieveLifeEventRequest { response =>
+        stubForGet(getLifeEventUrl, OK, """{"test": "test"}""")
+        retrieveLifeEventRequest { response =>
           response mustBe Left(DesFailureResponse())
         }
       }
-
     }
 
     "return a Right of Seq GetLifeEventItem" when {
-
       "DES returns successfully" in {
+        stubForGet(
+          getLifeEventUrl,
+          OK,
+          """[{ "lifeEventId": "1234567890", "lifeEventType": "STATUTORY_SUBMISSION", "lifeEventDate": "2018-04-05" }]"""
+        )
 
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                OK,
-                """[{
-                  "lifeEventId": "1234567890",
-                  "lifeEventType": "STATUTORY_SUBMISSION",
-                  "lifeEventDate": "2018-04-05"
-                  }]
-                """
-              )
-            )
-          )
-
-        doRetrieveLifeEventRequest { response =>
+        retrieveLifeEventRequest { response =>
           response mustBe Right(
             List(
               GetLifeEventItem(
@@ -858,29 +481,15 @@ class DesConnectorSpec extends DesConnectorTestHelper with BeforeAndAfterEach {
             )
           )
         }
-
       }
-
     }
-
   }
 
   "Request Bonus Payment endpoint" must {
-
     "return a populated DesTransactionResponse" when {
       "the DES response has a json body that is in the correct format" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                CREATED,
-                s"""{"transactionID": "87654321","message": "On Time"}""",
-                responseHeader
-              )
-            )
-          )
-
-        doRequestBonusPaymentRequest { response =>
+        stubForPost(requestBonusUrl, CREATED, """{"transactionID": "87654321","message": "On Time"}""")
+        requestBonusPaymentRequest { response =>
           response mustBe DesTransactionResponse("87654321", Some("On Time"))
         }
       }
@@ -888,149 +497,70 @@ class DesConnectorSpec extends DesConnectorTestHelper with BeforeAndAfterEach {
 
     "return a populated DesTransactionExistResponse" when {
       "the DES response returns a 409 with a json body that is in the correct format" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                CONFLICT,
-                s"""{"code": "x", "reason": "xx", "transactionID": "87654321"}""",
-                responseHeader
-              )
-            )
-          )
-
-        doRequestBonusPaymentRequest { response =>
+        stubForPost(requestBonusUrl, CONFLICT, """{"code": "x", "reason": "xx", "transactionID": "87654321"}""")
+        requestBonusPaymentRequest { response =>
           response mustBe DesTransactionExistResponse(code = "x", reason = "xx", transactionID = "87654321")
         }
       }
     }
 
     "return the default DesFailureResponse" when {
-
       "the DES response has no json body" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                GATEWAY_TIMEOUT,
-                ""
-              )
-            )
-          )
-
-        doRequestBonusPaymentRequest { response =>
+        stubForPost(requestBonusUrl, OK, "")
+        requestBonusPaymentRequest { response =>
           response mustBe DesFailureResponse()
         }
       }
 
       "the DES response has a json body that is in an incorrect format" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                CREATED,
-                """[1,2,3]"""
-              )
-            )
-          )
-
-        doRequestBonusPaymentRequest { response =>
+        stubForPost(requestBonusUrl, CREATED, """[1,2,3]""")
+        requestBonusPaymentRequest { response =>
           response mustBe DesFailureResponse()
         }
       }
-
     }
 
     "return a specific DesFailureResponse" when {
-
       "a specific failure is returned" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                NOT_FOUND,
-                s"""{"code": "LIFE_EVENT_DOES_NOT_EXIST","reason": "The lifeEventId does not match with HMRC’s records."}""",
-                responseHeader
-              )
-            )
-          )
-
-        doRequestBonusPaymentRequest { response =>
+        stubForPost(
+          requestBonusUrl,
+          NOT_FOUND,
+          """{"code": "LIFE_EVENT_DOES_NOT_EXIST","reason": "The lifeEventId does not match with HMRC’s records."}"""
+        )
+        requestBonusPaymentRequest { response =>
           response mustBe DesFailureResponse(
             "LIFE_EVENT_DOES_NOT_EXIST",
             "The lifeEventId does not match with HMRC’s records."
           )
         }
       }
-
     }
 
     "return a DesUnavailableResponse" when {
-
       "a 503 is returned" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                SERVICE_UNAVAILABLE,
-                ""
-              )
-            )
-          )
-
-        doRequestBonusPaymentRequest { response =>
+        stubForPost(requestBonusUrl, SERVICE_UNAVAILABLE, "")
+        requestBonusPaymentRequest { response =>
           response mustBe DesUnavailableResponse
         }
       }
-
     }
 
     "return a DesFailureResponse" when {
-
-      "a gateway timeout is returned" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.failed(
-              UpstreamErrorResponse("Timeout", GATEWAY_TIMEOUT, GATEWAY_TIMEOUT)
-            )
-          )
-
-        doRequestBonusPaymentRequest { response =>
-          response mustBe DesFailureResponse("Timeout", "Timeout")
+      "the connection fails" in {
+        server.stubFor(
+          post(urlEqualTo(requestBonusUrl))
+            .willReturn(aResponse().withFault(Fault.CONNECTION_RESET_BY_PEER))
+        )
+        requestBonusPaymentRequest { response =>
+          response mustBe DesFailureResponse()
         }
       }
-
-    }
-
-    "return a DesUnavailableResponse" when {
-
-      "a 499 is returned" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.failed(
-              UpstreamErrorResponse("CLIENT CLOSED REQUEST", 499, 499)
-            )
-          )
-
-        doRequestBonusPaymentRequest { response =>
-          response mustBe DesUnavailableResponse
-        }
-      }
-
     }
 
     "return a DesBadRequestResponse" when {
       "a 400 is returned" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                BAD_REQUEST,
-                ""
-              )
-            )
-          )
-        doRequestBonusPaymentRequest { response =>
+        stubForPost(requestBonusUrl, BAD_REQUEST, "")
+        requestBonusPaymentRequest { response =>
           response mustBe DesBadRequestResponse
         }
       }
@@ -1040,78 +570,41 @@ class DesConnectorSpec extends DesConnectorTestHelper with BeforeAndAfterEach {
   "Retrieve Bonus Payment endpoint" must {
     "return a DesUnavailableResponse" when {
       "a 503 is returned" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                SERVICE_UNAVAILABLE,
-                ""
-              )
-            )
-          )
-        doRetrieveBonusPaymentRequest { response =>
+        stubForGet(getBonusOrWithdrawal, SERVICE_UNAVAILABLE, "")
+        retrieveBonusPaymentRequest { response =>
           response mustBe DesUnavailableResponse
         }
       }
-
     }
 
     "return a DesFailureResponse" when {
-
       "a specific failure is returned" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                CONFLICT,
-                """{
-                  | "code": "ERROR_CODE",
-                  | "reason" : "ERROR MESSAGE"
-                  }""".stripMargin,
-                responseHeader
-              )
-            )
-          )
+        stubForGet(
+          getBonusOrWithdrawal,
+          CONFLICT,
+          """{
+            | "code": "ERROR_CODE",
+            | "reason" : "ERROR MESSAGE"
+            |}""".stripMargin
+        )
 
-        doRetrieveBonusPaymentRequest { response =>
+        retrieveBonusPaymentRequest { response =>
           response mustBe DesFailureResponse("ERROR_CODE", "ERROR MESSAGE")
         }
       }
 
       "the response has no json body" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                INTERNAL_SERVER_ERROR,
-                ""
-              )
-            )
-          )
-
-        doRetrieveBonusPaymentRequest { response =>
+        stubForGet(getBonusOrWithdrawal, OK, "")
+        retrieveBonusPaymentRequest { response =>
           response mustBe DesFailureResponse()
         }
       }
-
     }
 
     "return a GetBonusResponse" when {
-
       "DES returns successfully" in {
-
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                OK,
-                validBonusPaymentResponseJson,
-                responseHeader
-              )
-            )
-          )
-
-        doRetrieveBonusPaymentRequest { response =>
+        stubForGet(getBonusOrWithdrawal, OK, validBonusPaymentResponseJson)
+        retrieveBonusPaymentRequest { response =>
           response mustBe GetBonusResponse(
             lifeEventId = Some("1234567891"),
             periodStartDate = LocalDate.parse("2017-04-06"),
@@ -1125,28 +618,15 @@ class DesConnectorSpec extends DesConnectorTestHelper with BeforeAndAfterEach {
             supersede = None
           )
         }
-
       }
-
     }
-
   }
 
   "Retrieve Transaction endpoint" must {
-
     "return a unavailable response" when {
       "a 503 is returned" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                SERVICE_UNAVAILABLE,
-                ""
-              )
-            )
-          )
-
-        doRetrieveTransactionRequest { response =>
+        stubForGet(getTransactionUrl, SERVICE_UNAVAILABLE, "")
+        retrieveTransactionRequest { response =>
           response mustBe DesUnavailableResponse
         }
       }
@@ -1154,54 +634,31 @@ class DesConnectorSpec extends DesConnectorTestHelper with BeforeAndAfterEach {
 
     "return a failure response" when {
       "the DES response is a failure response" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                OK,
-                """{
-                  | "code": "ERROR_CODE",
-                  | "reason" : "ERROR MESSAGE"
-                  }""".stripMargin,
-                responseHeader
-              )
-            )
-          )
+        stubForGet(
+          getTransactionUrl,
+          OK,
+          """{ "code": "ERROR_CODE", "reason" : "ERROR MESSAGE" }""".stripMargin
+        )
 
-        doRetrieveTransactionRequest { response =>
+        retrieveTransactionRequest { response =>
           response mustBe DesFailureResponse("ERROR_CODE", "ERROR MESSAGE")
         }
       }
-      "the DES response has no json body" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                OK,
-                ""
-              )
-            )
-          )
 
-        doRetrieveTransactionRequest { response =>
+      "the DES response has no json body" in {
+        stubForGet(getTransactionUrl, OK, "")
+        retrieveTransactionRequest { response =>
           response mustBe DesFailureResponse()
         }
       }
-      "the DES response is invalid" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                OK,
-                """{
-                  | "status": "Due"
-                  }""".stripMargin,
-                responseHeader
-              )
-            )
-          )
 
-        doRetrieveTransactionRequest { response =>
+      "the DES response is invalid" in {
+        stubForGet(
+          getTransactionUrl,
+          OK,
+          """{  "status": "Due" }""".stripMargin
+        )
+        retrieveTransactionRequest { response =>
           response mustBe DesFailureResponse()
         }
       }
@@ -1209,23 +666,18 @@ class DesConnectorSpec extends DesConnectorTestHelper with BeforeAndAfterEach {
 
     "return a success response" when {
       "the DES response is a valid collected Pending transaction" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                OK,
-                """{
-                  |    "paymentStatus": "PENDING",
-                  |    "paymentDate": "2000-01-01",
-                  |    "paymentReference": "002630000994",
-                  |    "paymentAmount": 2.00
-                  |}""".stripMargin,
-                responseHeader
-              )
-            )
-          )
+        stubForGet(
+          getTransactionUrl,
+          OK,
+          """{
+            | "paymentStatus": "PENDING",
+            | "paymentDate": "2000-01-01",
+            | "paymentReference": "002630000994",
+            | "paymentAmount": 2.00
+            |}""".stripMargin
+        )
 
-        doRetrieveTransactionRequest { response =>
+        retrieveTransactionRequest { response =>
           response mustBe DesGetTransactionPending(
             paymentDueDate = LocalDate.parse("2000-01-01"),
             paymentReference = Some("002630000994"),
@@ -1233,22 +685,15 @@ class DesConnectorSpec extends DesConnectorTestHelper with BeforeAndAfterEach {
           )
         }
       }
-      "the DES response is a valid paid Pending transaction" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                OK,
-                """{
-                  |    "paymentStatus": "PENDING",
-                  |    "paymentDate": "2000-01-01"
-                  |}""".stripMargin,
-                responseHeader
-              )
-            )
-          )
 
-        doRetrieveTransactionRequest { response =>
+      "the DES response is a valid paid Pending transaction" in {
+        stubForGet(
+          getTransactionUrl,
+          OK,
+          """{ "paymentStatus": "PENDING", "paymentDate": "2000-01-01" }""".stripMargin
+        )
+
+        retrieveTransactionRequest { response =>
           response mustBe DesGetTransactionPending(
             paymentDueDate = LocalDate.parse("2000-01-01"),
             paymentReference = None,
@@ -1256,24 +701,20 @@ class DesConnectorSpec extends DesConnectorTestHelper with BeforeAndAfterEach {
           )
         }
       }
-      "the DES response is a valid Paid transaction" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                OK,
-                """{
-                  |    "paymentStatus": "PAID",
-                  |    "paymentDate": "2000-01-01",
-                  |    "paymentReference": "002630000993",
-                  |    "paymentAmount": 1.00
-                  |}""".stripMargin,
-                responseHeader
-              )
-            )
-          )
 
-        doRetrieveTransactionRequest { response =>
+      "the DES response is a valid Paid transaction" in {
+        stubForGet(
+          getTransactionUrl,
+          OK,
+          """{
+            | "paymentStatus": "PAID",
+            | "paymentDate": "2000-01-01",
+            | "paymentReference": "002630000993",
+            | "paymentAmount": 1.00
+            |}""".stripMargin
+        )
+
+        retrieveTransactionRequest { response =>
           response mustBe DesGetTransactionPaid(
             paymentDate = LocalDate.parse("2000-01-01"),
             paymentReference = "002630000993",
@@ -1282,24 +723,13 @@ class DesConnectorSpec extends DesConnectorTestHelper with BeforeAndAfterEach {
         }
       }
     }
-
   }
 
   "Retrieve Bulk Payment endpoint" must {
-
     "return a unavailable response" when {
       "a 503 is returned" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                SERVICE_UNAVAILABLE,
-                ""
-              )
-            )
-          )
-
-        doRetrieveBulkPaymentRequest { response =>
+        stubForGet(bulkPaymentUrl, SERVICE_UNAVAILABLE, "")
+        retrieveBulkPaymentRequest { response =>
           response mustBe DesUnavailableResponse
         }
       }
@@ -1307,53 +737,26 @@ class DesConnectorSpec extends DesConnectorTestHelper with BeforeAndAfterEach {
 
     "return a failure response" when {
       "the DES response is a failure response" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                OK,
-                """{
-                  | "code": "ERROR_CODE",
-                  | "reason" : "ERROR MESSAGE"
-                  }""".stripMargin,
-                responseHeader
-              )
-            )
-          )
-
-        doRetrieveBulkPaymentRequest { response =>
+        stubForGet(
+          bulkPaymentUrl,
+          OK,
+          """{ "code": "ERROR_CODE",  "reason" : "ERROR MESSAGE" }""".stripMargin
+        )
+        retrieveBulkPaymentRequest { response =>
           response mustBe DesFailureResponse("ERROR_CODE", "ERROR MESSAGE")
         }
       }
-      "the DES response has no json body" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                OK,
-                ""
-              )
-            )
-          )
 
-        doRetrieveBulkPaymentRequest { response =>
+      "the DES response has no json body" in {
+        stubForGet(bulkPaymentUrl, OK, "")
+        retrieveBulkPaymentRequest { response =>
           response mustBe DesFailureResponse()
         }
       }
+
       "the DES response is missing a processingDate" in {
-        val responseString = "{}"
-
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                OK,
-                responseString
-              )
-            )
-          )
-
-        doRetrieveBulkPaymentRequest { response =>
+        stubForGet(bulkPaymentUrl, OK, "{}")
+        retrieveBulkPaymentRequest { response =>
           response mustBe DesFailureResponse()
         }
       }
@@ -1363,41 +766,32 @@ class DesConnectorSpec extends DesConnectorTestHelper with BeforeAndAfterEach {
       "the DES response is the appropriate json response" in {
         val responseString =
           """{
-            |    "processingDate": "2017-03-07T09:30:00.000Z",
-            |    "idNumber": "Z5555",
-            |    "financialTransactions": [
-            |      {
-            |        "clearedAmount": -1000,
-            |        "items": [
-            |          {
-            |            "clearingSAPDocument": "ABC123456789",
-            |            "clearingDate": "2017-06-01"
-            |          }
-            |        ]
-            |      },
-            |      {
-            |        "outstandingAmount": -1500.55,
-            |        "items": [
-            |          {
-            |            "dueDate": "2017-07-01"
-            |          }
-            |        ]
-            |      }
-            |    ]
+            | "processingDate": "2017-03-07T09:30:00.000Z",
+            | "idNumber": "Z5555",
+            | "financialTransactions": [
+            |   {
+            |     "clearedAmount": -1000,
+            |     "items": [
+            |       {
+            |         "clearingSAPDocument": "ABC123456789",
+            |         "clearingDate": "2017-06-01"
+            |       }
+            |     ]
+            |   },
+            |   {
+            |     "outstandingAmount": -1500.55,
+            |     "items": [
+            |       {
+            |         "dueDate": "2017-07-01"
+            |       }
+            |     ]
+            |   }
+            | ]
             |}""".stripMargin
 
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                OK,
-                responseString,
-                responseHeader
-              )
-            )
-          )
+        stubForGet(bulkPaymentUrl, OK, responseString)
 
-        doRetrieveBulkPaymentRequest { response =>
+        retrieveBulkPaymentRequest { response =>
           response mustBe GetBulkPaymentSuccessResponse(
             lisaManagerReferenceNumber = "Z5555",
             payments = List(
@@ -1416,88 +810,43 @@ class DesConnectorSpec extends DesConnectorTestHelper with BeforeAndAfterEach {
     "return a not found response" when {
       "the DES response has no financial transactions field" in {
         val responseString =
-          """{
-            | "processingDate": "2017-03-07T09:30:00.000Z",
-            | "idNumber": "Z1234"
-            |}""".stripMargin
+          """{ "processingDate": "2017-03-07T09:30:00.000Z", "idNumber": "Z1234" }""".stripMargin
 
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                OK,
-                responseString,
-                responseHeader
-              )
-            )
-          )
-
-        doRetrieveBulkPaymentRequest { response =>
+        stubForGet(bulkPaymentUrl, OK, responseString)
+        retrieveBulkPaymentRequest { response =>
           response mustBe GetBulkPaymentNotFoundResponse
         }
       }
+
       "the DES response has no id number field" in {
         val responseString =
-          """{
-            | "processingDate": "2017-03-07T09:30:00.000Z",
-            | "financialTransactions": []
-            |}""".stripMargin
+          """{ "processingDate": "2017-03-07T09:30:00.000Z", "financialTransactions": [] }""".stripMargin
 
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                OK,
-                responseString,
-                responseHeader
-              )
-            )
-          )
+        stubForGet(bulkPaymentUrl, OK, responseString)
 
-        doRetrieveBulkPaymentRequest { response =>
+        retrieveBulkPaymentRequest { response =>
           response mustBe GetBulkPaymentNotFoundResponse
         }
       }
+
       "the DES response has no id number or financial transactions field" in {
         val responseString =
-          """{
-            | "processingDate": "2017-03-07T09:30:00.000Z"
-            |}""".stripMargin
+          """{ "processingDate": "2017-03-07T09:30:00.000Z" }""".stripMargin
 
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                OK,
-                responseString,
-                responseHeader
-              )
-            )
-          )
+        stubForGet(bulkPaymentUrl, OK, responseString)
 
-        doRetrieveBulkPaymentRequest { response =>
+        retrieveBulkPaymentRequest { response =>
           response mustBe GetBulkPaymentNotFoundResponse
         }
       }
     }
-
   }
 
   "Retrieve Account endpoint" must {
-
     "return a unavailable response" when {
       "a 503 is returned" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                SERVICE_UNAVAILABLE,
-                ""
-              )
-            )
-          )
-
-        doRetrieveAccountRequest { response =>
+        stubForGet(getAccountUrl, SERVICE_UNAVAILABLE, "")
+        retrieveAccountRequest { response =>
           response mustBe DesUnavailableResponse
         }
       }
@@ -1505,54 +854,27 @@ class DesConnectorSpec extends DesConnectorTestHelper with BeforeAndAfterEach {
 
     "return a failure response" when {
       "the DES response is a failure response" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                OK,
-                """{
-                  | "code": "ERROR_CODE",
-                  | "reason" : "ERROR MESSAGE"
-                  }""".stripMargin,
-                responseHeader
-              )
-            )
-          )
+        stubForGet(
+          getAccountUrl,
+          OK,
+          """{ "code": "ERROR_CODE", "reason" : "ERROR MESSAGE" }""".stripMargin
+        )
 
-        doRetrieveAccountRequest { response =>
+        retrieveAccountRequest { response =>
           response mustBe DesFailureResponse("ERROR_CODE", "ERROR MESSAGE")
         }
       }
-      "the DES response has no json body" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                OK,
-                ""
-              )
-            )
-          )
 
-        doRetrieveAccountRequest { response =>
+      "the DES response has no json body" in {
+        stubForGet(getAccountUrl, OK, "")
+        retrieveAccountRequest { response =>
           response mustBe DesFailureResponse()
         }
       }
+
       "the DES response is missing required fields" in {
-        val responseString = "{}"
-
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                OK,
-                responseString,
-                responseHeader
-              )
-            )
-          )
-
-        doRetrieveAccountRequest { response =>
+        stubForGet(getAccountUrl, OK, "{}")
+        retrieveAccountRequest { response =>
           response mustBe DesFailureResponse()
         }
       }
@@ -1562,33 +884,24 @@ class DesConnectorSpec extends DesConnectorTestHelper with BeforeAndAfterEach {
       "the DES response is the appropriate json response" in {
         val responseString =
           """{
-            |  "investorId": "1234567890",
-            |  "status": "OPEN",
-            |  "creationDate": "2016-01-01",
-            |  "creationReason": "REINSTATED",
-            |  "hmrcClosureDate": "2016-02-01",
-            |  "accountClosureReason": "TRANSFERRED_OUT",
-            |  "transferInDate": "2016-03-01",
-            |  "transferOutDate": "2016-04-01",
-            |  "xferredFromAccountId": "123abc789ABC34567890",
-            |  "xferredFromLmrn": "Z123453",
-            |  "lisaManagerClosureDate": "2016-05-01",
-            |  "subscriptionStatus": "AVAILABLE",
-            |  "firstSubscriptionDate": "2016-01-06"
+            | "investorId": "1234567890",
+            | "status": "OPEN",
+            | "creationDate": "2016-01-01",
+            | "creationReason": "REINSTATED",
+            | "hmrcClosureDate": "2016-02-01",
+            | "accountClosureReason": "TRANSFERRED_OUT",
+            | "transferInDate": "2016-03-01",
+            | "transferOutDate": "2016-04-01",
+            | "xferredFromAccountId": "123abc789ABC34567890",
+            | "xferredFromLmrn": "Z123453",
+            | "lisaManagerClosureDate": "2016-05-01",
+            | "subscriptionStatus": "AVAILABLE",
+            | "firstSubscriptionDate": "2016-01-06"
             |}""".stripMargin
 
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                OK,
-                responseString,
-                responseHeader
-              )
-            )
-          )
+        stubForGet(getAccountUrl, OK, responseString)
 
-        doRetrieveAccountRequest { response =>
+        retrieveAccountRequest { response =>
           response mustBe GetLisaAccountSuccessResponse(
             accountId = "123456",
             investorId = "1234567890",
@@ -1614,32 +927,23 @@ class DesConnectorSpec extends DesConnectorTestHelper with BeforeAndAfterEach {
       "there is no subscriptionStatus in the json response from DES" in {
         val responseString =
           """{
-            |  "investorId": "1234567890",
-            |  "status": "OPEN",
-            |  "creationDate": "2016-01-01",
-            |  "creationReason": "REINSTATED",
-            |  "hmrcClosureDate": "2016-02-01",
-            |  "accountClosureReason": "TRANSFERRED_OUT",
-            |  "transferInDate": "2016-03-01",
-            |  "transferOutDate": "2016-04-01",
-            |  "xferredFromAccountId": "123abc789ABC34567890",
-            |  "xferredFromLmrn": "Z123453",
-            |  "lisaManagerClosureDate": "2016-05-01",
-            |  "firstSubscriptionDate": "2016-01-06"
+            | "investorId": "1234567890",
+            | "status": "OPEN",
+            | "creationDate": "2016-01-01",
+            | "creationReason": "REINSTATED",
+            | "hmrcClosureDate": "2016-02-01",
+            | "accountClosureReason": "TRANSFERRED_OUT",
+            | "transferInDate": "2016-03-01",
+            | "transferOutDate": "2016-04-01",
+            | "xferredFromAccountId": "123abc789ABC34567890",
+            | "xferredFromLmrn": "Z123453",
+            | "lisaManagerClosureDate": "2016-05-01",
+            | "firstSubscriptionDate": "2016-01-06"
             |}""".stripMargin
 
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                OK,
-                responseString,
-                responseHeader
-              )
-            )
-          )
+        stubForGet(getAccountUrl, OK, responseString)
 
-        doRetrieveAccountRequest { response =>
+        retrieveAccountRequest { response =>
           response mustBe GetLisaAccountSuccessResponse(
             accountId = "123456",
             investorId = "1234567890",
@@ -1663,54 +967,31 @@ class DesConnectorSpec extends DesConnectorTestHelper with BeforeAndAfterEach {
   }
 
   "Report withdrawal endpoint" must {
-    "uses the des writes when posting data" in {
-      when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-        .thenReturn(
-          Future.successful(
-            HttpResponse(
-              CREATED,
-              s"""{"transactionID": "87654321","message": "On Time"}""",
-              responseHeader
-            )
-          )
-        )
-      doReportWithdrawalRequest { _ =>
-        verify(mockHttp).post(any())(any())
+    "post to the withdrawal endpoint" in {
+      stubForPost(withdrawalUrl, CREATED, """{"transactionID": "87654321","message": "On Time"}""")
+      reportWithdrawalRequest { _ =>
+        server.verify(postRequestedFor(urlEqualTo(withdrawalUrl)))
       }
     }
 
     "return a populated DesTransactionResponse" when {
       "the DES response has a json body that is in the correct format" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                CREATED,
-                s"""{"transactionID": "87654321","message": "On Time"}""",
-                responseHeader
-              )
-            )
-          )
-        doReportWithdrawalRequest { response =>
+        stubForPost(withdrawalUrl, CREATED, """{"transactionID": "87654321","message": "On Time"}""")
+        reportWithdrawalRequest { response =>
           response mustBe DesTransactionResponse("87654321", Some("On Time"))
         }
       }
-
     }
 
     "return a populated DesTransactionExistResponse" when {
       "the DES response has status CONFLICT" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                CONFLICT,
-                s"""{"code": "WITHDRAWAL_CHARGE_ALREADY_EXISTS","reason": "A withdrawal charge with these details has already been requested for this investor","investorTransactionID":"2345678901"}""",
-                responseHeader
-              )
-            )
-          )
-        doReportWithdrawalRequest { response =>
+        stubForPost(
+          withdrawalUrl,
+          CONFLICT,
+          """{"code": "WITHDRAWAL_CHARGE_ALREADY_EXISTS","reason": "A withdrawal charge with these details has already been requested for this investor","investorTransactionID":"2345678901"}"""
+        )
+
+        reportWithdrawalRequest { response =>
           response mustBe DesWithdrawalChargeAlreadyExistsResponse(
             "WITHDRAWAL_CHARGE_ALREADY_EXISTS",
             "A withdrawal charge with these details has already been requested for this investor",
@@ -1720,17 +1001,13 @@ class DesConnectorSpec extends DesConnectorTestHelper with BeforeAndAfterEach {
       }
 
       "the DES response has status FORBIDDEN and a transactionID value in the json body" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                FORBIDDEN,
-                s"""{"code": "SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED","reason": "This withdrawal charge has already been superseded","supersededTransactionByID": "2345678901"}""",
-                responseHeader
-              )
-            )
-          )
-        doReportWithdrawalRequest { response =>
+        stubForPost(
+          withdrawalUrl,
+          FORBIDDEN,
+          """{"code": "SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED","reason": "This withdrawal charge has already been superseded","supersededTransactionByID": "2345678901"}"""
+        )
+
+        reportWithdrawalRequest { response =>
           response mustBe DesWithdrawalChargeAlreadySupersededResponse(
             "SUPERSEDED_TRANSACTION_ID_ALREADY_SUPERSEDED",
             "This withdrawal charge has already been superseded",
@@ -1742,86 +1019,52 @@ class DesConnectorSpec extends DesConnectorTestHelper with BeforeAndAfterEach {
 
     "return the default DesFailureResponse" when {
       "the DES response has no json body" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                GATEWAY_TIMEOUT,
-                ""
-              )
-            )
-          )
-        doReportWithdrawalRequest { response =>
+        stubForPost(withdrawalUrl, OK, "")
+        reportWithdrawalRequest { response =>
           response mustBe DesFailureResponse()
         }
       }
 
       "the DES response has a json body that is in an incorrect format" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                CREATED,
-                """[1,2,3]"""
-              )
-            )
-          )
-        doReportWithdrawalRequest { response =>
+        stubForPost(withdrawalUrl, CREATED, """[1,2,3]""")
+        reportWithdrawalRequest { response =>
           response mustBe DesFailureResponse()
         }
       }
 
       "the DES response has a html body instead of JSON format" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                CREATED,
-                """<!DOCTYPE html>"""
-              )
-            )
-          )
-        doReportWithdrawalRequest { response =>
+        server.stubFor(
+          post(urlEqualTo(withdrawalUrl))
+            .willReturn(aResponse().withStatus(CREATED).withBody("<!DOCTYPE html>"))
+        )
+
+        reportWithdrawalRequest { response =>
           response mustBe DesFailureResponse()
         }
       }
-
     }
 
     "return a specific DesFailureResponse" when {
       "a specific failure is returned" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                NOT_FOUND,
-                s"""{"code": "LIFE_EVENT_DOES_NOT_EXIST","reason": "The lifeEventId does not match with HMRC’s records."}""",
-                responseHeader
-              )
-            )
-          )
-        doReportWithdrawalRequest { response =>
+        stubForPost(
+          withdrawalUrl,
+          NOT_FOUND,
+          """{"code": "LIFE_EVENT_DOES_NOT_EXIST","reason": "The lifeEventId does not match with HMRC’s records."}"""
+        )
+
+        reportWithdrawalRequest { response =>
           response mustBe DesFailureResponse(
             "LIFE_EVENT_DOES_NOT_EXIST",
             "The lifeEventId does not match with HMRC’s records."
           )
         }
       }
-
     }
 
     "return a DesUnavailableResponse" when {
       "a 503 is returned" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                SERVICE_UNAVAILABLE,
-                ""
-              )
-            )
-          )
-        doReportWithdrawalRequest { response =>
+        stubForPost(withdrawalUrl, SERVICE_UNAVAILABLE, "")
+        reportWithdrawalRequest { response =>
           response mustBe DesUnavailableResponse
         }
       }
@@ -1829,16 +1072,8 @@ class DesConnectorSpec extends DesConnectorTestHelper with BeforeAndAfterEach {
 
     "return a DesBadRequestResponse" when {
       "a 400 is returned" in {
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(
-            Future.successful(
-              HttpResponse(
-                BAD_REQUEST,
-                ""
-              )
-            )
-          )
-        doReportWithdrawalRequest { response =>
+        stubForPost(withdrawalUrl, BAD_REQUEST, "")
+        reportWithdrawalRequest { response =>
           response mustBe DesBadRequestResponse
         }
       }
