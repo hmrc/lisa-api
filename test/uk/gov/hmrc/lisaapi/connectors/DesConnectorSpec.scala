@@ -52,13 +52,10 @@ class DesConnectorSpec extends DesConnectorTestHelper {
     "/enterprise/financial-data/ZISA/Z123456/LISA?dateFrom=2018-01-01&dateTo=2018-01-01&onlyOpenItems=false"
 
   "Create Lisa Investor endpoint" must {
-    "return a populated CreateLisaInvestorSuccessResponse" when {
-
-      "The DES response has a json body that is in the correct format" in {
-        stubForPost(createInvestorUrl, CREATED, """{"investorID": "1234567890"}""")
-        createInvestorRequest { response =>
-          response must be(CreateLisaInvestorSuccessResponse("1234567890"))
-        }
+    "return a populated CreateLisaInvestorSuccessResponse when The DES response has a json body that is in the correct format" in {
+      stubForPost(createInvestorUrl, CREATED, """{"investorID": "1234567890"}""")
+      createInvestorRequest { response =>
+        response must be(CreateLisaInvestorSuccessResponse("1234567890"))
       }
     }
 
@@ -85,57 +82,47 @@ class DesConnectorSpec extends DesConnectorTestHelper {
       }
     }
 
-    "return a populated CreateLisaInvestorAlreadyExistsResponse" when {
-      "the investor already exists response is returned" in {
-        val investorID = "1234567890"
-        stubForPost(createInvestorUrl, CONFLICT, s"""{"investorID": "$investorID"}""")
-        createInvestorRequest { response =>
-          response must be(CreateLisaInvestorAlreadyExistsResponse(investorID))
-        }
+    "return a populated CreateLisaInvestorAlreadyExistsResponse when the investor already exists response is returned" in {
+      val investorID = "1234567890"
+      stubForPost(createInvestorUrl, CONFLICT, s"""{"investorID": "$investorID"}""")
+      createInvestorRequest { response =>
+        response must be(CreateLisaInvestorAlreadyExistsResponse(investorID))
       }
     }
 
-    "return a specific DesFailureResponse" when {
-      "a specific failure is returned" in {
-        stubForPost(
-          createInvestorUrl,
-          FORBIDDEN,
-          """{"code": "INVESTOR_NOT_FOUND","reason": "The investor details given do not match with HMRC’s records."}"""
+    "return a specific DesFailureResponse when a specific failure is returned" in {
+      stubForPost(
+        createInvestorUrl,
+        FORBIDDEN,
+        """{"code": "INVESTOR_NOT_FOUND","reason": "The investor details given do not match with HMRC’s records."}"""
+      )
+      createInvestorRequest { response =>
+        response must be(
+          DesFailureResponse("INVESTOR_NOT_FOUND", "The investor details given do not match with HMRC’s records.")
         )
-        createInvestorRequest { response =>
-          response must be(
-            DesFailureResponse("INVESTOR_NOT_FOUND", "The investor details given do not match with HMRC’s records.")
-          )
-        }
       }
     }
 
-    "return a DesUnavailableResponse" when {
-      "a 503 is returned" in {
-        stubForPost(createInvestorUrl, SERVICE_UNAVAILABLE, "")
-        createInvestorRequest { response =>
-          response mustBe DesUnavailableResponse
-        }
+    "return a DesUnavailableResponse when a 503 is returned" in {
+      stubForPost(createInvestorUrl, SERVICE_UNAVAILABLE, "")
+      createInvestorRequest { response =>
+        response mustBe DesUnavailableResponse
       }
     }
 
-    "return a DesBadRequestResponse" when {
-      "a 400 is returned" in {
-        stubForPost(createInvestorUrl, BAD_REQUEST, "")
-        createInvestorRequest { response =>
-          response mustBe DesBadRequestResponse
-        }
+    "return a DesBadRequestResponse when a 400 is returned" in {
+      stubForPost(createInvestorUrl, BAD_REQUEST, "")
+      createInvestorRequest { response =>
+        response mustBe DesBadRequestResponse
       }
     }
   }
 
   "Create Account endpoint" must {
-    "return a populated success response" when {
-      "DES returns 201 created" in {
-        stubForPost(createAccountUrl, CREATED, "")
-        createAccountRequest { response =>
-          response mustBe DesAccountResponse("9876543210")
-        }
+    "return a populated success response when DES returns 201 created" in {
+      stubForPost(createAccountUrl, CREATED, "")
+      createAccountRequest { response =>
+        response mustBe DesAccountResponse("9876543210")
       }
     }
 
@@ -155,48 +142,41 @@ class DesConnectorSpec extends DesConnectorTestHelper {
       }
     }
 
-    "return a DesUnavailableResponse" when {
-      "a 503 is returned" in {
-        stubForPost(createAccountUrl, SERVICE_UNAVAILABLE, "")
-        createAccountRequest { response =>
-          response mustBe DesUnavailableResponse
-        }
+    "return a DesUnavailableResponse when a 503 is returned" in {
+      stubForPost(createAccountUrl, SERVICE_UNAVAILABLE, "")
+      createAccountRequest { response =>
+        response mustBe DesUnavailableResponse
       }
     }
 
-    "return a DesBadRequestResponse" when {
-      "a 400 is returned" in {
-        stubForPost(createAccountUrl, BAD_REQUEST, "")
-        createAccountRequest { response =>
-          response mustBe DesBadRequestResponse
-        }
+    "return a DesBadRequestResponse when a 400 is returned" in {
+      stubForPost(createAccountUrl, BAD_REQUEST, "")
+      createAccountRequest { response =>
+        response mustBe DesBadRequestResponse
       }
     }
 
-    "return a type-appropriate failure response" when {
-      "a specific failure is returned" in {
-        stubForPost(
-          createAccountUrl,
-          FORBIDDEN,
-          """{"code": "INVESTOR_NOT_FOUND", "reason": "The investorId given does not match with HMRC’s records."}"""
+    "return a type-appropriate failure response when a specific failure is returned" in {
+      stubForPost(
+        createAccountUrl,
+        FORBIDDEN,
+        """{"code": "INVESTOR_NOT_FOUND", "reason": "The investorId given does not match with HMRC’s records."}"""
+      )
+
+      createAccountRequest { response =>
+        response mustBe DesFailureResponse(
+          "INVESTOR_NOT_FOUND",
+          "The investorId given does not match with HMRC’s records."
         )
-        createAccountRequest { response =>
-          response mustBe DesFailureResponse(
-            "INVESTOR_NOT_FOUND",
-            "The investorId given does not match with HMRC’s records."
-          )
-        }
       }
     }
   }
 
   "Transfer Account endpoint" must {
-    "return a populated success response" when {
-      "DES returns 201 created" in {
-        stubForPost(transferAccountUrl, CREATED, "")
-        transferAccountRequest { response =>
-          response mustBe DesAccountResponse("9876543210")
-        }
+    "return a populated success response when DES returns 201 created" in {
+      stubForPost(transferAccountUrl, CREATED, "")
+      transferAccountRequest { response =>
+        response mustBe DesAccountResponse("9876543210")
       }
     }
 
@@ -216,142 +196,116 @@ class DesConnectorSpec extends DesConnectorTestHelper {
       }
     }
 
-    "return a type-appropriate failure response" when {
-      "a specific failure is returned" in {
-        stubForPost(
-          transferAccountUrl,
-          FORBIDDEN,
-          """{"code": "INVESTOR_NOT_FOUND", "reason": "The investorId given does not match with HMRC’s records."}"""
+    "return a type-appropriate failure response when a specific failure is returned" in {
+      stubForPost(
+        transferAccountUrl,
+        FORBIDDEN,
+        """{"code": "INVESTOR_NOT_FOUND", "reason": "The investorId given does not match with HMRC’s records."}"""
+      )
+      transferAccountRequest { response =>
+        response mustBe DesFailureResponse(
+          "INVESTOR_NOT_FOUND",
+          "The investorId given does not match with HMRC’s records."
         )
-        transferAccountRequest { response =>
-          response mustBe DesFailureResponse(
-            "INVESTOR_NOT_FOUND",
-            "The investorId given does not match with HMRC’s records."
-          )
-        }
       }
     }
 
-    "return a DesUnavailableResponse" when {
-      "a 503 is returned" in {
-        stubForPost(transferAccountUrl, SERVICE_UNAVAILABLE, "")
-        transferAccountRequest { response =>
-          response mustBe DesUnavailableResponse
-        }
+    "return a DesUnavailableResponse when a 503 is returned" in {
+      stubForPost(transferAccountUrl, SERVICE_UNAVAILABLE, "")
+      transferAccountRequest { response =>
+        response mustBe DesUnavailableResponse
       }
     }
 
-    "return a DesBadRequestResponse" when {
-      "a 400 is returned" in {
-        stubForPost(transferAccountUrl, BAD_REQUEST, "")
-        transferAccountRequest { response =>
-          response mustBe DesBadRequestResponse
-        }
+    "return a DesBadRequestResponse when a 400 is returned" in {
+      stubForPost(transferAccountUrl, BAD_REQUEST, "")
+      transferAccountRequest { response =>
+        response mustBe DesBadRequestResponse
       }
     }
 
   }
 
   "Close Lisa Account endpoint" must {
-    "return a DesEmptySuccessResponse" when {
-      "DES returns 200 ok" in {
-        stubForPost(closeAccountUrl, OK, "")
-        closeAccountRequest { response =>
-          response mustBe DesEmptySuccessResponse
-        }
+    "return a DesEmptySuccessResponse when DES returns 200 ok" in {
+      stubForPost(closeAccountUrl, OK, "")
+      closeAccountRequest { response =>
+        response mustBe DesEmptySuccessResponse
       }
     }
 
-    "return a DesUnavailableResponse" when {
-      "a 503 is returned" in {
-        stubForPost(closeAccountUrl, SERVICE_UNAVAILABLE, "")
-        closeAccountRequest { response =>
-          response mustBe DesUnavailableResponse
-        }
+    "return a DesUnavailableResponse when a 503 is returned" in {
+      stubForPost(closeAccountUrl, SERVICE_UNAVAILABLE, "")
+      closeAccountRequest { response =>
+        response mustBe DesUnavailableResponse
       }
     }
 
-    "return a DesBadRequestResponse" when {
-      "a 400 is returned" in {
-        stubForPost(closeAccountUrl, BAD_REQUEST, "")
-        closeAccountRequest { response =>
-          response mustBe DesBadRequestResponse
-        }
+    "return a DesBadRequestResponse when a 400 is returned" in {
+      stubForPost(closeAccountUrl, BAD_REQUEST, "")
+      closeAccountRequest { response =>
+        response mustBe DesBadRequestResponse
       }
     }
 
-    "return a DesFailureResponse" when {
-      "any other response is received" in {
-        stubForPost(closeAccountUrl, GATEWAY_TIMEOUT, "")
-        closeAccountRequest { response =>
-          response mustBe DesFailureResponse()
-        }
+    "return a DesFailureResponse when any other response is received" in {
+      stubForPost(closeAccountUrl, GATEWAY_TIMEOUT, "")
+      closeAccountRequest { response =>
+        response mustBe DesFailureResponse()
       }
     }
   }
 
   "Reinstate Lisa Account endpoint" must {
-    "return a populated success response" when {
-      "DES returns 200 ok" in {
-        stubForPut(reinstateAccountUrl, OK, """{"code": "SUCCESS", "reason": "Account successfully reinstated"}""")
-        reinstateAccountRequest { response =>
-          response mustBe DesReinstateAccountSuccessResponse("SUCCESS", "Account successfully reinstated")
-        }
+    "return a populated success response when DES returns 200 ok" in {
+      stubForPut(reinstateAccountUrl, OK, """{"code": "SUCCESS", "reason": "Account successfully reinstated"}""")
+      reinstateAccountRequest { response =>
+        response mustBe DesReinstateAccountSuccessResponse("SUCCESS", "Account successfully reinstated")
       }
     }
 
-    "return a generic failure response" when {
-      "a 200 is returned, but the DES response has no json body" in {
-        stubForPut(reinstateAccountUrl, OK, "")
-        reinstateAccountRequest { response =>
-          response mustBe DesFailureResponse()
-        }
+    "return a generic failure response when a 200 is returned, but the DES response has no json body" in {
+      stubForPut(reinstateAccountUrl, OK, "")
+      reinstateAccountRequest { response =>
+        response mustBe DesFailureResponse()
       }
     }
 
-    "return a DesUnavailableResponse" when {
-      "a 503 is returned" in {
-        stubForPut(reinstateAccountUrl, SERVICE_UNAVAILABLE, "")
-        reinstateAccountRequest { response =>
-          response mustBe DesUnavailableResponse
-        }
+    "return a DesUnavailableResponse when a 503 is returned" in {
+      stubForPut(reinstateAccountUrl, SERVICE_UNAVAILABLE, "")
+      reinstateAccountRequest { response =>
+        response mustBe DesUnavailableResponse
       }
     }
 
-    "return a DesBadRequestResponse" when {
-      "a 400 is returned" in {
-        stubForPut(reinstateAccountUrl, BAD_REQUEST, "")
-        reinstateAccountRequest { response =>
-          response mustBe DesBadRequestResponse
-        }
+    "return a DesBadRequestResponse when a 400 is returned" in {
+      stubForPut(reinstateAccountUrl, BAD_REQUEST, "")
+      reinstateAccountRequest { response =>
+        response mustBe DesBadRequestResponse
       }
     }
 
-    "return a DesFailureResponse" when {
-      "a 500 is returned (not 200/400/503)" in {
-        stubForPut(reinstateAccountUrl, INTERNAL_SERVER_ERROR, "")
-        reinstateAccountRequest { response =>
-          response mustBe DesFailureResponse()
-        }
+    "return a DesFailureResponse when a 500 is returned (not 200/400/503)" in {
+      stubForPut(reinstateAccountUrl, INTERNAL_SERVER_ERROR, "")
+      reinstateAccountRequest { response =>
+        response mustBe DesFailureResponse()
       }
     }
 
   }
 
   "Update First Subscription date endpoint" must {
-    "return a populated DesUpdateSubscriptionSuccessResponse" when {
-      "the DES response has a json body that is in the correct format" in {
-        stubForPut(
-          updateFirstSubUrl,
-          OK,
-          """{"code": "INVESTOR_ACCOUNT_NOW_VOID", "reason": "Date of first Subscription updated successfully, but as a result of the date change the account has subsequently been voided"}"""
+    "return a populated DesUpdateSubscriptionSuccessResponse when the DES response has a json body that is in the correct format" in {
+      stubForPut(
+        updateFirstSubUrl,
+        OK,
+        """{"code": "INVESTOR_ACCOUNT_NOW_VOID", "reason": "Date of first Subscription updated successfully, but as a result of the date change the account has subsequently been voided"}"""
+      )
+      updateFirstSubscriptionDateRequest { response =>
+        response mustBe DesUpdateSubscriptionSuccessResponse(
+          "INVESTOR_ACCOUNT_NOW_VOID",
+          "Date of first Subscription updated successfully, but as a result of the date change the account has subsequently been voided"
         )
-        updateFirstSubscriptionDateRequest { response =>
-          response mustBe DesUpdateSubscriptionSuccessResponse(
-            "INVESTOR_ACCOUNT_NOW_VOID",
-            "Date of first Subscription updated successfully, but as a result of the date change the account has subsequently been voided"
-          )
-        }
       }
     }
 
@@ -375,55 +329,45 @@ class DesConnectorSpec extends DesConnectorTestHelper {
       }
     }
 
-    "return a DesUnavailableResponse" when {
-      "a 503 response is returned" in {
-        stubForPut(updateFirstSubUrl, SERVICE_UNAVAILABLE, "")
-        updateFirstSubscriptionDateRequest { response =>
-          response mustBe DesUnavailableResponse
-        }
+    "return a DesUnavailableResponse when a 503 response is returned" in {
+      stubForPut(updateFirstSubUrl, SERVICE_UNAVAILABLE, "")
+      updateFirstSubscriptionDateRequest { response =>
+        response mustBe DesUnavailableResponse
       }
     }
 
-    "return a DesBadRequestResponse" when {
-      "a 400 response is returned" in {
-        stubForPut(updateFirstSubUrl, BAD_REQUEST, "")
-        updateFirstSubscriptionDateRequest { response =>
-          response mustBe DesBadRequestResponse
-        }
+    "return a DesBadRequestResponse when a 400 response is returned" in {
+      stubForPut(updateFirstSubUrl, BAD_REQUEST, "")
+      updateFirstSubscriptionDateRequest { response =>
+        response mustBe DesBadRequestResponse
       }
     }
 
-    "return a DesTransactionExistResponse" when {
-      "a 409 response is returned with json in the correct format" in {
-        stubForPut(
-          updateFirstSubUrl,
-          CONFLICT,
-          """{"code": "x", "reason": "xx", "transactionID": "87654321"}"""
-        )
-        updateFirstSubscriptionDateRequest { response =>
-          response mustBe DesTransactionExistResponse(code = "x", reason = "xx", transactionID = "87654321")
-        }
+    "return a DesTransactionExistResponse when a 409 response is returned with json in the correct format" in {
+      stubForPut(
+        updateFirstSubUrl,
+        CONFLICT,
+        """{"code": "x", "reason": "xx", "transactionID": "87654321"}"""
+      )
+      updateFirstSubscriptionDateRequest { response =>
+        response mustBe DesTransactionExistResponse(code = "x", reason = "xx", transactionID = "87654321")
       }
     }
 
   }
 
   "Report Life Event endpoint" must {
-    "return a populated DesSuccessResponse" when {
-      "the DES response has a json body that is in the correct format" in {
-        stubForPost(reportLifeEventUrl, CREATED, """{"lifeEventID": "87654321"}""")
-        reportLifeEventRequest { response =>
-          response mustBe DesLifeEventResponse("87654321")
-        }
+    "return a populated DesSuccessResponse when the DES response has a json body that is in the correct format" in {
+      stubForPost(reportLifeEventUrl, CREATED, """{"lifeEventID": "87654321"}""")
+      reportLifeEventRequest { response =>
+        response mustBe DesLifeEventResponse("87654321")
       }
     }
 
-    "return a DesUnavailableResponse" when {
-      "a 503 is returned" in {
-        stubForPost(reportLifeEventUrl, SERVICE_UNAVAILABLE, "")
-        reportLifeEventRequest { response =>
-          response mustBe DesUnavailableResponse
-        }
+    "return a DesUnavailableResponse when a 503 is returned" in {
+      stubForPost(reportLifeEventUrl, SERVICE_UNAVAILABLE, "")
+      reportLifeEventRequest { response =>
+        response mustBe DesUnavailableResponse
       }
     }
 
@@ -443,30 +387,26 @@ class DesConnectorSpec extends DesConnectorTestHelper {
       }
     }
 
-    "return a populated DesFailureResponse" when {
-      "a LIFE_EVENT_INAPPROPRIATE failure is returned" in {
-        stubForPost(
-          reportLifeEventUrl,
-          FORBIDDEN,
-          """{"code": "LIFE_EVENT_INAPPROPRIATE","reason": "The life event conflicts with previous life event reported."}"""
+    "return a populated DesFailureResponse when a LIFE_EVENT_INAPPROPRIATE failure is returned" in {
+      stubForPost(
+        reportLifeEventUrl,
+        FORBIDDEN,
+        """{"code": "LIFE_EVENT_INAPPROPRIATE","reason": "The life event conflicts with previous life event reported."}"""
+      )
+      reportLifeEventRequest { response =>
+        response mustBe DesFailureResponse(
+          "LIFE_EVENT_INAPPROPRIATE",
+          "The life event conflicts with previous life event reported."
         )
-        reportLifeEventRequest { response =>
-          response mustBe DesFailureResponse(
-            "LIFE_EVENT_INAPPROPRIATE",
-            "The life event conflicts with previous life event reported."
-          )
-        }
       }
     }
   }
 
   "Retrieve Life Event endpoint" must {
-    "return a Left of DesUnavailableResponse" when {
-      "a 503 is returned" in {
-        stubForGet(getLifeEventUrl, SERVICE_UNAVAILABLE, "")
-        retrieveLifeEventRequest { response =>
-          response mustBe Left(DesUnavailableResponse)
-        }
+    "return a Left of DesUnavailableResponse when a 503 is returned" in {
+      stubForGet(getLifeEventUrl, SERVICE_UNAVAILABLE, "")
+      retrieveLifeEventRequest { response =>
+        response mustBe Left(DesUnavailableResponse)
       }
     }
 
@@ -498,45 +438,39 @@ class DesConnectorSpec extends DesConnectorTestHelper {
       }
     }
 
-    "return a Right of Seq GetLifeEventItem" when {
-      "DES returns successfully" in {
-        stubForGet(
-          getLifeEventUrl,
-          OK,
-          """[{ "lifeEventId": "1234567890", "lifeEventType": "STATUTORY_SUBMISSION", "lifeEventDate": "2018-04-05" }]"""
-        )
+    "return a Right of Seq GetLifeEventItem when DES returns successfully" in {
+      stubForGet(
+        getLifeEventUrl,
+        OK,
+        """[{ "lifeEventId": "1234567890", "lifeEventType": "STATUTORY_SUBMISSION", "lifeEventDate": "2018-04-05" }]"""
+      )
 
-        retrieveLifeEventRequest { response =>
-          response mustBe Right(
-            List(
-              GetLifeEventItem(
-                lifeEventId = "1234567890",
-                eventType = "Statutory Submission",
-                eventDate = LocalDate.parse("2018-04-05")
-              )
+      retrieveLifeEventRequest { response =>
+        response mustBe Right(
+          List(
+            GetLifeEventItem(
+              lifeEventId = "1234567890",
+              eventType = "Statutory Submission",
+              eventDate = LocalDate.parse("2018-04-05")
             )
           )
-        }
+        )
       }
     }
   }
 
   "Request Bonus Payment endpoint" must {
-    "return a populated DesTransactionResponse" when {
-      "the DES response has a json body that is in the correct format" in {
-        stubForPost(requestBonusUrl, CREATED, """{"transactionID": "87654321","message": "On Time"}""")
-        requestBonusPaymentRequest { response =>
-          response mustBe DesTransactionResponse("87654321", Some("On Time"))
-        }
+    "return a populated DesTransactionResponse when the DES response has a json body that is in the correct format" in {
+      stubForPost(requestBonusUrl, CREATED, """{"transactionID": "87654321","message": "On Time"}""")
+      requestBonusPaymentRequest { response =>
+        response mustBe DesTransactionResponse("87654321", Some("On Time"))
       }
     }
 
-    "return a populated DesTransactionExistResponse" when {
-      "the DES response returns a 409 with a json body that is in the correct format" in {
-        stubForPost(requestBonusUrl, CONFLICT, """{"code": "x", "reason": "xx", "transactionID": "87654321"}""")
-        requestBonusPaymentRequest { response =>
-          response mustBe DesTransactionExistResponse(code = "x", reason = "xx", transactionID = "87654321")
-        }
+    "return a populated DesTransactionExistResponse when the DES response returns a 409 with a json body that is in the correct format" in {
+      stubForPost(requestBonusUrl, CONFLICT, """{"code": "x", "reason": "xx", "transactionID": "87654321"}""")
+      requestBonusPaymentRequest { response =>
+        response mustBe DesTransactionExistResponse(code = "x", reason = "xx", transactionID = "87654321")
       }
     }
 
@@ -556,60 +490,50 @@ class DesConnectorSpec extends DesConnectorTestHelper {
       }
     }
 
-    "return a specific DesFailureResponse" when {
-      "a specific failure is returned" in {
-        stubForPost(
-          requestBonusUrl,
-          NOT_FOUND,
-          """{"code": "LIFE_EVENT_DOES_NOT_EXIST","reason": "The lifeEventId does not match with HMRC’s records."}"""
+    "return a specific DesFailureResponse when a specific failure is returned" in {
+      stubForPost(
+        requestBonusUrl,
+        NOT_FOUND,
+        """{"code": "LIFE_EVENT_DOES_NOT_EXIST","reason": "The lifeEventId does not match with HMRC’s records."}"""
+      )
+      requestBonusPaymentRequest { response =>
+        response mustBe DesFailureResponse(
+          "LIFE_EVENT_DOES_NOT_EXIST",
+          "The lifeEventId does not match with HMRC’s records."
         )
-        requestBonusPaymentRequest { response =>
-          response mustBe DesFailureResponse(
-            "LIFE_EVENT_DOES_NOT_EXIST",
-            "The lifeEventId does not match with HMRC’s records."
-          )
-        }
       }
     }
 
-    "return a DesUnavailableResponse" when {
-      "a 503 is returned" in {
-        stubForPost(requestBonusUrl, SERVICE_UNAVAILABLE, "")
-        requestBonusPaymentRequest { response =>
-          response mustBe DesUnavailableResponse
-        }
+    "return a DesUnavailableResponse when a 503 is returned" in {
+      stubForPost(requestBonusUrl, SERVICE_UNAVAILABLE, "")
+      requestBonusPaymentRequest { response =>
+        response mustBe DesUnavailableResponse
       }
     }
 
-    "return a DesFailureResponse" when {
-      "the connection fails" in {
-        server.stubFor(
-          post(urlEqualTo(requestBonusUrl))
-            .willReturn(aResponse().withFault(Fault.MALFORMED_RESPONSE_CHUNK))
-        )
-        requestBonusPaymentRequest { response =>
-          response mustBe DesFailureResponse()
-        }
+    "return a DesFailureResponse when the connection fails" in {
+      server.stubFor(
+        post(urlEqualTo(requestBonusUrl))
+          .willReturn(aResponse().withFault(Fault.MALFORMED_RESPONSE_CHUNK))
+      )
+      requestBonusPaymentRequest { response =>
+        response mustBe DesFailureResponse()
       }
     }
 
-    "return a DesBadRequestResponse" when {
-      "a 400 is returned" in {
-        stubForPost(requestBonusUrl, BAD_REQUEST, "")
-        requestBonusPaymentRequest { response =>
-          response mustBe DesBadRequestResponse
-        }
+    "return a DesBadRequestResponse when a 400 is returned" in {
+      stubForPost(requestBonusUrl, BAD_REQUEST, "")
+      requestBonusPaymentRequest { response =>
+        response mustBe DesBadRequestResponse
       }
     }
   }
 
   "Retrieve Bonus Payment endpoint" must {
-    "return a DesUnavailableResponse" when {
-      "a 503 is returned" in {
-        stubForGet(getBonusOrWithdrawal, SERVICE_UNAVAILABLE, "")
-        retrieveBonusPaymentRequest { response =>
-          response mustBe DesUnavailableResponse
-        }
+    "return a DesUnavailableResponse when a 503 is returned" in {
+      stubForGet(getBonusOrWithdrawal, SERVICE_UNAVAILABLE, "")
+      retrieveBonusPaymentRequest { response =>
+        response mustBe DesUnavailableResponse
       }
     }
 
@@ -637,34 +561,30 @@ class DesConnectorSpec extends DesConnectorTestHelper {
       }
     }
 
-    "return a GetBonusResponse" when {
-      "DES returns successfully" in {
-        stubForGet(getBonusOrWithdrawal, OK, validBonusPaymentResponseJson)
-        retrieveBonusPaymentRequest { response =>
-          response mustBe GetBonusResponse(
-            lifeEventId = Some("1234567891"),
-            periodStartDate = LocalDate.parse("2017-04-06"),
-            periodEndDate = LocalDate.parse("2017-05-05"),
-            htbTransfer = Some(HelpToBuyTransfer(0, 10)),
-            inboundPayments = InboundPayments(Some(4000), 4000, 4000, 4000),
-            bonuses = Bonuses(1000, 1000, Some(1000), "Life Event"),
-            creationDate = LocalDate.parse("2017-05-05"),
-            paymentStatus = "Paid",
-            supersededBy = None,
-            supersede = None
-          )
-        }
+    "return a GetBonusResponse when DES returns successfully" in {
+      stubForGet(getBonusOrWithdrawal, OK, validBonusPaymentResponseJson)
+      retrieveBonusPaymentRequest { response =>
+        response mustBe GetBonusResponse(
+          lifeEventId = Some("1234567891"),
+          periodStartDate = LocalDate.parse("2017-04-06"),
+          periodEndDate = LocalDate.parse("2017-05-05"),
+          htbTransfer = Some(HelpToBuyTransfer(0, 10)),
+          inboundPayments = InboundPayments(Some(4000), 4000, 4000, 4000),
+          bonuses = Bonuses(1000, 1000, Some(1000), "Life Event"),
+          creationDate = LocalDate.parse("2017-05-05"),
+          paymentStatus = "Paid",
+          supersededBy = None,
+          supersede = None
+        )
       }
     }
   }
 
   "Retrieve Transaction endpoint" must {
-    "return a unavailable response" when {
-      "a 503 is returned" in {
-        stubForGet(getTransactionUrl, SERVICE_UNAVAILABLE, "")
-        retrieveTransactionRequest { response =>
-          response mustBe DesUnavailableResponse
-        }
+    "return a unavailable response when a 503 is returned" in {
+      stubForGet(getTransactionUrl, SERVICE_UNAVAILABLE, "")
+      retrieveTransactionRequest { response =>
+        response mustBe DesUnavailableResponse
       }
     }
 
@@ -762,12 +682,11 @@ class DesConnectorSpec extends DesConnectorTestHelper {
   }
 
   "Retrieve Bulk Payment endpoint" must {
-    "return a unavailable response" when {
-      "a 503 is returned" in {
-        stubForGet(bulkPaymentUrl, SERVICE_UNAVAILABLE, "")
-        retrieveBulkPaymentRequest { response =>
-          response mustBe DesUnavailableResponse
-        }
+
+    "return an unavailable response when a 503 is returned" in {
+      stubForGet(bulkPaymentUrl, SERVICE_UNAVAILABLE, "")
+      retrieveBulkPaymentRequest { response =>
+        response mustBe DesUnavailableResponse
       }
     }
 
@@ -798,10 +717,9 @@ class DesConnectorSpec extends DesConnectorTestHelper {
       }
     }
 
-    "return a success response" when {
-      "the DES response is the appropriate json response" in {
-        val responseString =
-          """{
+    "return a success response when the DES response has the expected json response" in {
+      val responseString =
+        """{
             | "processingDate": "2017-03-07T09:30:00.000Z",
             | "idNumber": "Z5555",
             | "financialTransactions": [
@@ -825,21 +743,20 @@ class DesConnectorSpec extends DesConnectorTestHelper {
             | ]
             |}""".stripMargin
 
-        stubForGet(bulkPaymentUrl, OK, responseString)
+      stubForGet(bulkPaymentUrl, OK, responseString)
 
-        retrieveBulkPaymentRequest { response =>
-          response mustBe GetBulkPaymentSuccessResponse(
-            lisaManagerReferenceNumber = "Z5555",
-            payments = List(
-              BulkPaymentPaid(
-                paymentDate = Some(LocalDate.parse("2017-06-01")),
-                paymentReference = Some("ABC123456789"),
-                paymentAmount = 1000.00
-              ),
-              BulkPaymentPending(dueDate = Some(LocalDate.parse("2017-07-01")), paymentAmount = 1500.55)
-            )
+      retrieveBulkPaymentRequest { response =>
+        response mustBe GetBulkPaymentSuccessResponse(
+          lisaManagerReferenceNumber = "Z5555",
+          payments = List(
+            BulkPaymentPaid(
+              paymentDate = Some(LocalDate.parse("2017-06-01")),
+              paymentReference = Some("ABC123456789"),
+              paymentAmount = 1000.00
+            ),
+            BulkPaymentPending(dueDate = Some(LocalDate.parse("2017-07-01")), paymentAmount = 1500.55)
           )
-        }
+        )
       }
     }
 
@@ -879,12 +796,10 @@ class DesConnectorSpec extends DesConnectorTestHelper {
   }
 
   "Retrieve Account endpoint" must {
-    "return a unavailable response" when {
-      "a 503 is returned" in {
-        stubForGet(getAccountUrl, SERVICE_UNAVAILABLE, "")
-        retrieveAccountRequest { response =>
-          response mustBe DesUnavailableResponse
-        }
+    "return a unavailable response when a 503 is returned" in {
+      stubForGet(getAccountUrl, SERVICE_UNAVAILABLE, "")
+      retrieveAccountRequest { response =>
+        response mustBe DesUnavailableResponse
       }
     }
 
@@ -916,10 +831,9 @@ class DesConnectorSpec extends DesConnectorTestHelper {
       }
     }
 
-    "return a success response" when {
-      "the DES response is the appropriate json response" in {
-        val responseString =
-          """{
+    "return a success response when the DES response is the appropriate json response" in {
+      val responseString =
+        """{
             | "investorId": "1234567890",
             | "status": "OPEN",
             | "creationDate": "2016-01-01",
@@ -935,34 +849,32 @@ class DesConnectorSpec extends DesConnectorTestHelper {
             | "firstSubscriptionDate": "2016-01-06"
             |}""".stripMargin
 
-        stubForGet(getAccountUrl, OK, responseString)
+      stubForGet(getAccountUrl, OK, responseString)
 
-        retrieveAccountRequest { response =>
-          response mustBe GetLisaAccountSuccessResponse(
-            accountId = "123456",
-            investorId = "1234567890",
-            creationReason = "Reinstated",
-            firstSubscriptionDate = LocalDate.parse("2016-01-06"),
-            accountStatus = "OPEN",
-            subscriptionStatus = "AVAILABLE",
-            accountClosureReason = Some("Transferred out"),
-            closureDate = Some(LocalDate.parse("2016-05-01")),
-            transferAccount = Some(
-              GetLisaAccountTransferAccount(
-                transferredFromAccountId = "123abc789ABC34567890",
-                transferredFromLMRN = "Z123453",
-                transferInDate = LocalDate.parse("2016-03-01")
-              )
+      retrieveAccountRequest { response =>
+        response mustBe GetLisaAccountSuccessResponse(
+          accountId = "123456",
+          investorId = "1234567890",
+          creationReason = "Reinstated",
+          firstSubscriptionDate = LocalDate.parse("2016-01-06"),
+          accountStatus = "OPEN",
+          subscriptionStatus = "AVAILABLE",
+          accountClosureReason = Some("Transferred out"),
+          closureDate = Some(LocalDate.parse("2016-05-01")),
+          transferAccount = Some(
+            GetLisaAccountTransferAccount(
+              transferredFromAccountId = "123abc789ABC34567890",
+              transferredFromLMRN = "Z123453",
+              transferInDate = LocalDate.parse("2016-03-01")
             )
           )
-        }
+        )
       }
     }
 
-    "return a subscriptionStatus of AVAILABLE" when {
-      "there is no subscriptionStatus in the json response from DES" in {
-        val responseString =
-          """{
+    "return a subscriptionStatus of AVAILABLE when there is no subscriptionStatus in the json response from DES" in {
+      val responseString =
+        """{
             | "investorId": "1234567890",
             | "status": "OPEN",
             | "creationDate": "2016-01-01",
@@ -977,27 +889,26 @@ class DesConnectorSpec extends DesConnectorTestHelper {
             | "firstSubscriptionDate": "2016-01-06"
             |}""".stripMargin
 
-        stubForGet(getAccountUrl, OK, responseString)
+      stubForGet(getAccountUrl, OK, responseString)
 
-        retrieveAccountRequest { response =>
-          response mustBe GetLisaAccountSuccessResponse(
-            accountId = "123456",
-            investorId = "1234567890",
-            creationReason = "Reinstated",
-            firstSubscriptionDate = LocalDate.parse("2016-01-06"),
-            accountStatus = "OPEN",
-            subscriptionStatus = "AVAILABLE",
-            accountClosureReason = Some("Transferred out"),
-            closureDate = Some(LocalDate.parse("2016-05-01")),
-            transferAccount = Some(
-              GetLisaAccountTransferAccount(
-                transferredFromAccountId = "123abc789ABC34567890",
-                transferredFromLMRN = "Z123453",
-                transferInDate = LocalDate.parse("2016-03-01")
-              )
+      retrieveAccountRequest { response =>
+        response mustBe GetLisaAccountSuccessResponse(
+          accountId = "123456",
+          investorId = "1234567890",
+          creationReason = "Reinstated",
+          firstSubscriptionDate = LocalDate.parse("2016-01-06"),
+          accountStatus = "OPEN",
+          subscriptionStatus = "AVAILABLE",
+          accountClosureReason = Some("Transferred out"),
+          closureDate = Some(LocalDate.parse("2016-05-01")),
+          transferAccount = Some(
+            GetLisaAccountTransferAccount(
+              transferredFromAccountId = "123abc789ABC34567890",
+              transferredFromLMRN = "Z123453",
+              transferInDate = LocalDate.parse("2016-03-01")
             )
           )
-        }
+        )
       }
     }
   }
@@ -1010,12 +921,10 @@ class DesConnectorSpec extends DesConnectorTestHelper {
       }
     }
 
-    "return a populated DesTransactionResponse" when {
-      "the DES response has a json body that is in the correct format" in {
-        stubForPost(withdrawalUrl, CREATED, """{"transactionID": "87654321","message": "On Time"}""")
-        reportWithdrawalRequest { response =>
-          response mustBe DesTransactionResponse("87654321", Some("On Time"))
-        }
+    "return a populated DesTransactionResponse when the DES response has a json body that is in the correct format" in {
+      stubForPost(withdrawalUrl, CREATED, """{"transactionID": "87654321","message": "On Time"}""")
+      reportWithdrawalRequest { response =>
+        response mustBe DesTransactionResponse("87654321", Some("On Time"))
       }
     }
 
@@ -1080,38 +989,32 @@ class DesConnectorSpec extends DesConnectorTestHelper {
       }
     }
 
-    "return a specific DesFailureResponse" when {
-      "a specific failure is returned" in {
-        stubForPost(
-          withdrawalUrl,
-          NOT_FOUND,
-          """{"code": "LIFE_EVENT_DOES_NOT_EXIST","reason": "The lifeEventId does not match with HMRC’s records."}"""
+    "return a specific DesFailureResponse when a specific failure is returned" in {
+      stubForPost(
+        withdrawalUrl,
+        NOT_FOUND,
+        """{"code": "LIFE_EVENT_DOES_NOT_EXIST","reason": "The lifeEventId does not match with HMRC’s records."}"""
+      )
+
+      reportWithdrawalRequest { response =>
+        response mustBe DesFailureResponse(
+          "LIFE_EVENT_DOES_NOT_EXIST",
+          "The lifeEventId does not match with HMRC’s records."
         )
-
-        reportWithdrawalRequest { response =>
-          response mustBe DesFailureResponse(
-            "LIFE_EVENT_DOES_NOT_EXIST",
-            "The lifeEventId does not match with HMRC’s records."
-          )
-        }
       }
     }
 
-    "return a DesUnavailableResponse" when {
-      "a 503 is returned" in {
-        stubForPost(withdrawalUrl, SERVICE_UNAVAILABLE, "")
-        reportWithdrawalRequest { response =>
-          response mustBe DesUnavailableResponse
-        }
+    "return a DesUnavailableResponse when a 503 is returned when a 503 is returned" in {
+      stubForPost(withdrawalUrl, SERVICE_UNAVAILABLE, "")
+      reportWithdrawalRequest { response =>
+        response mustBe DesUnavailableResponse
       }
     }
 
-    "return a DesBadRequestResponse" when {
-      "a 400 is returned" in {
-        stubForPost(withdrawalUrl, BAD_REQUEST, "")
-        reportWithdrawalRequest { response =>
-          response mustBe DesBadRequestResponse
-        }
+    "return a DesBadRequestResponse when a 400 is returned" in {
+      stubForPost(withdrawalUrl, BAD_REQUEST, "")
+      reportWithdrawalRequest { response =>
+        response mustBe DesBadRequestResponse
       }
     }
   }
