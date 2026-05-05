@@ -38,4 +38,5 @@ trait WireMockHelper extends BeforeAndAfterAll with BeforeAndAfterEach { this: S
     super.afterAll()
     server.stop()
   }
+
 }

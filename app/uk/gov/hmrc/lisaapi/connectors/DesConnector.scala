@@ -51,8 +51,9 @@ class DesConnector @Inject() (
     "CorrelationId" -> correlationId
   )
 
-  private def correlationId(implicit hc: HeaderCarrier): String = {
+  private[connectors] def correlationId(implicit hc: HeaderCarrier): String = {
     val CorrelationIdPattern = """.*([A-Za-z0-9]{8}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}).*""".r
+
     hc.requestId match {
       case Some(requestId) =>
         requestId.value match {
@@ -350,18 +351,9 @@ class DesConnector @Inject() (
           case _                   => parseDesResponse[DesTransactionResponse](res)
         }
       }
-      .recover {
-        case response: UpstreamErrorResponse =>
-          if (response.reportAs == 499) {
-            logger.error(s"[DesConnector][requestBonusPayment] Service unavailable")
-            DesUnavailableResponse
-          } else {
-            logger.error(s"[DesConnector][requestBonusPayment] Upstream Des error")
-            DesFailureResponse(response.message, response.message)
-          }
-        case th: Throwable                   =>
-          logger.error(s"[DesConnector][requestBonusPayment] Des failure error: " + th.getMessage)
-          DesFailureResponse()
+      .recover { case th: Throwable =>
+        logger.error(s"[DesConnector][requestBonusPayment] Des failure error: " + th.getMessage)
+        DesFailureResponse()
       }
   }
 

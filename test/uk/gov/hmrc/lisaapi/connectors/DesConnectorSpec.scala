@@ -19,10 +19,12 @@ package uk.gov.hmrc.lisaapi.connectors
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.http.Fault
 import play.api.test.Helpers.*
+import uk.gov.hmrc.http.{HeaderCarrier, RequestId}
 import uk.gov.hmrc.lisaapi.models.*
 import uk.gov.hmrc.lisaapi.models.des.*
 
 import java.time.LocalDate
+import java.util.UUID
 
 class DesConnectorSpec extends DesConnectorTestHelper {
 
@@ -238,6 +240,16 @@ class DesConnectorSpec extends DesConnectorTestHelper {
         }
       }
     }
+
+    "return a DesBadRequestResponse" when {
+      "a 400 is returned" in {
+        stubForPost(transferAccountUrl, BAD_REQUEST, "")
+        transferAccountRequest { response =>
+          response mustBe DesBadRequestResponse
+        }
+      }
+    }
+
   }
 
   "Close Lisa Account endpoint" must {
@@ -289,7 +301,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
     }
 
     "return a generic failure response" when {
-      "the DES response has no json body" in {
+      "a 200 is returned, but the DES response has no json body" in {
         stubForPut(reinstateAccountUrl, OK, "")
         reinstateAccountRequest { response =>
           response mustBe DesFailureResponse()
@@ -314,6 +326,16 @@ class DesConnectorSpec extends DesConnectorTestHelper {
         }
       }
     }
+
+    "return a DesFailureResponse" when {
+      "a 500 is returned (not 200/400/503)" in {
+        stubForPut(reinstateAccountUrl, INTERNAL_SERVER_ERROR, "")
+        reinstateAccountRequest { response =>
+          response mustBe DesFailureResponse()
+        }
+      }
+    }
+
   }
 
   "Update First Subscription date endpoint" must {
@@ -370,6 +392,20 @@ class DesConnectorSpec extends DesConnectorTestHelper {
         }
       }
     }
+
+    "return a DesTransactionExistResponse" when {
+      "a 409 response is returned with json in the correct format" in {
+        stubForPut(
+          updateFirstSubUrl,
+          CONFLICT,
+          """{"code": "x", "reason": "xx", "transactionID": "87654321"}"""
+        )
+        updateFirstSubscriptionDateRequest { response =>
+          response mustBe DesTransactionExistResponse(code = "x", reason = "xx", transactionID = "87654321")
+        }
+      }
+    }
+
   }
 
   "Report Life Event endpoint" must {
@@ -549,7 +585,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
       "the connection fails" in {
         server.stubFor(
           post(urlEqualTo(requestBonusUrl))
-            .willReturn(aResponse().withFault(Fault.CONNECTION_RESET_BY_PEER))
+            .willReturn(aResponse().withFault(Fault.MALFORMED_RESPONSE_CHUNK))
         )
         requestBonusPaymentRequest { response =>
           response mustBe DesFailureResponse()
@@ -1077,6 +1113,36 @@ class DesConnectorSpec extends DesConnectorTestHelper {
           response mustBe DesBadRequestResponse
         }
       }
+    }
+  }
+
+  "correlationId" must {
+
+    "reuse the requestId given it matches the correlation id pattern, and return a valid UUID" in {
+      implicit val hc: HeaderCarrier =
+        HeaderCarrier(requestId = Some(RequestId("abcd1234-ab12-cd34-ef56")))
+
+      val result = desConnector.correlationId
+
+      result must startWith("abcd1234-ab12-cd34-ef56-")
+      UUID.fromString(result)
+    }
+
+    "make a new, valid UUID when the requestId does not match the correlation id pattern" in {
+      implicit val hc: HeaderCarrier =
+        HeaderCarrier(requestId = Some(RequestId("not-a-valid-correlation-id-pattern")))
+
+      val result = desConnector.correlationId
+
+      UUID.fromString(result)
+    }
+
+    "make a new, valid UUID when the requestId is empty" in {
+      implicit val hc: HeaderCarrier = HeaderCarrier(requestId = None)
+
+      val result = desConnector.correlationId
+
+      UUID.fromString(result)
     }
   }
 
