@@ -1125,7 +1125,7 @@ class DesConnectorSpec extends DesConnectorTestHelper {
       val result = desConnector.correlationId
 
       result must startWith("abcd1234-ab12-cd34-ef56-")
-      UUID.fromString(result)
+      UUID.fromString(result) // throws if invalid UUID
     }
 
     "make a new, valid UUID when the requestId does not match the correlation id pattern" in {

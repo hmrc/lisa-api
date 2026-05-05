@@ -67,8 +67,7 @@ class DesConnector @Inject() (
   private def desHeadersWithOriginator(implicit hc: HeaderCarrier): Seq[(String, String)] =
     desHeaders :+ ("OriginatorId" -> "DA2_LISA")
 
-  /** Attempts to create a new LISA investor
-    */
+  // Attempts to create a new LISA investor
   def createInvestor(lisaManager: String, request: CreateLisaInvestorRequest)(implicit
     hc: HeaderCarrier
   ): Future[DesResponse] = {
@@ -92,8 +91,7 @@ class DesConnector @Inject() (
     }
   }
 
-  /** Attempts to create a new LISA account
-    */
+  // Attempts to create a new LISA account
   def createAccount(lisaManager: String, request: CreateLisaAccountCreationRequest)(implicit
     hc: HeaderCarrier
   ): Future[DesResponse] = {
@@ -117,8 +115,7 @@ class DesConnector @Inject() (
     }
   }
 
-  /** Attempts to get the details for LISA account
-    */
+  // Attempts to get the details for LISA account
   def getAccountInformation(lisaManager: String, accountId: String)(implicit hc: HeaderCarrier): Future[DesResponse] = {
     val fullUrl =
       s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}"
@@ -143,8 +140,7 @@ class DesConnector @Inject() (
     }
   }
 
-  /** Attempts to reinstate a LISA account
-    */
+  // Attempts to reinstate a LISA account
   def reinstateAccount(lisaManager: String, accountId: String)(implicit hc: HeaderCarrier): Future[DesResponse] = {
     val fullUrl =
       s"$lisaServiceUrl/$lisaManager/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/reinstate"
@@ -168,8 +164,7 @@ class DesConnector @Inject() (
     }
   }
 
-  /** Attempts to transfer an existing LISA account
-    */
+  // Attempts to transfer an existing LISA account
   def transferAccount(lisaManager: String, request: CreateLisaAccountTransferRequest)(implicit
     hc: HeaderCarrier
   ): Future[DesResponse] = {
@@ -193,8 +188,7 @@ class DesConnector @Inject() (
     }
   }
 
-  /** Attempts to close a LISA account
-    */
+  // Attempts to close a LISA account
   def closeAccount(lisaManager: String, accountId: String, request: CloseLisaAccountRequest)(implicit
     hc: HeaderCarrier
   ): Future[DesResponse] = {
@@ -218,8 +212,7 @@ class DesConnector @Inject() (
     }
   }
 
-  /** Attempts to report a LISA Life Event
-    */
+  // Attempts to report a LISA Life Event
   def reportLifeEvent(lisaManager: String, accountId: String, request: ReportLifeEventRequestBase)(implicit
     hc: HeaderCarrier
   ): Future[DesResponse] = {
@@ -245,8 +238,7 @@ class DesConnector @Inject() (
     }
   }
 
-  /** Attempts to get a LISA Life Event
-    */
+  // Attempts to get a LISA Life Event
   def getLifeEvent(lisaManager: String, accountId: String, lifeEventId: LifeEventId)(implicit
     hc: HeaderCarrier
   ): Future[Either[DesFailure, Seq[GetLifeEventItem]]] = {
@@ -288,8 +280,7 @@ class DesConnector @Inject() (
     }
   }
 
-  /** Attempts to update the first subscription date
-    */
+  // Attempts to update the first subscription date
   def updateFirstSubDate(lisaManager: String, accountId: String, request: UpdateSubscriptionRequest)(implicit
     hc: HeaderCarrier
   ): Future[DesResponse] = {
@@ -321,11 +312,7 @@ class DesConnector @Inject() (
     }
   }
 
-  /** Attempts to request a bonus payment
-    *
-    * @return
-    *   A tuple of the http status code and a des response
-    */
+  // Attempts to request a bonus payment
   def requestBonusPayment(lisaManager: String, accountId: String, request: RequestBonusPaymentRequest)(implicit
     hc: HeaderCarrier
   ): Future[DesResponse] = {
@@ -357,8 +344,7 @@ class DesConnector @Inject() (
       }
   }
 
-  /** Attempts to get a submitted bonus payment's details from ITMP
-    */
+  // Attempts to get a submitted bonus payment's details from ITMP
   def getBonusOrWithdrawal(lisaManager: String, accountId: String, transactionId: String)(implicit
     hc: HeaderCarrier
   ): Future[DesResponse] = {
@@ -385,11 +371,7 @@ class DesConnector @Inject() (
     }
   }
 
-  /** Attempts to report a withdrawal charge
-    *
-    * @return
-    *   A tuple of the http status code and a des response
-    */
+  // Attempts to report a withdrawal charge
   def reportWithdrawalCharge(lisaManager: String, accountId: String, request: ReportWithdrawalChargeRequest)(implicit
     hc: HeaderCarrier
   ): Future[DesResponse] = {
@@ -417,8 +399,7 @@ class DesConnector @Inject() (
     }
   }
 
-  /** Attempts to details on a transaction from ETMP
-    */
+  // Attempts to details on a transaction from ETMP
   def getTransaction(lisaManager: String, accountId: String, transactionId: String)(implicit
     hc: HeaderCarrier
   ): Future[DesResponse] = {
