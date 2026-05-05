@@ -399,7 +399,7 @@ class DesConnector @Inject() (
     }
   }
 
-  // Attempts to details on a transaction from ETMP
+  // Attempts to get details on a transaction from ETMP
   def getTransaction(lisaManager: String, accountId: String, transactionId: String)(implicit
     hc: HeaderCarrier
   ): Future[DesResponse] = {
