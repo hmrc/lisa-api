@@ -27,8 +27,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import uk.gov.hmrc.lisaapi.helpers.BaseTestFixture
 import uk.gov.hmrc.lisaapi.utils.WireMockHelper
 
-trait ConnectorSpecHelper
-    extends BaseTestFixture with GuiceOneAppPerSuite with WireMockHelper with ScalaFutures with IntegrationPatience {
+trait ConnectorSpecHelper extends BaseTestFixture with GuiceOneAppPerSuite with WireMockHelper {
 
   def applicationBuilder(): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
