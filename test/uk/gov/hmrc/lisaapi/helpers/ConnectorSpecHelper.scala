@@ -85,7 +85,11 @@ trait ConnectorSpecHelper
       .withRequestBody(equalToJson(expectedBody.toString))
 
     server.verify(
-      if (withOriginator) expectedRequest.withHeader("OriginatorId", equalTo("DA2_LISA")) else expectedRequest
+      if (withOriginator) {
+        expectedRequest.withHeader("OriginatorId", equalTo("DA2_LISA"))
+      } else {
+        expectedRequest
+      }
     )
   }
 
@@ -97,7 +101,11 @@ trait ConnectorSpecHelper
       .withRequestBody(equalToJson(expectedBody.toString))
 
     server.verify(
-      if (withOriginator) expectedRequest.withHeader("OriginatorId", equalTo("DA2_LISA")) else expectedRequest
+      if (withOriginator) {
+        expectedRequest.withHeader("OriginatorId", equalTo("DA2_LISA"))
+      } else {
+        expectedRequest
+      }
     )
   }
 
@@ -108,7 +116,11 @@ trait ConnectorSpecHelper
       .withHeader("CorrelationId", matching(uuidPattern))
 
     server.verify(
-      if (withOriginator) expectedRequest.withHeader("OriginatorId", equalTo("DA2_LISA")) else expectedRequest
+      if (withOriginator) {
+        expectedRequest.withHeader("OriginatorId", equalTo("DA2_LISA"))
+      } else {
+        expectedRequest
+      }
     )
   }
 
