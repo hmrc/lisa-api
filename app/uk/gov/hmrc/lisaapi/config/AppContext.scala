@@ -33,6 +33,7 @@ class AppContext @Inject() (config: Configuration, serviceConfig: ServicesConfig
   lazy val v1endpointsEnabled: Boolean   = serviceConfig.getBoolean("api.endpointsEnabled")
   lazy val v2endpointsEnabled: Boolean   = serviceConfig.getBoolean("api.endpointsEnabledv2")
   lazy val desUrl: String                = serviceConfig.baseUrl("des")
+  lazy val hipUrl: String                = serviceConfig.baseUrl("hip")
 
   def endpointIsDisabled(endpoint: String): Boolean =
     config.getOptional[Seq[String]]("api.disabledEndpoints").fold(false)(list => list.contains(endpoint))
