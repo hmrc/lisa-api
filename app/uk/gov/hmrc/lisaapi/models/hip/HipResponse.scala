@@ -1,22 +1,33 @@
+/*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package uk.gov.hmrc.lisaapi.models.hip
 
 import org.apache.pekko.http.scaladsl.model.HttpResponse
 import play.api.libs.functional.syntax.{toAlternativeOps, toFunctionalBuilderOps}
 import play.api.libs.json
-import play.api.libs.json.{JsError, JsPath, JsSuccess, Json, Reads}
+import play.api.libs.json.{Format, JsError, JsPath, JsSuccess, Json, OFormat, Reads, Writes}
 import uk.gov.hmrc.lisaapi.models.{Amount, JsonReads}
 import uk.gov.hmrc.lisaapi.models.des.{DesFailure, DesResponse}
 
 import java.time.LocalDate
 
-trait HipResponse {
+trait HipResponse extends RoutingResponse {
 
 }
-
-
-
-
-
 
 trait HipGetTransactionResponse(paymentStatus: String) extends HipResponse
 
@@ -24,11 +35,9 @@ trait HipGetTransactionResponse(paymentStatus: String) extends HipResponse
 case class HipGetTransactionPending(
                                      // paymentStatus: String = "PENDING",
                                      paymentDueDate: LocalDate,
-                                   ) extends HipGetTransactionResponse(paymentStatus) {
+                                   ) extends HipGetTransactionResponse("PENDING") {
   def paymentStatus = "PENDING"
 }
-
-
 
 
 case class HipGetTransactionPaid(
@@ -36,7 +45,7 @@ case class HipGetTransactionPaid(
                                   paymentDate: LocalDate,
                                   paymentDueDate: LocalDate,
                                   paymentReference: String,
-                                  paymentAmount: Amount) extends HipGetTransactionResponse(paymentStatus) {
+                                  paymentAmount: Amount) extends HipGetTransactionResponse("PAID") {
 
   def paymentStatus = "PAID"
 
@@ -44,10 +53,6 @@ case class HipGetTransactionPaid(
 
 object HipGetTransactionResponse {
 
-  implicit val pendingReads: Reads[HipGetTransactionPending] = (
-    //   (JsPath \ "paymentStatus").read[String] and
-    (JsPath \ "paymentDueDate").read(JsonReads.isoDate)
-    )((paymentDueDate) => HipGetTransactionPending(paymentDueDate))
 
   implicit val paidReads: Reads[HipGetTransactionPaid] = (
     //    (JsPath \ "paymentStatus").read[String] and
@@ -56,6 +61,15 @@ object HipGetTransactionResponse {
       (JsPath \ "paymentReference").read[String] and
       (JsPath \ "paymentAmount").read[Amount]
     )((paymentDate, paymentDueDate, paymentReference, paymentAmount) =>  HipGetTransactionPaid(paymentDate, paymentDueDate, paymentReference, paymentAmount))
+
+  
+//  Json.Reads[HipGetTransactionPending]
+  
+  implicit val pendingReads: Reads[HipGetTransactionPending] = Json.reads[HipGetTransactionPending]
+//    //   (JsPath \ "paymentStatus").read[String] and
+//      (JsPath \ "paymentDueDate").read(JsonReads.isoDate)
+//    )((paymentDueDate) => HipGetTransactionPending(paymentDueDate))
+
 
   implicit val reads: Reads[HipGetTransactionResponse] = Reads[HipGetTransactionResponse] { json =>
     (json \ "paymentStatus").validate[String] match {
@@ -97,6 +111,6 @@ object HipFailureResponse {
   implicit val hip422ErrorReads: Reads[Seq[Hip422Error]] = (JsPath \ "errors").read[Seq[Hip422Error]]
 
   implicit val hipFailureReads: Reads[HipFailureResponse] = hipErrorReads.map(
-    error => HipFailureResponse(code = error.code)) orElse hip422ErrorReads.map(errors => HipFailureResponse(code = errors.map(e => e.code.mkString(",")).head)
+    error => HipFailureResponse(code = error.code)) orElse hip422ErrorReads.map(errors => HipFailureResponse(code = errors.map(e => e.code.mkString(",")).head))
 
 }

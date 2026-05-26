@@ -19,13 +19,13 @@ package uk.gov.hmrc.lisaapi.services
 import com.google.inject.Inject
 import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.lisaapi.connectors.DesConnector
-import uk.gov.hmrc.lisaapi.models.des._
-import uk.gov.hmrc.lisaapi.models._
+import uk.gov.hmrc.lisaapi.connectors.{DesConnector, RoutingConnector}
+import uk.gov.hmrc.lisaapi.models.des.*
+import uk.gov.hmrc.lisaapi.models.*
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class TransactionService @Inject() (desConnector: DesConnector)(implicit ec: ExecutionContext) extends Logging {
+class TransactionService @Inject() (desConnector: DesConnector, routingConnector: RoutingConnector)(implicit ec: ExecutionContext) extends Logging {
 
   def getTransaction(lisaManager: String, accountId: String, transactionId: String)(implicit
     hc: HeaderCarrier
@@ -109,7 +109,7 @@ class TransactionService @Inject() (desConnector: DesConnector)(implicit ec: Exe
   private def handleCollectedTransaction(lisaManager: String, accountId: String, transactionId: String)(implicit
     hc: HeaderCarrier
   ): Future[GetTransactionResponse] =
-    desConnector.getTransaction(lisaManager, accountId, transactionId) map {
+    routingConnector.getTransaction(lisaManager, accountId, transactionId) map {
       case DesUnavailableResponse           =>
         logger.warn(
           s"[TransactionService][handleCollectedTransaction] Matched DesUnavailableResponse for lisaManager : $lisaManager"
@@ -154,7 +154,7 @@ class TransactionService @Inject() (desConnector: DesConnector)(implicit ec: Exe
     transactionId: String,
     bonusDueForPeriod: Option[Amount]
   )(implicit hc: HeaderCarrier): Future[GetTransactionResponse] =
-    desConnector.getTransaction(lisaManager, accountId, transactionId) map {
+    routingConnector.getTransaction(lisaManager, accountId, transactionId) map {
       case DesUnavailableResponse            =>
         logger.warn(
           s"[TransactionService][handlePaidTransaction] Matched DesUnavailableResponse for lisaManager : $lisaManager"
