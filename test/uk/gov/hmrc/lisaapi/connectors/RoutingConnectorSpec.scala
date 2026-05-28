@@ -17,9 +17,10 @@
 package uk.gov.hmrc.lisaapi.connectors
 
 import com.github.tomakehurst.wiremock.http.Fault
-import org.mockito.ArgumentMatchers.anyString
+import org.mockito.ArgumentMatchers.{any, anyString}
 import org.mockito.Mockito
 import org.mockito.Mockito.*
+import play.api.Configuration
 import play.api.libs.json.{Json, Writes}
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.{HeaderCarrier, RequestId}
@@ -28,6 +29,7 @@ import uk.gov.hmrc.lisaapi.helpers.ConnectorSpecHelper
 import uk.gov.hmrc.lisaapi.models.*
 import uk.gov.hmrc.lisaapi.models.des.*
 import uk.gov.hmrc.lisaapi.models.hip.{HipBadRequest, HipGetTransactionPending}
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import java.time.LocalDate
@@ -54,20 +56,34 @@ class RoutingConnectorSpec extends ConnectorSpecHelper {
     "talk to HIP when useHip flag is true" in {
       val hipConnectorMock = mock[HipConnector]
       val desConnectorMock = mock[DesConnector]
-      val appContext = mock[AppContext]
-      when(hipConnectorMock.getTransaction(anyString(),anyString(), anyString())(Mockito.  ArgmentMatchers  eq(hc)).thenReturn(Future.successful(HipGetTransactionPending(LocalDate.parse("2026-05-05"))))
 
-//      val routingConnector = new RoutingConnector(appContext, desConnectorMock, hipConnectorMock)
-//
-//      routingConnector.getTransaction("lisaManager", "accountNo", "tranId")
-//
-//      verify(hipConnectorMock, times(1)).getTransaction("lisaManager", "accountNo", "tranId")(hc)
+      val mockConfiguration: Configuration = mock[Configuration]
+      val mockServicesConfig: ServicesConfig = mock[ServicesConfig]
+
+      when(mockServicesConfig.getBoolean("features.hip")).thenReturn(true)
+
+      val appContext = new AppContext(mockConfiguration, mockServicesConfig)
+
+      when(hipConnectorMock.getTransaction(anyString(), anyString(), anyString())(any[HeaderCarrier]())).thenReturn(Future.successful(HipGetTransactionPending(LocalDate.parse("2026-05-05"))))
+
+
+
+      val routingConnector = new RoutingConnector(appContext, desConnectorMock, hipConnectorMock)
+
+      routingConnector.getTransaction("lisaManager", "accountNo", "tranId")
+
+      verify(hipConnectorMock, times(1)).getTransaction("lisaManager", "accountNo", "tranId")
 
 
 
 
 
     }
+
+
+
+
+
   }
 
 

@@ -42,6 +42,8 @@ class AppContextSpec extends PlaySpec with MockitoSugar {
       when(mockServicesConfig.getBoolean("api.endpointsEnabled")).thenReturn(true)
       when(mockServicesConfig.getBoolean("api.endpointsEnabledv2")).thenReturn(true)
       when(mockServicesConfig.baseUrl("des")).thenReturn("http://localhost:8080")
+      when(mockServicesConfig.baseUrl("hip")).thenReturn("http://localhost:8885")
+      when(mockServicesConfig.getBoolean("features.hip")).thenReturn(true)
       when(mockConfiguration.getOptional[Configuration](any())(any())).thenReturn(None)
 
       val appContext: AppContext = new AppContext(mockConfiguration, mockServicesConfig)
@@ -56,6 +58,8 @@ class AppContextSpec extends PlaySpec with MockitoSugar {
       appContext.v1endpointsEnabled mustBe true
       appContext.v2endpointsEnabled mustBe true
       appContext.desUrl             mustBe "http://localhost:8080"
+      appContext.hipUrl             mustBe "http://localhost:8885"
+      appContext.useHip             mustBe true
       appContext.access             mustBe None
     }
 
