@@ -22,6 +22,7 @@ import play.api.libs.json
 import play.api.libs.json.{Format, JsError, JsPath, JsSuccess, Json, OFormat, Reads, Writes}
 import uk.gov.hmrc.lisaapi.models.{Amount, JsonReads}
 import uk.gov.hmrc.lisaapi.models.des.{DesFailure, DesResponse}
+import uk.gov.hmrc.lisaapi.models.hip.{HipFailureResponse,  HipFailures, HipGetTransactionResponse, HipNotFound, HipResponse, HipServiceUnavailable}
 
 import java.time.LocalDate
 
@@ -62,9 +63,9 @@ object HipGetTransactionResponse {
       (JsPath \ "paymentAmount").read[Amount]
     )((paymentDate, paymentDueDate, paymentReference, paymentAmount) =>  HipGetTransactionPaid(paymentDate, paymentDueDate, paymentReference, paymentAmount))
 
-  
+
 //  Json.Reads[HipGetTransactionPending]
-  
+
   implicit val pendingReads: Reads[HipGetTransactionPending] = Json.reads[HipGetTransactionPending]
 //    //   (JsPath \ "paymentStatus").read[String] and
 //      (JsPath \ "paymentDueDate").read(JsonReads.isoDate)
@@ -85,32 +86,62 @@ object HipGetTransactionResponse {
 
 }
 
-case class HipError(code: String, logID: String, message: String)
+//case class HipError(code: String, logID: String, message: String)
 
-case class Hip422Error(code: String, processingDate: String, text: String)
+case class HipFailureResponse(`type`: String, reason: String)
+
+//case class HipFailures(failures: Seq[HipFailureResponse])
+
+//case class Hip422Error(code: String, processingDate: String, text: String)
 
 
 trait HipFailure extends HipResponse
 
 
-case class HipUnavailableResponse(error: HipError) extends HipFailure
 
-case class HipValidationErrors(errors: Seq[Hip422Error]) extends HipFailure
-
-case class Hip4xxResponse(code: String) extends HipFailure
+case class HipBadRequest(failures: Hip400Error)
 
 
-case class HipFailureResponse(code: String = "INTERNAL_SERVER_ERROR")
-  extends HipFailure
 
-//case object HipUnavailableResponse extends HipFailure
+case class Hip422Error(processingDate: String, code: String, text: String)
+
+case class HipValidationError(errors: Hip422Error ) extends HipFailure
 
 
-object HipFailureResponse {
-  implicit val hipErrorReads: Reads[HipError] = (JsPath \ "error").read[HipError]
-  implicit val hip422ErrorReads: Reads[Seq[Hip422Error]] = (JsPath \ "errors").read[Seq[Hip422Error]]
+case class HipServerError(response: HipFailures) extends HipFailure
 
-  implicit val hipFailureReads: Reads[HipFailureResponse] = hipErrorReads.map(
-    error => HipFailureResponse(code = error.code)) orElse hip422ErrorReads.map(errors => HipFailureResponse(code = errors.map(e => e.code.mkString(",")).head))
+case class HipServiceUnavailable(response: HipFailures) extends HipFailure
+case class HipFailures(failures: Seq[HipError])
+case class HipError(`type`: String, reason: String)
 
+
+
+case object HipNotFound extends HipFailure
+
+case object HipOtherErrorResponse extends HipFailure
+
+
+object HipError {
+  implicit val hipErrorReads: Reads[HipError] = Json.reads[HipError]
+}
+
+object HipFailures {
+  implicit val reads: Reads[HipFailures] = Json.reads[HipFailures]
+}
+
+object HipServiceUnavailable {
+  implicit val reads: Reads[HipServiceUnavailable] = Json.reads[HipServiceUnavailable]
+}
+
+
+object HipServerError {
+  implicit val reads: Reads[HipServerError] = Json.reads[HipServerError]
+}
+
+object Hip422Error {
+  implicit val reads: Reads[Hip422Error] = Json.reads[Hip422Error]
+}
+
+object HipValidationError {
+  implicit val reads: Reads[HipValidationError] = Json.reads[HipValidationError]
 }

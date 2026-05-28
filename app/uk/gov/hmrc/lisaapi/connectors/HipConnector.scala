@@ -19,9 +19,9 @@ package uk.gov.hmrc.lisaapi.connectors
 import com.google.inject.{Inject, Singleton}
 import play.api.Logging
 import play.api.http.Status
-import play.api.http.Status.{NOT_FOUND, SERVICE_UNAVAILABLE}
+import play.api.http.Status.{CREATED, NOT_FOUND, OK, SERVICE_UNAVAILABLE}
 import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
-import play.api.libs.json.{JsError, JsSuccess, Reads}
+import play.api.libs.json.{JsError, JsSuccess, Json, Reads}
 import play.mvc.Http.{HeaderNames, MimeTypes}
 import play.utils.UriEncoding
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
@@ -29,7 +29,7 @@ import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.models.{GetTransactionResponse, LisaManagerReferenceNumber}
 import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesResponse}
-import uk.gov.hmrc.lisaapi.models.hip.{HipFailureResponse, HipGetTransactionResponse, HipResponse, HipUnavailableResponse}
+import uk.gov.hmrc.lisaapi.models.hip.{HipFailureResponse, HipFailures, HipGetTransactionResponse, HipNotFound, HipOtherErrorResponse, HipResponse, HipServerError, HipServiceUnavailable, HipValidationError}
 
 import java.time.Instant
 import java.time.format.DateTimeFormatter
@@ -72,7 +72,7 @@ class HipConnector @Inject() ( wsHttp: HttpClientV2,
     }
   }
 
-  def parseResponse[A <: HipResponse](res: HttpResponse)(implicit reads: Reads[A]): HipResponse = {
+   def parseJsonResponse[A <: HipResponse](res: HttpResponse)(implicit reads: Reads[A]): HipResponse = {
     val isJson = res.headers
       .getOrElse(HeaderNames.CONTENT_TYPE, Seq.empty[String])
       .map(_.toLowerCase)
@@ -82,30 +82,19 @@ class HipConnector @Inject() ( wsHttp: HttpClientV2,
       res.json.validate[A] match {
         case JsSuccess(value, _) => value
         case JsError(er)         =>
-          if (res.status == Status.OK || res.status == Status.CREATED) {
             logger.error(
-              s"[HipConnector][parseResponse] Error from HIP (parsing as HipResponse): ${er.mkString(", ")}"
+              s"[HipConnector][parseJsonResponse] Error from HIP (parsing as HipResponse): ${er.mkString(", ")}"
             )
-          }
-          res.json.validate[HipFailureResponse] match {
-            case JsSuccess(data, _) =>
-              logger.info(s"[HipConnector][parseResponse] HipFailureResponse from HIP: $data")
-              data
-            case JsError(ex)        =>
-              logger.error(
-                s"[HipConnector][parseResponse] Error from HIP (parsing as HipFailureResponse): ${ex.mkString(", ")}"
-              )
-              HipFailureResponse()
-          }
-      }
-    } else {
-      
-      //HIP does have valid non json response. therefore below log message is not applicable
-      
-//      logger.error(
-//        s"[HipConnector][parseResponse] Error from HIP (parsing as HipFailureResponse): Received non-JSON content from HIP, status: ${res.status}"
-//      )
-      HipFailureResponse()
+
+          HipOtherErrorResponse
+
+
+    }} else {
+
+      logger.error(
+        s"[HipConnector][parseJsonResponse] Error from HIP (parsing as HipFailureResponse): Received non-JSON content from HIP, status: ${res.status}"
+      )
+      HipOtherErrorResponse
     }
   }
   
@@ -134,10 +123,13 @@ class HipConnector @Inject() ( wsHttp: HttpClientV2,
     result.map { res =>
       logger.info("[HipConnector][getTransaction] Get Transaction details returned status: " + res.status)
       res.status match {
-        case SERVICE_UNAVAILABLE => HipFailureResponse(SERVICE_UNAVAILABLE.toString)
-        case NOT_FOUND => HipFailureResponse(NOT_FOUND.toString)
+        case SERVICE_UNAVAILABLE => parseJsonResponse[HipServiceUnavailable](res)
+        case Status.INTERNAL_SERVER_ERROR => parseJsonResponse[HipServerError](res)
+        case Status.UNPROCESSABLE_ENTITY => parseJsonResponse[HipValidationError](res)
+        case NOT_FOUND => HipNotFound
         
-        case _ => parseResponse[HipGetTransactionResponse](res)
+        case OK | CREATED => parseJsonResponse[HipGetTransactionResponse](res)
+        case _ => HipOtherErrorResponse
       }
     }
   }

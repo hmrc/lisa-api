@@ -31,7 +31,7 @@ import scala.concurrent.{Await, Future}
 
 class TransactionServiceSpec extends ServiceTestFixture {
 
-  val transactionService: TransactionService = new TransactionService(mockDesConnector)
+  val transactionService: TransactionService = new TransactionService(mockDesConnector, mockRoutingConnector )
 
   "Get Transaction" must {
 

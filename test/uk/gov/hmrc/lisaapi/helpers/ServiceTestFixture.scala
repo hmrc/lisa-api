@@ -17,10 +17,12 @@
 package uk.gov.hmrc.lisaapi.helpers
 
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import uk.gov.hmrc.lisaapi.connectors.DesConnector
+import uk.gov.hmrc.lisaapi.connectors.{DesConnector, HipConnector, RoutingConnector}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
 trait ServiceTestFixture extends BaseTestFixture with GuiceOneAppPerSuite {
   val mockDesConnector: DesConnector     = mock[DesConnector]
+  val mockHipConnector: HipConnector     = mock[HipConnector]
+  val mockRoutingConnector: RoutingConnector = mock[RoutingConnector]
   val mockAuditConnector: AuditConnector = mock[AuditConnector]
 }
