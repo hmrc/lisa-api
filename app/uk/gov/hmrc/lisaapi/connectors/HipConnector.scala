@@ -17,33 +17,32 @@
 package uk.gov.hmrc.lisaapi.connectors
 
 import com.google.inject.{Inject, Singleton}
+import jdk.internal.net.http.common.Log.headers
 import play.api.Logging
 import play.api.http.Status
-import play.api.http.Status.{CREATED, NOT_FOUND, OK, SERVICE_UNAVAILABLE}
+import play.api.http.Status.{BAD_REQUEST, CREATED, FORBIDDEN, INTERNAL_SERVER_ERROR, NOT_FOUND, OK, SERVICE_UNAVAILABLE, UNAUTHORIZED, UNPROCESSABLE_ENTITY}
 import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
-import play.api.libs.json.{JsError, JsSuccess, Json, Reads}
+import play.api.libs.json.{JsError, JsSuccess, JsValue, Json, Reads}
 import play.mvc.Http.{HeaderNames, MimeTypes}
 import play.utils.UriEncoding
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
+import uk.gov.hmrc.http.HttpReads.Implicits.readRaw
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.models.{GetTransactionResponse, LisaManagerReferenceNumber}
 import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesResponse}
-import uk.gov.hmrc.lisaapi.models.hip.{HipFailureResponse, HipFailures, HipGetTransactionResponse, HipNotFound, HipOtherErrorResponse, HipResponse, HipServerError, HipServiceUnavailable, HipValidationError}
+import uk.gov.hmrc.lisaapi.models.hip.{HipBadRequest, HipFailureResponse, HipFailures, HipForbidden, HipGetTransactionResponse, HipNotFound, HipOriginUnknown, HipOtherErrorResponse, HipResponse, HipServerError, HipServiceUnavailable, HipUnauthorized, HipValidationError}
 
 import java.time.Instant
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.UUID.randomUUID
+import scala.:+
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class HipConnector @Inject() ( wsHttp: HttpClientV2,
                      appContext: AppContext)(implicit ec: ExecutionContext) extends Logging{
-
-
-
-
 
 
 
@@ -72,31 +71,32 @@ class HipConnector @Inject() ( wsHttp: HttpClientV2,
     }
   }
 
-   def parseJsonResponse[A <: HipResponse](res: HttpResponse)(implicit reads: Reads[A]): HipResponse = {
-    val isJson = res.headers
-      .getOrElse(HeaderNames.CONTENT_TYPE, Seq.empty[String])
-      .map(_.toLowerCase)
-      .exists(_.contains(MimeTypes.JSON.toLowerCase))
+   def parseResponse[A <: HipResponse](res: HttpResponse, originCheck: Boolean = false)(implicit reads: Reads[A]): HipResponse = {
 
-    if (isJson) {
+
+     val isJson = res.headers
+      .getOrElse(HeaderNames.CONTENT_TYPE, Seq.empty[String])
+      .exists(_.toLowerCase.contains(MimeTypes.JSON.toLowerCase))
+
+     if (isJson) {
+       if (!(res.json \ "origin").asOpt[String].contains("HIP") && originCheck) {
+         return HipOriginUnknown
+       }
       res.json.validate[A] match {
         case JsSuccess(value, _) => value
         case JsError(er)         =>
             logger.error(
               s"[HipConnector][parseJsonResponse] Error from HIP (parsing as HipResponse): ${er.mkString(", ")}"
             )
-
           HipOtherErrorResponse
-
-
     }} else {
-
       logger.error(
         s"[HipConnector][parseJsonResponse] Error from HIP (parsing as HipFailureResponse): Received non-JSON content from HIP, status: ${res.status}"
       )
       HipOtherErrorResponse
     }
-  }
+ }
+
   
   
   
@@ -113,8 +113,6 @@ class HipConnector @Inject() ( wsHttp: HttpClientV2,
 
     logger.info("[HipConnector][getTransaction] Getting the Transaction details from hip: " + fullUrl)
 
-
-
     val result = wsHttp
       .get(url"$fullUrl")
       .setHeader(headersWithOriginator: _*)
@@ -123,12 +121,14 @@ class HipConnector @Inject() ( wsHttp: HttpClientV2,
     result.map { res =>
       logger.info("[HipConnector][getTransaction] Get Transaction details returned status: " + res.status)
       res.status match {
-        case SERVICE_UNAVAILABLE => parseJsonResponse[HipServiceUnavailable](res)
-        case Status.INTERNAL_SERVER_ERROR => parseJsonResponse[HipServerError](res)
-        case Status.UNPROCESSABLE_ENTITY => parseJsonResponse[HipValidationError](res)
+        case OK => parseResponse[HipGetTransactionResponse](res, false)
+        case BAD_REQUEST => parseResponse[HipBadRequest](res, true)
+        case SERVICE_UNAVAILABLE => parseResponse[HipServiceUnavailable](res, true)
+        case INTERNAL_SERVER_ERROR => parseResponse[HipServerError](res, true)
+        case UNPROCESSABLE_ENTITY => parseResponse[HipValidationError](res, false)
         case NOT_FOUND => HipNotFound
-        
-        case OK | CREATED => parseJsonResponse[HipGetTransactionResponse](res)
+        case UNAUTHORIZED => HipUnauthorized
+        case FORBIDDEN => HipForbidden
         case _ => HipOtherErrorResponse
       }
     }

@@ -99,7 +99,7 @@ trait HipFailure extends HipResponse
 
 
 
-case class HipBadRequest(failures: Hip400Error)
+case class HipBadRequest(response: HipFailures) extends HipFailure
 
 
 
@@ -118,7 +118,11 @@ case class HipError(`type`: String, reason: String)
 
 case object HipNotFound extends HipFailure
 
+case object HipUnauthorized extends HipFailure
+case object HipForbidden extends HipFailure
+
 case object HipOtherErrorResponse extends HipFailure
+case object HipOriginUnknown extends HipFailure
 
 
 object HipError {
@@ -141,6 +145,12 @@ object HipServerError {
 object Hip422Error {
   implicit val reads: Reads[Hip422Error] = Json.reads[Hip422Error]
 }
+
+object HipBadRequest {
+  implicit val reads: Reads[HipBadRequest] = Json.reads[HipBadRequest]
+
+}
+
 
 object HipValidationError {
   implicit val reads: Reads[HipValidationError] = Json.reads[HipValidationError]

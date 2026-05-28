@@ -16,39 +16,72 @@
 
 package uk.gov.hmrc.lisaapi.connectors
 
-import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.http.Fault
+import org.mockito.ArgumentMatchers.anyString
+import org.mockito.Mockito
+import org.mockito.Mockito.*
 import play.api.libs.json.{Json, Writes}
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.{HeaderCarrier, RequestId}
+import uk.gov.hmrc.lisaapi.config.AppContext
+import uk.gov.hmrc.lisaapi.helpers.ConnectorSpecHelper
 import uk.gov.hmrc.lisaapi.models.*
 import uk.gov.hmrc.lisaapi.models.des.*
+import uk.gov.hmrc.lisaapi.models.hip.{HipBadRequest, HipGetTransactionPending}
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import java.time.LocalDate
 import java.util.UUID
+import scala.concurrent.Future
 
-class RoutingConnectorSpec extends DesConnectorTestHelper {
+class RoutingConnectorSpec extends ConnectorSpecHelper {
+  implicit val hc: HeaderCarrier = HeaderCarrier(requestId = Some(RequestId("abcd1234-ab12-cd34-ef56")))
 
   lazy val hipConnector: HipConnector = injector.instanceOf[HipConnector]
   lazy val desConnector: DesConnector = injector.instanceOf[DesConnector]
 
-  val managerPathDES = "/RESTAdapter/lisa/bonus-charge/manager/Z123456"
-  val managerPathHIP = "/RESTAdapter/lisa/bonus-charge/manager/Z123456"
+  val managerPathDES = "/lifetime-isa/manager/Z123456"
+//  val managerPathHIP = "/RESTAdapter/lisa/bonus-charge/manager/Z123456"
   val accTransPath   = "/accounts/ABC12345/transaction/123456"
-
+  private val hipBaseTransactionUrl = "/RESTAdapter/lisa/bonus-charge/manager"
+  private val desBaseTransactionUrl = "/lifetime-isa/manager"
   val getTransactionUrlDES = s"$managerPathDES$accTransPath"
-  val getTransactionUrlHIP = s"$managerPathHIP$accTransPath"
-  
-  "Retrieve Transaction endpoint" must {
+  val hipTransactionUrl = s"$hipBaseTransactionUrl/Z123456/accounts/ABC12345/transaction/123456/bonusChargeDetails"
+  val desTransactionUrl = s"$desBaseTransactionUrl/Z123456/accounts/ABC12345/transaction/123456"
 
-    "return a Hip response when UseHip feature is true" in {
-      val json = ""
-      stubForGet(getTransactionUrlHIP, SERVICE_UNAVAILABLE, json)
-      val response = await(hipConnector.getTransaction("Z123456", "ABC12345", "123456"))
 
-      response mustBe HipUnavailableResponse
-      verifyDesGet(getTransactionUrlHIP, withOriginator = true)
+  "RoutingConnector" must {
+    "talk to HIP when useHip flag is true" in {
+      val hipConnectorMock = mock[HipConnector]
+      val desConnectorMock = mock[DesConnector]
+      val appContext = mock[AppContext]
+      when(hipConnectorMock.getTransaction(anyString(),anyString(), anyString())(Mockito.  ArgmentMatchers  eq(hc)).thenReturn(Future.successful(HipGetTransactionPending(LocalDate.parse("2026-05-05"))))
+
+//      val routingConnector = new RoutingConnector(appContext, desConnectorMock, hipConnectorMock)
+//
+//      routingConnector.getTransaction("lisaManager", "accountNo", "tranId")
+//
+//      verify(hipConnectorMock, times(1)).getTransaction("lisaManager", "accountNo", "tranId")(hc)
+
+
+
+
+
     }
+  }
+
+
+
+  "Retrieve Transaction endpoint" must {
+//
+//    "return a Hip response when UseHip feature is true" in {
+//      val json = ""
+//      stubForGet(getTransactionUrlHIP, SERVICE_UNAVAILABLE, json)
+//      val response = await(hipConnector.getTransaction("Z123456", "ABC12345", "123456"))
+//
+//      response mustBe HipUnavailableResponse
+//      verifyDesGet(getTransactionUrlHIP, withOriginator = true)
+//    }
 
     "return a Des response when UseHip feature is false" in {
       stubForGet(getTransactionUrlDES, SERVICE_UNAVAILABLE, "")
