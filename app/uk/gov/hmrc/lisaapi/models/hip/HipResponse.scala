@@ -97,7 +97,9 @@ case class HipFailureResponse(`type`: String, reason: String)
 
 trait HipFailure extends HipResponse
 
+case class HodError(code: String, message: String, logId: String)
 
+case class HodErrorResponse(error: HodError) extends HipFailure
 
 case class HipBadRequest(response: HipFailures) extends HipFailure
 
@@ -154,4 +156,14 @@ object HipBadRequest {
 
 object HipValidationError {
   implicit val reads: Reads[HipValidationError] = Json.reads[HipValidationError]
+}
+
+object HodError {
+  implicit val reads: Reads[HodError] = Json.reads[HodError]
+  
+}
+
+object HodErrorResponse {
+  implicit val reads: Reads[HodErrorResponse] = Json.reads[HodErrorResponse]
+
 }

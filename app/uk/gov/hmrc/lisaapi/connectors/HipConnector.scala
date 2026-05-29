@@ -31,7 +31,7 @@ import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.models.{GetTransactionResponse, LisaManagerReferenceNumber}
 import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesResponse}
-import uk.gov.hmrc.lisaapi.models.hip.{HipBadRequest, HipFailureResponse, HipFailures, HipForbidden, HipGetTransactionResponse, HipNotFound, HipOriginUnknown, HipOtherErrorResponse, HipResponse, HipServerError, HipServiceUnavailable, HipUnauthorized, HipValidationError}
+import uk.gov.hmrc.lisaapi.models.hip.{HipBadRequest, HipFailureResponse, HipFailures, HipForbidden, HipGetTransactionResponse, HipNotFound, HipOriginUnknown, HipOtherErrorResponse, HipResponse, HipServerError, HipServiceUnavailable, HipUnauthorized, HipValidationError, HodErrorResponse, HodError}
 
 import java.time.Instant
 import java.time.format.DateTimeFormatter
@@ -71,31 +71,94 @@ class HipConnector @Inject() ( wsHttp: HttpClientV2,
     }
   }
 
-   def parseResponse[A <: HipResponse](res: HttpResponse, originCheck: Boolean = false)(implicit reads: Reads[A]): HipResponse = {
+  def parseResponse[A <: HipResponse](res: HttpResponse, originCheck: Boolean = false)(implicit reads: Reads[A]): HipResponse = {
 
-
-     val isJson = res.headers
-      .getOrElse(HeaderNames.CONTENT_TYPE, Seq.empty[String])
-      .exists(_.toLowerCase.contains(MimeTypes.JSON.toLowerCase))
-
-     if (isJson) {
-       if (!(res.json \ "origin").asOpt[String].contains("HIP") && originCheck) {
-         return HipOriginUnknown
-       }
-      res.json.validate[A] match {
-        case JsSuccess(value, _) => value
-        case JsError(er)         =>
-            logger.error(
-              s"[HipConnector][parseJsonResponse] Error from HIP (parsing as HipResponse): ${er.mkString(", ")}"
-            )
-          HipOtherErrorResponse
-    }} else {
-      logger.error(
-        s"[HipConnector][parseJsonResponse] Error from HIP (parsing as HipFailureResponse): Received non-JSON content from HIP, status: ${res.status}"
-      )
-      HipOtherErrorResponse
+    def validateContentType: Either[HipResponse, Unit] = {
+      if (hasJsonContent(res)) Right(())
+      else {
+        logger.error(s"[HipConnector][parseResponse] Non-JSON response, status: ${res.status}")
+        Left(HipOtherErrorResponse)
+      }
     }
- }
+
+
+    def getAndValidateOrigin: Either[HipResponse, String] = {
+      val origin = (res.json \ "origin").asOpt[String]
+      origin match {
+        case Some(value) if value == "HIP" || value == "HOD" => Right(value)
+        case _ if res.status == 500 || res.status == 400 => Left(HipOriginUnknown)
+        case _  => Right("HIP")
+      }
+    }
+
+    def parseJson[A <: HipResponse](origin: String) = {
+
+      if(origin == "HOD") {
+        res.json.validate[HodErrorResponse] match {
+          case JsSuccess(value, _) => Right(value)
+          case JsError(errors) =>
+            logger.error(s"[HipConnector][parseResponse] JSON parsing error: ${errors.mkString(", ")}")
+            Left(HipOtherErrorResponse)
+        }
+      } else {
+
+
+        res.json.validate[A] match {
+          case JsSuccess(value, _) => Right(value)
+          case JsError(errors) =>
+            logger.error(s"[HipConnector][parseResponse] JSON parsing error: ${errors.mkString(", ")}")
+            Left(HipOtherErrorResponse)
+        }
+      }
+    }
+
+
+
+
+     def hasJsonContent(res: HttpResponse): Boolean = {
+       res.headers
+         .getOrElse(HeaderNames.CONTENT_TYPE, Seq.empty)
+         .exists(_.toLowerCase.contains(MimeTypes.JSON.toLowerCase))
+     }
+
+
+    (for {
+      _ <- validateContentType
+      origin <-  getAndValidateOrigin
+
+      value <- parseJson(origin)
+    } yield value).getOrElse(HipOtherErrorResponse)
+  }
+
+
+
+
+
+//   def parseResponse[A <: HipResponse](res: HttpResponse, originCheck: Boolean = false)(implicit reads: Reads[A]): HipResponse = {
+//
+//
+//     val isJson = res.headers
+//      .getOrElse(HeaderNames.CONTENT_TYPE, Seq.empty[String])
+//      .exists(_.toLowerCase.contains(MimeTypes.JSON.toLowerCase))
+//
+//     if (isJson) {
+//       if (!(res.json \ "origin").asOpt[String].contains("HIP") && originCheck) {
+//         return HipOriginUnknown
+//       }
+//      res.json.validate[A] match {
+//        case JsSuccess(value, _) => value
+//        case JsError(er)         =>
+//            logger.error(
+//              s"[HipConnector][parseJsonResponse] Error from HIP (parsing as HipResponse): ${er.mkString(", ")}"
+//            )
+//          HipOtherErrorResponse
+//    }} else {
+//      logger.error(
+//        s"[HipConnector][parseJsonResponse] Error from HIP (parsing as HipFailureResponse): Received non-JSON content from HIP, status: ${res.status}"
+//      )
+//      HipOtherErrorResponse
+//    }
+// }
 
   
   
