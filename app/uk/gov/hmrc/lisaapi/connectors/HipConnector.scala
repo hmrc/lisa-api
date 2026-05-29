@@ -61,7 +61,7 @@ class HipConnector @Inject() ( wsHttp: HttpClientV2,
     }
   }
 
-  def parseResponse[A <: HipResponse](res: HttpResponse, originCheck: Boolean = false)(implicit reads: Reads[A]): HipResponse = {
+  private[connectors] def parseResponse[A <: HipResponse](res: HttpResponse)(implicit reads: Reads[A]): HipResponse = {
 
     def validateContentType: Either[HipResponse, Unit] = {
       if (hasJsonContent(res)) Right(())
@@ -82,12 +82,10 @@ class HipConnector @Inject() ( wsHttp: HttpClientV2,
     }
 
     def parseJson(origin: String): Either[HipOtherErrorResponse.type , HipResponse] = {
-      
     val validation =   if(origin == "HOD") {
         res.json.validate[HodErrorResponse]
       } else {
         res.json.validate[A]
-        
       }
       
       validation match {
@@ -108,12 +106,11 @@ class HipConnector @Inject() ( wsHttp: HttpClientV2,
     (for {
       _ <- validateContentType
       origin <-  getAndValidateOrigin
-
       value <- parseJson(origin)
     } yield value).getOrElse(HipOtherErrorResponse)
   }
 
-  
+
   private def headersWithOriginator(implicit hc: HeaderCarrier): Seq[(String, String)] =
     headers :+ ("OriginatorId" -> "DA2_LISA")
 
@@ -124,21 +121,21 @@ class HipConnector @Inject() ( wsHttp: HttpClientV2,
      val fullUrl =
       s"$lisaServiceUrl/$lisaManagerReferenceNumber/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/transaction/$transactionId/bonusChargeDetails"
 
-    logger.info("[HipConnector][getTransaction] Getting the Transaction details from hip: " + fullUrl)
+     logger.info("[HipConnector][getTransaction] Getting the Transaction details from hip: " + fullUrl)
 
-    val result = wsHttp
+     val result = wsHttp
       .get(url"$fullUrl")
       .setHeader(headersWithOriginator: _*)
       .execute[HttpResponse]
 
-    result.map { res =>
+     result.map { res =>
       logger.info("[HipConnector][getTransaction] Get Transaction details returned status: " + res.status)
       res.status match {
-        case OK => parseResponse[HipGetTransactionResponse](res, false)
-        case BAD_REQUEST => parseResponse[HipBadRequest](res, true)
-        case SERVICE_UNAVAILABLE => parseResponse[HipServiceUnavailable](res, true)
-        case INTERNAL_SERVER_ERROR => parseResponse[HipServerError](res, true)
-        case UNPROCESSABLE_ENTITY => parseResponse[HipValidationError](res, false)
+        case OK => parseResponse[HipGetTransactionResponse](res)
+        case BAD_REQUEST => parseResponse[HipBadRequest](res)
+        case SERVICE_UNAVAILABLE => parseResponse[HipServiceUnavailable](res)
+        case INTERNAL_SERVER_ERROR => parseResponse[HipServerError](res)
+        case UNPROCESSABLE_ENTITY => parseResponse[HipValidationError](res)
         case NOT_FOUND => HipNotFound
         case UNAUTHORIZED => HipUnauthorized
         case FORBIDDEN => HipForbidden

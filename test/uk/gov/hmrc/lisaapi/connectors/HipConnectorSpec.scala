@@ -72,7 +72,7 @@ class HipConnectorSpec extends HipConnectorTestHelper {
     "parse returns HodErrorResponse for origin HOD" in {
 
       val res = HttpResponse(503, validServiceUnavailableHodJson, jsonContentType)
-      val result = hipConnector.parseResponse[HipServiceUnavailable](res, true)
+      val result = hipConnector.parseResponse[HipServiceUnavailable](res)
 
       result mustBe HipOtherErrorResponse
 
