@@ -16,133 +16,20 @@
 
 package uk.gov.hmrc.lisaapi.connectors
 
-import com.github.tomakehurst.wiremock.client.WireMock.*
-import com.github.tomakehurst.wiremock.http.Fault
 import play.api.http.Status.UNAUTHORIZED
-import play.api.libs.json.{Json, Writes}
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, RequestId}
 import uk.gov.hmrc.lisaapi.models.*
-import uk.gov.hmrc.lisaapi.models.des.*
-import uk.gov.hmrc.lisaapi.models.hip.{Hip422Error, HipBadRequest, HipError, HipFailures, HipForbidden, HipGetTransactionPaid, HipGetTransactionPending, HipGetTransactionResponse, HipNotFound, HipOriginUnknown, HipOtherErrorResponse, HipServerError, HipServiceUnavailable, HipUnauthorized, HipValidationError}
-
+import uk.gov.hmrc.lisaapi.models.hip.*
 import java.time.LocalDate
 import java.util.UUID
 
 class HipConnectorSpec extends HipConnectorTestHelper {
 
-  lazy val hipConnector: HipConnector = injector.instanceOf[HipConnector] // lazy to allow wiremock to start
-
+  lazy val hipConnector: HipConnector = injector.instanceOf[HipConnector]
   private val baseTransactionUrl = "/RESTAdapter/lisa/bonus-charge/manager"
-
   private val jsonContentType = Map("Content-Type" -> Seq("application/json"))
   private val stringContentType = Map("Content-Type" -> Seq("application/text"))
-
-
-  private val validHipBadRequestJson: String =
-    """{
-      |  "origin": "HIP",
-      |  "response": {
-      |    "failures": [
-      |      {
-      |        "type": "BAD_REQUEST",
-      |        "reason": "Invalid request"
-      |      }
-      |    ]
-      |  }
-      |}""".stripMargin
-
-
-  private val validValidationErrorJson: String =
-    """{
-      |  "errors": {
-      |    "processingDate": "2026-04-01T23:00:00Z",
-      |    "code": "003",
-      |    "text": "Request could not be processed"
-      |  }
-      |}""".stripMargin
-
-
-  private val validServiceUnavailableHodJson: String =
-    """{
-      |  "origin": "HoD",
-      |  "response": {
-      |    "error": {
-      |      "code": "500",
-      |      "message": "string",
-      |      "logID": "D82EBAB67AC6D7565C0682CA91BDC577"
-      |    }
-      |  }
-      |}""".stripMargin
-
-
-  private val validServiceUnavailableJson: String =
-    """{
-      |  "origin": "HIP",
-      |  "response": {
-      |    "failures": [
-      |      {
-      |        "type": "SERVICE_UNAVAILABLE",
-      |        "reason": "Dependent services maybe down"
-      |      }
-      |    ]
-      |  }
-      |}""".stripMargin
-
-
-
-
-  private val validServerErrorJson: String =
-    """{
-      |  "origin": "HIP",
-      |  "response": {
-      |    "failures": [
-      |      {
-      |        "type": "INTERNAL_SERVER_ERROR",
-      |        "reason": "Internal server error"
-      |      }
-      |    ]
-      |  }
-      |}""".stripMargin
-
-
-
-
-
-
-
-  private val expectedServiceUnavailable = HipServiceUnavailable(
-    response = HipFailures(
-      failures = Seq(
-        HipError(`type` = "SERVICE_UNAVAILABLE", reason = "Dependent services maybe down")
-      )
-    )
-  )
-
-  private val expectedServerError = HipServerError(
-    response = HipFailures(
-      failures = Seq(
-        HipError(`type` = "INTERNAL_SERVER_ERROR", reason = "Internal server error")
-      )
-    )
-  )
-
-  private val expectedBadRequestError = HipBadRequest(
-    response = HipFailures(
-      failures = Seq(
-        HipError(`type` = "BAD_REQUEST", reason = "Invalid request")
-      )
-    )
-  )
-
-  private val expectedValidationError = HipValidationError(
-    errors = Hip422Error(
-   processingDate =  "2026-04-01T23:00:00Z",
-      code = "003",
-      text = "Request could not be processed"
-    )
-  )
-
 
   "parseResponse" must {
 
@@ -244,20 +131,10 @@ class HipConnectorSpec extends HipConnectorTestHelper {
 
       result mustBe expectedBadRequestError
     }
-
-
-
-
-
-
-
-
   }
 
 
   "getTransaction" must {
-
-
     "return HipGetTransactionPending" in{
 
       val transactionUrl = s"$baseTransactionUrl/Z123456/accounts/ABC12345/transaction/123456/bonusChargeDetails"

@@ -77,7 +77,7 @@ class TransactionServiceSpec extends ServiceTestFixture {
           )
         )
 
-        when(mockDesConnector.getTransaction(any(), any(), any())(any()))
+        when(mockRoutingConnector.getTransaction(any(), any(), any())(any()))
           .thenReturn(Future.successful(DesGetTransactionPending(LocalDate.parse("2000-01-01"), None, None)))
 
         val result =
@@ -107,7 +107,7 @@ class TransactionServiceSpec extends ServiceTestFixture {
           )
         )
 
-        when(mockDesConnector.getTransaction(any(), any(), any())(any()))
+        when(mockRoutingConnector.getTransaction(any(), any(), any())(any()))
           .thenReturn(Future.successful(DesFailureResponse("NOT_FOUND")))
 
         val result =
@@ -142,7 +142,7 @@ class TransactionServiceSpec extends ServiceTestFixture {
           )
         )
 
-        when(mockDesConnector.getTransaction(any(), any(), any())(any()))
+        when(mockRoutingConnector.getTransaction(any(), any(), any())(any()))
           .thenReturn(
             Future.successful(DesGetTransactionPending(LocalDate.parse("2000-01-01"), Some("YREF"), Some(30)))
           )
@@ -179,7 +179,7 @@ class TransactionServiceSpec extends ServiceTestFixture {
           )
         )
 
-        when(mockDesConnector.getTransaction(any(), any(), any())(any()))
+        when(mockRoutingConnector.getTransaction(any(), any(), any())(any()))
           .thenReturn(Future.successful(DesFailureResponse("NOT_FOUND")))
 
         val result =
@@ -294,7 +294,7 @@ class TransactionServiceSpec extends ServiceTestFixture {
           )
         )
 
-        when(mockDesConnector.getTransaction(any(), any(), any())(any())).thenReturn(
+        when(mockRoutingConnector.getTransaction(any(), any(), any())(any())).thenReturn(
           Future.successful(
             DesGetTransactionPaid(
               paymentDate = LocalDate.parse("2000-01-01"),
@@ -340,7 +340,7 @@ class TransactionServiceSpec extends ServiceTestFixture {
           )
         )
 
-        when(mockDesConnector.getTransaction(any(), any(), any())(any()))
+        when(mockRoutingConnector.getTransaction(any(), any(), any())(any()))
           .thenReturn(Future.successful(des.DesGetTransactionPaid(LocalDate.parse("2000-01-01"), "XREF", 25)))
 
         val result =
@@ -374,7 +374,7 @@ class TransactionServiceSpec extends ServiceTestFixture {
           )
         )
 
-        when(mockDesConnector.getTransaction(any(), any(), any())(any()))
+        when(mockRoutingConnector.getTransaction(any(), any(), any())(any()))
           .thenReturn(Future.successful(DesFailureResponse("COULD_NOT_PROCESS")))
 
         val result =
@@ -438,7 +438,7 @@ class TransactionServiceSpec extends ServiceTestFixture {
           )
         )
 
-        when(mockDesConnector.getTransaction(any(), any(), any())(any()))
+        when(mockRoutingConnector.getTransaction(any(), any(), any())(any()))
           .thenReturn(Future.successful(DesUnavailableResponse))
 
         val result =
@@ -462,7 +462,7 @@ class TransactionServiceSpec extends ServiceTestFixture {
           )
         )
 
-        when(mockDesConnector.getTransaction(any(), any(), any())(any()))
+        when(mockRoutingConnector.getTransaction(any(), any(), any())(any()))
           .thenReturn(Future.successful(DesUnavailableResponse))
 
         val result =
@@ -521,7 +521,7 @@ class TransactionServiceSpec extends ServiceTestFixture {
           )
         )
 
-        when(mockDesConnector.getTransaction(any(), any(), any())(any()))
+        when(mockRoutingConnector.getTransaction(any(), any(), any())(any()))
           .thenReturn(Future.successful(DesFailureResponse("UNKNOWN_ERROR", "Unknown error")))
 
         val result =

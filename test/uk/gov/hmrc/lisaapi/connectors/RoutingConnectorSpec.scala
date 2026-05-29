@@ -40,11 +40,11 @@ class RoutingConnectorSpec extends BaseTestFixture {
   val hipConnectorMock = mock[HipConnector]
   val desConnectorMock = mock[DesConnector]
 
-  val appContext = new AppContext(mockConfiguration, mockServicesConfig)
-  val routingConnector = new RoutingConnector(appContext, desConnectorMock, hipConnectorMock)
-  
+
   "RoutingConnector" must {
-    "talk to HIP when useHip flag is true" in {     
+    "talk to HIP when useHip flag is true" in {
+      val appContext = new AppContext(mockConfiguration, mockServicesConfig)
+      val routingConnector = new RoutingConnector(appContext, desConnectorMock, hipConnectorMock)
       when(mockServicesConfig.getBoolean("features.hip")).thenReturn(true)
       when(hipConnectorMock.getTransaction(anyString(), anyString(), anyString())(any[HeaderCarrier]()))
         .thenReturn(Future.successful(HipGetTransactionPending(LocalDate.parse("2026-05-05"))))
@@ -54,12 +54,15 @@ class RoutingConnectorSpec extends BaseTestFixture {
     }
     
     "talk to DES when useHip flag is false" in {
+      val appContext = new AppContext(mockConfiguration, mockServicesConfig)
+      val routingConnector = new RoutingConnector(appContext, desConnectorMock, hipConnectorMock)
       when(mockServicesConfig.getBoolean("features.hip")).thenReturn(false)
       when(desConnectorMock.getTransaction(anyString(), anyString(), anyString())(any[HeaderCarrier]()))
         .thenReturn(Future.successful(DesGetTransactionPending(LocalDate.parse("2026-05-05"))))
 
       routingConnector.getTransaction("lisaManager", "accountNo", "tranId")
-      verify(desConnectorMock, times(1)).getTransaction("lisaManager", "accountNo", "tranId")
+
+     verify(desConnectorMock, times(1)).getTransaction("lisaManager", "accountNo", "tranId")
     }
 
   }

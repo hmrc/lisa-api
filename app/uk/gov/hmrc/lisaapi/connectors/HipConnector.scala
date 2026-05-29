@@ -17,36 +17,26 @@
 package uk.gov.hmrc.lisaapi.connectors
 
 import com.google.inject.{Inject, Singleton}
-import jdk.internal.net.http.common.Log.headers
 import play.api.Logging
-import play.api.http.Status
-import play.api.http.Status.{BAD_REQUEST, CREATED, FORBIDDEN, INTERNAL_SERVER_ERROR, NOT_FOUND, OK, SERVICE_UNAVAILABLE, UNAUTHORIZED, UNPROCESSABLE_ENTITY}
-import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
-import play.api.libs.json.{JsError, JsSuccess, JsValue, Json, Reads}
+import play.api.http.Status.*
+import play.api.libs.json.{JsError, JsSuccess, JsValue, Reads}
 import play.mvc.Http.{HeaderNames, MimeTypes}
 import play.utils.UriEncoding
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 import uk.gov.hmrc.http.HttpReads.Implicits.readRaw
 import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 import uk.gov.hmrc.lisaapi.config.AppContext
-import uk.gov.hmrc.lisaapi.models.{GetTransactionResponse, LisaManagerReferenceNumber}
-import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesResponse}
-import uk.gov.hmrc.lisaapi.models.hip.{HipBadRequest, HipFailureResponse, HipFailures, HipForbidden, HipGetTransactionResponse, HipNotFound, HipOriginUnknown, HipOtherErrorResponse, HipResponse, HipServerError, HipServiceUnavailable, HipUnauthorized, HipValidationError, HodError, HodErrorResponse}
-
+import uk.gov.hmrc.lisaapi.models.LisaManagerReferenceNumber
+import uk.gov.hmrc.lisaapi.models.hip.*
 import java.time.Instant
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.UUID.randomUUID
-import scala.:+
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class HipConnector @Inject() ( wsHttp: HttpClientV2,
                      appContext: AppContext)(implicit ec: ExecutionContext) extends Logging{
-
-
-
-
 
   val urlEncodingFormat: String = "utf-8"
   lazy val lisaServiceUrl: String = s"${appContext.hipUrl}/RESTAdapter/lisa/bonus-charge/manager"
@@ -107,29 +97,6 @@ class HipConnector @Inject() ( wsHttp: HttpClientV2,
           Left(HipOtherErrorResponse)
       }
       }
-      
-
-//      if(origin == "HOD") {
-//        res.json.validate[A] match {
-//          case JsSuccess(value, _) => Right(value)
-//          case JsError(errors) =>
-//            logger.error(s"[HipConnector][parseResponse] JSON parsing error: ${errors.mkString(", ")}")
-//            Left(HipOtherErrorResponse)
-//        }
-//      } else {
-//
-//
-//        res.json.validate[A] match {
-//          case JsSuccess(value, _) => Right(value)
-//          case JsError(errors) =>
-//            logger.error(s"[HipConnector][parseResponse] JSON parsing error: ${errors.mkString(", ")}")
-//            Left(HipOtherErrorResponse)
-//        }
-      //}
-//    }
-
-
-
 
      def hasJsonContent(res: HttpResponse): Boolean = {
        res.headers
@@ -146,39 +113,6 @@ class HipConnector @Inject() ( wsHttp: HttpClientV2,
     } yield value).getOrElse(HipOtherErrorResponse)
   }
 
-
-
-
-
-//   def parseResponse[A <: HipResponse](res: HttpResponse, originCheck: Boolean = false)(implicit reads: Reads[A]): HipResponse = {
-//
-//
-//     val isJson = res.headers
-//      .getOrElse(HeaderNames.CONTENT_TYPE, Seq.empty[String])
-//      .exists(_.toLowerCase.contains(MimeTypes.JSON.toLowerCase))
-//
-//     if (isJson) {
-//       if (!(res.json \ "origin").asOpt[String].contains("HIP") && originCheck) {
-//         return HipOriginUnknown
-//       }
-//      res.json.validate[A] match {
-//        case JsSuccess(value, _) => value
-//        case JsError(er)         =>
-//            logger.error(
-//              s"[HipConnector][parseJsonResponse] Error from HIP (parsing as HipResponse): ${er.mkString(", ")}"
-//            )
-//          HipOtherErrorResponse
-//    }} else {
-//      logger.error(
-//        s"[HipConnector][parseJsonResponse] Error from HIP (parsing as HipFailureResponse): Received non-JSON content from HIP, status: ${res.status}"
-//      )
-//      HipOtherErrorResponse
-//    }
-// }
-
-  
-  
-  
   
   private def headersWithOriginator(implicit hc: HeaderCarrier): Seq[(String, String)] =
     headers :+ ("OriginatorId" -> "DA2_LISA")

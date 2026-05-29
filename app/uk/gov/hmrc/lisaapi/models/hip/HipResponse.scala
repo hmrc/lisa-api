@@ -16,14 +16,11 @@
 
 package uk.gov.hmrc.lisaapi.models.hip
 
-import org.apache.pekko.http.scaladsl.model.HttpResponse
-import play.api.libs.functional.syntax.{toAlternativeOps, toFunctionalBuilderOps}
+import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json
-import play.api.libs.json.{Format, JsError, JsPath, JsSuccess, Json, OFormat, Reads, Writes}
+import play.api.libs.json.*
+import uk.gov.hmrc.lisaapi.models.hip.HipFailures
 import uk.gov.hmrc.lisaapi.models.{Amount, JsonReads}
-import uk.gov.hmrc.lisaapi.models.des.{DesFailure, DesResponse}
-import uk.gov.hmrc.lisaapi.models.hip.{HipFailureResponse,  HipFailures, HipGetTransactionResponse, HipNotFound, HipResponse, HipServiceUnavailable}
-
 import java.time.LocalDate
 
 trait HipResponse extends RoutingResponse {
@@ -34,7 +31,6 @@ trait HipGetTransactionResponse(paymentStatus: String) extends HipResponse
 
 
 case class HipGetTransactionPending(
-                                     // paymentStatus: String = "PENDING",
                                      paymentDueDate: LocalDate,
                                    ) extends HipGetTransactionResponse("PENDING") {
   def paymentStatus = "PENDING"
@@ -42,7 +38,6 @@ case class HipGetTransactionPending(
 
 
 case class HipGetTransactionPaid(
-                                  //  paymentStatus: String = "PAID",
                                   paymentDate: LocalDate,
                                   paymentDueDate: LocalDate,
                                   paymentReference: String,
@@ -56,7 +51,6 @@ object HipGetTransactionResponse {
 
 
   implicit val paidReads: Reads[HipGetTransactionPaid] = (
-    //    (JsPath \ "paymentStatus").read[String] and
     (JsPath \ "paymentDate").read(JsonReads.isoDate) and
       (JsPath \ "paymentDueDate").read(JsonReads.isoDate) and
       (JsPath \ "paymentReference").read[String] and
@@ -64,12 +58,8 @@ object HipGetTransactionResponse {
     )((paymentDate, paymentDueDate, paymentReference, paymentAmount) =>  HipGetTransactionPaid(paymentDate, paymentDueDate, paymentReference, paymentAmount))
 
 
-//  Json.Reads[HipGetTransactionPending]
 
   implicit val pendingReads: Reads[HipGetTransactionPending] = Json.reads[HipGetTransactionPending]
-//    //   (JsPath \ "paymentStatus").read[String] and
-//      (JsPath \ "paymentDueDate").read(JsonReads.isoDate)
-//    )((paymentDueDate) => HipGetTransactionPending(paymentDueDate))
 
 
   implicit val reads: Reads[HipGetTransactionResponse] = Reads[HipGetTransactionResponse] { json =>
@@ -86,13 +76,8 @@ object HipGetTransactionResponse {
 
 }
 
-//case class HipError(code: String, logID: String, message: String)
-
 case class HipFailureResponse(`type`: String, reason: String)
 
-//case class HipFailures(failures: Seq[HipFailureResponse])
-
-//case class Hip422Error(code: String, processingDate: String, text: String)
 
 
 trait HipFailure extends HipResponse
