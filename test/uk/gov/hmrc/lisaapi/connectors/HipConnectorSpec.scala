@@ -63,16 +63,15 @@ class HipConnectorSpec extends HipConnectorTestHelper {
       |}""".stripMargin
 
 
-  private val validServiceUnavailableOriginJson: String =
+  private val validServiceUnavailableHodJson: String =
     """{
-      |  "origin": "HOD",
+      |  "origin": "HoD",
       |  "response": {
-      |    "failures": [
-      |      {
-      |        "type": "SERVICE_UNAVAILABLE",
-      |        "reason": "Dependent services maybe down"
-      |      }
-      |    ]
+      |    "error": {
+      |      "code": "500",
+      |      "message": "string",
+      |      "logID": "D82EBAB67AC6D7565C0682CA91BDC577"
+      |    }
       |  }
       |}""".stripMargin
 
@@ -183,12 +182,12 @@ class HipConnectorSpec extends HipConnectorTestHelper {
 
     }
 
-    "parse returns HipOriginUnknown for origin other than HIP" in {
+    "parse returns HodErrorResponse for origin HOD" in {
 
-      val res = HttpResponse(503, validServiceUnavailableOriginJson, jsonContentType)
+      val res = HttpResponse(503, validServiceUnavailableHodJson, jsonContentType)
       val result = hipConnector.parseResponse[HipServiceUnavailable](res, true)
 
-      result mustBe HipOriginUnknown
+      result mustBe HipOtherErrorResponse
 
     }
 

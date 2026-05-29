@@ -31,7 +31,7 @@ import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.models.{GetTransactionResponse, LisaManagerReferenceNumber}
 import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesResponse}
-import uk.gov.hmrc.lisaapi.models.hip.{HipBadRequest, HipFailureResponse, HipFailures, HipForbidden, HipGetTransactionResponse, HipNotFound, HipOriginUnknown, HipOtherErrorResponse, HipResponse, HipServerError, HipServiceUnavailable, HipUnauthorized, HipValidationError, HodErrorResponse, HodError}
+import uk.gov.hmrc.lisaapi.models.hip.{HipBadRequest, HipFailureResponse, HipFailures, HipForbidden, HipGetTransactionResponse, HipNotFound, HipOriginUnknown, HipOtherErrorResponse, HipResponse, HipServerError, HipServiceUnavailable, HipUnauthorized, HipValidationError, HodError, HodErrorResponse}
 
 import java.time.Instant
 import java.time.format.DateTimeFormatter
@@ -91,26 +91,42 @@ class HipConnector @Inject() ( wsHttp: HttpClientV2,
       }
     }
 
-    def parseJson[A <: HipResponse](origin: String) = {
-
-      if(origin == "HOD") {
-        res.json.validate[HodErrorResponse] match {
-          case JsSuccess(value, _) => Right(value)
-          case JsError(errors) =>
-            logger.error(s"[HipConnector][parseResponse] JSON parsing error: ${errors.mkString(", ")}")
-            Left(HipOtherErrorResponse)
-        }
+    def parseJson(origin: String): Either[HipOtherErrorResponse.type , HipResponse] = {
+      
+    val validation =   if(origin == "HOD") {
+        res.json.validate[HodErrorResponse]
       } else {
-
-
-        res.json.validate[A] match {
-          case JsSuccess(value, _) => Right(value)
-          case JsError(errors) =>
-            logger.error(s"[HipConnector][parseResponse] JSON parsing error: ${errors.mkString(", ")}")
-            Left(HipOtherErrorResponse)
-        }
+        res.json.validate[A]
+        
       }
-    }
+      
+      validation match {
+        case JsSuccess(value, _) => Right(value: HipResponse)
+        case JsError(errors) =>
+          logger.error(s"[HipConnector][parseResponse] JSON parsing error: ${errors.mkString(", ")}")
+          Left(HipOtherErrorResponse)
+      }
+      }
+      
+
+//      if(origin == "HOD") {
+//        res.json.validate[A] match {
+//          case JsSuccess(value, _) => Right(value)
+//          case JsError(errors) =>
+//            logger.error(s"[HipConnector][parseResponse] JSON parsing error: ${errors.mkString(", ")}")
+//            Left(HipOtherErrorResponse)
+//        }
+//      } else {
+//
+//
+//        res.json.validate[A] match {
+//          case JsSuccess(value, _) => Right(value)
+//          case JsError(errors) =>
+//            logger.error(s"[HipConnector][parseResponse] JSON parsing error: ${errors.mkString(", ")}")
+//            Left(HipOtherErrorResponse)
+//        }
+      //}
+//    }
 
 
 
