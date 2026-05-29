@@ -19,13 +19,16 @@ package uk.gov.hmrc.lisaapi.services
 import com.google.inject.Inject
 import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.lisaapi.connectors.{DesConnector, RoutingConnector}
+import uk.gov.hmrc.lisaapi.config.AppContext
+import uk.gov.hmrc.lisaapi.connectors.{DesConnector, HipConnector, RoutingConnector}
 import uk.gov.hmrc.lisaapi.models.des.*
 import uk.gov.hmrc.lisaapi.models.*
+import uk.gov.hmrc.lisaapi.models.hip.{HipError, HipFailure, HipFailureResponse, HipForbidden, HipGetTransactionPaid, HipGetTransactionPending, HipNotFound, HipServiceUnavailable}
+import views.html.defaultpages.error
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class TransactionService @Inject() (desConnector: DesConnector, routingConnector: RoutingConnector)(implicit ec: ExecutionContext) extends Logging {
+class TransactionService @Inject() (desConnector: DesConnector, hipConnector: HipConnector, context: AppContext)(implicit ec: ExecutionContext) extends Logging {
 
   def getTransaction(lisaManager: String, accountId: String, transactionId: String)(implicit
     hc: HeaderCarrier
@@ -108,97 +111,190 @@ class TransactionService @Inject() (desConnector: DesConnector, routingConnector
 
   private def handleCollectedTransaction(lisaManager: String, accountId: String, transactionId: String)(implicit
     hc: HeaderCarrier
-  ): Future[GetTransactionResponse] =
-    routingConnector.getTransaction(lisaManager, accountId, transactionId) map {
-      case DesUnavailableResponse           =>
-        logger.warn(
-          s"[TransactionService][handleCollectedTransaction] Matched DesUnavailableResponse for lisaManager : $lisaManager"
-        )
-        GetTransactionServiceUnavailableResponse
-      case collected: DesGetTransactionPaid =>
-        GetTransactionSuccessResponse(
-          transactionId = transactionId,
-          paymentStatus = TransactionPaymentStatus.COLLECTED,
-          paymentDate = Some(collected.paymentDate),
-          paymentAmount = Some(collected.paymentAmount),
-          paymentReference = Some(collected.paymentReference),
-          transactionType = Some(TransactionPaymentType.DEBT)
-        )
-      case due: DesGetTransactionPending    =>
-        GetTransactionSuccessResponse(
-          transactionId = transactionId,
-          paymentStatus = TransactionPaymentStatus.DUE,
-          paymentDueDate = Some(due.paymentDueDate),
-          transactionType = Some(TransactionPaymentType.DEBT),
-          paymentAmount = due.paymentAmount,
-          paymentReference = due.paymentReference
-        )
-      case error: DesFailureResponse        =>
-        error.code match {
-          case "NOT_FOUND" =>
-            GetTransactionSuccessResponse(
-              transactionId = transactionId,
-              paymentStatus = TransactionPaymentStatus.DUE
-            )
-          case _           =>
-            logger.error(
-              s"[TransactionService][handleCollectedTransaction] Get collected transaction returned error: ${error.code} from ETMP for lisaManager : $lisaManager"
-            )
-            GetTransactionErrorResponse
-        }
+  ): Future[GetTransactionResponse] = {
+    if(context.useHip) {
+      hipConnector.getTransaction(lisaManager, accountId, transactionId) map {
+        case _ : HipServiceUnavailable =>
+          logger.warn(
+            s"[TransactionService][handleCollectedTransaction] Matched DesUnavailableResponse for lisaManager : $lisaManager"
+          )
+          GetTransactionServiceUnavailableResponse
+        case collected: HipGetTransactionPaid =>
+          GetTransactionSuccessResponse(
+            transactionId = transactionId,
+            paymentStatus = TransactionPaymentStatus.COLLECTED,
+            paymentDate = Some(collected.paymentDate),
+            paymentAmount = Some(collected.paymentAmount),
+            paymentReference = Some(collected.paymentReference),
+            transactionType = Some(TransactionPaymentType.DEBT)
+          )
+        case due: HipGetTransactionPending =>
+          GetTransactionSuccessResponse(
+            transactionId = transactionId,
+            paymentStatus = TransactionPaymentStatus.DUE,
+            paymentDueDate = Some(due.paymentDueDate),
+            transactionType = Some(TransactionPaymentType.DEBT),
+            paymentAmount = None,
+            paymentReference = None
+          )
+        case  HipNotFound =>
+              GetTransactionSuccessResponse(
+                transactionId = transactionId,
+                paymentStatus = TransactionPaymentStatus.DUE
+              )
+            case error: HipError =>
+              logger.error(
+                s"[TransactionService][handleCollectedTransaction] Get collected transaction returned error: ${error.`type`} from ETMP for lisaManager : $lisaManager"
+              )
+              GetTransactionErrorResponse
+      }
     }
+    else {
+      desConnector.getTransaction(lisaManager, accountId, transactionId) map {
+        case DesUnavailableResponse =>
+          logger.warn(
+            s"[TransactionService][handleCollectedTransaction] Matched DesUnavailableResponse for lisaManager : $lisaManager"
+          )
+          GetTransactionServiceUnavailableResponse
+        case collected: DesGetTransactionPaid =>
+          GetTransactionSuccessResponse(
+            transactionId = transactionId,
+            paymentStatus = TransactionPaymentStatus.COLLECTED,
+            paymentDate = Some(collected.paymentDate),
+            paymentAmount = Some(collected.paymentAmount),
+            paymentReference = Some(collected.paymentReference),
+            transactionType = Some(TransactionPaymentType.DEBT)
+          )
+        case due: DesGetTransactionPending =>
+          GetTransactionSuccessResponse(
+            transactionId = transactionId,
+            paymentStatus = TransactionPaymentStatus.DUE,
+            paymentDueDate = Some(due.paymentDueDate),
+            transactionType = Some(TransactionPaymentType.DEBT),
+            paymentAmount = due.paymentAmount,
+            paymentReference = due.paymentReference
+          )
+        case error: DesFailureResponse =>
+          error.code match {
+            case "NOT_FOUND" =>
+              GetTransactionSuccessResponse(
+                transactionId = transactionId,
+                paymentStatus = TransactionPaymentStatus.DUE
+              )
+            case _ =>
+              logger.error(
+                s"[TransactionService][handleCollectedTransaction] Get collected transaction returned error: ${error.code} from ETMP for lisaManager : $lisaManager"
+              )
+              GetTransactionErrorResponse
+          }
+      }
+    }
+  }
 
   private def handlePaidTransaction(
     lisaManager: String,
     accountId: String,
     transactionId: String,
     bonusDueForPeriod: Option[Amount]
-  )(implicit hc: HeaderCarrier): Future[GetTransactionResponse] =
-    routingConnector.getTransaction(lisaManager, accountId, transactionId) map {
-      case DesUnavailableResponse            =>
-        logger.warn(
-          s"[TransactionService][handlePaidTransaction] Matched DesUnavailableResponse for lisaManager : $lisaManager"
-        )
-        GetTransactionServiceUnavailableResponse
-      case paid: DesGetTransactionPaid       =>
-        GetTransactionSuccessResponse(
-          transactionId = transactionId,
-          paymentStatus = TransactionPaymentStatus.PAID,
-          paymentDate = Some(paid.paymentDate),
-          paymentAmount = Some(paid.paymentAmount),
-          paymentReference = Some(paid.paymentReference),
-          transactionType = Some(TransactionPaymentType.PAYMENT),
-          bonusDueForPeriod = bonusDueForPeriod
-        )
-      case pending: DesGetTransactionPending =>
-        GetTransactionSuccessResponse(
-          transactionId = transactionId,
-          paymentStatus = TransactionPaymentStatus.PENDING,
-          paymentDueDate = Some(pending.paymentDueDate),
-          paymentAmount = None,
-          transactionType = Some(TransactionPaymentType.PAYMENT),
-          bonusDueForPeriod = bonusDueForPeriod
-        )
-      case error: DesFailureResponse         =>
-        error.code match {
-          case "COULD_NOT_PROCESS" =>
-            GetTransactionSuccessResponse(
-              transactionId = transactionId,
-              paymentStatus = TransactionPaymentStatus.REFUND_CANCELLED,
-              transactionType = Some(TransactionPaymentType.PAYMENT)
-            )
-          case "NOT_FOUND"         =>
-            GetTransactionSuccessResponse(
-              transactionId = transactionId,
-              paymentStatus = TransactionPaymentStatus.PENDING,
-              bonusDueForPeriod = bonusDueForPeriod
-            )
-          case _                   =>
-            logger.error(
-              s"[TransactionService][handlePaidTransaction] Get paid transaction returned error: ${error.code} from ETMP for lisaManager : $lisaManager"
-            )
-            GetTransactionErrorResponse
-        }
+  )(implicit hc: HeaderCarrier): Future[GetTransactionResponse] = {
+    if (context.useHip) {
+      hipConnector.getTransaction(lisaManager, accountId, transactionId) map {
+        case _: HipServiceUnavailable =>
+          logger.warn(
+            s"[TransactionService][handlePaidTransaction] Matched DesUnavailableResponse for lisaManager : $lisaManager"
+          )
+          GetTransactionServiceUnavailableResponse
+        case paid: HipGetTransactionPaid =>
+          GetTransactionSuccessResponse(
+            transactionId = transactionId,
+            paymentStatus = TransactionPaymentStatus.PAID,
+            paymentDate = Some(paid.paymentDate),
+            paymentAmount = Some(paid.paymentAmount),
+            paymentReference = Some(paid.paymentReference),
+            transactionType = Some(TransactionPaymentType.PAYMENT),
+            bonusDueForPeriod = bonusDueForPeriod
+          )
+        case pending: HipGetTransactionPending =>
+          GetTransactionSuccessResponse(
+            transactionId = transactionId,
+            paymentStatus = TransactionPaymentStatus.PENDING,
+            paymentDueDate = Some(pending.paymentDueDate),
+            paymentAmount = None,
+            transactionType = Some(TransactionPaymentType.PAYMENT),
+            bonusDueForPeriod = bonusDueForPeriod
+          )
+
+        case HipForbidden =>
+                      GetTransactionSuccessResponse(
+                        transactionId = transactionId,
+                        paymentStatus = TransactionPaymentStatus.REFUND_CANCELLED,
+                        transactionType = Some(TransactionPaymentType.PAYMENT)
+                      )
+        
+        case HipNotFound =>
+          GetTransactionSuccessResponse(
+            transactionId = transactionId,
+            paymentStatus = TransactionPaymentStatus.PENDING,
+            bonusDueForPeriod = bonusDueForPeriod
+          )
+        case error: HipFailure =>
+          logger.error(
+            s"[TransactionService][handlePaidTransaction] Get paid transaction returned error: ${error} from ETMP for lisaManager : $lisaManager"
+          )
+          GetTransactionErrorResponse
+      }
+
+
+    }
+    else {
+
+      desConnector.getTransaction(lisaManager, accountId, transactionId) map {
+        case DesUnavailableResponse =>
+          logger.warn(
+            s"[TransactionService][handlePaidTransaction] Matched DesUnavailableResponse for lisaManager : $lisaManager"
+          )
+          GetTransactionServiceUnavailableResponse
+        case paid: DesGetTransactionPaid =>
+          GetTransactionSuccessResponse(
+            transactionId = transactionId,
+            paymentStatus = TransactionPaymentStatus.PAID,
+            paymentDate = Some(paid.paymentDate),
+            paymentAmount = Some(paid.paymentAmount),
+            paymentReference = Some(paid.paymentReference),
+            transactionType = Some(TransactionPaymentType.PAYMENT),
+            bonusDueForPeriod = bonusDueForPeriod
+          )
+        case pending: DesGetTransactionPending =>
+          GetTransactionSuccessResponse(
+            transactionId = transactionId,
+            paymentStatus = TransactionPaymentStatus.PENDING,
+            paymentDueDate = Some(pending.paymentDueDate),
+            paymentAmount = None,
+            transactionType = Some(TransactionPaymentType.PAYMENT),
+            bonusDueForPeriod = bonusDueForPeriod
+          )
+        case error: DesFailureResponse =>
+          error.code match {
+            case "COULD_NOT_PROCESS" =>
+              GetTransactionSuccessResponse(
+                transactionId = transactionId,
+                paymentStatus = TransactionPaymentStatus.REFUND_CANCELLED,
+                transactionType = Some(TransactionPaymentType.PAYMENT)
+              )
+            case "NOT_FOUND" =>
+              GetTransactionSuccessResponse(
+                transactionId = transactionId,
+                paymentStatus = TransactionPaymentStatus.PENDING,
+                bonusDueForPeriod = bonusDueForPeriod
+              )
+            case _ =>
+              logger.error(
+                s"[TransactionService][handlePaidTransaction] Get paid transaction returned error: ${error.code} from ETMP for lisaManager : $lisaManager"
+              )
+              GetTransactionErrorResponse
+          }
+      }
     }
 
+  }
 }
