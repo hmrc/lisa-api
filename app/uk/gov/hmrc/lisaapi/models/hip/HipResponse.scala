@@ -27,13 +27,15 @@ trait HipResponse extends RoutingResponse {
 
 }
 
-trait HipGetTransactionResponse(paymentStatus: String) extends HipResponse
+trait HipGetTransactionResponse extends HipResponse {
+  def paymentStatus: String
+}
 
 
 case class HipGetTransactionPending(
                                      paymentDueDate: LocalDate,
-                                   ) extends HipGetTransactionResponse("PENDING") {
-  def paymentStatus = "PENDING"
+                                   ) extends HipGetTransactionResponse {
+  val paymentStatus = "PENDING"
 }
 
 
@@ -41,9 +43,9 @@ case class HipGetTransactionPaid(
                                   paymentDate: LocalDate,
                                   paymentDueDate: LocalDate,
                                   paymentReference: String,
-                                  paymentAmount: Amount) extends HipGetTransactionResponse("PAID") {
+                                  paymentAmount: Amount) extends HipGetTransactionResponse {
 
-  def paymentStatus = "PAID"
+  val paymentStatus = "PAID"
 
 }
 
@@ -76,7 +78,7 @@ object HipGetTransactionResponse {
 
 }
 
-case class HipFailureResponse(`type`: String, reason: String)
+case class HipFailureResponse(`type`: String, reason: String) extends HipResponse
 
 
 

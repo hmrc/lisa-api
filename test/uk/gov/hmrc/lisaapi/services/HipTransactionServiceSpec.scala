@@ -19,9 +19,11 @@ package uk.gov.hmrc.lisaapi.services
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.lisaapi.connectors.HipConnectorTestHelper
 import uk.gov.hmrc.lisaapi.helpers.ServiceTestFixture
-import uk.gov.hmrc.lisaapi.models.des._
-import uk.gov.hmrc.lisaapi.models._
+import uk.gov.hmrc.lisaapi.models.*
+import uk.gov.hmrc.lisaapi.models.des.*
+import uk.gov.hmrc.lisaapi.models.hip.*
 import uk.gov.hmrc.lisaapi.services.TransactionService
 
 import java.time.LocalDate
@@ -29,9 +31,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
-class TransactionServiceSpec extends ServiceTestFixture {
+class HipTransactionServiceSpec extends ServiceTestFixture with HipConnectorTestHelper {
 
-  val transactionService: TransactionService = new TransactionService(mockDesConnector)
+  val transactionService: HipTransactionService = new HipTransactionService(mockHipConnector, mockDesConnector)
 
   "Get Transaction" must {
 
@@ -77,8 +79,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
           )
         )
 
-        when(mockDesConnector.getTransaction(any(), any(), any())(any()))
-          .thenReturn(Future.successful(DesGetTransactionPending(LocalDate.parse("2000-01-01"), None, None)))
+        when(mockHipConnector.getTransaction(any(), any(), any())(any()))
+          .thenReturn(Future.successful(HipGetTransactionPending(LocalDate.parse("2000-01-01"))))
 
         val result =
           Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
@@ -107,8 +109,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
           )
         )
 
-        when(mockDesConnector.getTransaction(any(), any(), any())(any()))
-          .thenReturn(Future.successful(DesFailureResponse("NOT_FOUND")))
+        when(mockHipConnector.getTransaction(any(), any(), any())(any()))
+          .thenReturn(Future.successful(HipFailureResponse("NOT_FOUND", "Not Found")))
 
         val result =
           Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
@@ -142,9 +144,9 @@ class TransactionServiceSpec extends ServiceTestFixture {
           )
         )
 
-        when(mockDesConnector.getTransaction(any(), any(), any())(any()))
+        when(mockHipConnector.getTransaction(any(), any(), any())(any()))
           .thenReturn(
-            Future.successful(DesGetTransactionPending(LocalDate.parse("2000-01-01"), Some("YREF"), Some(30)))
+            Future.successful(HipGetTransactionPending(LocalDate.parse("2000-01-01")))
           )
 
         val result =
@@ -155,8 +157,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
           paymentStatus = "Due",
           paymentDueDate = Some(LocalDate.parse("2000-01-01")),
           transactionType = Some("Debt"),
-          paymentReference = Some("YREF"),
-          paymentAmount = Some(30)
+          paymentReference = None,
+          paymentAmount = None
         )
       }
       "ITMP returns a Collected status and ETMP returns a Not Found error" in {
@@ -179,8 +181,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
           )
         )
 
-        when(mockDesConnector.getTransaction(any(), any(), any())(any()))
-          .thenReturn(Future.successful(DesFailureResponse("NOT_FOUND")))
+        when(mockHipConnector.getTransaction(any(), any(), any())(any()))
+          .thenReturn(Future.successful(HipFailureResponse("NOT_FOUND", "Not Found")))
 
         val result =
           Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
@@ -294,10 +296,11 @@ class TransactionServiceSpec extends ServiceTestFixture {
           )
         )
 
-        when(mockDesConnector.getTransaction(any(), any(), any())(any())).thenReturn(
+        when(mockHipConnector.getTransaction(any(), any(), any())(any())).thenReturn(
           Future.successful(
-            DesGetTransactionPaid(
+            HipGetTransactionPaid(
               paymentDate = LocalDate.parse("2000-01-01"),
+              paymentDueDate = LocalDate.parse("2000-01-01"),
               paymentReference = "002630000993",
               paymentAmount = 1.0
             )
@@ -340,8 +343,14 @@ class TransactionServiceSpec extends ServiceTestFixture {
           )
         )
 
-        when(mockDesConnector.getTransaction(any(), any(), any())(any()))
-          .thenReturn(Future.successful(des.DesGetTransactionPaid(LocalDate.parse("2000-01-01"), "XREF", 25)))
+        when(mockHipConnector.getTransaction(any(), any(), any())(any()))
+          .thenReturn(Future.successful(
+            HipGetTransactionPaid(
+              paymentDate = LocalDate.parse("2000-01-01"),
+              paymentDueDate = LocalDate.parse("2000-01-01"),
+              paymentReference = "002630000993",
+              paymentAmount = 1.0))
+          )
 
         val result =
           Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
@@ -350,8 +359,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
           transactionId = "12345",
           paymentStatus = "Collected",
           paymentDate = Some(LocalDate.parse("2000-01-01")),
-          paymentReference = Some("XREF"),
-          paymentAmount = Some(25),
+          paymentReference = Some("002630000993"),
+          paymentAmount = Some(1.0),
           transactionType = Some("Debt")
         )
       }
@@ -374,8 +383,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
           )
         )
 
-        when(mockDesConnector.getTransaction(any(), any(), any())(any()))
-          .thenReturn(Future.successful(DesFailureResponse("COULD_NOT_PROCESS")))
+        when(mockHipConnector.getTransaction(any(), any(), any())(any()))
+          .thenReturn(Future.successful(HipFailureResponse("COULD_NOT_PROCESS", "COULD_NOT_PROCESS")))
 
         val result =
           Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
@@ -438,8 +447,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
           )
         )
 
-        when(mockDesConnector.getTransaction(any(), any(), any())(any()))
-          .thenReturn(Future.successful(DesUnavailableResponse))
+        when(mockHipConnector.getTransaction(any(), any(), any())(any()))
+          .thenReturn(Future.successful(expectedServiceUnavailable))
 
         val result =
           Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
@@ -462,8 +471,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
           )
         )
 
-        when(mockDesConnector.getTransaction(any(), any(), any())(any()))
-          .thenReturn(Future.successful(DesUnavailableResponse))
+        when(mockHipConnector.getTransaction(any(), any(), any())(any()))
+          .thenReturn(Future.successful(expectedServiceUnavailable))
 
         val result =
           Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
@@ -521,8 +530,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
           )
         )
 
-        when(mockDesConnector.getTransaction(any(), any(), any())(any()))
-          .thenReturn(Future.successful(DesFailureResponse("UNKNOWN_ERROR", "Unknown error")))
+        when(mockHipConnector.getTransaction(any(), any(), any())(any()))
+          .thenReturn(Future.successful(HipFailureResponse("UNKNOWN_ERROR", "Unknown error")))
 
         val result =
           Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
@@ -546,8 +555,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
           )
         )
 
-        when(mockDesConnector.getTransaction(any(), any(), any())(any()))
-          .thenReturn(Future.successful(DesFailureResponse("UNKNOWN_ERROR", "Unknown error")))
+        when(mockHipConnector.getTransaction(any(), any(), any())(any()))
+          .thenReturn(Future.successful(HipFailureResponse("UNKNOWN_ERROR", "Unknown error")))
 
         val result =
           Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)

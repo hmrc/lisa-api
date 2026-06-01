@@ -18,6 +18,7 @@ package uk.gov.hmrc.lisaapi.helpers
 
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import uk.gov.hmrc.lisaapi.connectors.{DesConnector, HipConnector, RoutingConnector}
+import uk.gov.hmrc.lisaapi.services.{TransactionService, HipTransactionService, RoutingTransactionService}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
 trait ServiceTestFixture extends BaseTestFixture with GuiceOneAppPerSuite {
@@ -25,4 +26,8 @@ trait ServiceTestFixture extends BaseTestFixture with GuiceOneAppPerSuite {
   val mockHipConnector: HipConnector     = mock[HipConnector]
   val mockRoutingConnector: RoutingConnector = mock[RoutingConnector]
   val mockAuditConnector: AuditConnector = mock[AuditConnector]
+
+  val mockDesService: TransactionService = mock[TransactionService]
+  val mockHipService: HipTransactionService = mock[HipTransactionService]
+  val mockRoutingService: RoutingTransactionService = mock[RoutingTransactionService]
 }

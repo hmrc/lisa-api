@@ -33,18 +33,19 @@ class RoutingConnector @Inject()(
 )(using ec: ExecutionContext) {
 
 
-  def getTransaction(lisaManager: String, accountId: String, transactionId: String)(implicit
-                                                                                    hc: HeaderCarrier
-  ): Future[RoutingResponse] = {
-    
+  def getTransaction(lisaManager: String, accountId: String, transactionId: String)(
+    implicit hc: HeaderCarrier
+  ): Future[RoutingResponse] = {    
     if(context.useHip) {
       hipConnector.getTransaction(lisaManager, accountId, transactionId)
     } else
-      desConnector.getTransaction(lisaManager, accountId, transactionId)
-    
-    
-    
+      desConnector.getTransaction(lisaManager, accountId, transactionId)    
   }
-  
+
+  def getBonusOrWithdrawal(lisaManager: String, accountId: String, transactionId: String)(
+    implicit  hc: HeaderCarrier
+  ): Future[DesResponse] = {
+    desConnector.getBonusOrWithdrawal(lisaManager, accountId, transactionId)
+  }
 
 }

@@ -24,14 +24,14 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
 import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.services.{AuditService, TransactionService}
+import uk.gov.hmrc.lisaapi.services.{AuditService, RoutingTransactionService}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class TransactionController @Inject() (
   authConnector: AuthConnector,
   appContext: AppContext,
-  service: TransactionService,
+  service: RoutingTransactionService,
   auditService: AuditService,
   lisaMetrics: LisaMetrics,
   cc: ControllerComponents,
