@@ -24,7 +24,7 @@ trait HipConnectorTestHelper extends ConnectorSpecHelper {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
-   val validHipBadRequestJson: String =
+  val validHipBadRequestJson: String =
     """{
       |  "origin": "HIP",
       |  "response": {
@@ -37,8 +37,7 @@ trait HipConnectorTestHelper extends ConnectorSpecHelper {
       |  }
       |}""".stripMargin
 
-
-   val validValidationErrorJson: String =
+  val validValidationErrorJson: String =
     """{
       |  "errors": {
       |    "processingDate": "2026-04-01T23:00:00Z",
@@ -47,8 +46,7 @@ trait HipConnectorTestHelper extends ConnectorSpecHelper {
       |  }
       |}""".stripMargin
 
-
-   val validServiceUnavailableHodJson: String =
+  val validServiceUnavailableHodJson: String =
     """{
       |  "origin": "HoD",
       |  "response": {
@@ -60,8 +58,7 @@ trait HipConnectorTestHelper extends ConnectorSpecHelper {
       |  }
       |}""".stripMargin
 
-
-   val validServiceUnavailableJson: String =
+  val validServiceUnavailableJson: String =
     """{
       |  "origin": "HIP",
       |  "response": {
@@ -74,8 +71,7 @@ trait HipConnectorTestHelper extends ConnectorSpecHelper {
       |  }
       |}""".stripMargin
 
-
-   val validServerErrorJson: String =
+  val validServerErrorJson: String =
     """{
       |  "origin": "HIP",
       |  "response": {
@@ -88,8 +84,7 @@ trait HipConnectorTestHelper extends ConnectorSpecHelper {
       |  }
       |}""".stripMargin
 
-
-   val expectedServiceUnavailable = HipServiceUnavailable(
+  val expectedServiceUnavailable = HipServiceUnavailable(
     response = HipFailures(
       failures = Seq(
         HipError(`type` = "SERVICE_UNAVAILABLE", reason = "Dependent services maybe down")
@@ -97,7 +92,7 @@ trait HipConnectorTestHelper extends ConnectorSpecHelper {
     )
   )
 
-   val expectedServerError = HipServerError(
+  val expectedServerError = HipServerError(
     response = HipFailures(
       failures = Seq(
         HipError(`type` = "INTERNAL_SERVER_ERROR", reason = "Internal server error")
@@ -105,7 +100,7 @@ trait HipConnectorTestHelper extends ConnectorSpecHelper {
     )
   )
 
-   val expectedBadRequestError = HipBadRequest(
+  val expectedBadRequestError = HipBadRequest(
     response = HipFailures(
       failures = Seq(
         HipError(`type` = "BAD_REQUEST", reason = "Invalid request")
@@ -113,7 +108,7 @@ trait HipConnectorTestHelper extends ConnectorSpecHelper {
     )
   )
 
-   val expectedValidationError = HipValidationError(
+  val expectedValidationError = HipValidationError(
     errors = Hip422Error(
       processingDate = "2026-04-01T23:00:00Z",
       code = "003",

@@ -33,13 +33,13 @@ import scala.concurrent.{Await, Future}
 
 class HipTransactionServiceSpec extends ServiceTestFixture with HipConnectorTestHelper {
 
-  val transactionService: HipTransactionService = new HipTransactionService(mockHipConnector, mockDesConnector)
+  val transactionService: TransactionService = new TransactionService(mockRoutingConnector)
 
   "Get Transaction" must {
 
     "return a Pending transaction" when {
       "ITMP returns a Pending transaction" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+        when(mockRoutingConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
               lifeEventId = None,
@@ -64,7 +64,7 @@ class HipTransactionServiceSpec extends ServiceTestFixture with HipConnectorTest
         )
       }
       "ITMP returns a Paid status and ETMP returns a Pending status" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+        when(mockRoutingConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
               lifeEventId = None,
@@ -79,7 +79,7 @@ class HipTransactionServiceSpec extends ServiceTestFixture with HipConnectorTest
           )
         )
 
-        when(mockHipConnector.getTransaction(any(), any(), any())(any()))
+        when(mockRoutingConnector.getTransaction(any(), any(), any())(any()))
           .thenReturn(Future.successful(HipGetTransactionPending(LocalDate.parse("2000-01-01"))))
 
         val result =
@@ -94,7 +94,7 @@ class HipTransactionServiceSpec extends ServiceTestFixture with HipConnectorTest
         )
       }
       "ITMP returns a Paid status and ETMP returns a Not Found error" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+        when(mockRoutingConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
               lifeEventId = None,
@@ -109,7 +109,7 @@ class HipTransactionServiceSpec extends ServiceTestFixture with HipConnectorTest
           )
         )
 
-        when(mockHipConnector.getTransaction(any(), any(), any())(any()))
+        when(mockRoutingConnector.getTransaction(any(), any(), any())(any()))
           .thenReturn(Future.successful(HipFailureResponse("NOT_FOUND", "Not Found")))
 
         val result =
@@ -125,7 +125,7 @@ class HipTransactionServiceSpec extends ServiceTestFixture with HipConnectorTest
 
     "return a Due transaction" when {
       "ITMP returns a Collected status and ETMP returns a Pending status" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+        when(mockRoutingConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetWithdrawalResponse(
               LocalDate.parse("2018-05-06"),
@@ -144,7 +144,7 @@ class HipTransactionServiceSpec extends ServiceTestFixture with HipConnectorTest
           )
         )
 
-        when(mockHipConnector.getTransaction(any(), any(), any())(any()))
+        when(mockRoutingConnector.getTransaction(any(), any(), any())(any()))
           .thenReturn(
             Future.successful(HipGetTransactionPending(LocalDate.parse("2000-01-01")))
           )
@@ -162,7 +162,7 @@ class HipTransactionServiceSpec extends ServiceTestFixture with HipConnectorTest
         )
       }
       "ITMP returns a Collected status and ETMP returns a Not Found error" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+        when(mockRoutingConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetWithdrawalResponse(
               LocalDate.parse("2018-05-06"),
@@ -181,7 +181,7 @@ class HipTransactionServiceSpec extends ServiceTestFixture with HipConnectorTest
           )
         )
 
-        when(mockHipConnector.getTransaction(any(), any(), any())(any()))
+        when(mockRoutingConnector.getTransaction(any(), any(), any())(any()))
           .thenReturn(Future.successful(HipFailureResponse("NOT_FOUND", "Not Found")))
 
         val result =
@@ -196,7 +196,7 @@ class HipTransactionServiceSpec extends ServiceTestFixture with HipConnectorTest
 
     "return a Cancelled transaction" when {
       "ITMP returns a Cancelled status" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+        when(mockRoutingConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
               lifeEventId = None,
@@ -224,7 +224,7 @@ class HipTransactionServiceSpec extends ServiceTestFixture with HipConnectorTest
 
     "return a Void transaction" when {
       "ITMP returns a Void status" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+        when(mockRoutingConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
               lifeEventId = None,
@@ -252,7 +252,7 @@ class HipTransactionServiceSpec extends ServiceTestFixture with HipConnectorTest
 
     "return a Superseded transaction" when {
       "ITMP returns a Superseded status" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+        when(mockRoutingConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
               lifeEventId = None,
@@ -281,7 +281,7 @@ class HipTransactionServiceSpec extends ServiceTestFixture with HipConnectorTest
 
     "return a Paid transaction" when {
       "ITMP returns a Paid status and ETMP returns a Paid status" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+        when(mockRoutingConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
               lifeEventId = None,
@@ -296,7 +296,7 @@ class HipTransactionServiceSpec extends ServiceTestFixture with HipConnectorTest
           )
         )
 
-        when(mockHipConnector.getTransaction(any(), any(), any())(any())).thenReturn(
+        when(mockRoutingConnector.getTransaction(any(), any(), any())(any())).thenReturn(
           Future.successful(
             HipGetTransactionPaid(
               paymentDate = LocalDate.parse("2000-01-01"),
@@ -324,7 +324,7 @@ class HipTransactionServiceSpec extends ServiceTestFixture with HipConnectorTest
 
     "return a Collected transaction" when {
       "ITMP returns a Collected status and ETMP returns a Paid status" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+        when(mockRoutingConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetWithdrawalResponse(
               LocalDate.parse("2018-05-06"),
@@ -343,13 +343,16 @@ class HipTransactionServiceSpec extends ServiceTestFixture with HipConnectorTest
           )
         )
 
-        when(mockHipConnector.getTransaction(any(), any(), any())(any()))
-          .thenReturn(Future.successful(
-            HipGetTransactionPaid(
-              paymentDate = LocalDate.parse("2000-01-01"),
-              paymentDueDate = LocalDate.parse("2000-01-01"),
-              paymentReference = "002630000993",
-              paymentAmount = 1.0))
+        when(mockRoutingConnector.getTransaction(any(), any(), any())(any()))
+          .thenReturn(
+            Future.successful(
+              HipGetTransactionPaid(
+                paymentDate = LocalDate.parse("2000-01-01"),
+                paymentDueDate = LocalDate.parse("2000-01-01"),
+                paymentReference = "002630000993",
+                paymentAmount = 1.0
+              )
+            )
           )
 
         val result =
@@ -368,7 +371,7 @@ class HipTransactionServiceSpec extends ServiceTestFixture with HipConnectorTest
 
     "return a Charge refund cancelled transaction" when {
       "ITMP returns a Paid status and ETMP returns a COULD_NOT_PROCESS error" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+        when(mockRoutingConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
               lifeEventId = None,
@@ -383,7 +386,7 @@ class HipTransactionServiceSpec extends ServiceTestFixture with HipConnectorTest
           )
         )
 
-        when(mockHipConnector.getTransaction(any(), any(), any())(any()))
+        when(mockRoutingConnector.getTransaction(any(), any(), any())(any()))
           .thenReturn(Future.successful(HipFailureResponse("COULD_NOT_PROCESS", "COULD_NOT_PROCESS")))
 
         val result =
@@ -399,7 +402,7 @@ class HipTransactionServiceSpec extends ServiceTestFixture with HipConnectorTest
 
     "return a Transaction Not Found error" when {
       "ITMP returns a Transaction Not Found error" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any()))
+        when(mockRoutingConnector.getBonusOrWithdrawal(any(), any(), any())(any()))
           .thenReturn(Future.successful(DesFailureResponse("TRANSACTION_ID_NOT_FOUND")))
 
         val result =
@@ -411,7 +414,7 @@ class HipTransactionServiceSpec extends ServiceTestFixture with HipConnectorTest
 
     "return a Account Not Found error" when {
       "ITMP returns a Account Not Found error" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any()))
+        when(mockRoutingConnector.getBonusOrWithdrawal(any(), any(), any())(any()))
           .thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNTID_NOT_FOUND")))
 
         val result =
@@ -423,7 +426,7 @@ class HipTransactionServiceSpec extends ServiceTestFixture with HipConnectorTest
 
     "return a Service Unavailable error" when {
       "ITMP returns a 503" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any()))
+        when(mockRoutingConnector.getBonusOrWithdrawal(any(), any(), any())(any()))
           .thenReturn(Future.successful(DesUnavailableResponse))
 
         val result =
@@ -432,7 +435,7 @@ class HipTransactionServiceSpec extends ServiceTestFixture with HipConnectorTest
         result mustBe GetTransactionServiceUnavailableResponse
       }
       "ETMP returns a 503 for a paid transaction" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+        when(mockRoutingConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
               lifeEventId = None,
@@ -447,7 +450,7 @@ class HipTransactionServiceSpec extends ServiceTestFixture with HipConnectorTest
           )
         )
 
-        when(mockHipConnector.getTransaction(any(), any(), any())(any()))
+        when(mockRoutingConnector.getTransaction(any(), any(), any())(any()))
           .thenReturn(Future.successful(expectedServiceUnavailable))
 
         val result =
@@ -456,7 +459,7 @@ class HipTransactionServiceSpec extends ServiceTestFixture with HipConnectorTest
         result mustBe GetTransactionServiceUnavailableResponse
       }
       "ETMP returns a 503 for a collected transaction" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+        when(mockRoutingConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
               lifeEventId = None,
@@ -471,7 +474,7 @@ class HipTransactionServiceSpec extends ServiceTestFixture with HipConnectorTest
           )
         )
 
-        when(mockHipConnector.getTransaction(any(), any(), any())(any()))
+        when(mockRoutingConnector.getTransaction(any(), any(), any())(any()))
           .thenReturn(Future.successful(expectedServiceUnavailable))
 
         val result =
@@ -483,7 +486,7 @@ class HipTransactionServiceSpec extends ServiceTestFixture with HipConnectorTest
 
     "return an Error response" when {
       "ITMP returns an unknown error code" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any()))
+        when(mockRoutingConnector.getBonusOrWithdrawal(any(), any(), any())(any()))
           .thenReturn(Future.successful(DesFailureResponse("UNKNOWN_ERROR", "Unknown error")))
 
         val result =
@@ -493,7 +496,7 @@ class HipTransactionServiceSpec extends ServiceTestFixture with HipConnectorTest
       }
 
       "ITMP returns an unexpected payment status" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+        when(mockRoutingConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
               lifeEventId = None,
@@ -515,7 +518,7 @@ class HipTransactionServiceSpec extends ServiceTestFixture with HipConnectorTest
       }
 
       "ETMP returns an unknown error for a Paid transaction" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+        when(mockRoutingConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
               lifeEventId = None,
@@ -530,7 +533,7 @@ class HipTransactionServiceSpec extends ServiceTestFixture with HipConnectorTest
           )
         )
 
-        when(mockHipConnector.getTransaction(any(), any(), any())(any()))
+        when(mockRoutingConnector.getTransaction(any(), any(), any())(any()))
           .thenReturn(Future.successful(HipFailureResponse("UNKNOWN_ERROR", "Unknown error")))
 
         val result =
@@ -540,7 +543,7 @@ class HipTransactionServiceSpec extends ServiceTestFixture with HipConnectorTest
       }
 
       "ETMP returns an unknown error for a Collected transaction" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+        when(mockRoutingConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
               lifeEventId = None,
@@ -555,7 +558,7 @@ class HipTransactionServiceSpec extends ServiceTestFixture with HipConnectorTest
           )
         )
 
-        when(mockHipConnector.getTransaction(any(), any(), any())(any()))
+        when(mockRoutingConnector.getTransaction(any(), any(), any())(any()))
           .thenReturn(Future.successful(HipFailureResponse("UNKNOWN_ERROR", "Unknown error")))
 
         val result =

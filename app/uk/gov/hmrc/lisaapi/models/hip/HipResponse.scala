@@ -23,27 +23,24 @@ import uk.gov.hmrc.lisaapi.models.hip.HipFailures
 import uk.gov.hmrc.lisaapi.models.{Amount, JsonReads}
 import java.time.LocalDate
 
-trait HipResponse extends RoutingResponse {
-
-}
+trait HipResponse extends RoutingResponse {}
 
 trait HipGetTransactionResponse extends HipResponse {
   def paymentStatus: String
 }
 
-
 case class HipGetTransactionPending(
-                                     paymentDueDate: LocalDate,
-                                   ) extends HipGetTransactionResponse {
+  paymentDueDate: LocalDate
+) extends HipGetTransactionResponse {
   val paymentStatus = "PENDING"
 }
 
-
 case class HipGetTransactionPaid(
-                                  paymentDate: LocalDate,
-                                  paymentDueDate: LocalDate,
-                                  paymentReference: String,
-                                  paymentAmount: Amount) extends HipGetTransactionResponse {
+  paymentDate: LocalDate,
+  paymentDueDate: LocalDate,
+  paymentReference: String,
+  paymentAmount: Amount
+) extends HipGetTransactionResponse {
 
   val paymentStatus = "PAID"
 
@@ -51,36 +48,32 @@ case class HipGetTransactionPaid(
 
 object HipGetTransactionResponse {
 
-
   implicit val paidReads: Reads[HipGetTransactionPaid] = (
     (JsPath \ "paymentDate").read(JsonReads.isoDate) and
       (JsPath \ "paymentDueDate").read(JsonReads.isoDate) and
       (JsPath \ "paymentReference").read[String] and
       (JsPath \ "paymentAmount").read[Amount]
-    )((paymentDate, paymentDueDate, paymentReference, paymentAmount) =>  HipGetTransactionPaid(paymentDate, paymentDueDate, paymentReference, paymentAmount))
-
-
+  )((paymentDate, paymentDueDate, paymentReference, paymentAmount) =>
+    HipGetTransactionPaid(paymentDate, paymentDueDate, paymentReference, paymentAmount)
+  )
 
   implicit val pendingReads: Reads[HipGetTransactionPending] = Json.reads[HipGetTransactionPending]
-
 
   implicit val reads: Reads[HipGetTransactionResponse] = Reads[HipGetTransactionResponse] { json =>
     (json \ "paymentStatus").validate[String] match {
       case JsSuccess(paymentStatus, _) =>
         paymentStatus match {
           case "PENDING" => pendingReads.reads(json)
-          case "PAID" => paidReads.reads(json)
-          case other => JsError(s"Unknown payment status: $other")
+          case "PAID"    => paidReads.reads(json)
+          case other     => JsError(s"Unknown payment status: $other")
         }
-      case JsError(errors) => JsError(s"Unknown type: ${errors.mkString(", ")}")
+      case JsError(errors)             => JsError(s"Unknown type: ${errors.mkString(", ")}")
     }
   }
 
 }
 
 case class HipFailureResponse(`type`: String, reason: String) extends HipResponse
-
-
 
 trait HipFailure extends HipResponse
 
@@ -91,20 +84,15 @@ case class HodErrorResponse(response: HodError) extends HipFailure
 
 case class HipBadRequest(response: HipFailures) extends HipFailure
 
-
-
 case class Hip422Error(processingDate: String, code: String, text: String)
 
-case class HipValidationError(errors: Hip422Error ) extends HipFailure
-
+case class HipValidationError(errors: Hip422Error) extends HipFailure
 
 case class HipServerError(response: HipFailures) extends HipFailure
 
 case class HipServiceUnavailable(response: HipFailures) extends HipFailure
 case class HipFailures(failures: Seq[HipError])
 case class HipError(`type`: String, reason: String)
-
-
 
 case object HipNotFound extends HipFailure
 
@@ -113,7 +101,6 @@ case object HipForbidden extends HipFailure
 
 case object HipOtherErrorResponse extends HipFailure
 case object HipOriginUnknown extends HipFailure
-
 
 object HipError {
   implicit val hipErrorReads: Reads[HipError] = Json.reads[HipError]
@@ -127,7 +114,6 @@ object HipServiceUnavailable {
   implicit val reads: Reads[HipServiceUnavailable] = Json.reads[HipServiceUnavailable]
 }
 
-
 object HipServerError {
   implicit val reads: Reads[HipServerError] = Json.reads[HipServerError]
 }
@@ -140,7 +126,6 @@ object HipBadRequest {
   implicit val reads: Reads[HipBadRequest] = Json.reads[HipBadRequest]
 
 }
-
 
 object HipValidationError {
   implicit val reads: Reads[HipValidationError] = Json.reads[HipValidationError]
@@ -160,4 +145,3 @@ object HodErrorResponse {
   implicit val reads: Reads[HodErrorResponse] = Json.reads[HodErrorResponse]
 
 }
-

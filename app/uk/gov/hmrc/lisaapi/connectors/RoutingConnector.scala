@@ -26,26 +26,23 @@ import uk.gov.hmrc.lisaapi.models.hip.{HipResponse, RoutingResponse}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class RoutingConnector @Inject()(
-                                  context: AppContext,
-                                  desConnector: DesConnector,
-                                  hipConnector: HipConnector
+class RoutingConnector @Inject() (
+  context: AppContext,
+  desConnector: DesConnector,
+  hipConnector: HipConnector
 )(using ec: ExecutionContext) {
 
-
-  def getTransaction(lisaManager: String, accountId: String, transactionId: String)(
-    implicit hc: HeaderCarrier
-  ): Future[RoutingResponse] = {    
-    if(context.useHip) {
+  def getTransaction(lisaManager: String, accountId: String, transactionId: String)(implicit
+    hc: HeaderCarrier
+  ): Future[RoutingResponse] =
+    if (context.useHip) {
       hipConnector.getTransaction(lisaManager, accountId, transactionId)
     } else
-      desConnector.getTransaction(lisaManager, accountId, transactionId)    
-  }
+      desConnector.getTransaction(lisaManager, accountId, transactionId)
 
-  def getBonusOrWithdrawal(lisaManager: String, accountId: String, transactionId: String)(
-    implicit  hc: HeaderCarrier
-  ): Future[DesResponse] = {
+  def getBonusOrWithdrawal(lisaManager: String, accountId: String, transactionId: String)(implicit
+    hc: HeaderCarrier
+  ): Future[DesResponse] =
     desConnector.getBonusOrWithdrawal(lisaManager, accountId, transactionId)
-  }
 
 }

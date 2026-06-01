@@ -30,31 +30,30 @@ import scala.concurrent.Future
 
 class RoutingConnectorSpec extends BaseTestFixture {
   implicit val hc: HeaderCarrier = HeaderCarrier()
-  
+
   private val hipBaseTransactionUrl = "/RESTAdapter/lisa/bonus-charge/manager"
   private val desBaseTransactionUrl = "/lifetime-isa/manager"
-   
+
   val hipTransactionUrl = s"$hipBaseTransactionUrl/Z123456/accounts/ABC12345/transaction/123456/bonusChargeDetails"
   val desTransactionUrl = s"$desBaseTransactionUrl/Z123456/accounts/ABC12345/transaction/123456"
 
   val hipConnectorMock = mock[HipConnector]
   val desConnectorMock = mock[DesConnector]
 
-
   "RoutingConnector" must {
     "talk to HIP when useHip flag is true" in {
-      val appContext = new AppContext(mockConfiguration, mockServicesConfig)
+      val appContext       = new AppContext(mockConfiguration, mockServicesConfig)
       val routingConnector = new RoutingConnector(appContext, desConnectorMock, hipConnectorMock)
       when(mockServicesConfig.getBoolean("features.hip")).thenReturn(true)
       when(hipConnectorMock.getTransaction(anyString(), anyString(), anyString())(any[HeaderCarrier]()))
         .thenReturn(Future.successful(HipGetTransactionPending(LocalDate.parse("2026-05-05"))))
-      
+
       routingConnector.getTransaction("lisaManager", "accountNo", "tranId")
       verify(hipConnectorMock, times(1)).getTransaction("lisaManager", "accountNo", "tranId")
     }
-    
+
     "talk to DES when useHip flag is false" in {
-      val appContext = new AppContext(mockConfiguration, mockServicesConfig)
+      val appContext       = new AppContext(mockConfiguration, mockServicesConfig)
       val routingConnector = new RoutingConnector(appContext, desConnectorMock, hipConnectorMock)
       when(mockServicesConfig.getBoolean("features.hip")).thenReturn(false)
       when(desConnectorMock.getTransaction(anyString(), anyString(), anyString())(any[HeaderCarrier]()))
@@ -62,8 +61,9 @@ class RoutingConnectorSpec extends BaseTestFixture {
 
       routingConnector.getTransaction("lisaManager", "accountNo", "tranId")
 
-     verify(desConnectorMock, times(1)).getTransaction("lisaManager", "accountNo", "tranId")
+      verify(desConnectorMock, times(1)).getTransaction("lisaManager", "accountNo", "tranId")
     }
 
   }
+
 }

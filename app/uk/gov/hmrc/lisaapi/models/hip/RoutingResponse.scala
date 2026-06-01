@@ -16,4 +16,4 @@
 
 package uk.gov.hmrc.lisaapi.models.hip
 
-trait RoutingResponse 
+trait RoutingResponse

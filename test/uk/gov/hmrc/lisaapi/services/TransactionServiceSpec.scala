@@ -19,9 +19,11 @@ package uk.gov.hmrc.lisaapi.services
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.lisaapi.connectors.HipConnectorTestHelper
 import uk.gov.hmrc.lisaapi.helpers.ServiceTestFixture
-import uk.gov.hmrc.lisaapi.models.des._
-import uk.gov.hmrc.lisaapi.models._
+import uk.gov.hmrc.lisaapi.models.des.*
+import uk.gov.hmrc.lisaapi.models.hip.*
+import uk.gov.hmrc.lisaapi.models.*
 import uk.gov.hmrc.lisaapi.services.TransactionService
 
 import java.time.LocalDate
@@ -29,15 +31,15 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
-class TransactionServiceSpec extends ServiceTestFixture {
+class TransactionServiceSpec extends ServiceTestFixture with HipConnectorTestHelper {
 
-  val transactionService: TransactionService = new TransactionService(mockDesConnector)
+  val transactionService: TransactionService = new TransactionService(mockRoutingConnector)
 
   "Get Transaction" must {
 
     "return a Pending transaction" when {
       "ITMP returns a Pending transaction" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+        when(mockRoutingConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
               lifeEventId = None,
@@ -62,7 +64,7 @@ class TransactionServiceSpec extends ServiceTestFixture {
         )
       }
       "ITMP returns a Paid status and ETMP returns a Pending status" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+        when(mockRoutingConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
               lifeEventId = None,
@@ -77,7 +79,7 @@ class TransactionServiceSpec extends ServiceTestFixture {
           )
         )
 
-        when(mockDesConnector.getTransaction(any(), any(), any())(any()))
+        when(mockRoutingConnector.getTransaction(any(), any(), any())(any()))
           .thenReturn(Future.successful(DesGetTransactionPending(LocalDate.parse("2000-01-01"), None, None)))
 
         val result =
@@ -92,7 +94,7 @@ class TransactionServiceSpec extends ServiceTestFixture {
         )
       }
       "ITMP returns a Paid status and ETMP returns a Not Found error" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+        when(mockRoutingConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
               lifeEventId = None,
@@ -107,7 +109,7 @@ class TransactionServiceSpec extends ServiceTestFixture {
           )
         )
 
-        when(mockDesConnector.getTransaction(any(), any(), any())(any()))
+        when(mockRoutingConnector.getTransaction(any(), any(), any())(any()))
           .thenReturn(Future.successful(DesFailureResponse("NOT_FOUND")))
 
         val result =
@@ -123,7 +125,7 @@ class TransactionServiceSpec extends ServiceTestFixture {
 
     "return a Due transaction" when {
       "ITMP returns a Collected status and ETMP returns a Pending status" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+        when(mockRoutingConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetWithdrawalResponse(
               LocalDate.parse("2018-05-06"),
@@ -142,7 +144,7 @@ class TransactionServiceSpec extends ServiceTestFixture {
           )
         )
 
-        when(mockDesConnector.getTransaction(any(), any(), any())(any()))
+        when(mockRoutingConnector.getTransaction(any(), any(), any())(any()))
           .thenReturn(
             Future.successful(DesGetTransactionPending(LocalDate.parse("2000-01-01"), Some("YREF"), Some(30)))
           )
@@ -160,7 +162,7 @@ class TransactionServiceSpec extends ServiceTestFixture {
         )
       }
       "ITMP returns a Collected status and ETMP returns a Not Found error" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+        when(mockRoutingConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetWithdrawalResponse(
               LocalDate.parse("2018-05-06"),
@@ -179,7 +181,7 @@ class TransactionServiceSpec extends ServiceTestFixture {
           )
         )
 
-        when(mockDesConnector.getTransaction(any(), any(), any())(any()))
+        when(mockRoutingConnector.getTransaction(any(), any(), any())(any()))
           .thenReturn(Future.successful(DesFailureResponse("NOT_FOUND")))
 
         val result =
@@ -194,7 +196,7 @@ class TransactionServiceSpec extends ServiceTestFixture {
 
     "return a Cancelled transaction" when {
       "ITMP returns a Cancelled status" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+        when(mockRoutingConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
               lifeEventId = None,
@@ -222,7 +224,7 @@ class TransactionServiceSpec extends ServiceTestFixture {
 
     "return a Void transaction" when {
       "ITMP returns a Void status" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+        when(mockRoutingConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
               lifeEventId = None,
@@ -250,7 +252,7 @@ class TransactionServiceSpec extends ServiceTestFixture {
 
     "return a Superseded transaction" when {
       "ITMP returns a Superseded status" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+        when(mockRoutingConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
               lifeEventId = None,
@@ -279,7 +281,7 @@ class TransactionServiceSpec extends ServiceTestFixture {
 
     "return a Paid transaction" when {
       "ITMP returns a Paid status and ETMP returns a Paid status" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+        when(mockRoutingConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
               lifeEventId = None,
@@ -294,7 +296,7 @@ class TransactionServiceSpec extends ServiceTestFixture {
           )
         )
 
-        when(mockDesConnector.getTransaction(any(), any(), any())(any())).thenReturn(
+        when(mockRoutingConnector.getTransaction(any(), any(), any())(any())).thenReturn(
           Future.successful(
             DesGetTransactionPaid(
               paymentDate = LocalDate.parse("2000-01-01"),
@@ -321,7 +323,7 @@ class TransactionServiceSpec extends ServiceTestFixture {
 
     "return a Collected transaction" when {
       "ITMP returns a Collected status and ETMP returns a Paid status" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+        when(mockRoutingConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetWithdrawalResponse(
               LocalDate.parse("2018-05-06"),
@@ -340,7 +342,7 @@ class TransactionServiceSpec extends ServiceTestFixture {
           )
         )
 
-        when(mockDesConnector.getTransaction(any(), any(), any())(any()))
+        when(mockRoutingConnector.getTransaction(any(), any(), any())(any()))
           .thenReturn(Future.successful(des.DesGetTransactionPaid(LocalDate.parse("2000-01-01"), "XREF", 25)))
 
         val result =
@@ -359,7 +361,7 @@ class TransactionServiceSpec extends ServiceTestFixture {
 
     "return a Charge refund cancelled transaction" when {
       "ITMP returns a Paid status and ETMP returns a COULD_NOT_PROCESS error" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+        when(mockRoutingConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
               lifeEventId = None,
@@ -374,7 +376,7 @@ class TransactionServiceSpec extends ServiceTestFixture {
           )
         )
 
-        when(mockDesConnector.getTransaction(any(), any(), any())(any()))
+        when(mockRoutingConnector.getTransaction(any(), any(), any())(any()))
           .thenReturn(Future.successful(DesFailureResponse("COULD_NOT_PROCESS")))
 
         val result =
@@ -390,7 +392,7 @@ class TransactionServiceSpec extends ServiceTestFixture {
 
     "return a Transaction Not Found error" when {
       "ITMP returns a Transaction Not Found error" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any()))
+        when(mockRoutingConnector.getBonusOrWithdrawal(any(), any(), any())(any()))
           .thenReturn(Future.successful(DesFailureResponse("TRANSACTION_ID_NOT_FOUND")))
 
         val result =
@@ -402,7 +404,7 @@ class TransactionServiceSpec extends ServiceTestFixture {
 
     "return a Account Not Found error" when {
       "ITMP returns a Account Not Found error" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any()))
+        when(mockRoutingConnector.getBonusOrWithdrawal(any(), any(), any())(any()))
           .thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNTID_NOT_FOUND")))
 
         val result =
@@ -414,7 +416,7 @@ class TransactionServiceSpec extends ServiceTestFixture {
 
     "return a Service Unavailable error" when {
       "ITMP returns a 503" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any()))
+        when(mockRoutingConnector.getBonusOrWithdrawal(any(), any(), any())(any()))
           .thenReturn(Future.successful(DesUnavailableResponse))
 
         val result =
@@ -423,7 +425,7 @@ class TransactionServiceSpec extends ServiceTestFixture {
         result mustBe GetTransactionServiceUnavailableResponse
       }
       "ETMP returns a 503 for a paid transaction" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+        when(mockRoutingConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
               lifeEventId = None,
@@ -438,7 +440,7 @@ class TransactionServiceSpec extends ServiceTestFixture {
           )
         )
 
-        when(mockDesConnector.getTransaction(any(), any(), any())(any()))
+        when(mockRoutingConnector.getTransaction(any(), any(), any())(any()))
           .thenReturn(Future.successful(DesUnavailableResponse))
 
         val result =
@@ -447,7 +449,7 @@ class TransactionServiceSpec extends ServiceTestFixture {
         result mustBe GetTransactionServiceUnavailableResponse
       }
       "ETMP returns a 503 for a collected transaction" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+        when(mockRoutingConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
               lifeEventId = None,
@@ -462,7 +464,7 @@ class TransactionServiceSpec extends ServiceTestFixture {
           )
         )
 
-        when(mockDesConnector.getTransaction(any(), any(), any())(any()))
+        when(mockRoutingConnector.getTransaction(any(), any(), any())(any()))
           .thenReturn(Future.successful(DesUnavailableResponse))
 
         val result =
@@ -472,9 +474,9 @@ class TransactionServiceSpec extends ServiceTestFixture {
       }
     }
 
-    "return an Error response" when {
+    "return a Error response" when {
       "ITMP returns an unknown error code" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any()))
+        when(mockRoutingConnector.getBonusOrWithdrawal(any(), any(), any())(any()))
           .thenReturn(Future.successful(DesFailureResponse("UNKNOWN_ERROR", "Unknown error")))
 
         val result =
@@ -484,7 +486,7 @@ class TransactionServiceSpec extends ServiceTestFixture {
       }
 
       "ITMP returns an unexpected payment status" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+        when(mockRoutingConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
               lifeEventId = None,
@@ -506,7 +508,7 @@ class TransactionServiceSpec extends ServiceTestFixture {
       }
 
       "ETMP returns an unknown error for a Paid transaction" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+        when(mockRoutingConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
               lifeEventId = None,
@@ -521,7 +523,7 @@ class TransactionServiceSpec extends ServiceTestFixture {
           )
         )
 
-        when(mockDesConnector.getTransaction(any(), any(), any())(any()))
+        when(mockRoutingConnector.getTransaction(any(), any(), any())(any()))
           .thenReturn(Future.successful(DesFailureResponse("UNKNOWN_ERROR", "Unknown error")))
 
         val result =
@@ -531,7 +533,7 @@ class TransactionServiceSpec extends ServiceTestFixture {
       }
 
       "ETMP returns an unknown error for a Collected transaction" in {
-        when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
+        when(mockRoutingConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
               lifeEventId = None,
@@ -546,7 +548,7 @@ class TransactionServiceSpec extends ServiceTestFixture {
           )
         )
 
-        when(mockDesConnector.getTransaction(any(), any(), any())(any()))
+        when(mockRoutingConnector.getTransaction(any(), any(), any())(any()))
           .thenReturn(Future.successful(DesFailureResponse("UNKNOWN_ERROR", "Unknown error")))
 
         val result =
@@ -555,7 +557,6 @@ class TransactionServiceSpec extends ServiceTestFixture {
         result mustBe GetTransactionErrorResponse
       }
     }
-
   }
 
 }

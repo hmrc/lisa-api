@@ -35,16 +35,16 @@ import java.util.UUID.randomUUID
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class HipConnector @Inject() ( wsHttp: HttpClientV2,
-                     appContext: AppContext)(implicit ec: ExecutionContext) extends Logging{
+class HipConnector @Inject() (wsHttp: HttpClientV2, appContext: AppContext)(implicit ec: ExecutionContext)
+    extends Logging {
 
-  val urlEncodingFormat: String = "utf-8"
+  val urlEncodingFormat: String   = "utf-8"
   lazy val lisaServiceUrl: String = s"${appContext.hipUrl}/RESTAdapter/lisa/bonus-charge/manager"
 
   private def headers(implicit hc: HeaderCarrier): Seq[(String, String)] = Seq(
-    "X-Originating-System" -> appContext.appName,
-    "correlationid" -> correlationId,
-    "X-Receipt-Date" -> DateTimeFormatter.ISO_INSTANT.format(Instant.now().truncatedTo(ChronoUnit.SECONDS)),
+    "X-Originating-System"  -> appContext.appName,
+    "correlationid"         -> correlationId,
+    "X-Receipt-Date"        -> DateTimeFormatter.ISO_INSTANT.format(Instant.now().truncatedTo(ChronoUnit.SECONDS)),
     "X-Transmitting-System" -> "HIP"
   )
 
@@ -55,74 +55,69 @@ class HipConnector @Inject() ( wsHttp: HttpClientV2,
       case Some(requestId) =>
         requestId.value match {
           case CorrelationIdPattern(prefix) => prefix + "-" + randomUUID.toString.substring(24)
-          case _ => randomUUID.toString
+          case _                            => randomUUID.toString
         }
-      case _ => randomUUID.toString
+      case _               => randomUUID.toString
     }
   }
 
-  def parseResponse[A <: HipResponse](res: HttpResponse, originCheck: Boolean = false)(implicit reads: Reads[A]): HipResponse = {
+  def parseResponse[A <: HipResponse](res: HttpResponse, originCheck: Boolean = false)(implicit
+    reads: Reads[A]
+  ): HipResponse = {
 
-    def validateContentType: Either[HipResponse, Unit] = {
+    def validateContentType: Either[HipResponse, Unit] =
       if (hasJsonContent(res)) Right(())
       else {
         logger.error(s"[HipConnector][parseResponse] Non-JSON response, status: ${res.status}")
         Left(HipOtherErrorResponse)
       }
-    }
-
 
     def getAndValidateOrigin: Either[HipResponse, String] = {
       val origin = (res.json \ "origin").asOpt[String]
       origin match {
         case Some(value) if value == "HIP" || value == "HOD" => Right(value)
-        case _ if res.status == 500 || res.status == 400 => Left(HipOriginUnknown)
-        case _  => Right("HIP")
+        case _ if res.status == 500 || res.status == 400     => Left(HipOriginUnknown)
+        case _                                               => Right("HIP")
       }
     }
 
-    def parseJson(origin: String): Either[HipOtherErrorResponse.type , HipResponse] = {
-      
-    val validation =   if(origin == "HOD") {
+    def parseJson(origin: String): Either[HipOtherErrorResponse.type, HipResponse] = {
+
+      val validation = if (origin == "HOD") {
         res.json.validate[HodErrorResponse]
       } else {
         res.json.validate[A]
-        
       }
-      
+
       validation match {
         case JsSuccess(value, _) => Right(value: HipResponse)
-        case JsError(errors) =>
+        case JsError(errors)     =>
           logger.error(s"[HipConnector][parseResponse] JSON parsing error: ${errors.mkString(", ")}")
           Left(HipOtherErrorResponse)
       }
-      }
+    }
 
-     def hasJsonContent(res: HttpResponse): Boolean = {
-       res.headers
-         .getOrElse(HeaderNames.CONTENT_TYPE, Seq.empty)
-         .exists(_.toLowerCase.contains(MimeTypes.JSON.toLowerCase))
-     }
-
+    def hasJsonContent(res: HttpResponse): Boolean =
+      res.headers
+        .getOrElse(HeaderNames.CONTENT_TYPE, Seq.empty)
+        .exists(_.toLowerCase.contains(MimeTypes.JSON.toLowerCase))
 
     (for {
-      _ <- validateContentType
-      origin <-  getAndValidateOrigin
-
-      value <- parseJson(origin)
+      _      <- validateContentType
+      origin <- getAndValidateOrigin
+      value  <- parseJson(origin)
     } yield value).getOrElse(HipOtherErrorResponse)
   }
 
-  
   private def headersWithOriginator(implicit hc: HeaderCarrier): Seq[(String, String)] =
     headers :+ ("OriginatorId" -> "DA2_LISA")
 
-  def getTransaction(lisaManagerReferenceNumber: LisaManagerReferenceNumber, accountId: String, transactionId: String)(implicit
-                                                                                                                       hc: HeaderCarrier
+  def getTransaction(lisaManagerReferenceNumber: LisaManagerReferenceNumber, accountId: String, transactionId: String)(
+    implicit hc: HeaderCarrier
   ): Future[HipResponse] = {
 
-     val fullUrl =
-      s"$lisaServiceUrl/$lisaManagerReferenceNumber/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/transaction/$transactionId/bonusChargeDetails"
+    val fullUrl =
+      s"$lisaServiceUrl/$lisaManagerReferenceNumber/accounts/${UriEncoding.encodePathSegment(accountId, urlEncodingFormat)}/transaction/$transactionId"
 
     logger.info("[HipConnector][getTransaction] Getting the Transaction details from hip: " + fullUrl)
 
@@ -134,15 +129,15 @@ class HipConnector @Inject() ( wsHttp: HttpClientV2,
     result.map { res =>
       logger.info("[HipConnector][getTransaction] Get Transaction details returned status: " + res.status)
       res.status match {
-        case OK => parseResponse[HipGetTransactionResponse](res, false)
-        case BAD_REQUEST => parseResponse[HipBadRequest](res, true)
-        case SERVICE_UNAVAILABLE => parseResponse[HipServiceUnavailable](res, true)
+        case OK                    => parseResponse[HipGetTransactionResponse](res, false)
+        case BAD_REQUEST           => parseResponse[HipBadRequest](res, true)
+        case SERVICE_UNAVAILABLE   => parseResponse[HipServiceUnavailable](res, true)
         case INTERNAL_SERVER_ERROR => parseResponse[HipServerError](res, true)
-        case UNPROCESSABLE_ENTITY => parseResponse[HipValidationError](res, false)
-        case NOT_FOUND => HipNotFound
-        case UNAUTHORIZED => HipUnauthorized
-        case FORBIDDEN => HipForbidden
-        case _ => HipOtherErrorResponse
+        case UNPROCESSABLE_ENTITY  => parseResponse[HipValidationError](res, false)
+        case NOT_FOUND             => HipNotFound
+        case UNAUTHORIZED          => HipUnauthorized
+        case FORBIDDEN             => HipForbidden
+        case _                     => HipOtherErrorResponse
       }
     }
   }

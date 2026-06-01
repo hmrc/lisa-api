@@ -23,7 +23,7 @@ import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 trait BaseTestFixture extends PlaySpec with MockitoSugar {
-  val mockConfiguration: Configuration = mock[Configuration]
+  val mockConfiguration: Configuration   = mock[Configuration]
   val mockServicesConfig: ServicesConfig = mock[ServicesConfig]
-  val mockAppContext: AppContext       = mock[AppContext]
+  val mockAppContext: AppContext         = mock[AppContext]
 }
