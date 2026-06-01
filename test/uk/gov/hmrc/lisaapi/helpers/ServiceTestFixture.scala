@@ -17,8 +17,7 @@
 package uk.gov.hmrc.lisaapi.helpers
 
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import uk.gov.hmrc.lisaapi.config.AppContext
-import uk.gov.hmrc.lisaapi.connectors.{DesConnector, HipConnector, RoutingConnector}
+import uk.gov.hmrc.lisaapi.connectors.{DesConnector, HipConnector}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
 trait ServiceTestFixture extends BaseTestFixture with GuiceOneAppPerSuite {
