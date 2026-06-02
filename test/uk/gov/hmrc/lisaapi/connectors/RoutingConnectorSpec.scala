@@ -64,6 +64,17 @@ class RoutingConnectorSpec extends BaseTestFixture {
       verify(desConnectorMock, times(1)).getTransaction("lisaManager", "accountNo", "tranId")
     }
 
+    "talk to DES for getBonusOrWithdrawal" in {
+      val appContext       = new AppContext(mockConfiguration, mockServicesConfig)
+      val routingConnector = new RoutingConnector(appContext, desConnectorMock, hipConnectorMock)
+      when(desConnectorMock.getBonusOrWithdrawal(anyString(), anyString(), anyString())(any[HeaderCarrier]()))
+        .thenReturn(Future.successful(DesUnavailableResponse))
+
+      routingConnector.getBonusOrWithdrawal("lisaManager", "accountNo", "tranId")
+
+      verify(desConnectorMock, times(1)).getBonusOrWithdrawal("lisaManager", "accountNo", "tranId")
+    }
+
   }
 
 }
