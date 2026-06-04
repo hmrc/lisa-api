@@ -19,8 +19,7 @@ package uk.gov.hmrc.lisaapi.controllers.doc
 import com.google.inject.Inject
 import controllers.Assets
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import uk.gov.hmrc.lisaapi.config.{APIAccessConfig, AppContext}
-import uk.gov.hmrc.lisaapi.domain.APIAccess
+import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.views.*
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
@@ -39,7 +38,7 @@ class Documentation @Inject() (
         appContext.apiContext,
         appContext.v1apiStatus,
         appContext.v2apiStatus,
-        buildAccess(),
+        appContext.access,
         appContext.v1endpointsEnabled,
         appContext.v2endpointsEnabled
       )
@@ -48,10 +47,5 @@ class Documentation @Inject() (
 
   def specification(version: String, file: String): Action[AnyContent] =
     assets.at(s"/public/api/conf/$version", file)
-
-  private def buildAccess() = {
-    val access = APIAccessConfig(appContext.access)
-    APIAccess(access.accessType)
-  }
 
 }

@@ -1,7 +1,7 @@
 @import uk.gov.hmrc.lisaapi.domain.APIAccess
 @import play.api.libs.json.Json
 
-@(context: String, v1status: String, v2status: String, access: APIAccess, v1endpointsEnabled: Boolean, v2endpointsEnabled: Boolean)
+@(context: String, v1status: String, v2status: String, access: String, v1endpointsEnabled: Boolean, v2endpointsEnabled: Boolean)
 {
   "api": {
     "name": "Lifetime ISA",
@@ -12,13 +12,13 @@
         "version": "1.0",
         "status": "@v1status",
         "endpointsEnabled": @v1endpointsEnabled,
-        "access": @Json.toJson(access)
+        "access": "@access"
       },
       {
         "version": "2.0",
         "status": "@v2status",
         "endpointsEnabled": @v2endpointsEnabled,
-        "access": @Json.toJson(access)
+        "access": "@access"
       }
     ]
   }

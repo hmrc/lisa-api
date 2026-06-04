@@ -41,6 +41,7 @@ class AppContextSpec extends PlaySpec with MockitoSugar {
       when(mockServicesConfig.getString("environment")).thenReturn("test")
       when(mockServicesConfig.getBoolean("api.endpointsEnabled")).thenReturn(true)
       when(mockServicesConfig.getBoolean("api.endpointsEnabledv2")).thenReturn(true)
+      when(mockServicesConfig.getString("api.access")).thenReturn("PUBLIC")
       when(mockServicesConfig.baseUrl("des")).thenReturn("http://localhost:8080")
       when(mockConfiguration.getOptional[Configuration](any())(any())).thenReturn(None)
 
@@ -56,20 +57,20 @@ class AppContextSpec extends PlaySpec with MockitoSugar {
       appContext.v1endpointsEnabled mustBe true
       appContext.v2endpointsEnabled mustBe true
       appContext.desUrl             mustBe "http://localhost:8080"
-      appContext.access             mustBe None
+      appContext.access             mustBe "PUBLIC"
     }
 
-    "return access configuration when present" in {
-      val accessConfig = mock[Configuration]
-      when(mockConfiguration.getOptional[Configuration](any())(any())).thenReturn(Some(accessConfig))
-      when(mockServicesConfig.getString(any())).thenReturn("")
-      when(mockServicesConfig.getBoolean(any())).thenReturn(true)
-      when(mockServicesConfig.baseUrl(any())).thenReturn("")
-
-      val appContext: AppContext = new AppContext(mockConfiguration, mockServicesConfig)
-
-      appContext.access mustBe Some(accessConfig)
-    }
+//    "return access configuration when present" in {
+//      val accessConfig = mock[Configuration]
+//      when(mockConfiguration.getOptional[Configuration](any())(any())).thenReturn(Some(accessConfig))
+//      when(mockServicesConfig.getString(any())).thenReturn("")
+//      when(mockServicesConfig.getBoolean(any())).thenReturn(true)
+//      when(mockServicesConfig.baseUrl(any())).thenReturn("")
+//
+//      val appContext: AppContext = new AppContext(mockConfiguration, mockServicesConfig)
+//
+//      appContext.access mustBe Some(accessConfig)
+//    }
   }
 
   "endpointIsDisabled" must {
