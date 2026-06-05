@@ -33,6 +33,8 @@ import scala.concurrent.{Await, Future}
 
 class HipTransactionServiceSpec extends ServiceTestFixture with HipConnectorTestHelper {
 
+  import HipFails.*
+
   val transactionService: TransactionService = new TransactionService(mockRoutingConnector)
 
   "Get Transaction" must {

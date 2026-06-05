@@ -21,10 +21,13 @@ import play.api.test.Helpers.*
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, RequestId}
 import uk.gov.hmrc.lisaapi.models.*
 import uk.gov.hmrc.lisaapi.models.hip.*
-import java.time.LocalDate
+
 import java.util.UUID
 
 class HipConnectorSpec extends HipConnectorTestHelper {
+
+  import HipFails.*
+  import HipSuccesses.*
 
   lazy val hipConnector: HipConnector = injector.instanceOf[HipConnector]
   private val baseTransactionUrl      = "/RESTAdapter/lisa/bonus-charge/manager"
@@ -34,96 +37,56 @@ class HipConnectorSpec extends HipConnectorTestHelper {
   "parseResponse" must {
 
     "parse a PENDING transaction" in {
-
-      val json   =
-        """{
-          |  "paymentStatus": "PENDING",
-          |  "paymentDueDate": "2026-05-27"
-          |}""".stripMargin
-      val res    = HttpResponse(200, json, jsonContentType)
+      val res    = HttpResponse(OK, validHipPendingJson, jsonContentType)
       val result = hipConnector.parseResponse[HipGetTransactionResponse](res)
-
-      result mustBe HipGetTransactionPending(paymentDueDate = LocalDate.of(2026, 5, 27))
+      result mustBe expectedHipPending
     }
 
     "parse a PAID transaction" in {
-      val json =
-        """{
-          |  "paymentStatus":    "PAID",
-          |  "paymentDate":      "2026-05-27",
-          |  "paymentDueDate":   "2026-05-30",
-          |  "paymentReference": "1234567890",
-          |  "paymentAmount":    101.00
-          |}""".stripMargin
-
-      val res    = HttpResponse(200, json, jsonContentType)
+      val res    = HttpResponse(OK, validHipPaidJson, jsonContentType)
       val result = hipConnector.parseResponse[HipGetTransactionResponse](res)
-      result mustBe HipGetTransactionPaid(
-        paymentDate = LocalDate.of(2026, 5, 27),
-        paymentDueDate = LocalDate.of(2026, 5, 30),
-        paymentReference = "1234567890",
-        paymentAmount = BigDecimal(101.00)
-      )
-
+      result mustBe expectedHipPaid
     }
 
     "parse returns HodErrorResponse for origin HOD" in {
-
       val res    = HttpResponse(503, validServiceUnavailableHodJson, jsonContentType)
-      val result = hipConnector.parseResponse[HipServiceUnavailable](res, true)
-
+      val result = hipConnector.parseResponse[HipServiceUnavailable](res)
       result mustBe HipOtherErrorResponse
-
     }
 
     "parse returns HipOtherErrorResponse for invalid json" in {
-
-      val json   =
-        """{
-          |  "somethingElse": "Whatever",
-          |  "paymentDueDate": "2026-05-27"
-          |}""".stripMargin
-      val res    = HttpResponse(200, json, jsonContentType)
+      val res    = HttpResponse(200, validHipOtherErrorjson, jsonContentType)
       val result = hipConnector.parseResponse[HipGetTransactionResponse](res)
-
       result mustBe HipOtherErrorResponse
     }
 
     "parse returns HipOtherErrorResponse for non json" in {
-
-      val json = "I am not json"
-
-      val res    = HttpResponse(200, json, stringContentType)
+      val res    = HttpResponse(BAD_REQUEST, "I am not json", stringContentType)
       val result = hipConnector.parseResponse[HipGetTransactionResponse](res)
-
       result mustBe HipOtherErrorResponse
     }
 
     "parse HipServiceUnavailable" in {
-      val res    = HttpResponse(503, validServiceUnavailableJson, jsonContentType)
+      val res    = HttpResponse(SERVICE_UNAVAILABLE, validServiceUnavailableJson, jsonContentType)
       val result = hipConnector.parseResponse[HipServiceUnavailable](res)
-
       result mustBe expectedServiceUnavailable
     }
 
     "parse HipServerError" in {
-      val res    = HttpResponse(500, validServerErrorJson, jsonContentType)
+      val res    = HttpResponse(INTERNAL_SERVER_ERROR, validServerErrorJson, jsonContentType)
       val result = hipConnector.parseResponse[HipServerError](res)
-
       result mustBe expectedServerError
     }
 
     "parse HipValidationError" in {
-      val res    = HttpResponse(422, validValidationErrorJson, jsonContentType)
+      val res    = HttpResponse(UNPROCESSABLE_ENTITY, validValidationErrorJson, jsonContentType)
       val result = hipConnector.parseResponse[HipValidationError](res)
-
       result mustBe expectedValidationError
     }
 
     "parse HipBadRequest" in {
-      val res    = HttpResponse(400, validHipBadRequestJson, jsonContentType)
+      val res    = HttpResponse(BAD_REQUEST, validHipBadRequestJson, jsonContentType)
       val result = hipConnector.parseResponse[HipBadRequest](res)
-
       result mustBe expectedBadRequestError
     }
   }
@@ -135,18 +98,12 @@ class HipConnectorSpec extends HipConnectorTestHelper {
       stubForGet(
         transactionUrl,
         OK,
-        """{
-          |  "paymentStatus": "PENDING",
-          |  "paymentDueDate": "2026-05-27"
-          |}""".stripMargin
+        validHipPendingJson
       )
 
       val response = await(hipConnector.getTransaction("Z123456", "ABC12345", "123456"))
-
-      response mustBe HipGetTransactionPending(
-        paymentDueDate = LocalDate.parse("2026-05-27")
-      )
-
+      response mustBe expectedHipPending
+      verifyHipGet(transactionUrl)
     }
 
     "return HipGetTransactionPaid" in {
@@ -155,24 +112,12 @@ class HipConnectorSpec extends HipConnectorTestHelper {
       stubForGet(
         transactionUrl,
         OK,
-        """{
-          |  "paymentStatus":    "PAID",
-          |  "paymentDate":      "2026-05-27",
-          |  "paymentDueDate":   "2026-05-30",
-          |  "paymentReference": "1234567890",
-          |  "paymentAmount":    101.00
-          |}""".stripMargin
+        validHipPaidJson
       )
 
       val response = await(hipConnector.getTransaction("Z123456", "ABC12345", "123456"))
-
-      response mustBe HipGetTransactionPaid(
-        paymentDate = LocalDate.parse("2026-05-27"),
-        paymentDueDate = LocalDate.parse("2026-05-30"),
-        paymentReference = "1234567890",
-        paymentAmount = 101.00
-      )
-
+      response mustBe expectedHipPaid
+      verifyHipGet(transactionUrl)
     }
 
     "return BAD_REQUEST" in {
@@ -185,8 +130,8 @@ class HipConnectorSpec extends HipConnectorTestHelper {
       )
 
       val response = await(hipConnector.getTransaction("Z123456", "ABC12345", "123456"))
-
-      response mustBe HipBadRequest(HipFailures(List(HipError("BAD_REQUEST", "Invalid request"))))
+      response mustBe expectedBadRequestError
+      verifyHipGet(transactionUrl)
     }
 
     "return HipServiceUnavailable" in {
@@ -194,9 +139,8 @@ class HipConnectorSpec extends HipConnectorTestHelper {
 
       stubForGet(transactionUrl, SERVICE_UNAVAILABLE, validServiceUnavailableJson)
       val response = await(hipConnector.getTransaction("Z123456", "ABC12345", "123456"))
-      response.asInstanceOf[HipServiceUnavailable] mustBe HipServiceUnavailable(
-        HipFailures(List(HipError("SERVICE_UNAVAILABLE", "Dependent services maybe down")))
-      )
+      response.asInstanceOf[HipServiceUnavailable] mustBe expectedServiceUnavailable
+      verifyHipGet(transactionUrl)
     }
 
     "return INTERNAL_SERVER_ERROR" in {
@@ -204,9 +148,8 @@ class HipConnectorSpec extends HipConnectorTestHelper {
 
       stubForGet(transactionUrl, INTERNAL_SERVER_ERROR, validServerErrorJson)
       val response = await(hipConnector.getTransaction("Z123456", "ABC12345", "123456"))
-      response.asInstanceOf[HipServerError] mustBe HipServerError(
-        HipFailures(List(HipError("INTERNAL_SERVER_ERROR", "Internal server error")))
-      )
+      response.asInstanceOf[HipServerError] mustBe expectedServerError
+      verifyHipGet(transactionUrl)
     }
 
     "return UNPROCESSABLE_ENTITY" in {
@@ -214,9 +157,8 @@ class HipConnectorSpec extends HipConnectorTestHelper {
 
       stubForGet(transactionUrl, UNPROCESSABLE_ENTITY, validValidationErrorJson)
       val response = await(hipConnector.getTransaction("Z123456", "ABC12345", "123456"))
-      response.asInstanceOf[HipValidationError] mustBe HipValidationError(
-        Hip422Error("2026-04-01T23:00:00Z", "003", "Request could not be processed")
-      )
+      response.asInstanceOf[HipValidationError] mustBe expectedValidationError
+      verifyHipGet(transactionUrl)
     }
 
     "return NOT_FOUND" in {
@@ -225,6 +167,7 @@ class HipConnectorSpec extends HipConnectorTestHelper {
       stubForGet(transactionUrl, NOT_FOUND, "")
       val response = await(hipConnector.getTransaction("Z123456", "ABC12345", "123456"))
       response mustBe HipNotFound
+      verifyHipGet(transactionUrl)
     }
 
     "return UNAUTHORIZED" in {
@@ -233,6 +176,7 @@ class HipConnectorSpec extends HipConnectorTestHelper {
       stubForGet(transactionUrl, UNAUTHORIZED, "")
       val response = await(hipConnector.getTransaction("Z123456", "ABC12345", "123456"))
       response mustBe HipUnauthorized
+      verifyHipGet(transactionUrl)
     }
 
     "return FORBIDDEN" in {
@@ -241,6 +185,7 @@ class HipConnectorSpec extends HipConnectorTestHelper {
       stubForGet(transactionUrl, FORBIDDEN, "")
       val response = await(hipConnector.getTransaction("Z123456", "ABC12345", "123456"))
       response mustBe HipForbidden
+      verifyHipGet(transactionUrl)
     }
 
     "return HipOtherErrorResponse" in {
@@ -249,6 +194,7 @@ class HipConnectorSpec extends HipConnectorTestHelper {
       stubForGet(transactionUrl, FAILED_DEPENDENCY, "")
       val response = await(hipConnector.getTransaction("Z123456", "ABC12345", "123456"))
       response mustBe HipOtherErrorResponse
+      verifyHipGet(transactionUrl)
     }
 
   }

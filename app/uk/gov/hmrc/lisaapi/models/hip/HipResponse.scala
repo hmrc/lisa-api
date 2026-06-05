@@ -19,8 +19,8 @@ package uk.gov.hmrc.lisaapi.models.hip
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json
 import play.api.libs.json.*
-import uk.gov.hmrc.lisaapi.models.hip.HipFailures
 import uk.gov.hmrc.lisaapi.models.{Amount, JsonReads}
+
 import java.time.LocalDate
 
 trait HipResponse extends RoutingResponse {}
@@ -41,9 +41,7 @@ case class HipGetTransactionPaid(
   paymentReference: String,
   paymentAmount: Amount
 ) extends HipGetTransactionResponse {
-
   val paymentStatus = "PAID"
-
 }
 
 object HipGetTransactionResponse {
@@ -59,12 +57,13 @@ object HipGetTransactionResponse {
 
   implicit val pendingReads: Reads[HipGetTransactionPending] = Json.reads[HipGetTransactionPending]
 
-  implicit val reads: Reads[HipGetTransactionResponse] = Reads[HipGetTransactionResponse] { json =>
-    (json \ "paymentStatus").validate[String] match {
+  implicit val hipResponseReads: Reads[HipGetTransactionResponse] = Reads[HipGetTransactionResponse] { json =>
+    (json \ "success" \ "paymentStatus").validate[String] match {
       case JsSuccess(paymentStatus, _) =>
+        val jsVal = (json \ "success").get
         paymentStatus match {
-          case "PENDING" => pendingReads.reads(json)
-          case "PAID"    => paidReads.reads(json)
+          case "PENDING" => pendingReads.reads(jsVal)
+          case "PAID"    => paidReads.reads(jsVal)
           case other     => JsError(s"Unknown payment status: $other")
         }
       case JsError(errors)             => JsError(s"Unknown type: ${errors.mkString(", ")}")
@@ -73,9 +72,9 @@ object HipGetTransactionResponse {
 
 }
 
-case class HipFailureResponse(`type`: String, reason: String) extends HipResponse
-
 trait HipFailure extends HipResponse
+
+case class HipFailureResponse(`type`: String, reason: String) extends HipFailure
 
 case class HodErrorBody(code: String, message: String, logId: String)
 case class HodError(error: HodErrorBody)
@@ -95,53 +94,21 @@ case class HipFailures(failures: Seq[HipError])
 case class HipError(`type`: String, reason: String)
 
 case object HipNotFound extends HipFailure
-
 case object HipUnauthorized extends HipFailure
 case object HipForbidden extends HipFailure
 
 case object HipOtherErrorResponse extends HipFailure
 case object HipOriginUnknown extends HipFailure
 
-object HipError {
-  implicit val hipErrorReads: Reads[HipError] = Json.reads[HipError]
-}
-
-object HipFailures {
-  implicit val reads: Reads[HipFailures] = Json.reads[HipFailures]
-}
-
-object HipServiceUnavailable {
-  implicit val reads: Reads[HipServiceUnavailable] = Json.reads[HipServiceUnavailable]
-}
-
-object HipServerError {
-  implicit val reads: Reads[HipServerError] = Json.reads[HipServerError]
-}
-
-object Hip422Error {
-  implicit val reads: Reads[Hip422Error] = Json.reads[Hip422Error]
-}
-
-object HipBadRequest {
-  implicit val reads: Reads[HipBadRequest] = Json.reads[HipBadRequest]
-
-}
-
-object HipValidationError {
-  implicit val reads: Reads[HipValidationError] = Json.reads[HipValidationError]
-}
-
-object HodErrorBody {
-  implicit val reads: Reads[HodErrorBody] = Json.reads[HodErrorBody]
-
-}
-
-object HodError {
-  implicit val reads: Reads[HodError] = Json.reads[HodError]
-
-}
-
-object HodErrorResponse {
-  implicit val reads: Reads[HodErrorResponse] = Json.reads[HodErrorResponse]
-
+object HipFailure {
+  implicit val hipErrorReads: Reads[HipError]                          = Json.reads[HipError]
+  implicit val hipFailureReads: Reads[HipFailures]                     = Json.reads[HipFailures]
+  implicit val hpServiceUnavailableReads: Reads[HipServiceUnavailable] = Json.reads[HipServiceUnavailable]
+  implicit val hipServerErrorReads: Reads[HipServerError]              = Json.reads[HipServerError]
+  implicit val hip422ErrorReads: Reads[Hip422Error]                    = Json.reads[Hip422Error]
+  implicit val hipBadRequestReads: Reads[HipBadRequest]                = Json.reads[HipBadRequest]
+  implicit val hipValidationErrorReads: Reads[HipValidationError]      = Json.reads[HipValidationError]
+  implicit val hodErrorBodyReads: Reads[HodErrorBody]                  = Json.reads[HodErrorBody]
+  implicit val hodErrorReads: Reads[HodError]                          = Json.reads[HodError]
+  implicit val hodErrorResponseReads: Reads[HodErrorResponse]          = Json.reads[HodErrorResponse]
 }

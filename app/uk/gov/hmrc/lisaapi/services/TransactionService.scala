@@ -189,6 +189,12 @@ class TransactionService @Inject() (connector: RoutingConnector)(implicit ec: Ex
             )
             GetTransactionErrorResponse
         }
+
+      case error =>
+        logger.error(
+          s"[TransactionService][handleCollectedTransaction] Get collected transaction returned error: ${error.getClass.getTypeName} from ETMP for lisaManager : $lisaManager"
+        )
+        GetTransactionErrorResponse
     }
 
   private def handlePaidTransaction(
@@ -292,6 +298,11 @@ class TransactionService @Inject() (connector: RoutingConnector)(implicit ec: Ex
             )
             GetTransactionErrorResponse
         }
+      case error                             =>
+        logger.error(
+          s"[TransactionService][handlePaidTransaction] Get paid transaction returned error: ${error.getClass.getTypeName} from ETMP for lisaManager : $lisaManager"
+        )
+        GetTransactionErrorResponse
     }
 
 }

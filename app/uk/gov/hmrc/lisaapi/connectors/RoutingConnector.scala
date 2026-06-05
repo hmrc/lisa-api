@@ -16,12 +16,10 @@
 
 package uk.gov.hmrc.lisaapi.connectors
 
-import play.api.http.Status.{ACCEPTED, CREATED}
-import play.api.libs.json.{JsValue, Json}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.models.des.DesResponse
-import uk.gov.hmrc.lisaapi.models.hip.{HipResponse, RoutingResponse}
+import uk.gov.hmrc.lisaapi.models.hip.RoutingResponse
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}

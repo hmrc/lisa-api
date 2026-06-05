@@ -16,104 +16,159 @@
 
 package uk.gov.hmrc.lisaapi.connectors
 
+import com.github.tomakehurst.wiremock.client.WireMock.*
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.helpers.ConnectorSpecHelper
 import uk.gov.hmrc.lisaapi.models.hip.*
+
+import java.time.LocalDate
 
 trait HipConnectorTestHelper extends ConnectorSpecHelper {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  val validHipBadRequestJson: String =
-    """{
-      |  "origin": "HIP",
-      |  "response": {
-      |    "failures": [
-      |      {
-      |        "type": "BAD_REQUEST",
-      |        "reason": "Invalid request"
-      |      }
-      |    ]
-      |  }
-      |}""".stripMargin
+  def verifyHipGet(url: String): Unit =
+    server.verify(
+      getRequestedFor(urlEqualTo(url))
+        .withHeader("CorrelationId", matching(uuidPattern))
+        .withHeader("X-Originating-System", equalTo("LISA"))
+        .withHeader("X-Receipt-Date", matching(".+"))
+        .withHeader("X-Transmitting-System", equalTo("HIP"))
+        .withHeader("Authorization", equalTo("Basic dGVzdElkOnRlc3RTZWNyZXQ="))
+    )
 
-  val validValidationErrorJson: String =
-    """{
-      |  "errors": {
-      |    "processingDate": "2026-04-01T23:00:00Z",
-      |    "code": "003",
-      |    "text": "Request could not be processed"
-      |  }
-      |}""".stripMargin
+  object HipSuccesses {
 
-  val validServiceUnavailableHodJson: String =
-    """{
-      |  "origin": "HoD",
-      |  "response": {
-      |    "error": {
-      |      "code": "500",
-      |      "message": "string",
-      |      "logID": "D82EBAB67AC6D7565C0682CA91BDC577"
-      |    }
-      |  }
-      |}""".stripMargin
+    val validHipPendingJson: String =
+      """{
+        |  "success": {
+        |    "paymentStatus": "PENDING",
+        |    "paymentDueDate": "2026-05-27"
+        |  }
+        |}""".stripMargin
 
-  val validServiceUnavailableJson: String =
-    """{
-      |  "origin": "HIP",
-      |  "response": {
-      |    "failures": [
-      |      {
-      |        "type": "SERVICE_UNAVAILABLE",
-      |        "reason": "Dependent services maybe down"
-      |      }
-      |    ]
-      |  }
-      |}""".stripMargin
+    val expectedHipPending = HipGetTransactionPending(paymentDueDate = LocalDate.of(2026, 5, 27))
 
-  val validServerErrorJson: String =
-    """{
-      |  "origin": "HIP",
-      |  "response": {
-      |    "failures": [
-      |      {
-      |        "type": "INTERNAL_SERVER_ERROR",
-      |        "reason": "Internal server error"
-      |      }
-      |    ]
-      |  }
-      |}""".stripMargin
+    val validHipPaidJson: String =
+      """{
+        |  "success": {
+        |    "paymentStatus":    "PAID",
+        |    "paymentDate":      "2026-05-27",
+        |    "paymentDueDate":   "2026-05-30",
+        |    "paymentReference": "1234567890",
+        |    "paymentAmount":    101.00
+        |  }
+        |}""".stripMargin
 
-  val expectedServiceUnavailable = HipServiceUnavailable(
-    response = HipFailures(
-      failures = Seq(
-        HipError(`type` = "SERVICE_UNAVAILABLE", reason = "Dependent services maybe down")
+    val expectedHipPaid = HipGetTransactionPaid(
+      paymentDate = LocalDate.of(2026, 5, 27),
+      paymentDueDate = LocalDate.of(2026, 5, 30),
+      paymentReference = "1234567890",
+      paymentAmount = BigDecimal(101.00)
+    )
+
+  }
+
+  object HipFails {
+
+    val validHipOtherErrorjson: String =
+      """{
+        |  "somethingElse": "Whatever",
+        |  "paymentDueDate": "2026-05-27"
+        |}""".stripMargin
+
+    val validHipBadRequestJson: String =
+      """{
+        |  "origin": "HIP",
+        |  "response": {
+        |    "failures": [
+        |      {
+        |        "type": "BAD_REQUEST",
+        |        "reason": "Invalid request"
+        |      }
+        |    ]
+        |  }
+        |}""".stripMargin
+
+    val validValidationErrorJson: String =
+      """{
+        |  "errors": {
+        |    "processingDate": "2026-04-01T23:00:00Z",
+        |    "code": "003",
+        |    "text": "Request could not be processed"
+        |  }
+        |}""".stripMargin
+
+    val validServiceUnavailableHodJson: String =
+      """{
+        |  "origin": "HoD",
+        |  "response": {
+        |    "error": {
+        |      "code": "500",
+        |      "message": "string",
+        |      "logID": "D82EBAB67AC6D7565C0682CA91BDC577"
+        |    }
+        |  }
+        |}""".stripMargin
+
+    val validServiceUnavailableJson: String =
+      """{
+        |  "origin": "HIP",
+        |  "response": {
+        |    "failures": [
+        |      {
+        |        "type": "SERVICE_UNAVAILABLE",
+        |        "reason": "Dependent services maybe down"
+        |      }
+        |    ]
+        |  }
+        |}""".stripMargin
+
+    val validServerErrorJson: String =
+      """{
+        |  "origin": "HIP",
+        |  "response": {
+        |    "failures": [
+        |      {
+        |        "type": "INTERNAL_SERVER_ERROR",
+        |        "reason": "Internal server error"
+        |      }
+        |    ]
+        |  }
+        |}""".stripMargin
+
+    val expectedServiceUnavailable = HipServiceUnavailable(
+      response = HipFailures(
+        failures = Seq(
+          HipError(`type` = "SERVICE_UNAVAILABLE", reason = "Dependent services maybe down")
+        )
       )
     )
-  )
 
-  val expectedServerError = HipServerError(
-    response = HipFailures(
-      failures = Seq(
-        HipError(`type` = "INTERNAL_SERVER_ERROR", reason = "Internal server error")
+    val expectedServerError = HipServerError(
+      response = HipFailures(
+        failures = Seq(
+          HipError(`type` = "INTERNAL_SERVER_ERROR", reason = "Internal server error")
+        )
       )
     )
-  )
 
-  val expectedBadRequestError = HipBadRequest(
-    response = HipFailures(
-      failures = Seq(
-        HipError(`type` = "BAD_REQUEST", reason = "Invalid request")
+    val expectedBadRequestError = HipBadRequest(
+      response = HipFailures(
+        failures = Seq(
+          HipError(`type` = "BAD_REQUEST", reason = "Invalid request")
+        )
       )
     )
-  )
 
-  val expectedValidationError = HipValidationError(
-    errors = Hip422Error(
-      processingDate = "2026-04-01T23:00:00Z",
-      code = "003",
-      text = "Request could not be processed"
+    val expectedValidationError = HipValidationError(
+      errors = Hip422Error(
+        processingDate = "2026-04-01T23:00:00Z",
+        code = "003",
+        text = "Request could not be processed"
+      )
     )
-  )
+
+  }
 
 }

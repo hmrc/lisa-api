@@ -22,15 +22,19 @@ import play.api.http.Status.*
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Reads}
 import play.mvc.Http.{HeaderNames, MimeTypes}
 import play.utils.UriEncoding
+import sttp.model.HeaderNames as sttpHeaderNames
 import uk.gov.hmrc.http.HttpReads.Implicits.readRaw
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.models.LisaManagerReferenceNumber
 import uk.gov.hmrc.lisaapi.models.hip.*
+
+import java.nio.charset.StandardCharsets
 import java.time.Instant
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+import java.util.Base64
 import java.util.UUID.randomUUID
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -41,11 +45,19 @@ class HipConnector @Inject() (wsHttp: HttpClientV2, appContext: AppContext)(impl
   val urlEncodingFormat: String   = "utf-8"
   lazy val lisaServiceUrl: String = s"${appContext.hipUrl}/RESTAdapter/lisa/bonus-charge/manager"
 
+  private def authSecret: String =
+    Base64.getEncoder
+      .encodeToString(
+        s"${appContext.hipClientId}:${appContext.hipClientSecret}"
+          .getBytes(StandardCharsets.UTF_8)
+      )
+
   private def headers(implicit hc: HeaderCarrier): Seq[(String, String)] = Seq(
-    "X-Originating-System"  -> appContext.appName,
-    "correlationid"         -> correlationId,
-    "X-Receipt-Date"        -> DateTimeFormatter.ISO_INSTANT.format(Instant.now().truncatedTo(ChronoUnit.SECONDS)),
-    "X-Transmitting-System" -> "HIP"
+    sttpHeaderNames.Authorization -> s"Basic $authSecret",
+    "X-Originating-System"        -> "LISA",
+    "correlationid"               -> correlationId,
+    "X-Receipt-Date"              -> DateTimeFormatter.ISO_INSTANT.format(Instant.now().truncatedTo(ChronoUnit.SECONDS)),
+    "X-Transmitting-System"       -> "HIP"
   )
 
   private[connectors] def correlationId(implicit hc: HeaderCarrier): String = {
@@ -61,7 +73,7 @@ class HipConnector @Inject() (wsHttp: HttpClientV2, appContext: AppContext)(impl
     }
   }
 
-  def parseResponse[A <: HipResponse](res: HttpResponse, originCheck: Boolean = false)(implicit
+  def parseResponse[A <: HipResponse](res: HttpResponse)(implicit
     reads: Reads[A]
   ): HipResponse = {
 
@@ -129,11 +141,11 @@ class HipConnector @Inject() (wsHttp: HttpClientV2, appContext: AppContext)(impl
     result.map { res =>
       logger.info("[HipConnector][getTransaction] Get Transaction details returned status: " + res.status)
       res.status match {
-        case OK                    => parseResponse[HipGetTransactionResponse](res, false)
-        case BAD_REQUEST           => parseResponse[HipBadRequest](res, true)
-        case SERVICE_UNAVAILABLE   => parseResponse[HipServiceUnavailable](res, true)
-        case INTERNAL_SERVER_ERROR => parseResponse[HipServerError](res, true)
-        case UNPROCESSABLE_ENTITY  => parseResponse[HipValidationError](res, false)
+        case OK                    => parseResponse[HipGetTransactionResponse](res)
+        case BAD_REQUEST           => parseResponse[HipBadRequest](res)
+        case SERVICE_UNAVAILABLE   => parseResponse[HipServiceUnavailable](res)
+        case INTERNAL_SERVER_ERROR => parseResponse[HipServerError](res)
+        case UNPROCESSABLE_ENTITY  => parseResponse[HipValidationError](res)
         case NOT_FOUND             => HipNotFound
         case UNAUTHORIZED          => HipUnauthorized
         case FORBIDDEN             => HipForbidden

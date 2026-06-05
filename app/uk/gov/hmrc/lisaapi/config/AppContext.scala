@@ -35,6 +35,8 @@ class AppContext @Inject() (config: Configuration, serviceConfig: ServicesConfig
   lazy val desUrl: String                = serviceConfig.baseUrl("des")
   lazy val hipUrl: String                = serviceConfig.baseUrl("hip")
   lazy val useHip: Boolean               = serviceConfig.getBoolean("features.hip")
+  lazy val hipClientId: String           = serviceConfig.getString("microservice.services.hip.clientId")
+  lazy val hipClientSecret: String       = serviceConfig.getString("microservice.services.hip.clientSecret")
 
   def endpointIsDisabled(endpoint: String): Boolean =
     config.getOptional[Seq[String]]("api.disabledEndpoints").fold(false)(list => list.contains(endpoint))
