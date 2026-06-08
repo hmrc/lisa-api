@@ -31,12 +31,6 @@ import scala.concurrent.Future
 class RoutingConnectorSpec extends BaseTestFixture {
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  private val hipBaseTransactionUrl = "/RESTAdapter/lisa/bonus-charge/manager"
-  private val desBaseTransactionUrl = "/lifetime-isa/manager"
-
-  val hipTransactionUrl = s"$hipBaseTransactionUrl/Z123456/accounts/ABC12345/transaction/123456/bonusChargeDetails"
-  val desTransactionUrl = s"$desBaseTransactionUrl/Z123456/accounts/ABC12345/transaction/123456"
-
   val mockHipConnector: HipConnector = mock[HipConnector]
   val mockDesConnector: DesConnector = mock[DesConnector]
 
