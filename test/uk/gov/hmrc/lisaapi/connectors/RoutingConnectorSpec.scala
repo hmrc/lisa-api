@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.lisaapi.connectors
 
-import org.mockito.ArgumentMatchers.{any, anyString}
+import org.mockito.ArgumentMatchers.{any, anyString, eq => eqTo}
 import org.mockito.Mockito.*
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.config.AppContext
@@ -37,42 +37,39 @@ class RoutingConnectorSpec extends BaseTestFixture {
   val hipTransactionUrl = s"$hipBaseTransactionUrl/Z123456/accounts/ABC12345/transaction/123456/bonusChargeDetails"
   val desTransactionUrl = s"$desBaseTransactionUrl/Z123456/accounts/ABC12345/transaction/123456"
 
-  val hipConnectorMock = mock[HipConnector]
-  val desConnectorMock = mock[DesConnector]
+  val mockHipConnector: HipConnector = mock[HipConnector]
+  val mockDesConnector: DesConnector = mock[DesConnector]
 
   "RoutingConnector" must {
-    "talk to HIP when useHip flag is true" in {
-      val appContext       = new AppContext(mockConfiguration, mockServicesConfig)
-      val routingConnector = new RoutingConnector(appContext, desConnectorMock, hipConnectorMock)
-      when(mockServicesConfig.getBoolean("features.hip")).thenReturn(true)
-      when(hipConnectorMock.getTransaction(anyString(), anyString(), anyString())(any[HeaderCarrier]()))
+    "delegate to the HIP connector when useHip flag is true" in {
+      val routingConnector = new RoutingConnector(mockAppContext, mockDesConnector, mockHipConnector)
+      when(mockAppContext.useHip).thenReturn(true)
+      when(mockHipConnector.getTransaction(anyString(), anyString(), anyString())(eqTo(hc)))
         .thenReturn(Future.successful(HipGetTransactionPending(LocalDate.parse("2026-05-05"))))
 
       routingConnector.getTransaction("lisaManager", "accountNo", "tranId")
-      verify(hipConnectorMock, times(1)).getTransaction("lisaManager", "accountNo", "tranId")
+      verify(mockHipConnector, times(1)).getTransaction("lisaManager", "accountNo", "tranId")
     }
 
-    "talk to DES when useHip flag is false" in {
-      val appContext       = new AppContext(mockConfiguration, mockServicesConfig)
-      val routingConnector = new RoutingConnector(appContext, desConnectorMock, hipConnectorMock)
-      when(mockServicesConfig.getBoolean("features.hip")).thenReturn(false)
-      when(desConnectorMock.getTransaction(anyString(), anyString(), anyString())(any[HeaderCarrier]()))
+    "delegate to the DES connector when useHip flag is false" in {
+      val routingConnector = new RoutingConnector(mockAppContext, mockDesConnector, mockHipConnector)
+      when(mockAppContext.useHip).thenReturn(false)
+      when(mockDesConnector.getTransaction(anyString(), anyString(), anyString())(eqTo(hc)))
         .thenReturn(Future.successful(DesGetTransactionPending(LocalDate.parse("2026-05-05"))))
 
       routingConnector.getTransaction("lisaManager", "accountNo", "tranId")
 
-      verify(desConnectorMock, times(1)).getTransaction("lisaManager", "accountNo", "tranId")
+      verify(mockDesConnector, times(1)).getTransaction("lisaManager", "accountNo", "tranId")
     }
 
-    "talk to DES for getBonusOrWithdrawal" in {
-      val appContext       = new AppContext(mockConfiguration, mockServicesConfig)
-      val routingConnector = new RoutingConnector(appContext, desConnectorMock, hipConnectorMock)
-      when(desConnectorMock.getBonusOrWithdrawal(anyString(), anyString(), anyString())(any[HeaderCarrier]()))
+    "delegate to the DES connector for getBonusOrWithdrawal" in {
+      val routingConnector = new RoutingConnector(mockAppContext, mockDesConnector, mockHipConnector)
+      when(mockDesConnector.getBonusOrWithdrawal(anyString(), anyString(), anyString())(eqTo(hc)))
         .thenReturn(Future.successful(DesUnavailableResponse))
 
       routingConnector.getBonusOrWithdrawal("lisaManager", "accountNo", "tranId")
 
-      verify(desConnectorMock, times(1)).getBonusOrWithdrawal("lisaManager", "accountNo", "tranId")
+      verify(mockDesConnector, times(1)).getBonusOrWithdrawal("lisaManager", "accountNo", "tranId")
     }
 
   }

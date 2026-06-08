@@ -23,6 +23,8 @@ import uk.gov.hmrc.lisaapi.models.{Amount, JsonReads}
 
 import java.time.LocalDate
 
+trait RoutingResponse
+
 trait HipResponse extends RoutingResponse {}
 
 trait HipGetTransactionResponse extends HipResponse {
