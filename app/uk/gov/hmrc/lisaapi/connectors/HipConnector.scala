@@ -121,9 +121,6 @@ class HipConnector @Inject() (wsHttp: HttpClientV2, appContext: AppContext)(impl
     } yield value).getOrElse(HipOtherErrorResponse)
   }
 
-  private def headersWithOriginator(implicit hc: HeaderCarrier): Seq[(String, String)] =
-    headers :+ ("OriginatorId" -> "DA2_LISA")
-
   def getTransaction(lisaManagerReferenceNumber: LisaManagerReferenceNumber, accountId: String, transactionId: String)(
     implicit hc: HeaderCarrier
   ): Future[HipResponse] = {
@@ -135,7 +132,7 @@ class HipConnector @Inject() (wsHttp: HttpClientV2, appContext: AppContext)(impl
 
     val result = wsHttp
       .get(url"$fullUrl")
-      .setHeader(headersWithOriginator: _*)
+      .setHeader(headers: _*)
       .execute[HttpResponse]
 
     result.map { res =>
