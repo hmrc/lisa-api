@@ -32,12 +32,12 @@ import scala.concurrent.{Await, Future}
 
 class TransactionServiceSpec extends ServiceTestFixture {
 
-
   "Get Transaction From HIP" must {
     "return a Due transaction" when {
       "ITMP returns a Collected status and ETMP returns a Pending status" in {
         when(mockAppContext.useHip).thenReturn(true)
-        val transactionService: TransactionService = new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
+        val transactionService: TransactionService =
+          new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetWithdrawalResponse(
@@ -58,13 +58,10 @@ class TransactionServiceSpec extends ServiceTestFixture {
         )
 
         when(mockHipConnector.getTransaction(any(), any(), any())(any()))
-          .thenReturn(
-            Future.successful(HipGetTransactionPending(LocalDate.parse("2000-01-01"))
-            ))
+          .thenReturn(Future.successful(HipGetTransactionPending(LocalDate.parse("2000-01-01"))))
 
         val result =
           Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
-
 
         result mustBe GetTransactionSuccessResponse(
           transactionId = "12345",
@@ -79,7 +76,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
       "ITMP returns a Collected status and ETMP returns a Not Found error" in {
         when(mockAppContext.useHip).thenReturn(true)
 
-        val transactionService: TransactionService = new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
+        val transactionService: TransactionService =
+          new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetWithdrawalResponse(
@@ -116,7 +114,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
       "ITMP returns a Cancelled status" in {
         when(mockAppContext.useHip).thenReturn(true)
 
-        val transactionService: TransactionService = new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
+        val transactionService: TransactionService =
+          new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
@@ -147,7 +146,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
       "ITMP returns a Void status" in {
         when(mockAppContext.useHip).thenReturn(true)
 
-        val transactionService: TransactionService = new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
+        val transactionService: TransactionService =
+          new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
@@ -178,7 +178,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
       "ITMP returns a Superseded status" in {
         when(mockAppContext.useHip).thenReturn(true)
 
-        val transactionService: TransactionService = new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
+        val transactionService: TransactionService =
+          new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
@@ -210,7 +211,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
       "ITMP returns a Paid status and ETMP returns a Paid status" in {
         when(mockAppContext.useHip).thenReturn(true)
 
-        val transactionService: TransactionService = new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
+        val transactionService: TransactionService =
+          new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
@@ -256,7 +258,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
       "ITMP returns a Collected status and ETMP returns a Paid status" in {
         when(mockAppContext.useHip).thenReturn(true)
 
-        val transactionService: TransactionService = new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
+        val transactionService: TransactionService =
+          new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetWithdrawalResponse(
@@ -277,7 +280,11 @@ class TransactionServiceSpec extends ServiceTestFixture {
         )
 
         when(mockHipConnector.getTransaction(any(), any(), any())(any()))
-          .thenReturn(Future.successful(HipGetTransactionPaid(LocalDate.parse("2000-01-01"), LocalDate.parse("2000-01-01"), "XREF", 25)))
+          .thenReturn(
+            Future.successful(
+              HipGetTransactionPaid(LocalDate.parse("2000-01-01"), LocalDate.parse("2000-01-01"), "XREF", 25)
+            )
+          )
 
         val result =
           Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
@@ -297,7 +304,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
       "ITMP returns a Paid status and ETMP returns a COULD_NOT_PROCESS error" in {
         when(mockAppContext.useHip).thenReturn(true)
 
-        val transactionService: TransactionService = new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
+        val transactionService: TransactionService =
+          new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
@@ -331,7 +339,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
       "ITMP returns a Transaction Not Found error" in {
         when(mockAppContext.useHip).thenReturn(true)
 
-        val transactionService: TransactionService = new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
+        val transactionService: TransactionService =
+          new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any()))
           .thenReturn(Future.successful(DesFailureResponse("TRANSACTION_ID_NOT_FOUND")))
 
@@ -346,7 +355,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
       "ITMP returns a Account Not Found error" in {
         when(mockAppContext.useHip).thenReturn(true)
 
-        val transactionService: TransactionService = new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
+        val transactionService: TransactionService =
+          new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any()))
           .thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNTID_NOT_FOUND")))
 
@@ -361,7 +371,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
       "ITMP returns a 503" in {
         when(mockAppContext.useHip).thenReturn(true)
 
-        val transactionService: TransactionService = new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
+        val transactionService: TransactionService =
+          new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any()))
           .thenReturn(Future.successful(DesUnavailableResponse))
 
@@ -373,7 +384,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
       "ETMP returns a 503 for a paid transaction" in {
         when(mockAppContext.useHip).thenReturn(true)
 
-        val transactionService: TransactionService = new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
+        val transactionService: TransactionService =
+          new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
@@ -400,7 +412,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
       "ETMP returns a 503 for a collected transaction" in {
         when(mockAppContext.useHip).thenReturn(true)
 
-        val transactionService: TransactionService = new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
+        val transactionService: TransactionService =
+          new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
@@ -430,7 +443,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
       "ITMP returns an unknown error code" in {
         when(mockAppContext.useHip).thenReturn(true)
 
-        val transactionService: TransactionService = new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
+        val transactionService: TransactionService =
+          new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any()))
           .thenReturn(Future.successful(DesFailureResponse("UNKNOWN_ERROR", "Unknown error")))
 
@@ -443,7 +457,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
       "ITMP returns an unexpected payment status" in {
         when(mockAppContext.useHip).thenReturn(true)
 
-        val transactionService: TransactionService = new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
+        val transactionService: TransactionService =
+          new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
@@ -468,7 +483,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
       "ETMP returns an unknown error for a Paid transaction" in {
         when(mockAppContext.useHip).thenReturn(true)
 
-        val transactionService: TransactionService = new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
+        val transactionService: TransactionService =
+          new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
@@ -485,7 +501,9 @@ class TransactionServiceSpec extends ServiceTestFixture {
         )
 
         when(mockHipConnector.getTransaction(any(), any(), any())(any()))
-          .thenReturn(Future.successful(HipOtherErrorResponse)) //  DesFailureResponse("UNKNOWN_ERROR", "Unknown error")))
+          .thenReturn(
+            Future.successful(HipOtherErrorResponse)
+          ) //  DesFailureResponse("UNKNOWN_ERROR", "Unknown error")))
 
         val result =
           Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
@@ -496,7 +514,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
       "ETMP returns an unknown error for a Collected transaction" in {
         when(mockAppContext.useHip).thenReturn(false)
 
-        val transactionService: TransactionService = new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
+        val transactionService: TransactionService =
+          new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
@@ -530,7 +549,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
       "ITMP returns a Pending transaction" in {
         when(mockAppContext.useHip).thenReturn(false)
 
-        val transactionService: TransactionService = new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
+        val transactionService: TransactionService =
+          new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
@@ -558,7 +578,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
       "ITMP returns a Paid status and ETMP returns a Pending status" in {
         when(mockAppContext.useHip).thenReturn(false)
 
-        val transactionService: TransactionService = new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
+        val transactionService: TransactionService =
+          new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
@@ -591,7 +612,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
       "ITMP returns a Paid status and ETMP returns a Not Found error" in {
         when(mockAppContext.useHip).thenReturn(false)
 
-        val transactionService: TransactionService = new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
+        val transactionService: TransactionService =
+          new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
@@ -625,7 +647,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
       "ITMP returns a Collected status and ETMP returns a Pending status" in {
         when(mockAppContext.useHip).thenReturn(false)
 
-        val transactionService: TransactionService = new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
+        val transactionService: TransactionService =
+          new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetWithdrawalResponse(
@@ -665,7 +688,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
       "ITMP returns a Collected status and ETMP returns a Not Found error" in {
         when(mockAppContext.useHip).thenReturn(false)
 
-        val transactionService: TransactionService = new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
+        val transactionService: TransactionService =
+          new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetWithdrawalResponse(
@@ -702,7 +726,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
       "ITMP returns a Cancelled status" in {
         when(mockAppContext.useHip).thenReturn(false)
 
-        val transactionService: TransactionService = new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
+        val transactionService: TransactionService =
+          new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
@@ -733,7 +758,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
       "ITMP returns a Void status" in {
         when(mockAppContext.useHip).thenReturn(false)
 
-        val transactionService: TransactionService = new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
+        val transactionService: TransactionService =
+          new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
@@ -764,7 +790,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
       "ITMP returns a Superseded status" in {
         when(mockAppContext.useHip).thenReturn(false)
 
-        val transactionService: TransactionService = new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
+        val transactionService: TransactionService =
+          new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
@@ -796,7 +823,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
       "ITMP returns a Paid status and ETMP returns a Paid status" in {
         when(mockAppContext.useHip).thenReturn(false)
 
-        val transactionService: TransactionService = new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
+        val transactionService: TransactionService =
+          new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
@@ -841,7 +869,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
       "ITMP returns a Collected status and ETMP returns a Paid status" in {
         when(mockAppContext.useHip).thenReturn(false)
 
-        val transactionService: TransactionService = new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
+        val transactionService: TransactionService =
+          new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetWithdrawalResponse(
@@ -882,7 +911,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
       "ITMP returns a Paid status and ETMP returns a COULD_NOT_PROCESS error" in {
         when(mockAppContext.useHip).thenReturn(false)
 
-        val transactionService: TransactionService = new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
+        val transactionService: TransactionService =
+          new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
@@ -916,7 +946,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
       "ITMP returns a Transaction Not Found error" in {
         when(mockAppContext.useHip).thenReturn(false)
 
-        val transactionService: TransactionService = new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
+        val transactionService: TransactionService =
+          new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any()))
           .thenReturn(Future.successful(DesFailureResponse("TRANSACTION_ID_NOT_FOUND")))
 
@@ -931,7 +962,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
       "ITMP returns a Account Not Found error" in {
         when(mockAppContext.useHip).thenReturn(false)
 
-        val transactionService: TransactionService = new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
+        val transactionService: TransactionService =
+          new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any()))
           .thenReturn(Future.successful(DesFailureResponse("INVESTOR_ACCOUNTID_NOT_FOUND")))
 
@@ -946,7 +978,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
       "ITMP returns a 503" in {
         when(mockAppContext.useHip).thenReturn(false)
 
-        val transactionService: TransactionService = new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
+        val transactionService: TransactionService =
+          new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any()))
           .thenReturn(Future.successful(DesUnavailableResponse))
 
@@ -958,7 +991,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
       "ETMP returns a 503 for a paid transaction" in {
         when(mockAppContext.useHip).thenReturn(false)
 
-        val transactionService: TransactionService = new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
+        val transactionService: TransactionService =
+          new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
@@ -985,7 +1019,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
       "ETMP returns a 503 for a collected transaction" in {
         when(mockAppContext.useHip).thenReturn(false)
 
-        val transactionService: TransactionService = new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
+        val transactionService: TransactionService =
+          new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
@@ -1015,7 +1050,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
       "ITMP returns an unknown error code" in {
         when(mockAppContext.useHip).thenReturn(false)
 
-        val transactionService: TransactionService = new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
+        val transactionService: TransactionService =
+          new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any()))
           .thenReturn(Future.successful(DesFailureResponse("UNKNOWN_ERROR", "Unknown error")))
 
@@ -1028,7 +1064,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
       "ITMP returns an unexpected payment status" in {
         when(mockAppContext.useHip).thenReturn(false)
 
-        val transactionService: TransactionService = new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
+        val transactionService: TransactionService =
+          new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
@@ -1053,7 +1090,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
       "ETMP returns an unknown error for a Paid transaction" in {
         when(mockAppContext.useHip).thenReturn(false)
 
-        val transactionService: TransactionService = new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
+        val transactionService: TransactionService =
+          new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
@@ -1081,7 +1119,8 @@ class TransactionServiceSpec extends ServiceTestFixture {
       "ETMP returns an unknown error for a Collected transaction" in {
         when(mockAppContext.useHip).thenReturn(false)
 
-        val transactionService: TransactionService = new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
+        val transactionService: TransactionService =
+          new TransactionService(mockDesConnector, mockHipConnector, mockAppContext)
         when(mockDesConnector.getBonusOrWithdrawal(any(), any(), any())(any())).thenReturn(
           Future.successful(
             GetBonusResponse(
@@ -1108,6 +1147,5 @@ class TransactionServiceSpec extends ServiceTestFixture {
     }
 
   }
-
 
 }

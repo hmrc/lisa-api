@@ -30,26 +30,30 @@ trait HipGetTransactionResponse extends HipResponse {
 }
 
 case class HipGetTransactionPending(
-                                     paymentDueDate: LocalDate,
-                                   ) extends HipGetTransactionResponse {
+  paymentDueDate: LocalDate
+) extends HipGetTransactionResponse {
   val paymentStatus = "PENDING"
 }
 
 case class HipGetTransactionPaid(
-                                  paymentDate: LocalDate,
-                                  paymentDueDate: LocalDate,
-                                  paymentReference: String,
-                                  paymentAmount: Amount) extends HipGetTransactionResponse {
+  paymentDate: LocalDate,
+  paymentDueDate: LocalDate,
+  paymentReference: String,
+  paymentAmount: Amount
+) extends HipGetTransactionResponse {
   val paymentStatus = "PAID"
 }
 
 object HipGetTransactionResponse {
+
   implicit val paidReads: Reads[HipGetTransactionPaid] = (
     (JsPath \ "paymentDate").read(JsonReads.isoDate) and
       (JsPath \ "paymentDueDate").read(JsonReads.isoDate) and
       (JsPath \ "paymentReference").read[String] and
       (JsPath \ "paymentAmount").read[Amount]
-    )((paymentDate, paymentDueDate, paymentReference, paymentAmount) =>  HipGetTransactionPaid(paymentDate, paymentDueDate, paymentReference, paymentAmount))
+  )((paymentDate, paymentDueDate, paymentReference, paymentAmount) =>
+    HipGetTransactionPaid(paymentDate, paymentDueDate, paymentReference, paymentAmount)
+  )
 
   implicit val pendingReads: Reads[HipGetTransactionPending] = Json.reads[HipGetTransactionPending]
 
@@ -58,10 +62,10 @@ object HipGetTransactionResponse {
       case JsSuccess(paymentStatus, _) =>
         paymentStatus match {
           case "PENDING" => pendingReads.reads(json)
-          case "PAID" => paidReads.reads(json)
-          case other => JsError(s"Unknown payment status: $other")
+          case "PAID"    => paidReads.reads(json)
+          case other     => JsError(s"Unknown payment status: $other")
         }
-      case JsError(errors) => JsError(s"Unknown type: ${errors.mkString(", ")}")
+      case JsError(errors)             => JsError(s"Unknown type: ${errors.mkString(", ")}")
     }
   }
 
@@ -75,7 +79,7 @@ case class HodError(error: HodErrorBody)
 case class HodErrorResponse(response: HodError) extends HipFailure
 case class HipBadRequest(response: HipFailures) extends HipFailure
 case class Hip422Error(processingDate: String, code: String, text: String)
-case class HipValidationError(errors: Hip422Error ) extends HipFailure
+case class HipValidationError(errors: Hip422Error) extends HipFailure
 case class HipServerError(response: HipFailures) extends HipFailure
 case class HipServiceUnavailable(response: HipFailures) extends HipFailure
 case class HipFailures(failures: Seq[HipError])
@@ -125,4 +129,3 @@ object HodError {
 object HodErrorResponse {
   implicit val reads: Reads[HodErrorResponse] = Json.reads[HodErrorResponse]
 }
-
