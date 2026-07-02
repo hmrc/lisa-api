@@ -39,7 +39,7 @@ class RoutingConnectorSpec extends BaseTestFixture {
       val routingConnector = new RoutingConnector(mockAppContext, mockDesConnector, mockHipConnector)
       when(mockAppContext.useHip).thenReturn(true)
       when(mockHipConnector.getTransaction(anyString(), anyString(), anyString())(eqTo(hc)))
-        .thenReturn(Future.successful(HipGetTransactionPending(LocalDate.parse("2026-05-05"))))
+        .thenReturn(Future.successful(HipGetTransactionPending(LocalDate.parse("2026-05-05"), None, None)))
 
       routingConnector.getTransaction("lisaManager", "accountNo", "tranId")
       verify(mockHipConnector, times(1)).getTransaction("lisaManager", "accountNo", "tranId")

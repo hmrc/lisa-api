@@ -82,7 +82,7 @@ class HipTransactionServiceSpec extends ServiceTestFixture with HipConnectorTest
         )
 
         when(mockRoutingConnector.getTransaction(any(), any(), any())(any()))
-          .thenReturn(Future.successful(HipGetTransactionPending(LocalDate.parse("2000-01-01"))))
+          .thenReturn(Future.successful(HipGetTransactionPending(LocalDate.parse("2000-01-01"), None, None)))
 
         val result =
           Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
@@ -148,7 +148,7 @@ class HipTransactionServiceSpec extends ServiceTestFixture with HipConnectorTest
 
         when(mockRoutingConnector.getTransaction(any(), any(), any())(any()))
           .thenReturn(
-            Future.successful(HipGetTransactionPending(LocalDate.parse("2000-01-01")))
+            Future.successful(HipGetTransactionPending(LocalDate.parse("2000-01-01"), None, None))
           )
 
         val result =
