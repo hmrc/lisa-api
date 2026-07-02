@@ -63,9 +63,9 @@ object HipGetTransactionResponse {
     (JsPath \ "paymentDueDate").read(JsonReads.isoDate) and
       (JsPath \ "paymentAmount").readNullable[Amount] and
       (JsPath \ "paymentReference").readNullable[String]
-
-    )((paymentDueDate, paymentAmount, paymentReference) => HipGetTransactionPending(paymentDueDate, paymentAmount, paymentReference))
-
+  )((paymentDueDate, paymentAmount, paymentReference) =>
+    HipGetTransactionPending(paymentDueDate, paymentAmount, paymentReference)
+  )
 
   implicit val hipResponseReads: Reads[HipGetTransactionResponse] = Reads[HipGetTransactionResponse] { json =>
     (json \ "success" \ "paymentStatus").validate[String] match {
