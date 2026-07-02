@@ -173,8 +173,8 @@ class TransactionService @Inject() (connector: RoutingConnector)(implicit ec: Ex
           paymentStatus = TransactionPaymentStatus.DUE,
           paymentDueDate = Some(due.paymentDueDate),
           transactionType = Some(TransactionPaymentType.DEBT),
-          paymentAmount = None,
-          paymentReference = None
+          paymentAmount = due.paymentAmount,
+          paymentReference = due.paymentReference
         )
       case error: HipFailureResponse        =>
         error.`type` match {
@@ -259,6 +259,12 @@ class TransactionService @Inject() (connector: RoutingConnector)(implicit ec: Ex
           s"[TransactionService][handlePaidTransaction] Matched HipServiceUnavailable for lisaManager : $lisaManager"
         )
         GetTransactionServiceUnavailableResponse
+      case HipForbidden                      =>
+        GetTransactionSuccessResponse(
+          transactionId = transactionId,
+          paymentStatus = TransactionPaymentStatus.REFUND_CANCELLED,
+          transactionType = Some(TransactionPaymentType.PAYMENT)
+        )
       case paid: HipGetTransactionPaid       =>
         GetTransactionSuccessResponse(
           transactionId = transactionId,

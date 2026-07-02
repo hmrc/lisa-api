@@ -47,7 +47,7 @@ trait HipConnectorTestHelper extends ConnectorSpecHelper {
         |  }
         |}""".stripMargin
 
-    val expectedHipPending = HipGetTransactionPending(paymentDueDate = LocalDate.of(2026, 5, 27))
+    val expectedHipPending = HipGetTransactionPending(paymentDueDate = LocalDate.of(2026, 5, 27), None, None)
 
     val validHipPaidJson: String =
       """{
