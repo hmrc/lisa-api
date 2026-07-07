@@ -27,12 +27,16 @@ class AppContext @Inject() (config: Configuration, serviceConfig: ServicesConfig
   lazy val baseUrl: String               = serviceConfig.getString("baseUrl")
   lazy val v1apiStatus: String           = serviceConfig.getString("api.status")
   lazy val v2apiStatus: String           = serviceConfig.getString("api.statusv2")
-  lazy val desAuthToken: String          = serviceConfig.getString("desauthtoken")
-  lazy val desUrlHeaderEnv: String       = serviceConfig.getString("environment")
   lazy val access: Option[Configuration] = config.getOptional[Configuration](s"api.access")
   lazy val v1endpointsEnabled: Boolean   = serviceConfig.getBoolean("api.endpointsEnabled")
   lazy val v2endpointsEnabled: Boolean   = serviceConfig.getBoolean("api.endpointsEnabledv2")
   lazy val desUrl: String                = serviceConfig.baseUrl("des")
+  lazy val hipUrl: String                = serviceConfig.baseUrl("hip")
+  lazy val useHip: Boolean               = serviceConfig.getBoolean("features.hip")
+  lazy val desAuthToken: String          = serviceConfig.getString("microservice.services.des.authtoken")
+  lazy val desUrlHeaderEnv: String       = serviceConfig.getString("microservice.services.des.environment")
+  lazy val hipClientId: String           = serviceConfig.getString("microservice.services.hip.clientId")
+  lazy val hipClientSecret: String       = serviceConfig.getString("microservice.services.hip.clientSecret")
 
   def endpointIsDisabled(endpoint: String): Boolean =
     config.getOptional[Seq[String]]("api.disabledEndpoints").fold(false)(list => list.contains(endpoint))

@@ -21,9 +21,9 @@ import org.mockito.Mockito.when
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.connectors.HipConnectorTestHelper
 import uk.gov.hmrc.lisaapi.helpers.ServiceTestFixture
+import uk.gov.hmrc.lisaapi.models.*
 import uk.gov.hmrc.lisaapi.models.des.*
 import uk.gov.hmrc.lisaapi.models.hip.*
-import uk.gov.hmrc.lisaapi.models.*
 import uk.gov.hmrc.lisaapi.services.TransactionService
 
 import java.time.LocalDate
@@ -31,7 +31,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
-class TransactionServiceSpec extends ServiceTestFixture with HipConnectorTestHelper {
+class HipTransactionServiceSpec extends ServiceTestFixture with HipConnectorTestHelper {
+
+  import HipFails.*
 
   val transactionService: TransactionService = new TransactionService(mockRoutingConnector)
 
@@ -80,7 +82,7 @@ class TransactionServiceSpec extends ServiceTestFixture with HipConnectorTestHel
         )
 
         when(mockRoutingConnector.getTransaction(any(), any(), any())(any()))
-          .thenReturn(Future.successful(DesGetTransactionPending(LocalDate.parse("2000-01-01"), None, None)))
+          .thenReturn(Future.successful(HipGetTransactionPending(LocalDate.parse("2000-01-01"), None, None)))
 
         val result =
           Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
@@ -110,7 +112,7 @@ class TransactionServiceSpec extends ServiceTestFixture with HipConnectorTestHel
         )
 
         when(mockRoutingConnector.getTransaction(any(), any(), any())(any()))
-          .thenReturn(Future.successful(DesFailureResponse("NOT_FOUND")))
+          .thenReturn(Future.successful(HipFailureResponse("NOT_FOUND", "Not Found")))
 
         val result =
           Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
@@ -146,7 +148,7 @@ class TransactionServiceSpec extends ServiceTestFixture with HipConnectorTestHel
 
         when(mockRoutingConnector.getTransaction(any(), any(), any())(any()))
           .thenReturn(
-            Future.successful(DesGetTransactionPending(LocalDate.parse("2000-01-01"), Some("YREF"), Some(30)))
+            Future.successful(HipGetTransactionPending(LocalDate.parse("2000-01-01"), None, None))
           )
 
         val result =
@@ -157,8 +159,8 @@ class TransactionServiceSpec extends ServiceTestFixture with HipConnectorTestHel
           paymentStatus = "Due",
           paymentDueDate = Some(LocalDate.parse("2000-01-01")),
           transactionType = Some("Debt"),
-          paymentReference = Some("YREF"),
-          paymentAmount = Some(30)
+          paymentReference = None,
+          paymentAmount = None
         )
       }
       "ITMP returns a Collected status and ETMP returns a Not Found error" in {
@@ -182,7 +184,7 @@ class TransactionServiceSpec extends ServiceTestFixture with HipConnectorTestHel
         )
 
         when(mockRoutingConnector.getTransaction(any(), any(), any())(any()))
-          .thenReturn(Future.successful(DesFailureResponse("NOT_FOUND")))
+          .thenReturn(Future.successful(HipFailureResponse("NOT_FOUND", "Not Found")))
 
         val result =
           Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
@@ -298,8 +300,9 @@ class TransactionServiceSpec extends ServiceTestFixture with HipConnectorTestHel
 
         when(mockRoutingConnector.getTransaction(any(), any(), any())(any())).thenReturn(
           Future.successful(
-            DesGetTransactionPaid(
+            HipGetTransactionPaid(
               paymentDate = LocalDate.parse("2000-01-01"),
+              paymentDueDate = LocalDate.parse("2000-01-01"),
               paymentReference = "002630000993",
               paymentAmount = 1.0
             )
@@ -343,7 +346,16 @@ class TransactionServiceSpec extends ServiceTestFixture with HipConnectorTestHel
         )
 
         when(mockRoutingConnector.getTransaction(any(), any(), any())(any()))
-          .thenReturn(Future.successful(des.DesGetTransactionPaid(LocalDate.parse("2000-01-01"), "XREF", 25)))
+          .thenReturn(
+            Future.successful(
+              HipGetTransactionPaid(
+                paymentDate = LocalDate.parse("2000-01-01"),
+                paymentDueDate = LocalDate.parse("2000-01-01"),
+                paymentReference = "002630000993",
+                paymentAmount = 1.0
+              )
+            )
+          )
 
         val result =
           Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
@@ -352,8 +364,8 @@ class TransactionServiceSpec extends ServiceTestFixture with HipConnectorTestHel
           transactionId = "12345",
           paymentStatus = "Collected",
           paymentDate = Some(LocalDate.parse("2000-01-01")),
-          paymentReference = Some("XREF"),
-          paymentAmount = Some(25),
+          paymentReference = Some("002630000993"),
+          paymentAmount = Some(1.0),
           transactionType = Some("Debt")
         )
       }
@@ -377,7 +389,7 @@ class TransactionServiceSpec extends ServiceTestFixture with HipConnectorTestHel
         )
 
         when(mockRoutingConnector.getTransaction(any(), any(), any())(any()))
-          .thenReturn(Future.successful(DesFailureResponse("COULD_NOT_PROCESS")))
+          .thenReturn(Future.successful(HipFailureResponse("COULD_NOT_PROCESS", "COULD_NOT_PROCESS")))
 
         val result =
           Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
@@ -441,7 +453,7 @@ class TransactionServiceSpec extends ServiceTestFixture with HipConnectorTestHel
         )
 
         when(mockRoutingConnector.getTransaction(any(), any(), any())(any()))
-          .thenReturn(Future.successful(DesUnavailableResponse))
+          .thenReturn(Future.successful(expectedServiceUnavailable))
 
         val result =
           Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
@@ -465,7 +477,7 @@ class TransactionServiceSpec extends ServiceTestFixture with HipConnectorTestHel
         )
 
         when(mockRoutingConnector.getTransaction(any(), any(), any())(any()))
-          .thenReturn(Future.successful(DesUnavailableResponse))
+          .thenReturn(Future.successful(expectedServiceUnavailable))
 
         val result =
           Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
@@ -474,7 +486,7 @@ class TransactionServiceSpec extends ServiceTestFixture with HipConnectorTestHel
       }
     }
 
-    "return a Error response" when {
+    "return an Error response" when {
       "ITMP returns an unknown error code" in {
         when(mockRoutingConnector.getBonusOrWithdrawal(any(), any(), any())(any()))
           .thenReturn(Future.successful(DesFailureResponse("UNKNOWN_ERROR", "Unknown error")))
@@ -524,7 +536,7 @@ class TransactionServiceSpec extends ServiceTestFixture with HipConnectorTestHel
         )
 
         when(mockRoutingConnector.getTransaction(any(), any(), any())(any()))
-          .thenReturn(Future.successful(DesFailureResponse("UNKNOWN_ERROR", "Unknown error")))
+          .thenReturn(Future.successful(HipFailureResponse("UNKNOWN_ERROR", "Unknown error")))
 
         val result =
           Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
@@ -549,7 +561,7 @@ class TransactionServiceSpec extends ServiceTestFixture with HipConnectorTestHel
         )
 
         when(mockRoutingConnector.getTransaction(any(), any(), any())(any()))
-          .thenReturn(Future.successful(DesFailureResponse("UNKNOWN_ERROR", "Unknown error")))
+          .thenReturn(Future.successful(HipFailureResponse("UNKNOWN_ERROR", "Unknown error")))
 
         val result =
           Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
@@ -557,6 +569,7 @@ class TransactionServiceSpec extends ServiceTestFixture with HipConnectorTestHel
         result mustBe GetTransactionErrorResponse
       }
     }
+
   }
 
 }

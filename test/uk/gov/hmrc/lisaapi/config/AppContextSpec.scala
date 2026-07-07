@@ -32,18 +32,22 @@ class AppContextSpec extends PlaySpec with MockitoSugar {
   "AppContext" must {
 
     "return correct configuration values" in {
+      when(mockConfiguration.getOptional[Configuration](any())(any())).thenReturn(None)
+
       when(mockServicesConfig.getString("appName")).thenReturn("lisa-api")
       when(mockServicesConfig.getString("api.context")).thenReturn("lifetime-isa")
       when(mockServicesConfig.getString("baseUrl")).thenReturn("http://localhost:9667")
       when(mockServicesConfig.getString("api.status")).thenReturn("BETA")
       when(mockServicesConfig.getString("api.statusv2")).thenReturn("STABLE")
-      when(mockServicesConfig.getString("desauthtoken")).thenReturn("test-token")
-      when(mockServicesConfig.getString("environment")).thenReturn("test")
       when(mockServicesConfig.getBoolean("api.endpointsEnabled")).thenReturn(true)
       when(mockServicesConfig.getBoolean("api.endpointsEnabledv2")).thenReturn(true)
       when(mockServicesConfig.baseUrl("des")).thenReturn("http://localhost:8080")
-      when(mockConfiguration.getOptional[Configuration](any())(any())).thenReturn(None)
-
+      when(mockServicesConfig.baseUrl("hip")).thenReturn("http://localhost:8885")
+      when(mockServicesConfig.getBoolean("features.hip")).thenReturn(true)
+      when(mockServicesConfig.getString("microservice.services.des.authtoken")).thenReturn("test-token")
+      when(mockServicesConfig.getString("microservice.services.des.environment")).thenReturn("test")
+      when(mockServicesConfig.getString("microservice.services.hip.clientId")).thenReturn("test-id")
+      when(mockServicesConfig.getString("microservice.services.hip.clientSecret")).thenReturn("test-secret")
       val appContext: AppContext = new AppContext(mockConfiguration, mockServicesConfig)
 
       appContext.appName            mustBe "lisa-api"
@@ -56,7 +60,11 @@ class AppContextSpec extends PlaySpec with MockitoSugar {
       appContext.v1endpointsEnabled mustBe true
       appContext.v2endpointsEnabled mustBe true
       appContext.desUrl             mustBe "http://localhost:8080"
+      appContext.hipUrl             mustBe "http://localhost:8885"
+      appContext.useHip             mustBe true
       appContext.access             mustBe None
+      appContext.hipClientId        mustBe "test-id"
+      appContext.hipClientSecret    mustBe "test-secret"
     }
 
     "return access configuration when present" in {

@@ -16,13 +16,14 @@
 
 package uk.gov.hmrc.lisaapi.models.des
 
-import play.api.libs.functional.syntax._
-import play.api.libs.json._
-import uk.gov.hmrc.lisaapi.models._
+import play.api.libs.functional.syntax.*
+import play.api.libs.json.*
+import uk.gov.hmrc.lisaapi.models.*
+import uk.gov.hmrc.lisaapi.models.hip.RoutingResponse
 
 import java.time.LocalDate
 
-trait DesResponse
+trait DesResponse extends RoutingResponse
 
 sealed abstract class DesFailure extends DesResponse {
   val code: String

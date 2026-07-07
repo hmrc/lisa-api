@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.lisaapi.connectors
 
+import com.github.tomakehurst.wiremock.client.WireMock.*
+import play.api.libs.json.JsValue
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.helpers.ConnectorSpecHelper
 import uk.gov.hmrc.lisaapi.models.*
@@ -81,5 +83,52 @@ trait DesConnectorTestHelper extends ConnectorSpecHelper {
       Some(WithdrawalIncrease("2345678901", 250.00, 250.00, "Additional withdrawal")),
       "Superseded withdrawal"
     )
+
+  def verifyDesGet(url: String, withOriginator: Boolean = false): Unit = {
+    val expectedRequest = getRequestedFor(urlEqualTo(url))
+      .withHeader("Environment", equalTo(appContext.desUrlHeaderEnv))
+      .withHeader("Authorization", equalTo(s"Bearer ${appContext.desAuthToken}"))
+      .withHeader("CorrelationId", matching(uuidPattern))
+
+    server.verify(
+      if (withOriginator) {
+        expectedRequest.withHeader("OriginatorId", equalTo("DA2_LISA"))
+      } else {
+        expectedRequest
+      }
+    )
+  }
+
+  def verifyDesPost(url: String, expectedBody: JsValue, withOriginator: Boolean = false): Unit = {
+    val expectedRequest = postRequestedFor(urlEqualTo(url))
+      .withHeader("Environment", equalTo(appContext.desUrlHeaderEnv))
+      .withHeader("Authorization", equalTo(s"Bearer ${appContext.desAuthToken}"))
+      .withHeader("CorrelationId", matching(uuidPattern))
+      .withRequestBody(equalToJson(expectedBody.toString))
+
+    server.verify(
+      if (withOriginator) {
+        expectedRequest.withHeader("OriginatorId", equalTo("DA2_LISA"))
+      } else {
+        expectedRequest
+      }
+    )
+  }
+
+  def verifyDesPut(url: String, expectedBody: JsValue, withOriginator: Boolean = false): Unit = {
+    val expectedRequest = putRequestedFor(urlEqualTo(url))
+      .withHeader("Environment", equalTo(appContext.desUrlHeaderEnv))
+      .withHeader("Authorization", equalTo(s"Bearer ${appContext.desAuthToken}"))
+      .withHeader("CorrelationId", matching(uuidPattern))
+      .withRequestBody(equalToJson(expectedBody.toString))
+
+    server.verify(
+      if (withOriginator) {
+        expectedRequest.withHeader("OriginatorId", equalTo("DA2_LISA"))
+      } else {
+        expectedRequest
+      }
+    )
+  }
 
 }
