@@ -30,7 +30,7 @@ class HipConnectorSpec extends HipConnectorTestHelper {
   import HipSuccesses.*
 
   lazy val hipConnector: HipConnector = injector.instanceOf[HipConnector]
-  private val baseTransactionUrl      = "/RESTAdapter/lisa/bonus-charge/manager"
+  private val baseTransactionUrl      = "/etmp/RESTAdapter/lisa/bonus-charge/manager"
   private val jsonContentType         = Map("Content-Type" -> Seq("application/json"))
   private val stringContentType       = Map("Content-Type" -> Seq("application/text"))
 
