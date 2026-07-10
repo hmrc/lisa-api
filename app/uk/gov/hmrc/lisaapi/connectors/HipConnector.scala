@@ -43,7 +43,7 @@ class HipConnector @Inject() (wsHttp: HttpClientV2, appContext: AppContext)(impl
     extends Logging {
 
   val urlEncodingFormat: String   = "utf-8"
-  lazy val lisaServiceUrl: String = s"${appContext.hipUrl}/RESTAdapter/lisa/bonus-charge/manager"
+  lazy val lisaServiceUrl: String = s"${appContext.hipUrl}/etmp/RESTAdapter/lisa/bonus-charge/manager"
 
   private def authSecret: String =
     Base64.getEncoder
