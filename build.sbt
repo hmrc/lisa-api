@@ -1,5 +1,5 @@
 ThisBuild / majorVersion := 2
-ThisBuild / scalaVersion := "3.3.7"
+ThisBuild / scalaVersion := "3.3.8"
 
 lazy val microservice = Project("lisa-api", file("."))
   .enablePlugins(PlayScala, SbtDistributablesPlugin)
@@ -8,8 +8,7 @@ lazy val microservice = Project("lisa-api", file("."))
     scalacOptions ++= Seq(
       "-feature",
       "-Wconf:src=routes/.*:s",
-      "-Wconf:msg=unused-imports&src=views/.*:s",
-      "-Wconf:msg=unused-import&src=views/.*:s"
+      "-Wconf:msg=unused import&src=views/.*:s"
     ),
     libraryDependencies ++= AppDependencies(),
     PlayKeys.playDefaultPort := 9667

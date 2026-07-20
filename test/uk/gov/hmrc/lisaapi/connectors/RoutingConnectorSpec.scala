@@ -16,10 +16,9 @@
 
 package uk.gov.hmrc.lisaapi.connectors
 
-import org.mockito.ArgumentMatchers.{any, anyString, eq => eqTo}
+import org.mockito.ArgumentMatchers.{anyString, eq as eqTo}
 import org.mockito.Mockito.*
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.helpers.BaseTestFixture
 import uk.gov.hmrc.lisaapi.models.des.*
 import uk.gov.hmrc.lisaapi.models.hip.HipGetTransactionPending

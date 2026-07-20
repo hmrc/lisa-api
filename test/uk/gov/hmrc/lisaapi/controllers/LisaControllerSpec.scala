@@ -16,22 +16,25 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
+import ch.qos.logback.classic.Level
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
-import play.api.libs.functional.syntax._
+import play.api.Logger
+import play.api.libs.functional.syntax.*
 import play.api.libs.json.{JsPath, Json, Reads}
-import play.api.mvc._
-import play.api.test.Helpers._
+import play.api.mvc.*
+import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
-import uk.gov.hmrc.auth.core.{Enrolment, EnrolmentIdentifier, Enrolments}
+import uk.gov.hmrc.auth.core.{Enrolment, EnrolmentIdentifier, Enrolments, InsufficientConfidenceLevel}
 import uk.gov.hmrc.lisaapi.controllers.AccountController
 import uk.gov.hmrc.lisaapi.helpers.ControllerTestFixture
+import uk.gov.hmrc.play.bootstrap.tools.LogCapturing
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class LisaControllerSpec extends ControllerTestFixture {
+class LisaControllerSpec extends ControllerTestFixture with LogCapturing {
 
   val acceptHeader: (String, String) = (HeaderNames.ACCEPT, "application/vnd.hmrc.1.0+json")
 
@@ -285,12 +288,83 @@ class LisaControllerSpec extends ControllerTestFixture {
 
     }
 
+    "log the insufficient enrolments alert message exactly once, at ERROR, without an attached exception" when {
+
+      def alertMessageMustBeLogged(): Unit =
+        withCaptureOfLoggingFrom(Logger(accountController.getClass)) { logs =>
+          val res = doEnrolmentRequest()
+          status(res) mustBe UNAUTHORIZED
+
+          val alertLogs = logs.filter(_.getFormattedMessage.contains(INSUFFICIENT_ENROLMENTS_ALERT_TAG))
+          alertLogs.size                           mustBe 1
+          alertLogs.head.getLevel                  mustBe Level.ERROR
+          Option(alertLogs.head.getThrowableProxy) mustBe None
+        }
+
+      "there is no HMRC-LISA-ORG enrolment" in {
+        when(mockAuthConnector.authorise[Enrolments](any(), any())(any(), any()))
+          .thenReturn(Future.successful(Enrolments(Set.empty)))
+
+        alertMessageMustBeLogged()
+      }
+
+      "the enrolment ZREF does not match the lisaManager" in {
+        when(mockAuthConnector.authorise[Enrolments](any(), any())(any(), any()))
+          .thenReturn(
+            Future.successful(
+              Enrolments(Set(Enrolment("HMRC-LISA-ORG", Seq(EnrolmentIdentifier("ZREF", "Z999999")), "Activated")))
+            )
+          )
+
+        alertMessageMustBeLogged()
+      }
+
+      "the enrolment has no ZREF identifier" in {
+        when(mockAuthConnector.authorise[Enrolments](any(), any())(any(), any()))
+          .thenReturn(Future.successful(Enrolments(Set(Enrolment("HMRC-LISA-ORG", Seq.empty, "Activated")))))
+
+        alertMessageMustBeLogged()
+      }
+
+    }
+
+    "not log the insufficient enrolments alert message" when {
+
+      "the authorise call fails with an AuthorisationException" in {
+        when(mockAuthConnector.authorise[Enrolments](any(), any())(any(), any()))
+          .thenReturn(
+            Future.failed(InsufficientConfidenceLevel("Insufficient confidence level"))
+          )
+
+        withCaptureOfLoggingFrom(Logger(accountController.getClass)) { logs =>
+          status(doEnrolmentRequest()) mustBe UNAUTHORIZED
+
+          logs.exists(_.getFormattedMessage.contains(INSUFFICIENT_ENROLMENTS_ALERT_TAG)) mustBe false
+        }
+      }
+
+      "the enrolment matches and the request succeeds" in {
+        mockAuthorize(lisaManagerReferenceNumber)
+
+        withCaptureOfLoggingFrom(Logger(accountController.getClass)) { logs =>
+          status(doEnrolmentRequest()) must not be UNAUTHORIZED
+
+          logs.exists(_.getFormattedMessage.contains(INSUFFICIENT_ENROLMENTS_ALERT_TAG)) mustBe false
+        }
+      }
+
+    }
+
+    "use the alert tag expected by the lisa-api log message alert in hmrc/alert-config" in {
+      INSUFFICIENT_ENROLMENTS_ALERT_TAG mustBe "INSUFFICIENT_LISA_ENROLMENTS"
+    }
+
     "return 401 with ErrorUnauthorized" when {
 
       "the authorise call throws an AuthorisationException" in {
         when(mockAuthConnector.authorise[Enrolments](any(), any())(any(), any()))
           .thenReturn(
-            Future.failed(new uk.gov.hmrc.auth.core.InsufficientConfidenceLevel("Insufficient confidence level"))
+            Future.failed(InsufficientConfidenceLevel("Insufficient confidence level"))
           )
 
         val res = doEnrolmentRequest()

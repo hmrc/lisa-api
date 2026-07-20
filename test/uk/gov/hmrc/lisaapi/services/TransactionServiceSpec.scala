@@ -21,9 +21,8 @@ import org.mockito.Mockito.when
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.connectors.HipConnectorTestHelper
 import uk.gov.hmrc.lisaapi.helpers.ServiceTestFixture
-import uk.gov.hmrc.lisaapi.models.des.*
-import uk.gov.hmrc.lisaapi.models.hip.*
 import uk.gov.hmrc.lisaapi.models.*
+import uk.gov.hmrc.lisaapi.models.des.*
 import uk.gov.hmrc.lisaapi.services.TransactionService
 
 import java.time.LocalDate
