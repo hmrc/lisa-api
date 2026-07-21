@@ -82,36 +82,21 @@ abstract case class LisaController(
     authorised().retrieve(allEnrolments) { enrolments =>
       enrolments.getEnrolment("HMRC-LISA-ORG") match {
         case None            =>
-          logger.error(
-            "[LisaController][withEnrolment] Insufficient Enrolments no enrollment with name `HMRC-LISA-ORG`"
-          )
-          throw InsufficientEnrolments("Insufficient Enrolments no enrollment with name `HMRC-LISA-ORG`")
+          handleInsufficientEnrolments("no enrollment with name `HMRC-LISA-ORG`")
         case Some(enrolment) =>
           enrolment.getIdentifier("ZREF") match {
             case Some(lmrn) if lmrn.value == lisaManager =>
               logger.info(s"[LisaController][withEnrolment] Enrolment and ZREF match for $lisaManager")
               callback()
             case Some(lmrn)                              =>
-              logger.error(
-                s"[LisaController][withEnrolment] Insufficient Enrolments, there is enrollment with name `HMRC-LISA-ORG` but `ZREF` does not match, accountZREF=${lmrn.value} != lisaManager=$lisaManager"
-              )
-              throw InsufficientEnrolments(
-                "Insufficient Enrolments, there is enrollment with name `HMRC-LISA-ORG` but `ZREF` does not match"
+              handleInsufficientEnrolments(
+                s"there is enrollment with name `HMRC-LISA-ORG` but `ZREF` does not match, accountZREF=${lmrn.value} != lisaManager=$lisaManager"
               )
             case _                                       =>
-              logger.error(
-                "[LisaController][withEnrolment] Insufficient Enrolments, there is enrollment with name `HMRC-LISA-ORG` but `ZREF` dont exists"
-              )
-              throw InsufficientEnrolments(
-                "Insufficient Enrolments, there is enrollment with name `HMRC-LISA-ORG` but `ZREF` dont exists"
-              )
+              handleInsufficientEnrolments("there is enrollment with name `HMRC-LISA-ORG` but `ZREF` dont exists")
           }
       }
     } recoverWith {
-      case e: InsufficientEnrolments =>
-        logger.error(s"[LisaController][withEnrolment] Unauthorised access for ${request.uri}", e)
-        lisaMetrics.incrementMetrics(startTime, UNAUTHORIZED, LisaMetricKeys.getMetricKey(request.uri))
-        Future.successful(Unauthorized(ErrorInvalidLisaManager.asJson))
       case _: AuthorisationException =>
         logger.warn(s"[LisaController][withEnrolment] Unauthorised Exception for ${request.uri}")
         lisaMetrics.incrementMetrics(startTime, UNAUTHORIZED, LisaMetricKeys.getMetricKey(request.uri))
@@ -120,6 +105,16 @@ abstract case class LisaController(
         lisaMetrics.incrementMetrics(startTime, INTERNAL_SERVER_ERROR, LisaMetricKeys.getMetricKey(request.uri))
         Future.successful(InternalServerError(ErrorInternalServerError.asJson))
     }
+
+  private def handleInsufficientEnrolments(
+    reason: String
+  )(implicit request: Request[AnyContent], startTime: Long): Future[Result] = {
+    logger.error(
+      s"[LisaController][handleInsufficientEnrolments] $INSUFFICIENT_ENROLMENTS_ALERT_TAG: Insufficient Enrolments, $reason"
+    )
+    lisaMetrics.incrementMetrics(startTime, UNAUTHORIZED, LisaMetricKeys.getMetricKey(request.uri))
+    Future.successful(Unauthorized(ErrorInvalidLisaManager.asJson))
+  }
 
   protected def withValidJson[T](
     success: T => Future[Result],

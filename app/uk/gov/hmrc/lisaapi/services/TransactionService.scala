@@ -19,9 +19,9 @@ package uk.gov.hmrc.lisaapi.services
 import com.google.inject.Inject
 import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.lisaapi.connectors.{DesConnector, RoutingConnector}
-import uk.gov.hmrc.lisaapi.models.des.*
+import uk.gov.hmrc.lisaapi.connectors.RoutingConnector
 import uk.gov.hmrc.lisaapi.models.*
+import uk.gov.hmrc.lisaapi.models.des.*
 import uk.gov.hmrc.lisaapi.models.hip.*
 
 import scala.concurrent.{ExecutionContext, Future}

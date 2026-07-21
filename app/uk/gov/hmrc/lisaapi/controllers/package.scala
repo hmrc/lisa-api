@@ -40,16 +40,22 @@ package object controllers {
 }
 
 trait LisaConstants {
-  val ACCOUNTID: String     = "accountId"
-  val ZREF: String          = "lisaManagerReferenceNumber"
-  val NOTIFICATION: String  = "lateNotification"
-  val DATE_ERROR            = "INVALID_DATE"
-  val MISSING_ERROR         = "MISSING_FIELD"
-  val MONETARY_ERROR        = "INVALID_MONETARY_AMOUNT"
-  val LISA_START_DATE       = LocalDate.parse("2017-04-06")
-  val LISA_START_DATE_ERROR = "The %s cannot be before 6 April 2017"
-  val VERSION_1             = "1.0"
-  val VERSION_2             = "2.0"
-  val TAX_YEAR_START_MONTH  = 4
-  val TAX_YEAR_START_DAY    = 6
+
+  val ACCOUNTID: String             = "accountId"
+  val ZREF: String                  = "lisaManagerReferenceNumber"
+  val NOTIFICATION: String          = "lateNotification"
+  val DATE_ERROR: String            = "INVALID_DATE"
+  val MISSING_ERROR: String         = "MISSING_FIELD"
+  val MONETARY_ERROR: String        = "INVALID_MONETARY_AMOUNT"
+  val LISA_START_DATE: LocalDate    = LocalDate.parse("2017-04-06")
+  val LISA_START_DATE_ERROR: String = "The %s cannot be before 6 April 2017"
+  val VERSION_1: String             = "1.0"
+  val VERSION_2: String             = "2.0"
+
+  // Referenced by the LISA API log message threshold alert in hmrc/alert-config (DDCELiveServices) - keep in sync
+  val INSUFFICIENT_ENROLMENTS_ALERT_TAG: String = "INSUFFICIENT_LISA_ENROLMENTS"
+
+  val TAX_YEAR_START_MONTH: Int = 4
+  val TAX_YEAR_START_DAY: Int   = 6
+
 }
