@@ -16,11 +16,11 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
-import org.mockito.ArgumentMatchers.{any, eq => MatcherEquals}
+import org.mockito.ArgumentMatchers.{any, eq as MatcherEquals}
 import org.mockito.Mockito.{reset, verify, when}
 import play.api.libs.json.Json
 import play.api.mvc.{AnyContentAsJson, Result}
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.lisaapi.controllers.{
@@ -29,7 +29,7 @@ import uk.gov.hmrc.lisaapi.controllers.{
   WithdrawalController
 }
 import uk.gov.hmrc.lisaapi.helpers.ControllerTestFixture
-import uk.gov.hmrc.lisaapi.models._
+import uk.gov.hmrc.lisaapi.models.*
 
 import java.time.LocalDate
 import scala.concurrent.ExecutionContext.Implicits.global

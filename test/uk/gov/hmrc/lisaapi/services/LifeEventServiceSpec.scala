@@ -23,8 +23,8 @@ import uk.gov.hmrc.lisaapi.controllers.{
   ErrorAccountNotFound, ErrorInternalServerError, ErrorLifeEventIdNotFound, ErrorResponse, ErrorServiceUnavailable
 }
 import uk.gov.hmrc.lisaapi.helpers.ServiceTestFixture
-import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.models.des._
+import uk.gov.hmrc.lisaapi.models.*
+import uk.gov.hmrc.lisaapi.models.des.*
 import uk.gov.hmrc.lisaapi.services.LifeEventService
 
 import java.time.LocalDate

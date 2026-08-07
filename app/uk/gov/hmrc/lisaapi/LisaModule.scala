@@ -19,7 +19,7 @@ package uk.gov.hmrc.lisaapi
 import play.api.inject.{Binding, Module}
 import play.api.{Configuration, Environment}
 import uk.gov.hmrc.lisaapi.models.AnnualReturnValidator
-import uk.gov.hmrc.lisaapi.services._
+import uk.gov.hmrc.lisaapi.services.*
 
 class LisaModule extends Module {
 

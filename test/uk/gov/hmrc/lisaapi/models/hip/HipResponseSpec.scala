@@ -17,8 +17,8 @@
 package uk.gov.hmrc.lisaapi.models.hip
 
 import org.scalatestplus.play.PlaySpec
-import play.api.libs.json._
-import uk.gov.hmrc.lisaapi.models.hip.HipFailure._
+import play.api.libs.json.*
+import uk.gov.hmrc.lisaapi.models.hip.HipFailure.*
 
 import java.time.LocalDate
 

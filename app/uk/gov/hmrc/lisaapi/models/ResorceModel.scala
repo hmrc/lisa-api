@@ -16,8 +16,8 @@
 
 package uk.gov.hmrc.lisaapi.models
 
-import play.api.libs.functional.syntax._
-import play.api.libs.json.{JsPath, Json, OFormat, Reads, Writes}
+import play.api.libs.functional.syntax.*
+import play.api.libs.json.*
 
 case class ID(id: String)
 

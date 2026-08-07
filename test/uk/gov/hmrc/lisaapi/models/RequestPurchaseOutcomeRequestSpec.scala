@@ -18,7 +18,7 @@ package uk.gov.hmrc.lisaapi.models
 
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsPath, Json}
-import uk.gov.hmrc.lisaapi.models._
+import uk.gov.hmrc.lisaapi.models.*
 
 import java.time.LocalDate
 

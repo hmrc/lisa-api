@@ -17,7 +17,7 @@
 package uk.gov.hmrc.lisaapi.models
 
 import org.scalatestplus.play.PlaySpec
-import play.api.libs.json.{JsonValidationError, *}
+import play.api.libs.json.*
 import uk.gov.hmrc.lisaapi.models.CreateLisaInvestorRequest
 
 import java.time.LocalDate

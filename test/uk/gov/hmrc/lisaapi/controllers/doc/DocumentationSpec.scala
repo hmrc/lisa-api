@@ -56,7 +56,7 @@ class DocumentationSpec extends PlaySpec with MockitoSugar {
       when(mockAppContext.apiContext).thenReturn("lifetime-isa")
       when(mockAppContext.v1apiStatus).thenReturn("BETA")
       when(mockAppContext.v2apiStatus).thenReturn("STABLE")
-      when(mockAppContext.access).thenReturn(None)
+      when(mockAppContext.access).thenReturn("PUBLIC")
       when(mockAppContext.v1endpointsEnabled).thenReturn(true)
       when(mockAppContext.v2endpointsEnabled).thenReturn(true)
 
@@ -71,7 +71,7 @@ class DocumentationSpec extends PlaySpec with MockitoSugar {
       when(mockAppContext.apiContext).thenReturn("lifetime-isa")
       when(mockAppContext.v1apiStatus).thenReturn("ALPHA")
       when(mockAppContext.v2apiStatus).thenReturn("DEPRECATED")
-      when(mockAppContext.access).thenReturn(None)
+      when(mockAppContext.access).thenReturn("PUBLIC")
       when(mockAppContext.v1endpointsEnabled).thenReturn(false)
       when(mockAppContext.v2endpointsEnabled).thenReturn(false)
 

@@ -20,8 +20,8 @@ import com.google.inject.Inject
 import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.connectors.DesConnector
+import uk.gov.hmrc.lisaapi.models.*
 import uk.gov.hmrc.lisaapi.models.des.{DesFailureResponse, DesUnavailableResponse}
-import uk.gov.hmrc.lisaapi.models._
 
 import java.time.LocalDate
 import scala.concurrent.{ExecutionContext, Future}

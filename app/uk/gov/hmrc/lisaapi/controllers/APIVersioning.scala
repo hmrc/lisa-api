@@ -18,7 +18,7 @@ package uk.gov.hmrc.lisaapi.controllers
 
 import play.api.Logging
 import play.api.http.HeaderNames.ACCEPT
-import play.api.mvc._
+import play.api.mvc.*
 import uk.gov.hmrc.lisaapi.config.AppContext
 
 import scala.concurrent.{ExecutionContext, Future}

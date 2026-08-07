@@ -17,9 +17,9 @@
 package uk.gov.hmrc.lisaapi.models
 
 import org.scalatestplus.play.PlaySpec
-import play.api.libs.json._
+import play.api.libs.json.*
 import uk.gov.hmrc.lisaapi.controllers.ErrorValidation
-import uk.gov.hmrc.lisaapi.models._
+import uk.gov.hmrc.lisaapi.models.*
 import uk.gov.hmrc.lisaapi.utils.ErrorConverter
 
 import java.time.LocalDate

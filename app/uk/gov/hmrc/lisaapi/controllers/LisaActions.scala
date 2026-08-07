@@ -16,8 +16,8 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
-import play.api.mvc.Results._
-import play.api.mvc._
+import play.api.mvc.*
+import play.api.mvc.Results.*
 
 import scala.concurrent.{ExecutionContext, Future}
 
