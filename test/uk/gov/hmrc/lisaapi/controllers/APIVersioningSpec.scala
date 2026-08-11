@@ -16,9 +16,9 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
-import org.mockito.Mockito._
+import org.mockito.Mockito.*
 import play.api.http.HeaderNames.ACCEPT
-import play.api.mvc._
+import play.api.mvc.*
 import play.api.test.FakeRequest
 import play.test.Helpers
 import uk.gov.hmrc.lisaapi.config.AppContext
@@ -29,7 +29,7 @@ import uk.gov.hmrc.lisaapi.controllers.{
 import uk.gov.hmrc.lisaapi.helpers.ControllerTestFixture
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.concurrent.{Await, Future}
 import scala.language.postfixOps
 

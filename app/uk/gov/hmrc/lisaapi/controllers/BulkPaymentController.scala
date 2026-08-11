@@ -17,9 +17,9 @@
 package uk.gov.hmrc.lisaapi.controllers
 
 import com.google.inject.Inject
+import play.api.libs.json.*
 import play.api.libs.json.Reads.of
-import play.api.libs.json._
-import play.api.mvc._
+import play.api.mvc.*
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.config.AppContext

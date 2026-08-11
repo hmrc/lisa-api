@@ -18,13 +18,13 @@ package uk.gov.hmrc.lisaapi.services
 
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito._
+import org.mockito.Mockito.*
 import org.scalatest.BeforeAndAfter
 import uk.gov.hmrc.http.{Authorization, HeaderCarrier}
 import uk.gov.hmrc.lisaapi.helpers.ServiceTestFixture
-import uk.gov.hmrc.lisaapi.models._
+import uk.gov.hmrc.lisaapi.models.*
 import uk.gov.hmrc.lisaapi.services.AuditService
-import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
+import uk.gov.hmrc.lisaapi.utils.LisaExtensions.*
 import uk.gov.hmrc.play.audit.model.DataEvent
 
 import java.time.LocalDate

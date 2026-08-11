@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.lisaapi.config
 
-import org.mockito.ArgumentMatchers._
+import org.mockito.ArgumentMatchers.*
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
@@ -43,6 +43,7 @@ class AppContextSpec extends PlaySpec with MockitoSugar {
       when(mockServicesConfig.getString("environment")).thenReturn("test")
       when(mockServicesConfig.getBoolean("api.endpointsEnabled")).thenReturn(true)
       when(mockServicesConfig.getBoolean("api.endpointsEnabledv2")).thenReturn(true)
+      when(mockServicesConfig.getString("api.access")).thenReturn("PUBLIC")
       when(mockServicesConfig.baseUrl("des")).thenReturn("http://localhost:8080")
       when(mockServicesConfig.baseUrl("hip")).thenReturn("http://localhost:8885")
       when(mockServicesConfig.getBoolean("features.hip")).thenReturn(true)
@@ -62,7 +63,7 @@ class AppContextSpec extends PlaySpec with MockitoSugar {
       appContext.desUrl             mustBe "http://localhost:8080"
       appContext.hipUrl             mustBe "http://localhost:8885"
       appContext.useHip             mustBe true
-      appContext.access             mustBe None
+      appContext.access             mustBe "PUBLIC"
       appContext.hipClientId        mustBe "test-id"
       appContext.hipClientSecret    mustBe "test-secret"
     }
@@ -71,12 +72,13 @@ class AppContextSpec extends PlaySpec with MockitoSugar {
       val accessConfig = mock[Configuration]
       when(mockConfiguration.getOptional[Configuration](any())(any())).thenReturn(Some(accessConfig))
       when(mockServicesConfig.getString(any())).thenReturn("")
+      when(mockServicesConfig.getString("api.access")).thenReturn("PUBLIC")
       when(mockServicesConfig.getBoolean(any())).thenReturn(true)
       when(mockServicesConfig.baseUrl(any())).thenReturn("")
 
       val appContext: AppContext = new AppContext(mockConfiguration, mockServicesConfig)
 
-      appContext.access mustBe Some(accessConfig)
+      appContext.access mustBe "PUBLIC"
     }
   }
 

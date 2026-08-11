@@ -16,15 +16,15 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
-import org.mockito.ArgumentMatchers.{any, eq => matchersEquals}
-import org.mockito.Mockito._
+import org.mockito.ArgumentMatchers.{any, eq as matchersEquals}
+import org.mockito.Mockito.*
 import play.api.libs.json.Json
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.lisaapi.controllers.{ErrorAccountNotFound, GetLifeEventController}
 import uk.gov.hmrc.lisaapi.helpers.ControllerTestFixture
-import uk.gov.hmrc.lisaapi.models._
+import uk.gov.hmrc.lisaapi.models.*
 
 import java.time.LocalDate
 import scala.concurrent.ExecutionContext.Implicits.global

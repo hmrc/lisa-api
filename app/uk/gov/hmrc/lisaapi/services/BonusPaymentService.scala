@@ -17,13 +17,13 @@
 package uk.gov.hmrc.lisaapi.services
 
 import com.google.inject.Inject
-import uk.gov.hmrc.lisaapi.connectors.DesConnector
-import uk.gov.hmrc.lisaapi.models._
-import uk.gov.hmrc.lisaapi.models.des._
-
-import scala.concurrent.{ExecutionContext, Future}
 import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.lisaapi.connectors.DesConnector
+import uk.gov.hmrc.lisaapi.models.*
+import uk.gov.hmrc.lisaapi.models.des.*
+
+import scala.concurrent.{ExecutionContext, Future}
 
 class BonusPaymentService @Inject() (desConnector: DesConnector)(implicit ec: ExecutionContext) extends Logging {
 

@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.lisaapi.utils
 
-import org.mockito.Mockito._
+import org.mockito.Mockito.*
 import org.scalatest.BeforeAndAfter
 import play.api.libs.json.Json
 import uk.gov.hmrc.lisaapi.controllers.ErrorValidation

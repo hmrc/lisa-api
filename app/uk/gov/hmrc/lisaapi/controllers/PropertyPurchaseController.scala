@@ -23,9 +23,9 @@ import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
-import uk.gov.hmrc.lisaapi.models.{ReportLifeEventFundReleaseNotFoundResponse, ReportLifeEventMismatchResponse, _}
+import uk.gov.hmrc.lisaapi.models.*
 import uk.gov.hmrc.lisaapi.services.{AuditService, LifeEventService}
-import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
+import uk.gov.hmrc.lisaapi.utils.LisaExtensions.*
 
 import scala.concurrent.{ExecutionContext, Future}
 

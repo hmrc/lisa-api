@@ -18,12 +18,12 @@ package uk.gov.hmrc.lisaapi.controllers
 
 import com.google.inject.Inject
 import play.api.libs.json.Json
-import play.api.mvc._
+import play.api.mvc.*
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
-import uk.gov.hmrc.lisaapi.models._
+import uk.gov.hmrc.lisaapi.models.*
 import uk.gov.hmrc.lisaapi.services.{AuditService, ReinstateAccountService}
 
 import scala.concurrent.ExecutionContext

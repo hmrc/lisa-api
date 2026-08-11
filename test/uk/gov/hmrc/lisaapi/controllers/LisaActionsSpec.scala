@@ -16,8 +16,8 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
+import play.api.mvc.*
 import play.api.mvc.Results.BadRequest
-import play.api.mvc._
 import play.api.test.FakeRequest
 import play.test.Helpers
 import uk.gov.hmrc.lisaapi.controllers.{
@@ -26,7 +26,7 @@ import uk.gov.hmrc.lisaapi.controllers.{
 import uk.gov.hmrc.lisaapi.helpers.ControllerTestFixture
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.concurrent.{Await, Future}
 import scala.language.postfixOps
 

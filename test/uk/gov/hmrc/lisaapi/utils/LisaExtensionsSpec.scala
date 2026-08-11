@@ -18,7 +18,7 @@ package uk.gov.hmrc.lisaapi.utils
 
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import uk.gov.hmrc.lisaapi.helpers.BaseTestFixture
-import uk.gov.hmrc.lisaapi.utils.LisaExtensions._
+import uk.gov.hmrc.lisaapi.utils.LisaExtensions.*
 
 class LisaExtensionsSpec extends BaseTestFixture with GuiceOneAppPerSuite {
 

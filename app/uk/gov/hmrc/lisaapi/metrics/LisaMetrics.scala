@@ -16,11 +16,11 @@
 
 package uk.gov.hmrc.lisaapi.metrics
 
-import java.util.concurrent.TimeUnit
+import com.codahale.metrics.MetricRegistry
 import com.google.inject.Inject
 import uk.gov.hmrc.play.bootstrap.metrics.Metrics
-import com.codahale.metrics.MetricRegistry
 
+import java.util.concurrent.TimeUnit
 import scala.util.Try
 
 class LisaMetrics @Inject() (metrics: Metrics) {

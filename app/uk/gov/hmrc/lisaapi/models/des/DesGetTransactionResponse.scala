@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.lisaapi.models.des
 
-import play.api.libs.functional.syntax._
+import play.api.libs.functional.syntax.*
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Reads}
 import uk.gov.hmrc.lisaapi.models.{Amount, JsonReads}
 

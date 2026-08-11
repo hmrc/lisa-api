@@ -16,8 +16,8 @@
 
 package uk.gov.hmrc.lisaapi.models
 
-import play.api.libs.functional.syntax._
-import play.api.libs.json._
+import play.api.libs.functional.syntax.*
+import play.api.libs.json.*
 import uk.gov.hmrc.lisaapi.LisaConstants
 import uk.gov.hmrc.lisaapi.controllers.ErrorValidation
 import uk.gov.hmrc.lisaapi.services.CurrentDateService

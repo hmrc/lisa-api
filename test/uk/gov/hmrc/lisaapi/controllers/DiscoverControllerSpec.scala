@@ -16,8 +16,8 @@
 
 package uk.gov.hmrc.lisaapi.controllers
 
-import play.api.test.Helpers._
-import play.api.test._
+import play.api.test.*
+import play.api.test.Helpers.*
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.lisaapi.controllers.{DiscoverController, ErrorAcceptHeaderInvalid, ErrorBadRequestLmrn}
 import uk.gov.hmrc.lisaapi.helpers.ControllerTestFixture

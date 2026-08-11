@@ -23,7 +23,7 @@ import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.lisaapi.config.AppContext
 import uk.gov.hmrc.lisaapi.metrics.{LisaMetricKeys, LisaMetrics}
-import uk.gov.hmrc.lisaapi.models._
+import uk.gov.hmrc.lisaapi.models.*
 import uk.gov.hmrc.lisaapi.services.{AuditService, TransactionService}
 
 import scala.concurrent.{ExecutionContext, Future}

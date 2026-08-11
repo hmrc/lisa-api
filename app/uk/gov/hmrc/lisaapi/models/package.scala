@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.lisaapi
 
-import play.api.libs.json._
+import play.api.libs.json.*
 
 import java.time.LocalDate
 import java.time.format.{DateTimeFormatter, DateTimeParseException}
