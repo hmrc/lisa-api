@@ -1,5 +1,3 @@
-@import uk.gov.hmrc.lisaapi.domain.APIAccess
-@import play.api.libs.json.Json
 
 @(context: String, v1status: String, v2status: String, access: String, v1endpointsEnabled: Boolean, v2endpointsEnabled: Boolean)
 {
@@ -12,7 +10,7 @@
         "version": "1.0",
         "status": "@v1status",
         "endpointsEnabled": @v1endpointsEnabled,
-        "access": @access"
+        "access": "@access"
       },
       {
         "version": "2.0",
