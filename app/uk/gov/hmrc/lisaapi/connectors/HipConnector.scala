@@ -126,7 +126,7 @@ class HipConnector @Inject() (wsHttp: HttpClientV2, appContext: AppContext)(impl
   ): Future[HipResponse] = {
 
     val fullUrl =
-      s"$lisaServiceUrl/$lisaManagerReferenceNumber/transaction/$transactionId/accounts"
+      s"$lisaServiceUrl/$lisaManagerReferenceNumber/transaction/$transactionId/accounts?accountID=$accountId"
 
     logger.info("[HipConnector][getTransaction] Getting the Transaction details from hip: " + fullUrl)
 

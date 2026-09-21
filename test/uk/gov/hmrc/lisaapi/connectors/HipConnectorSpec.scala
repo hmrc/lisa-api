@@ -93,7 +93,7 @@ class HipConnectorSpec extends HipConnectorTestHelper {
 
   "getTransaction" must {
     "return HipGetTransactionPending" in {
-      val transactionUrl = s"$baseTransactionUrl/Z123456/transaction/123456/accounts"
+      val transactionUrl = s"$baseTransactionUrl/Z123456/transaction/123456/accounts?accountID=ABC12345"
       stubForGet(
         transactionUrl,
         OK,
@@ -107,7 +107,7 @@ class HipConnectorSpec extends HipConnectorTestHelper {
 
     "return HipGetTransactionPaid" in {
 
-      val transactionUrl = s"$baseTransactionUrl/Z123456/transaction/123456/accounts"
+      val transactionUrl = s"$baseTransactionUrl/Z123456/transaction/123456/accounts?accountID=ABC12345"
       stubForGet(
         transactionUrl,
         OK,
@@ -121,7 +121,7 @@ class HipConnectorSpec extends HipConnectorTestHelper {
 
     "return BAD_REQUEST" in {
 
-      val transactionUrl = s"$baseTransactionUrl/Z123456/transaction/123456/accounts"
+      val transactionUrl = s"$baseTransactionUrl/Z123456/transaction/123456/accounts?accountID=ABC12345"
       stubForGet(
         transactionUrl,
         BAD_REQUEST,
@@ -134,7 +134,7 @@ class HipConnectorSpec extends HipConnectorTestHelper {
     }
 
     "return HipServiceUnavailable" in {
-      val transactionUrl = s"$baseTransactionUrl/Z123456/transaction/123456/accounts"
+      val transactionUrl = s"$baseTransactionUrl/Z123456/transaction/123456/accounts?accountID=ABC12345"
 
       stubForGet(transactionUrl, SERVICE_UNAVAILABLE, validServiceUnavailableJson)
       val response = await(hipConnector.getTransaction("Z123456", "ABC12345", "123456"))
@@ -143,7 +143,7 @@ class HipConnectorSpec extends HipConnectorTestHelper {
     }
 
     "return INTERNAL_SERVER_ERROR" in {
-      val transactionUrl = s"$baseTransactionUrl/Z123456/transaction/123456/accounts"
+      val transactionUrl = s"$baseTransactionUrl/Z123456/transaction/123456/accounts?accountID=ABC12345"
 
       stubForGet(transactionUrl, INTERNAL_SERVER_ERROR, validServerErrorJson)
       val response = await(hipConnector.getTransaction("Z123456", "ABC12345", "123456"))
@@ -152,7 +152,7 @@ class HipConnectorSpec extends HipConnectorTestHelper {
     }
 
     "return UNPROCESSABLE_ENTITY" in {
-      val transactionUrl = s"$baseTransactionUrl/Z123456/transaction/123456/accounts"
+      val transactionUrl = s"$baseTransactionUrl/Z123456/transaction/123456/accounts?accountID=ABC12345"
 
       stubForGet(transactionUrl, UNPROCESSABLE_ENTITY, validValidationErrorJson)
       val response = await(hipConnector.getTransaction("Z123456", "ABC12345", "123456"))
@@ -161,7 +161,7 @@ class HipConnectorSpec extends HipConnectorTestHelper {
     }
 
     "return NOT_FOUND" in {
-      val transactionUrl = s"$baseTransactionUrl/Z123456/transaction/123456/accounts"
+      val transactionUrl = s"$baseTransactionUrl/Z123456/transaction/123456/accounts?accountID=ABC12345"
 
       stubForGet(transactionUrl, NOT_FOUND, "")
       val response = await(hipConnector.getTransaction("Z123456", "ABC12345", "123456"))
@@ -170,7 +170,7 @@ class HipConnectorSpec extends HipConnectorTestHelper {
     }
 
     "return UNAUTHORIZED" in {
-      val transactionUrl = s"$baseTransactionUrl/Z123456/transaction/123456/accounts"
+      val transactionUrl = s"$baseTransactionUrl/Z123456/transaction/123456/accounts?accountID=ABC12345"
 
       stubForGet(transactionUrl, UNAUTHORIZED, "")
       val response = await(hipConnector.getTransaction("Z123456", "ABC12345", "123456"))
@@ -179,7 +179,7 @@ class HipConnectorSpec extends HipConnectorTestHelper {
     }
 
     "return FORBIDDEN" in {
-      val transactionUrl = s"$baseTransactionUrl/Z123456/transaction/123456/accounts"
+      val transactionUrl = s"$baseTransactionUrl/Z123456/transaction/123456/accounts?accountID=ABC12345"
 
       stubForGet(transactionUrl, FORBIDDEN, "")
       val response = await(hipConnector.getTransaction("Z123456", "ABC12345", "123456"))
@@ -188,7 +188,7 @@ class HipConnectorSpec extends HipConnectorTestHelper {
     }
 
     "return HipOtherErrorResponse" in {
-      val transactionUrl = s"$baseTransactionUrl/Z123456/transaction/123456/accounts"
+      val transactionUrl = s"$baseTransactionUrl/Z123456/transaction/123456/accounts?accountID=ABC12345"
 
       stubForGet(transactionUrl, FAILED_DEPENDENCY, "")
       val response = await(hipConnector.getTransaction("Z123456", "ABC12345", "123456"))
