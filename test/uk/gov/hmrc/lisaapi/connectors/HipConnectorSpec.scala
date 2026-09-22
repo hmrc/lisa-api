@@ -42,10 +42,22 @@ class HipConnectorSpec extends HipConnectorTestHelper {
       result mustBe expectedHipPending
     }
 
+    "parse a minimal PENDING transaction" in {
+      val res    = HttpResponse(OK, minimalValidHipPendingJson, jsonContentType)
+      val result = hipConnector.parseResponse[HipGetTransactionResponse](res)
+      result mustBe minimalExpectedHipPending
+    }
+
     "parse a PAID transaction" in {
       val res    = HttpResponse(OK, validHipPaidJson, jsonContentType)
       val result = hipConnector.parseResponse[HipGetTransactionResponse](res)
       result mustBe expectedHipPaid
+    }
+
+    "parse a minimal PAID transaction" in {
+      val res    = HttpResponse(OK, minimalValidHipPaidJson, jsonContentType)
+      val result = hipConnector.parseResponse[HipGetTransactionResponse](res)
+      result mustBe minimalExpectedHipPaid
     }
 
     "parse returns HodErrorResponse for origin HOD" in {
@@ -105,6 +117,19 @@ class HipConnectorSpec extends HipConnectorTestHelper {
       verifyHipGet(transactionUrl)
     }
 
+    "return HipGetTransactionPending with minimal response" in {
+      val transactionUrl = s"$baseTransactionUrl/Z123456/transaction/123456/accounts?accountID=ABC12345"
+      stubForGet(
+        transactionUrl,
+        OK,
+        minimalValidHipPendingJson
+      )
+
+      val response = await(hipConnector.getTransaction("Z123456", "ABC12345", "123456"))
+      response mustBe minimalExpectedHipPending
+      verifyHipGet(transactionUrl)
+    }
+
     "return HipGetTransactionPaid" in {
 
       val transactionUrl = s"$baseTransactionUrl/Z123456/transaction/123456/accounts?accountID=ABC12345"
@@ -116,6 +141,20 @@ class HipConnectorSpec extends HipConnectorTestHelper {
 
       val response = await(hipConnector.getTransaction("Z123456", "ABC12345", "123456"))
       response mustBe expectedHipPaid
+      verifyHipGet(transactionUrl)
+    }
+
+    "return HipGetTransactionPaid with minimal response" in {
+
+      val transactionUrl = s"$baseTransactionUrl/Z123456/transaction/123456/accounts?accountID=ABC12345"
+      stubForGet(
+        transactionUrl,
+        OK,
+        minimalValidHipPaidJson
+      )
+
+      val response = await(hipConnector.getTransaction("Z123456", "ABC12345", "123456"))
+      response mustBe minimalExpectedHipPaid
       verifyHipGet(transactionUrl)
     }
 

@@ -82,7 +82,7 @@ class HipTransactionServiceSpec extends ServiceTestFixture with HipConnectorTest
         )
 
         when(mockRoutingConnector.getTransaction(any(), any(), any())(any()))
-          .thenReturn(Future.successful(HipGetTransactionPending(LocalDate.parse("2000-01-01"), None, None)))
+          .thenReturn(Future.successful(HipGetTransactionPending(Some(LocalDate.parse("2000-01-01")), None, None)))
 
         val result =
           Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
@@ -148,7 +148,7 @@ class HipTransactionServiceSpec extends ServiceTestFixture with HipConnectorTest
 
         when(mockRoutingConnector.getTransaction(any(), any(), any())(any()))
           .thenReturn(
-            Future.successful(HipGetTransactionPending(LocalDate.parse("2000-01-01"), None, None))
+            Future.successful(HipGetTransactionPending(Some(LocalDate.parse("2000-01-01")), None, None))
           )
 
         val result =
@@ -301,10 +301,10 @@ class HipTransactionServiceSpec extends ServiceTestFixture with HipConnectorTest
         when(mockRoutingConnector.getTransaction(any(), any(), any())(any())).thenReturn(
           Future.successful(
             HipGetTransactionPaid(
-              paymentDate = LocalDate.parse("2000-01-01"),
-              paymentDueDate = LocalDate.parse("2000-01-01"),
-              paymentReference = "002630000993",
-              paymentAmount = 1.0
+              paymentDate = Some(LocalDate.parse("2000-01-01")),
+              paymentDueDate = Some(LocalDate.parse("2000-01-01")),
+              paymentReference = Some("002630000993"),
+              paymentAmount = Some(1.0)
             )
           )
         )
@@ -349,10 +349,10 @@ class HipTransactionServiceSpec extends ServiceTestFixture with HipConnectorTest
           .thenReturn(
             Future.successful(
               HipGetTransactionPaid(
-                paymentDate = LocalDate.parse("2000-01-01"),
-                paymentDueDate = LocalDate.parse("2000-01-01"),
-                paymentReference = "002630000993",
-                paymentAmount = 1.0
+                paymentDate = Some(LocalDate.parse("2000-01-01")),
+                paymentDueDate = Some(LocalDate.parse("2000-01-01")),
+                paymentReference = Some("002630000993"),
+                paymentAmount = Some(1.0)
               )
             )
           )

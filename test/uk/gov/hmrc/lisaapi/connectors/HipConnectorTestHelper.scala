@@ -47,7 +47,16 @@ trait HipConnectorTestHelper extends ConnectorSpecHelper {
         |  }
         |}""".stripMargin
 
-    val expectedHipPending = HipGetTransactionPending(paymentDueDate = LocalDate.of(2026, 5, 27), None, None)
+    val minimalValidHipPendingJson: String =
+      """{
+        |  "success": {
+        |    "paymentStatus": "PENDING"
+        |  }
+        |}""".stripMargin
+
+    val expectedHipPending = HipGetTransactionPending(paymentDueDate = Some(LocalDate.of(2026, 5, 27)), None, None)
+
+    val minimalExpectedHipPending = HipGetTransactionPending(None, None, None)
 
     val validHipPaidJson: String =
       """{
@@ -60,12 +69,21 @@ trait HipConnectorTestHelper extends ConnectorSpecHelper {
         |  }
         |}""".stripMargin
 
+    val minimalValidHipPaidJson: String =
+      """{
+        |  "success": {
+        |    "paymentStatus":    "PAID"
+        |  }
+        |}""".stripMargin
+
     val expectedHipPaid = HipGetTransactionPaid(
-      paymentDate = LocalDate.of(2026, 5, 27),
-      paymentDueDate = LocalDate.of(2026, 5, 30),
-      paymentReference = "1234567890",
-      paymentAmount = BigDecimal(101.00)
+      paymentDate = Some(LocalDate.of(2026, 5, 27)),
+      paymentDueDate = Some(LocalDate.of(2026, 5, 30)),
+      paymentReference = Some("1234567890"),
+      paymentAmount = Some(BigDecimal(101.00))
     )
+
+    val minimalExpectedHipPaid = HipGetTransactionPaid(None, None, None, None)
 
   }
 

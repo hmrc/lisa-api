@@ -27,8 +27,14 @@ class HipResponseSpec extends PlaySpec {
   val pendingJson: String =
     """{"success": {"paymentStatus": "PENDING", "paymentDueDate": "2025-06-01", "paymentAmount": 123.45, "paymentReference": "ref123"}}"""
 
+  val minimalPendingJson: String =
+    """{"success": {"paymentStatus": "PENDING"}}"""
+
   val paidJson: String =
     """{"success": {"paymentStatus": "PAID", "paymentDate": "2025-05-20", "paymentDueDate": "2025-06-01", "paymentReference": "ref123", "paymentAmount": 123.45}}"""
+
+  val minimalPaidJson: String =
+    """{"success": {"paymentStatus": "PAID"}}"""
 
   val failuresJson: String =
     """{"response": {"failures": [{"type": "SOME_TYPE", "reason": "some reason"}]}}"""
@@ -42,9 +48,22 @@ class HipResponseSpec extends PlaySpec {
 
       res                   mustBe JsSuccess(
         HipGetTransactionPending(
-          paymentDueDate = LocalDate.parse("2025-06-01"),
+          paymentDueDate = Some(LocalDate.parse("2025-06-01")),
           paymentAmount = Some(BigDecimal("123.45")),
           paymentReference = Some("ref123")
+        )
+      )
+      res.get.paymentStatus mustBe "PENDING"
+    }
+
+    "deserialize a minimal PENDING response with just status field" in {
+      val res = Json.parse(minimalPendingJson).validate[HipGetTransactionResponse]
+
+      res                   mustBe JsSuccess(
+        HipGetTransactionPending(
+          paymentDueDate = None,
+          paymentAmount = None,
+          paymentReference = None
         )
       )
       res.get.paymentStatus mustBe "PENDING"
@@ -56,7 +75,7 @@ class HipResponseSpec extends PlaySpec {
 
       res mustBe JsSuccess(
         HipGetTransactionPending(
-          paymentDueDate = LocalDate.parse("2025-06-01"),
+          paymentDueDate = Some(LocalDate.parse("2025-06-01")),
           paymentAmount = None,
           paymentReference = None
         )
@@ -68,10 +87,24 @@ class HipResponseSpec extends PlaySpec {
 
       res                   mustBe JsSuccess(
         HipGetTransactionPaid(
-          paymentDate = LocalDate.parse("2025-05-20"),
-          paymentDueDate = LocalDate.parse("2025-06-01"),
-          paymentReference = "ref123",
-          paymentAmount = BigDecimal("123.45")
+          paymentDate = Some(LocalDate.parse("2025-05-20")),
+          paymentDueDate = Some(LocalDate.parse("2025-06-01")),
+          paymentReference = Some("ref123"),
+          paymentAmount = Some(BigDecimal("123.45"))
+        )
+      )
+      res.get.paymentStatus mustBe "PAID"
+    }
+
+    "deserialize a minimal PAID response without the optional fields" in {
+      val res = Json.parse(minimalPaidJson).validate[HipGetTransactionResponse]
+
+      res                   mustBe JsSuccess(
+        HipGetTransactionPaid(
+          paymentDate = None,
+          paymentDueDate = None,
+          paymentReference = None,
+          paymentAmount = None
         )
       )
       res.get.paymentStatus mustBe "PAID"

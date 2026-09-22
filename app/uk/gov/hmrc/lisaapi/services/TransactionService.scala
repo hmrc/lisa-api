@@ -162,16 +162,16 @@ class TransactionService @Inject() (connector: RoutingConnector)(implicit ec: Ex
         GetTransactionSuccessResponse(
           transactionId = transactionId,
           paymentStatus = TransactionPaymentStatus.COLLECTED,
-          paymentDate = Some(collected.paymentDate),
-          paymentAmount = Some(collected.paymentAmount),
-          paymentReference = Some(collected.paymentReference),
+          paymentDate = collected.paymentDate,
+          paymentAmount = collected.paymentAmount,
+          paymentReference = collected.paymentReference,
           transactionType = Some(TransactionPaymentType.DEBT)
         )
       case due: HipGetTransactionPending    =>
         GetTransactionSuccessResponse(
           transactionId = transactionId,
           paymentStatus = TransactionPaymentStatus.DUE,
-          paymentDueDate = Some(due.paymentDueDate),
+          paymentDueDate = due.paymentDueDate,
           transactionType = Some(TransactionPaymentType.DEBT),
           paymentAmount = due.paymentAmount,
           paymentReference = due.paymentReference
@@ -269,9 +269,9 @@ class TransactionService @Inject() (connector: RoutingConnector)(implicit ec: Ex
         GetTransactionSuccessResponse(
           transactionId = transactionId,
           paymentStatus = TransactionPaymentStatus.PAID,
-          paymentDate = Some(paid.paymentDate),
-          paymentAmount = Some(paid.paymentAmount),
-          paymentReference = Some(paid.paymentReference),
+          paymentDate = paid.paymentDate,
+          paymentAmount = paid.paymentAmount,
+          paymentReference = paid.paymentReference,
           transactionType = Some(TransactionPaymentType.PAYMENT),
           bonusDueForPeriod = bonusDueForPeriod
         )
@@ -279,7 +279,7 @@ class TransactionService @Inject() (connector: RoutingConnector)(implicit ec: Ex
         GetTransactionSuccessResponse(
           transactionId = transactionId,
           paymentStatus = TransactionPaymentStatus.PENDING,
-          paymentDueDate = Some(pending.paymentDueDate),
+          paymentDueDate = pending.paymentDueDate,
           paymentAmount = None,
           transactionType = Some(TransactionPaymentType.PAYMENT),
           bonusDueForPeriod = bonusDueForPeriod
