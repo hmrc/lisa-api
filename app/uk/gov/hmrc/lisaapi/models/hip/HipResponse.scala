@@ -41,7 +41,6 @@ case class HipGetTransactionPending(
 
 case class HipGetTransactionPaid(
   paymentDate: Option[LocalDate],
-  paymentDueDate: Option[LocalDate],
   paymentReference: Option[String],
   paymentAmount: Option[Amount]
 ) extends HipGetTransactionResponse {
@@ -52,15 +51,14 @@ object HipGetTransactionResponse {
 
   implicit val paidReads: Reads[HipGetTransactionPaid] = (
     (JsPath \ "paymentDate").readNullable(JsonReads.isoDate) and
-      (JsPath \ "paymentDueDate").readNullable(JsonReads.isoDate) and
       (JsPath \ "paymentReference").readNullable[String] and
       (JsPath \ "paymentAmount").readNullable[Amount]
-  )((paymentDate, paymentDueDate, paymentReference, paymentAmount) =>
-    HipGetTransactionPaid(paymentDate, paymentDueDate, paymentReference, paymentAmount)
+  )((paymentDate, paymentReference, paymentAmount) =>
+    HipGetTransactionPaid(paymentDate, paymentReference, paymentAmount)
   )
 
   implicit val pendingReads: Reads[HipGetTransactionPending] = (
-    (JsPath \ "paymentDueDate").readNullable(JsonReads.isoDate) and
+    (JsPath \ "paymentDate").readNullable(JsonReads.isoDate) and
       (JsPath \ "paymentAmount").readNullable[Amount] and
       (JsPath \ "paymentReference").readNullable[String]
   )((paymentDueDate, paymentAmount, paymentReference) =>

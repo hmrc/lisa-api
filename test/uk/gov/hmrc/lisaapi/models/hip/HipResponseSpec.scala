@@ -25,13 +25,13 @@ import java.time.LocalDate
 class HipResponseSpec extends PlaySpec {
 
   val pendingJson: String =
-    """{"success": {"paymentStatus": "PENDING", "paymentDueDate": "2025-06-01", "paymentAmount": 123.45, "paymentReference": "ref123"}}"""
+    """{"success": {"paymentStatus": "PENDING", "paymentDate": "2025-06-01", "paymentAmount": 123.45, "paymentReference": "ref123"}}"""
 
   val minimalPendingJson: String =
     """{"success": {"paymentStatus": "PENDING"}}"""
 
   val paidJson: String =
-    """{"success": {"paymentStatus": "PAID", "paymentDate": "2025-05-20", "paymentDueDate": "2025-06-01", "paymentReference": "ref123", "paymentAmount": 123.45}}"""
+    """{"success": {"paymentStatus": "PAID", "paymentDate": "2025-05-20", "paymentReference": "ref123", "paymentAmount": 123.45}}"""
 
   val minimalPaidJson: String =
     """{"success": {"paymentStatus": "PAID"}}"""
@@ -70,7 +70,7 @@ class HipResponseSpec extends PlaySpec {
     }
 
     "deserialize a PENDING response without the optional fields" in {
-      val json = """{"success": {"paymentStatus": "PENDING", "paymentDueDate": "2025-06-01"}}"""
+      val json = """{"success": {"paymentStatus": "PENDING", "paymentDate": "2025-06-01"}}"""
       val res  = Json.parse(json).validate[HipGetTransactionResponse]
 
       res mustBe JsSuccess(
@@ -88,7 +88,6 @@ class HipResponseSpec extends PlaySpec {
       res                   mustBe JsSuccess(
         HipGetTransactionPaid(
           paymentDate = Some(LocalDate.parse("2025-05-20")),
-          paymentDueDate = Some(LocalDate.parse("2025-06-01")),
           paymentReference = Some("ref123"),
           paymentAmount = Some(BigDecimal("123.45"))
         )
@@ -102,7 +101,6 @@ class HipResponseSpec extends PlaySpec {
       res                   mustBe JsSuccess(
         HipGetTransactionPaid(
           paymentDate = None,
-          paymentDueDate = None,
           paymentReference = None,
           paymentAmount = None
         )

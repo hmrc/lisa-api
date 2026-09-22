@@ -302,7 +302,6 @@ class HipTransactionServiceSpec extends ServiceTestFixture with HipConnectorTest
           Future.successful(
             HipGetTransactionPaid(
               paymentDate = Some(LocalDate.parse("2000-01-01")),
-              paymentDueDate = Some(LocalDate.parse("2000-01-01")),
               paymentReference = Some("002630000993"),
               paymentAmount = Some(1.0)
             )
@@ -350,7 +349,6 @@ class HipTransactionServiceSpec extends ServiceTestFixture with HipConnectorTest
             Future.successful(
               HipGetTransactionPaid(
                 paymentDate = Some(LocalDate.parse("2000-01-01")),
-                paymentDueDate = Some(LocalDate.parse("2000-01-01")),
                 paymentReference = Some("002630000993"),
                 paymentAmount = Some(1.0)
               )

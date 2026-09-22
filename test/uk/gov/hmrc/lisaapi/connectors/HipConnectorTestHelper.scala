@@ -43,7 +43,7 @@ trait HipConnectorTestHelper extends ConnectorSpecHelper {
       """{
         |  "success": {
         |    "paymentStatus": "PENDING",
-        |    "paymentDueDate": "2026-05-27"
+        |    "paymentDate": "2026-05-27"
         |  }
         |}""".stripMargin
 
@@ -63,7 +63,6 @@ trait HipConnectorTestHelper extends ConnectorSpecHelper {
         |  "success": {
         |    "paymentStatus":    "PAID",
         |    "paymentDate":      "2026-05-27",
-        |    "paymentDueDate":   "2026-05-30",
         |    "paymentReference": "1234567890",
         |    "paymentAmount":    101.00
         |  }
@@ -78,12 +77,11 @@ trait HipConnectorTestHelper extends ConnectorSpecHelper {
 
     val expectedHipPaid = HipGetTransactionPaid(
       paymentDate = Some(LocalDate.of(2026, 5, 27)),
-      paymentDueDate = Some(LocalDate.of(2026, 5, 30)),
       paymentReference = Some("1234567890"),
       paymentAmount = Some(BigDecimal(101.00))
     )
 
-    val minimalExpectedHipPaid = HipGetTransactionPaid(None, None, None, None)
+    val minimalExpectedHipPaid = HipGetTransactionPaid(None, None, None)
 
   }
 
@@ -92,7 +90,7 @@ trait HipConnectorTestHelper extends ConnectorSpecHelper {
     val validHipOtherErrorjson: String =
       """{
         |  "somethingElse": "Whatever",
-        |  "paymentDueDate": "2026-05-27"
+        |  "paymentDate": "2026-05-27"
         |}""".stripMargin
 
     val validHipBadRequestJson: String =
