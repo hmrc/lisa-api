@@ -43,29 +43,51 @@ trait HipConnectorTestHelper extends ConnectorSpecHelper {
       """{
         |  "success": {
         |    "paymentStatus": "PENDING",
-        |    "paymentDueDate": "2026-05-27"
+        |    "paymentDate": "2026-05-27",
+        |    "paymentReference": "1234567890",
+        |    "paymentAmount":    101.00
         |  }
         |}""".stripMargin
 
-    val expectedHipPending = HipGetTransactionPending(paymentDueDate = LocalDate.of(2026, 5, 27), None, None)
+    val minimalValidHipPendingJson: String =
+      """{
+        |  "success": {
+        |    "paymentStatus": "PENDING"
+        |  }
+        |}""".stripMargin
+
+    val expectedHipPending = HipGetTransactionPending(
+      paymentDueDate = Some(LocalDate.of(2026, 5, 27)),
+      paymentReference = Some("1234567890"),
+      paymentAmount = Some(BigDecimal(101.00))
+    )
+
+    val minimalExpectedHipPending = HipGetTransactionPending(None, None, None)
 
     val validHipPaidJson: String =
       """{
         |  "success": {
         |    "paymentStatus":    "PAID",
         |    "paymentDate":      "2026-05-27",
-        |    "paymentDueDate":   "2026-05-30",
         |    "paymentReference": "1234567890",
         |    "paymentAmount":    101.00
         |  }
         |}""".stripMargin
 
+    val minimalValidHipPaidJson: String =
+      """{
+        |  "success": {
+        |    "paymentStatus":    "PAID"
+        |  }
+        |}""".stripMargin
+
     val expectedHipPaid = HipGetTransactionPaid(
-      paymentDate = LocalDate.of(2026, 5, 27),
-      paymentDueDate = LocalDate.of(2026, 5, 30),
-      paymentReference = "1234567890",
-      paymentAmount = BigDecimal(101.00)
+      paymentDate = Some(LocalDate.of(2026, 5, 27)),
+      paymentReference = Some("1234567890"),
+      paymentAmount = Some(BigDecimal(101.00))
     )
+
+    val minimalExpectedHipPaid = HipGetTransactionPaid(None, None, None)
 
   }
 
@@ -74,7 +96,7 @@ trait HipConnectorTestHelper extends ConnectorSpecHelper {
     val validHipOtherErrorjson: String =
       """{
         |  "somethingElse": "Whatever",
-        |  "paymentDueDate": "2026-05-27"
+        |  "paymentDate": "2026-05-27"
         |}""".stripMargin
 
     val validHipBadRequestJson: String =
