@@ -112,7 +112,13 @@ class HipTransactionServiceSpec extends ServiceTestFixture with HipConnectorTest
         )
 
         when(mockRoutingConnector.getTransaction(any(), any(), any())(any()))
-          .thenReturn(Future.successful(HipFailureResponse("NOT_FOUND", "Not Found")))
+          .thenReturn(
+            Future.successful(
+              HipValidationError(
+                Hip422Error("2026-04-01T23:00:00Z", Hip422ErrorCode.NotFound, "LISA Transaction doesn’t exist")
+              )
+            )
+          )
 
         val result =
           Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
@@ -184,7 +190,13 @@ class HipTransactionServiceSpec extends ServiceTestFixture with HipConnectorTest
         )
 
         when(mockRoutingConnector.getTransaction(any(), any(), any())(any()))
-          .thenReturn(Future.successful(HipFailureResponse("NOT_FOUND", "Not Found")))
+          .thenReturn(
+            Future.successful(
+              HipValidationError(
+                Hip422Error("2026-04-01T23:00:00Z", Hip422ErrorCode.NotFound, "LISA Transaction doesn’t exist")
+              )
+            )
+          )
 
         val result =
           Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)
@@ -387,7 +399,13 @@ class HipTransactionServiceSpec extends ServiceTestFixture with HipConnectorTest
         )
 
         when(mockRoutingConnector.getTransaction(any(), any(), any())(any()))
-          .thenReturn(Future.successful(HipFailureResponse("COULD_NOT_PROCESS", "COULD_NOT_PROCESS")))
+          .thenReturn(
+            Future.successful(
+              HipValidationError(
+                Hip422Error("2026-04-01T23:00:00Z", Hip422ErrorCode.CouldNotProcess, "Could not process")
+              )
+            )
+          )
 
         val result =
           Await.result(transactionService.getTransaction("123", "456", "12345")(HeaderCarrier()), Duration.Inf)

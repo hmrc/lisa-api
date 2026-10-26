@@ -186,7 +186,7 @@ trait HipConnectorTestHelper extends ConnectorSpecHelper {
     val expectedValidationError = HipValidationError(
       errors = Hip422Error(
         processingDate = "2026-04-01T23:00:00Z",
-        code = "003",
+        code = Hip422ErrorCode.CouldNotProcess,
         text = "Request could not be processed"
       )
     )
