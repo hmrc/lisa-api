@@ -148,18 +148,43 @@ class HipResponseSpec extends PlaySpec {
       Json.parse(failuresJson).validate[HipBadRequest] mustBe JsSuccess(HipBadRequest(expectedFailures))
     }
 
-    "deserialize a Hip422Error" in {
+    "deserialize a Hip422Error with code 003 as CouldNotProcess" in {
       Json
-        .parse("""{"processingDate": "2025-06-01", "code": "001", "text": "some error"}""")
+        .parse(
+          """{"processingDate": "2026-04-01T23:00:00Z", "code": "003", "text": "Request could not be processed"}"""
+        )
         .validate[Hip422Error] mustBe
-        JsSuccess(Hip422Error("2025-06-01", "001", "some error"))
+        JsSuccess(
+          Hip422Error("2026-04-01T23:00:00Z", Hip422ErrorCode.CouldNotProcess, "Request could not be processed")
+        )
+    }
+
+    "deserialize a Hip422Error with code 066 as NotFound" in {
+      Json
+        .parse(
+          """{"processingDate": "2026-04-01T23:00:00Z", "code": "066", "text": "LISA Transaction doesn’t exist"}"""
+        )
+        .validate[Hip422Error] mustBe
+        JsSuccess(Hip422Error("2026-04-01T23:00:00Z", Hip422ErrorCode.NotFound, "LISA Transaction doesn’t exist"))
+    }
+
+    "fail to deserialize a Hip422Error with an unknown code" in {
+      Json
+        .parse("""{"processingDate": "2026-04-01T23:00:00Z", "code": "001", "text": "some other error"}""")
+        .validate[Hip422Error]
+        .isError mustBe true
     }
 
     "deserialize a HipValidationError" in {
-      val json = """{"errors": {"processingDate": "2025-06-01", "code": "001", "text": "some error"}}"""
+      val json =
+        """{"errors": {"processingDate": "2026-04-01T23:00:00Z", "code": "003", "text": "Request could not be processed"}}"""
 
       Json.parse(json).validate[HipValidationError] mustBe
-        JsSuccess(HipValidationError(Hip422Error("2025-06-01", "001", "some error")))
+        JsSuccess(
+          HipValidationError(
+            Hip422Error("2026-04-01T23:00:00Z", Hip422ErrorCode.CouldNotProcess, "Request could not be processed")
+          )
+        )
     }
 
     "deserialize a HodErrorBody" in {

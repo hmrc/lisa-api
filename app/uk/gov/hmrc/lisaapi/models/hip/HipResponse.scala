@@ -91,7 +91,24 @@ case class HodErrorResponse(response: HodError) extends HipFailure
 
 case class HipBadRequest(response: HipFailures) extends HipFailure
 
-case class Hip422Error(processingDate: String, code: String, text: String)
+enum Hip422ErrorCode(val value: String) {
+  case CouldNotProcess extends Hip422ErrorCode("003")
+  case NotFound extends Hip422ErrorCode("066")
+}
+
+object Hip422ErrorCode {
+
+  implicit val hip422ErrorCodeReads: Reads[Hip422ErrorCode] = Reads[Hip422ErrorCode] {
+    case JsString(code) =>
+      values
+        .find(_.value == code)
+        .fold[JsResult[Hip422ErrorCode]](JsError(s"Unknown HipValidationError code: $code"))(JsSuccess(_))
+    case _              => JsError("HipValidationError code should be a string")
+  }
+
+}
+
+case class Hip422Error(processingDate: String, code: Hip422ErrorCode, text: String)
 
 case class HipValidationError(errors: Hip422Error) extends HipFailure
 

@@ -176,16 +176,16 @@ class TransactionService @Inject() (connector: RoutingConnector)(implicit ec: Ex
           paymentAmount = due.paymentAmount,
           paymentReference = due.paymentReference
         )
-      case error: HipFailureResponse        =>
-        error.`type` match {
-          case "NOT_FOUND" =>
+      case error: HipValidationError        =>
+        error.errors.code match {
+          case Hip422ErrorCode.NotFound =>
             GetTransactionSuccessResponse(
               transactionId = transactionId,
               paymentStatus = TransactionPaymentStatus.DUE
             )
-          case error       =>
+          case code                     =>
             logger.error(
-              s"[TransactionService][handleCollectedTransaction] Get collected transaction returned error: ${error.getClass.getTypeName} from ETMP for lisaManager : $lisaManager"
+              s"[TransactionService][handleCollectedTransaction] Get collected transaction returned HIP 422 error code: ${code.value} from ETMP for lisaManager : $lisaManager"
             )
             GetTransactionErrorResponse
         }
@@ -284,25 +284,20 @@ class TransactionService @Inject() (connector: RoutingConnector)(implicit ec: Ex
           transactionType = Some(TransactionPaymentType.PAYMENT),
           bonusDueForPeriod = bonusDueForPeriod
         )
-      case error: HipFailureResponse         =>
-        error.`type` match {
-          case "COULD_NOT_PROCESS" =>
+      case error: HipValidationError         =>
+        error.errors.code match {
+          case Hip422ErrorCode.CouldNotProcess =>
             GetTransactionSuccessResponse(
               transactionId = transactionId,
               paymentStatus = TransactionPaymentStatus.REFUND_CANCELLED,
               transactionType = Some(TransactionPaymentType.PAYMENT)
             )
-          case "NOT_FOUND"         =>
+          case Hip422ErrorCode.NotFound        =>
             GetTransactionSuccessResponse(
               transactionId = transactionId,
               paymentStatus = TransactionPaymentStatus.PENDING,
               bonusDueForPeriod = bonusDueForPeriod
             )
-          case error               =>
-            logger.error(
-              s"[TransactionService][handlePaidTransaction] Get paid transaction returned HIP error: ${error.getClass.getTypeName} from ETMP for lisaManager : $lisaManager"
-            )
-            GetTransactionErrorResponse
         }
       case error                             =>
         logger.error(
